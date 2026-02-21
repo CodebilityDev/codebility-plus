@@ -28,7 +28,6 @@ import { createClientClientComponent } from "@/utils/supabase/client";
 import { useParams, useSearchParams } from "next/navigation";
 import { createNotificationAction } from "@/lib/actions/notification.actions";
 
-// Comment interface matching database structure
 interface TaskComment {
   id: string;
   task_id: string;
@@ -45,7 +44,6 @@ interface TaskComment {
   replies?: TaskComment[];
 }
 
-// Database comment interface
 interface DbComment {
   id: string;
   task_id: string;
@@ -61,7 +59,6 @@ interface DbComment {
     image_url: string | null;
   } | null;
 }
-// User interface for mentions
 interface MentionUser {
   id: string;
   name: string;
@@ -69,39 +66,30 @@ interface MentionUser {
   image_url: string | null;
 }
 
-// Utility function to extract mentions from text
 const extractMentions = (text: string): string[] => {
-  // allow usernames containing letters, numbers, dots, underscores and hyphens
   const mentionPattern = /@([A-Za-z0-9._-]+)/g;
   const mentions: string[] = [];
   let match;
   while ((match = mentionPattern.exec(text)) !== null) {
-    mentions.push(match[1].toLowerCase()); // normalize to lower-case for matching
+    mentions.push(match[1].toLowerCase());
   }
-  return [...new Set(mentions)]; // Remove duplicates
+  return [...new Set(mentions)];
 };
 
-// Utility function to format comment text with clickable links, mentions, and preserved formatting
-// Accepts optional `users` so mentions can be displayed using the user's full handle when resolvable
 const formatCommentText = (text: string, users?: MentionUser[]): JSX.Element => {
-  // URL regex pattern (no global flag — safer for repeated .test calls)
   const urlPattern = /(https?:\/\/[^\s]+)/;
-  // Mention regex pattern: allow letters, numbers, dots, underscores and hyphens
   const mentionPattern = /(@[A-Za-z0-9._-]+)/;
 
-  // Split text by newlines first to preserve line breaks
   const lines = text.split('\n');
 
   return (
     <>
       {lines.map((line, lineIndex) => {
-        // Split each line by URLs and mentions
         const parts = line.split(urlPattern).flatMap(part => part.split(mentionPattern));
 
         return (
           <span key={lineIndex}>
             {parts.map((part, partIndex) => {
-              // Check if this part is a URL
               if (urlPattern.test(part)) {
                 return (
                   <a
@@ -117,12 +105,10 @@ const formatCommentText = (text: string, users?: MentionUser[]): JSX.Element => 
                 );
               }
 
-              // Check if this part is a mention
               if (mentionPattern.test(part)) {
-                const mentionKey = part.slice(1).toLowerCase(); // strip '@' and normalize
+                const mentionKey = part.slice(1).toLowerCase();
 
-                // If users list provided, try to resolve to a full username
-                let displayText = part; // fallback to original mention
+                let displayText = part;
                 if (users && users.length > 0) {
                   const matched = users.find(u =>
                     u.username.toLowerCase() === mentionKey ||
@@ -130,7 +116,6 @@ const formatCommentText = (text: string, users?: MentionUser[]): JSX.Element => 
                     u.name.toLowerCase().startsWith(mentionKey)
                   );
                   if (matched) {
-                    // show full handle as the highlighted text (user requested full username display)
                     displayText = `@${matched.username}`;
                   }
                 }
@@ -232,7 +217,6 @@ const MentionDropdown = memo(function MentionDropdown({
   );
 });
 
-// Memoized TimeAgo component
 const CommentTimeAgo = memo(function CommentTimeAgo({
   date,
   isEdited
@@ -262,7 +246,6 @@ const CommentTimeAgo = memo(function CommentTimeAgo({
   );
 });
 
-// Memoized ReplyItem component
 const ReplyItem = memo(function ReplyItem({
   reply,
   currentUserId,
@@ -296,14 +279,12 @@ const ReplyItem = memo(function ReplyItem({
   const [editContent, setEditContent] = useState(reply.content);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  // Mention state for edit
   const [showEditMentionDropdown, setShowEditMentionDropdown] = useState(false);
   const [editMentionQuery, setEditMentionQuery] = useState("");
   const [editMentionPosition, setEditMentionPosition] = useState({ top: 0, left: 0, width: 200 });
   const [editFilteredUsers, setEditFilteredUsers] = useState<MentionUser[]>([]);
   const [editHighlightedIndex, setEditHighlightedIndex] = useState(0);
 
-  // Ref for edit textarea and wrapper (used for proper dropdown positioning)
   const editTextareaRef = useRef<HTMLTextAreaElement>(null);
   const editWrapperRef = useRef<HTMLDivElement>(null);
 
@@ -339,13 +320,11 @@ const ReplyItem = memo(function ReplyItem({
     setDropdownOpen(false);
   }, [reply.id, onDelete]);
 
-  // Mention handlers for edit
   const handleEditMentionInput = useCallback((value: string, textarea: HTMLTextAreaElement) => {
     if (!users) return;
 
     const cursorPosition = textarea.selectionStart;
     const textBeforeCursor = value.substring(0, cursorPosition);
-    // allow dots, underscores and hyphens in username queries
     const mentionMatch = textBeforeCursor.match(/@([A-Za-z0-9._-]*)$/);
 
     if (mentionMatch) {
@@ -358,7 +337,6 @@ const ReplyItem = memo(function ReplyItem({
         ).slice(0, 5)
       );
 
-      // Calculate position relative to the wrapper if available
       const textareaRect = textarea.getBoundingClientRect();
       const wrapperRect = editWrapperRef.current?.getBoundingClientRect();
       const top = wrapperRect ? textareaRect.bottom - wrapperRect.top + 5 : textareaRect.bottom + 5;
@@ -392,8 +370,6 @@ const ReplyItem = memo(function ReplyItem({
       const afterCursor = editContent.substring(cursorPosition);
       const mention = `@${user.username}`;
 
-      // If the user typed a multi-word name before selecting, strip the
-      // trailing name words that follow the cursor so only @username remains
       const typedFragment = editContent.substring(atIndex, cursorPosition);
       let trimmedAfter = afterCursor;
       const trailingNameMatch = afterCursor.match(/^(\s+[A-Za-zÀ-ÖØ-öø-ÿ'’-]+(?:\s+[A-Za-zÀ-ÖØ-öø-ÿ'’-]+)?)/);
@@ -555,7 +531,6 @@ const ReplyItem = memo(function ReplyItem({
   );
 });
 
-// Memoized CommentItem component
 const CommentItem = memo(function CommentItem({
   comment,
   currentUserId,
@@ -586,7 +561,6 @@ const CommentItem = memo(function CommentItem({
       return () => clearTimeout(timer);
     }
 
-    // Auto-expand if the target is a reply to this comment
     if (targetCommentId && comment.replies?.some(r => r.id === targetCommentId)) {
       setShowReplies(true);
     }
@@ -599,14 +573,12 @@ const CommentItem = memo(function CommentItem({
   const [replyContent, setReplyContent] = useState("");
   const [showReplies, setShowReplies] = useState(true);
 
-  // Mention state for reply
   const [showReplyMentionDropdown, setShowReplyMentionDropdown] = useState(false);
   const [replyMentionQuery, setReplyMentionQuery] = useState("");
   const [replyMentionPosition, setReplyMentionPosition] = useState({ top: 0, left: 0, width: 200 });
   const [replyFilteredUsers, setReplyFilteredUsers] = useState<MentionUser[]>([]);
   const [replyHighlightedIndex, setReplyHighlightedIndex] = useState(0);
 
-  // Mention state for edit
   const [showEditMentionDropdown, setShowEditMentionDropdown] = useState(false);
   const [editMentionQuery, setEditMentionQuery] = useState("");
   const [editMentionPosition, setEditMentionPosition] = useState({ top: 0, left: 0, width: 200 });
@@ -664,8 +636,6 @@ const CommentItem = memo(function CommentItem({
     setReplyContent("");
   }, []);
 
-  // Handle mention input for reply
-  // ref for the reply input wrapper (used to position dropdown relative to this element)
   const replyInputWrapperRef = useRef<HTMLDivElement>(null);
 
   const handleReplyMentionInput = useCallback((value: string, textarea: HTMLTextAreaElement) => {
@@ -714,7 +684,6 @@ const CommentItem = memo(function CommentItem({
       const afterCursor = replyContent.substring(cursorPosition);
       const mention = `@${user.username}`;
 
-      // Remove trailing typed last-name fragment when user had typed a space in the mention
       const typedFragment = replyContent.substring(atIndex, cursorPosition);
       let trimmedAfter = afterCursor;
       const trailingNameMatch = afterCursor.match(/^(\s+[A-Za-zÀ-ÖØ-öø-ÿ'’-]+(?:\s+[A-Za-zÀ-ÖØ-öø-ÿ'’-]+)?)/);
@@ -740,7 +709,6 @@ const CommentItem = memo(function CommentItem({
     handleReplyMentionInput(value, e.target);
   }, [handleReplyMentionInput]);
 
-  // Handle mention input for editing
   const handleEditMentionInput = useCallback((value: string, textarea: HTMLTextAreaElement) => {
     if (!users) return;
 
@@ -1065,7 +1033,6 @@ const CommentItem = memo(function CommentItem({
   );
 });
 
-// Main exported component
 export default function TaskCommentsSection({
   taskId,
   currentUserId,
@@ -1085,7 +1052,6 @@ export default function TaskCommentsSection({
   const [isLoading, setIsLoading] = useState(true);
   const supabase = createClientClientComponent();
 
-  // Mention related state
   const [users, setUsers] = useState<MentionUser[]>([]);
   const [showMentionDropdown, setShowMentionDropdown] = useState(false);
   const [mentionQuery, setMentionQuery] = useState("");
@@ -1096,7 +1062,6 @@ export default function TaskCommentsSection({
   const formRef = useRef<HTMLFormElement>(null);
   const [currentUserName, setCurrentUserName] = useState("");
 
-  // Transform database comment to UI comment format
   const transformComment = (dbComment: DbComment | any): TaskComment => {
     const user = Array.isArray(dbComment.codev)
       ? dbComment.codev[0]
@@ -1149,7 +1114,6 @@ export default function TaskCommentsSection({
     return topLevelComments;
   };
 
-  // Fetch users for mentions
   const fetchUsers = useCallback(async () => {
     if (!supabase) return;
     try {
@@ -1164,13 +1128,11 @@ export default function TaskCommentsSection({
         const mentionUsers: MentionUser[] = data.map(user => ({
           id: user.id,
           name: `${user.first_name} ${user.last_name}`.trim(),
-          // prefer the dedicated username column; fallback to first_name if missing
           username: (user.username || user.first_name).toString(),
           image_url: user.image_url,
         }));
         setUsers(mentionUsers);
 
-        // Set current user name
         const currentUser = data.find(user => user.id === currentUserId);
         if (currentUser) {
           setCurrentUserName(`${currentUser.first_name} ${currentUser.last_name}`.trim());
@@ -1181,12 +1143,10 @@ export default function TaskCommentsSection({
     }
   }, [supabase, currentUserId]);
 
-  // Fetch users on mount
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
 
-  // Update parent component when comment count changes
   useEffect(() => {
     if (!isLoading) {
       const totalCount = comments.reduce((acc, comment) => {
@@ -1196,7 +1156,6 @@ export default function TaskCommentsSection({
     }
   }, [comments, isLoading, onCommentCountChange]);
 
-  // Fetch comments on mount
   useEffect(() => {
     const fetchComments = async () => {
       if (!supabase) return;
@@ -1239,7 +1198,6 @@ export default function TaskCommentsSection({
     fetchComments();
   }, [taskId, supabase]);
 
-  // Subscribe to real-time updates
   useEffect(() => {
     if (!supabase) return;
 
@@ -1318,7 +1276,6 @@ export default function TaskCommentsSection({
     };
   }, [taskId, supabase]);
 
-  // Handle mention dropdown
   const handleMentionInput = useCallback((value: string, textarea: HTMLTextAreaElement) => {
     if (!users) return;
 
@@ -1328,21 +1285,20 @@ export default function TaskCommentsSection({
 
     if (atIndex !== -1 && (atIndex === 0 || textBeforeCursor[atIndex - 1] === ' ' || textBeforeCursor[atIndex - 1] === '\n')) {
       const query = textBeforeCursor.substring(atIndex + 1);
-      if (query.length >= 0) { // Show dropdown even with empty query
+      if (query.length >= 0) {
         const filtered = users.filter(user =>
           user.name.toLowerCase().includes(query.toLowerCase()) ||
           user.username.toLowerCase().includes(query.toLowerCase())
         );
 
         if (filtered.length > 0) {
-          // Calculate position relative to the form
           const formRect = formRef.current?.getBoundingClientRect();
           const textareaRect = textarea.getBoundingClientRect();
 
           if (formRect) {
-            const top = textareaRect.bottom - formRect.top + 5; // Position below the textarea relative to form
-            const left = textareaRect.left - formRect.left; // Align with left edge of textarea relative to form
-            const width = textareaRect.width; // Match textarea width
+            const top = textareaRect.bottom - formRect.top + 5;
+            const left = textareaRect.left - formRect.left;
+            const width = textareaRect.width;
 
             setMentionPosition({ top, left, width });
             setFilteredUsers(filtered);
@@ -1370,10 +1326,6 @@ export default function TaskCommentsSection({
       const afterCursor = newComment.substring(cursorPosition);
       const mention = `@${user.username}`;
 
-      // If user typed a multi-word display name (e.g. "@John Doe") and
-      // the typed fragment between '@' and cursor contains a space,
-      // remove the trailing name fragment after the cursor so we don't leave
-      // the second name as plain text.
       const typedFragment = newComment.substring(atIndex, cursorPosition);
       let trimmedAfter = afterCursor;
       const trailingNameMatch = afterCursor.match(/^(\s+[A-Za-zÀ-ÖØ-öø-ÿ'’-]+(?:\s+[A-Za-zÀ-ÖØ-öø-ÿ'’-]+)?)/);
@@ -1386,7 +1338,6 @@ export default function TaskCommentsSection({
       setNewComment(newText);
       setShowMentionDropdown(false);
 
-      // Set cursor position after the mention
       setTimeout(() => {
         textarea.focus();
         textarea.setSelectionRange(atIndex + mention.length + 1, atIndex + mention.length + 1);
@@ -1430,7 +1381,6 @@ export default function TaskCommentsSection({
 
         if (error) throw error;
 
-        // Optimistically add the comment
         if (data) {
           setComments((prev) => {
             const flatComments: TaskComment[] = [];
@@ -1445,8 +1395,6 @@ export default function TaskCommentsSection({
             return organizeComments(flatComments);
           });
 
-          // Send notifications for mentions
-          // Extract mentions and find matching users
           const mentionRegex = /@([A-Za-z0-9._-]+)/g;
           const potentialMentionKeys: string[] = [];
           let match;
@@ -1524,7 +1472,6 @@ export default function TaskCommentsSection({
 
         if (error) throw error;
 
-        // Optimistically add the reply
         if (data) {
           setComments((prev) => {
             const flatComments: TaskComment[] = [];
@@ -1539,7 +1486,6 @@ export default function TaskCommentsSection({
             return organizeComments(flatComments);
           });
 
-          // Send notifications for mentions
           const mentionRegex = /@([A-Za-z0-9._-]+)/g;
           const potentialMentionKeys: string[] = [];
           let match;
@@ -1617,7 +1563,6 @@ export default function TaskCommentsSection({
 
         if (error) throw error;
 
-        // Optimistically update the comment/reply
         if (data) {
           setComments((prev) => {
             const flatComments: TaskComment[] = [];
@@ -1635,7 +1580,6 @@ export default function TaskCommentsSection({
           });
 
 
-          // Send notifications for mentions
           const mentionRegex = /@([A-Za-z0-9._-]+)/g;
           const potentialMentionKeys: string[] = [];
           let match;
@@ -1692,7 +1636,6 @@ export default function TaskCommentsSection({
 
         if (error) throw error;
 
-        // Optimistically remove the comment/reply
         setComments((prev) => {
           const flatComments: TaskComment[] = [];
           prev.forEach(comment => {

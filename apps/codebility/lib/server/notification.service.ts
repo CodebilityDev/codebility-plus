@@ -1,9 +1,6 @@
 import { createClientServerComponent } from "@/utils/supabase/server";
 import { Notification } from "@/types/notifications";
 
-/**
- * Get the codev user ID from the Supabase auth user
- */
 async function getCodevUserId(supabase: any) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -12,7 +9,6 @@ async function getCodevUserId(supabase: any) {
 
   const authUser = user;
 
-  // Method 1: Try by auth user ID first (if codev.id matches auth.id)
   const { data: userById } = await supabase
     .from("codev")
     .select("id, email_address, username")
@@ -23,7 +19,6 @@ async function getCodevUserId(supabase: any) {
     return userById.id;
   }
 
-  // Method 2: Try by email_address (case-insensitive)
   const { data: userByEmail } = await supabase
     .from("codev")
     .select("id, email_address, username")
@@ -37,9 +32,6 @@ async function getCodevUserId(supabase: any) {
   return null;
 }
 
-/**
- * Fetch notifications for the current user
- */
 export async function getNotifications(limit: number = 50) {
   const supabase = await createClientServerComponent();
 
@@ -76,9 +68,6 @@ export async function getNotifications(limit: number = 50) {
   return { data: notifications, error: null };
 }
 
-/**
- * Mark a notification as read
- */
 export async function markNotificationAsRead(notificationId: string) {
   const supabase = await createClientServerComponent();
 
@@ -99,9 +88,6 @@ export async function markNotificationAsRead(notificationId: string) {
   return { data, error: null };
 }
 
-/**
- * Mark all notifications as read for the current user
- */
 export async function markAllNotificationsAsRead() {
   const supabase = await createClientServerComponent();
 
@@ -121,9 +107,6 @@ export async function markAllNotificationsAsRead() {
   return { data, error: null };
 }
 
-/**
- * Archive (soft delete) a notification
- */
 export async function archiveNotification(notificationId: string) {
   const supabase = await createClientServerComponent();
 
@@ -145,9 +128,6 @@ export async function archiveNotification(notificationId: string) {
   return { data, error: null };
 }
 
-/**
- * Delete all notifications for the current user
- */
 export async function clearAllNotifications() {
   const supabase = await createClientServerComponent();
 
@@ -168,9 +148,6 @@ export async function clearAllNotifications() {
   return { data, error: null };
 }
 
-/**
- * Get notification preferences for the current user
- */
 export async function getNotificationPreferences() {
   const supabase = await createClientServerComponent();
 
@@ -192,9 +169,6 @@ export async function getNotificationPreferences() {
   return { data, error: null };
 }
 
-/**
- * Update notification preferences for the current user
- */
 export async function updateNotificationPreferences(preferences: any) {
   const supabase = await createClientServerComponent();
 
@@ -220,9 +194,6 @@ export async function updateNotificationPreferences(preferences: any) {
   return { data, error: null };
 }
 
-/**
- * Create a notification (admin only or system use)
- */
 export async function createNotification({
   recipientId,
   title,
@@ -276,10 +247,8 @@ export async function createNotification({
   }
 
   if (data === null) {
-    console.log(`Notification creation skipped (likely duplicate or disabled) for recipient: ${recipientId}`);
     return { data: "skipped", error: null };
   }
 
-  console.log(`Notification created successfully: ${data} for recipient: ${recipientId}`);
   return { data, error: null };
 }

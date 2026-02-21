@@ -54,7 +54,7 @@ import DifficultyPointsTooltip, {
 import TaskCommentsSection from "./_components/TaskComments";
 import KanbanRichTextDisplay from "../kanban_modals/KanbanRichTextDisplay";
 
-// Fetch available members function - unchanged from original
+
 const fetchAvailableMembers = async (
   boardId: string,
 ): Promise<CodevMember[]> => {
@@ -357,8 +357,15 @@ const TaskViewModal = ({
     user?.role_id === 10;
   const canMarkAsDone = user?.role_id === 1 || user?.role_id === 5;
 
+  const searchParams = useSearchParams();
   const [showComments, setShowComments] = useState(false);
   const [commentCount, setCommentCount] = useState(0);
+
+  useEffect(() => {
+    if (searchParams.get("commentId")) {
+      setShowComments(true);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const fetchCommentCount = async () => {
