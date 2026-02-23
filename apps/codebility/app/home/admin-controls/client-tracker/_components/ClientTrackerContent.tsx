@@ -105,8 +105,8 @@ export default function ClientTrackerContent() {
     setLoadingHistory(true);
     setHistoryDialogOpen(true);
 
-    const weekStartStr = weekStart.toISOString().split('T')[0];
-    const result = await getAdminOutreachHistory(admin.admin_id, weekStartStr);
+    // Fetch all history for this admin, not just current week
+    const result = await getAdminOutreachHistory(admin.admin_id);
 
     if (result.success && result.data) {
       setHistory(result.data);
@@ -332,7 +332,6 @@ export default function ClientTrackerContent() {
                         variant="ghost"
                         size="sm"
                         onClick={() => viewHistory(admin)}
-                        disabled={admin.current_week_count === 0}
                         className="text-gray-900 dark:text-gray-100"
                       >
                         <Eye className="h-4 w-4 mr-1" />
@@ -354,7 +353,7 @@ export default function ClientTrackerContent() {
               Outreach History - {selectedAdmin?.first_name} {selectedAdmin?.last_name}
             </DialogTitle>
             <DialogDescription>
-              This week's client outreach records
+              All client outreach records for this admin
             </DialogDescription>
           </DialogHeader>
 
@@ -366,7 +365,7 @@ export default function ClientTrackerContent() {
             </div>
           ) : history.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
-              No outreach records for this week
+              No outreach records found
             </div>
           ) : (
             <div className="space-y-3">
