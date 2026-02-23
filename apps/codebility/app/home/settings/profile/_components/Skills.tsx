@@ -78,7 +78,6 @@ const Skills = ({ data }: SkillsProps) => {
   useEffect(() => {
     if (data?.tech_stacks?.length) {
       setStack(data.tech_stacks.map((stack) => stack.toLowerCase()));
-      console.log("Tech stacks loaded:", data.tech_stacks);
     } else {
       setStack([]);
     }

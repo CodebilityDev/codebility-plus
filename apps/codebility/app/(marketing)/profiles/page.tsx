@@ -34,14 +34,6 @@ export default async function Profiles() {
   // Prioritize by: Active projects > No projects, Available > Unavailable
   const sortedCodevs = prioritizeCodevs(qualifiedCodevs);
 
-  // Debug logging in development
-  if (process.env.NODE_ENV === "development") {
-    console.log("📊 PROFILES PAGE STATS:");
-    console.log(`   Total codevs fetched: ${codevsArray.length}`);
-    console.log(`   Qualified codevs: ${qualifiedCodevs.length}`);
-    console.log(`   Final displayed: ${sortedCodevs.length}`);
-  }
-
   return (
     <>
       <Section

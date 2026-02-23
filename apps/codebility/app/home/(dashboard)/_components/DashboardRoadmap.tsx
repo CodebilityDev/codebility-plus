@@ -21,7 +21,6 @@ export default function DashboardRoadmap() {
     const fetchStatus = async () => {
       try {
         const status = await fetchUserInternalStatus(user.id);
-        console.log("Status fetched:", status);
 
         const stepIndex = steps.indexOf(status);
         if (stepIndex !== -1) {

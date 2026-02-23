@@ -146,8 +146,6 @@ async function uploadImageToStorage(
       const randomString = Math.random().toString(36).substring(2, 15);
       const filename = `${authorId}_${timestamp}_${randomString}.jpg`;
 
-      console.log(`Processing image (attempt ${attempt + 1}/${retries}):`, filename);
-
       // Compress the image server-side
       const compressedBuffer = await compressImage(base64Image);
 
@@ -174,7 +172,6 @@ async function uploadImageToStorage(
 
       // Return the public URL
       const publicUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/codebility/overflowPostImage/${filename}`;
-      console.log('Upload successful:', publicUrl);
       return publicUrl;
       
     } catch (error) {
@@ -204,8 +201,6 @@ export async function postQuestion(data: PostQuestionData) {
   try {
     const supabase = await createClientServerComponent();
 
-    console.log('Starting question post with', data.images.length, 'images');
-
     // Upload all images in parallel with compression and error handling
     const imageUploadPromises = data.images.map((base64Image, index) => 
       uploadImageToStorage(supabase, base64Image, data.authorId)
@@ -223,8 +218,6 @@ export async function postQuestion(data: PostQuestionData) {
 
     // Filter out any failed uploads (nulls)
     const validImageUrls = uploadedImageUrls.filter((url): url is string => url !== null);
-
-    console.log(`Successfully uploaded ${validImageUrls.length} out of ${data.images.length} images`);
 
     // Warn if some images failed
     if (validImageUrls.length < data.images.length) {
@@ -374,12 +367,6 @@ export async function updateQuestion(data: UpdateQuestionData) {
       }
     });
 
-    console.log('Image update summary:', {
-      existing: existingUrls.length,
-      new: newBase64Images.length,
-      toDelete: previousImageUrls.length - existingUrls.length
-    });
-
     // Upload new images in parallel with compression
     const newImageUploadPromises = newBase64Images.map((base64Image, index) => 
       uploadImageToStorage(supabase, base64Image, data.authorId)
@@ -400,7 +387,6 @@ export async function updateQuestion(data: UpdateQuestionData) {
     const imagesToDelete = previousImageUrls.filter(url => !allImageUrls.includes(url));
     
     if (imagesToDelete.length > 0) {
-      console.log(`Deleting ${imagesToDelete.length} removed images`);
       const deletePromises = imagesToDelete.map(url => deleteImageFromStorage(supabase, url));
       await Promise.all(deletePromises);
     }
@@ -644,8 +630,6 @@ export async function postComment(data: PostCommentData) {
   try {
     const supabase = await createClientServerComponent();
 
-    console.log('Posting comment with data:', data);
-
     // Convert post_id to number for insertion
     const postIdNumber = parseInt(data.post_id);
 
@@ -677,8 +661,6 @@ export async function postComment(data: PostCommentData) {
       console.error('Error details:', JSON.stringify(error, null, 2));
       return { success: false, error: `Database error: ${error.message}` };
     }
-
-    console.log('Inserted comment data:', insertedComment);
 
     // Handle codev data (could be array or object)
     const codevData = Array.isArray(insertedComment.codev) 
@@ -790,8 +772,6 @@ export async function updateComment(data: UpdateCommentData) {
   try {
     const supabase = await createClientServerComponent();
 
-    console.log('Updating comment with data:', data);
-
     // Convert comment_id to number for the query
     const commentIdNumber = parseInt(data.comment_id);
 
@@ -824,8 +804,6 @@ export async function updateComment(data: UpdateCommentData) {
       console.error('Error details:', JSON.stringify(error, null, 2));
       return { success: false, error: `Database error: ${error.message}` };
     }
-
-    console.log('Updated comment data:', updatedComment);
 
     // Handle codev data (could be array or object)
     const codevData = Array.isArray(updatedComment.codev) 
@@ -865,8 +843,6 @@ export async function updateComment(data: UpdateCommentData) {
 export async function deleteComment(commentId: string) {
   try {
     const supabase = await createClientServerComponent();
-
-    console.log('Deleting comment:', commentId);
 
     const commentIdNumber = parseInt(commentId);
 

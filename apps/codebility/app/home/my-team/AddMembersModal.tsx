@@ -458,7 +458,6 @@ const AddMembersModal = ({
         clearTimeout(timeoutId);
         
         if (isMounted) {
-          console.log('✅ Loaded users:', users.length);
           setAvailableMembers(users || []);
           setLoadError(null);
         }

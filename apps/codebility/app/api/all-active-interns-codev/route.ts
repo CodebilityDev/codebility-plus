@@ -35,8 +35,6 @@ export async function GET() {
       );
     }
 
-    console.log("Debug - Raw data from Supabase:", data); // Add this to debug
-
     const INTERNS: Intern[] = (data ?? []).map((row: any) => {
       const name = `${row.first_name ?? ""} ${row.last_name ?? ""}`.trim();
       const role = row.roles?.name ?? "Intern";
@@ -47,8 +45,6 @@ export async function GET() {
         display_position: row.display_position ?? undefined,
       };
     });
-
-    console.log("Debug - Processed INTERNS:", INTERNS); // Add this to debug
 
     return NextResponse.json({ INTERNS });
   } catch (err) {

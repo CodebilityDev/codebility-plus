@@ -149,7 +149,6 @@ function PostReadInstructions({
   const onSubmit = async (data: any) => {
     setLoading(true);
     try {
-      console.log("Submitting fork URL:", data.fork_url);
 
       /* if non ui/ux role */
       if (user?.display_position.includes("UI/UX Designer") === false) {
@@ -282,7 +281,6 @@ function PostSubmitted({
   const onSubmit = async (data: any) => {
     setLoading(true);
     try {
-      console.log("Submitting fork URL:", data.fork_url);
 
       /* if non ui/ux role */
       if (user?.display_position.includes("UI/UX Designer") === false) {

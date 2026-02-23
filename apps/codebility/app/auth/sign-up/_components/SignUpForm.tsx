@@ -142,7 +142,7 @@ const SignUpForm = () => {
 
     // Listen for NDA signed message
     const handleMessage = (event: MessageEvent) => {
-      console.log("Received message:", event.data);
+
       if (event.data?.type === "NDA_SIGNED" && event.data?.signed) {
         setNdaSigned(true);
         setValue("nda_signed", true);

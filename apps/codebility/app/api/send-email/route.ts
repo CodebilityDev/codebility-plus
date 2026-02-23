@@ -28,11 +28,6 @@ export async function POST(request: Request) {
     const { recipient, subject, content, firstName, ndaLink, isNdaEmail } =
       (await request.json()) as EmailRequest;
 
-    // Log the email details
-/*     console.log("Email request received:");
-    console.log("To:", recipient);
-    console.log("Subject:", subject); */
-
     let html = content;
 
     // If it's an NDA email, use the React Email template

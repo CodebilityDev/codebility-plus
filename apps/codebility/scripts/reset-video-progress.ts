@@ -32,8 +32,6 @@ async function resetVideoProgress() {
   // Create Supabase client with service role key for admin access
   const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-  console.log(`🔄 Resetting video progress for applicant: ${APPLICANT_ID}`);
-
   // First, check if the applicant exists
   const { data: applicant, error: applicantError } = await supabase
     .from('applicant')
@@ -45,8 +43,6 @@ async function resetVideoProgress() {
     console.error('❌ Applicant not found:', applicantError?.message);
     process.exit(1);
   }
-
-  console.log('✅ Found applicant:', applicant.id);
 
   // Check current video progress
   const { data: currentProgress, error: fetchError } = await supabase
@@ -66,7 +62,6 @@ async function resetVideoProgress() {
       const watchPercentage = video.total_duration > 0
         ? Math.round((video.watched_duration / video.total_duration) * 100)
         : 0;
-      console.log(`   Video ${video.video_number}: ${video.completed ? '✅ Completed' : '❌ Not completed'} (${watchPercentage}%)`);
     });
   } else {
     console.log('   No progress records found');
@@ -107,7 +102,6 @@ async function resetVideoProgress() {
       const watchPercentage = video.total_duration > 0
         ? Math.round((video.watched_duration / video.total_duration) * 100)
         : 0;
-      console.log(`   Video ${video.video_number}: ${video.completed ? '✅ Completed' : '❌ Not completed'} (${watchPercentage}%)`);
     });
   }
 

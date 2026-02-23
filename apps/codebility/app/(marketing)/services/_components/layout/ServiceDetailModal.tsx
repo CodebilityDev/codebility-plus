@@ -96,8 +96,6 @@ export const ServiceDetailModal = ({
     },
     enabled: !!service?.id && isOpen,
   });
-    
-    console.log('Service in Modal:', service);
 
   // Get image URL for display
   const getImageUrl = () => {

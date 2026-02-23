@@ -31,11 +31,7 @@ const ApplicantProfileModal = () => {
 
   // Debug logging
   useEffect(() => {
-    console.log("🎯 ApplicantProfileModal - State:", {
-      isModalOpen,
-      hasApplicant: !!selectedApplicant,
-      applicantName: selectedApplicant ? `${selectedApplicant.first_name} ${selectedApplicant.last_name}` : "No applicant"
-    });
+    
   }, [isModalOpen, selectedApplicant]);
 
   // Helper function to safely check array length
@@ -58,11 +54,8 @@ const ApplicantProfileModal = () => {
 
   // Early return with debug logging
   if (!isModalOpen || !selectedApplicant) {
-    console.log("🚫 ApplicantProfileModal - Not rendering:", { isModalOpen, hasApplicant: !!selectedApplicant });
     return null;
   }
-
-  console.log("✅ ApplicantProfileModal - Rendering modal for:", selectedApplicant.first_name, selectedApplicant.last_name);
 
   return (
     <Dialog open={isModalOpen} onOpenChange={(open) => !open && closeModal()}>

@@ -193,10 +193,7 @@ export const signupUser = async (formData: FormData) => {
           nda_document = ndaUploadResult.documentUrl;
           nda_signed_at = new Date().toISOString();
           ndaProcessedWithStorage = true;
-          
-          console.log(`NDA stored in Supabase Storage:
-            - Signature: ${ndaUploadResult.signatureUrl}
-            - Document: ${ndaUploadResult.documentUrl}`);
+
         } else {
           console.error("Failed to upload NDA to storage:", ndaUploadResult.error);
           
@@ -279,12 +276,6 @@ export const signupUser = async (formData: FormData) => {
     const responseMessage = ndaProcessedWithStorage 
       ? "Account created successfully! NDA files securely stored. Redirecting to sign-in page..."
       : "Account created successfully! Redirecting to sign-in page...";
-    
-    console.log(`Signup completed for ${email_address}:
-      - User ID: ${user.id}
-      - NDA Status: ${nda_status}
-      - NDA Storage Method: ${ndaProcessedWithStorage ? 'Supabase Storage' : 'Database'}
-      - Profile Image: ${image_url ? 'Uploaded' : 'None'}`);
     
     return { 
       success: true, 

@@ -83,32 +83,6 @@ const SignUpInputs = ({
         <ErrorMessage />
       </div>
     );
-
-    // return (
-    //   <div
-    //     className="flex flex-col gap-1"
-    //     onClick={() => {
-    //       onOpen("techStackModal");
-    //       console.log("tech stack clicked");
-    //     }}
-    //   >
-    //     <InputLabel />
-    //     <Input
-    //       {...register(id)}
-    //       value={stack.join(", ")}
-    //       className={cn(inputStyles, "cursor-pointer")}
-    //       readOnly
-    //       placeholder={placeholder}
-    //       onChange={(e) => {
-    //         // This won't actually fire because it's readonly
-    //         setValue(id, e.target.value, {
-    //           shouldValidate: true,
-    //         });
-    //       }}
-    //     />
-    //     <ErrorMessage />
-    //   </div>
-    // );
   }
 
   // Handle position select
@@ -120,21 +94,6 @@ const SignUpInputs = ({
         <ErrorMessage />
       </div>
     );
-    // return (
-    //   <div className="flex flex-col gap-1">
-    //     <InputLabel />
-    //     <PositionSelect
-    //       value={values}
-    //       onChange={(value) => {
-    //         setValue(id, value, {
-    //           shouldValidate: false,
-    //         });
-    //       }}
-    //       error={errors[id]?.message}
-    //     />
-    //     <ErrorMessage />
-    //   </div>
-    // );
   }
 
   if (type === "number") {

@@ -112,8 +112,6 @@ export const AnnouncementModal: React.FC<AnnouncementModalProps> = ({
 
       if (upsertError) throw upsertError;
 
-      console.log("Successfully saved announcement:", data);
-
       setPages((prevPages) =>
         prevPages.map((page) =>
           page.category === updatedPage.category
