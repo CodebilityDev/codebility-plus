@@ -35,7 +35,6 @@ export default function ApplicantClientWrapper({
   const [selectedApplicant, setSelectedApplicant] = useState<NewApplicantType | null>(null);
 
   const openModal = (applicant: NewApplicantType) => {
-    console.log("🚀 Opening modal for:", applicant.first_name, applicant.last_name);
     setSelectedApplicant(applicant);
     setIsModalOpen(true);
   };

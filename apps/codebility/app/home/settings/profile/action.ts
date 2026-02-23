@@ -261,13 +261,6 @@ export async function updateWorkSchedule(
       throw new Error("Failed to delete existing schedule");
     }
 
-    console.log("Insert Payload:", {
-      codev_id: user.id,
-      days_of_week: sanitizedDays,
-      start_time: schedule.start_time,
-      end_time: schedule.end_time,
-    });
-
     // Insert the new schedule
     const { data, error: insertError } = await supabase
       .from("work_schedules")

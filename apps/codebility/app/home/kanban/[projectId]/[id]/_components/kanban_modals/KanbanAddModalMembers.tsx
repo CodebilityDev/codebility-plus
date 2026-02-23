@@ -113,13 +113,12 @@ function AssigneeSelector({
     const loadMembers = async () => {
       setIsLoading(true);
       try {
-        console.log("=== LOADING MEMBERS FOR BOARD:", boardId, "===");
+
         const members = await fetchAvailableMembers(boardId);
-        console.log("=== FETCHED MEMBERS:", members, "===");
 
         if (Array.isArray(members) && members.length > 0) {
           setAvailableMembers(members);
-          console.log("=== SET AVAILABLE MEMBERS:", members.length, "===");
+
         } else {
           console.warn("=== NO MEMBERS FOUND OR INVALID RESPONSE ===");
           setAvailableMembers([]);
@@ -151,7 +150,6 @@ function AssigneeSelector({
   // IMMEDIATE SELECTION - Updates UI instantly
   const handleSelect = (memberId: string) => {
     const selectedMember = availableMembers.find((m) => m.id === memberId);
-    console.log("=== SELECTING MEMBER IMMEDIATELY:", selectedMember, "===");
 
     if (selectedMember) {
       setLocalAssignee(selectedMember); // IMMEDIATE UI UPDATE
@@ -167,7 +165,7 @@ function AssigneeSelector({
         last_name: user.last_name || "",
         image_url: user.image_url,
       };
-      console.log("=== SELF ASSIGNING IMMEDIATELY:", userAsMember, "===");
+
       setLocalAssignee(userAsMember); // IMMEDIATE UI UPDATE
       onAssigneeChange([user.id]); // Trigger parent update
     }
@@ -353,11 +351,7 @@ const TaskViewModal = ({
 
     const fetchBoardId = async () => {
       try {
-        console.log(
-          "=== FETCHING BOARD ID FOR COLUMN:",
-          task.kanban_column_id,
-          "===",
-        );
+
         const { data, error } = await supabase
           .from("kanban_columns")
           .select("board_id")
@@ -368,7 +362,7 @@ const TaskViewModal = ({
           console.error("=== ERROR FETCHING BOARD ID:", error, "===");
           setBoardId("");
         } else if (data?.board_id) {
-          console.log("=== FOUND BOARD ID:", data.board_id, "===");
+
           setBoardId(data.board_id);
         }
       } catch (err) {
@@ -430,7 +424,9 @@ const TaskViewModal = ({
     const fetchPrimaryAssignee = async () => {
       const assigneeId = task?.codev_id || task?.codev?.id;
 
+      if (process.env.NODE_ENV !== 'production') {
       console.log("=== FETCHING PRIMARY ASSIGNEE, ID:", assigneeId, "===");
+      }
 
       // Always reset first
       setPrimaryAssignee(null);
@@ -443,13 +439,14 @@ const TaskViewModal = ({
           .single();
 
         if (!error && data) {
-          console.log("=== FOUND ASSIGNEE DATA:", data, "===");
+
           setPrimaryAssignee(data as CodevMember);
+
         } else {
           console.log("=== NO ASSIGNEE FOUND, ERROR:", error, "===");
         }
       } else if (task?.codev) {
-        console.log("=== USING TASK.CODEV DIRECTLY:", task.codev, "===");
+
         setPrimaryAssignee({
           id: task.codev.id,
           first_name: task.codev.first_name,
@@ -544,7 +541,6 @@ const TaskViewModal = ({
     if (!task || !supabase) return;
 
     const newAssigneeId = memberIds[0] || undefined;
-    console.log("=== ASSIGNMENT CHANGE:", { newAssigneeId, memberIds }, "===");
 
     try {
       // Update database
@@ -563,11 +559,7 @@ const TaskViewModal = ({
             .single();
 
           if (assigneeData) {
-            console.log(
-              "=== UPDATING TASK OBJECT WITH NEW ASSIGNEE:",
-              assigneeData,
-              "===",
-            );
+
             setPrimaryAssignee(assigneeData);
             if (task) {
               task.codev_id = newAssigneeId;

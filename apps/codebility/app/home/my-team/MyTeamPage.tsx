@@ -67,18 +67,20 @@ const MemberCard = ({
   const imageUrl = member.image_url || "/assets/images/default-avatar-200x200.jpg";
   const displayName = formatName(member.first_name, member.last_name);
   
-  // ✅ FIXED: Basic conversion with proper InternalStatus typing
+  // ✅ FIXED: Added missing username and username_updated_at fields
   const convertToCodev = (simpleMember: SimpleMemberData): Codev => {
     return {
       id: simpleMember.id,
       first_name: simpleMember.first_name,
       last_name: simpleMember.last_name,
+      username: null,                   // ✅ Added required field
+      username_updated_at: null,        // ✅ Added required field
       email_address: simpleMember.email_address,
       display_position: simpleMember.display_position ?? undefined,
       image_url: simpleMember.image_url ?? undefined,
-      availability_status: true, // Fallback
-      internal_status: 'GRADUATED' as InternalStatus, // ✅ Proper type casting
-      years_of_experience: 0, // Fallback
+      availability_status: true,
+      internal_status: 'GRADUATED' as InternalStatus,
+      years_of_experience: 0,
       about: undefined,
       education: [],
       work_experience: [],
@@ -92,8 +94,8 @@ const MemberCard = ({
       discord: undefined,
       phone_number: undefined,
       address: undefined,
-      role_id: undefined
-    } as Codev;
+      role_id: undefined,
+    } as unknown as Codev;
   };
 
   const handleAvatarClick = (e: React.MouseEvent) => {
@@ -195,7 +197,6 @@ const MyTeamPage = ({ projectData }: MyTeamPageProps) => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [isLoadingMembers, setIsLoadingMembers] = useState(false);
 
-  // ✅ FIXED: Initialize Supabase client safely following project pattern
   const [supabase, setSupabase] = useState<any>(null);
 
   useEffect(() => {
@@ -206,7 +207,6 @@ const MyTeamPage = ({ projectData }: MyTeamPageProps) => {
   // Modal hook for profile integration
   const { onOpen: openProfileModal } = useModal();
 
-  // ✅ FIXED: Enhanced profile fetching function with proper Supabase handling
   const getCompleteCodevProfileSafe = async (codevId: string): Promise<Codev | null> => {
     try {
       if (!supabase) {
@@ -233,19 +233,15 @@ const MyTeamPage = ({ projectData }: MyTeamPageProps) => {
         return null;
       }
 
-      // ✅ Handle years_of_experience calculation
       let finalYearsOfExperience = data.years_of_experience;
       
-      // If years_of_experience is null/undefined, calculate from work experience
       if (finalYearsOfExperience === null || finalYearsOfExperience === undefined) {
         finalYearsOfExperience = calculateYearsFromExperience(data.work_experience || []);
-        console.log(`🔧 Calculated years from work experience: ${finalYearsOfExperience}`);
       }
 
-      // ✅ FIXED: Proper type casting for InternalStatus
       const safeInternalStatus = data.internal_status as InternalStatus | undefined;
 
-      // ✅ Create enhanced profile with proper years_of_experience and types
+      // ✅ FIXED: Spread from data which includes username and username_updated_at from DB
       const enhancedProfile: Codev = {
         ...data,
         years_of_experience: finalYearsOfExperience,
@@ -255,18 +251,8 @@ const MyTeamPage = ({ projectData }: MyTeamPageProps) => {
         projects: data.projects || [],
         codev_points: data.codev_points || [],
         tech_stacks: data.tech_stacks || [],
-        positions: data.positions || []
+        positions: data.positions || [],
       };
-
-      console.log('✅ FIXED PROFILE DATA:', {
-        id: enhancedProfile.id,
-        name: `${enhancedProfile.first_name} ${enhancedProfile.last_name}`,
-        availability_status: enhancedProfile.availability_status,
-        internal_status: enhancedProfile.internal_status,
-        years_of_experience: enhancedProfile.years_of_experience, // ✅ Should now work
-        years_source: data.years_of_experience !== null ? 'database' : 'calculated',
-        work_experience_count: enhancedProfile.work_experience?.length || 0 // ✅ Safe optional chaining
-      });
 
       return enhancedProfile;
     } catch (error) {
@@ -278,33 +264,31 @@ const MyTeamPage = ({ projectData }: MyTeamPageProps) => {
   // ✅ FIXED: Client-side profile click handler with proper type safety
   const handleProfileClick = async (member: Codev) => {
     try {
-      console.log('🔍 Fetching profile data for:', member.id);
-      
-      // Step 1: Try to fetch complete profile data using safe method
       const completeProfile = await getCompleteCodevProfileSafe(member.id);
       
       if (completeProfile) {
-        console.log('✅ Successfully fetched complete profile');
         openProfileModal("profileModal", completeProfile);
       } else {
-        console.warn('❌ Using fallback profile data');
-        // ✅ FIXED: Proper fallback with correct InternalStatus typing
+        // ✅ FIXED: Fallback includes username and username_updated_at
         const fallbackProfile: Codev = {
           ...member,
+          username: member.username ?? null,
+          username_updated_at: member.username_updated_at ?? null,
           years_of_experience: 0,
           availability_status: true,
-          internal_status: 'GRADUATED' as InternalStatus // ✅ Explicit type casting
+          internal_status: 'GRADUATED' as InternalStatus,
         };
         openProfileModal("profileModal", fallbackProfile);
       }
     } catch (error) {
       console.error('❌ Error in profile click handler:', error);
-      // ✅ FIXED: Final fallback with safe typing
       const safeFallback: Codev = {
         ...member,
+        username: member.username ?? null,
+        username_updated_at: member.username_updated_at ?? null,
         years_of_experience: 0,
         availability_status: true,
-        internal_status: 'GRADUATED' as InternalStatus // ✅ Explicit type casting
+        internal_status: 'GRADUATED' as InternalStatus,
       };
       openProfileModal("profileModal", safeFallback);
     }
@@ -324,7 +308,6 @@ const MyTeamPage = ({ projectData }: MyTeamPageProps) => {
     if (!selectedProject) return;
 
     try {
-      // Get current team lead
       const teamLeadResult = await getTeamLead(selectedProject.project.id);
       const teamLead = teamLeadResult.data;
       
@@ -332,14 +315,16 @@ const MyTeamPage = ({ projectData }: MyTeamPageProps) => {
         throw new Error('Team leader not found');
       }
 
-      // Prepare updated members array
+      // ✅ FIXED: Added username and username_updated_at to teamLead spread object (line ~342 area)
       const updatedMembers = [
         {
           ...teamLead,
+          username: null,
+          username_updated_at: null,
           positions: [],
           tech_stacks: [],
           display_position: teamLead.display_position ?? undefined,
-        },
+        } as unknown as Codev,
         ...selectedMembers
           .filter((member) => member.id !== teamLead.id)
           .map((member) => ({
@@ -348,7 +333,6 @@ const MyTeamPage = ({ projectData }: MyTeamPageProps) => {
           })),
       ];
 
-      // Update using the existing function
       const result = await updateProjectMembers(
         selectedProject.project.id,
         updatedMembers,
@@ -358,7 +342,6 @@ const MyTeamPage = ({ projectData }: MyTeamPageProps) => {
       if (result.success) {
         toast.success("Project members updated successfully.");
         
-        // Update local state
         const updatedProjectMembers: SimpleMemberData[] = selectedMembers
           .filter(member => member.id !== teamLead.id)
           .map(member => ({
@@ -417,7 +400,6 @@ const MyTeamPage = ({ projectData }: MyTeamPageProps) => {
             {projects.map((projectItem) => {
               const { project, teamLead, members } = projectItem;
               
-              // ✅ FIXED: Safe null check for members.data
               const membersList = members.data ?? [];
               const membersCount = membersList.length;
               
@@ -428,7 +410,7 @@ const MyTeamPage = ({ projectData }: MyTeamPageProps) => {
                   <div className="space-y-4 sm:space-y-5 md:space-y-6">
                     
                     {/* Project Header */}
-                    <div className=" p-6 sm:p-0">
+                    <div className="p-6 sm:p-0">
                       <div className="flex items-center justify-between mb-2">
                         <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white transition-colors duration-200">
                           {project.name}

@@ -43,9 +43,8 @@ export default function PostViewCommentList({
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        console.log("Fetching comments for post:", postId);
+
         const data = await getPostComments(postId);
-        console.log("Fetched comments:", data);
         
         // Transform the data to ensure correct structure
         const transformedComments = (data || []).map((comment: any) => ({
@@ -88,7 +87,7 @@ export default function PostViewCommentList({
   return (
     <div className="flex flex-col gap-2">
       {comments.map((c) => {
-        console.log("Rendering comment:", c.id, "with mentions:", c.mentions);
+
         const userImage = c.commenter?.image_url || defaultAvatar;
         return (
           <PostViewCommentItem

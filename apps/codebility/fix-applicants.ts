@@ -48,20 +48,10 @@ async function findRecentlyAcceptedApplicants() {
     return;
   }
 
-  console.log(`📋 Found ${applicants.length} recently accepted applicants:\n`);
-
-  applicants.forEach((applicant, index) => {
-    console.log(`${index + 1}. ${applicant.first_name} ${applicant.last_name}`);
-    console.log(`   Email: ${applicant.email_address}`);
-    console.log(`   Accepted: ${new Date(applicant.date_joined).toLocaleString()}`);
-    console.log(`   ID: ${applicant.id}\n`);
-  });
-
   return applicants;
 }
 
 async function revertApplicantsToWaitlist(applicantIds: string[]) {
-  console.log(`\n🔄 Reverting ${applicantIds.length} applicants back to waitlist...\n`);
 
   const { error } = await supabase
     .from('codev')

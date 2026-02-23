@@ -148,14 +148,11 @@ export default function JobListingsTable() {
   };
 
   const handleDelete = async (jobId: string) => {
-    console.log("Delete button clicked for job ID:", jobId);
     
     if (confirm("Are you sure you want to delete this job listing? This action cannot be undone.")) {
       try {
         console.log("User confirmed deletion, calling deleteJobListing...");
         const result = await deleteJobListing(jobId);
-
-        console.log("Delete result:", result);
 
         if (!result.success) {
           throw new Error(result.error || "Failed to delete job");

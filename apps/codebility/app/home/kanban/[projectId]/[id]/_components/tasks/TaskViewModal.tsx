@@ -533,8 +533,6 @@ const TaskViewModal = ({
 
     setIsLoading(true);
 
-    console.log("Attempting to complete task with ID:", task.id);
-
     removeTaskOptimistic(task.id);
     onClose();
     toast.success("Completing task...");

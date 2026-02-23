@@ -67,7 +67,6 @@ const MemberRating = ({ memberId, projectId }: MemberRatingProps) => {
     if (client) {
       // Get current user session and map to codev_id
       client.auth.getSession().then(async ({ data: { session } }) => {
-        console.log("🔐 Auth session:", session?.user?.email);
         
         if (session?.user?.email) {
           // Map auth user email to codev_id
@@ -76,12 +75,6 @@ const MemberRating = ({ memberId, projectId }: MemberRatingProps) => {
             .select("id")
             .eq("email_address", session.user.email)
             .single();
-          
-          console.log("👤 Codev mapping:", { 
-            email: session.user.email, 
-            codevId: codevData?.id,
-            error: error?.message 
-          });
           
           if (codevData) {
             setCurrentCodevId(codevData.id);
@@ -96,7 +89,9 @@ const MemberRating = ({ memberId, projectId }: MemberRatingProps) => {
   // Check if current user is team lead and load existing ratings
   useEffect(() => {
     if (!supabase || !currentCodevId || !projectId) {
+      if (process.env.NODE_ENV !== 'production') {
       console.log("⚠️ Missing dependencies:", { supabase: !!supabase, currentCodevId, projectId });
+      }
       return;
     }
 
@@ -104,7 +99,6 @@ const MemberRating = ({ memberId, projectId }: MemberRatingProps) => {
       setIsLoading(true);
       
       try {
-        console.log("🔍 Checking permissions for:", { currentCodevId, projectId, memberId });
         
         // Check if current user is team lead for this project
         const { data: projectMember, error: roleError } = await supabase
@@ -114,13 +108,8 @@ const MemberRating = ({ memberId, projectId }: MemberRatingProps) => {
           .eq("codev_id", currentCodevId) // Now using correct codev_id
           .single();
 
-        console.log("👤 Current user role:", projectMember?.role, roleError ? `Error: ${roleError.message}` : "");
-
         const isLead = projectMember?.role === "team_leader";
         setIsTeamLead(isLead);
-
-        // Load existing ratings for this member in this project
-        console.log("📊 Fetching ratings for member:", memberId);
         
         const { data: existingRatings, error: ratingError } = await supabase
           .from("member_ratings")
@@ -138,7 +127,6 @@ const MemberRating = ({ memberId, projectId }: MemberRatingProps) => {
 
         if (existingRatings && existingRatings.length > 0) {
           const rating = existingRatings[0];
-          console.log("✅ Loading ratings:", rating);
           
           // Load existing ratings into state
           setRatings({

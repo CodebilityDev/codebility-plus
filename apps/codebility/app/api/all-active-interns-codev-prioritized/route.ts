@@ -149,8 +149,6 @@ export async function GET() {
       };
     });
 
-    console.log(`Prioritized ${TEAM_MEMBERS.length} team members`);
-
     return NextResponse.json({ TEAM_MEMBERS });
   } catch (err) {
     console.error("Unexpected error in /api/all-active-interns-codev-prioritized:", err);

@@ -294,8 +294,6 @@ const Navigation = () => {
           .eq("id", user.id)
           .single();
 
-        console.log("User Row:", userRow);
-
         if (fetchError) {
           console.error("Error fetching codev:", fetchError.message);
           setUserData(null);

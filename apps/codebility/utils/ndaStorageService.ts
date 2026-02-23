@@ -72,8 +72,6 @@ async function uploadFileToStorage(
     const fileName = `${timestamp}_${file.name}`;
     const filePath = `${folder}/${fileName}`;
 
-    console.log(`Uploading file to: ${bucket}/${filePath}`);
-
     const { error: uploadError } = await supabase.storage
       .from(bucket)
       .upload(filePath, file, {
@@ -94,7 +92,6 @@ async function uploadFileToStorage(
       throw new Error("Failed to get public URL");
     }
 
-    console.log(`File uploaded successfully: ${publicUrlData.publicUrl}`);
     return publicUrlData.publicUrl.toString();
 
   } catch (error) {
@@ -121,8 +118,6 @@ export async function uploadNdaToStorage(
     const signatureFilename = `nda_signature_${userIdentifier}_${timestamp}.png`;
     const documentFilename = `nda_document_${userIdentifier}_${timestamp}.pdf`;
 
-    console.log(`Processing NDA upload for user: ${first_name} ${last_name}`);
-
     // Convert data URLs to File objects
     const signatureFile = dataUrlToFile(
       signatureDataUrl, 
@@ -136,8 +131,6 @@ export async function uploadNdaToStorage(
       'application/pdf'
     );
 
-    console.log(`Files created - Signature: ${signatureFile.size} bytes, Document: ${documentFile.size} bytes`);
-
     // Upload signature to Supabase Storage
     const signatureUrl = await uploadFileToStorage(signatureFile, {
       bucket: "codebility",
@@ -149,8 +142,6 @@ export async function uploadNdaToStorage(
       bucket: "codebility", 
       folder: "nda/documents",
     });
-
-    console.log(`NDA files uploaded successfully for ${userIdentifier}`);
 
     return {
       signatureUrl,
@@ -180,8 +171,6 @@ export async function updateCodevNdaUrls(
   try {
     const supabase = await createClientServerComponent();
     
-    console.log(`Updating database for codev ${codevId} with storage URLs`);
-    
     const { error } = await supabase
       .from("codev")
       .update({
@@ -196,8 +185,6 @@ export async function updateCodevNdaUrls(
       console.error(`Database update error for ${codevId}:`, error);
       throw error;
     }
-
-    console.log(`Database updated successfully for codev ${codevId}`);
 
     // Revalidate the in-house page to show updated NDA status
     revalidatePath("/home/in-house");
@@ -225,8 +212,6 @@ export async function completeNdaSigning(
     return { success: false, error: "Codev ID is required" };
   }
 
-  console.log(`Starting complete NDA signing process for ${userData.first_name} ${userData.last_name}`);
-
   try {
     // Step 1: Upload files to storage
     const uploadResult = await uploadNdaToStorage(signatureDataUrl, documentDataUrl, userData);
@@ -237,8 +222,6 @@ export async function completeNdaSigning(
         error: uploadResult.error || "Failed to upload files to storage" 
       };
     }
-
-    console.log(`Storage upload completed, updating database for codev ${userData.codev_id}`);
 
     // Step 2: Update database with URLs
     const dbResult = await updateCodevNdaUrls(
@@ -254,7 +237,6 @@ export async function completeNdaSigning(
       };
     }
 
-    console.log(`NDA signing process completed successfully for ${userData.codev_id}`);
     return { success: true };
 
   } catch (error) {

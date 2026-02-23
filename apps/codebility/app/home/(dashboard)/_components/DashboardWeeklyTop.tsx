@@ -227,7 +227,6 @@ export default function WeeklyTop() {
         }
 
         if (data) {
-          console.log("Codev points data:", data.slice(0, 3)); // Debug: show first 3 records
 
           // First, get all projects
           const { data: projects, error: projectsError } = await supabase
@@ -254,9 +253,6 @@ export default function WeeklyTop() {
             setProjectLeaders([]);
             return;
           }
-
-          console.log("Projects:", projects);
-          console.log("Project members:", projectMembers);
 
           // Create a map of codev_id to project_id
           const codevToProjectMap = new Map<string, string>();

@@ -167,10 +167,6 @@ export default function CodevBadge({
                           [categoryId]: true,
                         }));
 
-                        // Log the error for debugging
-                        console.log(
-                          `Badge not found: ${badgePath}, falling back to generated badge`,
-                        );
                       }}
                     />
                   )}

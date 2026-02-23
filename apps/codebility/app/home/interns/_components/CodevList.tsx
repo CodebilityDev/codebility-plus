@@ -47,44 +47,8 @@ export default function CodevList({ data, filters, activeTab = "active", isSearc
     
     const result = getPrioritizedAndFilteredCodevs(tabFilteredData, filters, true);
 
-    /*     // Console logs for debugging
-    console.log("🔍 INTERNS PAGE DEBUG:");
-    console.log("📊 Total data received:", data.length);
-    console.log("🔄 Filters applied:", filters);
-    console.log("✅ Final filtered results:", result.length); */
-
-    // Log each displayed user with detailed info
-    /*   console.log("👥 DISPLAYED USERS:");
-    result.forEach((codev, index) => {
-      console.log(`${index + 1}. ${codev.first_name} ${codev.last_name}`, {
-        id: codev.id,
-        application_status: codev.application_status,
-        availability_status: codev.availability_status,
-        internal_status: codev.internal_status,
-        display_position: codev.display_position,
-        role_id: codev.role_id,
-        years_of_experience: codev.years_of_experience
-      });
-    }); */
-
-    // Summary by application status
-    /* const statusCounts = result.reduce(
-      (acc, codev) => {
-        const status = codev.application_status || "unknown";
-        acc[status] = (acc[status] || 0) + 1;
-        return acc;
-      },
-      {} as Record<string, number>,
-    ); */
-
-    /*   console.log("📈 STATUS BREAKDOWN:", statusCounts);
-    console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"); */
-
     return result;
   }, [data, filters, activeTab]);
-
-  console.log("📊 FILTERED CODEVS:", filteredCodevs.length);
-  console.log("🔍 FILTERS USED:", filters);
 
   const {
     currentPage,

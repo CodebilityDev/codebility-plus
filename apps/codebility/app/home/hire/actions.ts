@@ -126,7 +126,6 @@ export async function updateJobListing(
 
 export async function deleteJobListing(jobId: string) {
   try {
-    console.log("Delete job started for ID:", jobId);
     
     const supabase = await createClientServerComponent();
 
@@ -136,8 +135,6 @@ export async function deleteJobListing(jobId: string) {
       console.error("Auth error:", authError);
       return { success: false, error: "Unauthorized - Please log in again" };
     }
-
-    console.log("User authenticated:", user.id);
 
     // Get user details to check role
     const { data: userData, error: userError } = await supabase
@@ -151,11 +148,8 @@ export async function deleteJobListing(jobId: string) {
       return { success: false, error: "User not found" };
     }
 
-    console.log("User data:", { id: userData.id, role_id: userData.role_id });
-
     // Check if user is admin (role_id 1 or 4)
     const isAdmin = userData.role_id === 1 || userData.role_id === 4;
-    console.log("Is admin:", isAdmin);
 
     // Use service role client for admin operations to bypass RLS
     let queryClient;
@@ -202,7 +196,6 @@ export async function deleteJobListing(jobId: string) {
     }
 
     const job = jobs[0];
-    console.log("Job found:", { id: job.id, title: job.title, status: job.status, created_by: job.created_by });
 
     // Check permissions - only for non-admin users
     if (!isAdmin && job.created_by !== userData.id) {
