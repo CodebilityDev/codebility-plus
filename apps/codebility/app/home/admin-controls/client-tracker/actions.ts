@@ -54,12 +54,13 @@ export async function getAdminOutreachStats(): Promise<{
     // Get current week start
     const weekStart = getCurrentWeekStart().toISOString().split('T')[0];
 
-    // Get all admins
+    // Get all admins (excluding inactive ones)
     const { data: admins, error: adminsError } = await supabase
       .from('codev')
       .select('id, first_name, last_name, email_address')
       .eq('role_id', 1)
       .eq('application_status', 'passed')
+      .neq('internal_status', 'INACTIVE')
       .order('first_name');
 
     if (adminsError) {

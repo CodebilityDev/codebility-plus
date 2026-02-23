@@ -304,7 +304,14 @@ export default function ClientTrackerContent() {
               </TableRow>
             ) : (
               stats
-                .sort((a, b) => b.current_week_count - a.current_week_count)
+                .sort((a, b) => {
+                  // Primary sort: Total all time count (descending)
+                  if (b.total_count !== a.total_count) {
+                    return b.total_count - a.total_count;
+                  }
+                  // Secondary sort: Current week count (descending)
+                  return b.current_week_count - a.current_week_count;
+                })
                 .map((admin) => (
                   <TableRow key={admin.admin_id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
                     <TableCell className="font-medium text-gray-900 dark:text-gray-100">
@@ -347,7 +354,7 @@ export default function ClientTrackerContent() {
 
       {/* History Dialog */}
       <Dialog open={historyDialogOpen} onOpenChange={setHistoryDialogOpen}>
-        <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto overflow-x-hidden">
           <DialogHeader>
             <DialogTitle>
               Outreach History - {selectedAdmin?.first_name} {selectedAdmin?.last_name}
@@ -396,13 +403,13 @@ export default function ClientTrackerContent() {
                   </div>
 
                   {record.client_email && (
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1 break-all">
                       📧 {record.client_email}
                     </p>
                   )}
 
                   {record.job_link && (
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1 break-all">
                       🔗 <a
                         href={record.job_link}
                         target="_blank"
