@@ -38,7 +38,7 @@ interface MemberRatingProps {
   memberId: string;
   projectId: string;
 }
-
+ 
 const MemberRating = ({ memberId, projectId }: MemberRatingProps) => {
   // Supabase client and user state
   const [supabase, setSupabase] = useState<any>(null);
