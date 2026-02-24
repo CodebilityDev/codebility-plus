@@ -652,14 +652,16 @@ export const completeTask = async (
     try {
       const notificationPromises = allMemberIds.map(async (memberId, index) => {
         const pointsResult = pointsResults[index];
-        const existingPoints = pointsResult?.data;
+        if (!pointsResult) return null;
+
+        const existingPoints = pointsResult.data;
         const pointsAwarded = memberId === primaryAssigneeId ? taskPoints : sidekickPoints;
 
         // Only send notification if points were successfully awarded
         if (!criticalErrors.some(error =>
           error.error &&
-          (pointsResult.error === error.error ||
-            (!existingPoints && pointsResults[index].error === error.error))
+          (pointsResult?.error === error.error ||
+            (!existingPoints && pointsResult?.error === error.error))
         )) {
           return createNotificationAction({
             recipientId: memberId,
