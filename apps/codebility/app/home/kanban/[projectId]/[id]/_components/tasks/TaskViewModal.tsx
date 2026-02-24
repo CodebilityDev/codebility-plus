@@ -360,7 +360,6 @@ const TaskViewModal = ({
   const searchParams = useSearchParams();
   const [showComments, setShowComments] = useState(false);
   const [commentCount, setCommentCount] = useState(0);
-
   useEffect(() => {
     if (searchParams.get("commentId")) {
       setShowComments(true);

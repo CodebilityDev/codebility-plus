@@ -28,8 +28,11 @@ export function useKanbanTaskUrlModal(
   useEffect(() => {
     const taskId = searchParams.get("taskId");
 
-    // Open modal only once from URL
-    if (taskId && !openedFromUrlRef.current) {
+    // Only process if we're actually looking at the task list, NOT the archive
+    const isArchiveView = searchParams.get("view") === "archive";
+
+    // Open modal only once from URL (for active tasks)
+    if (taskId && !openedFromUrlRef.current && !isArchiveView) {
       const task = tasks.find((t) => t.id === taskId);
       if (task) {
         onOpen("taskViewModal", task);
@@ -38,7 +41,7 @@ export function useKanbanTaskUrlModal(
     }
 
     // Clear URL if modal closed
-    if (!isOpen && searchParams.has("taskId")) {
+    if (!isOpen && searchParams.has("taskId") && !isArchiveView) {
       router.replace(pathname, { scroll: false });
       openedFromUrlRef.current = false; // reset so next URL param works
     }
