@@ -7,7 +7,7 @@ import { getCurrentWeekStart } from "./utils";
 export interface ClientOutreach {
   id: string;
   admin_id: string;
-  client_name: string;
+  client_name: string | null;
   client_email: string | null;
   client_company: string | null;
   job_link: string | null;
@@ -119,7 +119,7 @@ export async function getAdminOutreachStats(): Promise<{
  * Add a new client outreach record
  */
 export async function addClientOutreach(formData: {
-  client_name: string;
+  client_name?: string;
   client_email?: string;
   client_company?: string;
   job_link?: string;

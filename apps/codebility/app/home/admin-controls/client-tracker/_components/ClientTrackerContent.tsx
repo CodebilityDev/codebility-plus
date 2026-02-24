@@ -77,11 +77,6 @@ export default function ClientTrackerContent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.client_name.trim()) {
-      toast.error("Client name is required");
-      return;
-    }
-
     setSubmitting(true);
     const result = await addClientOutreach(formData);
 
@@ -229,13 +224,12 @@ export default function ClientTrackerContent() {
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <Label htmlFor="client_name">Client Name *</Label>
+                  <Label htmlFor="client_name">Client Name</Label>
                   <Input
                     id="client_name"
                     value={formData.client_name}
                     onChange={(e) => setFormData(prev => ({ ...prev, client_name: e.target.value }))}
                     placeholder="John Doe"
-                    required
                   />
                 </div>
 
@@ -466,7 +460,7 @@ export default function ClientTrackerContent() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-baseline gap-2 flex-wrap">
                         <h4 className="font-semibold text-sm text-gray-900 dark:text-gray-100">
-                          {record.client_name}
+                          {record.client_name || "Unnamed Client"}
                         </h4>
                         {record.client_company && (
                           <span className="text-xs text-gray-500 dark:text-gray-400">
@@ -525,7 +519,7 @@ export default function ClientTrackerContent() {
                           src={record.conversation_image}
                           alt="Conversation screenshot"
                           className="max-w-full h-auto rounded border border-gray-200 dark:border-gray-700 cursor-pointer hover:opacity-90 transition-opacity"
-                          onClick={() => window.open(record.conversation_image, '_blank')}
+                          onClick={() => record.conversation_image && window.open(record.conversation_image, '_blank')}
                         />
                       </div>
                     )}
