@@ -575,15 +575,24 @@ export const completeTask = async (
       return { success: false, error: `Failed to archive task: ${archiveError.message}` };
     }
 
-    // Fetch project and board info for the notification URL
-    const { data: colData } = await supabase
+    // Fetch board and project info for the notification URL
+    const { data: columnData } = await supabase
       .from("kanban_columns")
-      .select("board_id, kanban_boards(project_id)")
+      .select("board_id")
       .eq("id", task.kanban_column_id)
       .single();
 
-    const boardId = colData?.board_id;
-    const projectId = (colData?.kanban_boards as any)?.project_id;
+    const boardId = columnData?.board_id;
+    let projectId = null;
+
+    if (boardId) {
+      const { data: boardData } = await supabase
+        .from("kanban_boards")
+        .select("project_id")
+        .eq("id", boardId)
+        .single();
+      projectId = boardData?.project_id;
+    }
 
     // OPTIMIZATION: Prepare all member IDs and points
     const sidekickPoints = Math.floor(taskPoints * 0.5);
@@ -695,10 +704,13 @@ export const completeTask = async (
     }
 
     // Single revalidation at the end
+    revalidatePath("/home/kanban");
+    if (projectId) {
+      revalidatePath(`/home/kanban/${projectId}`);
+    }
     if (projectId && boardId) {
       revalidatePath(`/home/kanban/${projectId}/${boardId}`);
     }
-    revalidatePath("/home/kanban");
 
     return { success: true };
   } catch (error) {
