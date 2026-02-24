@@ -1176,7 +1176,7 @@ const TaskViewModal = ({
               </>
             )}
 
-            {canMarkAsDone && task?.pr_link && (
+            {canMarkAsDone && task?.pr_link && !task?.is_archive && (
               <Button
                 onClick={handleMarkAsDone}
                 disabled={isLoading}

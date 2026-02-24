@@ -665,7 +665,7 @@ export const completeTask = async (
             recipientId: memberId,
             title: "Task Completed!",
             message: `Congratulations! You have completed the task '${task.title}' and gained ${pointsAwarded}+ points.`,
-            type: "achievement",
+            type: "success",
             priority: "normal",
             actionUrl: projectId && boardId
               ? `/home/kanban/${projectId}/${boardId}?view=archive&taskId=${task.id}`
@@ -693,6 +693,9 @@ export const completeTask = async (
     }
 
     // Single revalidation at the end
+    if (projectId && boardId) {
+      revalidatePath(`/home/kanban/${projectId}/${boardId}`);
+    }
     revalidatePath("/home/kanban");
 
     return { success: true };

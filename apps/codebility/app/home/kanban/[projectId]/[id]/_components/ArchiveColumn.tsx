@@ -6,6 +6,7 @@ import { createClientClientComponent } from "@/utils/supabase/client";
 import { Task } from "@/types/home/codev";
 import { IconArchive } from "@/public/assets/svgs";
 
+import { useModal } from "@/hooks/use-modal";
 import toast from "react-hot-toast";
 import ArchiveTask from "./ArchiveTask";
 
@@ -18,6 +19,7 @@ export default function ArchiveColumn({ projectId, boardId }: ArchiveColumnProps
   const [archivedTasks, setArchivedTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [supabase, setSupabase] = useState<any>(null);
+  const { onOpen } = useModal();
 
   const searchParams = useSearchParams();
   const highlightTaskId = searchParams.get("taskId");
@@ -96,6 +98,16 @@ export default function ArchiveColumn({ projectId, boardId }: ArchiveColumnProps
 
     fetchArchivedTasks();
   }, [supabase, boardId]);
+
+  // Automatically open the task modal if a taskId is highlighted in the URL
+  useEffect(() => {
+    if (highlightTaskId && archivedTasks.length > 0) {
+      const task = archivedTasks.find(t => t.id === highlightTaskId);
+      if (task) {
+        onOpen("taskViewModal", task);
+      }
+    }
+  }, [highlightTaskId, archivedTasks, onOpen]);
 
   const handleDeleteTask = async (taskId: string) => {
     if (!supabase) return;
