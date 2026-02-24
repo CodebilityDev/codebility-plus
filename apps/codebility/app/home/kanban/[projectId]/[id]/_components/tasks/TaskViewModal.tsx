@@ -548,8 +548,6 @@ const TaskViewModal = ({
     try {
       const result = await completeTask(task);
 
-      console.log("Task completion result:", result);
-
       if (result.success) {
         toast.success("Task completed and points awarded!");
 

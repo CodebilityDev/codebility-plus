@@ -429,7 +429,6 @@ const TaskAddModal = () => {
         setLastSavedAt(new Date());
         setHasUnsavedChanges(false);
         // Silent save - no toast notification
-        console.log("✅ Draft auto-saved");
       }
     } catch (error) {
       console.error("Auto-save error:", error);

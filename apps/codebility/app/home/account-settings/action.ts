@@ -16,7 +16,6 @@ export const updatePassword = async (formData: FormData) => {
     });
 
     if (signInError) {
-        console.log("error message: ", signInError.message);
         return { succes: false, error: signInError.message };
     }
 
@@ -25,7 +24,6 @@ export const updatePassword = async (formData: FormData) => {
     });
 
     if (updateError) {
-        console.log("Error updating password: ", updateError.message);
         return { success: false, error: updateError.message };
     }
 

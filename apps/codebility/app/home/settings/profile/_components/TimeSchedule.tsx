@@ -130,7 +130,6 @@ const TimeSchedule = ({ data }: TimeScheduleProps) => {
         end_time: schedule.end_time,
       };
 
-      console.log("scheduleData:", scheduleData);
       await updateWorkSchedule(scheduleData);
       toast.success("Schedule updated successfully!", { id: toastId });
       setIsEditMode(false);

@@ -23,9 +23,6 @@ async function resetVideoProgress() {
   const supabaseServiceKey = process.env.DB_SERVICE_ROLE || process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!supabaseUrl || !supabaseServiceKey) {
-    console.error('❌ Missing required environment variables:');
-    console.error('   - NEXT_PUBLIC_SUPABASE_URL');
-    console.error('   - DB_SERVICE_ROLE or SUPABASE_SERVICE_ROLE_KEY');
     process.exit(1);
   }
 
@@ -40,7 +37,6 @@ async function resetVideoProgress() {
     .single();
 
   if (applicantError || !applicant) {
-    console.error('❌ Applicant not found:', applicantError?.message);
     process.exit(1);
   }
 
@@ -52,19 +48,15 @@ async function resetVideoProgress() {
     .order('video_number');
 
   if (fetchError) {
-    console.error('❌ Error fetching current progress:', fetchError.message);
     process.exit(1);
   }
 
-  console.log('\n📊 Current video progress:');
   if (currentProgress && currentProgress.length > 0) {
     currentProgress.forEach((video) => {
       const watchPercentage = video.total_duration > 0
         ? Math.round((video.watched_duration / video.total_duration) * 100)
         : 0;
     });
-  } else {
-    console.log('   No progress records found');
   }
 
   // Reset all video progress to false
@@ -79,7 +71,6 @@ async function resetVideoProgress() {
     .eq('applicant_id', applicant.id);
 
   if (updateError) {
-    console.error('❌ Error resetting video progress:', updateError.message);
     process.exit(1);
   }
 
@@ -91,12 +82,9 @@ async function resetVideoProgress() {
     .order('video_number');
 
   if (verifyError) {
-    console.error('❌ Error verifying reset:', verifyError.message);
     process.exit(1);
   }
 
-  console.log('\n✅ Video progress successfully reset!');
-  console.log('\n📊 Updated video progress:');
   if (updatedProgress && updatedProgress.length > 0) {
     updatedProgress.forEach((video) => {
       const watchPercentage = video.total_duration > 0
@@ -106,7 +94,6 @@ async function resetVideoProgress() {
   }
 
   // Also reset quiz and commitment fields in the applicant table
-  console.log('\n🔄 Resetting quiz and commitment fields...');
   const { error: resetApplicantError } = await supabase
     .from('applicant')
     .update({
@@ -122,18 +109,11 @@ async function resetVideoProgress() {
     .eq('id', applicant.id);
 
   if (resetApplicantError) {
-    console.error('❌ Error resetting quiz/commitment fields:', resetApplicantError.message);
     process.exit(1);
   }
 
-  console.log('✅ Quiz and commitment fields successfully reset!');
-  console.log('\n✨ Done! The applicant can now:');
-  console.log('   - Rewatch all onboarding videos');
-  console.log('   - Retake the quiz');
-  console.log('   - Re-sign the commitment');
 }
 
 resetVideoProgress().catch((error) => {
-  console.error('❌ Unexpected error:', error);
   process.exit(1);
 });

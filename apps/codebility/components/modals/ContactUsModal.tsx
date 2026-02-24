@@ -55,7 +55,7 @@ const ContactUsModal = () => {
 
       handleReset();
     } catch (error) {
-      console.log("Contact Us Error: ", error);
+      // handle error
     }
   };
 
@@ -100,7 +100,6 @@ const ContactUsModal = () => {
               placeholder="What is your name?"
               value={name}
               required
-              error={validationErrors.name}
               aria-invalid={!!validationErrors.name}
               onChange={(e) => {
                 setName(e.target.value.toLowerCase());
@@ -110,6 +109,9 @@ const ContactUsModal = () => {
                 }));
               }}
             />
+            {validationErrors.name && (
+              <p className="text-red-500 text-sm mt-1">{validationErrors.name}</p>
+            )}
           </div>
 
           <div>
@@ -120,7 +122,6 @@ const ContactUsModal = () => {
               placeholder="What is your email?"
               value={email}
               required
-              error={validationErrors.email}
               aria-invalid={!!validationErrors.email}
               onChange={(e) => {
                 setEmail(e.target.value.toLowerCase());
@@ -130,6 +131,9 @@ const ContactUsModal = () => {
                 }));
               }}
             />
+            {validationErrors.email && (
+              <p className="text-red-500 text-sm mt-1">{validationErrors.email}</p>
+            )}
           </div>
 
           <div>
@@ -140,7 +144,6 @@ const ContactUsModal = () => {
               placeholder="What is your telephone?"
               value={telephone}
               required
-              error={validationErrors.telephone}
               aria-invalid={!!validationErrors.telephone}
               onChange={(e) => {
                 setTelephone(e.target.value);
@@ -150,6 +153,9 @@ const ContactUsModal = () => {
                 }));
               }}
             />
+            {validationErrors.telephone && (
+              <p className="text-red-500 text-sm mt-1">{validationErrors.telephone}</p>
+            )}
           </div>
 
           <div>
@@ -159,7 +165,6 @@ const ContactUsModal = () => {
               placeholder="How can we help you?"
               value={message}
               required
-              error={validationErrors.message}
               aria-invalid={!!validationErrors.message}
               onChange={(e) => {
                 setMessage(e.target.value.toLowerCase());
@@ -169,6 +174,9 @@ const ContactUsModal = () => {
                 }));
               }}
             />
+            {validationErrors.message && (
+              <p className="text-red-500 text-sm mt-1">{validationErrors.message}</p>
+            )}
           </div>
 
           <DialogFooter className="flex flex-col gap-2 lg:flex-row">

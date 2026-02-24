@@ -93,8 +93,6 @@ export default function ApplicantTestTimeRemaining({
     );
   }
 
-  console.log("timeleft", timeLeft);
-
   const getStatusColor = () => {
     if (timeLeft.isExpired) {
       return isSubmitted ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400";

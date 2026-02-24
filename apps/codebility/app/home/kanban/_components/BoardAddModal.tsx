@@ -76,11 +76,9 @@ const BoardAddModal = () => {
       if (response.success) {
         toast.success("Create board successful.");
       } else {
-        console.log(response.error);
         toast.error("Failed to create board.");
       }
     } catch (error) {
-      console.log("Error create board modal: ", error);
       toast.error("Something went wrong!");
     } finally {
       onClose();

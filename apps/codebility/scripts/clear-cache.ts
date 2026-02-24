@@ -16,8 +16,6 @@ const REDIS_PASSWORD = process.env.REDIS_PASSWORD;
 
 async function clearCache() {
   if (!REDIS_URL || !REDIS_PASSWORD) {
-    console.log("❌ Redis not configured. No cache to clear.");
-    console.log("   This is okay - the app will fetch fresh data from the database.");
     return;
   }
 
@@ -30,33 +28,24 @@ async function clearCache() {
       }
     );
 
-    console.log("🔄 Clearing cache...\n");
-
     // Clear applicants cache
     const applicantsKey = "cache:codevs:applicants";
     await redis.del(applicantsKey);
-    console.log(`✅ Cleared: ${applicantsKey}`);
 
     // Clear in-house cache
     const inhouseKey = "cache:codevs:inhouse";
     await redis.del(inhouseKey);
-    console.log(`✅ Cleared: ${inhouseKey}`);
 
     // Clear all codevs cache
     const codevsKey = "cache:codevs:codevs.all";
     await redis.del(codevsKey);
-    console.log(`✅ Cleared: ${codevsKey}`);
 
     // Clear dashboard cache
     const dashboardKey = "cache:dashboard:admin";
     await redis.del(dashboardKey);
-    console.log(`✅ Cleared: ${dashboardKey}`);
-
-    console.log("\n✨ Cache cleared successfully!");
 
     await redis.quit();
   } catch (error) {
-    console.error("❌ Error clearing cache:", error);
     process.exit(1);
   }
 }
