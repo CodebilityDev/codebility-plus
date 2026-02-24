@@ -58,10 +58,9 @@ export async function getAdminOutreachStats(): Promise<{
     // Get all admins (excluding inactive ones)
     const { data: admins, error: adminsError } = await supabase
       .from('codev')
-      .select('id, first_name, last_name, email_address')
+      .select('id, first_name, last_name, email_address, internal_status')
       .eq('role_id', 1)
       .eq('application_status', 'passed')
-      .neq('internal_status', 'INACTIVE')
       .order('first_name');
 
     if (adminsError) {
@@ -98,15 +97,17 @@ export async function getAdminOutreachStats(): Promise<{
       return acc;
     }, {} as Record<string, number>) || {};
 
-    // Combine data
-    const stats: AdminOutreachStats[] = admins?.map(admin => ({
-      admin_id: admin.id,
-      first_name: admin.first_name,
-      last_name: admin.last_name,
-      email_address: admin.email_address,
-      current_week_count: currentWeekCounts[admin.id] || 0,
-      total_count: totalCounts[admin.id] || 0,
-    })) || [];
+    // Combine data and filter out INACTIVE admins
+    const stats: AdminOutreachStats[] = admins
+      ?.filter(admin => admin.internal_status !== 'INACTIVE')
+      .map(admin => ({
+        admin_id: admin.id,
+        first_name: admin.first_name,
+        last_name: admin.last_name,
+        email_address: admin.email_address,
+        current_week_count: currentWeekCounts[admin.id] || 0,
+        total_count: totalCounts[admin.id] || 0,
+      })) || [];
 
     return { success: true, data: stats };
   } catch (error) {
