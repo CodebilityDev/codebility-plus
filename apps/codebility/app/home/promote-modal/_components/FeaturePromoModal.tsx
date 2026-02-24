@@ -17,13 +17,17 @@ export default function FeaturePromoModal({ data }: { data: FeatureModal }) {
   const router = useRouter();
 
   useEffect(() => {
+  const dismissed = sessionStorage.getItem("codebility_promo_modal_dismissed_v1");
+  if (!dismissed) {
     const t = setTimeout(() => setOpen(true), 800);
     return () => clearTimeout(t);
-  }, []);
-
-  function handleOpenChange(value: boolean) {
-    setOpen(value);
   }
+}, []);
+
+function handleOpenChange(value: boolean) {
+  if (!value) sessionStorage.setItem("codebility_promo_modal_dismissed_v1", "true");
+  setOpen(value);
+}
 
   function handleCTA() {
     handleOpenChange(false);
