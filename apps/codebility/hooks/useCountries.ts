@@ -216,7 +216,6 @@ export const useCountries = () => {
       // ✅ Check cache first
       const cached = getCachedCountries();
       if (cached) {
-        console.log('✅ Using cached countries');
         setCountries(cached);
         return; // Don't fetch if we have valid cache
       }
@@ -226,7 +225,6 @@ export const useCountries = () => {
       setError(null);
       
       try {
-        console.log('🌍 Fetching countries from API...');
         const countryData = await fetchCountries();
         
         if (!isMounted) return;
@@ -240,7 +238,6 @@ export const useCountries = () => {
         
         setCountries(formattedCountries);
         setCachedCountries(formattedCountries); // ✅ Cache the results
-        console.log('✅ Countries loaded and cached successfully');
       } catch (err) {
         if (!isMounted) return;
         

@@ -40,7 +40,6 @@ export default function ApplicantClientWrapper({
   };
 
   const closeModal = () => {
-    console.log("🔒 Closing modal");
     setIsModalOpen(false);
     setSelectedApplicant(null);
   };

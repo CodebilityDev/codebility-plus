@@ -39,7 +39,6 @@ export default function TimeTrackerTableDesktop({ timeLog }: Props) {
               log,
               index, // reverse log array to start from newest log.
             ) => {
-              console.log("log: ", log);
               return (
                 <TableRow
                   key={index}

@@ -267,7 +267,6 @@ const ExperienceForm = ({
       handleEditModePerItem(itemNo, false);
       setEditMode(false);
     } catch (error) {
-      console.log(error);
       toast.error("Something went wrong!");
     } finally {
       setIsLoading(false);
