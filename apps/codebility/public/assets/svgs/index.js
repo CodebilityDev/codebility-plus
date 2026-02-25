@@ -107,3 +107,4 @@ export { default as IconArrowUpRight } from "./icon-arrow-up-right.svg";
 export { default as IconFourDotsMenu } from "./icon-four-dots-menu.svg";
 export { default as IconArrowR } from "./icon-arrow-r.svg";
 export { default as IconArrowL } from "./icon-arrow-l.svg";
+export { default as IconTicketSupport } from "./icon-ticket-support.svg";
