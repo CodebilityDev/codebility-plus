@@ -360,7 +360,6 @@ const TaskViewModal = ({
   const searchParams = useSearchParams();
   const [showComments, setShowComments] = useState(false);
   const [commentCount, setCommentCount] = useState(0);
-
   useEffect(() => {
     if (searchParams.get("commentId")) {
       setShowComments(true);
@@ -1174,7 +1173,7 @@ const TaskViewModal = ({
               </>
             )}
 
-            {canMarkAsDone && task?.pr_link && (
+            {canMarkAsDone && task?.pr_link && !task?.is_archive && (
               <Button
                 onClick={handleMarkAsDone}
                 disabled={isLoading}

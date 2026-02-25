@@ -4,7 +4,7 @@ import DefaultAvatar from "@/components/DefaultAvatar";
 import { IconDelete } from "@/public/assets/svgs";
 import { Task } from "@/types/home/codev";
 import { DeleteIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Button } from "@codevs/ui/button";
 import {
@@ -22,10 +22,18 @@ import {
 interface ArchiveTaskProps {
   task: Task;
   onDelete: (taskId: string) => void;
+  isHighlighted?: boolean;
 }
 
-export default function ArchiveTask({ task, onDelete }: ArchiveTaskProps) {
+export default function ArchiveTask({ task, onDelete, isHighlighted }: ArchiveTaskProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const taskRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isHighlighted && taskRef.current) {
+      taskRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [isHighlighted]);
 
   const handleDeleteConfirm = () => {
     onDelete(task.id);
@@ -74,7 +82,13 @@ export default function ArchiveTask({ task, onDelete }: ArchiveTaskProps) {
   };
 
   return (
-    <div className="border-lightgray dark:border-darkgray dark:bg-black-100 rounded-lg border bg-white p-4 shadow-sm">
+    <div
+      ref={taskRef}
+      className={`border-lightgray dark:border-darkgray dark:bg-black-100 rounded-lg border bg-white p-4 shadow-sm transition-all duration-500 ${isHighlighted
+          ? "ring-2 ring-customBlue-600 border-customBlue-600 bg-blue-50/50 dark:bg-blue-900/10 scale-[1.02]"
+          : ""
+        }`}
+    >
       <div className="flex items-start justify-between">
         <div className="flex-1">
           {/* Task Title */}

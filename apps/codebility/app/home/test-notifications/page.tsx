@@ -7,8 +7,9 @@ import { useUserStore } from "@/store/codev-store";
 import { toast } from "sonner";
 import { sendTestNotification as sendNotificationAction } from "./actions";
 import { ManualFetchTest } from "./manual-fetch";
+import type { Notification } from "@/types/notifications";
 
-const testNotifications = [
+const testNotifications: Array<any> = [
   {
     title: "Welcome to Codebility!",
     message: "Your account has been set up successfully. Start exploring!",
@@ -24,21 +25,15 @@ const testNotifications = [
   },
   {
     title: "Task Completed!",
-    message: "Great job! You completed the login page implementation",
+    message: "Great job! You completed the login page implementation. View it in the Archive.",
     type: "success" as const,
     priority: "normal" as const,
-  },
-  {
-    title: "Task Completed!",
-    message: "Congratulations! You have completed the task 'Implement User Authentication' and gained 25+ points.",
-    type: "achievement" as const,
-    priority: "normal" as const,
-    action_url: "/home/tasks",
+    action_url: "/home/kanban/00000000-0000-0000-0000-000000000001/00000000-0000-0000-0000-000000000002?view=archive&taskId=00000000-0000-0000-0000-000000000003",
     metadata: {
-      taskId: "test-task-123",
+      taskId: "00000000-0000-0000-0000-000000000003",
       taskTitle: "Implement User Authentication",
       pointsAwarded: 25,
-      skillCategoryId: "backend-development",
+      skillCategoryId: "00000000-0000-0000-0000-000000000004",
       completedAt: new Date().toISOString()
     },
   },
@@ -85,7 +80,7 @@ const testNotifications = [
   },
   {
     title: "System Maintenance",
-    message: "Scheduled maintenance on Dec 25, 2024 from 2:00 AM to 4:00 AM",
+    message: "Scheduled maintenance on Dec 25, 2026 from 2:00 AM to 4:00 AM",
     type: "system" as const,
     priority: "urgent" as const,
   },
@@ -111,7 +106,7 @@ export default function TestNotificationsPage() {
       if (result?.error) {
         toast.error("Failed to create notification: " + result.error);
       } else {
-        // Don't show success toast here, the notification will appear in the panel
+        
       }
     } catch (error) {
       toast.error("Failed to create notification");
@@ -133,11 +128,10 @@ export default function TestNotificationsPage() {
             <div className="mb-3">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-semibold">{notification.title}</h3>
-                <span className={`text-xs px-2 py-1 rounded-full ${
-                  notification.priority === "urgent" ? "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300" :
+                <span className={`text-xs px-2 py-1 rounded-full ${notification.priority === "urgent" ? "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300" :
                   notification.priority === "high" ? "bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300" :
-                  "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
-                }`}>
+                    "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                  }`}>
                   {notification.priority}
                 </span>
               </div>

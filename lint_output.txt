@@ -1,0 +1,36 @@
+turbo 2.6.3
+
+• Packages in scope: codebility
+• Running lint in 1 packages
+• Remote caching disabled
+codebility:lint: cache miss, executing 910a6343cb3c3f0e
+codebility:lint: 
+codebility:lint: > codebility@0.1.0 lint C:\Users\Codevs\codebility-plus\apps\codebility
+codebility:lint: > eslint .
+codebility:lint: 
+codebility:lint: 
+codebility:lint: Oops! Something went wrong! :(
+codebility:lint: 
+codebility:lint: ESLint: 8.57.1
+codebility:lint: 
+codebility:lint: Error [ERR_PACKAGE_PATH_NOT_EXPORTED]: Package subpath './nextjs' is not defined by "exports" in C:\Users\Codevs\codebility-plus\apps\codebility\node_modules\@codevs\eslint-config\package.json imported from C:\Users\Codevs\codebility-plus\apps\codebility\eslint.config.js
+codebility:lint:     at exportsNotFound (node:internal/modules/esm/resolve:322:10)
+codebility:lint:     at packageExportsResolve (node:internal/modules/esm/resolve:670:9)
+codebility:lint:     at packageResolve (node:internal/modules/esm/resolve:856:14)
+codebility:lint:     at moduleResolve (node:internal/modules/esm/resolve:946:18)
+codebility:lint:     at defaultResolve (node:internal/modules/esm/resolve:1188:11)
+codebility:lint:     at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:708:12)
+codebility:lint:     at #cachedDefaultResolve (node:internal/modules/esm/loader:657:25)
+codebility:lint:     at ModuleLoader.resolve (node:internal/modules/esm/loader:640:38)
+codebility:lint:     at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:264:38)
+codebility:lint:     at ModuleJob._link (node:internal/modules/esm/module_job:168:49)
+codebility:lint:  ELIFECYCLE  Command failed with exit code 2.
+codebility:lint: ERROR: command finished with error: command (C:\Users\Codevs\codebility-plus\apps\codebility) C:\Users\BONFIRE BASE\AppData\Local\pnpm\.tools\pnpm\10.25.0\bin\pnpm.CMD run lint exited (2)
+codebility#lint: command (C:\Users\Codevs\codebility-plus\apps\codebility) C:\Users\BONFIRE BASE\AppData\Local\pnpm\.tools\pnpm\10.25.0\bin\pnpm.CMD run lint exited (2)
+
+ Tasks:    0 successful, 1 total
+Cached:    0 cached, 1 total
+  Time:    6.793s 
+Failed:    codebility#lint
+
+ ERROR  run failed: command  exited (2)
