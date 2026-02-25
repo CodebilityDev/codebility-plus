@@ -299,14 +299,12 @@ const AddMembersModal = ({
   const teamLeadData = teamLead.data;
   const currentMembers = members.data ?? [];
 
-  const [supabase, setSupabase] = useState<any>(null);
-
-  useEffect(() => {
+  const supabase = useMemo(() => {
     try {
-      const supabaseClient = createClientClientComponent();
-      setSupabase(supabaseClient);
+      return createClientClientComponent();
     } catch (error) {
       console.error('Failed to initialize Supabase client:', error);
+      return null;
     }
   }, []);
 
@@ -319,7 +317,7 @@ const AddMembersModal = ({
   const [isLoadingMembers, setIsLoadingMembers] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  // ✅ NEW: Direct fetch function that includes ALL internal statuses including INTERN
+  // ✅ FIXED: Paginated fetch to bypass Supabase's 1000-row default limit
   const fetchAllCodevs = useCallback(async (): Promise<Codev[]> => {
     if (!supabase) {
       console.error('Supabase client not available');
@@ -327,18 +325,34 @@ const AddMembersModal = ({
     }
 
     try {
-      const { data, error } = await supabase
-        .from('codev')
-        .select('*')
-        .in('internal_status', ['GRADUATED', 'INTERN', 'MENTOR', 'TRAINING', 'ADMIN', 'ONBOARDING'])
-        .order('first_name', { ascending: true });
+      const PAGE_SIZE = 1000;
+      let allData: Codev[] = [];
+      let from = 0;
 
-      if (error) {
-        console.error('Error fetching codevs:', error);
-        throw error;
+      while (true) {
+        const { data, error } = await supabase
+          .from('codev')
+          .select('*')
+          .in('internal_status', ['GRADUATED', 'INTERN', 'MENTOR', 'TRAINING', 'ADMIN', 'ONBOARDING'])
+          .order('first_name', { ascending: true })
+          .range(from, from + PAGE_SIZE - 1);
+
+        if (error) {
+          console.error('Error fetching codevs page:', error);
+          throw error;
+        }
+
+        if (!data || data.length === 0) break;
+
+        allData = [...allData, ...data];
+
+        // If we got fewer rows than PAGE_SIZE, we've reached the last page
+        if (data.length < PAGE_SIZE) break;
+
+        from += PAGE_SIZE;
       }
 
-      return data || [];
+      return allData;
     } catch (error) {
       console.error('Failed to fetch codevs directly:', error);
       throw error;
@@ -433,7 +447,7 @@ const AddMembersModal = ({
     }
   }, [getCompleteCodevProfileSafe, openProfileModal]);
 
-  // ✅ FIXED: Load available members using direct fetch that includes INTERNS
+  // ✅ Load available members
   useEffect(() => {
     let isMounted = true;
     let timeoutId: NodeJS.Timeout;
@@ -445,14 +459,12 @@ const AddMembersModal = ({
       setLoadError(null);
       
       try {
-        // Set up timeout
         timeoutId = setTimeout(() => {
           if (isMounted) {
             throw new Error('Loading timeout');
           }
         }, 30000);
 
-        // ✅ Use direct fetch instead of getProjectCodevs()
         const users = await fetchAllCodevs();
         
         clearTimeout(timeoutId);
@@ -560,7 +572,7 @@ const AddMembersModal = ({
     }
   }, [isOpen]);
 
-  // ✅ FIXED: Submit handler with username and username_updated_at
+  // ✅ Submit handler
   const handleSubmit = async () => {
     if (!teamLeadData) {
       toast.error('Team leader not found');
@@ -699,74 +711,76 @@ const AddMembersModal = ({
                     </Button>
                   </div>
                 ) : filteredUsers.length > 0 ? (
-                  filteredUsers.slice(0, 50).map((user) => (
-                    <div
-                      key={user.id}
-                      onClick={() => toggleMember(user)}
-                      className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg cursor-pointer transition-all duration-200 ${
-                        isSelected(user.id) 
-                          ? 'bg-customBlue-600/30 ring-2 ring-customBlue-500' 
-                          : 'hover:bg-gray-700/30'
-                      }`}
-                    >
-                      <div className="flex-shrink-0">
-                        <div 
-                          className={`relative rounded-full overflow-hidden ring-2 transition-all duration-200 cursor-pointer hover:ring-customBlue-300 ${
-                            isSelected(user.id) 
-                              ? 'ring-customBlue-500' 
-                              : 'ring-customBlue-400'
-                          }`}
-                          style={{ width: 40, height: 40 }}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleProfileClick(user);
-                          }}
-                          title="Click to view profile"
-                        >
-                          <img
-                            src={
-                              user.image_url ||
-                              "https://codebility-cdn.pages.dev/assets/images/default-avatar-200x200.jpg"
-                            }
-                            alt={`${user.first_name} ${user.last_name}`}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.src = "https://codebility-cdn.pages.dev/assets/images/default-avatar-200x200.jpg";
-                            }}
-                          />
-                        </div>
-                      </div>
-                      
-                      <div className="flex-1 min-w-0">
-                        <div className="text-white font-semibold text-sm sm:text-base truncate">
-                          {user.first_name} {user.last_name}
-                          {isCurrentMember(user.id) && (
-                            <span className="ml-2 text-xs text-green-400 font-normal">(Current)</span>
-                          )}
-                        </div>
-                        {user.display_position && (
-                          <div className="text-gray-300 text-xs sm:text-sm truncate">
-                            {user.display_position}
-                          </div>
-                        )}
-                      </div>
-                      
-                      <div className="flex-shrink-0">
-                        <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded border-2 flex items-center justify-center transition-all duration-200 ${
+                  filteredUsers
+                    .slice(0, searchQuery ? filteredUsers.length : 50)
+                    .map((user) => (
+                      <div
+                        key={user.id}
+                        onClick={() => toggleMember(user)}
+                        className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg cursor-pointer transition-all duration-200 ${
                           isSelected(user.id) 
-                            ? 'bg-white border-white' 
-                            : 'bg-transparent border-gray-400'
-                        }`}>
-                          {isSelected(user.id) && (
-                            <svg className="w-4 h-4 text-black font-bold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                            </svg>
+                            ? 'bg-customBlue-600/30 ring-2 ring-customBlue-500' 
+                            : 'hover:bg-gray-700/30'
+                        }`}
+                      >
+                        <div className="flex-shrink-0">
+                          <div 
+                            className={`relative rounded-full overflow-hidden ring-2 transition-all duration-200 cursor-pointer hover:ring-customBlue-300 ${
+                              isSelected(user.id) 
+                                ? 'ring-customBlue-500' 
+                                : 'ring-customBlue-400'
+                            }`}
+                            style={{ width: 40, height: 40 }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleProfileClick(user);
+                            }}
+                            title="Click to view profile"
+                          >
+                            <img
+                              src={
+                                user.image_url ||
+                                "https://codebility-cdn.pages.dev/assets/images/default-avatar-200x200.jpg"
+                              }
+                              alt={`${user.first_name} ${user.last_name}`}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.src = "https://codebility-cdn.pages.dev/assets/images/default-avatar-200x200.jpg";
+                              }}
+                            />
+                          </div>
+                        </div>
+                        
+                        <div className="flex-1 min-w-0">
+                          <div className="text-white font-semibold text-sm sm:text-base truncate">
+                            {user.first_name} {user.last_name}
+                            {isCurrentMember(user.id) && (
+                              <span className="ml-2 text-xs text-green-400 font-normal">(Current)</span>
+                            )}
+                          </div>
+                          {user.display_position && (
+                            <div className="text-gray-300 text-xs sm:text-sm truncate">
+                              {user.display_position}
+                            </div>
                           )}
                         </div>
+                        
+                        <div className="flex-shrink-0">
+                          <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded border-2 flex items-center justify-center transition-all duration-200 ${
+                            isSelected(user.id) 
+                              ? 'bg-white border-white' 
+                              : 'bg-transparent border-gray-400'
+                          }`}>
+                            {isSelected(user.id) && (
+                              <svg className="w-4 h-4 text-black font-bold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                              </svg>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  ))
+                    ))
                 ) : (
                   <div className="text-center py-8 text-gray-400">
                     <Users className="h-12 w-12 mx-auto mb-3 opacity-50" />
