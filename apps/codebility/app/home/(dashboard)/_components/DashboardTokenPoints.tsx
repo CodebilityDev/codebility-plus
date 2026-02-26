@@ -26,7 +26,9 @@ export default function TokenPoints() {
   const [points, setPoints] = useState<Record<string, number>>({});
   const [levels, setLevels] = useState<Record<string, number>>({});
   const [attendancePoints, setAttendancePoints] = useState(0);
-  const [socialPoints, setSocialPoints] = useState(0);
+  // Social points default to 0 — RPC was dropped (20260219_drop_obsolete_social_points_rpc.sql)
+  // TODO: Re-implement when feeds/social table is built
+  const [socialPoints] = useState(0);
   const [profilePoints, setProfilePoints] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -48,7 +50,7 @@ export default function TokenPoints() {
       setLoading(true);
       setError(null);
 
-      // FIXED: Use getUser() instead of getSession()
+      // Use getUser() instead of getSession() for secure auth check
       const {
         data: { user: authUser },
         error: authError,
@@ -74,11 +76,12 @@ export default function TokenPoints() {
 
         if (categoriesError) throw categoriesError;
 
+        // Exclude PM from points overview
         const skillCategories = (categories as SkillCategory[]).filter(
           (category) => category.name !== "Project Manager",
-        ); // Exclude PM from points overview
+        );
 
-        // Fetch user's points
+        // Fetch user's skill points
         const { data: pointsData, error: pointsError } = await supabase
           .from("codev_points")
           .select("id, codev_id, skill_category_id, points")
@@ -106,19 +109,16 @@ export default function TokenPoints() {
           setPoints(pointsByCategory);
         }
 
-        // Fetch attendance points from separate table
+        // Fetch attendance points — separate table from skill points
         const { data: attendanceData, error: attendanceError } = await supabase
           .from("attendance_points")
           .select("points")
           .eq("codev_id", authUser.id)
           .single();
 
-        // If no attendance points record exists, create one
+        // PGRST116 = no rows found — create the record if missing
         if (attendanceError && attendanceError.code === "PGRST116") {
-          // Count actual attendance records
           const {
-            data: attendanceCount,
-            error: countError,
             count,
           } = await supabase
             .from("attendance")
@@ -129,7 +129,6 @@ export default function TokenPoints() {
           const totalPoints = (count || 0) * 2;
 
           if (totalPoints > 0) {
-            // Create attendance points record
             const { data: newAttendancePoints } = await supabase
               .from("attendance_points")
               .insert({
@@ -159,7 +158,7 @@ export default function TokenPoints() {
           }
         }
 
-        // Fetch profile points from the API
+        // Fetch profile completion points via API route
         if (user?.id) {
           try {
             const res = await fetch(`/api/profile-points/${user.id}`);
@@ -179,25 +178,7 @@ export default function TokenPoints() {
           }
         }
 
-        // Fetch social points
-        if (user?.id) {
-          try {
-            // Fetch user's points
-            const { data: pointsData, error: pointsError } = await supabase.rpc(
-              "calculate_social_points",
-              { codev_id: user.id },
-            );
-
-            if (pointsError) throw pointsError;
-            if (isMounted) {
-              setSocialPoints(pointsData);
-            }
-          } catch (error) {
-            console.error("Failed to fetch social points:", error);
-          }
-        }
-
-        // Fetch levels for all categories
+        // Fetch levels for all skill categories
         const { data: levelsData, error: levelsError } = await supabase
           .from("levels")
           .select("id, skill_category_id, level, min_points, max_points")
@@ -209,7 +190,7 @@ export default function TokenPoints() {
 
         const skillLevels = levelsData as Level[];
 
-        // Map levels to categories
+        // Map current level to each category based on point thresholds
         const levelsByCategory = skillCategories.reduce(
           (acc, category) => {
             const categoryPoints = pointsByCategory[category.name] || 0;
@@ -235,20 +216,19 @@ export default function TokenPoints() {
           setLevels(levelsByCategory);
         }
 
+        // Check if user qualifies for promotion
         if (isMounted) {
           if (
             user?.role_id == 4 &&
             Object.values(levelsByCategory).some((value) => value >= 2) &&
-            !promotionAccepted // Don't show if promotion was already accepted
+            !promotionAccepted
           ) {
             setRoleToBePromoted("Codev");
             if (!user?.promote_declined) setIsModalOpen(true);
-          }
-          //Codev ready to be promoted to Mentor
-          else if (
+          } else if (
             user?.role_id == 10 &&
             Object.values(levelsByCategory).some((value) => value >= 3) &&
-            !promotionAccepted // Don't show if promotion was already accepted
+            !promotionAccepted
           ) {
             setUserLevel(2);
             setRoleToBePromoted("Mentor");
@@ -272,7 +252,7 @@ export default function TokenPoints() {
     return () => {
       isMounted = false;
     };
-  }, [user, promotionAccepted]); // Add promotionAccepted to dependencies
+  }, [user, promotionAccepted]);
 
   const handlePromotionAccepted = () => {
     setPromotionAccepted(true);
@@ -283,12 +263,10 @@ export default function TokenPoints() {
   if (loading) {
     return (
       <Box className="!before:absolute !before:inset-0 !before:bg-gradient-to-br !before:from-white/10 !before:to-transparent !before:pointer-events-none relative flex w-full flex-1 flex-col gap-6 overflow-hidden !border-white/10 !bg-white/5 !shadow-2xl !backdrop-blur-2xl dark:!border-slate-400/10 dark:!bg-slate-900/5">
-        {/* Background decoration */}
         <div className="from-customBlue-50/30 dark:from-customBlue-950/10 absolute inset-0 bg-gradient-to-br to-purple-50/30 dark:to-purple-950/10" />
         <div className="absolute -right-4 -top-4 h-32 w-32 rounded-full bg-gradient-to-br from-yellow-400/10 to-orange-400/10 blur-2xl" />
 
         <div className="relative">
-          {/* Header skeleton */}
           <div className="mb-4 flex items-center gap-3">
             <Skeleton className="h-10 w-10 rounded-full" />
             <div className="space-y-2">
@@ -297,7 +275,6 @@ export default function TokenPoints() {
             </div>
           </div>
 
-          {/* Cards skeleton */}
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div
@@ -358,8 +335,9 @@ export default function TokenPoints() {
     return colorMap[category] || "from-gray-500 to-gray-600";
   };
 
+  // Calculate progress percentage toward the next level (100 points per level)
   const getProgressToNextLevel = (category: string, currentPoints: number) => {
-    const nextLevelThreshold = (levels[category] ?? 1) * 100; // Assuming 100 points per level, default to level 1 if undefined
+    const nextLevelThreshold = (levels[category] ?? 1) * 100;
     const progress = ((currentPoints % 100) / 100) * 100;
     return Math.min(progress, 100);
   };
@@ -373,7 +351,6 @@ export default function TokenPoints() {
 
   return (
     <Box className="!before:absolute !before:inset-0 !before:bg-gradient-to-br !before:from-white/10 !before:to-transparent !before:pointer-events-none relative flex w-full flex-1 flex-col gap-6 overflow-hidden !border-white/10 !bg-white/5 !shadow-2xl !backdrop-blur-2xl dark:!border-slate-400/10 dark:!bg-slate-900/5">
-      {/* Background decoration */}
       <div className="from-customBlue-50/30 dark:from-customBlue-950/10 absolute inset-0 bg-gradient-to-br to-purple-50/30 dark:to-purple-950/10" />
       <div className="absolute -right-4 -top-4 h-32 w-32 rounded-full bg-gradient-to-br from-yellow-400/10 to-orange-400/10 blur-2xl" />
 
@@ -497,7 +474,7 @@ export default function TokenPoints() {
             </div>
           </div>
 
-          {/* Skill Points Cards */}
+          {/* Skill Points Cards — one per category */}
           {Object.entries(points).map(([category, point]) => {
             const currentLevel = levels[category] || 1;
             const progress = getProgressToNextLevel(category, point);
@@ -507,7 +484,6 @@ export default function TokenPoints() {
                 key={category}
                 className="dark:bg-white/3 group relative overflow-hidden rounded-xl border border-white/10 bg-white/5 p-4 shadow-sm backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/10 hover:shadow-lg dark:border-white/5 dark:hover:bg-white/5"
               >
-                {/* Background gradient */}
                 <div
                   className={`absolute inset-0 bg-gradient-to-br ${getCategoryColor(category)} opacity-5 transition-opacity group-hover:opacity-10`}
                 />
@@ -537,7 +513,7 @@ export default function TokenPoints() {
                     </div>
                   </div>
 
-                  {/* Progress bar for next level */}
+                  {/* Progress bar toward next level */}
                   <div className="space-y-1">
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-gray-500">
@@ -555,7 +531,7 @@ export default function TokenPoints() {
                     </div>
                   </div>
 
-                  {/* Level badge */}
+                  {/* Level badge — only shown at level 2+ */}
                   {currentLevel >= 2 && (
                     <div className="absolute -right-2 -top-2 animate-pulse rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 px-2 py-1 text-xs font-bold text-white">
                       <ArrowUp className="mr-1 inline h-3 w-3" />
@@ -568,6 +544,7 @@ export default function TokenPoints() {
           })}
         </div>
       </div>
+
       {roleToBePromoted == "Codev" && !promotionAccepted && (
         <div className="relative">
           <div className="to-customBlue-500 absolute inset-0 rounded-lg bg-gradient-to-r from-green-400 opacity-75 blur-sm"></div>
@@ -586,6 +563,7 @@ export default function TokenPoints() {
           />
         </div>
       )}
+
       {roleToBePromoted == "Mentor" && !promotionAccepted && (
         <div className="relative">
           <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-purple-400 to-pink-500 opacity-75 blur-sm"></div>
