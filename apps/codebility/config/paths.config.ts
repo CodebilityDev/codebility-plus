@@ -27,6 +27,7 @@ const PathsSchema = z.object({
     my_team: z.string().min(1),
     admin_dashboard: z.string().min(1),
     overflow: z.string().min(1),
+    ticket_support: z.string().min(1),
   }),
 });
 
@@ -57,6 +58,7 @@ const pathsConfig = PathsSchema.parse({
     resume: "/home/settings/resume",
     admin_dashboard: "/home/admin-dashboard",
     overflow: "/home/overflow",
+    ticket_support: "/home/ticket-support",
   },
 } satisfies z.infer<typeof PathsSchema>);
 
