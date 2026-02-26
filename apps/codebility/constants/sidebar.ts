@@ -154,12 +154,6 @@ export const getSidebarData = async (
           label: "Org Chart",
           permission: "orgchart" as PermissionKey,
         },
-        {
-          route: pathsConfig.app.ticket_support,
-          imgURL: "/assets/svgs/icon-ticket-support.svg",
-          label: "Ticket Support",
-          permission: "interns" as PermissionKey,
-        },
       ].filter((link) => hasPermission(link.permission)),
     },
     {
@@ -216,7 +210,19 @@ export const getSidebarData = async (
         },
       ].filter((link) => hasPermission(link.permission)),
     },
-  ].filter(section => section.links.length > 0);
+    {
+      id: "4",
+      title: "Help",
+      links: [
+        {
+          route: pathsConfig.app.ticket_support,
+          imgURL: "/assets/svgs/icon-ticket-support.svg",
+          label: "Ticket Support",
+          permission: "interns" as PermissionKey,
+        },
+      ].filter((link) => hasPermission(link.permission)),
+    },
+  ].filter((section) => section.links.length > 0);
 
   return sidebarData;
 };
