@@ -164,7 +164,9 @@ export default function ServicesPage() {
       return <CoverPagePreview />;
     } else if (currentPage <= services.length) {
       const serviceIndex = currentPage - 1;
-      return <ServicePagePreview service={services[serviceIndex]} index={serviceIndex} />;
+      const service = services[serviceIndex];
+      if (!service) return null;
+      return <ServicePagePreview service={service} index={serviceIndex} />;
     } else {
       return <SummaryPagePreview />;
     }
@@ -199,18 +201,14 @@ export default function ServicesPage() {
     }
 
     try {
-      console.log('🚀 Starting PDF generation - using jsPDF approach...');
       toast("Generating PDF with all pages...", { duration: 5000 });
 
       // Dynamically import libraries
       const html2canvas = (await import('html2canvas')).default;
       const { default: jsPDF } = await import('jspdf');
 
-      console.log('✅ Libraries imported');
-
       // Get all page elements (exclude split preview pages, only use original pages for capture)
       const pages = document.querySelectorAll('#pdf-all-pages-hidden .pdf-page:not(.pdf-split-page)');
-      console.log(`📄 Found ${pages.length} original pages to capture (excluding split preview pages)`);
 
       if (pages.length === 0) {
         toast.error("No pages found to export");
@@ -223,8 +221,6 @@ export default function ServicesPage() {
         unit: 'mm',
         format: 'a4'
       });
-
-      console.log('📄 Created new PDF document');
 
       // Create an overlay to hide the rendering from user
       const overlay = document.createElement('div');
@@ -244,7 +240,6 @@ export default function ServicesPage() {
       // Capture each page
       for (let i = 0; i < pages.length; i++) {
         const page = pages[i] as HTMLElement;
-        console.log(`📸 Capturing page ${i + 1}/${pages.length}...`);
 
         // Update overlay message
         overlay.innerHTML = `<div style="text-align: center;"><div style="font-size: 24px; font-weight: bold; margin-bottom: 10px; color: white;">Generating PDF...</div><div style="font-size: 16px; color: #a5b4fc;">Capturing page ${i + 1} of ${pages.length}</div></div>`;
@@ -268,32 +263,12 @@ export default function ServicesPage() {
         const pageHeight = page.scrollHeight;
         const pageWidth = page.offsetWidth;
 
-        console.log(`📏 Page ${i + 1} dimensions:`, {
-          width: pageWidth,
-          height: pageHeight,
-          a4Width: '794px',
-          a4Height: '1123px',
-          widthInMm: (pageWidth * 25.4 / 96).toFixed(2) + 'mm',
-          heightInMm: (pageHeight * 25.4 / 96).toFixed(2) + 'mm'
-        });
-
         // Capture with html2canvas without forcing dimensions
         const canvas = await html2canvas(page, {
           scale: 2,
           useCORS: true,
           logging: false,
           backgroundColor: '#0f172a'
-        });
-
-        console.log(`✅ Page ${i + 1} captured:`, {
-          width: canvas.width,
-          height: canvas.height,
-          widthAt1x: canvas.width / 2,
-          heightAt1x: canvas.height / 2,
-          expectedA4Width: 794,
-          expectedA4Height: 1123,
-          widthDiff: (canvas.width / 2) - 794,
-          heightDiff: (canvas.height / 2) - 1123
         });
 
         // Hide the page again
@@ -307,7 +282,6 @@ export default function ServicesPage() {
         const a4WidthMm = 210; // A4 width in mm
 
         const numPages = Math.ceil(pageHeight / a4HeightPx);
-        console.log(`📄 Page ${i + 1} needs ${numPages} PDF page(s)`);
 
         // Split the canvas into multiple PDF pages if needed
         for (let j = 0; j < numPages; j++) {
@@ -378,7 +352,6 @@ export default function ServicesPage() {
               );
             }
 
-            console.log(`✅ Page ${i + 1}, section ${j + 1}/${numPages} added to PDF`);
           }
         }
       }
@@ -390,7 +363,6 @@ export default function ServicesPage() {
       const filename = `codebility-services-catalog-${new Date().toISOString().split('T')[0]}.pdf`;
       pdf.save(filename);
 
-      console.log('✅ PDF saved:', filename);
       toast.success("PDF downloaded successfully!");
     } catch (error) {
       console.error("❌ Error generating PDF:", error);
@@ -1425,7 +1397,7 @@ export default function ServicesPage() {
   }
 
   return (
-    <PageContainer maxWidth="6xl">
+    <PageContainer maxWidth="7xl">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div className="flex items-center gap-3">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-500 shadow-lg">

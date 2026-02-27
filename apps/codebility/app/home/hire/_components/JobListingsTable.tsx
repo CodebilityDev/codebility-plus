@@ -105,7 +105,6 @@ export default function JobListingsTable() {
         .order('posted_date', { ascending: false });
 
       if (jobsError) {
-        console.error('Error fetching job listings:', jobsError);
         toast({
           title: "Failed to load job listings",
           description: "Please refresh the page to try again.",
@@ -136,7 +135,6 @@ export default function JobListingsTable() {
 
       setJobs(jobsWithCounts);
     } catch (error) {
-      console.error('Error:', error);
       toast({
         title: "An error occurred",
         description: "Failed to load job listings.",
@@ -148,14 +146,10 @@ export default function JobListingsTable() {
   };
 
   const handleDelete = async (jobId: string) => {
-    console.log("Delete button clicked for job ID:", jobId);
     
     if (confirm("Are you sure you want to delete this job listing? This action cannot be undone.")) {
       try {
-        console.log("User confirmed deletion, calling deleteJobListing...");
         const result = await deleteJobListing(jobId);
-
-        console.log("Delete result:", result);
 
         if (!result.success) {
           throw new Error(result.error || "Failed to delete job");
@@ -169,15 +163,12 @@ export default function JobListingsTable() {
           description: "The job listing has been permanently removed.",
         });
       } catch (error) {
-        console.error('Delete error:', error);
         toast({
           title: "Failed to delete",
           description: error instanceof Error ? error.message : "Please try again later.",
           variant: "destructive",
         });
       }
-    } else {
-      console.log("User cancelled deletion");
     }
   };
 
@@ -233,7 +224,6 @@ export default function JobListingsTable() {
         description: `The job listing has been ${statusText} successfully.`,
       });
     } catch (error) {
-      console.error('Status update error:', error);
       toast({
         title: "Failed to update status",
         description: error instanceof Error ? error.message : "Please try again later.",

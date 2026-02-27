@@ -56,7 +56,6 @@ const LeftSidebar = () => {
             
             // Filter out Codev Overflow from CODEVS section
             if (link.label === "Codev Overflow") {
-              console.log("🚧 Codev Overflow feature not yet implemented - hiding from navigation");
               return false;
             }
             

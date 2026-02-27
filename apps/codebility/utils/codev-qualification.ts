@@ -1,5 +1,4 @@
 import { Codev, CodevPoints } from "@/types/home/codev";
-
 /**
  * Calculate total points across all skill categories for a codev
  * @param codev_points - Array of CodevPoints from codev.codev_points
@@ -16,7 +15,6 @@ export const getTotalCodevPoints = (codev_points?: CodevPoints[]): number => {
     return sum + pointValue;
   }, 0);
 };
-
 /**
  * Check if a codev meets the showcase qualification criteria
  * 
@@ -34,27 +32,12 @@ export const getTotalCodevPoints = (codev_points?: CodevPoints[]): number => {
 export const isQualifiedForShowcase = (codev: Codev): boolean => {
   const totalPoints = getTotalCodevPoints(codev.codev_points);
   
-  // Simplified qualification criteria (3 checks only)
   const meetsPointsThreshold = totalPoints >= 100;
   const hasPassedApplication = codev.application_status === "passed";
   const isAvailable = codev.availability_status === true;
   
-  // Debug logging (remove in production)
-  if (process.env.NODE_ENV === "development") {
-    if (!meetsPointsThreshold || !hasPassedApplication || !isAvailable) {
-      console.log(`❌ ${codev.first_name} ${codev.last_name} disqualified:`, {
-        totalPoints,
-        meetsPointsThreshold,
-        internal_status: codev.internal_status,
-        hasPassedApplication,
-        isAvailable,
-      });
-    }
-  }
-  
   return meetsPointsThreshold && hasPassedApplication && isAvailable;
 };
-
 /**
  * Filter an array of codevs to only those who meet showcase qualification
  * @param codevs - Array of Codev objects
@@ -62,24 +45,8 @@ export const isQualifiedForShowcase = (codev: Codev): boolean => {
  */
 export const getQualifiedCodevs = (codevs: Codev[]): Codev[] => {
   if (!Array.isArray(codevs)) {
-    console.warn("getQualifiedCodevs: Expected array, received:", typeof codevs);
     return [];
   }
   
-  const qualified = codevs.filter(isQualifiedForShowcase);
-  
-  // Debug summary
-  if (process.env.NODE_ENV === "development") {
-    console.log(`✅ Qualified codevs: ${qualified.length} out of ${codevs.length}`);
-    
-    // Show total points distribution
-    const pointsDistribution = qualified.map(c => ({
-      name: `${c.first_name} ${c.last_name}`,
-      points: getTotalCodevPoints(c.codev_points),
-      status: c.internal_status
-    }));
-    console.table(pointsDistribution);
-  }
-  
-  return qualified;
+  return codevs.filter(isQualifiedForShowcase);
 };

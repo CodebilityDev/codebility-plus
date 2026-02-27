@@ -201,6 +201,30 @@ export async function completeOnboarding(codevId: string, newStatus: string = "w
       return { success: false, error };
     }
 
+    // If transitioning to waitlist, save the timestamp in applicant table
+    if (newStatus === "waitlist") {
+      const { data: applicantData } = await supabase
+        .from("applicant")
+        .select("id")
+        .eq("codev_id", codevId)
+        .single();
+
+      if (applicantData) {
+        const { error: applicantError } = await supabase
+          .from("applicant")
+          .update({
+            waitlist_entered_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", applicantData.id);
+
+        if (applicantError) {
+          console.error("Error updating applicant waitlist timestamp:", applicantError);
+          // Don't fail the whole operation if this fails
+        }
+      }
+    }
+
     revalidatePath("/applicant/onboarding");
     revalidatePath("/applicant/waiting");
     return { success: true };

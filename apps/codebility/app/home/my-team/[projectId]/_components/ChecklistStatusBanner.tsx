@@ -51,29 +51,18 @@ const ChecklistStatusBanner = ({ projectId }: ChecklistStatusBannerProps) => {
   }, [projectId]);
 
   const fetchFreshMemberData = async () => {
-    // Only log in development - hidden in production
-    if (process.env.NODE_ENV === 'development') {
-      console.log("🔄 ChecklistStatusBanner: Fetching fresh member data...");
-    }
+
     setIsFetchingMembers(true);
     
     try {
       const teamLeadResult = await getTeamLead(projectId);
       if (teamLeadResult.data) {
         setFreshTeamLead(teamLeadResult.data);
-        // Only log sensitive user data in development
-        if (process.env.NODE_ENV === 'development') {
-          console.log("👑 Banner - Team Lead:", teamLeadResult.data.first_name, teamLeadResult.data.last_name);
-        }
       }
 
       const membersResult = await getMembers(projectId);
       if (membersResult.data) {
         setFreshTeamMembers(membersResult.data);
-        // Only log member count in development - don't expose actual member data
-        if (process.env.NODE_ENV === 'development') {
-          console.log("👥 Banner - Fresh members fetched:", membersResult.data.length);
-        }
       }
     } catch (error) {
       // Only log errors in development
@@ -88,11 +77,6 @@ const ChecklistStatusBanner = ({ projectId }: ChecklistStatusBannerProps) => {
   const allMembers = freshTeamLead 
     ? [freshTeamLead, ...freshTeamMembers] 
     : freshTeamMembers;
-
-  // Only log in development
-  if (process.env.NODE_ENV === 'development') {
-    console.log("📊 Banner - Total members for display:", allMembers.length);
-  }
 
   useEffect(() => {
     if (!isFetchingMembers && allMembers.length > 0) {
@@ -114,10 +98,6 @@ const ChecklistStatusBanner = ({ projectId }: ChecklistStatusBannerProps) => {
     }
 
     try {
-      // Only log in development - don't expose member count in production
-      if (process.env.NODE_ENV === 'development') {
-        console.log("🔍 Banner - Loading checklist data for", allMembers.length, "members");
-      }
 
       // Get all checklist items for this project
       const { data: checklistData, error } = await supabase
@@ -131,11 +111,6 @@ const ChecklistStatusBanner = ({ projectId }: ChecklistStatusBannerProps) => {
           console.error("❌ Banner - Error loading checklist data:", error);
         }
         return;
-      }
-
-      // Only log in development
-      if (process.env.NODE_ENV === 'development') {
-        console.log("📋 Banner - Found", checklistData?.length || 0, "total checklist items");
       }
 
       // 🔧 CRITICAL FIX: Create status for ALL members, not just those with items
@@ -154,10 +129,6 @@ const ChecklistStatusBanner = ({ projectId }: ChecklistStatusBannerProps) => {
           pendingItems: memberItems.length - completedCount
         };
 
-        // Only log individual member data in development - SENSITIVE DATA
-        if (process.env.NODE_ENV === 'development') {
-          console.log(`  - ${member.first_name} ${member.last_name}: ${completedCount}/${memberItems.length} completed`);
-        }
       });
 
       // 🔧 CRITICAL FIX: Don't filter out members with 0 items
@@ -173,10 +144,6 @@ const ChecklistStatusBanner = ({ projectId }: ChecklistStatusBannerProps) => {
 
       setMemberStatuses(statusArray);
       
-      // Only log in development
-      if (process.env.NODE_ENV === 'development') {
-        console.log("✅ Banner - Loaded statuses for ALL", statusArray.length, "members (including those with 0 items)");
-      }
     } catch (error) {
       // Only log errors in development
       if (process.env.NODE_ENV === 'development') {
@@ -196,16 +163,6 @@ const ChecklistStatusBanner = ({ projectId }: ChecklistStatusBannerProps) => {
     // 2. They have 0 items (nothing to complete)
     return s.pendingItems === 0;
   }).length;
-
-  // Only log summary in development - don't expose member counts in production
-  if (process.env.NODE_ENV === 'development') {
-    console.log("📊 Banner Summary:", {
-      totalMembers: memberStatuses.length,
-      membersWithPending,
-      membersFullyCompleted,
-      totalPendingItems
-    });
-  }
 
   if (isFetchingMembers) {
     return (

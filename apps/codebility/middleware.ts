@@ -224,7 +224,6 @@ export async function middleware(req: NextRequest) {
       const requiredPermission = routePermissionMap[key];
 
       if (!isValidPermission(requiredPermission)) {
-        console.log(`Invalid permission mapping for route: ${pathname}`);
         return redirectTo(req, "/home");
       }
 
@@ -242,9 +241,6 @@ export async function middleware(req: NextRequest) {
       }
 
       if (!rolePermissions[requiredPermission]) {
-        console.log(
-          `User with role ${role_id} does not have permission "${requiredPermission}" for ${pathname}`,
-        );
         return redirectTo(req, "/home");
       }
     }

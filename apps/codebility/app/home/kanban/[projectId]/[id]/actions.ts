@@ -41,9 +41,9 @@ const updateDeveloperLevels = async (codevId?: string) => {
       .maybeSingle();
 
     if (!levelError && levelData) {
-      return { 
-        skillCategoryId: pointRecord.skill_category_id, 
-        level: levelData.level 
+      return {
+        skillCategoryId: pointRecord.skill_category_id,
+        level: levelData.level
       };
     }
     return null;
@@ -216,14 +216,14 @@ export const createNewTask = async (
         .select("project_id")
         .eq("id", columnData.board_id)
         .single();
-        
+
       if (boardData?.project_id) {
         revalidatePath(`/home/kanban/${boardData.project_id}/${columnData.board_id}`);
-        
+
         // Send notification if task is assigned to someone other than the creator
         if (codev_id && newTask?.id) {
           const { data: { user } } = await supabase.auth.getUser();
-          
+
           // Only send notification if assigning to someone else
           if (user && user.id !== codev_id) {
             await createNotificationAction({
@@ -234,7 +234,7 @@ export const createNewTask = async (
               priority: "normal",
               projectId: boardData.project_id,
               actionUrl: `/home/kanban/${boardData.project_id}/${columnData.board_id}?taskId=${newTask.id}`,
-              metadata: { 
+              metadata: {
                 taskId: newTask.id,
                 assignedAt: new Date().toISOString()
               }
@@ -319,7 +319,7 @@ export const updateTask = async (
     if (codev_id && codev_id !== existingTask.codev_id) {
       // Get current user to avoid self-notification
       const { data: { user } } = await supabase.auth.getUser();
-      
+
       // Only send notification if assigning to someone else
       if (user && user.id !== codev_id) {
         // Fetch project info to build the action URL
@@ -337,7 +337,7 @@ export const updateTask = async (
           priority: "normal",
           projectId: (colData?.kanban_boards as any)?.project_id,
           actionUrl: `/home/kanban/${(colData?.kanban_boards as any)?.project_id}/${colData?.board_id}?taskId=${taskId}`,
-          metadata: { 
+          metadata: {
             taskId,
             assignedAt: new Date().toISOString()
           }
@@ -380,14 +380,14 @@ export const deleteTask = async (
         .select("board_id")
         .eq("id", taskData.kanban_column_id)
         .single();
-        
+
       if (columnData?.board_id) {
         const { data: boardData } = await supabase
           .from("kanban_boards")
           .select("project_id")
           .eq("id", columnData.board_id)
           .single();
-          
+
         if (boardData?.project_id) {
           revalidatePath(`/home/kanban/${boardData.project_id}/${columnData.board_id}`);
         }
@@ -564,7 +564,7 @@ export const completeTask = async (
     // Archive the task immediately
     const { error: archiveError } = await supabase
       .from("tasks")
-      .update({ 
+      .update({
         is_archive: true,
         updated_at: new Date().toISOString()
       })
@@ -573,6 +573,25 @@ export const completeTask = async (
     if (archiveError) {
       console.error("Error archiving task:", archiveError);
       return { success: false, error: `Failed to archive task: ${archiveError.message}` };
+    }
+
+    // Fetch board and project info for the notification URL
+    const { data: columnData } = await supabase
+      .from("kanban_columns")
+      .select("board_id")
+      .eq("id", task.kanban_column_id)
+      .single();
+
+    const boardId = columnData?.board_id;
+    let projectId = null;
+
+    if (boardId) {
+      const { data: boardData } = await supabase
+        .from("kanban_boards")
+        .select("project_id")
+        .eq("id", boardId)
+        .single();
+      projectId = boardData?.project_id;
     }
 
     // OPTIMIZATION: Prepare all member IDs and points
@@ -642,22 +661,26 @@ export const completeTask = async (
     try {
       const notificationPromises = allMemberIds.map(async (memberId, index) => {
         const pointsResult = pointsResults[index];
-        const existingPoints = pointsResult?.data;
+        if (!pointsResult) return null;
+
+        const existingPoints = pointsResult.data;
         const pointsAwarded = memberId === primaryAssigneeId ? taskPoints : sidekickPoints;
-        
+
         // Only send notification if points were successfully awarded
-        if (!criticalErrors.some(error => 
-          error.error && 
-          (pointsResult.error === error.error || 
-           (!existingPoints && pointsResults[index].error === error.error))
+        if (!criticalErrors.some(error =>
+          error.error &&
+          (pointsResult?.error === error.error ||
+            (!existingPoints && pointsResult?.error === error.error))
         )) {
           return createNotificationAction({
             recipientId: memberId,
             title: "Task Completed!",
             message: `Congratulations! You have completed the task '${task.title}' and gained ${pointsAwarded}+ points.`,
-            type: "achievement",
+            type: "success",
             priority: "normal",
-            actionUrl: `/home/tasks`,
+            actionUrl: projectId && boardId
+              ? `/home/kanban/${projectId}/${boardId}?view=archive&taskId=${task.id}`
+              : `/home/tasks`,
             metadata: {
               taskId: task.id,
               taskTitle: task.title,
@@ -671,7 +694,7 @@ export const completeTask = async (
 
       const notificationResults = await Promise.all(notificationPromises.filter(Boolean));
       const failedNotifications = notificationResults.filter(result => result?.error);
-      
+
       if (failedNotifications.length > 0) {
         console.warn("Some notifications failed to send:", failedNotifications);
       }
@@ -682,6 +705,12 @@ export const completeTask = async (
 
     // Single revalidation at the end
     revalidatePath("/home/kanban");
+    if (projectId) {
+      revalidatePath(`/home/kanban/${projectId}`);
+    }
+    if (projectId && boardId) {
+      revalidatePath(`/home/kanban/${projectId}/${boardId}`);
+    }
 
     return { success: true };
   } catch (error) {
@@ -747,14 +776,14 @@ export async function updateTaskPRLink(taskId: string, prLink: string) {
         .select("board_id")
         .eq("id", taskData.kanban_column_id)
         .single();
-        
+
       if (columnData?.board_id) {
         const { data: boardData } = await supabase
           .from("kanban_boards")
           .select("project_id")
           .eq("id", columnData.board_id)
           .single();
-          
+
         if (boardData?.project_id) {
           revalidatePath(`/home/kanban/${boardData.project_id}/${columnData.board_id}`);
         }
@@ -776,7 +805,7 @@ export async function unarchiveTask(taskId: string) {
   try {
     const { error } = await supabase
       .from("tasks")
-      .update({ 
+      .update({
         is_archive: false,
         updated_at: new Date().toISOString()
       })
@@ -799,14 +828,14 @@ export async function unarchiveTask(taskId: string) {
         .select("board_id")
         .eq("id", taskData.kanban_column_id)
         .single();
-        
+
       if (columnData?.board_id) {
         const { data: boardData } = await supabase
           .from("kanban_boards")
           .select("project_id")
           .eq("id", columnData.board_id)
           .single();
-          
+
         if (boardData?.project_id) {
           revalidatePath(`/home/kanban/${boardData.project_id}/${columnData.board_id}`);
         }
@@ -850,9 +879,9 @@ export const saveDraft = async (
 
     // Validate required fields
     if (!created_by || !project_id || !intended_column_id) {
-      return { 
-        success: false, 
-        error: "Missing required fields: created_by, project_id, or intended_column_id" 
+      return {
+        success: false,
+        error: "Missing required fields: created_by, project_id, or intended_column_id"
       };
     }
 
@@ -1092,7 +1121,7 @@ export const promoteDraft = async (
     if (draft.codev_id) {
       // Get current user to avoid self-notification
       const { data: { user } } = await supabase.auth.getUser();
-      
+
       // Only send notification if assigning to someone else
       if (user && user.id !== draft.codev_id) {
         await createNotificationAction({
@@ -1103,7 +1132,7 @@ export const promoteDraft = async (
           priority: "normal",
           projectId: draft.project_id,
           actionUrl: `/home/kanban/${draft.project_id}/${draft.intended_column_id}?taskId=${newTask.id}`,
-          metadata: { 
+          metadata: {
             taskId: newTask.id,
             assignedAt: new Date().toISOString()
           }

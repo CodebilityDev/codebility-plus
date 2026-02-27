@@ -113,19 +113,14 @@ function AssigneeSelector({
     const loadMembers = async () => {
       setIsLoading(true);
       try {
-        console.log("=== LOADING MEMBERS FOR BOARD:", boardId, "===");
         const members = await fetchAvailableMembers(boardId);
-        console.log("=== FETCHED MEMBERS:", members, "===");
 
         if (Array.isArray(members) && members.length > 0) {
           setAvailableMembers(members);
-          console.log("=== SET AVAILABLE MEMBERS:", members.length, "===");
         } else {
-          console.warn("=== NO MEMBERS FOUND OR INVALID RESPONSE ===");
           setAvailableMembers([]);
         }
       } catch (error) {
-        console.error("=== ERROR LOADING MEMBERS:", error, "===");
         setAvailableMembers([]);
       } finally {
         setIsLoading(false);
@@ -143,7 +138,6 @@ function AssigneeSelector({
 
   // IMMEDIATE REMOVAL - Updates UI instantly
   const handleRemove = () => {
-    console.log("=== REMOVING ASSIGNEE IMMEDIATELY ===");
     setLocalAssignee(null); // IMMEDIATE UI UPDATE
     onAssigneeChange([]); // Trigger parent update
   };
@@ -151,7 +145,6 @@ function AssigneeSelector({
   // IMMEDIATE SELECTION - Updates UI instantly
   const handleSelect = (memberId: string) => {
     const selectedMember = availableMembers.find((m) => m.id === memberId);
-    console.log("=== SELECTING MEMBER IMMEDIATELY:", selectedMember, "===");
 
     if (selectedMember) {
       setLocalAssignee(selectedMember); // IMMEDIATE UI UPDATE
@@ -167,7 +160,7 @@ function AssigneeSelector({
         last_name: user.last_name || "",
         image_url: user.image_url,
       };
-      console.log("=== SELF ASSIGNING IMMEDIATELY:", userAsMember, "===");
+
       setLocalAssignee(userAsMember); // IMMEDIATE UI UPDATE
       onAssigneeChange([user.id]); // Trigger parent update
     }
@@ -353,11 +346,6 @@ const TaskViewModal = ({
 
     const fetchBoardId = async () => {
       try {
-        console.log(
-          "=== FETCHING BOARD ID FOR COLUMN:",
-          task.kanban_column_id,
-          "===",
-        );
         const { data, error } = await supabase
           .from("kanban_columns")
           .select("board_id")
@@ -365,14 +353,11 @@ const TaskViewModal = ({
           .single();
 
         if (error) {
-          console.error("=== ERROR FETCHING BOARD ID:", error, "===");
           setBoardId("");
         } else if (data?.board_id) {
-          console.log("=== FOUND BOARD ID:", data.board_id, "===");
           setBoardId(data.board_id);
         }
       } catch (err) {
-        console.error("=== EXCEPTION FETCHING BOARD ID:", err, "===");
         setBoardId("");
       }
     };
@@ -383,7 +368,6 @@ const TaskViewModal = ({
   // Reset states when task changes - AGGRESSIVE RESET
   useEffect(() => {
     if (task?.id) {
-      console.log("=== TASK CHANGED, RESETTING STATES ===");
       setPrLink(task?.pr_link || "");
       setPrimaryAssignee(null);
       setForceRefreshKey(Date.now().toString()); // Force component refresh
@@ -430,8 +414,6 @@ const TaskViewModal = ({
     const fetchPrimaryAssignee = async () => {
       const assigneeId = task?.codev_id || task?.codev?.id;
 
-      console.log("=== FETCHING PRIMARY ASSIGNEE, ID:", assigneeId, "===");
-
       // Always reset first
       setPrimaryAssignee(null);
 
@@ -443,21 +425,15 @@ const TaskViewModal = ({
           .single();
 
         if (!error && data) {
-          console.log("=== FOUND ASSIGNEE DATA:", data, "===");
           setPrimaryAssignee(data as CodevMember);
-        } else {
-          console.log("=== NO ASSIGNEE FOUND, ERROR:", error, "===");
         }
       } else if (task?.codev) {
-        console.log("=== USING TASK.CODEV DIRECTLY:", task.codev, "===");
         setPrimaryAssignee({
           id: task.codev.id,
           first_name: task.codev.first_name,
           last_name: task.codev.last_name,
           image_url: task.codev.image_url,
         });
-      } else {
-        console.log("=== NO ASSIGNEE DATA AVAILABLE ===");
       }
     };
 
@@ -530,7 +506,6 @@ const TaskViewModal = ({
         toast.error(result.error || "Failed to complete task");
       }
     } catch (error) {
-      console.error("Error completing task:", error);
       toast.error("Failed to complete task");
     }
 
@@ -544,7 +519,6 @@ const TaskViewModal = ({
     if (!task || !supabase) return;
 
     const newAssigneeId = memberIds[0] || undefined;
-    console.log("=== ASSIGNMENT CHANGE:", { newAssigneeId, memberIds }, "===");
 
     try {
       // Update database
@@ -563,11 +537,6 @@ const TaskViewModal = ({
             .single();
 
           if (assigneeData) {
-            console.log(
-              "=== UPDATING TASK OBJECT WITH NEW ASSIGNEE:",
-              assigneeData,
-              "===",
-            );
             setPrimaryAssignee(assigneeData);
             if (task) {
               task.codev_id = newAssigneeId;
@@ -578,7 +547,6 @@ const TaskViewModal = ({
             );
           }
         } else {
-          console.log("=== REMOVING ASSIGNEE FROM TASK ===");
           setPrimaryAssignee(null);
           if (task) {
             task.codev_id = undefined;
@@ -593,11 +561,9 @@ const TaskViewModal = ({
         // Refresh board data
         await fetchBoardData();
       } else {
-        console.error("=== DATABASE ERROR:", error, "===");
         toast.error("Failed to update assignee");
       }
     } catch (error) {
-      console.error("=== ERROR UPDATING ASSIGNEE:", error, "===");
       toast.error("Failed to update assignee");
     }
   };

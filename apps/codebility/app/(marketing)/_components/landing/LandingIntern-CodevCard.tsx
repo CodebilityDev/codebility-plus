@@ -103,7 +103,6 @@ function Avatar({
           onError={() => setImgError(true)}
           onLoad={() => {
             setImgLoaded(true);
-            console.log('Image loaded:', person.name);
           }}
           className={`absolute top-1/2 left-1/2 object-cover transition-opacity duration-200 ${
             imgLoaded ? 'opacity-100' : 'opacity-0'

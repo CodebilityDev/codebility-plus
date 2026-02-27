@@ -41,7 +41,6 @@ async function saveAttendanceRecord(
   let result;
 
   if (existing) {
-    console.log(`[UPDATE] Updating record: ${existing.id}`);
     result = await supabase
       .from("attendance")
       .update({
@@ -56,7 +55,6 @@ async function saveAttendanceRecord(
       .select()
       .single();
   } else {
-    console.log(`[INSERT] Creating record for ${record.date}`);
     result = await supabase
       .from("attendance")
       .insert({
@@ -79,7 +77,6 @@ async function saveAttendanceRecord(
     return { success: false, error: result.error.message };
   }
 
-  console.log(`[SAVE SUCCESS] ${existing ? "Updated" : "Created"} record for ${record.date}`);
   return { success: true, data: result.data };
 }
 
@@ -161,8 +158,6 @@ export async function bulkSaveAttendance(
   const supabase = await createClientServerComponent();
 
   try {
-    console.log(`[BULK SAVE] Processing ${records.length} records`);
-
     // ✅ Use saveAttendanceRecord (not saveAttendance) to avoid:
     //    1. Redundant revalidatePath calls per record
     //    2. The old recalculateAttendancePoints race condition
@@ -186,7 +181,6 @@ export async function bulkSaveAttendance(
       revalidatePath(`/home`);
     }
 
-    console.log(`[BULK SUCCESS] All ${records.length} records saved`);
     return { success: true, results };
   } catch (error) {
     console.error("[BULK ERROR] Unexpected:", error);
@@ -201,7 +195,6 @@ export async function syncAllAttendancePoints(projectId?: string) {
   const supabase = await createClientServerComponent();
 
   try {
-    console.log(`[MASS SYNC START]${projectId ? ` Project: ${projectId}` : " All projects"}`);
 
     let query = supabase.from("attendance").select("codev_id");
     if (projectId) query = query.eq("project_id", projectId);
@@ -235,8 +228,7 @@ export async function syncAllAttendancePoints(projectId?: string) {
           );
       })
     );
-
-    console.log(`[MASS SYNC SUCCESS] ${uniqueCodevIds.length} members processed`);
+    
     return {
       success: true,
       message: `Successfully synced ${uniqueCodevIds.length} members`,

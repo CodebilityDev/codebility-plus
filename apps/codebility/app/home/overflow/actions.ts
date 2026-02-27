@@ -51,7 +51,6 @@ export async function fetchQuestions(page: number = 1, pageSize: number = 5): Pr
     .range(start, end)
 
   if (error) {
-    console.error('Error fetching questions:', error)
     return { questions: [], currentPage: 1, totalPages: 0, totalCount: 0 }
   }
 
@@ -119,15 +118,8 @@ async function compressImage(base64String: string): Promise<Buffer> {
       })
       .toBuffer();
 
-    const originalSize = imageBuffer.length;
-    const compressedSize = compressedBuffer.length;
-    const savings = ((1 - compressedSize / originalSize) * 100).toFixed(1);
-
-    console.log(`Compressed image: ${(originalSize / 1024).toFixed(2)}KB → ${(compressedSize / 1024).toFixed(2)}KB (${savings}% reduction)`);
-
     return compressedBuffer;
   } catch (error) {
-    console.error('Error compressing image:', error);
     throw new Error('Failed to compress image');
   }
 }
@@ -146,8 +138,6 @@ async function uploadImageToStorage(
       const randomString = Math.random().toString(36).substring(2, 15);
       const filename = `${authorId}_${timestamp}_${randomString}.jpg`;
 
-      console.log(`Processing image (attempt ${attempt + 1}/${retries}):`, filename);
-
       // Compress the image server-side
       const compressedBuffer = await compressImage(base64Image);
 
@@ -161,8 +151,6 @@ async function uploadImageToStorage(
         });
 
       if (error) {
-        console.error(`Upload error (attempt ${attempt + 1}):`, error);
-        
         // Retry on certain errors
         if (attempt < retries - 1 && (error.message.includes('timeout') || error.message.includes('network'))) {
           await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1))); // Exponential backoff
@@ -174,12 +162,9 @@ async function uploadImageToStorage(
 
       // Return the public URL
       const publicUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/codebility/overflowPostImage/${filename}`;
-      console.log('Upload successful:', publicUrl);
       return publicUrl;
       
     } catch (error) {
-      console.error(`Error in uploadImageToStorage (attempt ${attempt + 1}):`, error);
-      
       if (attempt < retries - 1) {
         await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
         continue;
@@ -204,32 +189,16 @@ export async function postQuestion(data: PostQuestionData) {
   try {
     const supabase = await createClientServerComponent();
 
-    console.log('Starting question post with', data.images.length, 'images');
-
     // Upload all images in parallel with compression and error handling
     const imageUploadPromises = data.images.map((base64Image, index) => 
       uploadImageToStorage(supabase, base64Image, data.authorId)
-        .then(url => {
-          if (url) {
-            console.log(`Image ${index + 1} compressed and uploaded successfully`);
-          } else {
-            console.warn(`Image ${index + 1} failed to upload`);
-          }
-          return url;
-        })
+        .then(url => url)
     );
 
     const uploadedImageUrls = await Promise.all(imageUploadPromises);
 
     // Filter out any failed uploads (nulls)
     const validImageUrls = uploadedImageUrls.filter((url): url is string => url !== null);
-
-    console.log(`Successfully uploaded ${validImageUrls.length} out of ${data.images.length} images`);
-
-    // Warn if some images failed
-    if (validImageUrls.length < data.images.length) {
-      console.warn(`${data.images.length - validImageUrls.length} images failed to upload`);
-    }
 
     // Insert the question into overflow_post table
     const { data: insertedQuestion, error } = await supabase
@@ -265,7 +234,6 @@ export async function postQuestion(data: PostQuestionData) {
       .single();
 
     if (error) {
-      console.error('Error inserting question:', error);
       throw new Error(`Failed to post question: ${error.message}`);
     }
 
@@ -299,7 +267,6 @@ export async function postQuestion(data: PostQuestionData) {
     };
 
   } catch (error) {
-    console.error('Error in postQuestion:', error);
     return { 
       success: false, 
       error: error instanceof Error ? error.message : 'Failed to post question' 
@@ -321,7 +288,6 @@ async function deleteImageFromStorage(supabase: any, imageUrl: string): Promise<
   try {
     const publicPath = imageUrl.split('/storage/v1/object/public/codebility/')[1];
     if (!publicPath) {
-      console.warn('Invalid image URL format:', imageUrl);
       return false;
     }
 
@@ -330,14 +296,11 @@ async function deleteImageFromStorage(supabase: any, imageUrl: string): Promise<
       .remove([publicPath]);
 
     if (error) {
-      console.error(`Failed to delete image: ${publicPath}`, error);
       return false;
     }
 
-    console.log('Successfully deleted image:', publicPath);
     return true;
   } catch (error) {
-    console.error('Error deleting image:', error);
     return false;
   }
 }
@@ -354,7 +317,6 @@ export async function updateQuestion(data: UpdateQuestionData) {
       .single();
 
     if (fetchError) {
-      console.error('Error fetching existing post:', fetchError);
       return { success: false, error: 'Failed to fetch existing post' };
     }
 
@@ -374,21 +336,10 @@ export async function updateQuestion(data: UpdateQuestionData) {
       }
     });
 
-    console.log('Image update summary:', {
-      existing: existingUrls.length,
-      new: newBase64Images.length,
-      toDelete: previousImageUrls.length - existingUrls.length
-    });
-
     // Upload new images in parallel with compression
     const newImageUploadPromises = newBase64Images.map((base64Image, index) => 
       uploadImageToStorage(supabase, base64Image, data.authorId)
-        .then(url => {
-          if (url) {
-            console.log(`New image ${index + 1} compressed and uploaded successfully`);
-          }
-          return url;
-        })
+        .then(url => url)
     );
 
     const uploadedNewImageUrls = await Promise.all(newImageUploadPromises);
@@ -400,7 +351,6 @@ export async function updateQuestion(data: UpdateQuestionData) {
     const imagesToDelete = previousImageUrls.filter(url => !allImageUrls.includes(url));
     
     if (imagesToDelete.length > 0) {
-      console.log(`Deleting ${imagesToDelete.length} removed images`);
       const deletePromises = imagesToDelete.map(url => deleteImageFromStorage(supabase, url));
       await Promise.all(deletePromises);
     }
@@ -437,7 +387,6 @@ export async function updateQuestion(data: UpdateQuestionData) {
       .single();
 
     if (updateError) {
-      console.error('Error updating question:', updateError);
       return { success: false, error: `Database error: ${updateError.message}` };
     }
 
@@ -474,7 +423,6 @@ export async function updateQuestion(data: UpdateQuestionData) {
     };
     
   } catch (error) {
-    console.error('Error in updateQuestion:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to update question',
@@ -498,7 +446,6 @@ export async function deletePostAndImages(postId: number) {
       .single();
 
     if (fetchError) {
-      console.error("Error fetching post:", fetchError);
       return { success: false, error: "Failed to fetch post" };
     }
 
@@ -512,7 +459,7 @@ export async function deletePostAndImages(postId: number) {
       try {
         imageUrls = JSON.parse(post.image_url) as string[];
       } catch {
-        console.warn("Invalid JSON in image_url, skipping image deletion");
+        // Invalid JSON in image_url, skipping image deletion
       }
     }
 
@@ -532,19 +479,15 @@ export async function deletePostAndImages(postId: number) {
         const filePath = pathParts.slice(6).join("/");
 
         if (!bucket || !filePath) {
-          console.warn("Cannot parse storage path from URL:", url);
           continue;
         }
 
-        const { error: deleteError } = await supabase.storage
+        await supabase.storage
           .from(bucket)
           .remove([filePath]);
 
-        if (deleteError) {
-          console.warn("Failed to delete file from storage:", filePath, deleteError);
-        }
       } catch (e) {
-        console.warn("Error deleting image URL:", url, e);
+        // Error deleting image, continue with next
       }
     }
 
@@ -555,13 +498,11 @@ export async function deletePostAndImages(postId: number) {
       .eq("id", postId);
 
     if (deletePostError) {
-      console.error("Failed to delete post:", deletePostError);
       return { success: false, error: "Failed to delete post" };
     }
 
     return { success: true };
   } catch (error) {
-    console.error("Error in deletePostAndImages:", error);
     return { success: false, error: "Internal error" };
   }
 }
@@ -614,7 +555,6 @@ export async function fetchComments(postId: string): Promise<Comment[]> {
     .order('created_at', { ascending: true });
 
   if (error) {
-    console.error('Error fetching comments:', error);
     return [];
   }
 
@@ -644,8 +584,6 @@ export async function postComment(data: PostCommentData) {
   try {
     const supabase = await createClientServerComponent();
 
-    console.log('Posting comment with data:', data);
-
     // Convert post_id to number for insertion
     const postIdNumber = parseInt(data.post_id);
 
@@ -673,12 +611,8 @@ export async function postComment(data: PostCommentData) {
       .single();
 
     if (error) {
-      console.error('Supabase insert error:', error);
-      console.error('Error details:', JSON.stringify(error, null, 2));
       return { success: false, error: `Database error: ${error.message}` };
     }
-
-    console.log('Inserted comment data:', insertedComment);
 
     // Handle codev data (could be array or object)
     const codevData = Array.isArray(insertedComment.codev) 
@@ -692,7 +626,6 @@ export async function postComment(data: PostCommentData) {
     .single();
 
     if (fetchError) {
-    console.error('Error fetching post:', fetchError);
     return;
     }
 
@@ -704,12 +637,7 @@ export async function postComment(data: PostCommentData) {
         .update({ comments: currentCount + 1 })
         .eq('id', postIdNumber);
 
-
-
-    if (updateError) {
-      console.error('Error updating comment count:', updateError);
-      // Don't fail the whole operation if count update fails
-    }
+    // Don't fail the whole operation if count update fails
 
     const comment: Comment = {
       id: insertedComment.id.toString(),
@@ -730,7 +658,6 @@ export async function postComment(data: PostCommentData) {
     revalidatePath('/home/overflow');
     return { success: true, comment };
   } catch (error) {
-    console.error('Error in postComment:', error);
     return { 
       success: false, 
       error: error instanceof Error ? error.message : 'Failed to post comment' 
@@ -790,8 +717,6 @@ export async function updateComment(data: UpdateCommentData) {
   try {
     const supabase = await createClientServerComponent();
 
-    console.log('Updating comment with data:', data);
-
     // Convert comment_id to number for the query
     const commentIdNumber = parseInt(data.comment_id);
 
@@ -820,12 +745,8 @@ export async function updateComment(data: UpdateCommentData) {
       .single();
 
     if (error) {
-      console.error('Supabase update error:', error);
-      console.error('Error details:', JSON.stringify(error, null, 2));
       return { success: false, error: `Database error: ${error.message}` };
     }
-
-    console.log('Updated comment data:', updatedComment);
 
     // Handle codev data (could be array or object)
     const codevData = Array.isArray(updatedComment.codev) 
@@ -851,7 +772,6 @@ export async function updateComment(data: UpdateCommentData) {
     revalidatePath('/home/overflow');
     return { success: true, comment };
   } catch (error) {
-    console.error('Error in updateComment:', error);
     return { 
       success: false, 
       error: error instanceof Error ? error.message : 'Failed to update comment' 
@@ -866,8 +786,6 @@ export async function deleteComment(commentId: string) {
   try {
     const supabase = await createClientServerComponent();
 
-    console.log('Deleting comment:', commentId);
-
     const commentIdNumber = parseInt(commentId);
 
     // First, get the post_id before deleting
@@ -878,7 +796,6 @@ export async function deleteComment(commentId: string) {
       .single();
 
     if (fetchError) {
-      console.error('Error fetching comment:', fetchError);
       return { success: false, error: 'Failed to find comment' };
     }
 
@@ -891,7 +808,6 @@ export async function deleteComment(commentId: string) {
       .eq('id', commentIdNumber);
 
     if (deleteError) {
-      console.error('Error deleting comment:', deleteError);
       return { success: false, error: 'Failed to delete comment' };
     }
 
@@ -913,7 +829,6 @@ export async function deleteComment(commentId: string) {
     revalidatePath('/home/overflow');
     return { success: true };
   } catch (error) {
-    console.error('Error in deleteComment:', error);
     return { 
       success: false, 
       error: error instanceof Error ? error.message : 'Failed to delete comment' 
@@ -983,7 +898,6 @@ export async function togglePostLike(postId: string, userId: string) {
       return { success: true, action: "liked", liked: true };
     }
   } catch (error) {
-    console.error("Error toggling like:", error);
     return { success: false, error: "Failed to toggle like" };
   }
 }
@@ -1007,7 +921,6 @@ export async function checkPostLike(postId: string, userId: string) {
 
     return { success: true, liked: !!data };
   } catch (error) {
-    console.error("Error checking like:", error);
     return { success: false, liked: false };
   }
 }
@@ -1028,7 +941,6 @@ export async function getUserLikedPosts(userId: string) {
     const likedPostIds = data.map((like) => like.target_id.toString());
     return { success: true, likedPostIds };
   } catch (error) {
-    console.error("Error fetching liked posts:", error);
     return { success: false, likedPostIds: [] };
   }
 }
@@ -1060,7 +972,6 @@ export async function fetchCommentLikes(userId: string, questionId: string): Pro
 
     return likes ? likes.map(like => like.target_id.toString()) : [];
   } catch (error) {
-    console.error("Error fetching comment likes:", error);
     return [];
   }
 }
@@ -1119,7 +1030,6 @@ export async function toggleCommentLike(commentId: string, userId: string) {
       return { success: true, action: "liked", liked: true };
     }
   } catch (error) {
-    console.error("Error toggling comment like:", error);
     return { success: false, error: "Failed to toggle comment like" };
   }
 }
@@ -1141,7 +1051,6 @@ export const getSocialPoints = async (userId: string): Promise<number | null> =>
 
     return data;
   } catch (error) {
-    console.error("Failed to fetch social points:", error);
     throw error;
   }
 };

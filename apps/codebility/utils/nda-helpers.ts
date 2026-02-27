@@ -77,7 +77,6 @@ export const cleanupNdaStorage = (): void => {
     localStorage.removeItem(key);
   });
 
-  console.log("NDA localStorage data cleaned up successfully");
 };
 
 /**
@@ -94,7 +93,6 @@ export const appendNdaDataToForm = (formData: FormData): boolean => {
     formData.append("ndaDocument", ndaData.document!);
     formData.append("ndaSignedAt", ndaData.signedAt!);
     
-    console.log("NDA data appended to form submission");
     return true;
   }
 

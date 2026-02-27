@@ -143,27 +143,13 @@ export default function ProposalPage() {
 
         if (projectsResult.data && !projectsResult.error) {
           setRealProjects(projectsResult.data);
-        } else {
-          console.error('❌ Error fetching projects:', projectsResult.error);
         }
-
-        console.log('🔍 Codevs result:', codevsResult);
 
         if (codevsResult.data && !codevsResult.error) {
-          console.log('✅ Codevs fetched:', codevsResult.data.length);
-          console.log('📋 Codev data sample:', codevsResult.data.slice(0, 3).map(c => ({
-            name: `${c.first_name} ${c.last_name}`,
-            role: c.role,
-            image_url: c.image_url,
-            full_data: c
-          })));
           setCodevProfiles(codevsResult.data);
-        } else {
-          console.error('❌ Error fetching codevs:', codevsResult.error);
-          console.log('❌ Codevs data:', codevsResult.data);
         }
       } catch (error) {
-        console.error("Error fetching data:", error);
+        // Error fetching data
       } finally {
         setIsLoadingProjects(false);
       }
@@ -276,16 +262,12 @@ export default function ProposalPage() {
               {/* Project Showcase Grid / Codev Profiles - Below Hero */}
               {isCodevHireService ? (
                 (() => {
-                  console.log('🎯 Rendering Codev Hire section');
-                  console.log('🎯 codevProfiles:', codevProfiles);
-                  console.log('🎯 Is Array?', Array.isArray(codevProfiles));
-                  console.log('🎯 Length:', codevProfiles?.length);
 
                   return Array.isArray(codevProfiles) && codevProfiles.length > 0 ? (
                     <div className="mb-8">
                       <h3 className="text-xl font-semibold mb-4 text-white">Available Developers & Mentors</h3>
                       <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-3">
-                        {codevProfiles.map((codev, idx) => {
+                        {codevProfiles.map((codev: any, idx) => {
                         const codevName = `${codev.first_name || ''} ${codev.last_name || ''}`.trim() || 'Developer';
                         const codevPosition = codev.display_position || codev.positions?.[0] || 'Developer';
                         const codevImage = codev.image_url;

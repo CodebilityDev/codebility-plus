@@ -97,27 +97,13 @@ export async function getCodevProfiles() {
       throw error;
     }
 
-    console.log('✅ Raw codev data fetched (before filtering):', data?.length || 0);
-
     // Filter for active codevs and mentors
     const activeCodevs = (data || []).filter((c: any) => {
       const validStatuses = ['GRADUATED', 'TRAINING', 'MENTOR', 'ADMIN'];
       const isValidStatus = validStatuses.includes(c.internal_status);
 
-      if (!isValidStatus) {
-        console.log(`⚠️ Filtered out: ${c.first_name} ${c.last_name} - Status: ${c.internal_status}, Role ID: ${c.role_id}`);
-      }
-
       return isValidStatus;
     });
-
-    console.log('✅ Active codevs after filtering:', activeCodevs.length);
-    console.log('📋 Role breakdown:', activeCodevs.map((c: any) => ({
-      name: `${c.first_name} ${c.last_name}`,
-      role: c.role,
-      role_id: c.role_id,
-      internal_status: c.internal_status
-    })));
 
     return { data: activeCodevs as Codev[], error: null };
   } catch (error) {

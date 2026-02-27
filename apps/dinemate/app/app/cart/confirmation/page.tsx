@@ -48,9 +48,6 @@ export  default function ConfirmationPage() {
     if (cartData) {
 
         const menuIds = cartData.cartContents.map(c => c.menuId)
-        console.log({
-            menuIds
-        })
         const menus = await menuService.getSpecificMenus(menuIds)
         if (!menus) {
           console.error("error retrieving menu data")

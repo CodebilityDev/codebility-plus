@@ -18,18 +18,6 @@ import { SimpleMemberData, getMembers, getTeamLead } from "@/app/home/projects/a
  * 5. ✅ Runs automatically on modal open
  * 6. ✅ Clean toast messages (no emoji, no double quotes)
  * 
- * HOW IT WORKS:
- * - Fetches current team members from database on modal open
- * - Detects when members are missing checklist items
- * - Creates missing records automatically (backfill)
- * - Identifies UI/UX designers by position
- * - Excludes UI/UX from coding-related items (github, supabase, etc.)
- * 
- * AUTHENTICATION:
- * - Self-contained (no currentUserId prop needed)
- * - Maps auth.email → codev.id
- * - Checks if user is team lead
- * 
  * PERMISSION RULES:
  * - ALL members can VIEW checklist items
  * - ONLY team leads can add, edit, or delete items
@@ -100,26 +88,19 @@ const ChecklistManageModal = ({
 
   // Fetch fresh member data from database
   const fetchFreshMemberData = async () => {
-    console.log("🔄 ChecklistManageModal: Fetching fresh member data...");
     setIsFetchingMembers(true);
     
     try {
-      // Fetch team lead
       const teamLeadResult = await getTeamLead(projectId);
       if (teamLeadResult.data?.id) {
         setFreshTeamLeadId(teamLeadResult.data.id);
-        console.log("👑 Team Lead ID:", teamLeadResult.data.id);
       }
 
-      // Fetch members
       const membersResult = await getMembers(projectId);
       if (membersResult.data) {
         setFreshTeamMembers(membersResult.data);
-        console.log("👥 Fresh members fetched:", membersResult.data.length);
-        console.log("📝 Member names:", membersResult.data.map(m => `${m.first_name} ${m.last_name} (${m.display_position || 'No position'})`));
       }
     } catch (error) {
-      console.error("❌ Error fetching fresh member data:", error);
       toast.error("Failed to load team members");
     } finally {
       setIsFetchingMembers(false);
@@ -141,40 +122,34 @@ const ChecklistManageModal = ({
         if (codevData) {
           setCurrentCodevId(codevData.id);
           setIsTeamLead(codevData.id === freshTeamLeadId);
-          console.log("🔐 Current user is team lead:", codevData.id === freshTeamLeadId);
         }
       }
       setAuthChecked(true);
     });
   }, [supabase, freshTeamLeadId]);
 
-  // ✅ NEW: Check if member is UI/UX designer
+  // Check if member is UI/UX designer
   const isUIUXDesigner = (member: SimpleMemberData): boolean => {
     const position = (member.display_position || '').toLowerCase();
     return UIUX_KEYWORDS.some(keyword => position.includes(keyword));
   };
 
-  // ✅ NEW: Check if checklist item is coding-related
+  // Check if checklist item is coding-related
   const isCodingItem = (itemTitle: string): boolean => {
     const title = itemTitle.toLowerCase();
     return CODING_ITEM_KEYWORDS.some(keyword => title.includes(keyword));
   };
 
-  // ✅ NEW: Get member IDs that should have a specific item
+  // Get member IDs that should have a specific item
   const getMemberIdsForItem = (itemTitle: string): string[] => {
     if (!freshTeamLeadId) return [];
     
-    // Start with team lead
-    const teamLeadMember = freshTeamMembers.find(m => m.id === freshTeamLeadId) || null;
+    const teamLeadMember = freshTeamMembers.find(m => m.id === freshTeamLeadId) ?? null;
     let validMembers = teamLeadMember ? [teamLeadMember] : [];
-    
-    // Add regular members
     validMembers = [...validMembers, ...freshTeamMembers.filter(m => m.id !== freshTeamLeadId)];
     
-    // If item is coding-related, filter out UI/UX designers
     if (isCodingItem(itemTitle)) {
       validMembers = validMembers.filter(m => !isUIUXDesigner(m));
-      console.log(`📋 Item "${itemTitle}" is coding-related, excluding UI/UX designers`);
     }
     
     return validMembers.map(m => m.id);
@@ -192,50 +167,44 @@ const ChecklistManageModal = ({
     return [freshTeamLeadId, ...memberIds];
   }, [freshTeamLeadId, freshTeamMembers]);
 
-  // ✅ NEW: Auto-sync function - backfills missing records
+  // Auto-sync function - backfills missing records
   const autoSyncChecklistItems = async () => {
     if (!supabase || !projectId || allMemberIds.length === 0) return;
 
     setIsSyncing(true);
-    console.log("🔄 Starting auto-sync for checklist items...");
 
     try {
-      // Get all unique checklist items for this project
       const { data: existingItems, error: fetchError } = await supabase
         .from("member_checklists")
         .select("title, member_id")
         .eq("project_id", projectId);
 
       if (fetchError) {
-        console.error("Error fetching existing items:", fetchError);
         return;
       }
 
       // Group by title to see which members have which items
-      const itemsByTitle: { [key: string]: string[] } = {};
-      
-      existingItems?.forEach((item: any) => {
-        if (!itemsByTitle[item.title]) {
-          itemsByTitle[item.title] = [];
-        }
-        itemsByTitle[item.title].push(item.member_id);
-      });
+      // FIX: Explicitly type the accumulator to avoid implicit 'undefined' on index access
+      const itemsByTitle = (existingItems ?? []).reduce(
+        (acc: Record<string, string[]>, item: { title: string; member_id: string }) => {
+          if (!acc[item.title]) acc[item.title] = [];
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          acc[item.title]!.push(item.member_id);
+          return acc;
+        },
+        {} as Record<string, string[]>
+      );
 
       const uniqueTitles = Object.keys(itemsByTitle);
-      console.log(`📋 Found ${uniqueTitles.length} unique checklist items`);
-
       let totalBackfilled = 0;
 
-      // For each title, ensure all appropriate members have it
       for (const title of uniqueTitles) {
-        const existingMemberIds = itemsByTitle[title];
+        // FIX: Use nullish coalescing to guarantee string[] (never undefined)
+        const existingMemberIds: string[] = itemsByTitle[title] ?? [];
         const requiredMemberIds = getMemberIdsForItem(title);
         const missingMemberIds = requiredMemberIds.filter(id => !existingMemberIds.includes(id));
 
         if (missingMemberIds.length > 0) {
-          console.log(`➕ Backfilling "${title}" for ${missingMemberIds.length} members`);
-          
-          // Get reference record to copy settings from
           const { data: referenceRecord } = await supabase
             .from("member_checklists")
             .select("*")
@@ -244,16 +213,15 @@ const ChecklistManageModal = ({
             .limit(1)
             .single();
 
-          // Create missing records
           const newRecords = missingMemberIds.map(memberId => ({
             project_id: projectId,
             member_id: memberId,
             title: title,
-            description: referenceRecord?.description || null,
-            priority: referenceRecord?.priority || "medium",
-            completed: false, // Always start as incomplete
+            description: referenceRecord?.description ?? null,
+            priority: referenceRecord?.priority ?? "medium",
+            completed: false,
             created_by: freshTeamLeadId,
-            due_date: referenceRecord?.due_date || null,
+            due_date: referenceRecord?.due_date ?? null,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           }));
@@ -262,23 +230,17 @@ const ChecklistManageModal = ({
             .from("member_checklists")
             .insert(newRecords);
 
-          if (insertError) {
-            console.error(`Error backfilling "${title}":`, insertError);
-          } else {
+          if (!insertError) {
             totalBackfilled += newRecords.length;
           }
         }
       }
 
       if (totalBackfilled > 0) {
-        console.log(`✅ Auto-sync complete: Backfilled ${totalBackfilled} records`);
         toast.success(`Synced ${totalBackfilled} missing checklist items`);
-      } else {
-        console.log("✅ Auto-sync complete: All members already have all items");
       }
 
     } catch (error) {
-      console.error("Error during auto-sync:", error);
       toast.error("Failed to sync checklist items");
     } finally {
       setIsSyncing(false);
@@ -289,7 +251,6 @@ const ChecklistManageModal = ({
   useEffect(() => {
     if (isOpen && supabase && projectId && allMemberIds.length > 0 && !isFetchingMembers) {
       loadChecklistItems();
-      // ✅ Run auto-sync after loading items
       setTimeout(() => {
         autoSyncChecklistItems();
       }, 500);
@@ -354,7 +315,6 @@ const ChecklistManageModal = ({
 
     setIsLoading(true);
     try {
-      // ✅ Get appropriate member IDs (excludes UI/UX if coding-related)
       const targetMemberIds = getMemberIdsForItem(newItemTitle.trim());
 
       if (targetMemberIds.length === 0) {
@@ -363,13 +323,8 @@ const ChecklistManageModal = ({
         return;
       }
 
-      // Count UI/UX designers excluded
       const uiuxCount = allMemberIds.length - targetMemberIds.length;
-      if (uiuxCount > 0) {
-        console.log(`ℹ️ Excluding ${uiuxCount} UI/UX designer(s) from "${newItemTitle.trim()}"`);
-      }
 
-      // Create checklist item for appropriate members
       const itemsToInsert = targetMemberIds.map(memberId => ({
         project_id: projectId,
         member_id: memberId,

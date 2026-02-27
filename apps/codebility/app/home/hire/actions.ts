@@ -9,10 +9,6 @@ function createServiceRoleClient() {
   const key = process.env.DB_SERVICE_ROLE;
   
   if (!url || !key) {
-    console.error("Missing environment variables:", { 
-      hasUrl: !!url, 
-      hasKey: !!key 
-    });
     throw new Error("Missing Supabase environment variables");
   }
   
@@ -44,7 +40,6 @@ export async function updateJobListing(
     // Get the current user
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
-      console.error("Auth error:", authError);
       return { success: false, error: "Unauthorized - Please log in again" };
     }
 
@@ -56,7 +51,6 @@ export async function updateJobListing(
       .single();
 
     if (userError || !userData) {
-      console.error("User fetch error:", userError);
       return { success: false, error: "User not found" };
     }
 
@@ -71,7 +65,6 @@ export async function updateJobListing(
       .single();
 
     if (jobError || !job) {
-      console.error("Job fetch error:", jobError);
       return { success: false, error: "Job not found" };
     }
 
@@ -85,7 +78,6 @@ export async function updateJobListing(
     try {
       updateClient = isAdmin ? createServiceRoleClient() : supabase;
     } catch (serviceError) {
-      console.error("Service role client error:", serviceError);
       // Fallback to regular client if service role fails
       updateClient = supabase;
     }
@@ -110,13 +102,11 @@ export async function updateJobListing(
       .single();
 
     if (error) {
-      console.error("Update error:", error);
       return { success: false, error: `Failed to update: ${error.message}` };
     }
 
     return { success: true, data: updatedJob };
   } catch (error) {
-    console.error("Server action error:", error);
     return { 
       success: false, 
       error: error instanceof Error ? error.message : "An unexpected error occurred" 
@@ -126,18 +116,14 @@ export async function updateJobListing(
 
 export async function deleteJobListing(jobId: string) {
   try {
-    console.log("Delete job started for ID:", jobId);
     
     const supabase = await createClientServerComponent();
 
     // Get the current user
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
-      console.error("Auth error:", authError);
       return { success: false, error: "Unauthorized - Please log in again" };
     }
-
-    console.log("User authenticated:", user.id);
 
     // Get user details to check role
     const { data: userData, error: userError } = await supabase
@@ -147,15 +133,11 @@ export async function deleteJobListing(jobId: string) {
       .single();
 
     if (userError || !userData) {
-      console.error("User fetch error:", userError);
       return { success: false, error: "User not found" };
     }
 
-    console.log("User data:", { id: userData.id, role_id: userData.role_id });
-
     // Check if user is admin (role_id 1 or 4)
     const isAdmin = userData.role_id === 1 || userData.role_id === 4;
-    console.log("Is admin:", isAdmin);
 
     // Use service role client for admin operations to bypass RLS
     let queryClient;
@@ -165,17 +147,13 @@ export async function deleteJobListing(jobId: string) {
         const serviceClient = createServiceRoleClient();
         queryClient = serviceClient;
         deleteClient = serviceClient;
-        console.log("Using service role client for admin");
       } else {
         queryClient = supabase;
         deleteClient = supabase;
-        console.log("Using regular client");
       }
     } catch (serviceError) {
-      console.error("Service role client error:", serviceError);
       queryClient = supabase;
       deleteClient = supabase;
-      console.log("Fallback to regular client");
     }
 
     // Get the job to check ownership - use service role client if admin
@@ -184,64 +162,43 @@ export async function deleteJobListing(jobId: string) {
       .select('id, created_by, title, status')
       .eq('id', jobId);
 
-    console.log("Job query result:", { jobs, error: jobError });
-
     if (jobError) {
-      console.error("Job fetch error:", jobError);
       return { success: false, error: `Database error: ${jobError.message}` };
     }
 
     if (!jobs || jobs.length === 0) {
-      console.error("No job found with ID:", jobId);
       return { success: false, error: `Job not found (ID: ${jobId})` };
     }
 
     if (jobs.length > 1) {
-      console.error("Multiple jobs found with same ID:", jobs);
       return { success: false, error: "Data integrity error: Multiple jobs found" };
     }
 
     const job = jobs[0];
-    console.log("Job found:", { id: job.id, title: job.title, status: job.status, created_by: job.created_by });
 
     // Check permissions - only for non-admin users
     if (!isAdmin && job.created_by !== userData.id) {
-      console.log("Permission denied: User is not admin and not job creator");
       return { success: false, error: "You don't have permission to delete this job" };
     }
 
-    console.log("Permission check passed");
-
     // First, delete related job applications (cascade delete)
-    console.log("Deleting related applications...");
     const { error: applicationsDeleteError } = await deleteClient
       .from('job_applications')
       .delete()
       .eq('job_id', jobId);
 
-    if (applicationsDeleteError) {
-      console.error("Applications delete error:", applicationsDeleteError);
-      // Continue anyway, might not have applications
-    } else {
-      console.log("Applications deleted successfully");
-    }
-
     // Delete the job
-    console.log("Deleting job listing...");
     const { error: deleteError } = await deleteClient
       .from('job_listings')
       .delete()
       .eq('id', jobId);
 
     if (deleteError) {
-      console.error("Delete error:", deleteError);
       return { success: false, error: `Failed to delete: ${deleteError.message}` };
     }
 
-    console.log("Job deleted successfully");
     return { success: true };
   } catch (error) {
-    console.error("Server action error:", error);
     return { 
       success: false, 
       error: error instanceof Error ? error.message : "An unexpected error occurred" 
@@ -318,13 +275,11 @@ export async function updateApplicationStatus(
       .single();
 
     if (error) {
-      console.error("Update error:", error);
       return { success: false, error: error.message };
     }
 
     return { success: true, data: updatedApplication };
   } catch (error) {
-    console.error("Server action error:", error);
     return { success: false, error: "An unexpected error occurred" };
   }
 }
@@ -379,13 +334,11 @@ export async function deleteJobApplication(applicationId: string, jobId: string)
       .eq('id', applicationId);
 
     if (error) {
-      console.error("Delete error:", error);
       return { success: false, error: error.message };
     }
 
     return { success: true };
   } catch (error) {
-    console.error("Server action error:", error);
     return { success: false, error: "An unexpected error occurred" };
   }
 }
@@ -448,13 +401,11 @@ export async function updateJobListingStatus(
       .single();
 
     if (error) {
-      console.error("Update status error:", error);
       return { success: false, error: error.message };
     }
 
     return { success: true, data: updatedJob };
   } catch (error) {
-    console.error("Server action error:", error);
     return { success: false, error: "An unexpected error occurred" };
   }
 }

@@ -278,7 +278,6 @@ const Navigation = () => {
         const { data: { user }, error: authError } = await supabase.auth.getUser();
 
         if (authError) {
-          console.log("Auth error:", authError.message);
           setUserData(null);
           return;
         }
@@ -293,8 +292,6 @@ const Navigation = () => {
           .select(`*, applicant (id, codev_id)`)
           .eq("id", user.id)
           .single();
-
-        console.log("User Row:", userRow);
 
         if (fetchError) {
           console.error("Error fetching codev:", fetchError.message);

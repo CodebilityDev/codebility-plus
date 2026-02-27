@@ -1,6 +1,7 @@
 "use client";
 
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import KanbanBoardsSearch from "@/app/home/kanban/_components/KanbanBoardsSearch";
 import { getMembers } from "@/app/home/projects/actions";
@@ -36,8 +37,11 @@ function KanbanBoard({ boardData, projectId }: KanbanBoardProps) {
   const canAddColumn = user?.role_id === 1 || user?.role_id === 5;
   const canAddMember = canAddColumn;
 
+  const searchParams = useSearchParams();
+  const viewParam = searchParams.get("view");
+
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
-  const [showArchive, setShowArchive] = useState(false);
+  const [showArchive, setShowArchive] = useState(viewParam === "archive");
   const [draftCount, setDraftCount] = useState<number>(0);
 
   const { data: allMembers = [], isLoading: isMembersLoading } = useQuery({
@@ -75,6 +79,12 @@ function KanbanBoard({ boardData, projectId }: KanbanBoardProps) {
       setDraftCount(result.count);
     }
   };
+
+  useEffect(() => {
+    if (viewParam === "archive") {
+      setShowArchive(true);
+    }
+  }, [viewParam]);
 
   const handleFilterClick = useCallback((userId: string) => {
     setActiveFilter((prev) => (prev === userId ? null : userId));
@@ -186,11 +196,10 @@ function KanbanBoard({ boardData, projectId }: KanbanBoardProps) {
                   <Button
                     onClick={() => setShowArchive(!showArchive)}
                     variant={showArchive ? "default" : "outline"}
-                    className={`flex transform items-center gap-2 whitespace-nowrap px-3 py-2 text-sm transition-all duration-300 hover:scale-105 ${
-                      showArchive
+                    className={`flex transform items-center gap-2 whitespace-nowrap px-3 py-2 text-sm transition-all duration-300 hover:scale-105 ${showArchive
                         ? "bg-customBlue-600 hover:bg-customBlue-700 shadow-customBlue-500/30 text-white shadow-lg"
                         : "border-gray-300 bg-white text-gray-700 hover:border-gray-400 hover:bg-gray-100 dark:border-white/20 dark:bg-transparent dark:text-gray-300 dark:hover:bg-white/10 backdrop-blur-sm"
-                    }`}
+                      }`}
                     aria-pressed={showArchive}
                   >
                     <Archive className="h-4 w-4 text-gray-600 dark:text-gray-300" aria-hidden="true" />

@@ -38,7 +38,7 @@ export const getSidebarData = async (
   if (!roleId) {
     return [];
   }
-  
+
   let rolePermissions: RolePermissions;
   if (roleId == -1) {
     // If inactive
@@ -76,9 +76,9 @@ export const getSidebarData = async (
       )
       .eq("id", roleId)
       .single();
-  
+
     rolePermissions = data as RolePermissions;
-    
+
     if (error || !rolePermissions) {
       console.error("Failed to fetch role permissions:", error);
       return [];
@@ -210,7 +210,19 @@ export const getSidebarData = async (
         },
       ].filter((link) => hasPermission(link.permission)),
     },
-  ].filter(section => section.links.length > 0);
+    {
+      id: "4",
+      title: "Help",
+      links: [
+        {
+          route: pathsConfig.app.ticket_support,
+          imgURL: "/assets/svgs/icon-ticket-support.svg",
+          label: "Ticket Support",
+          permission: "interns" as PermissionKey,
+        },
+      ].filter((link) => hasPermission(link.permission)),
+    },
+  ].filter((section) => section.links.length > 0);
 
   return sidebarData;
 };

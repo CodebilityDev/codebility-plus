@@ -660,9 +660,6 @@ export const getMembers = async (
 }> => {
   const supabase = await createClientServerComponent();
   
-  // ✅ DEBUG LOG: Function entry
-  console.log("🔍 NEW getMembers function called for project:", projectId);
-  
   try {
     // Step 1: Get all project_members with role = 'member'
     const { data: projectMembers, error: pmError } = await supabase
@@ -671,38 +668,22 @@ export const getMembers = async (
       .eq("project_id", projectId)
       .eq("role", "member");
 
-    // ✅ DEBUG LOG: Project members count
-    console.log("📊 Project members found:", projectMembers?.length || 0);
-    if (projectMembers && projectMembers.length > 0) {
-      console.log("🔑 Codev IDs from project_members:", projectMembers.map(pm => pm.codev_id));
-    }
-
     if (pmError) {
       console.error("❌ Error fetching project members:", pmError);
       return { error: pmError, data: null };
     }
 
     if (!projectMembers || projectMembers.length === 0) {
-      console.log("⚠️ No project members found with role='member'");
       return { error: null, data: [] };
     }
 
     // Step 2: Get codev details separately (avoids RLS/join issues)
     const codevIds = projectMembers.map(pm => pm.codev_id);
     
-    // ✅ DEBUG LOG: Codev IDs being queried
-    console.log("🔎 Fetching codev details for", codevIds.length, "IDs");
-    
     const { data: codevs, error: codevError } = await supabase
       .from("codev")
       .select("id, first_name, last_name, email_address, display_position, image_url")
       .in("id", codevIds);
-
-    // ✅ DEBUG LOG: Codev records count
-    console.log("👤 Codev records found:", codevs?.length || 0);
-    if (codevs && codevs.length > 0) {
-      console.log("👥 Codev names:", codevs.map(c => `${c.first_name} ${c.last_name} (${c.id})`));
-    }
 
     if (codevError) {
       console.error("❌ Error fetching codev details:", codevError);
@@ -732,11 +713,6 @@ export const getMembers = async (
         joined_at: pm.joined_at,
       };
     }).filter(Boolean) as SimpleMemberData[];
-
-    // ✅ DEBUG LOG: Final results
-    console.log("✅ Final members returned:", members.length);
-    console.log("📝 Member names:", members.map(m => `${m.first_name} ${m.last_name}`));
-    console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 
     return { error: null, data: members };
   } catch (error) {

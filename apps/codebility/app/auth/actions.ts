@@ -170,7 +170,6 @@ export const signupUser = async (formData: FormData) => {
     const signedAt = formData.get("ndaSignedAt") as string;
 
     if (ndaSigned === "true" && signature && document) {
-      console.log("NDA data found in form submission, processing with storage system...");
       
       try {
         // **NEW: Upload NDA files to Supabase Storage instead of storing base64**
@@ -185,7 +184,6 @@ export const signupUser = async (formData: FormData) => {
         );
 
         if (ndaUploadResult.success) {
-          console.log("NDA files uploaded to storage successfully");
           
           // Set the storage URLs instead of base64 data
           nda_status = true;
@@ -193,15 +191,11 @@ export const signupUser = async (formData: FormData) => {
           nda_document = ndaUploadResult.documentUrl;
           nda_signed_at = new Date().toISOString();
           ndaProcessedWithStorage = true;
-          
-          console.log(`NDA stored in Supabase Storage:
-            - Signature: ${ndaUploadResult.signatureUrl}
-            - Document: ${ndaUploadResult.documentUrl}`);
+
         } else {
           console.error("Failed to upload NDA to storage:", ndaUploadResult.error);
           
           // **FALLBACK: Use base64 storage if storage upload fails**
-          console.log("Falling back to base64 storage for NDA data");
           nda_status = true;
           nda_signature = signature;
           nda_document = document;
@@ -211,7 +205,6 @@ export const signupUser = async (formData: FormData) => {
         console.error("Error processing NDA with storage system:", ndaError);
         
         // **FALLBACK: Use base64 storage if there's an error**
-        console.log("Falling back to base64 storage due to error");
         nda_status = true;
         nda_signature = signature;
         nda_document = document;
@@ -279,12 +272,6 @@ export const signupUser = async (formData: FormData) => {
     const responseMessage = ndaProcessedWithStorage 
       ? "Account created successfully! NDA files securely stored. Redirecting to sign-in page..."
       : "Account created successfully! Redirecting to sign-in page...";
-    
-    console.log(`Signup completed for ${email_address}:
-      - User ID: ${user.id}
-      - NDA Status: ${nda_status}
-      - NDA Storage Method: ${ndaProcessedWithStorage ? 'Supabase Storage' : 'Database'}
-      - Profile Image: ${image_url ? 'Uploaded' : 'None'}`);
     
     return { 
       success: true, 
@@ -366,7 +353,6 @@ export const signOut = async (): Promise<void> => {
     if (error) throw new Error(`Sign out error: ${error.message}`);
 
     clearUser();
-    console.log("User successfully signed out");
     // Redirect to the /codev page
     redirect("/codev");
   } catch (error) {
