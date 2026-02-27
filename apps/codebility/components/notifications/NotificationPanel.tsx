@@ -88,19 +88,19 @@ export function NotificationPanel({
   };
 
   return (
-    <div className="fixed inset-x-4 top-16 z-50 animate-slide-down rounded-lg border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-900 sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-96">
+    <div className="fixed inset-x-4 top-16 z-50 animate-slide-down rounded-lg border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-900 sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-96 max-w-[calc(100vw-2rem)]">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3 dark:border-gray-700">
-        <div className="flex items-center gap-2">
-          <Bell className="h-5 w-5 text-gray-700 dark:text-gray-300" />
-          <h3 className="font-semibold text-gray-900 dark:text-white">Notifications</h3>
+      <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3 dark:border-gray-700 min-w-0">
+        <div className="flex items-center gap-2 min-w-0 flex-1">
+          <Bell className="h-5 w-5 text-gray-700 dark:text-gray-300 flex-shrink-0" />
+          <h3 className="font-semibold text-gray-900 dark:text-white truncate">Notifications</h3>
           {unreadCount > 0 && (
             <span className="rounded-full bg-red-500 px-2 py-0.5 text-xs text-white">
               {unreadCount}
             </span>
           )}
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 flex-shrink-0">
           {unreadCount > 0 && (
             <Button
               variant="ghost"
@@ -145,21 +145,37 @@ export function NotificationPanel({
                     !notification.read && "bg-blue-50 dark:bg-blue-900/20"
                   )}
                 >
-                  <div className="flex gap-3">
+                  <div className="flex gap-3 min-w-0">
                     <div className={cn("mt-0.5 flex-shrink-0", colorClass)}>
                       <Icon className="h-5 w-5" />
                     </div>
-                    <div className="min-w-0 flex-1">
+                    <div className="min-w-0 flex-1 overflow-hidden">
                       <p className={cn(
-                        "text-sm font-medium",
+                        "text-sm font-medium break-words leading-tight",
                         !notification.read ? "text-gray-900 dark:text-white" : "text-gray-700 dark:text-gray-300"
                       )}>
                         {notification.title}
                       </p>
-                      <p className="mt-0.5 text-sm text-gray-600 dark:text-gray-400">
-                        {notification.message}
-                      </p>
-                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-500">
+                      <div className="mt-0.5 text-sm text-gray-600 dark:text-gray-400 break-words leading-tight overflow-wrap-anywhere">
+                        {notification.message.split(/(https?:\/\/[^\s]+)/g).map((part, index) => {
+                          if (part.match(/https?:\/\/[^\s]+/)) {
+                            return (
+                              <a
+                                key={index}
+                                href={part}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-600 hover:text-blue-800 underline dark:text-blue-400 dark:hover:text-blue-300 break-all"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                {part}
+                              </a>
+                            );
+                          }
+                          return <span key={index} className="break-words">{part}</span>;
+                        })}
+                      </div>
+                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-500 truncate">
                         {formatDistanceToNow(
                           notification.createdAt || new Date(notification.created_at), 
                           { addSuffix: true }
