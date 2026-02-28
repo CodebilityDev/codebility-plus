@@ -7,12 +7,12 @@ export const revalidate = 0;
 
 export default async function TicketSupportManagementPage() {
     return (
-        <PageContainer maxWidth="xl">
-            <div className="relative">
-                {/* Coming Soon Modal Overlay */}
-                <ComingSoonModal />
+        <div className="relative min-h-screen bg-white dark:bg-gray-950">
+            {/* Coming Soon Modal Overlay */}
+            <ComingSoonModal />
 
-                {/* Page Content (visible but blurred behind modal) */}
+            {/* Page Content (visible but blurred behind modal) */}
+            <PageContainer maxWidth="xl" className="blur-[2px]">
                 <div className="space-y-6">
                     <H1>Ticket Support Management</H1>
 
@@ -25,7 +25,7 @@ export default async function TicketSupportManagementPage() {
                     {/* Placeholder content section */}
                     <div className="relative mt-8 min-h-[500px] w-full rounded-xl border border-gray-200 bg-light-900/50 dark:border-white/10 dark:bg-dark-100 shadow-sm backdrop-blur-sm" />
                 </div>
-            </div>
-        </PageContainer>
+            </PageContainer>
+        </div>
     );
 }
