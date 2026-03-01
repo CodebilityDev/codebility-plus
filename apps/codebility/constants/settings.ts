@@ -52,4 +52,11 @@ export const adminControlsCardData: SettingsCardDataProps[] = [
     title: "Ticket Support Management",
     description: "Manage and track support tickets efficiently.",
   },
+  {
+    path: "/home/promote-modal/",
+    imageName: "icon-edit",
+    imageAlt: "Icon Edit Promotional Feature",
+    title: "Promotional Feature",
+    description: "Edit promotional feature popups displayed on home page.",
+  },
 ];

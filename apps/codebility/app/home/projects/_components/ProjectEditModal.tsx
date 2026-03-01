@@ -260,7 +260,6 @@ const ProjectEditModal = () => {
       setCroppedFile(file);
       setOpenImageCropper(true);
     } catch (error) {
-      console.error("Failed to upload image:", error);
       toast.error("Failed to upload image");
     }
   };
@@ -744,7 +743,6 @@ const ProjectEditModal = () => {
 
       // Handle image upload if there's a new cropped file
       if (croppedFile) {
-        console.log("Uploading new image");
         const uploadResult = await uploadImage(croppedFile, {
           bucket: "codebility",
           folder: `projectImage/${Date.now()}_${croppedFile.name.replace(/\s+/g, "_")}`,
@@ -755,11 +753,9 @@ const ProjectEditModal = () => {
         }
 
         // Set the new image URL
-        console.log("Setting new main_image:", uploadResult);
         form.append("main_image", uploadResult);
       } else if (data.main_image && croppedImage) {
         // If using existing image without changes
-        console.log("Keeping existing image:", data.main_image);
         form.append("main_image", data.main_image);
       }
 
@@ -831,12 +827,6 @@ const ProjectEditModal = () => {
 
       form.append("project_members", JSON.stringify(projectMembers));
 
-      console.log("Form data before submission:");
-      // Log the form data to verify all fields are included
-      for (let [key, value] of form.entries()) {
-        console.log(`${key}: ${value}`);
-      }
-
       const response = await updateProject(data.id, form);
       if (response.success) {
         // Invalidate queries to refresh data across components
@@ -849,7 +839,6 @@ const ProjectEditModal = () => {
         toast.error(response.error || "Failed to update project");
       }
     } catch (error) {
-      console.error("Error updating project:", error);
       toast.error("Failed to update project");
     } finally {
       setIsLoading(false);

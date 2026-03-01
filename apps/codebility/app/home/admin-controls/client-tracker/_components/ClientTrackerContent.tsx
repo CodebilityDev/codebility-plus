@@ -50,8 +50,10 @@ export default function ClientTrackerContent() {
     client_company: "",
     job_link: "",
     notes: "",
+    conversation_image: "",
   });
   const [submitting, setSubmitting] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string>("");
 
   const weekStart = getCurrentWeekStart();
   const weekEnd = new Date(weekStart);
@@ -75,11 +77,6 @@ export default function ClientTrackerContent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.client_name.trim()) {
-      toast.error("Client name is required");
-      return;
-    }
-
     setSubmitting(true);
     const result = await addClientOutreach(formData);
 
@@ -91,7 +88,9 @@ export default function ClientTrackerContent() {
         client_company: "",
         job_link: "",
         notes: "",
+        conversation_image: "",
       });
+      setImagePreview("");
       setAddDialogOpen(false);
       fetchStats(); // Refresh stats
     } else {
@@ -100,13 +99,53 @@ export default function ClientTrackerContent() {
     setSubmitting(false);
   };
 
+  const handleImagePaste = async (e: React.ClipboardEvent) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+
+    for (const item of Array.from(items)) {
+      if (item.type.indexOf('image') !== -1) {
+        const file = item.getAsFile();
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            const base64String = event.target?.result as string;
+            setFormData(prev => ({ ...prev, conversation_image: base64String }));
+            setImagePreview(base64String);
+          };
+          reader.readAsDataURL(file);
+          toast.success("Image pasted!");
+        }
+      }
+    }
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const base64String = event.target?.result as string;
+        setFormData(prev => ({ ...prev, conversation_image: base64String }));
+        setImagePreview(base64String);
+        toast.success("Image uploaded!");
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setFormData(prev => ({ ...prev, conversation_image: "" }));
+    setImagePreview("");
+  };
+
   const viewHistory = async (admin: AdminOutreachStats) => {
     setSelectedAdmin(admin);
     setLoadingHistory(true);
     setHistoryDialogOpen(true);
 
-    const weekStartStr = weekStart.toISOString().split('T')[0];
-    const result = await getAdminOutreachHistory(admin.admin_id, weekStartStr);
+    // Fetch all history for this admin, not just current week
+    const result = await getAdminOutreachHistory(admin.admin_id);
 
     if (result.success && result.data) {
       setHistory(result.data);
@@ -185,13 +224,12 @@ export default function ClientTrackerContent() {
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <Label htmlFor="client_name">Client Name *</Label>
+                  <Label htmlFor="client_name">Client Name</Label>
                   <Input
                     id="client_name"
                     value={formData.client_name}
                     onChange={(e) => setFormData(prev => ({ ...prev, client_name: e.target.value }))}
                     placeholder="John Doe"
-                    required
                   />
                 </div>
 
@@ -236,6 +274,43 @@ export default function ClientTrackerContent() {
                     placeholder="Additional details about the outreach..."
                     rows={3}
                   />
+                </div>
+
+                <div>
+                  <Label htmlFor="conversation_image">Conversation Screenshot (Optional)</Label>
+                  <div
+                    className="mt-1 flex flex-col gap-2"
+                    onPaste={handleImagePaste}
+                  >
+                    <Input
+                      id="conversation_image"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="cursor-pointer"
+                    />
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Or paste image here (Ctrl/Cmd + V)
+                    </p>
+                    {imagePreview && (
+                      <div className="relative mt-2 rounded-lg border border-gray-200 dark:border-gray-700 p-2">
+                        <img
+                          src={imagePreview}
+                          alt="Preview"
+                          className="max-h-40 w-auto rounded object-contain"
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={removeImage}
+                          className="absolute top-1 right-1 bg-red-100 hover:bg-red-200 text-red-600 dark:bg-red-900/30 dark:hover:bg-red-900/50"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <div className="flex justify-end gap-2">
@@ -304,7 +379,14 @@ export default function ClientTrackerContent() {
               </TableRow>
             ) : (
               stats
-                .sort((a, b) => b.current_week_count - a.current_week_count)
+                .sort((a, b) => {
+                  // Primary sort: Total all time count (descending)
+                  if (b.total_count !== a.total_count) {
+                    return b.total_count - a.total_count;
+                  }
+                  // Secondary sort: Current week count (descending)
+                  return b.current_week_count - a.current_week_count;
+                })
                 .map((admin) => (
                   <TableRow key={admin.admin_id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
                     <TableCell className="font-medium text-gray-900 dark:text-gray-100">
@@ -332,7 +414,6 @@ export default function ClientTrackerContent() {
                         variant="ghost"
                         size="sm"
                         onClick={() => viewHistory(admin)}
-                        disabled={admin.current_week_count === 0}
                         className="text-gray-900 dark:text-gray-100"
                       >
                         <Eye className="h-4 w-4 mr-1" />
@@ -348,13 +429,13 @@ export default function ClientTrackerContent() {
 
       {/* History Dialog */}
       <Dialog open={historyDialogOpen} onOpenChange={setHistoryDialogOpen}>
-        <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto overflow-x-hidden">
           <DialogHeader>
             <DialogTitle>
               Outreach History - {selectedAdmin?.first_name} {selectedAdmin?.last_name}
             </DialogTitle>
             <DialogDescription>
-              This week's client outreach records
+              All client outreach records for this admin
             </DialogDescription>
           </DialogHeader>
 
@@ -366,64 +447,83 @@ export default function ClientTrackerContent() {
             </div>
           ) : history.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
-              No outreach records for this week
+              No outreach records found
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {history.map((record) => (
                 <div
                   key={record.id}
-                  className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                  className="border border-gray-200 dark:border-gray-700 rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
                 >
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <h4 className="font-semibold text-gray-900 dark:text-gray-100">
-                        {record.client_name}
-                      </h4>
-                      {record.client_company && (
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {record.client_company}
-                        </p>
-                      )}
+                  <div className="flex justify-between items-start gap-2 mb-2">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-baseline gap-2 flex-wrap">
+                        <h4 className="font-semibold text-sm text-gray-900 dark:text-gray-100">
+                          {record.client_name || "Unnamed Client"}
+                        </h4>
+                        {record.client_company && (
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                            @ {record.client_company}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                        {formatDate(record.outreach_date)}
+                      </p>
                     </div>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => handleDelete(record.id)}
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 h-7 w-7 p-0 shrink-0"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-3.5 w-3.5" />
                     </Button>
                   </div>
 
-                  {record.client_email && (
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                      📧 {record.client_email}
-                    </p>
-                  )}
+                  <div className="space-y-1.5 text-xs">
+                    {record.client_email && (
+                      <div className="flex items-start gap-1.5">
+                        <span className="text-gray-500 dark:text-gray-400 shrink-0">Email:</span>
+                        <span className="text-gray-700 dark:text-gray-300 break-all">{record.client_email}</span>
+                      </div>
+                    )}
 
-                  {record.job_link && (
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                      🔗 <a
-                        href={record.job_link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 dark:text-blue-400 hover:underline"
-                      >
-                        {record.job_link}
-                      </a>
-                    </p>
-                  )}
+                    {record.job_link && (
+                      <div className="flex items-start gap-1.5">
+                        <span className="text-gray-500 dark:text-gray-400 shrink-0">Link:</span>
+                        <a
+                          href={record.job_link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 dark:text-blue-400 hover:underline break-all"
+                        >
+                          {record.job_link}
+                        </a>
+                      </div>
+                    )}
 
-                  <p className="text-xs text-gray-500 mb-2">
-                    📅 {formatDate(record.outreach_date)}
-                  </p>
+                    {record.notes && (
+                      <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+                        <p className="text-xs text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                          {record.notes}
+                        </p>
+                      </div>
+                    )}
 
-                  {record.notes && (
-                    <p className="text-sm text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 rounded p-2 mt-2">
-                      {record.notes}
-                    </p>
-                  )}
+                    {record.conversation_image && (
+                      <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1.5">Conversation:</p>
+                        <img
+                          src={record.conversation_image}
+                          alt="Conversation screenshot"
+                          className="max-w-full h-auto rounded border border-gray-200 dark:border-gray-700 cursor-pointer hover:opacity-90 transition-opacity"
+                          onClick={() => record.conversation_image && window.open(record.conversation_image, '_blank')}
+                        />
+                      </div>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>

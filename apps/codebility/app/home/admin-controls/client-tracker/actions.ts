@@ -7,12 +7,13 @@ import { getCurrentWeekStart } from "./utils";
 export interface ClientOutreach {
   id: string;
   admin_id: string;
-  client_name: string;
+  client_name: string | null;
   client_email: string | null;
   client_company: string | null;
   job_link: string | null;
   outreach_date: string;
   notes: string | null;
+  conversation_image: string | null;
   week_start: string;
   created_at: string;
 }
@@ -54,10 +55,10 @@ export async function getAdminOutreachStats(): Promise<{
     // Get current week start
     const weekStart = getCurrentWeekStart().toISOString().split('T')[0];
 
-    // Get all admins
+    // Get all admins (excluding inactive ones)
     const { data: admins, error: adminsError } = await supabase
       .from('codev')
-      .select('id, first_name, last_name, email_address')
+      .select('id, first_name, last_name, email_address, internal_status')
       .eq('role_id', 1)
       .eq('application_status', 'passed')
       .order('first_name');
@@ -96,15 +97,17 @@ export async function getAdminOutreachStats(): Promise<{
       return acc;
     }, {} as Record<string, number>) || {};
 
-    // Combine data
-    const stats: AdminOutreachStats[] = admins?.map(admin => ({
-      admin_id: admin.id,
-      first_name: admin.first_name,
-      last_name: admin.last_name,
-      email_address: admin.email_address,
-      current_week_count: currentWeekCounts[admin.id] || 0,
-      total_count: totalCounts[admin.id] || 0,
-    })) || [];
+    // Combine data and filter out INACTIVE admins
+    const stats: AdminOutreachStats[] = admins
+      ?.filter(admin => admin.internal_status !== 'INACTIVE')
+      .map(admin => ({
+        admin_id: admin.id,
+        first_name: admin.first_name,
+        last_name: admin.last_name,
+        email_address: admin.email_address,
+        current_week_count: currentWeekCounts[admin.id] || 0,
+        total_count: totalCounts[admin.id] || 0,
+      })) || [];
 
     return { success: true, data: stats };
   } catch (error) {
@@ -117,11 +120,12 @@ export async function getAdminOutreachStats(): Promise<{
  * Add a new client outreach record
  */
 export async function addClientOutreach(formData: {
-  client_name: string;
+  client_name?: string;
   client_email?: string;
   client_company?: string;
   job_link?: string;
   notes?: string;
+  conversation_image?: string;
 }): Promise<{
   success: boolean;
   data?: ClientOutreach;
@@ -154,6 +158,7 @@ export async function addClientOutreach(formData: {
         client_company: formData.client_company || null,
         job_link: formData.job_link || null,
         notes: formData.notes || null,
+        conversation_image: formData.conversation_image || null,
         outreach_date: new Date().toISOString(),
       })
       .select()
