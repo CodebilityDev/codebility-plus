@@ -40,18 +40,6 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
-  "pnpm": {
-    "overrides": {
-      "@types/react": "18.3.3",
-      "@types/react-dom": "18.3.0",
-      "react": "^18.3.1",
-      "react-dom": "^18.3.1",
-      "react-signature-canvas": "npm:react-signature-canvas@1.1.0-alpha.1",
-      "reactjs-qr-code-reader": "npm:reactjs-qr-code-reader@1.0.3",
-      "react-smooth": "npm:react-smooth@4.0.4",
-      "react-overlays": "npm:react-overlays@5.2.1"
-    }
-  },
   "nohoist": [
     "**/expo-router",
     "**/expo-router/**"
@@ -73,5 +61,20 @@
     "postcss": "^8",
     "react-day-picker": "8.10.1",
     "tailwindcss": "^4.1.16"
-  }
+  },
+  "overrides": {
+    "@types/react": "18.3.3",
+    "@types/react-dom": "18.3.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-signature-canvas": "npm:react-signature-canvas@1.1.0-alpha.1",
+    "reactjs-qr-code-reader": "npm:reactjs-qr-code-reader@1.0.3",
+    "react-smooth": "npm:react-smooth@4.0.4",
+    "react-overlays": "npm:react-overlays@5.2.1"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "tooling/*"
+  ]
 }
