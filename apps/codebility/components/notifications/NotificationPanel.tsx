@@ -157,23 +157,58 @@ export function NotificationPanel({
                         {notification.title}
                       </p>
                       <div className="mt-0.5 text-sm text-gray-600 dark:text-gray-400 break-words leading-tight overflow-wrap-anywhere">
-                        {notification.message.split(/(https?:\/\/[^\s]+)/g).map((part, index) => {
-                          if (part.match(/https?:\/\/[^\s]+/)) {
-                            return (
-                              <a
-                                key={index}
-                                href={part}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-600 hover:text-blue-800 underline dark:text-blue-400 dark:hover:text-blue-300 break-all"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                {part}
-                              </a>
-                            );
+                        {(() => {
+                          const parts: Array<{ type: "text" | "mdlink" | "url"; content: string; href?: string }> = [];
+                          const regex = /\[([^\]]+)\]\(([^)]+)\)|(https?:\/\/[^\s]+)/g;
+                          let lastIndex = 0;
+                          let match;
+
+                          while ((match = regex.exec(notification.message)) !== null) {
+                            if (match.index > lastIndex) {
+                              parts.push({ type: "text", content: notification.message.slice(lastIndex, match.index) });
+                            }
+                            if (match[1] && match[2]) {
+                              parts.push({ type: "mdlink", content: match[1], href: match[2] });
+                            } else if (match[3]) {
+                              parts.push({ type: "url", content: match[3], href: match[3] });
+                            }
+                            lastIndex = match.index + match[0].length;
                           }
-                          return <span key={index} className="break-words">{part}</span>;
-                        })}
+
+                          if (lastIndex < notification.message.length) {
+                            parts.push({ type: "text", content: notification.message.slice(lastIndex) });
+                          }
+
+                          return parts.map((part, index) => {
+                            if (part.type === "mdlink") {
+                              return (
+                                <a
+                                  key={index}
+                                  href={part.href}
+                                  className="italic text-blue-600 underline hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  {part.content}
+                                </a>
+                              );
+                            }
+                            if (part.type === "url") {
+                              return (
+                                <a
+                                  key={index}
+                                  href={part.href}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 underline hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 break-all"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  {part.content}
+                                </a>
+                              );
+                            }
+                            return <span key={index} className="break-words">{part.content}</span>;
+                          });
+                        })()}
                       </div>
                       <p className="mt-1 text-xs text-gray-500 dark:text-gray-500 truncate">
                         {formatDistanceToNow(
