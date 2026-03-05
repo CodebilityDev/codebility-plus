@@ -14,7 +14,8 @@ import {
   UserPlus,
   Calendar,
   Award,
-  Briefcase
+  Briefcase,
+  Megaphone
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@codevs/ui/button";
@@ -45,6 +46,7 @@ const notificationIcons = {
   project: Briefcase,
   task: CheckCircle,
   system: Info,
+  announcement: Megaphone
 };
 
 const notificationColors = {
@@ -61,6 +63,7 @@ const notificationColors = {
   project: "text-green-500",
   task: "text-blue-500",
   system: "text-gray-500",
+  announcement: "text-orange-500",
 };
 
 export function NotificationPanel({
