@@ -16,7 +16,8 @@ export interface Notification {
     | "attendance"
     | "project"
     | "task"
-    | "system";
+    | "system"
+    |"announcement";
   priority: "low" | "normal" | "high" | "urgent";
   read: boolean;
   archived: boolean;

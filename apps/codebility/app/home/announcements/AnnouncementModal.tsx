@@ -125,11 +125,19 @@ export const AnnouncementModal: React.FC<AnnouncementModalProps> = ({
             : page
         )
       );
-    } catch (err) {
-      console.error("Error saving announcement:", err);
-      setError("Failed to save announcement");
-    }
-  };
+      const { data: { user } } = await supabase.auth.getUser();
+
+      await supabase.rpc("broadcast_announcement_notification", {
+        p_title: "Announcement Updated",
+        p_message: `"${updatedPage.title}" has been updated.`,
+        p_sender_id: user?.id,
+        p_action_url: "/home",
+      });
+          } catch (err) {
+            console.error("Error saving announcement:", err);
+            setError("Failed to save announcement");
+          }
+        };
 
   const handleTabClick = (category: AnnouncementCategory) => {
     setActiveTab(category);
