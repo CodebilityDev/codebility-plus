@@ -5,6 +5,8 @@ import * as Icons from "lucide-react";
 import { FeatureModal, ModalFeature } from "../type";
 import { upsertActiveModal } from "../actions";
 import IconPicker from "./IconPicker";
+import { Upload, X } from "lucide-react";
+import { uploadModalImage } from "../actions";
 
 interface EditPromoModalProps {
   data: FeatureModal | null;
@@ -21,9 +23,27 @@ export default function EditPromoModal({ data }: EditPromoModalProps) {
     dismiss_label: data?.dismiss_label ?? "Maybe later",
     features: data?.features ?? [],
     is_active: data?.is_active ?? true,
+    image_url: data?.image_url ?? "",
   });
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+
+
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  setUploading(true);
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const { url, error } = await uploadModalImage(formData);
+  setUploading(false);
+
+  if (url) handleChange("image_url", url);
+  else alert(error ?? "Upload failed.");
+}
 
   function handleChange(field: keyof FeatureModal, value: unknown) {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -151,8 +171,49 @@ export default function EditPromoModal({ data }: EditPromoModalProps) {
               </div>
             ))}
           </div>
-        </div>
+          
+          {/* Image upload */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+              Image
+            </label>
 
+            {/* Preview */}
+            {form.image_url && (
+              <div className="relative h-36 w-full overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700">
+                <img
+                  src={form.image_url}
+                  alt="Preview"
+                  className="h-full w-full object-cover"
+                />
+                <button
+                  onClick={() => handleChange("image_url", "")}
+                  className="absolute right-2 top-2 rounded-full bg-black/50 p-1 text-white hover:bg-black/70"
+                >
+                  <Icons.X className="h-3 w-3" />
+                </button>
+              </div>
+            )}
+
+            {/* Upload input */}
+            <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-violet-400 py-3 text-sm text-violet-600 hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-colors">
+              <Icons.Upload className="h-4 w-4" />
+              {uploading ? "Uploading..." : form.image_url ? "Replace Image" : "Upload Image"}
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                disabled={uploading}
+                onChange={handleImageUpload}
+              />
+            </label>
+            <p className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500">
+              <Icons.Info className="h-3 w-3 shrink-0" />
+              Recommended size: <span className="font-medium text-gray-500 dark:text-gray-400">600 × 800px</span> (portrait) · JPG, PNG, WEBP
+            </p>    
+          </div>
+        </div>
+        
         {/* ── RIGHT COLUMN: Features + Preview ── */}
         <div className="flex flex-col gap-6">
 
@@ -225,54 +286,76 @@ export default function EditPromoModal({ data }: EditPromoModalProps) {
               Preview
             </h2>
             <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg">
-              <div className="h-1.5 w-full bg-gradient-to-r from-violet-500 via-blue-500 to-cyan-400" />
-              <div className="bg-white dark:bg-gray-900 px-5 py-4">
-                {form.badge && (
-                  <span className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold text-violet-700 dark:bg-violet-900/40 dark:text-violet-300">
-                    {form.badge}
-                  </span>
-                )}
-                <p className="text-base font-bold text-gray-900 dark:text-white">
-                  {form.headline || (
-                    <span className="text-gray-300 dark:text-gray-600">Headline...</span>
+              <div className="flex min-h-[280px]">
+
+                {/* Image panel */}
+                <div className="relative w-[40%] shrink-0">
+                  {form.image_url ? (
+                    <img
+                      src={form.image_url}
+                      alt="Preview"
+                      className="absolute inset-0 h-full w-full object-cover object-top"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800">
+                      <Icons.Image className="h-8 w-8 text-gray-300 dark:text-gray-600" />
+                    </div>
                   )}
-                </p>
-                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                  {form.subheadline || (
-                    <span className="text-gray-300 dark:text-gray-600">Subheadline...</span>
+                  {/* Vertical gradient strip */}
+                  <div className="absolute top-0 right-0 bottom-0 w-1 bg-gradient-to-b from-violet-500 via-blue-500 to-cyan-400" />
+                </div>
+
+                {/* Content panel */}
+                <div className="flex flex-col flex-1 bg-white dark:bg-gray-900 px-4 py-4">
+                  {form.badge && (
+                    <span className="mb-2 inline-flex w-fit items-center gap-1.5 rounded-full bg-violet-100 px-2 py-0.5 text-xs font-semibold text-violet-700 dark:bg-violet-900/40 dark:text-violet-300">
+                      ✨ {form.badge}
+                    </span>
                   )}
-                </p>
-                {(form.features ?? []).length > 0 && (
-                  <ul className="mt-3 space-y-1.5">
-                    {form.features?.map((f, i) => (
-                      <li
-                        key={i}
-                        className="flex items-center gap-2 rounded-lg bg-gray-50 px-3 py-2 dark:bg-gray-800"
-                      >
-                        {(() => {
-                          const Icon = f.icon ? (Icons[f.icon as keyof typeof Icons] as Icons.LucideIcon) : null;
-                          return Icon ? <Icon className="h-4 w-4 shrink-0 text-violet-600" /> : null;
-                        })()}
-                        <div>
-                          <p className="text-xs font-semibold text-gray-800 dark:text-gray-100">
-                            {f.title}
-                          </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
-                            {f.description}
-                          </p>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-                <div className="mt-3 flex gap-2">
-                  <div className="flex-1 rounded-lg bg-gradient-to-r from-violet-600 to-blue-600 px-3 py-1.5 text-center text-xs font-semibold text-white">
-                    {form.cta_label || "CTA Button"}
-                  </div>
-                  <div className="flex-1 rounded-lg px-3 py-1.5 text-center text-xs text-gray-500">
-                    {form.dismiss_label || "Maybe later"}
+                  <p className="text-sm font-bold text-gray-900 dark:text-white">
+                    {form.headline || (
+                      <span className="text-gray-300 dark:text-gray-600">Headline...</span>
+                    )}
+                  </p>
+                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    {form.subheadline || (
+                      <span className="text-gray-300 dark:text-gray-600">Subheadline...</span>
+                    )}
+                  </p>
+
+                  {(form.features ?? []).length > 0 && (
+                    <ul className="mt-2 space-y-1 flex-1">
+                      {form.features?.map((f, i) => {
+                        const Icon = f.icon
+                          ? (Icons[f.icon as keyof typeof Icons] as Icons.LucideIcon)
+                          : null;
+                        return (
+                          <li key={i} className="flex items-center gap-2 rounded-lg bg-gray-50 px-2 py-1.5 dark:bg-gray-800">
+                            {Icon && <Icon className="h-3 w-3 shrink-0 text-violet-600" />}
+                            <div>
+                              <p className="text-xs font-semibold text-gray-800 dark:text-gray-100">
+                                {f.title}
+                              </p>
+                              <p className="text-xs text-gray-500 dark:text-gray-400">
+                                {f.description}
+                              </p>
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+
+                  <div className="mt-3 flex gap-2">
+                    <div className="flex-1 rounded-lg bg-gradient-to-r from-violet-600 to-blue-600 px-2 py-1.5 text-center text-xs font-semibold text-white">
+                      {form.cta_label || "CTA Button"}
+                    </div>
+                    <div className="flex-1 rounded-lg px-2 py-1.5 text-center text-xs text-gray-500">
+                      {form.dismiss_label || "Maybe later"}
+                    </div>
                   </div>
                 </div>
+
               </div>
             </div>
           </div>
