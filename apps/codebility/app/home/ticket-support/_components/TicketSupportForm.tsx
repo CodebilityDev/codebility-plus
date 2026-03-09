@@ -2,6 +2,8 @@
 
 import { useState, useMemo } from "react";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+import { createClientClientComponent } from "@/utils/supabase/client";
 import {
     Select,
     SelectContent,
@@ -19,6 +21,7 @@ interface ProjectData {
 
 interface TicketSupportFormProps {
     projects: ProjectData[];
+    user: any; // Keep it simple for now, or use User from @supabase/supabase-js
 }
 
 const ROLE_POSITIONS = [
@@ -41,13 +44,16 @@ const TICKET_TYPES = [
     "Other",
 ];
 
-const PRIORITY_LEVELS = ["critical", "high", "medium", "low"];
+const PRIORITY_LEVELS = ["urgent", "high", "medium", "low"];
 
 const TICKET_DETAILS_MAX_CHARS = 1000;
 
 export default function TicketSupportForm({
     projects,
+    user,
 }: TicketSupportFormProps) {
+    const supabase = createClientClientComponent();
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [fullName, setFullName] = useState("");
     const [rolePosition, setRolePosition] = useState("");
     const [selectedProject, setSelectedProject] = useState("");
@@ -57,6 +63,7 @@ export default function TicketSupportForm({
     const [priority, setPriority] = useState("");
     const [ticketTitle, setTicketTitle] = useState("");
     const [ticketDetails, setTicketDetails] = useState("");
+
     const handleProjectChange = (projectId: string) => {
         setSelectedProject(projectId);
         if (projectId === "none") {
@@ -71,10 +78,47 @@ export default function TicketSupportForm({
         }
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Frontend-only — no backend submission
-        alert("Ticket submission is coming soon!");
+
+        if (!supabase) {
+            toast.error("Database connection failed. Please try again later.");
+            return;
+        }
+
+        try {
+            setIsSubmitting(true);
+            const { error } = await supabase.from("ticket_support").insert({
+                full_name: fullName,
+                user_id: user?.id,
+                role_position: rolePosition,
+                project_id: selectedProject === "none" ? null : selectedProject,
+                assigned_team: assignedTeam,
+                ticket_type: ticketType,
+                other_type: otherType,
+                priority: priority.toUpperCase(),
+                subject: ticketTitle,
+                message: ticketDetails,
+            });
+
+            if (error) throw error;
+
+            toast.success("Ticket submitted successfully!");
+            // Reset form
+            setFullName("");
+            setRolePosition("");
+            setSelectedProject("");
+            setAssignedTeam("");
+            setTicketType("");
+            setOtherType("");
+            setPriority("");
+            setTicketTitle("");
+            setTicketDetails("");
+        } catch (error: any) {
+            toast.error(error.message || "Failed to submit ticket. Please try again.");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -100,7 +144,7 @@ export default function TicketSupportForm({
                             value={fullName}
                             onChange={(e) => setFullName(e.target.value)}
                             placeholder="Enter your full name"
-                            className="bg-light-900 dark:bg-dark-200 dark:text-light-900 focus:border-customBlue-500 w-full rounded-lg border border-gray-300 p-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-customBlue-100 dark:border-zinc-700 dark:placeholder:text-gray-500"
+                            className="bg-light-900 dark:bg-dark-200 dark:text-light-900 focus:border-customBlue-500 w-full rounded-lg border border-gray-300 p-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-customBlue-100 dark:border-zinc-700 dark:placeholder:text-zinc-400"
                             required
                         />
                     </div>
@@ -111,7 +155,7 @@ export default function TicketSupportForm({
                             Role Position <span className="text-red-500">*</span>
                         </Label>
                         <Select value={rolePosition} onValueChange={setRolePosition}>
-                            <SelectTrigger className="bg-light-900 focus:border-customBlue-500 border border-gray-300 dark:border-gray-700">
+                            <SelectTrigger className="bg-light-900 dark:bg-dark-200 dark:text-light-900 border border-gray-300 dark:border-gray-700 focus:border-customBlue-500">
                                 <SelectValue placeholder="Select your role" />
                             </SelectTrigger>
                             <SelectContent>
@@ -132,7 +176,7 @@ export default function TicketSupportForm({
                             Project <span className="text-red-500">*</span>
                         </Label>
                         <Select value={selectedProject} onValueChange={handleProjectChange}>
-                            <SelectTrigger className="bg-light-900 focus:border-customBlue-500 border border-gray-300 dark:border-gray-700">
+                            <SelectTrigger className="bg-light-900 dark:bg-dark-200 dark:text-light-900 border border-gray-300 dark:border-gray-700 focus:border-customBlue-500">
                                 <SelectValue placeholder="Select your project" />
                             </SelectTrigger>
                             <SelectContent>
@@ -157,7 +201,7 @@ export default function TicketSupportForm({
                             readOnly={selectedProject !== "none"}
                             onChange={(e) => setAssignedTeam(e.target.value)}
                             placeholder={selectedProject === "none" ? "Enter team or lead name" : "Auto-filled from project"}
-                            className={`bg-light-900 dark:bg-dark-200 dark:text-light-900 w-full rounded-lg border border-gray-300 p-2 text-sm placeholder:text-gray-400 dark:border-zinc-700 dark:placeholder:text-gray-500 ${selectedProject !== "none" ? "cursor-not-allowed" : "focus:border-customBlue-500 focus:outline-none focus:ring-1 focus:ring-customBlue-100"
+                            className={`bg-light-900 dark:bg-dark-200 dark:text-light-900 w-full rounded-lg border border-gray-300 p-2 text-sm placeholder:text-gray-400 dark:border-zinc-700 dark:placeholder:text-zinc-400 ${selectedProject !== "none" ? "cursor-not-allowed" : "focus:border-customBlue-500 focus:outline-none focus:ring-1 focus:ring-customBlue-100"
                                 }`}
                         />
                     </div>
@@ -181,7 +225,7 @@ export default function TicketSupportForm({
                             Type <span className="text-red-500">*</span>
                         </Label>
                         <Select value={ticketType} onValueChange={setTicketType}>
-                            <SelectTrigger className="bg-light-900 focus:border-customBlue-500 border border-gray-300 dark:border-gray-700">
+                            <SelectTrigger className="bg-light-900 dark:bg-dark-200 dark:text-light-900 border border-gray-300 dark:border-gray-700 focus:border-customBlue-500">
                                 <SelectValue placeholder="Select ticket type" />
                             </SelectTrigger>
                             <SelectContent>
@@ -202,7 +246,7 @@ export default function TicketSupportForm({
                             Priority <span className="text-red-500">*</span>
                         </Label>
                         <Select value={priority} onValueChange={setPriority}>
-                            <SelectTrigger className="bg-light-900 focus:border-customBlue-500 border border-gray-300 dark:border-gray-700">
+                            <SelectTrigger className="bg-light-900 dark:bg-dark-200 dark:text-light-900 border border-gray-300 dark:border-gray-700 focus:border-customBlue-500">
                                 <SelectValue placeholder="Select priority" />
                             </SelectTrigger>
                             <SelectContent>
@@ -233,7 +277,7 @@ export default function TicketSupportForm({
                             value={otherType}
                             onChange={(e) => setOtherType(e.target.value)}
                             placeholder="Describe your inquiry type"
-                            className="bg-light-900 dark:bg-dark-200 dark:text-light-900 focus:border-customBlue-500 w-full rounded-lg border border-gray-300 p-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-customBlue-100 dark:border-zinc-700 dark:placeholder:text-gray-500"
+                            className="bg-light-900 dark:bg-dark-200 dark:text-light-900 focus:border-customBlue-500 w-full rounded-lg border border-gray-300 p-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-customBlue-100 dark:border-zinc-700 dark:placeholder:text-zinc-400"
                             required
                         />
                     </div>
@@ -250,7 +294,7 @@ export default function TicketSupportForm({
                         value={ticketTitle}
                         onChange={(e) => setTicketTitle(e.target.value)}
                         placeholder="Brief summary of your issue"
-                        className="bg-light-900 dark:bg-dark-200 dark:text-light-900 focus:border-customBlue-500 w-full rounded-lg border border-gray-300 p-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-customBlue-100 dark:border-zinc-700 dark:placeholder:text-gray-500"
+                        className="bg-light-900 dark:bg-dark-200 dark:text-light-900 focus:border-customBlue-500 w-full rounded-lg border border-gray-300 p-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-customBlue-100 dark:border-zinc-700 dark:placeholder:text-zinc-400"
                     />
                 </div>
 
@@ -280,7 +324,7 @@ export default function TicketSupportForm({
                         rows={6}
                         maxLength={TICKET_DETAILS_MAX_CHARS}
                         required
-                        className="bg-light-900 dark:bg-dark-200 dark:text-light-900 focus:border-customBlue-500 w-full resize-none rounded-lg border border-gray-300 p-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-customBlue-100 dark:border-zinc-700 dark:placeholder:text-gray-500"
+                        className="bg-light-900 dark:bg-dark-200 dark:text-light-900 focus:border-customBlue-500 w-full resize-none rounded-lg border border-gray-300 p-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-customBlue-100 dark:border-zinc-700 dark:placeholder:text-zinc-400"
                     />
                 </div>
             </div>
@@ -289,6 +333,8 @@ export default function TicketSupportForm({
             <div className="flex justify-start gap-2 pt-2">
                 <button
                     type="submit"
+                    disabled={isSubmitting}
+                    className={`${isSubmitting ? "cursor-not-allowed opacity-70" : "hover:opacity-90"}`}
                     style={{
                         backgroundColor: "#2563EB",
                         color: "white",
@@ -300,7 +346,7 @@ export default function TicketSupportForm({
                         width: "auto",
                     }}
                 >
-                    Submit Ticket
+                    {isSubmitting ? "Submitting..." : "Submit Ticket"}
                 </button>
             </div>
         </form>

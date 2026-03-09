@@ -14,12 +14,12 @@ CREATE TABLE IF NOT EXISTS ticket_support (
     full_name TEXT NOT NULL,
     email TEXT,
     role_position TEXT,
-    project_id UUID REFERENCES project(id) ON DELETE SET NULL,
+    project_id UUID REFERENCES projects(id) ON DELETE SET NULL,
     assigned_team TEXT,
     ticket_type TEXT NOT NULL,
     other_type TEXT,
-    subject TEXT, -- This will correspond to 'ticketTitle' from frontend
-    message TEXT NOT NULL, -- This will correspond to 'ticketDetails' from frontend
+    subject TEXT, -- Matches 'ticketTitle' from frontend
+    message TEXT NOT NULL, -- Matches 'ticketDetails' from frontend
     status TEXT NOT NULL DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'OPEN', 'IN_PROGRESS', 'RESOLVED', 'CLOSED')),
     priority TEXT NOT NULL DEFAULT 'MEDIUM' CHECK (priority IN ('LOW', 'MEDIUM', 'HIGH', 'URGENT')),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
