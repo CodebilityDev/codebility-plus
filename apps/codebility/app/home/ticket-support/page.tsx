@@ -1,7 +1,6 @@
 import { createClientServerComponent } from "@/utils/supabase/server";
 
 import TicketSupportForm from "./_components/TicketSupportForm";
-import ComingSoonModal from "./_components/ComingSoonModal";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -72,10 +71,7 @@ export default async function TicketSupportPage() {
 
     return (
         <div className="relative min-h-screen bg-white dark:bg-gray-950">
-            {/* Coming Soon Modal Overlay */}
-            <ComingSoonModal />
-
-            {/* Page Content (visible but blurred behind modal) */}
+            {/* Page Content */}
             <div className="mx-auto max-w-6xl px-6 py-12">
                 {/* Header — Codev Overflow style */}
                 <div className="mb-12 text-center">
@@ -93,7 +89,7 @@ export default async function TicketSupportPage() {
 
                 {/* Form */}
                 <div className="relative">
-                    <TicketSupportForm projects={projects} />
+                <TicketSupportForm projects={projects} userId={authUser?.id || null} userEmail={authUser?.email || null} />
                 </div>
             </div>
         </div>
