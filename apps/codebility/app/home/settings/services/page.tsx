@@ -164,7 +164,9 @@ export default function ServicesPage() {
       return <CoverPagePreview />;
     } else if (currentPage <= services.length) {
       const serviceIndex = currentPage - 1;
-      return <ServicePagePreview service={services[serviceIndex]} index={serviceIndex} />;
+      const service = services[serviceIndex];
+      if (!service) return null;
+      return <ServicePagePreview service={service} index={serviceIndex} />;
     } else {
       return <SummaryPagePreview />;
     }
@@ -199,14 +201,11 @@ export default function ServicesPage() {
     }
 
     try {
-      console.log('🚀 Starting PDF generation - using jsPDF approach...');
       toast("Generating PDF with all pages...", { duration: 5000 });
 
       // Dynamically import libraries
       const html2canvas = (await import('html2canvas')).default;
       const { default: jsPDF } = await import('jspdf');
-
-      console.log('✅ Libraries imported');
 
       // Get all page elements (exclude split preview pages, only use original pages for capture)
       const pages = document.querySelectorAll('#pdf-all-pages-hidden .pdf-page:not(.pdf-split-page)');
@@ -222,8 +221,6 @@ export default function ServicesPage() {
         unit: 'mm',
         format: 'a4'
       });
-
-      console.log('📄 Created new PDF document');
 
       // Create an overlay to hide the rendering from user
       const overlay = document.createElement('div');
@@ -1400,7 +1397,7 @@ export default function ServicesPage() {
   }
 
   return (
-    <PageContainer maxWidth="6xl">
+    <PageContainer maxWidth="7xl">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div className="flex items-center gap-3">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-500 shadow-lg">

@@ -170,7 +170,6 @@ export const signupUser = async (formData: FormData) => {
     const signedAt = formData.get("ndaSignedAt") as string;
 
     if (ndaSigned === "true" && signature && document) {
-      console.log("NDA data found in form submission, processing with storage system...");
       
       try {
         // **NEW: Upload NDA files to Supabase Storage instead of storing base64**
@@ -185,7 +184,6 @@ export const signupUser = async (formData: FormData) => {
         );
 
         if (ndaUploadResult.success) {
-          console.log("NDA files uploaded to storage successfully");
           
           // Set the storage URLs instead of base64 data
           nda_status = true;
@@ -198,7 +196,6 @@ export const signupUser = async (formData: FormData) => {
           console.error("Failed to upload NDA to storage:", ndaUploadResult.error);
           
           // **FALLBACK: Use base64 storage if storage upload fails**
-          console.log("Falling back to base64 storage for NDA data");
           nda_status = true;
           nda_signature = signature;
           nda_document = document;
@@ -208,7 +205,6 @@ export const signupUser = async (formData: FormData) => {
         console.error("Error processing NDA with storage system:", ndaError);
         
         // **FALLBACK: Use base64 storage if there's an error**
-        console.log("Falling back to base64 storage due to error");
         nda_status = true;
         nda_signature = signature;
         nda_document = document;
@@ -357,7 +353,6 @@ export const signOut = async (): Promise<void> => {
     if (error) throw new Error(`Sign out error: ${error.message}`);
 
     clearUser();
-    console.log("User successfully signed out");
     // Redirect to the /codev page
     redirect("/codev");
   } catch (error) {

@@ -40,7 +40,7 @@ export default async function TicketManagementPage() {
               Ticket Management
             </H1>
             <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base mt-1">
-              View and manage submitted support tickets
+               View and manage submitted support tickets
             </p>
           </div>
         </div>

@@ -1,23 +1,16 @@
 // app/api/cron/meeting-reminders/route.ts
 import { createNotificationAction } from "@/lib/actions/notification.actions";
-import { createClient } from "@supabase/supabase-js";
+import { createClientServerComponent } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
-  // Verify cron secret for security
-  const authHeader = request.headers.get("authorization");
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return new Response("Unauthorized", { status: 401 });
-  }
-
   try {
-    // ✅ Create Supabase client with service role for server-side operations
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    );
+    // Parse URL to get test type parameter 
+    const url = new URL(request.url);
+    const testType = url.searchParams.get('testType'); // '8am', '30min', 'start', or null for all
 
-    // ✅ FIX: Use Manila timezone (Asia/Manila = UTC+8)
+    const supabase = await createClientServerComponent();
+
     const nowUTC = new Date();
     const nowManila = new Date(
       nowUTC.toLocaleString("en-US", { timeZone: "Asia/Manila" })
@@ -33,35 +26,82 @@ export async function GET(request: Request) {
     const currentHour = nowManila.getHours();
     const currentMinute = nowManila.getMinutes();
 
-    console.log(`[Cron] Manila time: ${nowManila.toLocaleString("en-US", { timeZone: "Asia/Manila" })}`);
-    console.log(`[Cron] Current day: ${currentDay}, Hour: ${currentHour}, Minute: ${currentMinute}`);
+    // Determine which notification types to send
+    const isTestMode = !!testType; // this is for testing page purposes - if testType is provided, we are in test mode
+    const shouldSend8AM = !testType || testType === '8am';
+    const shouldSend30Min = !testType || testType === '30min';
+    const shouldSendStart = !testType || testType === 'start';
 
-    // ✅ Query projects with Supabase syntax
+    // Query projects without the problematic team_lead_id column
     const { data: projectsWithMeetings, error: projectsError } = await supabase
-      .from("project")
+      .from("projects")
       .select(
         `
-        *,
-        teamLead:team_lead_id(*),
-        teamMembers:project_members(user:user_id(*))
+        id,
+        name,
+        meeting_schedule,
+        meeting_link
       `,
       )
       .not("meeting_schedule", "is", null);
 
     if (projectsError) {
-      console.error("Error fetching projects:", projectsError);
       return NextResponse.json(
-        { success: false, error: "Failed to fetch projects" },
+        { 
+          success: false, 
+          error: "Failed to fetch projects",
+          details: {
+            message: projectsError.message,
+            hint: projectsError.hint
+          }
+        },
         { status: 500 },
       );
     }
 
     let notificationsSent = 0;
 
+    // Helper function to get all team members
+    const getTeamMembers = async (projectId: string) => {
+      const allMembers: any[] = [];
+      
+      // Get all project members
+      const { data: projectMembers, error: membersError } = await supabase
+        .from("project_members")
+        .select(`
+          codev_id,
+          role,
+          codev:codev_id (
+            id,
+            first_name,
+            last_name,
+            email_address
+          )
+        `)
+        .eq("project_id", projectId);
+        
+      if (membersError) {
+        return [];
+      }
+
+      if (!projectMembers || projectMembers.length === 0) {
+        return [];
+      }
+      
+      for (const member of projectMembers) {
+        // Ensure codev is a single object, not an array
+        const codevData = Array.isArray(member.codev) ? member.codev[0] : member.codev;
+        if (codevData) {
+          allMembers.push(codevData);
+        }
+      }
+      
+      return allMembers;
+    };
+
     for (const project of projectsWithMeetings || []) {
-      // ✅ Validate project has required fields
+      // Validate project has required fields
       if (!project.id || !project.name) {
-        console.warn("Skipping project with missing id or name");
         continue;
       }
 
@@ -74,13 +114,13 @@ export async function GET(request: Request) {
         meetingLink?: string;
       } | null;
 
-      // Check if today is a meeting day
+      // Always check if today is a meeting day (for both test and production)
       if (
         !schedule?.time ||
         !schedule?.selectedDays ||
         !schedule.selectedDays.includes(currentDay)
       ) {
-        continue;
+        continue; // Skip projects without meetings today
       }
 
       // Parse and validate time
@@ -96,17 +136,12 @@ export async function GET(request: Request) {
       const currentTimeInMinutes = currentHour * 60 + currentMinute;
       const timeDifference = meetingTimeInMinutes - currentTimeInMinutes;
 
-      console.log(`[Project: ${projectName}] Meeting at ${schedule.time}, Time difference: ${timeDifference} minutes`);
+      // Get team members
+      const allMembers = await getTeamMembers(projectId);
 
-      // Build team members array
-      const teamMembers = project.teamMembers
-        ? project.teamMembers.map((pm: any) => pm.user).filter(Boolean)
-        : [];
-      const allMembers = project.teamLead
-        ? [project.teamLead, ...teamMembers]
-        : teamMembers;
-
-      if (allMembers.length === 0) continue;
+      if (allMembers.length === 0) {
+        continue; // Skip projects with no team members
+      }
 
       // Helper to format time
       const formatTime = (time24: string): string => {
@@ -125,88 +160,112 @@ export async function GET(request: Request) {
 
       const formattedTime = formatTime(schedule.time);
 
-      // ✅ MORNING REMINDER (8:00-8:15 AM Manila time for meetings today)
-      if (currentHour === 8 && currentMinute < 15) {
-        console.log(`[${projectName}] Sending MORNING reminder`);
-        
-        const notificationPromises = allMembers.map((member) =>
-          createNotificationAction({
-            recipientId: member.id,
-            title: "📅 Meeting Scheduled Today",
-            message: `Reminder: "${projectName}" team meeting today at ${formattedTime}\n\nPlatform: Discord\n\nMake sure you're available!`,
-            type: "event",
-            priority: "medium",
-            actionUrl: `/home/my-team/${projectId}`,
-            metadata: {
-              projectId,
-              projectName,
-              meetingTime: schedule.time,
-              meetingTimeFormatted: formattedTime,
-              platform: "Discord",
-              reminderType: "morning",
-              timestamp: nowManila.toISOString(),
-            },
-          }),
-        );
+      // MORNING REMINDER (at 8:00 AM Manila time for meetings today, or always in test mode for 8am)
+      if (shouldSend8AM && (isTestMode || (currentHour === 8 && currentMinute < 15))) {
+        const notificationPromises = allMembers.map(async (member) => {
+          try {
+            const result = await createNotificationAction({
+              recipientId: member.id,
+              title: "📅 Meeting Today!",
+              message: `Good morning! ☀️ You have a team meeting today at ${formattedTime} on Discord. Get your workspace ready and don't be late!`,
+              type: "event",
+              priority: "normal",
+              actionUrl: `/home/my-team/${projectId}`,
+              metadata: {
+                projectId,
+                projectName,
+                meetingTime: schedule.time,
+                meetingTimeFormatted: formattedTime,
+                platform: "Discord",
+                reminderType: "morning",
+                timestamp: nowManila.toISOString(),
+              },
+            });
+            
+            if (!result.error && result.data && result.data !== "skipped") {
+              return result;
+            }
+            return null;
+          } catch (error) {
+            return null;
+          }
+        });
 
-        await Promise.all(notificationPromises);
-        notificationsSent += notificationPromises.length;
+        const results = await Promise.all(notificationPromises);
+        const successfulNotifications = results.filter(r => r !== null).length;
+        notificationsSent += successfulNotifications;
       }
 
-      // ✅ 30-MINUTE REMINDER (25-35 minutes before meeting)
-      if (timeDifference >= 25 && timeDifference <= 35) {
-        console.log(`[${projectName}] Sending 30-MINUTE reminder`);
-        
-        const notificationPromises = allMembers.map((member) =>
-          createNotificationAction({
-            recipientId: member.id,
-            title: "⏰ Meeting Starting Soon",
-            message: `"${projectName}" team meeting starts in 30 minutes (${formattedTime})\n\nJoin the Discord voice channel`,
-            type: "event",
-            priority: "high",
-            actionUrl: `/home/my-team/${projectId}`,
-            metadata: {
-              projectId,
-              projectName,
-              meetingTime: schedule.time,
-              meetingTimeFormatted: formattedTime,
-              platform: "Discord",
-              reminderType: "30min",
-              timestamp: nowManila.toISOString(),
-            },
-          }),
-        );
+      // 30-MINUTE REMINDER (exactly 30 minutes before meeting start, or always in test mode for this type)
+      if (shouldSend30Min && (isTestMode || timeDifference === 30)) {
+        const notificationPromises = allMembers.map(async (member) => {
+          try {
+            const result = await createNotificationAction({
+              recipientId: member.id,
+              title: "⏰ Meeting in 30 Minutes!",
+              message: `Heads up! 🚀 Your team meeting starts in 30 minutes at ${formattedTime}. Wrap up what you're doing and hop on Discord!\n\nClick here to join [${projectName}](/home/my-team/${projectId})`,
+              type: "event",
+              priority: "high",
+              actionUrl: `/home/my-team/${projectId}`,
+              metadata: {
+                projectId,
+                projectName,
+                meetingTime: schedule.time,
+                meetingTimeFormatted: formattedTime,
+                platform: "Discord",
+                reminderType: "30min",
+                timestamp: nowManila.toISOString(),
+              },
+            });
+            
+            if (!result.error && result.data && result.data !== "skipped") {
+              return result;
+            }
+            return null;
+          } catch (error) {
+            return null;
+          }
+        });
 
-        await Promise.all(notificationPromises);
-        notificationsSent += notificationPromises.length;
+        const results = await Promise.all(notificationPromises);
+        const successfulNotifications = results.filter(r => r !== null).length;
+        notificationsSent += successfulNotifications;
       }
 
-      // ✅ MEETING START NOTIFICATION (at meeting time, -5 to +5 min window)
-      if (timeDifference >= -5 && timeDifference <= 5) {
-        console.log(`[${projectName}] Sending START notification`);
-        
-        const notificationPromises = allMembers.map((member) =>
-          createNotificationAction({
-            recipientId: member.id,
-            title: "🔴 Meeting Starting Now!",
-            message: `"${projectName}" team meeting is starting now!\n\nJoin the Discord voice channel now!`,
-            type: "event",
-            priority: "urgent",
-            actionUrl: `/home/my-team/${projectId}`,
-            metadata: {
-              projectId,
-              projectName,
-              meetingTime: schedule.time,
-              meetingTimeFormatted: formattedTime,
-              platform: "Discord",
-              reminderType: "start",
-              timestamp: nowManila.toISOString(),
-            },
-          }),
-        );
+      // MEETING START NOTIFICATION (at exact meeting time, or always in test mode for this type)
+      if (shouldSendStart && (isTestMode || timeDifference === 0)) {
+        const notificationPromises = allMembers.map(async (member) => {
+          try {
+            const result = await createNotificationAction({
+              recipientId: member.id,
+              title: "🔴 Meeting is Live!",
+              message: `It's go time! 🎉 Your team meeting is happening right now on Discord. Don't keep the team waiting!\n\nClick here to join [${projectName}](/home/my-team/${projectId})`,
+              type: "event",
+              priority: "urgent",
+              actionUrl: `/home/my-team/${projectId}`,
+              metadata: {
+                projectId,
+                projectName,
+                meetingTime: schedule.time,
+                meetingTimeFormatted: formattedTime,
+                platform: "Discord",
+                reminderType: "start",
+                timestamp: nowManila.toISOString(),
+              },
+            });
+            
+            if (!result.error && result.data && result.data !== "skipped") {
+              return result;
+            }
+            return null;
+          } catch (error) {
+            return null;
+          }
+        });
 
-        await Promise.all(notificationPromises);
-        notificationsSent += notificationPromises.length;
+        const results = await Promise.all(notificationPromises);
+        const successfulNotifications = results.filter(r => r !== null).length;
+        notificationsSent += successfulNotifications;
       }
     }
 
@@ -217,11 +276,18 @@ export async function GET(request: Request) {
       currentDay,
       timestamp: nowManila.toISOString(),
       projectsChecked: projectsWithMeetings?.length || 0,
+      testType: testType || 'all (production mode)',
     });
   } catch (error) {
-    console.error("Error sending meeting reminders:", error);
     return NextResponse.json(
-      { success: false, error: "Internal server error" },
+      { 
+        success: false, 
+        error: "Internal server error",
+        details: {
+          message: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined,
+        }
+      },
       { status: 500 },
     );
   }

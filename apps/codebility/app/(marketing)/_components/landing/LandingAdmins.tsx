@@ -1,23 +1,33 @@
 import React from "react";
-import getRandomColor from "@/lib/getRandomColor";
-import { getCodevs } from "@/lib/server/codev.service";
+import { createClient } from "@supabase/supabase-js";
 import { Codev } from "@/types/home/codev";
 
 import Section from "../MarketingSection";
-import AdminCard from "./LandingAdminCard";
-import BlueBg from "./LandingBlueBg";
 import AnimatedAdminsSection from "./AnimatedAdminsSection";
 
 const FOUNDER_USER_ID = process.env.NEXT_PUBLIC_FOUNDER_USER_ID || "";
 
 export default async function Admins() {
-  // Fetch both admins and mentors in parallel
+  /**
+   * Use anon Supabase client — NO cookie access, NO session reading.
+   * This is a public marketing page. Using createClientServerComponent()
+   * here was causing GoTrueClient to attempt a token refresh on every
+   * page load for users with expired sessions → AuthApiError: refresh_token_not_found
+   *
+   * Fix: createClient() with anon key = no auth context = no token refresh attempt.
+   */
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  // Fetch admins (role_id: 1) and mentors (role_id: 5) in parallel
   const [
     { data: admins, error: adminError },
     { data: mentors, error: mentorError },
   ] = await Promise.all([
-    getCodevs({ filters: { role_id: 1 } }),
-    getCodevs({ filters: { role_id: 5 } }),
+    supabase.from("codev").select("*").eq("role_id", 1),
+    supabase.from("codev").select("*").eq("role_id", 5),
   ]);
 
   if (adminError || mentorError) return <div>ERROR</div>;
@@ -37,7 +47,6 @@ export default async function Admins() {
           if (aHasImage && !bHasImage) return -1;
           if (!aHasImage && bHasImage) return 1;
 
-          // If both have images or both don't have images, maintain original order
           return 0;
         })
         .filter((admin) => !admin.display_position?.includes("Developer"))
@@ -47,21 +56,18 @@ export default async function Admins() {
     ? [...mentors]
         .filter((mentor) => mentor.availability_status !== false)
         .sort((a, b) => {
-          // Mentors with profile pictures come before those without
           const aHasImage = !!a.image_url;
           const bHasImage = !!b.image_url;
 
           if (aHasImage && !bHasImage) return -1;
           if (!aHasImage && bHasImage) return 1;
 
-          // If both have images or both don't have images, maintain original order
           return 0;
         })
     : [];
 
-  // Helper function to format position text
+  // Format position text — handles UI/UX abbreviations and slashes
   const formatPosition = (position: string) => {
-    // Special cases for abbreviations
     const specialCases: Record<string, string> = {
       "ui/ux": "UI/UX",
       ui: "UI",
@@ -71,13 +77,9 @@ export default async function Admins() {
     return position
       .split(" ")
       .map((word) => {
-        // Check if word is a special case (case-insensitive)
         const lowerWord = word.toLowerCase();
-        if (specialCases[lowerWord]) {
-          return specialCases[lowerWord];
-        }
+        if (specialCases[lowerWord]) return specialCases[lowerWord];
 
-        // Handle words with slashes
         if (word.includes("/")) {
           return word
             .split("/")
@@ -91,7 +93,6 @@ export default async function Admins() {
             .join("/");
         }
 
-        // Default capitalization
         return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
       })
       .join(" ");

@@ -1,0 +1,242 @@
+__tests__/components/leaderboard/LeaderboardTable.test.tsx(1,32): error TS2307: Cannot find module '@testing-library/react' or its corresponding type declarations.
+__tests__/components/leaderboard/LeaderboardTable.test.tsx(48,1): error TS2593: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/components/leaderboard/LeaderboardTable.test.tsx(49,3): error TS2593: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/components/leaderboard/LeaderboardTable.test.tsx(50,5): error TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/components/leaderboard/LeaderboardTable.test.tsx(59,7): error TS2304: Cannot find name 'expect'.
+__tests__/components/leaderboard/LeaderboardTable.test.tsx(60,7): error TS2304: Cannot find name 'expect'.
+__tests__/components/leaderboard/LeaderboardTable.test.tsx(61,7): error TS2304: Cannot find name 'expect'.
+__tests__/components/leaderboard/LeaderboardTable.test.tsx(62,7): error TS2304: Cannot find name 'expect'.
+__tests__/components/leaderboard/LeaderboardTable.test.tsx(65,5): error TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/components/leaderboard/LeaderboardTable.test.tsx(75,7): error TS2304: Cannot find name 'expect'.
+__tests__/components/leaderboard/LeaderboardTable.test.tsx(79,3): error TS2593: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/components/leaderboard/LeaderboardTable.test.tsx(80,5): error TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/components/leaderboard/LeaderboardTable.test.tsx(89,7): error TS2304: Cannot find name 'expect'.
+__tests__/components/leaderboard/LeaderboardTable.test.tsx(90,7): error TS2304: Cannot find name 'expect'.
+__tests__/components/leaderboard/LeaderboardTable.test.tsx(91,7): error TS2304: Cannot find name 'expect'.
+__tests__/components/leaderboard/LeaderboardTable.test.tsx(92,7): error TS2304: Cannot find name 'expect'.
+__tests__/components/leaderboard/LeaderboardTable.test.tsx(96,3): error TS2593: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/components/leaderboard/LeaderboardTable.test.tsx(97,5): error TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/components/leaderboard/LeaderboardTable.test.tsx(106,7): error TS2304: Cannot find name 'expect'.
+__tests__/components/leaderboard/LeaderboardTable.test.tsx(107,7): error TS2304: Cannot find name 'expect'.
+__tests__/components/leaderboard/LeaderboardTable.test.tsx(111,3): error TS2593: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/components/leaderboard/LeaderboardTable.test.tsx(112,5): error TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/components/leaderboard/LeaderboardTable.test.tsx(123,7): error TS2304: Cannot find name 'expect'.
+__tests__/components/leaderboard/LeaderboardTable.test.tsx(127,3): error TS2593: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/components/leaderboard/LeaderboardTable.test.tsx(128,5): error TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/components/leaderboard/LeaderboardTable.test.tsx(139,7): error TS2304: Cannot find name 'expect'.
+__tests__/components/leaderboard/LeaderboardTable.test.tsx(140,7): error TS2304: Cannot find name 'expect'.
+__tests__/components/leaderboard/LeaderboardTable.test.tsx(144,3): error TS2593: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/components/leaderboard/LeaderboardTable.test.tsx(145,5): error TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/components/leaderboard/LeaderboardTable.test.tsx(154,7): error TS2304: Cannot find name 'expect'.
+__tests__/components/leaderboard/LeaderboardTable.test.tsx(155,7): error TS2304: Cannot find name 'expect'.
+__tests__/components/leaderboard/LeaderboardTable.test.tsx(156,7): error TS2304: Cannot find name 'expect'.
+__tests__/components/leaderboard/LeaderboardTable.test.tsx(159,5): error TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/components/leaderboard/LeaderboardTable.test.tsx(168,7): error TS2304: Cannot find name 'expect'.
+__tests__/components/leaderboard/LeaderboardTable.test.tsx(169,7): error TS2304: Cannot find name 'expect'.
+__tests__/components/leaderboard/LeaderboardTable.test.tsx(170,7): error TS2304: Cannot find name 'expect'.
+__tests__/components/leaderboard/LeaderboardTable.test.tsx(174,3): error TS2593: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/components/leaderboard/LeaderboardTable.test.tsx(175,5): error TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/components/leaderboard/LeaderboardTable.test.tsx(186,7): error TS2304: Cannot find name 'expect'.
+__tests__/hooks/useLeaderboard.test.ts(1,37): error TS2307: Cannot find module '@testing-library/react' or its corresponding type declarations.
+__tests__/hooks/useLeaderboard.test.ts(5,16): error TS2304: Cannot find name 'jest'.
+__tests__/hooks/useLeaderboard.test.ts(7,35): error TS2503: Cannot find namespace 'jest'.
+__tests__/hooks/useLeaderboard.test.ts(9,1): error TS2593: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/hooks/useLeaderboard.test.ts(10,3): error TS2304: Cannot find name 'beforeEach'.
+__tests__/hooks/useLeaderboard.test.ts(14,3): error TS2593: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/hooks/useLeaderboard.test.ts(15,5): error TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/hooks/useLeaderboard.test.ts(41,9): error TS2304: Cannot find name 'expect'.
+__tests__/hooks/useLeaderboard.test.ts(44,7): error TS2304: Cannot find name 'expect'.
+__tests__/hooks/useLeaderboard.test.ts(45,7): error TS2304: Cannot find name 'expect'.
+__tests__/hooks/useLeaderboard.test.ts(48,5): error TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/hooks/useLeaderboard.test.ts(63,9): error TS2304: Cannot find name 'expect'.
+__tests__/hooks/useLeaderboard.test.ts(66,7): error TS2304: Cannot find name 'expect'.
+__tests__/hooks/useLeaderboard.test.ts(67,7): error TS2304: Cannot find name 'expect'.
+__tests__/hooks/useLeaderboard.test.ts(71,3): error TS2593: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/hooks/useLeaderboard.test.ts(72,5): error TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/hooks/useLeaderboard.test.ts(97,9): error TS2304: Cannot find name 'expect'.
+__tests__/hooks/useLeaderboard.test.ts(100,7): error TS2304: Cannot find name 'expect'.
+__tests__/hooks/useLeaderboard.test.ts(104,3): error TS2593: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/hooks/useLeaderboard.test.ts(105,5): error TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/hooks/useLeaderboard.test.ts(131,9): error TS2304: Cannot find name 'expect'.
+__tests__/hooks/useLeaderboard.test.ts(134,7): error TS2304: Cannot find name 'expect'.
+__tests__/hooks/useLeaderboard.test.ts(138,3): error TS2593: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/hooks/useLeaderboard.test.ts(139,5): error TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/hooks/useLeaderboard.test.ts(152,9): error TS2304: Cannot find name 'expect'.
+__tests__/hooks/useLeaderboard.test.ts(161,7): error TS2304: Cannot find name 'expect'.
+__tests__/hooks/useLeaderboard.test.ts(165,3): error TS2593: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/hooks/useLeaderboard.test.ts(166,5): error TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/hooks/useLeaderboard.test.ts(179,9): error TS2304: Cannot find name 'expect'.
+__tests__/hooks/useLeaderboard.test.ts(186,7): error TS2304: Cannot find name 'expect'.
+__tests__/hooks/useLeaderboard.test.ts(187,9): error TS2304: Cannot find name 'expect'.
+__tests__/hooks/useLeaderboard.test.ts(191,5): error TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/hooks/useLeaderboard.test.ts(204,9): error TS2304: Cannot find name 'expect'.
+__tests__/hooks/useLeaderboard.test.ts(211,7): error TS2304: Cannot find name 'expect'.
+__tests__/hooks/useLeaderboard.test.ts(212,9): error TS2304: Cannot find name 'expect'.
+app/(marketing)/_components/landing/LandingScrollToHash.tsx(12,34): error TS2345: Argument of type 'null' is not assignable to parameter of type 'string'.
+app/(marketing)/careers/_components/JobApplicationModal.tsx(101,64): error TS18047: 'supabase' is possibly 'null'.
+app/(marketing)/careers/_components/JobApplicationModal.tsx(108,11): error TS2322: Type 'string' is not assignable to type 'null'.
+app/(marketing)/careers/_components/JobApplicationModal.tsx(113,31): error TS18047: 'supabase' is possibly 'null'.
+app/api/all-active-interns-codev-prioritized/route.ts(102,14): error TS2352: Conversion of type '{ id: any; first_name: any; last_name: any; email_address: any; phone_number: any; address: any; about: any; positions: never[]; display_position: any; tech_stacks: never[]; image_url: any; internal_status: any; ... 10 more ...; project_members: any; }' to type 'Codev' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type '{ id: any; first_name: any; last_name: any; email_address: any; phone_number: any; address: any; about: any; positions: never[]; display_position: any; tech_stacks: never[]; image_url: any; internal_status: any; ... 10 more ...; project_members: any; }' is missing the following properties from type 'Codev': username, username_updated_at
+app/api/attendance/route.ts(48,13): error TS2339: Property 'codev_id' does not exist on type 'unknown'.
+app/api/attendance/route.ts(48,23): error TS2339: Property 'project_id' does not exist on type 'unknown'.
+app/api/attendance/route.ts(48,35): error TS2339: Property 'date' does not exist on type 'unknown'.
+app/api/attendance/route.ts(48,41): error TS2339: Property 'status' does not exist on type 'unknown'.
+app/api/attendance/route.ts(48,49): error TS2339: Property 'check_in' does not exist on type 'unknown'.
+app/api/attendance/route.ts(48,59): error TS2339: Property 'check_out' does not exist on type 'unknown'.
+app/api/codev/[codevId]/points/route.ts(47,44): error TS2339: Property 'count' does not exist on type 'any[]'.
+app/api/job-listings/route.ts(72,9): error TS2698: Spread types may only be created from object types.
+app/api/profile-points/[codevId]/route.ts(137,26): error TS2339: Property 'maxItems' does not exist on type '{ points: number; maxPoints: number; isOneTime: boolean; description: string; } | { points: number; maxPoints: number; isOneTime: boolean; minLength: number; description: string; } | { points: number; maxPoints: number; isOneTime: boolean; description: string; } | ... 10 more ... | { ...; }'.
+  Property 'maxItems' does not exist on type '{ points: number; maxPoints: number; isOneTime: boolean; description: string; }'.
+app/api/profile-points/[codevId]/route.ts(137,65): error TS2339: Property 'maxItems' does not exist on type '{ points: number; maxPoints: number; isOneTime: boolean; description: string; } | { points: number; maxPoints: number; isOneTime: boolean; minLength: number; description: string; } | { points: number; maxPoints: number; isOneTime: boolean; description: string; } | ... 10 more ... | { ...; }'.
+  Property 'maxItems' does not exist on type '{ points: number; maxPoints: number; isOneTime: boolean; description: string; }'.
+app/api/profile-points/[codevId]/route.ts(138,41): error TS2339: Property 'pointsPerItem' does not exist on type '{ points: number; maxPoints: number; isOneTime: boolean; description: string; } | { points: number; maxPoints: number; isOneTime: boolean; minLength: number; description: string; } | { points: number; maxPoints: number; isOneTime: boolean; description: string; } | ... 10 more ... | { ...; }'.
+  Property 'pointsPerItem' does not exist on type '{ points: number; maxPoints: number; isOneTime: boolean; description: string; }'.
+app/api/profile-points/[codevId]/route.ts(262,26): error TS2339: Property 'points' does not exist on type '{ points: number; maxPoints: number; isOneTime: boolean; description: string; } | { points: number; maxPoints: number; isOneTime: boolean; minLength: number; description: string; } | { points: number; maxPoints: number; isOneTime: boolean; description: string; } | ... 10 more ... | { ...; }'.
+  Property 'points' does not exist on type '{ pointsPerItem: number; maxPoints: number; maxItems: number; isOneTime: boolean; description: string; }'.
+app/api/profile-points/[codevId]/route.ts(264,31): error TS2339: Property 'points' does not exist on type '{ points: number; maxPoints: number; isOneTime: boolean; description: string; } | { points: number; maxPoints: number; isOneTime: boolean; minLength: number; description: string; } | { points: number; maxPoints: number; isOneTime: boolean; description: string; } | ... 10 more ... | { ...; }'.
+  Property 'points' does not exist on type '{ pointsPerItem: number; maxPoints: number; maxItems: number; isOneTime: boolean; description: string; }'.
+app/api/profile-points/[codevId]/route.ts(267,26): error TS2339: Property 'points' does not exist on type '{ points: number; maxPoints: number; isOneTime: boolean; description: string; } | { points: number; maxPoints: number; isOneTime: boolean; minLength: number; description: string; } | { points: number; maxPoints: number; isOneTime: boolean; description: string; } | ... 10 more ... | { ...; }'.
+  Property 'points' does not exist on type '{ pointsPerItem: number; maxPoints: number; maxItems: number; isOneTime: boolean; description: string; }'.
+app/api/soft-skills-leaderboard/route.ts(72,38): error TS2339: Property 'points' does not exist on type 'never'.
+app/api/soft-skills-leaderboard/route.ts(77,35): error TS2339: Property 'points' does not exist on type 'never'.
+app/auth/onboarding/_components/HeroWithAboutEffect/AboutSlides.tsx(19,7): error TS2322: Type 'RefObject<HTMLDivElement | null>' is not assignable to type 'LegacyRef<HTMLDivElement> | undefined'.
+  Type 'RefObject<HTMLDivElement | null>' is not assignable to type 'RefObject<HTMLDivElement>'.
+    Type 'HTMLDivElement | null' is not assignable to type 'HTMLDivElement'.
+      Type 'null' is not assignable to type 'HTMLDivElement'.
+app/auth/onboarding/_components/HeroWithAboutEffect/HeroSection.tsx(22,9): error TS2322: Type 'RefObject<HTMLHeadingElement | null>' is not assignable to type 'LegacyRef<HTMLHeadingElement> | undefined'.
+  Type 'RefObject<HTMLHeadingElement | null>' is not assignable to type 'RefObject<HTMLHeadingElement>'.
+    Type 'HTMLHeadingElement | null' is not assignable to type 'HTMLHeadingElement'.
+      Type 'null' is not assignable to type 'HTMLHeadingElement'.
+app/auth/onboarding/_components/HeroWithAboutEffect/StickyLogo.tsx(14,7): error TS2322: Type 'RefObject<HTMLDivElement | null>' is not assignable to type 'LegacyRef<HTMLDivElement> | undefined'.
+  Type 'RefObject<HTMLDivElement | null>' is not assignable to type 'RefObject<HTMLDivElement>'.
+    Type 'HTMLDivElement | null' is not assignable to type 'HTMLDivElement'.
+      Type 'null' is not assignable to type 'HTMLDivElement'.
+app/home/(dashboard)/_components/DashboardWeeklyTop.tsx(103,39): error TS18047: 'supabase' is possibly 'null'.
+app/home/(dashboard)/_components/DashboardWeeklyTop.tsx(128,41): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+app/home/(dashboard)/_components/DashboardWeeklyTop.tsx(135,33): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'SetStateAction<string>'.
+  Type 'undefined' is not assignable to type 'SetStateAction<string>'.
+app/home/(dashboard)/_components/DashboardWeeklyTop.tsx(169,32): error TS18046: 'data' is of type 'unknown'.
+app/home/(dashboard)/_components/DashboardWeeklyTop.tsx(201,21): error TS18047: 'supabase' is possibly 'null'.
+app/home/(dashboard)/_components/DashboardWeeklyTop.tsx(232,66): error TS18047: 'supabase' is possibly 'null'.
+app/home/(dashboard)/_components/DashboardWeeklyTop.tsx(245,71): error TS18047: 'supabase' is possibly 'null'.
+app/home/(dashboard)/_components/DashboardWeeklyTop.tsx(341,21): error TS18047: 'supabase' is possibly 'null'.
+app/home/(dashboard)/_components/DashboardWeeklyTop.tsx(700,13): error TS2322: Type '(value: LeaderboardType) => void' is not assignable to type '(value: string) => void'.
+  Types of parameters 'value' and 'value' are incompatible.
+    Type 'string' is not assignable to type 'LeaderboardType'.
+app/home/_components/NavbarContent.tsx(4,34): error TS2307: Cannot find module 'next-auth/server' or its corresponding type declarations.
+app/home/_components/OptimizedLayout.tsx(4,31): error TS2307: Cannot find module 'react-error-boundary' or its corresponding type declarations.
+app/home/applicants/_components/ApplicantProfileModal.tsx(15,10): error TS2305: Module '"@/public/assets/svgs"' has no exported member 'IconFigma'.
+app/home/certificate-preview/page.tsx(43,14): error TS18047: 'currentLevel' is possibly 'null'.
+app/home/certificate-preview/page.tsx(68,39): error TS18047: 'supabase' is possibly 'null'.
+app/home/certificate-preview/page.tsx(94,45): error TS18047: 'supabase' is possibly 'null'.
+app/home/certificate-preview/page.tsx(100,48): error TS18047: 'supabase' is possibly 'null'.
+app/home/hire/_components/ApplicationDetailsModal.tsx(54,15): error TS2345: Argument of type 'string' is not assignable to parameter of type 'SetStateAction<"rejected" | "pending" | "reviewing" | "shortlisted" | "hired">'.
+app/home/hire/_components/ApplicationDetailsModal.tsx(97,30): error TS2339: Property 'years_of_experience' does not exist on type 'JobApplication'.
+app/home/hire/_components/ApplicationDetailsModal.tsx(100,34): error TS2339: Property 'years_of_experience' does not exist on type 'JobApplication'.
+app/home/hire/_components/ApplicationDetailsModal.tsx(151,28): error TS2339: Property 'github' does not exist on type 'JobApplication'.
+app/home/hire/_components/ApplicationDetailsModal.tsx(153,37): error TS2339: Property 'github' does not exist on type 'JobApplication'.
+app/home/hire/_components/ApplicationDetailsModal.tsx(177,24): error TS2339: Property 'notes' does not exist on type 'JobApplication'.
+app/home/hire/_components/ApplicationDetailsModal.tsx(181,30): error TS2339: Property 'notes' does not exist on type 'JobApplication'.
+app/home/hire/_components/CreateJobForm.tsx(79,37): error TS18047: 'supabase' is possibly 'null'.
+app/home/hire/_components/CreateJobForm.tsx(108,40): error TS18047: 'supabase' is possibly 'null'.
+app/home/hire/_components/CreateJobForm.tsx(122,31): error TS18047: 'supabase' is possibly 'null'.
+app/home/hire/applications/[jobId]/client-page.tsx(700,9): error TS2322: Type 'JobApplication | null' is not assignable to type 'import("C:/Users/Codevs/codebility-plus/apps/codebility/app/(marketing)/careers/_types/job-listings").JobApplication | null'.
+  Property 'job_title' is missing in type 'JobApplication' but required in type 'import("C:/Users/Codevs/codebility-plus/apps/codebility/app/(marketing)/careers/_types/job-listings").JobApplication'.
+app/home/in-house/_components/table/InHouseTable.tsx(463,33): error TS2339: Property 'key' does not exist on type 'never'.
+app/home/in-house/_components/table/InHouseTable.tsx(466,29): error TS2339: Property 'label' does not exist on type 'never'.
+app/home/interns/_components/InternalProjects.tsx(33,66): error TS18047: 'supabase' is possibly 'null'.
+app/home/interns/_components/InternalProjects.tsx(41,59): error TS18047: 'supabase' is possibly 'null'.
+app/home/interns/_components/InternalProjects.tsx(57,67): error TS18047: 'supabase' is possibly 'null'.
+app/home/interns/_components/InternalProjects.tsx(89,34): error TS2532: Object is possibly 'undefined'.
+app/home/interns/_components/InternalProjects.tsx(92,65): error TS18047: 'supabase' is possibly 'null'.
+app/home/kanban/[projectId]/[id]/_components/kanban_modals/KanbanAddMembersModal.tsx(142,9): error TS2345: Argument of type '({ display_position: string | undefined; id: string; first_name: string; last_name: string; username: string | null; username_updated_at: string | null; email_address: string; phone_number?: string | undefined; ... 36 more ...; headline?: string | undefined; } | { ...; })[]' is not assignable to parameter of type 'Codev[]'.
+  Type '{ display_position: string | undefined; id: string; first_name: string; last_name: string; username: string | null; username_updated_at: string | null; email_address: string; phone_number?: string | undefined; ... 36 more ...; headline?: string | undefined; } | { ...; }' is not assignable to type 'Codev'.
+    Type '{ positions: any; tech_stacks: any; display_position: string | undefined; id: string; first_name: string; last_name: string; email_address: string; image_url: string | null; role: string; joined_at: string; }' is missing the following properties from type 'Codev': username, username_updated_at
+app/home/my-team/[projectId]/_components/AttendanceTracker.tsx(51,29): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+app/home/my-team/[projectId]/_components/AttendanceTracker.tsx(75,26): error TS2345: Argument of type '(prev: Record<string, AttendanceRecord>) => { [x: string]: AttendanceRecord | { memberId: string; date: string | undefined; status: AttendanceStatus; checkIn: string | undefined; checkOut: string | undefined; notes?: string | undefined; }; }' is not assignable to parameter of type 'SetStateAction<Record<string, AttendanceRecord>>'.
+  Type '(prev: Record<string, AttendanceRecord>) => { [x: string]: AttendanceRecord | { memberId: string; date: string | undefined; status: AttendanceStatus; checkIn: string | undefined; checkOut: string | undefined; notes?: string | undefined; }; }' is not assignable to type '(prevState: Record<string, AttendanceRecord>) => Record<string, AttendanceRecord>'.
+    Type '{ [x: string]: AttendanceRecord | { memberId: string; date: string | undefined; status: AttendanceStatus; checkIn: string | undefined; checkOut: string | undefined; notes?: string; }; }' is not assignable to type 'Record<string, AttendanceRecord>'.
+      'string' index signatures are incompatible.
+        Type 'AttendanceRecord | { memberId: string; date: string | undefined; status: AttendanceStatus; checkIn: string | undefined; checkOut: string | undefined; notes?: string | undefined; }' is not assignable to type 'AttendanceRecord'.
+          Type '{ memberId: string; date: string | undefined; status: AttendanceStatus; checkIn: string | undefined; checkOut: string | undefined; notes?: string; }' is not assignable to type 'AttendanceRecord'.
+            Types of property 'date' are incompatible.
+              Type 'string | undefined' is not assignable to type 'string'.
+                Type 'undefined' is not assignable to type 'string'.
+app/home/my-team/[projectId]/_components/AttendanceWarningBanner.tsx(32,29): error TS18048: 'result.summary.membersWithWarnings' is possibly 'undefined'.
+app/home/my-team/[projectId]/_components/CompactMemberGrid.tsx(88,11): error TS2322: Type '{ codevId: string; presentDays: number | undefined; }[]' is not assignable to type '{ codevId: string; presentDays: number; }[]'.
+  Type '{ codevId: string; presentDays: number | undefined; }' is not assignable to type '{ codevId: string; presentDays: number; }'.
+    Types of property 'presentDays' are incompatible.
+      Type 'number | undefined' is not assignable to type 'number'.
+        Type 'undefined' is not assignable to type 'number'.
+app/home/my-team/_components/MyTeamView.tsx(109,9): error TS2345: Argument of type '{ id: string; first_name: string; last_name: string; email_address: string; image_url: string | null | undefined; positions: never[]; tech_stacks: never[]; display_position: string | undefined; }[]' is not assignable to parameter of type 'Codev[]'.
+  Type '{ id: string; first_name: string; last_name: string; email_address: string; image_url: string | null | undefined; positions: never[]; tech_stacks: never[]; display_position: string | undefined; }' is missing the following properties from type 'Codev': username, username_updated_at
+app/home/settings/news-banners/_components/BannerImageUpload.tsx(60,29): error TS2345: Argument of type 'Promise<string | null>' is not assignable to parameter of type 'string'.
+app/home/settings/news-banners/_components/BannerImageUpload.tsx(91,27): error TS2345: Argument of type 'Promise<string | null>' is not assignable to parameter of type 'string'.
+app/home/settings/news-banners/_components/NewsBannerForm.tsx(93,24): error TS18047: 'supabase' is possibly 'null'.
+app/home/settings/news-banners/_components/NewsBannerForm.tsx(99,38): error TS18047: 'supabase' is possibly 'null'.
+app/home/settings/news-banners/_components/NewsBannerForm.tsx(100,24): error TS18047: 'supabase' is possibly 'null'.
+app/home/settings/news-banners/actions.ts(65,23): error TS2532: Object is possibly 'undefined'.
+app/home/settings/news-banners/actions.ts(122,23): error TS2532: Object is possibly 'undefined'.
+app/home/settings/news-banners/actions.ts(175,29): error TS2345: Argument of type 'Promise<string | null>' is not assignable to parameter of type 'string'.
+app/home/settings/news-banners/page.tsx(46,35): error TS18047: 'supabase' is possibly 'null'.
+app/home/settings/news-banners/page.tsx(64,29): error TS18047: 'supabase' is possibly 'null'.
+app/home/settings/news-banners/page.tsx(82,29): error TS18047: 'supabase' is possibly 'null'.
+app/home/settings/news-banners/page.tsx(122,20): error TS2322: Type '"6xl"' is not assignable to type '"sm" | "lg" | "md" | "full" | "xl" | "2xl" | "7xl" | undefined'.
+app/home/settings/profile/_components/ProfileCompletionGuide.tsx(230,40): error TS18047: 'supabase' is possibly 'null'.
+app/home/settings/profile/_components/ProfileCompletionGuide.tsx(244,22): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'SetStateAction<ProfilePointsData | null>'.
+app/home/settings/services/_components/ServiceForm.tsx(80,5): error TS2322: Type 'string' is not assignable to type 'never'.
+app/home/settings/services/_components/ServiceForm.tsx(89,15): error TS2339: Property 'createService' does not exist on type 'typeof import("C:/Users/Codevs/codebility-plus/apps/codebility/app/home/settings/services/actions")'.
+app/home/settings/services/_components/ServiceForm.tsx(89,30): error TS2339: Property 'updateService' does not exist on type 'typeof import("C:/Users/Codevs/codebility-plus/apps/codebility/app/home/settings/services/actions")'.
+app/home/settings/services/actions.ts(108,20): error TS2352: Conversion of type '{ id: any; first_name: any; last_name: any; image_url: any; tech_stacks: any; display_position: any; positions: any; role_id: any; role: { id: any; name: any; }[]; availability_status: any; internal_status: any; application_status: any; }[]' to type 'Codev[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type '{ id: any; first_name: any; last_name: any; image_url: any; tech_stacks: any; display_position: any; positions: any; role_id: any; role: { id: any; name: any; }[]; availability_status: any; internal_status: any; application_status: any; }' is missing the following properties from type 'Codev': username, username_updated_at, email_address
+app/home/settings/services/page.tsx(167,34): error TS2322: Type 'Service | undefined' is not assignable to type 'Service'.
+  Type 'undefined' is not assignable to type 'Service'.
+app/home/settings/services/page.tsx(1403,20): error TS2322: Type '"6xl"' is not assignable to type '"sm" | "lg" | "md" | "full" | "xl" | "2xl" | "7xl" | undefined'.
+app/home/settings/surveys/actions.ts(69,23): error TS2532: Object is possibly 'undefined'.
+app/home/settings/surveys/actions.ts(128,23): error TS2532: Object is possibly 'undefined'.
+app/home/settings/surveys/actions.ts(181,29): error TS2345: Argument of type 'Promise<string | null>' is not assignable to parameter of type 'string'.
+app/home/settings/surveys/questions/actions.ts(76,23): error TS2532: Object is possibly 'undefined'.
+app/home/settings/surveys/questions/actions.ts(128,23): error TS2532: Object is possibly 'undefined'.
+app/home/settings/surveys/responses/actions.ts(50,23): error TS2532: Object is possibly 'undefined'.
+app/home/surveys/[surveyId]/page.tsx(59,60): error TS18047: 'supabase' is possibly 'null'.
+app/home/surveys/[surveyId]/page.tsx(283,20): error TS2322: Type '"3xl"' is not assignable to type '"sm" | "lg" | "md" | "full" | "xl" | "2xl" | "7xl" | undefined'.
+app/proposal/page.tsx(277,46): error TS18046: 'codev' is of type 'unknown'.
+app/proposal/page.tsx(277,72): error TS18046: 'codev' is of type 'unknown'.
+app/proposal/page.tsx(278,47): error TS18046: 'codev' is of type 'unknown'.
+app/proposal/page.tsx(278,73): error TS18046: 'codev' is of type 'unknown'.
+app/proposal/page.tsx(279,44): error TS18046: 'codev' is of type 'unknown'.
+components/leaderboard/LeaderboardContainer.tsx(27,22): error TS2451: Cannot redeclare block-scoped variable 'setTimePeriod'.
+components/leaderboard/LeaderboardContainer.tsx(35,5): error TS2451: Cannot redeclare block-scoped variable 'setTimePeriod'.
+components/leaderboard/LeaderboardContainer.tsx(172,11): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+components/leaderboard/LeaderboardFilters.tsx(84,11): error TS2322: Type '(value: LeaderboardType) => void' is not assignable to type '(value: string) => void'.
+  Types of parameters 'value' and 'value' are incompatible.
+    Type 'string' is not assignable to type 'LeaderboardType'.
+components/modals/ContactUsModal.tsx(103,15): error TS2322: Type '{ id: string; type: "text"; label: string; placeholder: string; value: string; required: true; error: string; "aria-invalid": boolean; onChange: (e: ChangeEvent<HTMLInputElement>) => void; }' is not assignable to type 'IntrinsicAttributes & InputProps & RefAttributes<HTMLInputElement>'.
+  Property 'error' does not exist on type 'IntrinsicAttributes & InputProps & RefAttributes<HTMLInputElement>'. Did you mean 'onError'?
+components/modals/ContactUsModal.tsx(123,15): error TS2322: Type '{ id: string; type: "email"; label: string; placeholder: string; value: string; required: true; error: string; "aria-invalid": boolean; onChange: (e: ChangeEvent<HTMLInputElement>) => void; }' is not assignable to type 'IntrinsicAttributes & InputProps & RefAttributes<HTMLInputElement>'.
+  Property 'error' does not exist on type 'IntrinsicAttributes & InputProps & RefAttributes<HTMLInputElement>'. Did you mean 'onError'?
+components/modals/ContactUsModal.tsx(143,15): error TS2322: Type '{ id: string; type: "tel"; label: string; placeholder: string; value: string; required: true; error: string; "aria-invalid": boolean; onChange: (e: ChangeEvent<HTMLInputElement>) => void; }' is not assignable to type 'IntrinsicAttributes & InputProps & RefAttributes<HTMLInputElement>'.
+  Property 'error' does not exist on type 'IntrinsicAttributes & InputProps & RefAttributes<HTMLInputElement>'. Did you mean 'onError'?
+components/modals/ContactUsModal.tsx(162,15): error TS2322: Type '{ id: string; label: string; placeholder: string; value: string; required: true; error: string; "aria-invalid": boolean; onChange: (e: ChangeEvent<HTMLTextAreaElement>) => void; }' is not assignable to type 'IntrinsicAttributes & TextareaProps & RefAttributes<HTMLTextAreaElement>'.
+  Property 'error' does not exist on type 'IntrinsicAttributes & TextareaProps & RefAttributes<HTMLTextAreaElement>'. Did you mean 'onError'?
+hooks/useLeaderboard.ts(65,53): error TS18047: 'supabase' is possibly 'null'.
+hooks/useLeaderboard.ts(89,37): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+hooks/useLeaderboard.ts(94,29): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'SetStateAction<string>'.
+  Type 'undefined' is not assignable to type 'SetStateAction<string>'.
+hooks/useLeaderboard.ts(118,9): error TS18046: 'errorData' is of type 'unknown'.
+hooks/useLeaderboard.ts(119,9): error TS18046: 'errorData' is of type 'unknown'.
+hooks/useLeaderboard.ts(125,12): error TS18046: 'result' is of type 'unknown'.
+hooks/useLeaderboard.ts(134,9): error TS18046: 'errorData' is of type 'unknown'.
+hooks/useLeaderboard.ts(135,9): error TS18046: 'errorData' is of type 'unknown'.
+hooks/useLeaderboard.ts(141,12): error TS18046: 'result' is of type 'unknown'.
+hooks/useLeaderboard.ts(150,9): error TS18046: 'errorData' is of type 'unknown'.
+hooks/useLeaderboard.ts(151,9): error TS18046: 'errorData' is of type 'unknown'.
+hooks/useLeaderboard.ts(157,12): error TS18046: 'result' is of type 'unknown'.
+lib/actions/notification.actions.ts(37,49): error TS2345: Argument of type '{ recipientId: string; title: string; message: string; type: string; priority?: string | undefined; actionUrl?: string | undefined; metadata?: any; senderId?: string | undefined; projectId?: string | undefined; jobId?: string | undefined; }' is not assignable to parameter of type '{ recipientId: string; title: string; message: string; type: "error" | "user" | "project" | "message" | "success" | "info" | "warning" | "event" | "achievement" | "job" | "attendance" | "task" | "system"; ... 5 more ...; jobId?: string | undefined; }'.
+  Types of property 'type' are incompatible.
+    Type 'string' is not assignable to type '"error" | "user" | "project" | "message" | "success" | "info" | "warning" | "event" | "achievement" | "job" | "attendance" | "task" | "system"'.

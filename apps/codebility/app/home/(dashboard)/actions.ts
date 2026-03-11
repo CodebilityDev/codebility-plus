@@ -40,7 +40,6 @@ export const startUserTimer = async (codevId: string) => {
     .eq("id", codevId)
     .select();
 
-  console.log("start user timer error ", error);
 };
 
 const stopUserTimer = async (codevId: string) => {
@@ -53,7 +52,6 @@ const stopUserTimer = async (codevId: string) => {
     })
     .eq("id", codevId);
 
-  console.log(error);
 };
 
 export const logUserTime = async (formData: FormData) => {

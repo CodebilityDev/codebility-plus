@@ -80,7 +80,6 @@ export default function DashboardCurrentProjectModal() {
         const projectIds = projectMemberships.map((pm: any) => pm.project_id);
 
         if (!projectIds.includes(projectId)) {
-          console.log("User is not a member of this project.");
           setTasks([]);
           return;
         }

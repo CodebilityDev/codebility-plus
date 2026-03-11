@@ -44,6 +44,7 @@ export const newApplicantsSchema = z.object({
         quiz_completed_at: z.string().datetime({ offset: true }).nullable(),
         can_do_mobile: z.boolean().nullable(),
         commitment_signed_at: z.string().datetime({ offset: true }).nullable(),
+        waitlist_entered_at: z.string().datetime({ offset: true }).nullable().optional(),
         signature_data: z.string().nullable(),
         created_at: z.string().datetime({ offset: true }),
         updated_at: z.string().datetime({ offset: true }),

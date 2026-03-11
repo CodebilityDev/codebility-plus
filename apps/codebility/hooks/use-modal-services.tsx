@@ -20,7 +20,6 @@ export const useModal = create<ModalState>((set) => ({
   },
   closeModal: () => {
     try {
-      console.log("closeModal called");
       set({ isOpen: false, modalContent: null });
     } catch (error) {
       console.error("Error in closeModal:", error);

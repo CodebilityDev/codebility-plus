@@ -674,7 +674,6 @@ export const getMembers = async (
     }
 
     if (!projectMembers || projectMembers.length === 0) {
-      console.log("⚠️ No project members found with role='member'");
       return { error: null, data: [] };
     }
 

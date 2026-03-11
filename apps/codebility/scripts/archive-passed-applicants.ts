@@ -14,7 +14,6 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
-  console.error("Missing Supabase credentials");
   process.exit(1);
 }
 
@@ -22,7 +21,6 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function archivePassedApplicants() {
   try {
-    console.log("🔍 Finding applicants with 'passed' status...\n");
 
     // Find all codevs with passed status that still have applicant records
     const { data: passedCodevs, error: fetchError } = await supabase
@@ -42,26 +40,12 @@ async function archivePassedApplicants() {
       .not("applicant", "is", null);
 
     if (fetchError) {
-      console.error("❌ Error fetching passed codevs:", fetchError);
       return;
     }
 
     if (!passedCodevs || passedCodevs.length === 0) {
-      console.log("✅ No applicant records found for passed codevs. Database is clean!");
       return;
     }
-
-    console.log(`📋 Found ${passedCodevs.length} passed codev(s) with applicant records:\n`);
-
-    for (const codev of passedCodevs) {
-      console.log(`   - ${codev.first_name} ${codev.last_name} (${codev.email_address})`);
-    }
-
-    console.log("\n🗄️  These applicant records will be archived automatically by the database trigger.");
-    console.log("   The trigger activates when application_status is updated.");
-    console.log("\n💡 To manually trigger the archive, you can run:");
-    console.log("   UPDATE codev SET application_status = 'passed' WHERE application_status = 'passed';");
-    console.log("\n   Or delete the applicant records directly (they're already 'passed'):");
 
     for (const codev of passedCodevs) {
       if (codev.applicant) {
@@ -71,17 +55,12 @@ async function archivePassedApplicants() {
           .eq("codev_id", codev.id);
 
         if (deleteError) {
-          console.error(`   ❌ Failed to delete applicant for ${codev.email_address}:`, deleteError);
-        } else {
-          console.log(`   ✅ Deleted applicant record for ${codev.first_name} ${codev.last_name}`);
+          // handle error if needed
         }
       }
     }
 
-    console.log("\n✨ Cleanup complete!");
-
   } catch (error) {
-    console.error("❌ Unexpected error:", error);
     process.exit(1);
   }
 }

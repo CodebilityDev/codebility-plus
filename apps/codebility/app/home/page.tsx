@@ -3,6 +3,8 @@ import H1 from "@/components/shared/dashboard/H1";
 import PageContainer from "./_components/PageContainer";
 import DashboardClient from "./_components/DashboardClient";
 import NewsBanner from "./_components/NewsBanner";
+import { fetchActiveModal } from "./promote-modal/actions";
+import FeaturePromoModal from "./promote-modal/_components/FeaturePromoModal";
 
 // Loading component for better UX
 function DashboardLoading() {
@@ -26,9 +28,13 @@ function DashboardLoading() {
 
 export const revalidate = 3600; // Revalidate every hour for fresh data
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const modal = await fetchActiveModal();
+
   return (
     <div className="w-full">
+      {modal && <FeaturePromoModal data={modal} />}
+
       <div className="flex flex-col gap-4 pt-4 relative mb-8">
         {/* Background decorations - contained within content area */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">

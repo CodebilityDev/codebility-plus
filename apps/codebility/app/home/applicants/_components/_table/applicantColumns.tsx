@@ -455,6 +455,48 @@ const waitlistColumns: ColumnDef<NewApplicantType>[] = [
       className: "w-28 text-center",
     },
   },
+  {
+    id: "waitlist_entered",
+    accessorKey: "applicant.waitlist_entered_at",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="flex h-8 items-center justify-center gap-1 px-2 py-1 text-xs font-semibold text-gray-800 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-100 dark:hover:bg-gray-800 dark:hover:text-white"
+        >
+          Waitlist
+          <ArrowUpDown className="h-3 w-3" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      const applicant = row.original;
+      const waitlistEntered = applicant.applicant?.waitlist_entered_at;
+
+      return (
+        <div className="flex items-center justify-center px-2 py-2">
+          {waitlistEntered ? (
+            <div className="flex flex-col items-center gap-0.5">
+              <span className="text-xs font-medium text-gray-900 dark:text-gray-100">
+                {new Date(waitlistEntered).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' })}
+              </span>
+              <span className="text-[10px] text-gray-500 dark:text-gray-400">
+                {new Date(waitlistEntered).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+              </span>
+            </div>
+          ) : (
+            <span className="text-xs text-gray-500 dark:text-gray-500">
+              N/A
+            </span>
+          )}
+        </div>
+      );
+    },
+    meta: {
+      className: "w-28 text-center",
+    },
+  },
 ];
 
 /**

@@ -84,14 +84,11 @@ export default async function ProjectSection() {
         // Validate the URL before adding to carousel
         try {
           new URL(imageUrl);
-          console.log(`✅ Valid image URL for project ${project.name}:`, imageUrl);
         } catch (error) {
-          console.warn(`❌ Invalid image URL for project ${project.name}:`, imageUrl);
           // Use fallback image for invalid URLs
           imageUrl = '/assets/images/index/projects-large.jpg';
         }
       } else {
-        console.warn(`⚠️ No image found for project ${project.name}, using fallback`);
         // Use fallback image for projects without images
         imageUrl = '/assets/images/index/projects-large.jpg';
       }
