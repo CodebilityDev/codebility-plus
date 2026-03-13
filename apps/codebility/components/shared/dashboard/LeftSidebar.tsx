@@ -157,7 +157,7 @@ const LeftSidebar = () => {
             </h4>
             <div className="mt-3 flex flex-1 flex-col gap-2 max-lg:hidden">
               {item.links.map((link: SidebarLink) => {
-                const allowedRoutes = ["/settings", "/orgchart"];
+                const allowedRoutes = ["/settings", "/orgchart", "/home/admin-controls"];
                 const isAdminOrUser =
                   userRole?.name === "ADMIN" || userRole?.name === "USER";
                 const isAllowedRoute =

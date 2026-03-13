@@ -72,7 +72,7 @@ export const CustomSelect = ({
           <SelectValue placeholder={disabled ? "Loading..." : placeholder} />
         </SelectTrigger>
 
-        <SelectContent className="bg-light-800 dark:bg-dark-200">
+        <SelectContent side="bottom" position="popper" sideOffset={4} className="bg-light-800 dark:bg-dark-200">
           {/** If searchable, show an inline search input */}
           {searchable && (
             <div className="p-2">

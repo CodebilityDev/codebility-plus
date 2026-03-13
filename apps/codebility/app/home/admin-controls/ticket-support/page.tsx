@@ -1,31 +1,54 @@
-import PageContainer from "@/app/home/_components/PageContainer";
-import { H1 } from "@/components/shared/dashboard";
-import ComingSoonModal from "@/app/home/ticket-support/_components/ComingSoonModal";
+import { Suspense } from "react";
+import { Ticket } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton/skeleton";
+import H1 from "@/components/shared/dashboard/H1";
+import PageContainer from "../../_components/PageContainer";
+import { getTickets, getCodevList } from "./actions";
+import TicketManagementView from "./_components/TicketManagementView";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-export default async function TicketSupportManagementPage() {
-    return (
-        <div className="relative min-h-screen bg-white dark:bg-gray-950">
-            {/* Coming Soon Modal Overlay */}
-            <ComingSoonModal />
+function TicketManagementLoading() {
+  return (
+    <div className="space-y-4">
+      <Skeleton className="h-12 w-full" />
+      <Skeleton className="h-96 w-full" />
+    </div>
+  );
+}
 
-            {/* Page Content (visible but blurred behind modal) */}
-            <PageContainer maxWidth="xl" className="blur-[2px]">
-                <div className="space-y-6">
-                    <H1>Ticket Support Management</H1>
+async function TicketManagementContent() {
+  const [tickets, codevList] = await Promise.all([
+    getTickets(),
+    getCodevList(),
+  ]);
 
-                    <div className="mx-auto mt-4 h-px w-full bg-gradient-to-r from-transparent via-purple-500 to-transparent" />
+  return <TicketManagementView initialTickets={tickets} codevList={codevList} />;
+}
 
-                    <p className="mx-auto max-w-2xl text-center text-lg font-light text-gray-600 dark:text-gray-300">
-                        This feature is currently a work in progress and is yet to be fully developed.
-                    </p>
-
-                    {/* Placeholder content section */}
-                    <div className="relative mt-8 min-h-[500px] w-full rounded-xl border border-gray-200 bg-light-900/50 dark:border-white/10 dark:bg-dark-100 shadow-sm backdrop-blur-sm" />
-                </div>
-            </PageContainer>
+export default async function TicketManagementPage() {
+  return (
+    <PageContainer maxWidth="full" noPadding>
+      <div className="flex flex-col gap-6 px-2 pt-6 md:pt-8">
+        <div className="flex items-center gap-4">
+          <div className="flex shrink-0 h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500">
+            <Ticket className="h-6 w-6 text-white" />
+          </div>
+          <div>
+            <H1 className="!mb-0 text-3xl font-bold tracking-tight bg-gradient-to-r from-violet-600 to-fuchsia-600 bg-clip-text text-transparent pb-1">
+              Ticket Management
+            </H1>
+            <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base mt-1">
+               View and manage submitted support tickets
+            </p>
+          </div>
         </div>
-    );
+
+        <Suspense fallback={<TicketManagementLoading />}>
+          <TicketManagementContent />
+        </Suspense>
+      </div>
+    </PageContainer>
+  );
 }

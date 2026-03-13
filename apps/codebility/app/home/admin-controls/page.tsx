@@ -4,6 +4,10 @@ import { H1 } from "@/components/shared/dashboard";
 import { adminControlsCardData } from "@/constants/settings";
 import PageContainer from "../_components/PageContainer";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+
 const AdminControls = () => {
   return (
     <PageContainer maxWidth="xl">

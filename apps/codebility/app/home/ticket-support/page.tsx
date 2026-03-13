@@ -71,7 +71,7 @@ export default async function TicketSupportPage() {
 
     return (
         <div className="relative min-h-screen bg-white dark:bg-gray-950">
-            {/* Support Form Container */}
+            {/* Page Content */}
             <div className="mx-auto max-w-6xl px-6 py-12">
                 {/* Header — Codev Overflow style */}
                 <div className="mb-12 text-center">
@@ -89,7 +89,7 @@ export default async function TicketSupportPage() {
 
                 {/* Form */}
                 <div className="relative">
-                    <TicketSupportForm projects={projects} user={authUser} />
+                <TicketSupportForm projects={projects} userId={authUser?.id || null} userEmail={authUser?.email || null} />
                 </div>
             </div>
         </div>

@@ -18,6 +18,13 @@ export const settingsCardData: SettingsCardDataProps[] = [
 
 export const adminControlsCardData: SettingsCardDataProps[] = [
   {
+    path: "/home/admin-controls/ticket-support",
+    imageName: "icon-ticket-support",
+    imageAlt: "Icon Ticket Support",
+    title: "Ticket Management",
+    description: "View and manage submitted support tickets.",
+  },
+  {
     path: "/home/settings/news-banners",
     imageName: "icon-bell",
     imageAlt: "Icon News",
@@ -44,13 +51,6 @@ export const adminControlsCardData: SettingsCardDataProps[] = [
     imageAlt: "Icon Client Tracker",
     title: "Client Tracker",
     description: "Track weekly client outreach by all admins.",
-  },
-  {
-    path: "/home/admin-controls/ticket-support",
-    imageName: "icon-ticket-support",
-    imageAlt: "Icon Ticket Support",
-    title: "Ticket Support Management",
-    description: "Manage and track support tickets efficiently.",
   },
   {
     path: "/home/promote-modal/",

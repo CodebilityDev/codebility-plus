@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
 interface PostStore {
-  isToggleOpen: Boolean;
+  isToggleOpen: boolean;
   toggleNav: () => void;
   closeNav: () => void;
 }
