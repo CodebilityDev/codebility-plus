@@ -180,3 +180,43 @@ export async function deleteTicket(ticketId: string) {
   revalidatePath("/home/admin-controls/ticket-support");
   return { success: true };
 }
+
+export async function archiveTicket(ticketId: string) {
+  const supabase = await createClientServerComponent();
+
+  const { data, error } = await supabase
+    .from("ticket_support")
+    .update({ is_archived: true, updated_at: new Date().toISOString() })
+    .eq("id", ticketId)
+    .select();
+
+  console.log("[archiveTicket]", { ticketId, data, error });
+
+  if (error) {
+    console.error("Error archiving ticket:", error);
+    return { success: false, error: error.message };
+  }
+
+  revalidatePath("/home/admin-controls/ticket-support");
+  return { success: true };
+}
+
+export async function unarchiveTicket(ticketId: string) {
+  const supabase = await createClientServerComponent();
+
+  const { data, error } = await supabase
+    .from("ticket_support")
+    .update({ is_archived: false, updated_at: new Date().toISOString() })
+    .eq("id", ticketId)
+    .select();
+
+  console.log("[unarchiveTicket]", { ticketId, data, error });
+
+  if (error) {
+    console.error("Error unarchiving ticket:", error);
+    return { success: false, error: error.message };
+  }
+
+  revalidatePath("/home/admin-controls/ticket-support");
+  return { success: true };
+}

@@ -53,13 +53,6 @@ export const adminControlsCardData: SettingsCardDataProps[] = [
     description: "Track weekly client outreach by all admins.",
   },
   {
-    path: "/home/admin-controls/ticket-support",
-    imageName: "icon-ticket-support",
-    imageAlt: "Icon Ticket Support",
-    title: "Ticket Support Management",
-    description: "Manage and track support tickets efficiently.",
-  },
-  {
     path: "/home/promote-modal/",
     imageName: "icon-edit",
     imageAlt: "Icon Edit Promotional Feature",

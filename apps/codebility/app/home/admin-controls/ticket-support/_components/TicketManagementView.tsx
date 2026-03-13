@@ -43,6 +43,7 @@ export default function TicketManagementView({
   const [filterStatus, setFilterStatus] = useState<string>("ALL");
   const [filterPriority, setFilterPriority] = useState<string>("ALL");
   const [filterAssignedTo, setFilterAssignedTo] = useState<string>("ALL");
+  const [showArchived, setShowArchived] = useState(false);
 
   const [wasSidebarOpen, setWasSidebarOpen] = useState(false);
 
@@ -62,6 +63,13 @@ export default function TicketManagementView({
 
   const filteredAndSortedTickets = useMemo(() => {
     let result = [...initialTickets];
+
+    // Archive filter
+    if (showArchived) {
+      result = result.filter((t) => t.is_archived);
+    } else {
+      result = result.filter((t) => !t.is_archived);
+    }
 
     // Search filter
     if (searchQuery.trim()) {
@@ -118,7 +126,7 @@ export default function TicketManagementView({
     });
 
     return result;
-  }, [initialTickets, searchQuery, sortField, sortDirection, filterStatus, filterPriority, filterAssignedTo]);
+  }, [initialTickets, searchQuery, sortField, sortDirection, filterStatus, filterPriority, filterAssignedTo, showArchived]);
 
   const handleTicketSelect = (ticket: TicketSupport) => {
     setSelectedTicket(ticket);
@@ -172,6 +180,8 @@ export default function TicketManagementView({
           codevList={codevList}
           selectedTicketId={selectedTicket?.id || null}
           onTicketSelect={handleTicketSelect}
+          showArchived={showArchived}
+          onShowArchivedChange={setShowArchived}
         />
       </div>
 

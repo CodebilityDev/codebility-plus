@@ -1,7 +1,7 @@
 "use client";
 
 
-import { Search, ChevronDown, SlidersHorizontal, ArrowUpDown } from "lucide-react";
+import { Search, ChevronDown, SlidersHorizontal, ArrowUpDown, Archive as FolderArchive } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -38,6 +38,8 @@ interface TicketDataTableProps {
   codevList: { id: string; name: string; image_url: string | null }[];
   selectedTicketId: string | null;
   onTicketSelect: (ticket: TicketSupport) => void;
+  showArchived: boolean;
+  onShowArchivedChange: (show: boolean) => void;
 }
 
 function DropdownMenu({
@@ -118,6 +120,8 @@ export default function TicketDataTable({
   codevList,
   selectedTicketId,
   onTicketSelect,
+  showArchived,
+  onShowArchivedChange,
 }: TicketDataTableProps) {
   const activeFilterCount =
     (filterStatus !== "ALL" ? 1 : 0) + 
@@ -141,6 +145,18 @@ export default function TicketDataTable({
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Archive Toggle */}
+          <button
+            onClick={() => onShowArchivedChange(!showArchived)}
+            className={`flex items-center gap-2 rounded-lg border px-4 py-2 text-sm transition-all duration-200 ${
+              showArchived
+                ? "border-purple-500/50 bg-purple-500/10 text-purple-600 dark:text-purple-400"
+                : "border-gray-200 bg-white text-gray-700 hover:border-gray-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-gray-300"
+            }`}
+          >
+            <FolderArchive className={`h-4 w-4 ${showArchived ? "animate-pulse" : ""}`} />
+            {showArchived ? "Showing Archived" : "Show Archived"}
+          </button>
           {/* Sort By */}
           <DropdownMenu
             trigger={

@@ -220,11 +220,6 @@ export async function middleware(req: NextRequest) {
     }
 
     if (matchedRoute && role_id) {
-      // TEMP BYPASS for testing Ticket Management
-      if (pathname.startsWith("/home/admin-controls")) {
-        return NextResponse.next();
-      }
-
       const key = matchedRoute as keyof typeof routePermissionMap;
       const requiredPermission = routePermissionMap[key];
 

@@ -25,7 +25,10 @@ import {
   updateTicketPriority,
   updateTicketAssignment,
   deleteTicket,
+  archiveTicket,
+  unarchiveTicket,
 } from "../actions";
+import { Archive, ArchiveRestore } from "lucide-react";
 
 interface TicketPreviewSidebarProps {
   ticket: TicketSupport;
@@ -42,6 +45,8 @@ export default function TicketPreviewSidebar({
 }: TicketPreviewSidebarProps) {
   const [isPending, startTransition] = useTransition();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
+  const [showUnarchiveConfirm, setShowUnarchiveConfirm] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const statusColor = STATUS_COLORS[ticket.status as TicketStatus] || STATUS_COLORS.PENDING;
@@ -133,6 +138,47 @@ export default function TicketPreviewSidebar({
     });
   };
 
+  const handleArchive = () => {
+    setError(null);
+    startTransition(async () => {
+      try {
+        const res = await archiveTicket(ticket.id);
+        if (!res.success) {
+          setError(`Archive failed: ${res.error}`);
+          setShowArchiveConfirm(false);
+          return;
+        }
+        setShowArchiveConfirm(false);
+        onClose(); // Close sidebar after successful archive
+        onUpdated();
+      } catch (err: any) {
+        console.error("Failed to archive ticket:", err);
+        setError(`Archive failed: ${err.message}`);
+        setShowArchiveConfirm(false);
+      }
+    });
+  };
+
+  const handleUnarchive = () => {
+    setError(null);
+    startTransition(async () => {
+      try {
+        const res = await unarchiveTicket(ticket.id);
+        if (!res.success) {
+          setError(`Unarchive failed: ${res.error}`);
+          setShowUnarchiveConfirm(false);
+          return;
+        }
+        setShowUnarchiveConfirm(false);
+        onUpdated();
+      } catch (err: any) {
+        console.error("Failed to unarchive ticket:", err);
+        setError(`Unarchive failed: ${err.message}`);
+        setShowUnarchiveConfirm(false);
+      }
+    });
+  };
+
   return (
     <div
       className="fixed right-0 top-[64px] bottom-0 z-[45] w-full max-w-[420px] border-l border-gray-200 bg-white shadow-2xl overflow-y-auto dark:border-zinc-800 dark:bg-zinc-950"
@@ -169,6 +215,46 @@ export default function TicketPreviewSidebar({
                 No
               </button>
             </div>
+          ) : showArchiveConfirm ? (
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-medium text-purple-500 uppercase tracking-wider">
+                Confirm Archive?
+              </span>
+              <button
+                onClick={handleArchive}
+                disabled={isPending}
+                className="rounded-lg bg-purple-500 px-2 py-1 text-xs font-medium text-white hover:bg-purple-600 disabled:opacity-50"
+              >
+                {isPending ? "..." : "Yes"}
+              </button>
+              <button
+                onClick={() => setShowArchiveConfirm(false)}
+                disabled={isPending}
+                className="rounded-lg bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600 hover:bg-gray-200 dark:bg-zinc-800 dark:text-gray-400 dark:hover:bg-zinc-700"
+              >
+                No
+              </button>
+            </div>
+          ) : showUnarchiveConfirm ? (
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-medium text-green-500 uppercase tracking-wider">
+                Unarchive?
+              </span>
+              <button
+                onClick={handleUnarchive}
+                disabled={isPending}
+                className="rounded-lg bg-green-500 px-2 py-1 text-xs font-medium text-white hover:bg-green-600 disabled:opacity-50"
+              >
+                {isPending ? "..." : "Yes"}
+              </button>
+              <button
+                onClick={() => setShowUnarchiveConfirm(false)}
+                disabled={isPending}
+                className="rounded-lg bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600 hover:bg-gray-200 dark:bg-zinc-800 dark:text-gray-400 dark:hover:bg-zinc-700"
+              >
+                No
+              </button>
+            </div>
           ) : (
             <div className="flex items-center gap-1">
               <button
@@ -178,6 +264,23 @@ export default function TicketPreviewSidebar({
               >
                 <Trash2 className="h-5 w-5" />
               </button>
+              {ticket.is_archived ? (
+                <button
+                  onClick={() => setShowUnarchiveConfirm(true)}
+                  className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-green-50 hover:text-green-500 dark:hover:bg-green-500/10"
+                  title="Unarchive Ticket"
+                >
+                  <ArchiveRestore className="h-5 w-5" />
+                </button>
+              ) : (
+                <button
+                  onClick={() => setShowArchiveConfirm(true)}
+                  className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-purple-50 hover:text-purple-500 dark:hover:bg-purple-500/10"
+                  title="Archive Ticket"
+                >
+                  <Archive className="h-5 w-5" />
+                </button>
+              )}
               <button
                 onClick={onClose}
                 className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-gray-900 dark:hover:text-white"
@@ -214,11 +317,18 @@ export default function TicketPreviewSidebar({
                 {ticket.subject || "No Subject"}
               </h3>
             </div>
-            <span
-              className={`shrink-0 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColor.bg} ${statusColor.text}`}
-            >
-              {STATUS_LABELS[ticket.status as TicketStatus]}
-            </span>
+            <div className="flex items-center gap-2">
+              <span
+                className={`shrink-0 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColor.bg} ${statusColor.text}`}
+              >
+                {STATUS_LABELS[ticket.status as TicketStatus]}
+              </span>
+              {ticket.is_archived && (
+                <span className="inline-flex items-center rounded-full bg-purple-500/10 px-2.5 py-0.5 text-xs font-medium text-purple-600 dark:bg-purple-500/20 dark:text-purple-400">
+                  Archived
+                </span>
+              )}
+            </div>
           </div>
         </div>
 

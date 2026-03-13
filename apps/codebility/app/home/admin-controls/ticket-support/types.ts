@@ -15,6 +15,7 @@ export interface TicketSupport {
   message: string;
   status: TicketStatus;
   priority: TicketPriority;
+  is_archived: boolean;
   created_at: string;
   updated_at: string;
   assigned_to: string | null;
