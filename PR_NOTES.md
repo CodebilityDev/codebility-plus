@@ -11,7 +11,7 @@ This PR implements and refines the **Ticket Management System (TMS)** and the **
 ## 3. Core Implementation
 - **Data Table (`TicketDataTable.tsx`)**: High-density table with multi-column sorting, real-time search, and semantic filtering (Status, Priority, Assigned To).
 - **Preview Sidebar (`TicketPreviewSidebar.tsx`)**: A non-modal, slides-in panel for granular ticket management without losing context of the table.
-- **Server Actions (`actions.ts`)**: Full CRUD for ticket lifecycle (`getTickets`, `updateTicketStatus`, `updateTicketPriority`, `updateTicketAssignment`, `deleteTicket`).
+- **Server Actions (`actions.ts`)**: Full CRUD for ticket lifecycle (`getTickets`, `updateTicketStatus`, `updateTicketPriority`, `updateTicketAssignment`, `deleteTicket`, `archiveTicket`, `unarchiveTicket`).
 - **Dynamic Routing**: SSR implementation utilizing Next.js `router.refresh()` for high-integrity data syncing.
 
 ---
@@ -31,6 +31,14 @@ This PR implements and refines the **Ticket Management System (TMS)** and the **
 - **Smart Component**: Integrated the searchable `CustomSelect` for support person assignments.
 - **UI Consistency**: Forced dropdown behavior (`side="bottom"`, `position="popper"`) across all platforms to prevent accidental upward overflows on mobile.
 - **Visual Mapping**: The assignment dropdown and table now display support staff **profile pictures** (or initial avatars) next to names for faster visual recognition.
+
+### **D. Archive/Unarchive Lifecycle Management**
+- **Boolean Architecture**: Implemented a dedicated `is_archived` boolean column. This preserves the ticket's original status (e.g., "Resolved") while hiding it from active views, avoiding DB constraint conflicts.
+- **Exclusive View-Switching**: The "Show Archived" toggle acts as a folder switcher. Turning it ON hides all active tickets and shows *only* archived ones, providing a dedicated cleanup workspace.
+- **Action-Based UI**: 
+  - **Archive**: Represented by a Purple Folder icon with a "Confirm Archive?" safety check.
+  - **Unarchive**: Represented by a Green Restore icon with an immediate restoration flow.
+- **Visual Feedback**: Added a purple "Archived" badge in the preview sidebar for clear state identification.
 
 ---
 
@@ -55,3 +63,6 @@ This PR implements and refines the **Ticket Management System (TMS)** and the **
 - [x] **Navigation**: Verify left sidebar closes when a ticket row is clicked and re-opens when the preview is closed.
 - [x] **Updates**: Change a ticket's status; verify the table status badge updates immediately.
 - [x] **Search**: Verify search bar filters by ID, Subject, and Submitter Name.
+- [x] **Archiving**: Archive a ticket; verify it disappears from the main list. Toggle "Show Archived"; verify it appears there.
+- [x] **Unarchiving**: Restore a ticket; verify it moves back to the main list immediately.
+- [x] **Database**: Verify `is_archived` column exists in the `ticket_support` table.
