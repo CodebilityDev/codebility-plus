@@ -4,7 +4,7 @@ import { useState, useEffect, memo, useCallback } from "react";
 import { Button } from "@codevs/ui/button";
 import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
-import { X, Upload, AlertCircle, Bold, Italic, Code, List, ListOrdered, Undo, Redo } from "lucide-react";
+import { X, Upload, AlertCircle, Bold, Italic, Code, List, ListOrdered, Undo, Redo, FileText, Link as LinkIcon } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -18,6 +18,7 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
+import Link from '@tiptap/extension-link';
 import { common, createLowlight } from 'lowlight';
 
 const lowlight = createLowlight(common);
@@ -81,6 +82,21 @@ const MenuBar = memo(function MenuBar({ editor }: { editor: any }) {
         title="Inline Code"
       >
         <Code className="h-4 w-4" />
+      </Button>
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        onClick={() => {
+          const url = window.prompt('Enter URL:')
+          if (url) {
+            editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run()
+          }
+        }}
+        className={`h-8 w-8 p-0 ${editor.isActive('link') ? 'bg-gray-200 dark:bg-gray-700' : ''}`}
+        title="Add Link"
+      >
+        <LinkIcon className="h-4 w-4" />
       </Button>
       <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
       <Button
@@ -153,15 +169,20 @@ const ImagePreview = memo(function ImagePreview({
   const handleRemove = useCallback(() => {
     onRemove(index);
   }, [index, onRemove]);
+  
+  const isImage = image.startsWith('data:image/') || /\.(jpe?g|png|gif|webp)$/i.test(image);
+  const fileName = !image.startsWith('data:') ? image.split('/').pop() || 'file' : 'document';
 
   return (
-    <div className="relative group aspect-video rounded-lg overflow-hidden border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900">
-      <Image
-        src={image}
-        alt={`Screenshot ${index + 1}`}
-        fill
-        className="object-cover"
-      />
+    <div className="relative group aspect-video rounded-lg overflow-hidden border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 flex items-center justify-center">
+      {isImage ? (
+        <Image src={image} alt={`File ${index + 1}`} fill className="object-cover" />
+      ) : (
+        <div className="flex flex-col items-center gap-1 p-2 text-center">
+          <FileText className="h-8 w-8 text-blue-500" />
+          <span className="text-xs text-gray-600 dark:text-gray-400 truncate w-full text-center px-1">{fileName}</span>
+        </div>
+      )}
       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors" />
       <Button
         type="button"
@@ -190,12 +211,12 @@ const ImageUploadSection = memo(function ImageUploadSection({
   return (
     <div className="space-y-2">
       <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-        Screenshots {images.length > 0 && <span className="text-gray-500">({images.length}/5)</span>}
+        {images.length >= 5 ? 'Max files reached' : 'Upload Files'} {images.length > 0 && <span className="text-gray-500">({images.length}/5)</span>}
       </Label>
       <div className="flex items-center gap-3">
         <Input
           type="file"
-          accept="image/*"
+          accept="image/*,.pdf,.doc,.docx,.txt"
           multiple
           onChange={onUpload}
           disabled={uploadingImages || images.length >= 5}
@@ -218,12 +239,12 @@ const ImageUploadSection = memo(function ImageUploadSection({
           ) : (
             <>
               <Upload className="h-4 w-4" />
-              {images.length >= 5 ? 'Max images reached' : 'Upload Images'}
+              {images.length >= 5 ? 'Max files reached' : 'Upload Files'}
             </>
           )}
         </Label>
         <p className="text-xs text-gray-500">
-          JPG, PNG, GIF • Max 10MB • Compressed on upload
+          Images, PDF, DOC, TXT • Max 10MB each
         </p>
       </div>
 
@@ -240,7 +261,7 @@ const ImageUploadSection = memo(function ImageUploadSection({
         </div>
       )}
       <p className="text-xs text-gray-500">
-        Images will be automatically compressed during upload. Tap to remove.
+        Images will be compressed on upload. Hover to remove.
       </p>
     </div>
   );
@@ -269,6 +290,10 @@ export default function PostQuestionModal({
       }),
       CodeBlockLowlight.configure({
         lowlight,
+      }),
+      Link.configure({
+        openOnClick: true,
+        autolink: true,
       }),
       Placeholder.configure({
         placeholder: 'Describe your problem in detail. Include:\n• What you\'re trying to achieve\n• What you\'ve tried so far\n• Any error messages\n• Code snippets (if relevant)',
@@ -383,8 +408,9 @@ export default function PostQuestionModal({
             return;
           }
 
-          if (!file.type.startsWith('image/')) {
-            reject(new Error(`${file.name} is not a valid image file.`));
+          const allowedTypes = ['image/', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
+          if (!allowedTypes.some(type => file.type.startsWith(type))) {
+            reject(new Error(`${file.name} is not a supported file type.`));
             return;
           }
 
@@ -404,13 +430,13 @@ export default function PostQuestionModal({
       const uploadedImages = await Promise.all(imagePromises);
       
       if (images.length + uploadedImages.length > 5) {
-        setError("Maximum 5 images allowed per question");
+        setError("Maximum 5 files allowed per question");
         return;
       }
 
       setImages(prev => [...prev, ...uploadedImages]);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to upload images';
+      const errorMessage = err instanceof Error ? err.message : 'Failed to upload files';
       setError(errorMessage);
     } finally {
       setUploadingImages(false);
@@ -572,6 +598,10 @@ export const QuestionContentDisplay = memo(function QuestionContentDisplay({
       CodeBlockLowlight.configure({
         lowlight,
       }),
+      Link.configure({
+        openOnClick: true,
+        autolink: true,
+      }),
     ],
     content: content,
     editable: false,
@@ -587,6 +617,18 @@ export const QuestionContentDisplay = memo(function QuestionContentDisplay({
       displayEditor.commands.setContent(content);
     }
   }, [content, displayEditor]);
+
+  useEffect(() => {
+    // Add target="_blank" to all links so they open in new tab
+    const editorElement = displayEditor?.view?.dom;
+    if (editorElement) {
+      const links = editorElement.querySelectorAll('a');
+      links.forEach(link => {
+        link.setAttribute('target', '_blank');
+        link.setAttribute('rel', 'noopener noreferrer');
+      });
+    }
+  }, [displayEditor, content]);
   
   return <EditorContent editor={displayEditor} />;
 });
