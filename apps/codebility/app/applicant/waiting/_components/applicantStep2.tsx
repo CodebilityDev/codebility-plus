@@ -154,7 +154,7 @@ function PostReadInstructions({
       if (user?.display_position.includes("UI/UX Designer") === false) {
         //validate the fork url
         const urlPattern =
-          /^(https?:\/\/)?(www\.)?github\.com\/[a-zA-Z0-9_-]+\/codebility-assessment(\/.*)?$/;
+          /^(https?:\/\/)?(www\.)?github\.com\/[a-zA-Z0-9_-]+\/codebility-assessment(\.git)?(\/.*)?$/;
 
         if (!urlPattern.test(data.fork_url)) {
           throw new Error(
@@ -286,7 +286,7 @@ function PostSubmitted({
       if (user?.display_position.includes("UI/UX Designer") === false) {
         //validate the fork url
         const urlPattern =
-          /^(https?:\/\/)?(www\.)?github\.com\/[a-zA-Z0-9_-]+\/codebility-assessment(\/.*)?$/;
+          /^(https?:\/\/)?(www\.)?github\.com\/[a-zA-Z0-9_-]+\/codebility-assessment(\.git)?(\/.*)?$/;
 
         if (!urlPattern.test(data.fork_url)) {
           throw new Error(
