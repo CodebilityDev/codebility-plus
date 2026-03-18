@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, memo, useCallback } from "react";
 import Image from "next/image";
 import DefaultAvatar from "@/components/DefaultAvatar";
 import { Button } from "@/components/ui/button";
-import { Heart, MessageCircle, Clock, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { ThumbsUp, MessageCircle, Clock, MoreHorizontal, Pencil, Trash2, FileText } from "lucide-react";
 import {
   Carousel,
   CarouselContent,
@@ -190,68 +190,158 @@ const OwnerMenu = memo(function OwnerMenu({
   );
 });
 
-// Memoized QuestionImages component
-const QuestionImages = memo(function QuestionImages({
-  images,
-  onImageClick,
+// Helper function to determine if a file is an image
+const isFileImage = (src: string): boolean => {
+  return src.startsWith('data:image/') || /\.(jpe?g|png|gif|webp)$/i.test(src);
+}
+
+// Helper function to get file type
+const getFileType = (src: string): string => {
+  if (src.startsWith('data:')) {
+    const mimeMatch = src.match(/data:([^;]+);/);
+    const mimeType = mimeMatch?.[1] || '';
+    
+    if (mimeType.includes('image')) return 'image';
+    if (mimeType.includes('pdf')) return 'pdf';
+    if (mimeType.includes('word') || mimeType.includes('wordprocessingml')) return 'doc';
+    if (mimeType.includes('text')) return 'txt';
+  } else {
+    const ext = src.split('.').pop()?.toLowerCase() || '';
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) return 'image';
+    if (ext === 'pdf') return 'pdf';
+    if (['doc', 'docx'].includes(ext)) return 'doc';
+    if (ext === 'txt') return 'txt';
+  }
+  return 'file';
+}
+
+// Memoized FilePreviewThumbnail component for documents
+const FilePreviewThumbnail = memo(function FilePreviewThumbnail({
+  fileType,
+  fileName,
+  onClick,
 }: {
-  images: string[];
-  onImageClick: (image: string, index: number) => void;
+  fileType: string;
+  fileName: string;
+  onClick: () => void;
 }) {
-  if (!images || images.length === 0) return null;
+  const getIcon = () => {
+    switch (fileType) {
+      case 'pdf':
+        return <span className="text-red-600 font-bold text-lg">PDF</span>;
+      case 'doc':
+        return <span className="text-blue-600 font-bold text-lg">DOC</span>;
+      case 'txt':
+        return <span className="text-gray-600 font-bold text-lg">TXT</span>;
+      default:
+        return <FileText className="h-6 w-6 text-gray-500" />;
+    }
+  }
+
+  return (
+    <div
+      onClick={onClick}
+      className="group relative overflow-hidden rounded-lg sm:rounded-xl border border-gray-200 bg-gradient-to-br from-gray-50 to-gray-100 shadow-sm transition-all duration-300 hover:shadow-md cursor-pointer dark:from-gray-700 dark:to-gray-800 dark:border-gray-700"
+    >
+      <div className="relative w-full" style={{ paddingBottom: '75%' }}>
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+          <div className="flex items-center justify-center h-12 w-12 rounded-lg bg-white dark:bg-gray-900">
+            {getIcon()}
+          </div>
+          <p className="text-xs font-medium text-gray-600 dark:text-gray-300 truncate px-2 text-center max-w-full">
+            {fileName}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+});
+
+// Memoized QuestionFiles component (updated from QuestionImages)
+const QuestionFiles = memo(function QuestionFiles({
+  files,
+  onFileClick,
+}: {
+  files: string[];
+  onFileClick: (file: string, index: number) => void;
+}) {
+  if (!files || files.length === 0) return null;
+
+  const getFileName = (src: string, index: number): string => {
+    if (src.startsWith('data:')) {
+      const fileType = getFileType(src);
+      return `Document ${index + 1}.${fileType === 'doc' ? 'docx' : fileType}`;
+    } else {
+      return src.split('/').pop() || `File ${index + 1}`;
+    }
+  }
 
   return (
     <div className="mb-3 sm:mb-4 px-0 sm:px-8 md:px-12">
       <Carousel
         opts={{
           align: "start",
-          loop: images.length > 1,
+          loop: files.length > 1,
         }}
         className="w-full"
       >
         <CarouselContent className="-ml-2 md:-ml-4">
-          {images.map((image, index) => (
-            <CarouselItem
-              key={index}
-              className={`pl-2 md:pl-4 ${images.length === 1
-                ? 'basis-full'
-                : images.length === 2
-                  ? 'basis-full sm:basis-1/2'
-                  : 'basis-full sm:basis-1/2 lg:basis-1/3'
-                }`}
-            >
-              <div
-                className="group relative overflow-hidden rounded-lg sm:rounded-xl border border-gray-200 bg-gray-50 shadow-sm transition-shadow duration-300 hover:shadow-md cursor-pointer"
-                onClick={() => onImageClick(image, index)}
+          {files.map((file, index) => {
+            const isImage = isFileImage(file);
+            const fileType = getFileType(file);
+            const fileName = getFileName(file, index);
+
+            return (
+              <CarouselItem
+                key={index}
+                className={`pl-2 md:pl-4 ${files.length === 1
+                  ? 'basis-full'
+                  : files.length === 2
+                    ? 'basis-full sm:basis-1/2'
+                    : 'basis-full sm:basis-1/2 lg:basis-1/3'
+                  }`}
               >
-                <div
-                  className="relative w-full"
-                  style={{
-                    paddingBottom: images.length === 1 ? '56.25%' : '75%'
-                  }}
-                >
-                  <Image
-                    src={image}
-                    alt={`Screenshot ${index + 1}`}
-                    fill
-                    sizes={
-                      images.length === 1
-                        ? '100vw'
-                        : images.length === 2
-                          ? '(max-width: 640px) 100vw, 50vw'
-                          : '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
-                    }
-                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                {isImage ? (
+                  <div
+                    className="group relative overflow-hidden rounded-lg sm:rounded-xl border border-gray-200 bg-gray-50 shadow-sm transition-shadow duration-300 hover:shadow-md cursor-pointer"
+                    onClick={() => onFileClick(file, index)}
+                  >
+                    <div
+                      className="relative w-full"
+                      style={{
+                        paddingBottom: files.length === 1 ? '56.25%' : '75%'
+                      }}
+                    >
+                      <Image
+                        src={file}
+                        alt={`Screenshot ${index + 1}`}
+                        fill
+                        sizes={
+                          files.length === 1
+                            ? '100vw'
+                            : files.length === 2
+                              ? '(max-width: 640px) 100vw, 50vw'
+                              : '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
+                        }
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <FilePreviewThumbnail
+                    fileType={fileType}
+                    fileName={fileName}
+                    onClick={() => onFileClick(file, index)}
                   />
-                </div>
-              </div>
-            </CarouselItem>
-          ))}
+                )}
+              </CarouselItem>
+            );
+          })}
         </CarouselContent>
-        {images.length > 1 && (
+        {files.length > 1 && (
           <>
             <div className="sm:hidden flex text-xs text-muted-foreground mt-2">
-              Swipe to check for more images.
+              Swipe to check for more files.
             </div>
             <CarouselPrevious className="hidden sm:flex text-foreground border-foreground" />
             <CarouselNext className="hidden sm:flex text-foreground border-foreground" />
@@ -307,11 +397,11 @@ const QuestionActions = memo(function QuestionActions({
           onClick={onLike}
           disabled={isLiking}
           className={`flex items-center gap-1.5 sm:gap-2 rounded-full px-2.5 sm:px-3 py-1.5 sm:py-2 transition-all duration-200 ${isLiked
-            ? "bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400"
+            ? "bg-orange-50 text-orange-600 hover:bg-orange-100 dark:bg-orange-900/20 dark:text-orange-400"
             : "text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
             } ${isLiking ? "opacity-50 cursor-not-allowed" : ""}`}
         >
-          <Heart className={`h-4 w-4 ${isLiked ? "fill-current" : ""}`} />
+          <ThumbsUp className={`h-4 w-4 ${isLiked ? "fill-current" : ""}`} />
           <span className="text-xs sm:text-sm font-medium">{likes}</span>
         </Button>
 
@@ -344,7 +434,7 @@ export default function QuestionCard({ question, onLike, loggedIn, setQuestions 
   const [showMenu, setShowMenu] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<{
+  const [selectedFile, setSelectedFile] = useState<{
     src: string
     alt: string
   } | null>(null);
@@ -518,17 +608,18 @@ export default function QuestionCard({ question, onLike, loggedIn, setQuestions 
     }
   }, [question.id, setQuestions, toast]);
 
-  // Memoize handleImageClick
-  const handleImageClick = useCallback((image: string, index: number) => {
-    setSelectedImage({
-      src: image,
-      alt: `Screenshot ${index + 1}`
+  // Memoize handleFileClick
+  const handleFileClick = useCallback((file: string, index: number) => {
+    const isImage = isFileImage(file);
+    setSelectedFile({
+      src: file,
+      alt: isImage ? `Screenshot ${index + 1}` : `File ${index + 1}`
     });
   }, []);
 
-  // Memoize closeImagePreview
-  const closeImagePreview = useCallback(() => {
-    setSelectedImage(null);
+  // Memoize closeFilePreview
+  const closeFilePreview = useCallback(() => {
+    setSelectedFile(null);
   }, []);
 
   // Memoize closeEditModal
@@ -562,17 +653,17 @@ export default function QuestionCard({ question, onLike, loggedIn, setQuestions 
       </h3>
 
       {/* Question Content */}
-      <span className="mb-3 sm:mb-4 text-sm sm:text-base leading-relaxed text-gray-700 dark:text-gray-300 break-words">
+      <span className="mb-3 sm:mb-4 text-sm sm:text-base leading-relaxed text-gray-700 dark:text-gray-300 break-words [&_a]:text-blue-500 [&_a]:underline [&_a]:cursor-pointer [&_a]:hover:text-blue-600">
         <QuestionContentDisplay 
           content={question.content}
           className="text-gray-700 dark:text-gray-300"
         />
       </span>
 
-      {/* Images */}
-      <QuestionImages
-        images={question.images}
-        onImageClick={handleImageClick}
+      {/* Files (Images and Documents) */}
+      <QuestionFiles
+        files={question.images}
+        onFileClick={handleFileClick}
       />
 
       {/* Tags */}
@@ -600,13 +691,13 @@ export default function QuestionCard({ question, onLike, loggedIn, setQuestions 
         </div>
       )}
 
-      {/* Image Preview Modal */}
-      {selectedImage && (
+      {/* File Preview Modal */}
+      {selectedFile && (
         <QuestionImagePreview
           isOpen={true}
-          onClose={closeImagePreview}
-          imageSrc={selectedImage.src}
-          imageAlt={selectedImage.alt}
+          onClose={closeFilePreview}
+          imageSrc={selectedFile.src}
+          imageAlt={selectedFile.alt}
         />
       )}
 

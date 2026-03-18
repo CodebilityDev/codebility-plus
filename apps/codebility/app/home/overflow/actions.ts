@@ -92,7 +92,7 @@ export async function fetchQuestions(page: number = 1, pageSize: number = 5): Pr
 
 
 
-// Server-side image compression using sharp
+// Server-side image compression using sharp (for images only)
 async function compressImage(base64String: string): Promise<Buffer> {
   try {
     // Extract base64 data
@@ -124,10 +124,11 @@ async function compressImage(base64String: string): Promise<Buffer> {
   }
 }
 
-// Helper function to upload image to Supabase Storage with compression and retry logic
+// Helper function to upload files (images, PDFs, docs, etc.) to Supabase Storage
+// Images are compressed, documents are uploaded as-is with correct content-type
 async function uploadImageToStorage(
   supabase: any, 
-  base64Image: string, 
+  base64File: string, 
   authorId: string,
   retries = 3
 ): Promise<string | null> {
@@ -136,16 +137,43 @@ async function uploadImageToStorage(
       // Generate unique filename
       const timestamp = Date.now();
       const randomString = Math.random().toString(36).substring(2, 15);
-      const filename = `${authorId}_${timestamp}_${randomString}.jpg`;
+      
+      // Determine if file is an image or document
+      const isImage = base64File.includes('data:image/');
 
-      // Compress the image server-side
-      const compressedBuffer = await compressImage(base64Image);
+      let uploadBuffer: Buffer;
+      let contentType: string;
+      let extension: string;
 
-      // Upload compressed image to Supabase Storage
+      if (isImage) {
+        // Compress images
+        uploadBuffer = await compressImage(base64File);
+        contentType = 'image/jpeg';
+        extension = 'jpg';
+      } else {
+        // Handle documents - extract mime type and upload as-is
+        const mimeMatch = base64File.match(/data:([^;]+);base64,/);
+        contentType = mimeMatch?.[1] || 'application/octet-stream';
+        const base64Data = base64File.split(',')[1] || base64File;
+        uploadBuffer = Buffer.from(base64Data, 'base64');
+        
+        // Map content types to file extensions
+        const extMap: Record<string, string> = {
+          'application/pdf': 'pdf',
+          'application/msword': 'doc',
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',
+          'text/plain': 'txt',
+        };
+        extension = extMap[contentType] || 'bin';
+      }
+
+      const filename = `${authorId}_${timestamp}_${randomString}.${extension}`;
+
+      // Upload to Supabase Storage
       const { data, error } = await supabase.storage
         .from('codebility')
-        .upload(`overflowPostImage/${filename}`, compressedBuffer, {
-          contentType: 'image/jpeg',
+        .upload(`overflowPostImage/${filename}`, uploadBuffer, {
+          contentType,
           upsert: false,
           cacheControl: '3600', // Cache for 1 hour
         });
@@ -189,16 +217,16 @@ export async function postQuestion(data: PostQuestionData) {
   try {
     const supabase = await createClientServerComponent();
 
-    // Upload all images in parallel with compression and error handling
-    const imageUploadPromises = data.images.map((base64Image, index) => 
-      uploadImageToStorage(supabase, base64Image, data.authorId)
+    // Upload all files in parallel (images with compression, documents as-is)
+    const fileUploadPromises = data.images.map((base64File, index) => 
+      uploadImageToStorage(supabase, base64File, data.authorId)
         .then(url => url)
     );
 
-    const uploadedImageUrls = await Promise.all(imageUploadPromises);
+    const uploadedFileUrls = await Promise.all(fileUploadPromises);
 
     // Filter out any failed uploads (nulls)
-    const validImageUrls = uploadedImageUrls.filter((url): url is string => url !== null);
+    const validFileUrls = uploadedFileUrls.filter((url): url is string => url !== null);
 
     // Insert the question into overflow_post table
     const { data: insertedQuestion, error } = await supabase
@@ -208,7 +236,7 @@ export async function postQuestion(data: PostQuestionData) {
         title: data.title,
         question_details: data.content,
         tags: JSON.stringify(data.tags),
-        image_url: JSON.stringify(validImageUrls),
+        image_url: JSON.stringify(validFileUrls),
         likes: 0,
         comments: 0,
         fields: null,
@@ -262,7 +290,7 @@ export async function postQuestion(data: PostQuestionData) {
     return { 
       success: true, 
       question,
-      uploadedImages: validImageUrls.length,
+      uploadedImages: validFileUrls.length,
       totalImages: data.images.length
     };
 
@@ -283,7 +311,7 @@ export interface UpdateQuestionData {
   authorId: string;
 }
 
-// Helper function to delete image from storage
+// Helper function to delete file from storage
 async function deleteImageFromStorage(supabase: any, imageUrl: string): Promise<boolean> {
   try {
     const publicPath = imageUrl.split('/storage/v1/object/public/codebility/')[1];
@@ -309,7 +337,7 @@ export async function updateQuestion(data: UpdateQuestionData) {
   try {
     const supabase = await createClientServerComponent();
 
-    // Fetch the current images from the database
+    // Fetch the current files from the database
     const { data: existingPost, error: fetchError } = await supabase
       .from('overflow_post')
       .select('image_url')
@@ -320,38 +348,38 @@ export async function updateQuestion(data: UpdateQuestionData) {
       return { success: false, error: 'Failed to fetch existing post' };
     }
 
-    const previousImageUrls: string[] = existingPost.image_url
+    const previousFileUrls: string[] = existingPost.image_url
       ? (JSON.parse(existingPost.image_url) as string[])
       : [];
 
-    // Separate existing URLs from new base64 images
+    // Separate existing URLs from new base64 files
     const existingUrls: string[] = [];
-    const newBase64Images: string[] = [];
+    const newBase64Files: string[] = [];
 
-    data.images.forEach((img) => {
-      if (img.startsWith('data:image/')) {
-        newBase64Images.push(img);
+    data.images.forEach((file) => {
+      if (file.startsWith('data:')) {
+        newBase64Files.push(file);
       } else {
-        existingUrls.push(img);
+        existingUrls.push(file);
       }
     });
 
-    // Upload new images in parallel with compression
-    const newImageUploadPromises = newBase64Images.map((base64Image, index) => 
-      uploadImageToStorage(supabase, base64Image, data.authorId)
+    // Upload new files in parallel (images with compression, documents as-is)
+    const newFileUploadPromises = newBase64Files.map((base64File, index) => 
+      uploadImageToStorage(supabase, base64File, data.authorId)
         .then(url => url)
     );
 
-    const uploadedNewImageUrls = await Promise.all(newImageUploadPromises);
-    const validNewImageUrls = uploadedNewImageUrls.filter((url): url is string => url !== null);
+    const uploadedNewFileUrls = await Promise.all(newFileUploadPromises);
+    const validNewFileUrls = uploadedNewFileUrls.filter((url): url is string => url !== null);
 
-    const allImageUrls = [...existingUrls, ...validNewImageUrls];
+    const allFileUrls = [...existingUrls, ...validNewFileUrls];
 
-    // Delete removed images in parallel
-    const imagesToDelete = previousImageUrls.filter(url => !allImageUrls.includes(url));
+    // Delete removed files in parallel
+    const filesToDelete = previousFileUrls.filter(url => !allFileUrls.includes(url));
     
-    if (imagesToDelete.length > 0) {
-      const deletePromises = imagesToDelete.map(url => deleteImageFromStorage(supabase, url));
+    if (filesToDelete.length > 0) {
+      const deletePromises = filesToDelete.map(url => deleteImageFromStorage(supabase, url));
       await Promise.all(deletePromises);
     }
 
@@ -362,7 +390,7 @@ export async function updateQuestion(data: UpdateQuestionData) {
         title: data.title,
         question_details: data.content,
         tags: JSON.stringify(data.tags),
-        image_url: JSON.stringify(allImageUrls),
+        image_url: JSON.stringify(allFileUrls),
         updated_at: new Date().toISOString(),
       })
       .eq('id', parseInt(data.question_id))
@@ -418,8 +446,8 @@ export async function updateQuestion(data: UpdateQuestionData) {
     return { 
       success: true, 
       question,
-      uploadedImages: validNewImageUrls.length,
-      deletedImages: imagesToDelete.length
+      uploadedImages: validNewFileUrls.length,
+      deletedImages: filesToDelete.length
     };
     
   } catch (error) {
@@ -438,7 +466,7 @@ export async function deletePostAndImages(postId: number) {
   const supabase = await createClientServerComponent();
 
   try {
-    // 1. Fetch post by id to get image URLs
+    // 1. Fetch post by id to get file URLs
     const { data: post, error: fetchError } = await supabase
       .from("overflow_post")
       .select("image_url")
@@ -454,17 +482,17 @@ export async function deletePostAndImages(postId: number) {
     }
 
     // 2. Parse image_url field (which is JSON array of strings)
-    let imageUrls: string[] = [];
+    let fileUrls: string[] = [];
     if (post.image_url) {
       try {
-        imageUrls = JSON.parse(post.image_url) as string[];
+        fileUrls = JSON.parse(post.image_url) as string[];
       } catch {
-        // Invalid JSON in image_url, skipping image deletion
+        // Invalid JSON in image_url, skipping file deletion
       }
     }
 
-    // 3. Delete images from storage
-    for (const url of imageUrls) {
+    // 3. Delete files from storage
+    for (const url of fileUrls) {
       try {
         // Extract storage path from public URL
         // Example URL: https://<project-ref>.supabase.co/storage/v1/object/public/codebility/overflowPostImage/filename.png
@@ -487,7 +515,7 @@ export async function deletePostAndImages(postId: number) {
           .remove([filePath]);
 
       } catch (e) {
-        // Error deleting image, continue with next
+        // Error deleting file, continue with next
       }
     }
 
