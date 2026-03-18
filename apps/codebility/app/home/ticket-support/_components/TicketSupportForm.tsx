@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import {
     Select,
     SelectContent,
@@ -121,43 +122,42 @@ export default function TicketSupportForm({
     };
 
     return (
-        <form onSubmit={handleSubmit} className="mx-auto max-w-3xl space-y-10">
+        <form onSubmit={handleSubmit} className="mx-auto w-full space-y-10">
             {/* Inquiree Info Section */}
-            <div className="space-y-6">
-                <div className="flex items-center gap-3">
-                    <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-300 to-transparent dark:via-gray-700" />
-                    <h2 className="text-lg font-semibold tracking-wide text-gray-800 dark:text-gray-200">
+            <div className="space-y-6 animate-fade-in-up" style={{ animationDelay: "100ms" }}>
+                <div className="flex items-center gap-4">
+                    <h2 className="text-sm font-bold uppercase tracking-widest text-customBlue-600 dark:text-customBlue-400">
                         Inquiree Info
                     </h2>
-                    <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-300 to-transparent dark:via-gray-700" />
+                    <div className="h-px flex-1 bg-gradient-to-r from-customBlue-100 to-transparent dark:from-customBlue-900/50" />
                 </div>
 
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                     {/* Full Name */}
                     <div className="space-y-2">
-                        <Label className="text-sm font-medium">
+                        <Label className="text-sm font-medium text-gray-900 dark:text-gray-100">
                             Full Name <span className="text-red-500">*</span>
                         </Label>
-                        <input
+                        <Input
                             type="text"
                             value={fullName}
                             onChange={(e) => setFullName(e.target.value)}
                             placeholder="Enter your full name"
-                            className="bg-white dark:bg-zinc-900 dark:text-white focus:border-customBlue-500 w-full rounded-lg border border-gray-300 p-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-customBlue-100 dark:border-zinc-800 dark:placeholder:text-gray-400"
+                            className="h-11 bg-white dark:bg-[#1a1f3d] dark:text-white dark:border-customBlue-900/50 focus:border-customBlue-500 transition-all"
                             required
                         />
                     </div>
 
                     {/* Role Position */}
                     <div className="space-y-2">
-                        <Label className="text-sm font-medium">
+                        <Label className="text-sm font-medium text-gray-900 dark:text-gray-100">
                             Role Position <span className="text-red-500">*</span>
                         </Label>
                         <Select value={rolePosition} onValueChange={setRolePosition}>
-                            <SelectTrigger className="bg-white dark:bg-zinc-900 dark:text-gray-300 dark:border-zinc-800 focus:border-customBlue-500 border border-gray-300">
+                            <SelectTrigger className="h-11 bg-white dark:bg-[#1a1f3d] dark:text-gray-300 dark:border-customBlue-900/50 focus:border-customBlue-500 border border-gray-300 transition-all">
                                 <SelectValue placeholder="Select your role" />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="dark:bg-[#1a1f3d] dark:border-customBlue-900">
                                 <SelectGroup>
                                     {ROLE_POSITIONS.map((role) => (
                                         <SelectItem key={role} value={role}>
@@ -171,14 +171,14 @@ export default function TicketSupportForm({
 
                     {/* Project */}
                     <div className="space-y-2">
-                        <Label className="text-sm font-medium">
+                        <Label className="text-sm font-medium text-gray-900 dark:text-gray-100">
                             Project <span className="text-red-500">*</span>
                         </Label>
                         <Select value={selectedProject} onValueChange={handleProjectChange}>
-                            <SelectTrigger className="bg-white dark:bg-zinc-900 dark:text-gray-300 dark:border-zinc-800 focus:border-customBlue-500 border border-gray-300">
+                            <SelectTrigger className="h-11 bg-white dark:bg-[#1a1f3d] dark:text-gray-300 dark:border-customBlue-900/50 focus:border-customBlue-500 border border-gray-300 transition-all">
                                 <SelectValue placeholder="Select your project" />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="dark:bg-[#1a1f3d] dark:border-customBlue-900">
                                 <SelectGroup>
                                     <SelectItem value="none">None</SelectItem>
                                     {projects.map((project) => (
@@ -193,14 +193,16 @@ export default function TicketSupportForm({
 
                     {/* Assigned Team */}
                     <div className="space-y-2">
-                        <Label className="text-sm font-medium">Assigned Team</Label>
-                        <input
+                        <Label className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                            Assigned Team
+                        </Label>
+                        <Input
                             type="text"
                             value={assignedTeam}
                             readOnly={selectedProject !== "none"}
                             onChange={(e) => setAssignedTeam(e.target.value)}
                             placeholder={selectedProject === "none" ? "Enter team or lead name" : "Auto-filled from project"}
-                            className={`bg-white dark:bg-zinc-900 dark:text-white w-full rounded-lg border border-gray-300 p-2 text-sm placeholder:text-gray-400 dark:border-zinc-800 dark:placeholder:text-gray-400 ${selectedProject !== "none" ? "cursor-not-allowed" : "focus:border-customBlue-500 focus:outline-none focus:ring-1 focus:ring-customBlue-100"
+                            className={`h-11 bg-white dark:bg-[#1a1f3d] dark:text-white dark:border-customBlue-900/50 transition-all ${selectedProject !== "none" ? "cursor-not-allowed opacity-70" : "focus:border-customBlue-500"
                                 }`}
                         />
                     </div>
@@ -208,26 +210,25 @@ export default function TicketSupportForm({
             </div>
 
             {/* How can we help you? Section */}
-            <div className="space-y-6">
-                <div className="flex items-center gap-3">
-                    <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-300 to-transparent dark:via-gray-700" />
-                    <h2 className="text-lg font-semibold tracking-wide text-gray-800 dark:text-gray-200">
+            <div className="space-y-6 animate-fade-in-up" style={{ animationDelay: "200ms" }}>
+                <div className="flex items-center gap-4">
+                    <h2 className="text-sm font-bold uppercase tracking-widest text-customBlue-600 dark:text-customBlue-400">
                         How can we help you?
                     </h2>
-                    <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-300 to-transparent dark:via-gray-700" />
+                    <div className="h-px flex-1 bg-gradient-to-r from-customBlue-100 to-transparent dark:from-customBlue-900/50" />
                 </div>
 
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                     {/* Type */}
                     <div className="space-y-2">
-                        <Label className="text-sm font-medium">
+                        <Label className="text-sm font-medium text-gray-900 dark:text-gray-100">
                             Type <span className="text-red-500">*</span>
                         </Label>
                         <Select value={ticketType} onValueChange={setTicketType}>
-                            <SelectTrigger className="bg-white dark:bg-zinc-900 dark:text-gray-300 dark:border-zinc-800 focus:border-customBlue-500 border border-gray-300">
+                            <SelectTrigger className="h-11 bg-white dark:bg-[#1a1f3d] dark:text-gray-300 dark:border-customBlue-900/50 focus:border-customBlue-500 border border-gray-300 transition-all">
                                 <SelectValue placeholder="Select ticket type" />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="dark:bg-[#1a1f3d] dark:border-customBlue-900">
                                 <SelectGroup>
                                     {TICKET_TYPES.map((type) => (
                                         <SelectItem key={type} value={type}>
@@ -241,14 +242,14 @@ export default function TicketSupportForm({
 
                     {/* Priority */}
                     <div className="space-y-2">
-                        <Label className="text-sm font-medium">
+                        <Label className="text-sm font-medium text-gray-900 dark:text-gray-100">
                             Priority <span className="text-red-500">*</span>
                         </Label>
                         <Select value={priority} onValueChange={setPriority}>
-                            <SelectTrigger className="bg-white dark:bg-zinc-900 dark:text-gray-300 dark:border-zinc-800 focus:border-customBlue-500 border border-gray-300">
+                            <SelectTrigger className="h-11 bg-white dark:bg-[#1a1f3d] dark:text-gray-300 dark:border-customBlue-900/50 focus:border-customBlue-500 border border-gray-300 transition-all">
                                 <SelectValue placeholder="Select priority" />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="dark:bg-[#1a1f3d] dark:border-customBlue-900">
                                 <SelectGroup>
                                     {PRIORITY_LEVELS.map((level) => (
                                         <SelectItem
@@ -268,15 +269,15 @@ export default function TicketSupportForm({
                 {/* Other Type input (shown when "Other" is selected) */}
                 {ticketType === "Other" && (
                     <div className="space-y-2">
-                        <Label className="text-sm font-medium">
+                        <Label className="text-sm font-medium text-gray-900 dark:text-gray-100">
                             Please specify <span className="text-red-500">*</span>
                         </Label>
-                        <input
+                        <Input
                             type="text"
                             value={otherType}
                             onChange={(e) => setOtherType(e.target.value)}
                             placeholder="Describe your inquiry type"
-                            className="bg-white dark:bg-zinc-900 dark:text-white focus:border-customBlue-500 w-full rounded-lg border border-gray-300 p-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-customBlue-100 dark:border-zinc-800 dark:placeholder:text-gray-400"
+                            className="h-11 bg-white dark:bg-[#1a1f3d] dark:text-white dark:border-customBlue-900/50 focus:border-customBlue-500 transition-all"
                             required
                         />
                     </div>
@@ -284,23 +285,22 @@ export default function TicketSupportForm({
 
                 {/* Ticket Title (Optional) */}
                 <div className="space-y-2">
-                    <Label className="text-sm font-medium">
-                        Ticket Title{" "}
-                        <span className="ml-2 text-xs text-gray-500">(Optional)</span>
+                    <Label className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                        Ticket Title <span className="ml-1 text-xs text-gray-400 font-normal">(Optional)</span>
                     </Label>
-                    <input
+                    <Input
                         type="text"
                         value={ticketTitle}
                         onChange={(e) => setTicketTitle(e.target.value)}
                         placeholder="Brief summary of your issue"
-                        className="bg-white dark:bg-zinc-900 dark:text-white focus:border-customBlue-500 w-full rounded-lg border border-gray-300 p-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-customBlue-100 dark:border-zinc-800 dark:placeholder:text-gray-400"
+                        className="h-11 bg-white dark:bg-[#1a1f3d] dark:text-white dark:border-customBlue-900/50 focus:border-customBlue-500 transition-all"
                     />
                 </div>
 
                 {/* Ticket Details */}
                 <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                        <Label className="text-sm font-medium">
+                        <Label className="text-sm font-medium text-gray-900 dark:text-gray-100">
                             Ticket Details <span className="text-red-500">*</span>
                         </Label>
                         <span
@@ -319,11 +319,11 @@ export default function TicketSupportForm({
                                 setTicketDetails(e.target.value);
                             }
                         }}
-                        placeholder="Provide detailed information about your issue..."
+                        placeholder="Provide detailed information about your issue, steps to reproduce, or any specific errors you've encountered..."
                         rows={6}
                         maxLength={TICKET_DETAILS_MAX_CHARS}
                         required
-                        className="bg-white dark:bg-zinc-900 dark:text-white focus:border-customBlue-500 w-full resize-none rounded-lg border border-gray-300 p-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-customBlue-100 dark:border-zinc-800 dark:placeholder:text-gray-400"
+                        className="bg-white dark:bg-[#1a1f3d] dark:text-white focus:border-customBlue-500 w-full resize-none rounded-lg border border-gray-300 p-3 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-customBlue-100 dark:border-customBlue-900/50 dark:placeholder:text-gray-500 transition-all"
                     />
                 </div>
             </div>
@@ -341,23 +341,16 @@ export default function TicketSupportForm({
                 </div>
             )}
 
-            {/* Submit Button — matches portal button style */}
-            <div className="flex justify-start gap-2 pt-2">
+            {/* Submit Button */}
+            <div className="flex justify-end gap-2 pt-4">
                 <button
                     type="submit"
                     disabled={isSubmitting}
-                    style={{
-                        backgroundColor: isSubmitting ? "#1e40af" : "#2563EB",
-                        color: "white",
-                        padding: "6px 16px",
-                        fontSize: "14px",
-                        borderRadius: "4px",
-                        border: "none",
-                        minWidth: "auto",
-                        width: "auto",
-                        opacity: isSubmitting ? 0.7 : 1,
-                        cursor: isSubmitting ? "not-allowed" : "pointer",
-                    }}
+                    className={`rounded-lg px-8 py-2.5 text-sm font-medium text-white transition-all focus:outline-none focus:ring-2 focus:ring-customBlue-500/50 ${
+                        isSubmitting 
+                        ? "bg-customBlue-800 cursor-not-allowed opacity-70" 
+                        : "bg-customBlue-600 hover:bg-customBlue-500 active:scale-[0.98] shadow-lg shadow-customBlue-500/20"
+                    }`}
                 >
                     {isSubmitting ? "Submitting..." : "Submit Ticket"}
                 </button>
