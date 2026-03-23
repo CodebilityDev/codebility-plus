@@ -10,7 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Codev, InternalStatus } from "@/types/home/codev";
-import { Search, Users } from "lucide-react";
+import { Search, Users, X } from "lucide-react";
 import toast from "react-hot-toast";
 import { useModal } from "@/hooks/use-modal-users";
 import { createClientClientComponent } from "@/utils/supabase/client";
@@ -43,14 +43,15 @@ const calculateYearsFromExperience = (workExperience: any[]): number => {
   return Math.round(totalYears);
 };
 
-// ✅ Responsive Avatar Component
+// ✅ Responsive Avatar Component — X button visible only on hover
 const TeamMemberAvatar = ({ 
   imageUrl, 
   name, 
   position,
   size = 32,
   member,
-  onClick
+  onClick,
+  onRemove,
 }: { 
   imageUrl?: string | null; 
   name: string; 
@@ -58,36 +59,55 @@ const TeamMemberAvatar = ({
   size?: number;
   member?: Codev;
   onClick?: (member: Codev) => void;
+  onRemove?: (member: Codev) => void;
 }) => (
-  <div className="flex flex-col items-center space-y-1 w-full"> 
-    <div 
-      className={`relative flex-shrink-0 rounded-full overflow-hidden ring-1 sm:ring-2 ring-customBlue-400 ${
-        member && onClick ? 'cursor-pointer hover:ring-customBlue-300 transition-all duration-200' : ''
-      }`}
-      style={{ width: size, height: size }}
-      onClick={(e) => {
-        e.stopPropagation();
-        if (member && onClick) {
-          onClick(member);
-        }
-      }}
-      title={member ? "Click to view profile" : undefined}
-    >
-      <img
-        src={
-          imageUrl ||
-          "https://codebility-cdn.pages.dev/assets/images/default-avatar-200x200.jpg"
-        }
-        alt={name}
-        className="w-full h-full object-cover"
-        onError={(e) => {
-          const target = e.target as HTMLImageElement;
-          target.src = "https://codebility-cdn.pages.dev/assets/images/default-avatar-200x200.jpg";
+  <div className="flex flex-col items-center space-y-1 w-full">
+    {/* ✅ Extra padding so the X button (positioned outside the circle) is never clipped */}
+    <div className="group relative" style={{ width: size + 8, height: size + 8, padding: 4 }}>
+      <div 
+        className={`relative rounded-full overflow-hidden ring-1 sm:ring-2 ring-customBlue-400 w-full h-full ${
+          member && onClick ? 'cursor-pointer hover:ring-customBlue-300 transition-all duration-200' : ''
+        }`}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (member && onClick) {
+            onClick(member);
+          }
         }}
-      />
+        title={member ? "Click to view profile" : undefined}
+      >
+        <img
+          src={
+            imageUrl ||
+            "https://codebility-cdn.pages.dev/assets/images/default-avatar-200x200.jpg"
+          }
+          alt={name}
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.src = "https://codebility-cdn.pages.dev/assets/images/default-avatar-200x200.jpg";
+          }}
+        />
+      </div>
+
+      {/* ✅ X Remove Button — only visible on hover via group-hover */}
+      {member && onRemove && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove(member);
+          }}
+          title="Remove member"
+          className="absolute top-0 right-0 z-20 flex items-center justify-center rounded-full bg-red-500 hover:bg-red-600 text-white shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-150"
+          style={{ width: Math.max(14, size * 0.38), height: Math.max(14, size * 0.38) }}
+        >
+          <X style={{ width: Math.max(8, size * 0.22), height: Math.max(8, size * 0.22) }} strokeWidth={3} />
+        </button>
+      )}
     </div>
+
     <div className="text-center w-full">
-      <div className="text-xs text-white font-medium truncate w-full leading-tight mt-2">
+      <div className="text-xs text-white font-medium truncate w-full leading-tight mt-1">
         {name}
       </div>
       {position && (
@@ -180,15 +200,17 @@ const TeamLeaderDisplay = ({
   </div>
 );
 
-// ✅ Team Members Grid
+// ✅ Team Members Grid — flex-based scroll, hover-reveal scrollbar, no cut-offs
 const TeamMembersGrid = ({ 
   members,
   currentMemberIds,
-  onProfileClick
+  onProfileClick,
+  onRemoveMember,
 }: { 
   members: Codev[];
   currentMemberIds: string[];
   onProfileClick?: (member: Codev) => void;
+  onRemoveMember?: (member: Codev) => void;
 }) => {
   const getAvatarSize = () => {
     if (typeof window !== 'undefined') {
@@ -200,32 +222,60 @@ const TeamMembersGrid = ({
   };
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="flex flex-col min-h-0 flex-1">
       <h4 className="text-base sm:text-lg font-semibold text-white mb-1 mt-[-15px]">Team Members</h4>
-      <div className="mb-1 sm:mb-2 md:mt-2">
+      <div className="mb-1 sm:mb-2 md:mt-2 flex-shrink-0">
         <span className="text-white text-xs sm:text-sm">{members.length} members</span>
       </div>
-      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-1 sm:gap-2 w-full mt-6">
-        {members.map((member) => {
-          const isNew = !currentMemberIds.includes(member.id);
-          return (
-            <div key={member.id} className="w-full flex flex-col items-center relative mb-5">
-              {isNew && (
-                <div className="absolute -top-1 -right-1 bg-green-500 text-white text-xs px-1 rounded-full z-10">
-                  New
-                </div>
-              )}
-              <TeamMemberAvatar
-                imageUrl={member.image_url}
-                name={member.first_name}
-                position={member.display_position}
-                size={getAvatarSize()}
-                member={member}
-                onClick={onProfileClick}
-              />
-            </div>
-          );
-        })}
+
+      {/*
+        - flex-1 + min-h-0 lets the scroll container grow to fill whatever space
+          the parent left panel gives it — no hardcoded heights, no excess space
+        - overflowY:'scroll' always reserves the scrollbar gutter → zero layout shift on hover
+        - scrollbar track/thumb are transparent by default, visible only on hover via CSS
+        - inner grid overflow:visible so X buttons and avatar rings never clip
+      */}
+      <div
+        className="mt-2 members-scroll flex-1 min-h-0"
+        style={{ overflowY: 'scroll', overflowX: 'hidden' }}
+      >
+        <div
+          className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 w-full"
+          style={{
+            columnGap: '8px',
+            rowGap: '24px',
+            paddingTop: '8px',
+            paddingBottom: '16px',
+            paddingLeft: '4px',
+            paddingRight: '4px',
+            overflow: 'visible',
+          }}
+        >
+          {members.map((member) => {
+            const isNew = !currentMemberIds.includes(member.id);
+            return (
+              <div key={member.id} className="w-full flex flex-col items-center relative">
+                {isNew && (
+                  <div
+                    className="absolute bg-green-500 text-white text-xs px-1 rounded-full z-30 pointer-events-none"
+                    style={{ top: 2, right: 2 }}
+                  >
+                    New
+                  </div>
+                )}
+                <TeamMemberAvatar
+                  imageUrl={member.image_url}
+                  name={member.first_name}
+                  position={member.display_position}
+                  size={getAvatarSize()}
+                  member={member}
+                  onClick={onProfileClick}
+                  onRemove={onRemoveMember}
+                />
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
@@ -237,15 +287,17 @@ const ProjectPreview = ({
   teamLead, 
   selectedMembers,
   currentMemberIds,
-  onProfileClick
+  onProfileClick,
+  onRemoveMember,
 }: { 
   projectName: string; 
   teamLead: SimpleMemberData | null;
   selectedMembers: Codev[];
   currentMemberIds: string[];
   onProfileClick?: (member: Codev) => void;
+  onRemoveMember?: (member: Codev) => void;
 }) => (
-  <div className="h-full flex flex-col p-1 sm:p-2 gap-y-6">
+  <div className="h-full flex flex-col p-1 sm:p-2 gap-y-4 overflow-hidden">
     <div className="flex-shrink-0">
       <h3 className="text-base sm:text-lg font-semibold text-white mb-1">Project Name</h3>
       <div className="flex items-center gap-2 sm:gap-3 mt-2">
@@ -278,11 +330,12 @@ const ProjectPreview = ({
       />
     </div>
     
-    <div className="flex-1 min-h-0 mr-8">
+    <div className="flex-1 min-h-0 mr-8 flex flex-col">
       <TeamMembersGrid 
         members={selectedMembers} 
         currentMemberIds={currentMemberIds}
         onProfileClick={onProfileClick}
+        onRemoveMember={onRemoveMember}
       />
     </div>
   </div>
@@ -317,7 +370,7 @@ const AddMembersModal = ({
   const [isLoadingMembers, setIsLoadingMembers] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  // ✅ FIXED: Paginated fetch to bypass Supabase's 1000-row default limit
+  // ✅ Paginated fetch to bypass Supabase's 1000-row default limit
   const fetchAllCodevs = useCallback(async (): Promise<Codev[]> => {
     if (!supabase) {
       console.error('Supabase client not available');
@@ -346,7 +399,6 @@ const AddMembersModal = ({
 
         allData = [...allData, ...data];
 
-        // If we got fewer rows than PAGE_SIZE, we've reached the last page
         if (data.length < PAGE_SIZE) break;
 
         from += PAGE_SIZE;
@@ -532,6 +584,11 @@ const AddMembersModal = ({
     });
   }, []);
 
+  // ✅ Remove member via X button on avatar
+  const handleRemoveMember = useCallback((member: Codev) => {
+    setSelectedMembers(prev => prev.filter(m => m.id !== member.id));
+  }, []);
+
   const isSelected = useCallback((userId: string) => 
     selectedMembers.some(m => m.id === userId), 
     [selectedMembers]
@@ -644,6 +701,36 @@ const AddMembersModal = ({
   if (!isOpen) return null;
 
   return (
+    <>
+    <style>{`
+      /* Members grid: scrollbar gutter always reserved (no layout shift), thumb hidden until hover */
+      .members-scroll {
+        scrollbar-width: thin;
+        scrollbar-color: transparent transparent;
+      }
+      .members-scroll:hover {
+        scrollbar-color: rgba(99, 120, 255, 0.45) transparent;
+      }
+      .members-scroll::-webkit-scrollbar {
+        width: 4px;
+        background: transparent;
+      }
+      .members-scroll::-webkit-scrollbar-track {
+        background: transparent;
+        border: none;
+        box-shadow: none;
+      }
+      .members-scroll::-webkit-scrollbar-thumb {
+        background-color: transparent;
+        border-radius: 4px;
+        border: none;
+        box-shadow: none;
+      }
+      .members-scroll:hover::-webkit-scrollbar-thumb {
+        background-color: rgba(99, 120, 255, 0.45);
+      }
+    `}</style>
+    <div style={{display:'contents'}}>
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-full w-[85vw] sm:w-[80vw] lg:w-[80vw] h-[80vh] flex flex-col dark:bg-slate-950 border-2 border-slate-300 dark:border-blue-900/60 p-4 sm:p-0">
         <DialogHeader className="flex-shrink-0 px-3 sm:px-6 pt-1 pb-1">
@@ -654,13 +741,14 @@ const AddMembersModal = ({
 
         <div className="flex flex-col lg:flex-row flex-1 min-h-0 overflow-hidden">
           {/* Left Panel - Project Preview */}
-          <div className="w-full lg:w-3/5 border-b lg:border-b-0 lg:border-r border-white/30 dark:border-white/20 pr-0 md:pr-6">
+          <div className="w-full lg:w-3/5 border-b lg:border-b-0 lg:border-r border-white/30 dark:border-white/20 pr-0 md:pr-6 h-full overflow-hidden">
             <ProjectPreview 
               projectName={project.name}
               teamLead={teamLeadData}
               selectedMembers={selectedMembers}
               currentMemberIds={currentMembers.map(m => m.id)}
               onProfileClick={handleProfileClick}
+              onRemoveMember={handleRemoveMember}
             />
           </div>
 
@@ -821,6 +909,8 @@ const AddMembersModal = ({
         </div>
       </DialogContent>
     </Dialog>
+    </div>
+    </>
   );
 };
 
