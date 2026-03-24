@@ -7,7 +7,7 @@ export const pageSize = {
   tasks: 9,
   weeklyTop: 10,
   projects: 12,
-  services: 9,
+  services: 12,
 } as const;
 
 export const projects = [

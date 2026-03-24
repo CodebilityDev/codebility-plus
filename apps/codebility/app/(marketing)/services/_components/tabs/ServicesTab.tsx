@@ -122,14 +122,14 @@ export const ServicesTab = memo(({ servicesData, onServiceSelect }: Props) => {
           </div>
 
           {/* Projects Grid */}
-          <div id="services-grid" className="mx-[-4px] grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div id="services-grid" className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {paginatedProjects && paginatedProjects.length > 0 ? (
               paginatedProjects.map((project, index) => (
                 <div
                   key={project.id}
-                  className="animate-fade-in-up px-1"
+                  className="animate-fade-in-up"
                   style={{
-                    animationDelay: `${index * 150}ms`,
+                    animationDelay: `${index * 80}ms`,
                     animationFillMode: "both",
                   }}
                 >
@@ -140,7 +140,7 @@ export const ServicesTab = memo(({ servicesData, onServiceSelect }: Props) => {
                 </div>
               ))
             ) : (
-              <div className="col-span-full text-center text-white">
+              <div className="py-20 text-center text-white">
                 No projects available for this category
               </div>
             )}
