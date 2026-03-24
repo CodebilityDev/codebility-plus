@@ -662,12 +662,7 @@ const ProjectEditModal = () => {
               <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">
                 Team Leader *
               </label>
-              {/* value prop binds currentTeamLeader state to the select,
-                  so the pre-populated leader shows as the selected option.
-                  enhancedUserOptions guarantees the leader's option exists
-                  even if they were filtered out of getProjectCodevs(). */}
               <CustomSelect
-                label="Team Leader"
                 options={enhancedUserOptions.filter(
                   (user) => !selectedMembers.find((member) => member.id === user.value),
                 )}
@@ -696,6 +691,7 @@ const ProjectEditModal = () => {
                   setSelectedMembers((prev) => prev.filter((m) => m.id !== memberId))
                 }
                 excludeMembers={currentTeamLeader ? [currentTeamLeader.id] : []}
+                showLabel={false}
               />
             </div>
           </div>

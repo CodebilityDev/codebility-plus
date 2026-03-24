@@ -11,7 +11,6 @@ import {
 
 import { Label } from "@codevs/ui/label";
 
-// Extend your interface to include a "searchable" prop.
 interface Option {
   id: string;
   value: string;
@@ -21,14 +20,14 @@ interface Option {
 }
 
 interface CustomSelectProps {
-  label: string;
+  label?: string; // ← made optional: omit to suppress the heading entirely
   options: Option[];
   value?: string;
   onChange: (value: string) => void;
   placeholder?: string;
   disabled?: boolean;
   variant?: "default" | "simple";
-  searchable?: boolean; // <--- New prop
+  searchable?: boolean;
 }
 
 export const CustomSelect = ({
@@ -38,14 +37,12 @@ export const CustomSelect = ({
   onChange,
   placeholder,
   disabled,
-  variant = "default", // Default to showing avatars
-  searchable = false, // <--- Default false
+  variant = "default",
+  searchable = false,
 }: CustomSelectProps) => {
-  // Keep track of the user's search term
   const [searchTerm, setSearchTerm] = useState("");
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  // Filter options based on the search term
   const filteredOptions = useMemo(() => {
     if (!searchable) return options;
     const lowerSearch = searchTerm.toLowerCase();
@@ -57,23 +54,24 @@ export const CustomSelect = ({
     });
   }, [options, searchable, searchTerm]);
 
-  // Handle user typing in the search input
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
-    // Stop event propagation so the dropdown doesn't close
     e.stopPropagation();
     setSearchTerm(e.target.value);
   };
 
   return (
     <div className="space-y-2">
-      <Label className="dark:text-light-900 text-black">{label}</Label>
+      {/* Render label only when provided — prevents duplicate headings when
+          the parent component already renders its own label above this select. */}
+      {label && (
+        <Label className="dark:text-light-900 text-black">{label}</Label>
+      )}
       <Select value={value} onValueChange={onChange} disabled={disabled}>
         <SelectTrigger className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 w-full text-black">
           <SelectValue placeholder={disabled ? "Loading..." : placeholder} />
         </SelectTrigger>
 
         <SelectContent side="bottom" position="popper" sideOffset={4} className="bg-light-800 dark:bg-dark-200">
-          {/** If searchable, show an inline search input */}
           {searchable && (
             <div className="p-2">
               <input
@@ -82,10 +80,10 @@ export const CustomSelect = ({
                 placeholder="Search..."
                 value={searchTerm}
                 onChange={handleSearchChange}
-                onPointerDown={(e) => e.stopPropagation()} // Keep dropdown open
-                onFocus={(e) => e.stopPropagation()} // Keep dropdown open
+                onPointerDown={(e) => e.stopPropagation()}
+                onFocus={(e) => e.stopPropagation()}
                 onKeyDown={(e) => {
-                  e.stopPropagation(); // Prevent Select keyboard navigation
+                  e.stopPropagation();
                 }}
                 autoFocus={false}
                 className="dark:bg-dark-100 w-full rounded-md bg-white p-2 text-sm dark:text-white"
@@ -126,7 +124,6 @@ export const CustomSelect = ({
                       </div>
                     </div>
                   ) : (
-                    // Simple variant without avatar
                     <div className="flex flex-col">
                       <span>{option.label}</span>
                       {option.subLabel && (
