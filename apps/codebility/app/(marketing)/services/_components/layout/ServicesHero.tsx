@@ -4,7 +4,7 @@ import SideNavMenu from "../../../_components/MarketingSidenavMenu";
 export const Hero = () => {
   return (
     <div className="relative">
-      <section className="relative mt-2 flex min-h-[300px] w-full flex-col items-center justify-center overflow-hidden bg-cover bg-no-repeat lg:mt-20">
+      <section id="services-hero" className="relative mt-2 flex min-h-[300px] w-full flex-col items-center justify-center overflow-hidden bg-cover bg-no-repeat lg:mt-20">
         <SideNavMenu />
         <Container className="text-white">
           <div className="relative z-10 flex flex-col gap-4 pt-20 text-center lg:pt-0">

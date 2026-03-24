@@ -91,11 +91,11 @@ export const ServicesTab = memo(({ servicesData, onServiceSelect }: Props) => {
   };
 
   return (
-    <Section className="relative">
+    <Section id="services-projects" className="relative">
       <Container className="relative z-0">
         <div className="flex flex-col gap-4">
           {/* Tabs */}
-          <div className="mx-auto flex flex-wrap justify-center gap-2 rounded-2xl border border-white/20 bg-white/10 p-1 backdrop-blur-sm dark:bg-white/5">
+          <div id="services-categories" className="mx-auto flex flex-wrap justify-center gap-2 rounded-2xl border border-white/20 bg-white/10 p-1 backdrop-blur-sm dark:bg-white/5">
             <button
               onClick={() => handleTabClick(ALL_CATEGORY_ID)}
               className={`rounded-xl px-3 py-1.5 text-sm font-semibold transition-all duration-200 ${
@@ -122,7 +122,7 @@ export const ServicesTab = memo(({ servicesData, onServiceSelect }: Props) => {
           </div>
 
           {/* Projects Grid */}
-          <div className="mx-[-4px] grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div id="services-grid" className="mx-[-4px] grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {paginatedProjects && paginatedProjects.length > 0 ? (
               paginatedProjects.map((project, index) => (
                 <div
@@ -148,7 +148,7 @@ export const ServicesTab = memo(({ servicesData, onServiceSelect }: Props) => {
 
           {/* Pagination */}
           {projects.length > pageSize.services && (
-            <div className="text-white">
+            <div id="services-pagination" className="text-white">
               <DefaultPagination
                 currentPage={currentPage}
                 handleNextPage={handleNextPage}

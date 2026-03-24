@@ -76,7 +76,7 @@ export const ServiceDetailView = ({ service, onBack }) => {
   });
 
   return (
-    <div className="mx-auto w-full max-w-[1200px] px-4 py-8 pb-24 sm:px-6 md:pb-8">
+    <div id="service-detail" className="mx-auto w-full max-w-[1200px] px-4 py-8 pb-24 sm:px-6 md:pb-8">
       {/* Back Button */}
       <div className="mb-6 mt-24">
         <Button
@@ -117,7 +117,7 @@ export const ServiceDetailView = ({ service, onBack }) => {
       </div>
 
       {/* 2. Project Information */}
-      <section className="mt-12">
+      <section id="service-detail-info" className="mt-12">
         <div className="rounded-lg bg-gray-50 p-6 dark:bg-gray-800/50">
           <h2 className="mb-6 flex items-center gap-3 text-2xl font-bold">
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-lg font-bold text-blue-600 dark:bg-blue-900 dark:text-blue-400">
@@ -319,7 +319,7 @@ export const ServiceDetailView = ({ service, onBack }) => {
       </section>
 
       {/* 3. Team Information */}
-      <section className="mt-12">
+      <section id="service-detail-team" className="mt-12">
         <div className="rounded-lg bg-gray-50 p-6 dark:bg-gray-800/50">
           <h2 className="mb-6 flex items-center gap-3 text-2xl font-bold">
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-lg font-bold text-blue-600 dark:bg-blue-900 dark:text-blue-400">
@@ -402,7 +402,7 @@ export const ServiceDetailView = ({ service, onBack }) => {
       </section>
 
       {/* 4. Project Gallery */}
-      <section className="mt-12">
+      <section id="service-detail-gallery" className="mt-12">
         <div className="rounded-lg bg-gray-50 p-6 dark:bg-gray-800/50">
           <h2 className="mb-6 flex items-center gap-3 text-2xl font-bold">
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-lg font-bold text-blue-600 dark:bg-blue-900 dark:text-blue-400">

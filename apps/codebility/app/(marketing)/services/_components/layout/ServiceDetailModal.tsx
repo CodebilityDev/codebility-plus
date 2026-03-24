@@ -110,7 +110,7 @@ export const ServiceDetailModal = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-full w-[95vw] sm:w-[90vw] lg:w-[80vw] h-[90vh] max-h-[90vh] p-0 flex flex-col overflow-hidden">
-        <DialogHeader className="flex-shrink-0 px-4 sm:px-6 pt-4 pb-2">
+        <DialogHeader id="service-detail-header" className="flex-shrink-0 px-4 sm:px-6 pt-4 pb-2">
           <DialogTitle className="text-xl sm:text-2xl font-bold text-center">
             {service?.name || "Service Details"}
           </DialogTitle>
@@ -160,7 +160,7 @@ export const ServiceDetailModal = ({
           </div>
 
           {/* Project Information */}
-          <section className="space-y-6">
+          <section id="service-detail-info" className="space-y-6">
             <div className="rounded-lg bg-gray-50 p-4 dark:bg-gray-800/50 sm:p-6">
               <h2 className="mb-4 flex items-center gap-3 text-lg font-bold sm:text-xl">
                 <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-600 dark:bg-blue-900 dark:text-blue-400 sm:h-8 sm:w-8 sm:text-lg">
@@ -299,7 +299,7 @@ export const ServiceDetailModal = ({
 
             {/* Team Section */}
             {(teamLead || members.length > 0 || (service?.members && service.members.length > 0)) && (
-              <div className="rounded-lg bg-gray-50 p-4 dark:bg-gray-800/50 sm:p-6">
+              <div id="service-detail-team" className="rounded-lg bg-gray-50 p-4 dark:bg-gray-800/50 sm:p-6">
                 <h2 className="mb-4 flex items-center gap-3 text-lg font-bold sm:text-xl">
                   <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-600 dark:bg-blue-900 dark:text-blue-400 sm:h-8 sm:w-8 sm:text-lg">
                     3
