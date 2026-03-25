@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useMemo } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { IconLink } from "@/public/assets/svgs";
@@ -81,6 +81,28 @@ export const ServicesServiceCard = memo(({ service, onSelect }: Props) => {
     [members],
   );
 
+  const [isHovered, setIsHovered] = useState(false);
+  const [showDescription, setShowDescription] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (!isHovered) {
+      setShowDescription(false);
+      if (timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current = null;
+      return;
+    }
+
+    // After 2s on hover, switch to description
+    timerRef.current = setTimeout(() => {
+      setShowDescription(true);
+    }, 2000);
+
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [isHovered]);
+
   const handleClick = () => {
     if (onSelect) {
       onSelect(service);
@@ -92,7 +114,12 @@ export const ServicesServiceCard = memo(({ service, onSelect }: Props) => {
   return (
     <div className="group cursor-pointer overflow-hidden rounded-xl bg-white/[0.04] ring-1 ring-white/[0.08] transition-all duration-300 hover:bg-white/[0.07] hover:ring-white/[0.16] hover:shadow-[0_8px_30px_rgba(0,0,0,0.3)]">
       {/* Image — consistent 4:3 aspect ratio */}
-      <div className="relative aspect-[4/3] w-full overflow-hidden" onClick={handleClick}>
+      <div
+        className="relative aspect-[4/3] w-full overflow-hidden"
+        onClick={handleClick}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
         <Image
           src={imageUrl}
           alt={name}
@@ -102,27 +129,54 @@ export const ServicesServiceCard = memo(({ service, onSelect }: Props) => {
           quality={75}
         />
 
-        {/* Hover overlay with action */}
-        <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-all duration-300 group-hover:bg-black/40">
-          <div className="flex translate-y-3 items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-semibold text-gray-900 opacity-0 shadow-xl backdrop-blur-sm transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-            <Eye className="size-4" />
-            View Project
-          </div>
-        </div>
-
-        {/* Category badges — top left */}
+        {/* Category badges — dark glass pill */}
         {categories.length > 0 && (
-          <div className="absolute left-2.5 top-2.5 flex max-w-[calc(100%-1.25rem)] flex-wrap gap-1">
+          <div className="absolute left-3 top-3 flex max-w-[calc(100%-1.5rem)] flex-wrap gap-1.5">
             {categories.map((category) => (
               <span
                 key={category.id}
-                className="rounded-md bg-black/60 px-2 py-0.5 text-[11px] font-medium text-white backdrop-blur-md"
+                className="rounded-md border border-white/10 bg-gray-950/75 px-2.5 py-1 text-[11px] font-semibold text-white/90"
               >
                 {category.name}
               </span>
             ))}
           </div>
         )}
+
+        {/* Bottom glass band — grows from single-line to 40% max on description */}
+        <div
+          className="pointer-events-none absolute inset-x-0 bottom-0 border-t border-white/10 bg-gray-950/75 px-4 py-3"
+          style={{
+            opacity: isHovered ? 1 : 0,
+            maxHeight: showDescription ? "40%" : "auto",
+            transition: "opacity 300ms cubic-bezier(0.4,0,0.2,1), max-height 300ms cubic-bezier(0.4,0,0.2,1)",
+          }}
+        >
+          {!showDescription && (
+            <span
+              className="flex items-center gap-2 text-sm font-semibold text-white/90"
+              style={{
+                animation: "fadeSlideIn 300ms cubic-bezier(0.4,0,0.2,1) both",
+              }}
+            >
+              <Eye className="size-4 text-white/60" />
+              View Project
+            </span>
+          )}
+          {showDescription && (
+            <span
+              className="block overflow-hidden text-ellipsis text-[13px] leading-relaxed text-white/80"
+              style={{
+                display: "-webkit-box",
+                WebkitLineClamp: 3,
+                WebkitBoxOrient: "vertical",
+                animation: "fadeSlideIn 300ms cubic-bezier(0.4,0,0.2,1) both",
+              }}
+            >
+              {description || "No description available."}
+            </span>
+          )}
+        </div>
 
         {/* Website link — top right */}
         {hasValidWebsite && (
