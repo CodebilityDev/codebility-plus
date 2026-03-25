@@ -1,13 +1,11 @@
-export type AnnouncementCategory = 
-  | "whats-new" 
-  | "under-maintenance" 
-  | "connect-with-us";
+export type AnnouncementCategory = string;
 
 export interface AnnouncementPage {
+  id?: number;
   category: AnnouncementCategory;
   title: string;
-  banner_image: string; // Image path - will be editable in future
-  content: string; // Editable content
+  banner_image: string;
+  content: string;
   last_updated: string;
 }
 
