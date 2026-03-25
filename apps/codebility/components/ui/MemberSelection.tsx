@@ -53,7 +53,7 @@ export const MemberSelection = ({
       {showLabel && (
         <label className="dark:text-light-900 text-black">Team Members</label>
       )}
-      <div className="flex gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <div className="flex flex-wrap items-center gap-2">
           {selectedMembers.map((member) => (
             <div
@@ -77,9 +77,12 @@ export const MemberSelection = ({
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="h-12 w-12 rounded-full p-0">
-              <IconPlus className="h-6 w-6" />
-            </Button>
+            <button 
+              className="h-12 w-12 rounded-full border border-gray-600 bg-transparent hover:bg-gray-700 transition-colors"
+              style={{ display: "grid", placeItems: "center" }}
+            >
+              <IconPlus className="h-5 w-5" style={{ transform: "translateX(3px) translateY(1px)" }} />
+            </button>
           </DropdownMenuTrigger>
 
           <DropdownMenuContent

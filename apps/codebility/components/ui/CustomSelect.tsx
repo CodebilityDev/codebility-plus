@@ -68,7 +68,38 @@ export const CustomSelect = ({
       )}
       <Select value={value} onValueChange={onChange} disabled={disabled}>
         <SelectTrigger className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 w-full text-black">
-          <SelectValue placeholder={disabled ? "Loading..." : placeholder} />
+          {(() => {
+            const selected = options.find((o) => o.value === value);
+            if (!selected) return <span className="text-gray-400">{disabled ? "Loading..." : placeholder}</span>;
+
+            return variant === "default" ? (
+              <div className="flex items-center gap-3">
+                <div className="h-9 w-9 flex-shrink-0 self-center rounded-full overflow-hidden">
+                  {selected.imageUrl ? (
+                    <img
+                      src={selected.imageUrl}
+                      alt={selected.label}
+                      className="h-full w-full rounded-full object-cover"
+                    />
+                  ) : (
+                    <img
+                      src="https://codebility-cdn.pages.dev/assets/images/default-avatar-200x200.jpg"
+                      alt="Default Avatar"
+                      className="h-full w-full rounded-full object-cover"
+                    />
+                  )}
+                </div>
+                <div className="flex flex-col leading-tight min-w-0">
+                  <span className="text-sm font-medium block">{selected.label}</span>
+                  {selected.subLabel && (
+                    <span className="text-xs text-gray-500 block">{selected.subLabel}</span>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <span>{selected.label}</span>
+            );
+          })()}
         </SelectTrigger>
 
         <SelectContent side="bottom" position="popper" sideOffset={4} className="bg-light-800 dark:bg-dark-200">
