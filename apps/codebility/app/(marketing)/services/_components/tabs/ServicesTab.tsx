@@ -91,14 +91,14 @@ export const ServicesTab = memo(({ servicesData, onServiceSelect }: Props) => {
   };
 
   return (
-    <Section id="services-projects" className="relative">
-      <Container className="relative z-0">
+    <Section id="services-projects" className="relative !pt-0">
+      <Container className="relative z-0 !max-w-full px-4 sm:px-8 xl:min-w-[1260px] 2xl:min-w-[1560px]">
         <div className="flex flex-col gap-4">
           {/* Tabs */}
-          <div id="services-categories" className="mx-auto flex flex-wrap justify-center gap-2 rounded-2xl border border-white/20 bg-white/10 p-1 backdrop-blur-sm dark:bg-white/5">
+          <div id="services-categories" className="mx-auto flex max-w-full flex-wrap justify-center gap-1.5 rounded-2xl border border-white/20 bg-white/10 p-2 backdrop-blur-sm sm:gap-2.5 dark:bg-white/5">
             <button
               onClick={() => handleTabClick(ALL_CATEGORY_ID)}
-              className={`rounded-xl px-3 py-1.5 text-sm font-semibold transition-all duration-200 ${
+              className={`rounded-xl px-2.5 py-1 text-xs font-semibold transition-all duration-200 sm:px-5 sm:py-2.5 sm:text-base ${
                 currentCategory === ALL_CATEGORY_ID
                   ? "bg-white text-gray-900 shadow-lg"
                   : "text-white hover:bg-white/20 hover:text-white"
@@ -110,7 +110,7 @@ export const ServicesTab = memo(({ servicesData, onServiceSelect }: Props) => {
               <button
                 key={cat.id}
                 onClick={() => handleTabClick(cat.id)}
-                className={`rounded-xl px-3 py-1.5 text-sm font-semibold transition-all duration-200 ${
+                className={`rounded-xl px-2.5 py-1 text-xs font-semibold transition-all duration-200 sm:px-5 sm:py-2.5 sm:text-base ${
                   currentCategory === cat.id
                     ? "bg-white text-gray-900 shadow-lg"
                     : "text-white hover:bg-white/20 hover:text-white"
@@ -122,12 +122,12 @@ export const ServicesTab = memo(({ servicesData, onServiceSelect }: Props) => {
           </div>
 
           {/* Projects Grid */}
-          <div id="services-grid" className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div id="services-grid" className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
             {paginatedProjects && paginatedProjects.length > 0 ? (
               paginatedProjects.map((project, index) => (
                 <div
                   key={project.id}
-                  className="animate-fade-in-up"
+                  className="animate-fade-in-up aspect-square w-full"
                   style={{
                     animationDelay: `${index * 80}ms`,
                     animationFillMode: "both",

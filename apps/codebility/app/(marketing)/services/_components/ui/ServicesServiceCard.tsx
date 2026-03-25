@@ -112,10 +112,10 @@ export const ServicesServiceCard = memo(({ service, onSelect }: Props) => {
   };
 
   return (
-    <div className="group cursor-pointer overflow-hidden rounded-xl bg-white/[0.04] ring-1 ring-white/[0.08] transition-all duration-300 hover:bg-white/[0.07] hover:ring-white/[0.16] hover:shadow-[0_8px_30px_rgba(0,0,0,0.3)]">
+    <div className="group flex h-full cursor-pointer flex-col overflow-hidden rounded-xl bg-white/[0.04] ring-1 ring-white/[0.08] transition-all duration-300 hover:bg-white/[0.07] hover:ring-white/[0.16] hover:shadow-[0_8px_30px_rgba(0,0,0,0.3)]">
       {/* Image — consistent 4:3 aspect ratio */}
       <div
-        className="relative aspect-[4/3] w-full overflow-hidden"
+        className="relative w-full flex-1 overflow-hidden"
         onClick={handleClick}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
