@@ -90,3 +90,4 @@ build/**
 distapps/bot/.env
 .env
 apps/codebility/public/assets/onboardingvideos/*.mp4
+.planning/
