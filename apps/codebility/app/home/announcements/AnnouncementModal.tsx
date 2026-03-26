@@ -321,6 +321,40 @@ export const AnnouncementModal: React.FC<AnnouncementModalProps> = ({
     }
   };
 
+  const [draggingId, setDraggingId] = useState<string | null>(null);
+  const [dragOverId, setDragOverId] = useState<string | null>(null);
+
+  const handleDragStart = (e: React.DragEvent, id: AnnouncementCategory) => {
+  setDraggingId(id);
+  e.dataTransfer.effectAllowed = "move";
+  };
+
+  const handleDragOver = (_e: React.DragEvent, id: AnnouncementCategory) => {
+    setDragOverId(id);
+  };
+
+  const handleDragEnd = () => {
+    setDraggingId(null);
+    setDragOverId(null);
+  };
+
+  const handleDrop = (_e: React.DragEvent, targetId: AnnouncementCategory) => {
+    if (!draggingId || draggingId === targetId) return;
+    setTabs((prev) => {
+      const updated = [...prev];
+      const fromIndex = updated.findIndex((t) => t.id === draggingId);
+      const toIndex = updated.findIndex((t) => t.id === targetId);
+      if (fromIndex === -1 || toIndex === -1) return updated;
+      const [moved] = updated.splice(fromIndex, 1);
+      if (moved) {
+        updated.splice(toIndex, 0, moved);
+      }
+      return updated;
+    });
+    setDraggingId(null);
+    setDragOverId(null);
+  };
+
   const handleTabClick = (category: AnnouncementCategory) => {
     setActiveTab(category);
     setEditingCategory(null);
@@ -441,6 +475,12 @@ export const AnnouncementModal: React.FC<AnnouncementModalProps> = ({
                       onClick={handleTabClick}
                       onEdit={(id, label) => setEditingCategory({ id, label })}
                       onDelete={(id) => setDeleteConfirm(id)}
+                      onDragStart={handleDragStart}
+                      onDragOver={handleDragOver}
+                      onDragEnd={handleDragEnd}
+                      onDrop={handleDrop}
+                      isDragging={draggingId === tab.id}
+                      isDragOver={dragOverId === tab.id}
                     />
                   )}
                 </div>
