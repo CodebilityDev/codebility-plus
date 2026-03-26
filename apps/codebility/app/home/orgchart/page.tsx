@@ -11,22 +11,27 @@ async function OrgChartData() {
   const supabase = await createClientServerComponent();
   const { data: orgChartData, error } = await supabase
     .from("codev")
-    .select(
-      "id, first_name, last_name, display_position, image_url, application_status, availability_status",
-    )
+    .select("id, first_name, last_name, display_position, image_url, application_status, availability_status")
     .eq("availability_status", true)
-    .eq("application_status", "passed");
+    .eq("application_status", "passed")
+    .order("first_name", { ascending: true });
 
   if (error) {
     return <div>Error loading organization chart</div>;
   }
 
   const positionOrder: Record<string, number> = {
+    "CEO / Founder": 1,
     "CEO/Founder": 1,
     Admin: 2,
     Marketing: 3,
     "Project Manager": 4,
-    Developer: 5,
+    "Full Stack Developer": 5,
+    "Frontend Developer": 6,
+    "Backend Developer": 7,
+    "Mobile Developer": 8,
+    "UI/UX Designer": 9,
+    Developer: 10,
   };
 
   const sortedData = orgChartData.sort(
@@ -40,20 +45,8 @@ async function OrgChartData() {
 
 const Page = () => {
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-950">
-      <div className="mx-auto max-w-7xl px-6 py-16">
-        <div className="mb-20 text-center">
-          <div className="mb-6">
-            <h1 className="text-5xl font-light tracking-tight text-gray-900 dark:text-white">
-              Our Team
-            </h1>
-            <div className="mx-auto mt-6 h-px w-32 bg-gradient-to-r from-transparent via-customBlue-400 to-transparent"></div>
-          </div>
-          <p className="mx-auto max-w-3xl text-lg font-light text-gray-600 dark:text-gray-300">
-            Meet the extraordinary individuals who drive innovation and excellence in everything we create
-          </p>
-        </div>
-        
+    <div className="min-h-screen">
+      <div className="mx-auto max-w-[1600px] px-6 py-12">
         <div className="relative">
           <Suspense fallback={<OrgChartSkeleton />}>
             <OrgChartData />

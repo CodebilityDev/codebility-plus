@@ -6,8 +6,13 @@ export default async function LeftSidebarServer() {
   const supabase = await createClientServerComponent();
   
   // Get user data server-side
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return null;
+  const { data: authData } = await supabase.auth.getUser();
+  const user = authData?.user;
+  
+  if (!user) {
+    const sidebarData = await getSidebarData(null);
+    return <LeftSidebarClient initialSidebarData={sidebarData} />;
+  }
   
   const { data: userData } = await supabase
     .from("codev")
@@ -15,7 +20,11 @@ export default async function LeftSidebarServer() {
     .eq("id", user.id)
     .single();
     
-  if (!userData) return null;
+  if (!userData) {
+    // Fallback if user exists in auth but not in codev table
+    const sidebarData = await getSidebarData(null);
+    return <LeftSidebarClient initialSidebarData={sidebarData} />;
+  }
   
   // Calculate roleId server-side
   const roleId = userData.internal_status === "INACTIVE" || 
