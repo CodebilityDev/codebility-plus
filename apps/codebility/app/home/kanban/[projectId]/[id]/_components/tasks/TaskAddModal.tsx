@@ -252,6 +252,10 @@ function MemberSelector({
                 placeholder="Search members..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                // FIX CBP-102: Prevents Radix DropdownMenu typeahead from
+                // intercepting keystrokes and shifting focus away from this
+                // input to a matching DropdownMenuItem while the user is typing.
+                onKeyDown={(e) => e.stopPropagation()}
                 className="w-full rounded-md border px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800"
               />
             </div>
