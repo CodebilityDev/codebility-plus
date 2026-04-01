@@ -45,9 +45,9 @@ async function OrgChartData() {
 
 const Page = () => {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen relative">
       <div className="mx-auto max-w-[1600px] px-6 py-12">
-        <div className="relative">
+        <div className="">
           <Suspense fallback={<OrgChartSkeleton />}>
             <OrgChartData />
           </Suspense>

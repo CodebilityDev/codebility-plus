@@ -134,7 +134,7 @@ export default function OrgChart({ data }: OrgChartProps) {
 
   const [mounted, setMounted] = useState(false);
   const { theme, resolvedTheme } = useTheme();
-  const { closeNav } = useNavStore();
+  const { closeNav, isToggleOpen } = useNavStore();
   const { enabled: animEnabled, durationInSeconds: animDuration } = usePageAnimationSettings();
 
   const setExpandedRole = (roleParams: { key: string, title: string } | null) => {
@@ -196,7 +196,7 @@ export default function OrgChart({ data }: OrgChartProps) {
 
   return (
     <div className={cn(
-      "relative w-full lg:h-full flex flex-col items-center transition-all duration-500 lg:overflow-hidden"
+      "w-full lg:h-full flex flex-col items-center transition-all duration-500 lg:overflow-hidden"
     )}>
       {/* Animated Background Decor */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
@@ -249,7 +249,7 @@ export default function OrgChart({ data }: OrgChartProps) {
       </div>
 
       {/* Main Container */}
-      <div className="relative flex-1 w-full grid [grid-template-areas:'stack'] place-items-center items-center lg:overflow-hidden">
+      <div className="flex-1 w-full grid [grid-template-areas:'stack'] place-items-center items-center lg:overflow-hidden">
         {/* Tree View - Always present to serve as backdrop when expanded */}
         <motion.div
           key="tree-view"
@@ -334,7 +334,11 @@ export default function OrgChart({ data }: OrgChartProps) {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 60, scale: 0.98 }}
               transition={{ duration: animEnabled ? animDuration * 0.75 : 0, ease: [0.22, 1, 0.36, 1] }}
-              className="[grid-area:stack] fixed inset-0 z-[50] pb-20 w-full flex flex-col justify-start min-h-screen bg-white/95 dark:bg-gray-950/95 overflow-y-auto px-4 sm:px-8 2xl:px-12 pointer-events-none"
+              className={cn(
+                "fixed bottom-0 right-0 z-[50] pb-20 flex flex-col justify-start bg-white/95 dark:bg-gray-950/95 overflow-y-auto px-4 sm:px-8 2xl:px-12 pointer-events-none transition-all duration-300 left-0",
+                "top-[60px]",
+                isToggleOpen ? "lg:left-64" : "lg:left-20"
+              )}
             >
               {/* Focused Header Section */}
               <div className="mb-12 mt-12 flex flex-col items-center gap-6 w-full pointer-events-auto">
