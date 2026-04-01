@@ -479,7 +479,7 @@ export default function WeeklyTop() {
       const hasData = data && data.points > 0;
       
       rows.push(
-        <TableRow key={i} className={`${getRowStyle(i + 1)} transition-all duration-200 hover:scale-[1.01] hover:shadow-md ${i <= 2 ? 'animate-pulse [animation-duration:3s]' : ''}`}>
+        <TableRow key={i} className={`${getRowStyle(i + 1)} transition-all duration-200 ${i <= 2 ? 'animate-pulse [animation-duration:3s]' : ''}`}>
           <TableCell className="flex items-center gap-2">
             {getRankIcon(i + 1, true)}
             <span className="font-semibold">{i + 1}</span>
@@ -517,7 +517,7 @@ export default function WeeklyTop() {
       const hasData = leader && leader.total_points > 0;
       
       rows.push(
-        <TableRow key={i} className={`${getSoftSkillsRowStyle(i + 1)} transition-all duration-200 hover:scale-[1.01] hover:shadow-md ${i <= 2 ? 'animate-pulse [animation-duration:3s]' : ''}`}>
+        <TableRow key={i} className={`${getSoftSkillsRowStyle(i + 1)} transition-all duration-200 ${i <= 2 ? 'animate-pulse [animation-duration:3s]' : ''}`}>
           <TableCell className="flex items-center gap-2">
             {getRankIcon(i + 1, false)}
             <span className="font-semibold">{i + 1}</span>
@@ -585,7 +585,7 @@ export default function WeeklyTop() {
       const hasData = project && project.total_points > 0;
       
       rows.push(
-        <TableRow key={i} className={`${getRowStyle(i + 1)} transition-all duration-200 hover:scale-[1.01] hover:shadow-md ${i <= 2 ? 'animate-pulse [animation-duration:3s]' : ''}`}>
+        <TableRow key={i} className={`${getRowStyle(i + 1)} transition-all duration-200 ${i <= 2 ? 'animate-pulse [animation-duration:3s]' : ''}`}>
           <TableCell className="flex items-center gap-2">
             {getRankIcon(i + 1, true)}
             <span className="font-semibold">{i + 1}</span>
