@@ -141,7 +141,7 @@ export async function middleware(req: NextRequest) {
     const { data: userData, error: userError } = await supabase
       .from("codev")
       .select("id, application_status, role_id")
-      .eq("id", user.id)
+      .eq("id", user!.id)
       .single();
 
     if (userError || !userData) {
@@ -149,7 +149,7 @@ export async function middleware(req: NextRequest) {
       return redirectToLogin(req);
     }
 
-    const { application_status, role_id } = userData;
+    const { application_status, role_id } = userData || {};
 
     // 4. Handle application status redirects
     if (application_status === "passed") {
@@ -240,7 +240,7 @@ export async function middleware(req: NextRequest) {
         return redirectToLogin(req);
       }
 
-      if (!rolePermissions[requiredPermission]) {
+      if (!(rolePermissions as any)[requiredPermission as string]) {
         return redirectTo(req, "/home");
       }
     }
