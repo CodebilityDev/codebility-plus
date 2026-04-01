@@ -35,7 +35,7 @@ export default function TicketManagementView({
   codevList,
 }: TicketManagementViewProps) {
   const router = useRouter();
-  const { closeNav, toggleNav, isToggleOpen } = useNavStore(); 
+  const { } = useNavStore(); 
   const [selectedTicket, setSelectedTicket] = useState<TicketSupport | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortField, setSortField] = useState<SortField>("created_at");
@@ -44,8 +44,6 @@ export default function TicketManagementView({
   const [filterPriority, setFilterPriority] = useState<string>("ALL");
   const [filterAssignedTo, setFilterAssignedTo] = useState<string>("ALL");
   const [showArchived, setShowArchived] = useState(false);
-
-  const [wasSidebarOpen, setWasSidebarOpen] = useState(false);
 
   
   useEffect(() => {
@@ -130,17 +128,10 @@ export default function TicketManagementView({
 
   const handleTicketSelect = (ticket: TicketSupport) => {
     setSelectedTicket(ticket);
-    setWasSidebarOpen(isToggleOpen);
-    if (isToggleOpen) {
-      closeNav(); 
-    }
   };
 
   const handleCloseSidebar = () => {
     setSelectedTicket(null);
-    if (wasSidebarOpen && !isToggleOpen) {
-      toggleNav(); 
-    }
   };
 
   const handleTicketUpdated = () => {

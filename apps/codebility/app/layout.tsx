@@ -11,6 +11,7 @@ import { TooltipProvider } from "@codevs/ui/tooltip";
 
 const outfit = Outfit({
 	subsets: ["latin"],
+	preload: false,
 });
 
 export async function generateMetadata(): Promise<Metadata> {

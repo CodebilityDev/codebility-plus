@@ -1,22 +1,25 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
 
 export default function ProfileCloseButton() {
+  const router = useRouter();
+
   const handleClose = () => {
-    window.close();
+    // If they came from somewhere within the app, go back. 
+    // In rare cases where they opened directly, they might need to go home, but router.back() handles history.
+    router.back();
   };
 
   return (
-    <Link href="/">
-      <Button
-        variant="hollow"
-        className="bg-black-200 flex gap-2 border-zinc-700 text-white"
-        onClick={handleClose}
-      >
-        Close
-      </Button>
-    </Link>
+    <button
+      onClick={handleClose}
+      aria-label="Go back"
+      className="text-white hover:text-gray-300 transition-colors"
+    >
+      <X className="h-6 w-6" />
+    </button>
   );
 }

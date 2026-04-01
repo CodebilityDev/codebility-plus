@@ -1,149 +1,117 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@codevs/ui/card";
 import { Skeleton } from "@codevs/ui/skeleton";
+import { cn } from "@/lib/utils";
 
-const TeamMemberSkeleton = ({ delay = 0 }: { delay?: number }) => (
-  <Card className="h-32 w-36 overflow-hidden border-2 border-gray-200 shadow-lg dark:border-gray-700 animate-pulse" style={{ animationDelay: `${delay}s` }}>
-    <CardContent className="flex h-full flex-col items-center justify-center gap-1 p-2">
-      <div className="relative overflow-hidden">
-        <Skeleton className="h-12 w-12 rounded-full bg-gray-200 dark:bg-gray-700" />
-        <div 
-          className="absolute inset-0 h-12 w-12 rounded-full bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer -translate-x-full" 
-          style={{ animationDelay: `${delay + 0.5}s` }}
-        />
+const MemberPillSkeleton = ({ size = "md" }: { size?: "md" | "lg" }) => {
+  const isLg = size === "lg";
+  return (
+    <div className={cn(
+      "flex items-center gap-4 sm:gap-5 rounded-2xl border-2 border-gray-100 dark:border-gray-800/60 bg-white/50 dark:bg-gray-900/40 shadow-sm p-3 sm:p-4 pr-4 sm:pr-8 w-full backdrop-blur-sm animate-pulse",
+      isLg ? "max-w-[340px]" : "max-w-[320px] sm:max-w-none sm:min-w-[300px]"
+    )}>
+      <Skeleton className={cn("rounded-xl flex-shrink-0 bg-gray-200 dark:bg-gray-800", isLg ? "h-14 w-14 sm:h-16 sm:w-16" : "h-10 w-10 sm:h-12 sm:w-12")} />
+      <div className="flex flex-col gap-2.5 w-full">
+        <Skeleton className={cn("bg-gray-200 dark:bg-gray-800", isLg ? "h-4 w-32" : "h-3 w-28")} />
+        <Skeleton className={cn("bg-gray-200 dark:bg-gray-800", isLg ? "h-3 w-24" : "h-2 w-20")} />
       </div>
-      <div className="text-center space-y-1 w-full">
-        <div className="relative overflow-hidden">
-          <Skeleton className="h-3 w-20 mx-auto bg-gray-200 dark:bg-gray-700" />
-          <div 
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer -translate-x-full" 
-            style={{ animationDelay: `${delay + 0.7}s` }}
-          />
-        </div>
-        <div className="relative overflow-hidden">
-          <Skeleton className="h-2 w-16 mx-auto bg-gray-200 dark:bg-gray-700" />
-          <div 
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer -translate-x-full" 
-            style={{ animationDelay: `${delay + 0.9}s` }}
-          />
-        </div>
-      </div>
-    </CardContent>
-  </Card>
-);
+    </div>
+  );
+};
 
-const DepartmentSkeleton = ({ title, memberCount = 3, color }: { title: string; memberCount?: number; color: string }) => (
-  <div className="flex flex-col items-center">
-    <Card className="mb-4 w-full max-w-sm overflow-hidden border-0 shadow-lg">
-      <CardContent className={`bg-gradient-to-r ${color} p-2 text-center`}>
-        <p className="text-sm font-bold text-white">{title}</p>
-      </CardContent>
-    </Card>
-    <div className="relative mb-4">
-      <div className="h-6 w-1 bg-gradient-to-b from-gray-400 to-gray-200 dark:from-gray-600 dark:to-gray-700" />
-      <div className="absolute -bottom-1 left-1/2 h-2 w-2 -translate-x-1/2 rounded-full bg-gray-400 dark:bg-gray-600" />
+const RolePillSkeleton = () => (
+  <div className="animate-pulse h-14 sm:h-16 w-full max-w-[320px] sm:min-w-[300px] flex items-center justify-between gap-4 sm:gap-6 rounded-2xl border-2 border-gray-100 dark:border-gray-800/60 bg-white/50 dark:bg-gray-900/40 px-4 sm:px-8 shadow-sm backdrop-blur-sm">
+    <div className="flex items-center gap-3 sm:gap-4 truncate mr-2 w-full">
+      <Skeleton className="h-4 w-4 rounded-full bg-gray-200 dark:bg-gray-800 flex-shrink-0" />
+      <Skeleton className="h-4 w-28 bg-gray-200 dark:bg-gray-800" />
     </div>
-    <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-      {Array.from({ length: memberCount }).map((_, index) => (
-        <TeamMemberSkeleton key={index} delay={index * 0.1} />
-      ))}
-    </div>
+    <Skeleton className="h-7 w-7 rounded-lg bg-gray-200 dark:bg-gray-800 flex-shrink-0" />
   </div>
 );
 
-const DeveloperTeamSkeleton = ({ title, memberCount = 4, color }: { title: string; memberCount?: number; color: string }) => (
-  <div className="flex flex-col items-center">
-    <Card className="mb-4 w-full max-w-md overflow-hidden border-0 shadow-lg">
-      <CardContent className={`bg-gradient-to-r ${color} p-2 text-center`}>
-        <p className="text-sm font-bold text-white">{title}</p>
-      </CardContent>
-    </Card>
-    <div className="relative mb-4">
-      <div className="h-6 w-1 bg-gradient-to-b from-gray-400 to-gray-200 dark:from-gray-600 dark:to-gray-700" />
-      <div className="absolute -bottom-1 left-1/2 h-2 w-2 -translate-x-1/2 rounded-full bg-gray-400 dark:bg-gray-600" />
-    </div>
-    <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-      {Array.from({ length: memberCount }).map((_, index) => (
-        <TeamMemberSkeleton key={index} delay={index * 0.1} />
-      ))}
-    </div>
+const VerticalConnectorSkeleton = () => (
+  <div className="flex lg:hidden h-10 w-[2px] bg-gray-200 dark:bg-gray-800 relative my-2 z-0 animate-pulse">
+    <div className="absolute top-0 -left-[5px] h-3 w-3 rounded-full bg-gray-300 dark:bg-gray-700" />
+    <div className="absolute bottom-0 -left-[5px] h-3 w-3 rounded-full bg-gray-300 dark:bg-gray-700" />
+  </div>
+);
+
+const HorizontalConnectorSkeleton = ({ crossbar, flexGrow, count, coreCount }: any) => (
+  <div className={cn("hidden lg:flex relative h-full items-center justify-center pointer-events-none z-0 animate-pulse", flexGrow ? "flex-grow min-w-[30px] xl:min-w-[60px]" : "w-16 xl:w-24")}>
+    <Skeleton className="w-full h-[2px] bg-gray-200 dark:bg-gray-800" />
+    
+    <div className="absolute left-0 h-3 w-3 -ml-1.5 rounded-full bg-gray-300 dark:bg-gray-700" />
+
+    {crossbar && count && count > 1 && (
+      <>
+        {coreCount && coreCount > 1 && (
+           <Skeleton
+             className="absolute left-0 w-[2px] bg-gray-200 dark:bg-gray-800" 
+             style={{ height: `${(coreCount - 1) * 112}px` }} 
+           />
+        )}
+        <Skeleton
+          className="absolute right-0 w-[2px] bg-gray-200 dark:bg-gray-800" 
+          style={{ height: `${(count - 1) * 96}px` }} 
+        />
+        <div className="absolute right-0 h-3 w-3 -mr-1.5 rounded-full bg-gray-300 dark:bg-gray-700" />
+      </>
+    )}
+    
+    {!crossbar && (
+       <>
+         <Skeleton
+           className="absolute right-0 w-[2px] bg-gray-200 dark:bg-gray-800" 
+           style={{ height: `${2 * 112}px` }} 
+         />
+         <div className="absolute right-0 h-3 w-3 -mr-1.5 rounded-full bg-gray-300 dark:bg-gray-700" />
+       </>
+    )}
   </div>
 );
 
 export default function OrgChartSkeleton() {
   return (
-    <div className="mx-auto w-full">
-      <CardHeader className="mb-8 text-center">
-        <CardTitle className="bg-gradient-to-r from-customBlue-600 to-purple-600 bg-clip-text text-3xl font-bold text-transparent">
-          CODEBILITY
-        </CardTitle>
-        <p className="mt-1 text-lg text-gray-600 dark:text-gray-400">Organizational Chart</p>
-      </CardHeader>
-
-      {/* CEO Section */}
-      <div className="mb-8 flex flex-col items-center">
-        <div className="relative">
-          <div className="absolute -inset-2 rounded-lg bg-gradient-to-r from-yellow-400 to-orange-400 opacity-20 blur-lg animate-pulse" />
-          <TeamMemberSkeleton delay={0.2} />
-        </div>
-        <div className="relative my-4">
-          <div className="h-8 w-1 bg-gradient-to-b from-gray-400 to-gray-200 dark:from-gray-600 dark:to-gray-700" />
-          <div className="absolute -bottom-2 left-1/2 h-3 w-3 -translate-x-1/2 rounded-full bg-gray-400 dark:bg-gray-600" />
+    <div className="relative w-full pt-8 pb-32 flex flex-col items-center min-h-[calc(100vh-80px)] overflow-x-hidden">
+      <div className="w-full max-w-[1600px] px-8 2xl:px-12 mb-16">
+        <div className="flex flex-col gap-4 animate-pulse">
+          <Skeleton className="h-12 w-[220px] bg-gray-200 dark:bg-gray-800 rounded-lg self-start" />
+          <div className="flex flex-col gap-2 mt-2">
+            <Skeleton className="h-4 w-full max-w-2xl bg-gray-200 dark:bg-gray-800" />
+            <Skeleton className="h-4 w-3/4 max-w-xl bg-gray-200 dark:bg-gray-800" />
+          </div>
         </div>
       </div>
 
-      {/* Admin, Marketing, PM Section */}
-      <div className="relative mb-8">
-        <div className="absolute left-1/2 top-0 h-px w-3/4 -translate-x-1/2 bg-gradient-to-r from-transparent via-gray-300 to-transparent dark:via-gray-600" />
-        <div className="grid w-full grid-cols-1 gap-6 pt-6 md:grid-cols-3">
-          <DepartmentSkeleton 
-            title="ADMIN" 
-            memberCount={2} 
-            color="from-customBlue-500 to-cyan-500" 
-          />
-          <DepartmentSkeleton 
-            title="MARKETING" 
-            memberCount={1} 
-            color="from-purple-500 to-pink-500" 
-          />
-          <DepartmentSkeleton 
-            title="PROJECT MANAGERS" 
-            memberCount={2} 
-            color="from-green-500 to-emerald-500" 
-          />
-        </div>
-      </div>
+      <div className="relative w-full grid [grid-template-areas:'stack'] place-items-center items-start overflow-hidden">
+        <div className="[grid-area:stack] flex items-center justify-center w-full max-w-[1600px] px-4 sm:px-8 2xl:px-12 pb-20 z-10 transition-all pointer-events-none">
+          <div className="flex flex-col lg:flex-row items-center gap-6 lg:gap-0 w-full max-w-6xl mx-auto justify-center lg:justify-between">
+            
+            <div className="flex-shrink-0 flex flex-col items-center z-10 relative w-full lg:w-auto px-2 sm:px-4">
+              <MemberPillSkeleton size="lg" />
+            </div>
 
-      {/* Developers Section */}
-      <div className="relative">
-        <div className="absolute left-1/2 top-0 h-px w-4/5 -translate-x-1/2 bg-gradient-to-r from-transparent via-gray-300 to-transparent dark:via-gray-600" />
-        <div className="grid w-full grid-cols-1 gap-8 pt-6 md:grid-cols-2 xl:grid-cols-3">
-          <DeveloperTeamSkeleton 
-            title="FULL STACK DEVELOPERS" 
-            memberCount={6} 
-            color="from-indigo-500 to-customBlue-500" 
-          />
-          <DeveloperTeamSkeleton 
-            title="FRONTEND DEVELOPERS" 
-            memberCount={4} 
-            color="from-customTeal-500 to-green-500" 
-          />
-          <DeveloperTeamSkeleton 
-            title="BACKEND DEVELOPERS" 
-            memberCount={3} 
-            color="from-orange-500 to-red-500" 
-          />
-          <DeveloperTeamSkeleton 
-            title="MOBILE DEVELOPERS" 
-            memberCount={2} 
-            color="from-purple-500 to-pink-500" 
-          />
-          <DeveloperTeamSkeleton 
-            title="UI/UX DESIGNERS" 
-            memberCount={3} 
-            color="from-customViolet-500 to-purple-500" 
-          />
+            <VerticalConnectorSkeleton />
+            <HorizontalConnectorSkeleton flexGrow />
+
+            <div className="flex flex-col gap-4 lg:gap-12 w-full lg:w-auto items-center z-10 relative px-2 sm:px-4">
+              <RolePillSkeleton />
+              <RolePillSkeleton />
+              <RolePillSkeleton />
+            </div>
+
+            <VerticalConnectorSkeleton />
+            <HorizontalConnectorSkeleton crossbar flexGrow count={5} coreCount={3} />
+
+            <div className="flex flex-col gap-4 lg:gap-8 w-full lg:w-auto items-center z-10 relative px-2 sm:px-4">
+              <RolePillSkeleton />
+              <RolePillSkeleton />
+              <RolePillSkeleton />
+              <RolePillSkeleton />
+              <RolePillSkeleton />
+            </div>
+
+          </div>
         </div>
       </div>
     </div>
