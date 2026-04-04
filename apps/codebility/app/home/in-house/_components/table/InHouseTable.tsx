@@ -40,6 +40,7 @@ import { columns } from "./columns";
 import { EditableRow, Role } from "./EditableRow";
 import { TableActions } from "./TableActions";
 import { InHouseMobileTable } from "./InHouseMobileTable";
+import InHousePreviewSidebar from "./InHousePreviewSidebar";
 
 interface NdaEmailDialogProps {
   codev: Codev;
@@ -134,6 +135,7 @@ export function InHouseTable({
   const [supabase, setSupabase] = useState<any>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [roles, setRoles] = useState<Role[]>([]);
+  const [selectedMember, setSelectedMember] = useState<Codev | null>(null);
 
   const totalPages = useMemo(
     () => Math.ceil(data.length / pageSize.applicants),
@@ -359,6 +361,18 @@ export function InHouseTable({
         onSort={onSort}
       />
 
+      {selectedMember && (
+        <InHousePreviewSidebar
+          member={selectedMember}
+          roles={roles}
+          onClose={() => setSelectedMember(null)}
+          onUpdated={onDataChange}
+          onSendNdaEmail={handleSendNdaEmail}
+          onDownloadNda={handleDownloadNda}
+          onDownloadSignature={handleDownloadSignature}
+        />
+      )}
+
       {/* COMPACT: Using table-auto with specific column widths to prevent overflow */}
       <div className="border-light-700 dark:border-dark-200 bg-light-300 dark:bg-dark-100 hidden overflow-x-auto rounded-lg border xl:block">
         <Table className="w-full table-fixed">
@@ -393,7 +407,7 @@ export function InHouseTable({
                   /* COMPACT: Status badge column */
                   <TableHead
                     key={column.key}
-                    className="dark:text-light-900 hidden w-24 px-2 py-2 text-xs font-bold text-black 2xl:table-cell"
+                    className="dark:text-light-900 w-24 px-2 py-2 text-xs font-bold text-black"
                   >
                     {column.label}
                   </TableHead>
@@ -401,7 +415,7 @@ export function InHouseTable({
                   /* COMPACT: Role column */
                   <TableHead
                     key={column.key}
-                    className="dark:text-light-900 hidden w-20 px-2 py-2 text-xs font-bold text-black 2xl:table-cell"
+                    className="dark:text-light-900 w-28 px-2 py-2 text-xs font-bold text-black"
                   >
                     {column.label}
                   </TableHead>
@@ -409,68 +423,23 @@ export function InHouseTable({
                   /* COMPACT: Position - sortable */
                   <TableHead
                     key={column.key}
-                    className="dark:text-light-900 hidden w-32 cursor-pointer px-2 py-2 text-xs font-bold text-black hover:bg-light-700 dark:hover:bg-dark-400 2xl:table-cell"
+                    className="dark:text-light-900 w-36 cursor-pointer px-2 py-2 text-xs font-bold text-black hover:bg-light-700 dark:hover:bg-dark-400"
                     onClick={() => onSort?.("display_position")}
                   >
                     {column.label}
                     <SortIndicator columnKey="display_position" />
                   </TableHead>
-                ) : column.key === "projects" ? (
-                  /* COMPACT: Projects column */
-                  <TableHead
-                    key={column.key}
-                    className="dark:text-light-900 hidden w-32 px-2 py-2 text-xs font-bold text-black 2xl:table-cell"
-                  >
-                    {column.label}
-                  </TableHead>
-                ) : column.key === "nda_status" ? (
-                  /* COMPACT: NDA Status - needs more width for buttons */
-                  <TableHead
-                    key={column.key}
-                    className="dark:text-light-900 hidden w-36 px-2 py-2 text-xs font-bold text-black 2xl:table-cell"
-                  >
-                    {column.label}
-                  </TableHead>
-                ) : column.key === "portfolio_website" ? (
-                  /* COMPACT: Portfolio column - small */
-                  <TableHead
-                    key={column.key}
-                    className="dark:text-light-900 hidden w-16 px-2 py-2 text-xs font-bold text-black 2xl:table-cell"
-                  >
-                    {column.label}
-                  </TableHead>
-                ) : column.key === "date_joined" ? (
-                  /* COMPACT: Date - sortable */
-                  <TableHead
-                    key={column.key}
-                    className="dark:text-light-900 hidden w-24 cursor-pointer px-2 py-2 text-xs font-bold text-black hover:bg-light-700 dark:hover:bg-dark-400 2xl:table-cell"
-                    onClick={() => onSort?.("date_joined")}
-                  >
-                    {column.label}
-                    <SortIndicator columnKey="date_joined" />
-                  </TableHead>
-                ) : column.key === "availability_status" ? (
-                  /* COMPACT: Availability toggle */
-                  <TableHead
-                    key={column.key}
-                    className="dark:text-light-900 hidden w-20 px-2 py-2 text-xs font-bold text-black 2xl:table-cell"
-                  >
-                    Avail.
-                  </TableHead>
                 ) : (
-                  /* COMPACT: Other columns */
+                  /* COMPACT: Other columns fallback */
                   <TableHead
-                    key={column.key}
-                    className="dark:text-light-900 hidden px-2 py-2 text-xs font-bold text-black 2xl:table-cell"
+                    key={(column as any).key}
+                    className="dark:text-light-900 px-2 py-2 text-xs font-bold text-black"
                   >
-                    {column.label}
+                    {(column as any).label}
                   </TableHead>
                 ),
               )}
 
-              <TableHead className="dark:text-light-900 px-2 py-2 text-xs font-bold text-black 2xl:hidden">
-                Info
-              </TableHead>
               <TableHead className="dark:text-light-900 w-16 px-2 py-2 text-xs font-bold text-black">
                 Actions
               </TableHead>
@@ -493,7 +462,8 @@ export function InHouseTable({
               ) : (
                 <TableRow
                   key={item.id}
-                  className="border-light-700 dark:border-dark-200 hover:bg-light-800 dark:hover:bg-dark-300 odd:dark:bg-dark-200 odd:bg-grey-100/10 border-b border-gray-200 dark:border-gray-700"
+                  onClick={() => setSelectedMember(item)}
+                  className="cursor-pointer border-light-700 dark:border-dark-200 hover:bg-light-800 dark:hover:bg-dark-300 odd:dark:bg-dark-200 odd:bg-grey-100/10 border-b"
                 >
                   {/* COMPACT: Avatar px-6 → px-2, h-10 w-10 → h-8 w-8 */}
                   <TableCell className="dark:text-light-900 px-2 py-2 text-xs text-black">
@@ -524,275 +494,34 @@ export function InHouseTable({
                     {item.email_address}
                   </TableCell>
 
-                  {/* COMPACT: Mobile Info Dropdown px-4 → px-2, py-3 → py-2 */}
-                  <TableCell className="dark:text-light-900 flex items-start justify-start px-2 py-2 text-xs text-black 2xl:hidden">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <span className="cursor-pointer hover:text-gray-600">
-                          ⋯
-                        </span>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-56">
-                        <DropdownMenuLabel>Users Info</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuGroup>
-                          <DropdownMenuItem>
-                            Role
-                            <DropdownMenuShortcut>
-                              {item.role_id
-                                ? roles.find((role) => role.id === item.role_id)
-                                    ?.name || "-"
-                                : "-"}
-                            </DropdownMenuShortcut>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            Position
-                            <DropdownMenuShortcut>
-                              {typeof item.display_position === "string"
-                                ? capitalize(item.display_position)
-                                : "-"}
-                            </DropdownMenuShortcut>
-                          </DropdownMenuItem>
-                          <DropdownMenuSub>
-                            <DropdownMenuSubTrigger>
-                              Projects
-                            </DropdownMenuSubTrigger>
-                            <DropdownMenuPortal>
-                              <DropdownMenuSubContent>
-                                {item.projects?.length ? (
-                                  <DropdownMenuItem className="space-y-1">
-                                    {item.projects.map((project) => (
-                                      <div key={project.id}>{project.name}</div>
-                                    ))}
-                                  </DropdownMenuItem>
-                                ) : (
-                                  <DropdownMenuItem>-</DropdownMenuItem>
-                                )}
-                              </DropdownMenuSubContent>
-                            </DropdownMenuPortal>
-                          </DropdownMenuSub>
-                          <DropdownMenuSub>
-                            <DropdownMenuSubTrigger>
-                              NDA Status
-                            </DropdownMenuSubTrigger>
-                            <DropdownMenuPortal>
-                              <DropdownMenuSubContent>
-                                <DropdownMenuItem className="flex items-center gap-2">
-                                  <span
-                                    className={`${getNdaStatusColor(item.nda_status)}`}
-                                  >
-                                    {item.nda_status ? "Yes" : "No"}
-                                  </span>
-
-                                  {item.nda_status ? (
-                                    <div className="flex gap-1">
-                                      <Button
-                                        variant="outline"
-                                        size="sm"
-                                        className="text-green-500 hover:text-green-600 dark:text-green-200 dark:hover:text-green-300"
-                                        onClick={() => handleDownloadNda(item.id)}
-                                      >
-                                        <Download className="mr-1 h-3 w-3" />
-                                        PDF
-                                      </Button>
-                                      {/* CHANGED: "Sig" → "Signature" */}
-                                      <Button
-                                        variant="outline"
-                                        size="sm"
-                                        className="text-blue-500 hover:text-blue-600 dark:text-blue-200 dark:hover:text-blue-300"
-                                        onClick={() =>
-                                          handleDownloadSignature(item.id)
-                                        }
-                                      >
-                                        <Download className="mr-1 h-3 w-3" />
-                                        Signature
-                                      </Button>
-                                    </div>
-                                  ) : item.nda_request_sent ? (
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      className="ml-2 text-yellow-500 dark:text-yellow-200"
-                                      disabled
-                                    >
-                                      <span className="mr-1">⏳</span>
-                                      Pending
-                                    </Button>
-                                  ) : (
-                                    <SendNdaButton
-                                      codev={item}
-                                      onSendNdaEmail={handleSendNdaEmail}
-                                    />
-                                  )}
-                                </DropdownMenuItem>
-                              </DropdownMenuSubContent>
-                            </DropdownMenuPortal>
-                          </DropdownMenuSub>
-                          <DropdownMenuSub>
-                            <DropdownMenuSubTrigger>
-                              Portfolio
-                            </DropdownMenuSubTrigger>
-                            <DropdownMenuPortal>
-                              <DropdownMenuSubContent>
-                                <DropdownMenuItem>
-                                  {item.portfolio_website ? (
-                                    <a
-                                      href={item.portfolio_website}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="inline-flex items-center text-blue-500 hover:text-blue-600 dark:text-blue-200 dark:hover:text-blue-300"
-                                    >
-                                      <Link2 className="mr-1 h-4 w-4" />
-                                      Portfolio
-                                    </a>
-                                  ) : (
-                                    "-"
-                                  )}
-                                </DropdownMenuItem>
-                              </DropdownMenuSubContent>
-                            </DropdownMenuPortal>
-                          </DropdownMenuSub>
-                        </DropdownMenuGroup>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuGroup>
-                          <DropdownMenuItem>
-                            Status
-                            <DropdownMenuShortcut>
-                              <StatusBadge
-                                status={item.internal_status as InternalStatus}
-                              />
-                            </DropdownMenuShortcut>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            Availability Status
-                            <DropdownMenuShortcut>
-                              <SwitchStatusButton
-                                disabled={false}
-                                handleSwitch={() => {}}
-                                isActive={item.availability_status ?? false}
-                              />
-                            </DropdownMenuShortcut>
-                          </DropdownMenuItem>
-                        </DropdownMenuGroup>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-
                   {/* COMPACT: All desktop columns px-4 → px-2, py-3 → py-2, text-base → text-xs */}
-                  <TableCell className="hidden px-2 py-2 2xl:table-cell">
-                    <StatusBadge
-                      status={item.internal_status as InternalStatus}
-                    />
-                  </TableCell>
-
-                  <TableCell className="dark:text-light-900 hidden px-2 py-2 text-xs text-black 2xl:table-cell">
+                  <TableCell className="dark:text-light-900 px-2 py-2 text-xs text-black">
                     {item.role_id
                       ? roles.find((role) => role.id === item.role_id)?.name ||
                         "-"
                       : "-"}
                   </TableCell>
 
-                  <TableCell className="dark:text-light-900 hidden px-2 py-2 text-xs text-black 2xl:table-cell">
+                  <TableCell className="dark:text-light-900 px-2 py-2 text-xs text-black">
                     {typeof item.display_position === "string"
                       ? capitalize(item.display_position)
                       : "-"}
                   </TableCell>
 
-                  <TableCell className="dark:text-light-900 hidden px-2 py-2 text-xs text-black 2xl:table-cell">
-                    {item.projects?.length ? (
-                      <div className="space-y-0.5">
-                        {item.projects.map((project) => (
-                          <div key={project.id}>{project.name}</div>
-                        ))}
-                      </div>
-                    ) : (
-                      "-"
-                    )}
-                  </TableCell>
-
-                  {/* COMPACT: NDA Status column - compact buttons */}
-                  <TableCell className="dark:text-light-900 hidden px-2 py-2 text-xs text-black 2xl:table-cell">
-                    <div className="flex items-center gap-1">
-                      <span className={`${getNdaStatusColor(item.nda_status)}`}>
-                        {item.nda_status ? "Yes" : "No"}
-                      </span>
-
-                      {item.nda_status ? (
-                        <div className="flex gap-1">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="h-6 px-2 text-[10px] text-green-500 hover:text-green-600 dark:text-green-200 dark:hover:text-green-300"
-                            onClick={() => handleDownloadNda(item.id)}
-                          >
-                            <Download className="mr-0.5 h-2.5 w-2.5" />
-                            PDF
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="h-6 px-2 text-[10px] text-blue-500 hover:text-blue-600 dark:text-blue-200 dark:hover:text-blue-300"
-                            onClick={() => handleDownloadSignature(item.id)}
-                          >
-                            <Download className="mr-0.5 h-2.5 w-2.5" />
-                            Sig
-                          </Button>
-                        </div>
-                      ) : item.nda_request_sent ? (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="h-6 px-2 text-[10px] text-yellow-500 dark:text-yellow-200"
-                          disabled
-                        >
-                          <span className="mr-0.5">⏳</span>
-                          Pending
-                        </Button>
-                      ) : (
-                        <SendNdaButton
-                          codev={item}
-                          onSendNdaEmail={handleSendNdaEmail}
-                        />
-                      )}
-                    </div>
-                  </TableCell>
-
-                  <TableCell className="dark:text-light-900 hidden px-2 py-2 text-xs text-black 2xl:table-cell">
-                    {item.portfolio_website ? (
-                      <a
-                        href={item.portfolio_website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center text-blue-500 hover:text-blue-600 dark:text-blue-200 dark:hover:text-blue-300"
-                      >
-                        <Link2 className="mr-0.5 h-3 w-3" />
-                        Link
-                      </a>
-                    ) : (
-                      "-"
-                    )}
-                  </TableCell>
-
-                  <TableCell className="dark:text-light-900 hidden px-2 py-2 text-xs text-black 2xl:table-cell">
-                    {item.date_joined
-                      ? new Date(item.date_joined).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' })
-                      : "-"}
-                  </TableCell>
-
-                  <TableCell className="dark:text-light-900 hidden px-2 py-2 text-xs text-black 2xl:table-cell">
-                    <SwitchStatusButton
-                      disabled={false}
-                      handleSwitch={() => {}}
-                      isActive={item.availability_status ?? false}
+                  <TableCell className="px-2 py-2">
+                    <StatusBadge
+                      status={item.internal_status as InternalStatus}
                     />
                   </TableCell>
 
                   <TableCell className="px-2 py-2">
-                    <TableActions
-                      item={item}
-                      onEdit={() => setEditingId(item.id)}
-                      onDelete={() => handleDelete(item.id)}
-                    />
+                    <div onClick={(e) => e.stopPropagation()}>
+                      <TableActions
+                        item={item}
+                        onEdit={() => setEditingId(item.id)}
+                        onDelete={() => handleDelete(item.id)}
+                      />
+                    </div>
                   </TableCell>
                 </TableRow>
               ),
