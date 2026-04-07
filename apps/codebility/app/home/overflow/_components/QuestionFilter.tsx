@@ -385,11 +385,11 @@ export default function SearchFilter({
           )}
         </div>
 
-        {/* Right Column: Top Answer Board */}
+        {/* Right Column: Top Streak Board */}
         <div className="w-40 md:w-52 lg:w-[220px] xl:w-[300px] flex-shrink-0">
           <Label className="dark:text-light-900 mb-1.5 flex items-center gap-2 text-sm font-medium text-black">
             <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-            Top Answer Board
+            Top Streak Board
           </Label>
           <div
             className="overflow-y-auto divide-y divide-light-700 dark:divide-dark-200 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600"
