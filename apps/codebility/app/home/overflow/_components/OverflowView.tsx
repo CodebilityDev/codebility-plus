@@ -2,12 +2,12 @@
 
 import { useState, useEffect, useTransition } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Loader2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { Plus, Loader2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Clock, Flame } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import PostQuestionModal from "./PostQuestionModal";
 import QuestionCard from "./QuestionCard";
 import SearchFilter, { FilterOptions } from "./QuestionFilter";
-import { fetchQuestions, Question, postQuestion, getSocialPoints } from '../actions';
+import { fetchQuestions, Question, postQuestion, getSocialPoints, fetchTrendingTopics, TrendingTopic } from '../actions';
 
 type Author = {
   id: string;
@@ -19,12 +19,50 @@ interface OverflowViewProps {
   author: Author;
 }
 
-function Pagination({ 
-  currentPage, 
-  totalPages, 
-  onPageChange, 
-  isLoading 
-}: { 
+// ── helpers ───────────────────────────────────────────────────────────────────
+
+function getInitials(name: string) {
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+}
+
+function timeAgo(dateStr: string) {
+  const seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+  if (seconds < 60) return `${seconds}s ago`;
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  return `${Math.floor(hours / 24)}d ago`;
+}
+
+const AVATAR_COLORS = [
+  "bg-blue-100 text-blue-700",
+  "bg-green-100 text-green-700",
+  "bg-amber-100 text-amber-700",
+  "bg-purple-100 text-purple-700",
+  "bg-pink-100 text-pink-700",
+  "bg-teal-100 text-teal-700",
+];
+
+function avatarColor(id: string) {
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) hash = id.charCodeAt(i) + ((hash << 5) - hash);
+  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
+}
+
+// ── Pagination ────────────────────────────────────────────────────────────────
+
+function Pagination({
+  currentPage,
+  totalPages,
+  onPageChange,
+  isLoading,
+}: {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
@@ -35,33 +73,22 @@ function Pagination({
     const maxVisible = 5;
 
     if (totalPages <= maxVisible + 2) {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
-      }
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
     } else {
       pages.push(1);
-
       if (currentPage <= 3) {
-        for (let i = 2; i <= Math.min(5, totalPages - 1); i++) {
-          pages.push(i);
-        }
-        pages.push('...');
+        for (let i = 2; i <= Math.min(5, totalPages - 1); i++) pages.push(i);
+        pages.push("...");
       } else if (currentPage >= totalPages - 2) {
-        pages.push('...');
-        for (let i = totalPages - 4; i < totalPages; i++) {
-          pages.push(i);
-        }
+        pages.push("...");
+        for (let i = totalPages - 4; i < totalPages; i++) pages.push(i);
       } else {
-        pages.push('...');
-        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
-          pages.push(i);
-        }
-        pages.push('...');
+        pages.push("...");
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) pages.push(i);
+        pages.push("...");
       }
-
       pages.push(totalPages);
     }
-
     return pages;
   };
 
@@ -78,7 +105,6 @@ function Pagination({
       >
         <ChevronsLeft className="h-4 w-4" />
       </Button>
-
       <Button
         variant="outline"
         size="sm"
@@ -88,20 +114,17 @@ function Pagination({
       >
         <ChevronLeft className="h-4 w-4" />
       </Button>
-
       <div className="flex items-center gap-1">
         {getPageNumbers().map((page, index) => {
-          if (page === '...') {
+          if (page === "...") {
             return (
               <span key={`ellipsis-${index}`} className="px-2 text-gray-500">
                 ...
               </span>
             );
           }
-
           const pageNumber = page as number;
           const isActive = pageNumber === currentPage;
-
           return (
             <Button
               key={pageNumber}
@@ -120,7 +143,6 @@ function Pagination({
           );
         })}
       </div>
-
       <Button
         variant="outline"
         size="sm"
@@ -130,7 +152,6 @@ function Pagination({
       >
         <ChevronRight className="h-4 w-4" />
       </Button>
-
       <Button
         variant="outline"
         size="sm"
@@ -144,6 +165,221 @@ function Pagination({
   );
 }
 
+// ── TopTrendingTopics ─────────────────────────────────────────────────────────
+
+function TopTrendingTopics({
+  topics,
+  onTagClick,
+}: {
+  topics: TrendingTopic[];
+  onTagClick: (tag: string) => void;
+}) {
+  const maxPosts = Math.max(...topics.map((t) => t.posts), 1);
+
+  if (topics.length === 0) return null;
+
+  return (
+    <div className="w-full rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-white dark:bg-gray-800 shadow-sm">
+      {/* Header */}
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/80">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
+          <path d="M12 2C12 2 7 8 7 13a5 5 0 0010 0c0-5-5-11-5-11z" fill="#EF9F27" />
+          <path
+            d="M12 13c0 0-2.5-2-2.5-4.5 0 0-1.5 1.5-1.5 3.5a4 4 0 008 0c0-2-1.5-4-1.5-4S12 10.5 12 13z"
+            fill="#BA7517"
+          />
+        </svg>
+        <span className="text-sm font-semibold text-gray-900 dark:text-white">
+          Top trending topics
+        </span>
+        <span className="ml-auto text-xs text-gray-400 dark:text-gray-500">
+          Last 7 days
+        </span>
+      </div>
+
+      {/* Rows */}
+      <div className="divide-y divide-gray-100 dark:divide-gray-700">
+        {topics.map((t) => {
+          const isTop3 = t.rank <= 3;
+          const barWidth = Math.round((t.posts / maxPosts) * 100);
+
+          return (
+            <div
+              key={t.tag}
+              className="flex items-center gap-2 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+            >
+              {/* Rank */}
+              <span
+                className={`w-4 text-center text-xs shrink-0 ${
+                  isTop3
+                    ? "font-semibold text-violet-500 dark:text-violet-400"
+                    : "font-normal text-gray-400 dark:text-gray-500"
+                }`}
+              >
+                {t.rank}
+              </span>
+
+              {/* Tag pill */}
+              <button
+                onClick={() => onTagClick(t.tag)}
+                className="shrink-0 rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 px-2 py-0.5 text-xs font-medium hover:bg-violet-200 dark:hover:bg-violet-900/60 transition-colors whitespace-nowrap border-none cursor-pointer"
+              >
+                #{t.tag}
+              </button>
+
+              {/* Activity bar */}
+              <div className="flex-1 min-w-0">
+                <div className="h-1 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-violet-400 dark:bg-violet-500 transition-all duration-300"
+                    style={{ width: `${barWidth}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* Posts stat */}
+              <div className="flex items-center gap-1 shrink-0">
+                <span className="text-xs text-gray-400 dark:text-gray-500">posts</span>
+                <span className="text-xs font-semibold text-gray-700 dark:text-gray-200">
+                  {t.posts.toLocaleString()}
+                </span>
+              </div>
+
+              {/* Engagement stat */}
+              <div className="flex items-center gap-1 shrink-0">
+                <span className="text-xs text-gray-400 dark:text-gray-500">eng.</span>
+                <span className="text-xs font-semibold text-gray-700 dark:text-gray-200">
+                  {t.engagement.toLocaleString()}
+                </span>
+              </div>
+
+              {/* Badge */}
+              {t.badge === "Hot" && (
+                <span className="shrink-0 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 px-2 py-0.5 text-xs font-medium">
+                  Hot
+                </span>
+              )}
+              {t.badge === "Rising" && (
+                <span className="shrink-0 rounded-full bg-teal-100 dark:bg-teal-900/40 text-teal-700 dark:text-teal-400 px-2 py-0.5 text-xs font-medium">
+                  Rising
+                </span>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ── RecentSidebar ─────────────────────────────────────────────────────────────
+
+function RecentSidebar({
+  questions,
+  trendingTopics,
+  onTagClick,
+}: {
+  questions: Question[];
+  trendingTopics: TrendingTopic[];
+  onTagClick: (tag: string) => void;
+}) {
+  const recent = [...questions]
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .slice(0, 8);
+
+  return (
+    <aside className="hidden lg:block w-80 shrink-0">
+      <div className="sticky top-6 flex flex-col gap-4">
+
+        {/* Trending Topics */}
+        <TopTrendingTopics topics={trendingTopics} onTagClick={onTagClick} />
+
+        {/* Recent Posts */}
+        <div className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-white dark:bg-gray-800 shadow-sm">
+          {/* Header */}
+          <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/80">
+            <Clock className="h-4 w-4 text-customBlue-500" />
+            <span className="text-sm font-semibold text-gray-900 dark:text-white">
+              Most Recently Posted
+            </span>
+          </div>
+
+          {/* List */}
+          <ul className="divide-y divide-gray-100 dark:divide-gray-700">
+            {recent.length === 0 && (
+              <li className="px-4 py-6 text-center text-sm text-gray-500 dark:text-gray-400">
+                No questions yet
+              </li>
+            )}
+            {recent.map((q) => (
+              <li
+                key={q.id}
+                className="flex items-start gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer"
+                onClick={() => {
+                  const el = document.getElementById(`question-${q.id}`);
+                  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+                }}
+              >
+                {/* Avatar */}
+                <div
+                  className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${avatarColor(q.author.id)}`}
+                >
+                  {q.author.image_url ? (
+                    <img
+                      src={q.author.image_url}
+                      alt={q.author.name}
+                      className="h-7 w-7 rounded-full object-cover"
+                    />
+                  ) : (
+                    getInitials(q.author.name)
+                  )}
+                </div>
+
+                {/* Text */}
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium leading-snug text-gray-900 dark:text-white">
+                    {q.title}
+                  </p>
+                  <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                    {q.author.name} · {timeAgo(q.created_at)}
+                  </p>
+                  {q.tags.length > 0 && (
+                    <div className="mt-1 flex flex-wrap gap-1">
+                      {q.tags.slice(0, 2).map((tag) => (
+                        <span
+                          key={tag}
+                          className="rounded-full bg-blue-50 px-2 py-0.5 text-xs text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                      {q.tags.length > 2 && (
+                        <span className="text-xs text-gray-400">+{q.tags.length - 2}</span>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+
+          {/* Footer */}
+          {recent.length > 0 && (
+            <div className="border-t border-gray-100 dark:border-gray-700 px-4 py-2.5 text-center">
+              <span className="text-xs text-gray-400 dark:text-gray-500">
+                Showing {recent.length} latest submissions
+              </span>
+            </div>
+          )}
+        </div>
+
+      </div>
+    </aside>
+  );
+}
+
+// ── OverflowView ──────────────────────────────────────────────────────────────
+
 export default function OverflowView({ author }: OverflowViewProps) {
   const { toast } = useToast();
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
@@ -152,8 +388,8 @@ export default function OverflowView({ author }: OverflowViewProps) {
   const [isPosting, setIsPosting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [socPoints, setSocPoints] = useState(0);
-  
-  // Search and filter states
+  const [trendingTopics, setTrendingTopics] = useState<TrendingTopic[]>([]);
+  const [solverRefreshKey, setSolverRefreshKey] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
     searchBy: "all",
@@ -161,8 +397,7 @@ export default function OverflowView({ author }: OverflowViewProps) {
     dateFrom: undefined,
     dateTo: undefined,
   });
-  
-  // Pagination states
+
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
@@ -173,9 +408,9 @@ export default function OverflowView({ author }: OverflowViewProps) {
       const points = await getSocialPoints(author.id);
       setSocPoints(points || 0);
     } catch (error) {
-      console.error('Failed to fetch social points:', error);
+      console.error("Failed to fetch social points:", error);
     }
-  }; 
+  };
 
   const loadQuestions = async (page: number = 1) => {
     setIsLoading(true);
@@ -186,7 +421,7 @@ export default function OverflowView({ author }: OverflowViewProps) {
       setTotalPages(result.totalPages);
       setTotalCount(result.totalCount);
     } catch (error) {
-      console.error('Fetch error:', error);
+      console.error("Fetch error:", error);
       toast({
         title: "Error",
         description: "Failed to load questions. Please try again.",
@@ -197,93 +432,71 @@ export default function OverflowView({ author }: OverflowViewProps) {
     }
   };
 
-  // Fetch questions on mount
-  useEffect(() => {
-    loadQuestions(1);
-  }, []);
+  const loadTrendingTopics = async () => {
+    try {
+      const topics = await fetchTrendingTopics();
+      setTrendingTopics(topics);
+    } catch (error) {
+      console.error("Failed to fetch trending topics:", error);
+    }
+  };
 
-  // Fetch social points on mount
-  useEffect(() => {
-    refreshSocialPoints();
-  }, [author.id]);
+  useEffect(() => { loadQuestions(1); }, []);
+  useEffect(() => { refreshSocialPoints(); }, [author.id]);
+  useEffect(() => { loadTrendingTopics(); }, []);
 
   const handlePageChange = async (newPage: number) => {
     if (newPage < 1 || newPage > totalPages || newPage === currentPage) return;
-
     startTransition(async () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: "smooth" });
       await loadQuestions(newPage);
     });
   };
 
-  // Apply search and filters
   const getFilteredQuestions = () => {
     let filtered = [...questions];
-
-    // Apply "My Posts" filter first
-    if (sortBy === "myPosts") {
-      filtered = filtered.filter((q) => q.author.id === author.id);
-    }
-
-    // Apply search query
+    if (sortBy === "myPosts") filtered = filtered.filter((q) => q.author.id === author.id);
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase().trim();
       filtered = filtered.filter((q) => {
         switch (filterOptions.searchBy) {
-          case "title":
-            return q.title.toLowerCase().includes(query);
-          case "content":
-            return q.content.toLowerCase().includes(query);
-          case "tags":
-            return q.tags.some(tag => tag.toLowerCase().includes(query));
-          case "author":
-            return q.author.name.toLowerCase().includes(query);
-          case "all":
+          case "title":   return q.title.toLowerCase().includes(query);
+          case "content": return q.content.toLowerCase().includes(query);
+          case "tags":    return q.tags.some((tag) => tag.toLowerCase().includes(query));
+          case "author":  return q.author.name.toLowerCase().includes(query);
           default:
             return (
               q.title.toLowerCase().includes(query) ||
               q.content.toLowerCase().includes(query) ||
-              q.tags.some(tag => tag.toLowerCase().includes(query)) ||
+              q.tags.some((tag) => tag.toLowerCase().includes(query)) ||
               q.author.name.toLowerCase().includes(query)
             );
         }
       });
     }
-
-    // Apply "has posted" filter (authors who have created posts)
     if (filterOptions.hasPosted) {
-      // This would require additional data about which authors have posts
-      // For now, we'll just filter to show questions from authors who appear in the list
-      const authorIds = new Set(questions.map(q => q.author.id));
-      filtered = filtered.filter(q => authorIds.has(q.author.id));
+      const authorIds = new Set(questions.map((q) => q.author.id));
+      filtered = filtered.filter((q) => authorIds.has(q.author.id));
     }
-
-    // Apply date filters
     if (filterOptions.dateFrom) {
       const fromDate = new Date(filterOptions.dateFrom);
-      filtered = filtered.filter(q => new Date(q.created_at) >= fromDate);
+      filtered = filtered.filter((q) => new Date(q.created_at) >= fromDate);
     }
     if (filterOptions.dateTo) {
       const toDate = new Date(filterOptions.dateTo);
-      toDate.setHours(23, 59, 59, 999); // End of day
-      filtered = filtered.filter(q => new Date(q.created_at) <= toDate);
+      toDate.setHours(23, 59, 59, 999);
+      filtered = filtered.filter((q) => new Date(q.created_at) <= toDate);
     }
-
     return filtered;
   };
 
-  // Apply sorting
   const sortedQuestions = getFilteredQuestions().sort((a, b) => {
     switch (sortBy) {
       case "newest":
-      case "myPosts":
-        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-      case "oldest":
-        return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
-      case "popular":
-        return b.likes - a.likes;
-      default:
-        return 0;
+      case "myPosts": return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      case "oldest":  return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+      case "popular": return b.likes - a.likes;
+      default:        return 0;
     }
   });
 
@@ -294,7 +507,6 @@ export default function OverflowView({ author }: OverflowViewProps) {
     images: string[];
   }) => {
     setIsPosting(true);
-
     try {
       const result = await postQuestion({
         title: questionData.title,
@@ -303,12 +515,10 @@ export default function OverflowView({ author }: OverflowViewProps) {
         images: questionData.images,
         authorId: author.id,
       });
-
       if (result.success && result.question) {
-        // Reload current page to show new question
         await loadQuestions(currentPage);
         await refreshSocialPoints();
-        
+        await loadTrendingTopics();
         setIsPostModalOpen(false);
         toast({
           title: "Success!",
@@ -325,7 +535,7 @@ export default function OverflowView({ author }: OverflowViewProps) {
         });
       }
     } catch (error) {
-      console.error('Error posting question:', error);
+      console.error("Error posting question:", error);
       toast({
         title: "Error",
         description: "An error occurred. Please try again.",
@@ -337,127 +547,148 @@ export default function OverflowView({ author }: OverflowViewProps) {
     }
   };
 
-  const handleLike = (questionId: string) => {
+  const handleLike = (_questionId: string) => {
     refreshSocialPoints();
   };
 
+
   return (
-    <div className="flex flex-col gap-8">
-      {/* Header with Ask Question button and Social Points */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <Button
-          onClick={() => setIsPostModalOpen(true)}
-          className="rounded-full bg-gradient-to-r from-customBlue-500 to-indigo-500 px-6 py-2 text-white shadow-lg transition-all duration-200 hover:from-customBlue-600 hover:to-indigo-600 hover:shadow-xl"
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Ask Question
-        </Button>
-        
-        {/* Social Points Display */}
-        <div className="flex w-48 gap-2 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-2 shadow-lg">
-          <div className="flex flex-col">
-            <span className="text-xs font-medium text-foreground">Social Points</span>
-            <span className="text-lg font-bold text-foreground">{socPoints}</span>
-          </div>
-        </div>
-      </div>
+    <div className="flex items-start gap-8">
 
-      {/* Search and Filter Component */}
-      <SearchFilter
-        onSearchChange={setSearchQuery}
-        onSortChange={setSortBy}
-        onFilterChange={setFilterOptions}
-        currentSort={sortBy}
-        currentUserId={author.id}
-      />
+      {/* Main content */}
+      <div className="flex flex-1 min-w-0 flex-col gap-8">
 
-      {/* Top Pagination */}
-      {totalPages > 1 && !isLoading && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 rounded-xl bg-white/70 p-3 sm:p-4 shadow-md backdrop-blur-sm dark:bg-gray-800/70">
-          <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 order-2 sm:order-1">
-            Showing page <span className="font-semibold text-customBlue-600 dark:text-customBlue-400">{currentPage}</span> of{' '}
-            <span className="font-semibold">{totalPages}</span>
-            {' '}({totalCount} total questions)
-          </div>
-          <div className="order-1 sm:order-2">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-              isLoading={isPending}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Questions list */}
-      <div className="space-y-6">
-        {isLoading || isPending ? (
-          <div className="mx-auto max-w-md rounded-2xl bg-accent p-12 text-center backdrop-blur-sm dark:bg-gray-800/60">
-            <div className="mb-6 flex justify-center">
-              <Loader2 className="h-16 w-16 animate-spin text-customBlue-500" />
+        {/* Header */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <Button
+            onClick={() => setIsPostModalOpen(true)}
+            className="rounded-full bg-gradient-to-r from-customBlue-500 to-indigo-500 px-6 py-2 text-white shadow-lg transition-all duration-200 hover:from-customBlue-600 hover:to-indigo-600 hover:shadow-xl"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Ask Question
+          </Button>
+          <div className="flex w-48 gap-2 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-2 shadow-lg">
+            <div className="flex flex-col">
+              <span className="text-xs font-medium text-foreground">Social Points</span>
+              <span className="text-lg font-bold text-foreground">{socPoints}</span>
             </div>
-            <h3 className="mb-4 text-2xl font-light text-gray-900 dark:text-white">Loading questions...</h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              Please wait while we fetch the latest questions.
-            </p>
           </div>
-        ) : sortedQuestions.length > 0 ? (
-          sortedQuestions.map((question) => (
-            <QuestionCard
-              key={question.id}
-              question={question}
-              onLike={handleLike}
-              loggedIn={author}
-              setQuestions={setQuestions}
-              refreshSocialPoints={refreshSocialPoints}
-            />
-          ))
-        ) : (
-          <div className="mx-auto max-w-md rounded-2xl bg-white/60 p-12 text-center backdrop-blur-sm dark:bg-gray-800/60">
-            <div className="mb-6 text-6xl">💭</div>
-            <h3 className="mb-4 text-2xl font-light text-gray-900 dark:text-white">
-              {searchQuery || filterOptions.dateFrom || filterOptions.dateTo 
-                ? "No questions found" 
-                : "No questions yet"}
-            </h3>
-            <p className="mb-8 text-gray-600 dark:text-gray-400">
-              {searchQuery || filterOptions.dateFrom || filterOptions.dateTo
-                ? "Try adjusting your search or filters to find what you're looking for."
-                : "Be the first to ask a question and help build our knowledge base!"}
-            </p>
-            {!searchQuery && !filterOptions.dateFrom && !filterOptions.dateTo && (
-              <Button
-                className="rounded-full bg-gradient-to-r from-customBlue-500 to-indigo-500 px-8 py-3 text-white shadow-lg transition-all duration-200 hover:from-customBlue-600 hover:to-indigo-600 hover:shadow-xl"
-                onClick={() => setIsPostModalOpen(true)}
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Ask the First Question
-              </Button>
-            )}
+        </div>
+
+        {/* Search & Filter */}
+        <SearchFilter
+          onSearchChange={setSearchQuery}
+          onSortChange={setSortBy}
+          onFilterChange={setFilterOptions}
+          currentSort={sortBy}
+          currentUserId={author.id}
+          refreshKey={solverRefreshKey}
+
+        />
+
+        {/* Top Pagination */}
+        {totalPages > 1 && !isLoading && (
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 rounded-xl bg-white/70 p-3 sm:p-4 shadow-md backdrop-blur-sm dark:bg-gray-800/70">
+            <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 order-2 sm:order-1">
+              Showing page{" "}
+              <span className="font-semibold text-customBlue-600 dark:text-customBlue-400">{currentPage}</span>{" "}
+              of <span className="font-semibold">{totalPages}</span> ({totalCount} total questions)
+            </div>
+            <div className="order-1 sm:order-2">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+                isLoading={isPending}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Questions list */}
+        <div className="space-y-6">
+          {isLoading || isPending ? (
+            <div className="mx-auto max-w-md rounded-2xl bg-accent p-12 text-center backdrop-blur-sm dark:bg-gray-800/60">
+              <div className="mb-6 flex justify-center">
+                <Loader2 className="h-16 w-16 animate-spin text-customBlue-500" />
+              </div>
+              <h3 className="mb-4 text-2xl font-light text-gray-900 dark:text-white">
+                Loading questions...
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                Please wait while we fetch the latest questions.
+              </p>
+            </div>
+          ) : sortedQuestions.length > 0 ? (
+            sortedQuestions.map((question) => (
+              <div id={`question-${question.id}`} key={question.id}>
+                <QuestionCard
+                  question={question}
+                  onLike={handleLike}
+                  loggedIn={author}
+                  setQuestions={setQuestions}
+                  refreshSocialPoints={refreshSocialPoints}
+                  onSolutionMarked={() => setSolverRefreshKey(k => k + 1)}
+                />
+              </div>
+            ))
+          ) : (
+            <div className="mx-auto max-w-md rounded-2xl bg-white/60 p-12 text-center backdrop-blur-sm dark:bg-gray-800/60">
+              <div className="mb-6 text-6xl">💭</div>
+              <h3 className="mb-4 text-2xl font-light text-gray-900 dark:text-white">
+                {searchQuery || filterOptions.dateFrom || filterOptions.dateTo
+                  ? "No questions found"
+                  : "No questions yet"}
+              </h3>
+              <p className="mb-8 text-gray-600 dark:text-gray-400">
+                {searchQuery || filterOptions.dateFrom || filterOptions.dateTo
+                  ? "Try adjusting your search or filters to find what you're looking for."
+                  : "Be the first to ask a question and help build our knowledge base!"}
+              </p>
+              {!searchQuery && !filterOptions.dateFrom && !filterOptions.dateTo && (
+                <Button
+                  className="rounded-full bg-gradient-to-r from-customBlue-500 to-indigo-500 px-8 py-3 text-white shadow-lg transition-all duration-200 hover:from-customBlue-600 hover:to-indigo-600 hover:shadow-xl"
+                  onClick={() => setIsPostModalOpen(true)}
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  Ask the First Question
+                </Button>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Bottom Pagination */}
+        {totalPages > 1 && !isLoading && !isPending && (
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 rounded-xl bg-white/70 p-3 sm:p-4 shadow-md backdrop-blur-sm dark:bg-gray-800/70">
+            <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 order-2 sm:order-1">
+              Page{" "}
+              <span className="font-semibold text-customBlue-600 dark:text-customBlue-400">{currentPage}</span>{" "}
+              of <span className="font-semibold">{totalPages}</span>
+            </div>
+            <div className="order-1 sm:order-2">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+                isLoading={isPending}
+              />
+            </div>
           </div>
         )}
       </div>
 
-      {/* Bottom Pagination */}
-      {totalPages > 1 && !isLoading && !isPending && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 rounded-xl bg-white/70 p-3 sm:p-4 shadow-md backdrop-blur-sm dark:bg-gray-800/70">
-          <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 order-2 sm:order-1">
-            Page <span className="font-semibold text-customBlue-600 dark:text-customBlue-400">{currentPage}</span> of{' '}
-            <span className="font-semibold">{totalPages}</span>
-          </div>
-          <div className="order-1 sm:order-2">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-              isLoading={isPending}
-            />
-          </div>
-        </div>
-      )}
+      {/* Sidebar */}
+      <RecentSidebar
+        questions={questions}
+        trendingTopics={trendingTopics}
+        onTagClick={(tag) => {
+          setSearchQuery(tag);
+          setFilterOptions((prev) => ({ ...prev, searchBy: "tags" }));
+        }}
+      />
 
-      {/* Post Question Modal */}
+      {/* Modal */}
       <PostQuestionModal
         isOpen={isPostModalOpen}
         onClose={() => setIsPostModalOpen(false)}

@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, memo, useCallback } from "react";
 import Image from "next/image";
 import DefaultAvatar from "@/components/DefaultAvatar";
 import { Button } from "@/components/ui/button";
-import { ThumbsUp, MessageCircle, Clock, MoreHorizontal, Pencil, Trash2, FileText } from "lucide-react";
+import { ThumbsUp, MessageCircle, Clock, MoreHorizontal, Pencil, Trash2, FileText, ArrowBigUp } from "lucide-react";
 import {
   Carousel,
   CarouselContent,
@@ -45,6 +45,7 @@ interface QuestionCardProps {
   }
   setQuestions : React.Dispatch<React.SetStateAction<Question[]>>;
   refreshSocialPoints: () => Promise<void>;
+  onSolutionMarked?: () => void; // ← add
 }
 
 // Memoized TimeAgo component
@@ -401,7 +402,7 @@ const QuestionActions = memo(function QuestionActions({
             : "text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
             } ${isLiking ? "opacity-50 cursor-not-allowed" : ""}`}
         >
-          <ThumbsUp className={`h-4 w-4 ${isLiked ? "fill-current" : ""}`} />
+          <ArrowBigUp className={`h-4 w-4 ${isLiked ? "fill-current" : ""}`} />
           <span className="text-xs sm:text-sm font-medium">{likes}</span>
         </Button>
 
@@ -428,7 +429,7 @@ const QuestionActions = memo(function QuestionActions({
   );
 });
 
-export default function QuestionCard({ question, onLike, loggedIn, setQuestions }: QuestionCardProps) {
+export default function QuestionCard({ question, onLike, loggedIn, setQuestions, onSolutionMarked }: QuestionCardProps) {
   const [showComments, setShowComments] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
@@ -627,6 +628,36 @@ export default function QuestionCard({ question, onLike, loggedIn, setQuestions 
     setShowEditModal(false);
   }, []);
 
+  const ExpandableContent = memo(function ExpandableContent({
+    content,
+    threshold = 300,
+    className,
+  }: {
+    content: string;
+    threshold?: number;
+    className?: string;
+  }) {
+    const [expanded, setExpanded] = useState(false);
+    const needsTruncation = content.length > threshold;
+
+    return (
+      <span className={className}>
+        <QuestionContentDisplay
+          content={expanded || !needsTruncation ? content : content.slice(0, threshold) + "…"}
+          className={className ?? ""}
+        />
+        {needsTruncation && (
+          <button
+            onClick={() => setExpanded(prev => !prev)}
+            className="ml-1 text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors underline-offset-2 hover:underline"
+          >
+            {expanded ? "Show Less" : "See More"}
+          </button>
+        )}
+      </span>
+    );
+  });
+
   return (
     <div className="rounded-xl sm:rounded-2xl bg-white/70 p-4 sm:p-6 shadow-lg backdrop-blur-sm transition-all duration-300 hover:bg-white/80 hover:shadow-xl dark:bg-gray-800/70 dark:hover:bg-gray-800/80">
       {/* Question Header */}
@@ -653,12 +684,13 @@ export default function QuestionCard({ question, onLike, loggedIn, setQuestions 
       </h3>
 
       {/* Question Content */}
-      <span className="mb-3 sm:mb-4 text-sm sm:text-base leading-relaxed text-gray-700 dark:text-gray-300 break-words [&_a]:text-blue-500 [&_a]:underline [&_a]:cursor-pointer [&_a]:hover:text-blue-600">
-        <QuestionContentDisplay 
+      <div className="mb-3 sm:mb-4 text-sm sm:text-base leading-relaxed text-gray-700 dark:text-gray-300 break-words [&_a]:text-blue-500 [&_a]:underline [&_a]:cursor-pointer [&_a]:hover:text-blue-600">
+        <ExpandableContent
           content={question.content}
+          threshold={300}
           className="text-gray-700 dark:text-gray-300"
         />
-      </span>
+      </div>
 
       {/* Files (Images and Documents) */}
       <QuestionFiles
@@ -687,6 +719,8 @@ export default function QuestionCard({ question, onLike, loggedIn, setQuestions 
             questionId={question.id} 
             loggedIn={loggedIn} 
             setQuestions={setQuestions}
+            questionAuthorId={question.author.id} 
+            onSolutionMarked={onSolutionMarked}
           />
         </div>
       )}
