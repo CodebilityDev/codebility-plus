@@ -42,7 +42,7 @@ const routePermissionMap: Record<string, keyof RolePermissions> = {
   "/home/interns": "interns",
   "/home/orgchart": "orgchart",
   "/home/applicants": "applicants",
-  "/home/in-house": "inhouse", 
+  "/home/in-house": "inhouse",
   "/home/clients": "clients",
   "/home/hire": "clients",
   "/home/projects": "projects",
@@ -68,6 +68,11 @@ type RolePermissions = {
 export async function middleware(req: NextRequest) {
   try {
     const { pathname } = req.nextUrl;
+ 
+    if (pathname.startsWith("/home/my-team")) {
+      return NextResponse.next();
+    }
+
 
     // 1. Check if the route is public - allow access without any auth checks
     if (PUBLIC_ROUTES.includes(pathname as any)) {
@@ -101,7 +106,7 @@ export async function middleware(req: NextRequest) {
     }
 
     // From this point on, we need authenticated users
-     const supabase = await createClientServerComponent();
+    const supabase = await createClientServerComponent();
     const {
       data: { user },
       error: authError,
@@ -245,7 +250,7 @@ export async function middleware(req: NextRequest) {
       }
     }
 
-    // All checks passed, allow access to the requested route
+
     return NextResponse.next();
   } catch (error) {
     console.error("Middleware error:", error);

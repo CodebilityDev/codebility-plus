@@ -26,6 +26,7 @@ interface ProjectData {
     data: SimpleMemberData[] | null;
     error?: string | null;
   };
+  userRole?: string;
 }
 
 interface MyTeamViewProps {
@@ -106,7 +107,7 @@ const MyTeamView = ({ projectData }: MyTeamViewProps) => {
       // Update project members with timeout
       const updatePromise = updateProjectMembers(
         selectedProject.project.id,
-        updatedMembers,
+        updatedMembers as any,
         teamLead.id,
       );
       
@@ -189,6 +190,7 @@ const MyTeamView = ({ projectData }: MyTeamViewProps) => {
             <TeamProjectCard
               key={projectItem.project.id}
               project={projectItem}
+              userRole={projectItem.userRole}
               onAddMembers={() => handleOpenAddModal(projectItem)}
               isLoading={isLoadingMembers && selectedProject?.project.id === projectItem.project.id}
             />

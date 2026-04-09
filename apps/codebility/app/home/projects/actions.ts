@@ -77,16 +77,29 @@ export async function getUserProjects(): Promise<{
       return { error: { message: "User not authenticated" }, data: null };
     }
 
-    // Fetch the user's codev_id based on their email
-    const { data: codevData, error: codevError } = await supabase
+
+    let { data: codevData, error: codevError } = await supabase
       .from("codev")
-      .select("id")
-      .eq("email_address", user.email)
+      .select("id, email_address")
+      .eq("id", user.id)
       .single();
 
     if (codevError || !codevData) {
-      console.error("Error fetching codev_id:", codevError);
-      return { error: { message: "User profile not found" }, data: null };
+      // Fallback: search by email with case-insensitive check
+      const { data: fallbackData } = await supabase
+        .from("codev")
+        .select("id, email_address")
+        .ilike("email_address", user.email || "")
+        .single();
+
+      if (fallbackData) {
+        codevData = fallbackData;
+        codevError = null;
+      }
+    }
+
+    if (codevError || !codevData) {
+      return { error: { message: "User profile not found. Please complete your profile setup." }, data: null };
     }
 
     const userCodevId = codevData.id;
@@ -107,11 +120,11 @@ export async function getUserProjects(): Promise<{
       project: DbProject;
     }
 
-    // Fetch projects where the user is either a team leader or member
+    // Fetch projects where the user is assigned ANY role
     const { data: projectMembers, error: projectMembersError } = await supabase
-    .from("project_members")
-    .select(
-      `
+      .from("project_members")
+      .select(
+        `
       project_id,
       role,
       project:project_id (
@@ -123,9 +136,8 @@ export async function getUserProjects(): Promise<{
         meeting_link
       )
     `,
-    )
-    .eq("codev_id", userCodevId)
-    .in("role", ["team_leader", "member"]) as { data: ProjectMember[] | null; error: any };
+      )
+      .eq("codev_id", userCodevId) as { data: ProjectMember[] | null; error: any };
 
     if (projectMembersError) {
       console.error("Error fetching user projects:", projectMembersError);
@@ -138,16 +150,16 @@ export async function getUserProjects(): Promise<{
 
     // Map the project members to the expected return type
     const userProjects = projectMembers.map((pm) => ({
-    project: {
-      id: pm.project.id,
-      name: pm.project.name,
-      status: pm.project.status || "pending",
-      kanban_display: pm.project.kanban_display ?? false,
-      public_display: pm.project.public_display ?? false,  
-      meeting_link: pm.project.meeting_link ?? null,       
-    } as Project,
-    role: pm.role,
-  }));
+      project: {
+        id: pm.project.id,
+        name: pm.project.name,
+        status: pm.project.status || "pending",
+        kanban_display: pm.project.kanban_display ?? false,
+        public_display: pm.project.public_display ?? false,
+        meeting_link: pm.project.meeting_link ?? null,
+      } as Project,
+      role: pm.role,
+    }));
 
     return { error: null, data: userProjects };
   } catch (error) {
@@ -357,7 +369,7 @@ export async function updatePublicDisplaySwitch(
     console.error("Error in updating projects and kanban board:", projectError);
 
   await invalidateCache(cacheKeys.projects.all);
-  
+
   revalidatePath("/home/projects");
   revalidatePath("/services");
 
@@ -424,7 +436,7 @@ export async function updateProject(projectId: string, formData: FormData) {
         updateData[key] = value;
       }
     }
-    
+
     if (techStack) {
       updateData.tech_stack = techStack;
     }
@@ -659,7 +671,7 @@ export const getMembers = async (
   data: SimpleMemberData[] | null;
 }> => {
   const supabase = await createClientServerComponent();
-  
+
   try {
     // Step 1: Get all project_members with role = 'member'
     const { data: projectMembers, error: pmError } = await supabase
@@ -679,7 +691,7 @@ export const getMembers = async (
 
     // Step 2: Get codev details separately (avoids RLS/join issues)
     const codevIds = projectMembers.map(pm => pm.codev_id);
-    
+
     const { data: codevs, error: codevError } = await supabase
       .from("codev")
       .select("id, first_name, last_name, email_address, display_position, image_url")
@@ -693,7 +705,7 @@ export const getMembers = async (
     // Step 3: Merge data manually
     const members = projectMembers.map(pm => {
       const codev = codevs?.find(c => c.id === pm.codev_id);
-      
+
       // If codev record is missing, log warning
       if (!codev) {
         console.warn(`⚠️ Missing codev record for member: ${pm.codev_id}`);

@@ -35,6 +35,7 @@ import CompactMemberGrid from "./CompactMemberGrid";
 import MeetingBasedAttendance from "./MeetingBasedAttendance";
 import ScheduleMeetingModal from "./ScheduleMeetingModal";
 import SyncAllAttendance from "./SyncAllAttendance";
+import Top3Showcase from "./Top3Showcase";
 
 /**
  * TeamDetailView - ENHANCED VERSION
@@ -137,45 +138,45 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
   }, [projectInfo.id, viewMode]);
 
 
-// Format schedule for display
-const formatSchedule = () => {
-  if (
-    !currentSchedule ||
-    !currentSchedule.selectedDays ||
-    currentSchedule.selectedDays.length === 0
-  )
-    return null;
+  // Format schedule for display
+  const formatSchedule = () => {
+    if (
+      !currentSchedule ||
+      !currentSchedule.selectedDays ||
+      currentSchedule.selectedDays.length === 0
+    )
+      return null;
 
-  const weekDays = [
-    { value: "monday", label: "Monday", short: "Mon" },
-    { value: "tuesday", label: "Tuesday", short: "Tue" },
-    { value: "wednesday", label: "Wednesday", short: "Wed" },
-    { value: "thursday", label: "Thursday", short: "Thu" },
-    { value: "friday", label: "Friday", short: "Fri" },
-    { value: "saturday", label: "Saturday", short: "Sat" },
-    { value: "sunday", label: "Sunday", short: "Sun" },
-  ];
+    const weekDays = [
+      { value: "monday", label: "Monday", short: "Mon" },
+      { value: "tuesday", label: "Tuesday", short: "Tue" },
+      { value: "wednesday", label: "Wednesday", short: "Wed" },
+      { value: "thursday", label: "Thursday", short: "Thu" },
+      { value: "friday", label: "Friday", short: "Fri" },
+      { value: "saturday", label: "Saturday", short: "Sat" },
+      { value: "sunday", label: "Sunday", short: "Sun" },
+    ];
 
-  const selectedDaysDisplay = currentSchedule.selectedDays
-    .map((day) => weekDays.find((d) => d.value === day)?.short)
-    .filter(Boolean)
-    .join(", ");
+    const selectedDaysDisplay = currentSchedule.selectedDays
+      .map((day) => weekDays.find((d) => d.value === day)?.short)
+      .filter(Boolean)
+      .join(", ");
 
-  // Convert military time to 12-hour format
-  const convertTo12Hour = (time24: string) => {
-    const parts = time24.split(":");
-    const hours = parts[0] || "0";
-    const minutes = parts[1] || "00";
-    const hour = parseInt(hours, 10);
-    const ampm = hour >= 12 ? "PM" : "AM";
-    const hour12 = hour % 12 || 12; // Convert 0 to 12 for midnight
-    return `${hour12}:${minutes} ${ampm}`;
+    // Convert military time to 12-hour format
+    const convertTo12Hour = (time24: string) => {
+      const parts = time24.split(":");
+      const hours = parts[0] || "0";
+      const minutes = parts[1] || "00";
+      const hour = parseInt(hours, 10);
+      const ampm = hour >= 12 ? "PM" : "AM";
+      const hour12 = hour % 12 || 12; // Convert 0 to 12 for midnight
+      return `${hour12}:${minutes} ${ampm}`;
+    };
+
+    const formattedTime = convertTo12Hour(currentSchedule.time);
+
+    return `${selectedDaysDisplay} at ${formattedTime}`;
   };
-
-  const formattedTime = convertTo12Hour(currentSchedule.time);
-
-  return `${selectedDaysDisplay} at ${formattedTime}`;
-};
 
   const handleOpenAddModal = () => {
     setShowAddModal(true);
@@ -303,11 +304,10 @@ const formatSchedule = () => {
               variant={viewMode === "team" ? "default" : "outline"}
               size="sm"
               onClick={() => setViewMode("team")}
-              className={`flex h-9 items-center gap-1.5 px-2.5 text-xs sm:px-3 sm:text-sm ${
-                viewMode !== "team"
+              className={`flex h-9 items-center gap-1.5 px-2.5 text-xs sm:px-3 sm:text-sm ${viewMode !== "team"
                   ? "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
                   : ""
-              }`}
+                }`}
             >
               <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               <span className="xs:inline hidden sm:inline">Team View</span>
@@ -319,11 +319,10 @@ const formatSchedule = () => {
               variant={viewMode === "attendance" ? "default" : "outline"}
               size="sm"
               onClick={() => setViewMode("attendance")}
-              className={`flex h-9 items-center gap-1.5 px-2.5 text-xs sm:px-3 sm:text-sm ${
-                viewMode !== "attendance"
+              className={`flex h-9 items-center gap-1.5 px-2.5 text-xs sm:px-3 sm:text-sm ${viewMode !== "attendance"
                   ? "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
                   : ""
-              }`}
+                }`}
             >
               <Table className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               <span className="whitespace-nowrap">Attendance</span>
@@ -348,33 +347,33 @@ const formatSchedule = () => {
           {((viewMode === "attendance" && isCurrentUserTeamLead) ||
             (viewMode === "team" && isCurrentUserTeamLead) ||
             true) && (
-            <div className="flex flex-wrap items-center gap-2">
-              {/* Save & Sync buttons - Only for team leads in attendance view */}
-              {viewMode === "attendance" &&
-                isCurrentUserTeamLead &&
-                hasAttendanceChanges && (
-                  <Button
-                    onClick={handleSaveAttendance}
-                    variant="default"
-                    size="sm"
-                    className="flex h-9 items-center gap-2"
-                  >
-                    <Save className="h-4 w-4" />
-                    Save Changes
-                  </Button>
-                )}
+              <div className="flex flex-wrap items-center gap-2">
+                {/* Save & Sync buttons - Only for team leads in attendance view */}
+                {viewMode === "attendance" &&
+                  isCurrentUserTeamLead &&
+                  hasAttendanceChanges && (
+                    <Button
+                      onClick={handleSaveAttendance}
+                      variant="default"
+                      size="sm"
+                      className="flex h-9 items-center gap-2"
+                    >
+                      <Save className="h-4 w-4" />
+                      Save Changes
+                    </Button>
+                  )}
 
-              {/* Sync All Points, Schedule Meeting, Kanban Board in One row */}
-              <div className="flex w-full flex-col items-stretch gap-2 sm:flex-row sm:items-center">
-                {viewMode === "attendance" && isCurrentUserTeamLead && (
-                  <SyncAllAttendance
-                    projectId={projectInfo.id}
-                    isTeamLead={isCurrentUserTeamLead}
-                  />
-                )}
+                {/* Sync All Points, Schedule Meeting, Kanban Board in One row */}
+                <div className="flex w-full flex-col items-stretch gap-2 sm:flex-row sm:items-center">
+                  {viewMode === "attendance" && isCurrentUserTeamLead && (
+                    <SyncAllAttendance
+                      projectId={projectInfo.id}
+                      isTeamLead={isCurrentUserTeamLead}
+                    />
+                  )}
 
-                {/* Schedule Meeting - ONLY VISIBLE TO TEAM LEADS */}
-                {/* {isCurrentUserTeamLead && ( */}
+                  {/* Schedule Meeting - ONLY VISIBLE TO TEAM LEADS */}
+                  {/* {isCurrentUserTeamLead && ( */}
                   <Button
                     variant="outline"
                     size="sm"
@@ -385,44 +384,44 @@ const formatSchedule = () => {
                     <CalendarDays className="h-4 w-4" />
                     Schedule Meeting
                   </Button>
-                {/* )} */}
+                  {/* )} */}
 
-                {/* Kanban Board Button - VISIBLE TO ALL MEMBERS */}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex h-9 items-center gap-2 border-purple-300 text-purple-700 hover:bg-purple-50 dark:border-purple-600 dark:text-purple-300 dark:hover:bg-purple-900/20"
-                  title="Go to Kanban Board"
-                  onClick={() => router.push(`/home/kanban/${projectInfo.id}`)}
-                >
-                  <Kanban className="h-4 w-4" />
-                  Kanban Board
-                </Button>
-
-                {/* Manage Members - ONLY VISIBLE TO TEAM LEADS in Team View */}
-                {viewMode === "team" && isCurrentUserTeamLead && (
+                  {/* Kanban Board Button - VISIBLE TO ALL MEMBERS */}
                   <Button
-                    onClick={handleOpenAddModal}
-                    disabled={isLoadingMembers}
+                    variant="outline"
                     size="sm"
-                    className="flex h-9 items-center gap-2"
+                    className="flex h-9 items-center gap-2 border-purple-300 text-purple-700 hover:bg-purple-50 dark:border-purple-600 dark:text-purple-300 dark:hover:bg-purple-900/20"
+                    title="Go to Kanban Board"
+                    onClick={() => router.push(`/home/kanban/${projectInfo.id}`)}
                   >
-                    <UserPlus className="h-4 w-4" />
-                    {isLoadingMembers ? "Loading..." : "Manage Members"}
+                    <Kanban className="h-4 w-4" />
+                    Kanban Board
                   </Button>
-                )}
+
+                  {/* Manage Members - ONLY VISIBLE TO TEAM LEADS in Team View */}
+                  {viewMode === "team" && isCurrentUserTeamLead && (
+                    <Button
+                      onClick={handleOpenAddModal}
+                      disabled={isLoadingMembers}
+                      size="sm"
+                      className="flex h-9 items-center gap-2"
+                    >
+                      <UserPlus className="h-4 w-4" />
+                      {isLoadingMembers ? "Loading..." : "Manage Members"}
+                    </Button>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
+            )}
         </div>
 
         {viewMode === "team" ? (
           <>
             {/* Meeting Schedule and Checklist Status - Side by side */}
-            <div className="mb-4 grid grid-cols-1 items-start gap-4 md:grid-cols-3">
+            <div className="mb-4 grid grid-cols-1 items-stretch gap-4 md:grid-cols-3">
               {/* Meeting Schedule - Takes 2 columns */}
               {formatSchedule() && (
-                <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-950/20 md:col-span-2">
+                <div className="h-full flex flex-col justify-center rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-950/20 md:col-span-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="rounded-lg bg-blue-100 p-2 dark:bg-blue-900/50">
@@ -458,7 +457,7 @@ const formatSchedule = () => {
               )}
 
               {/* Checklist Status - Takes 1 column on the right */}
-              <div className={formatSchedule() ? "" : "md:col-span-3"}>
+              <div className={formatSchedule() ? "h-full" : "md:col-span-3"}>
                 <ChecklistStatusBanner
                   projectId={projectInfo.id}
                   teamMembers={members?.data || []}
@@ -467,73 +466,75 @@ const formatSchedule = () => {
               </div>
             </div>
 
-            {/* Team Overview and Attendance Points - Equal width */}
-            <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-              {/* Team Overview Card */}
-              <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Users className="h-5 w-5 text-gray-400" />
-                    <div>
-                      <h2 className="text-base font-semibold text-gray-900 dark:text-white">
-                        Team Overview
-                      </h2>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {totalMembers} total member
-                        {totalMembers !== 1 ? "s" : ""}
-                      </p>
+            {/* Main Stats Section (50/50 split) */}
+            <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  {/* Team Overview Card */}
+                  <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Users className="h-5 w-5 text-gray-400" />
+                        <div>
+                          <h2 className="text-base font-semibold text-gray-900 dark:text-white">
+                            Team Overview
+                          </h2>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            {totalMembers} total member{totalMembers !== 1 ? "s" : ""}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                          {totalMembers}
+                        </div>
+                        <div className="text-xs text-gray-500">Members</div>
+                      </div>
                     </div>
                   </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {totalMembers}
-                    </div>
-                    <div className="text-xs text-gray-500">Members</div>
-                  </div>
-                </div>
-              </div>
 
-              {/* Attendance Summary Card */}
-              <div className="rounded-lg border border-gray-200 bg-gradient-to-br from-blue-50 to-cyan-50 p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:from-blue-950/20 dark:to-cyan-950/20">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                    <div>
-                      <h2 className="text-base font-semibold text-gray-900 dark:text-white">
-                        Attendance Points
-                      </h2>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        This month's progress
-                      </p>
+                  {/* Attendance Summary Card */}
+                  <div className="rounded-lg border border-gray-200 bg-gradient-to-br from-blue-50 to-cyan-50 p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:from-blue-950/20 dark:to-cyan-950/20">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                        <div>
+                          <h2 className="text-base font-semibold text-gray-900 dark:text-white">
+                            Attendance Points
+                          </h2>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            This month's progress
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <TrendingUp className="h-4 w-4 text-green-600 dark:text-green-400" />
+                        <div className="text-right">
+                          <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                            +{monthlyAttendancePoints.totalPoints}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {monthlyAttendancePoints.presentDays > 0 ? "Earned" : "No attendance yet"}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-2 space-y-1">
+                      {monthlyAttendancePoints.presentDays > 0 && (
+                        <p className="text-xs text-gray-600 dark:text-gray-400">
+                          {monthlyAttendancePoints.presentDays} attendance{" "}
+                          {monthlyAttendancePoints.presentDays === 1 ? "day" : "days"}{" "}
+                          recorded
+                        </p>
+                      )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <TrendingUp className="h-4 w-4 text-green-600 dark:text-green-400" />
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                        +{monthlyAttendancePoints.totalPoints}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {monthlyAttendancePoints.presentDays > 0
-                          ? "Earned"
-                          : "No attendance yet"}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-2 space-y-1">
-                  {monthlyAttendancePoints.presentDays > 0 && (
-                    <p className="text-xs text-gray-600 dark:text-gray-400">
-                      {monthlyAttendancePoints.presentDays} attendance{" "}
-                      {monthlyAttendancePoints.presentDays === 1
-                        ? "day"
-                        : "days"}{" "}
-                      recorded
-                    </p>
-                  )}
-                </div>
-              </div>
             </div>
+
+            {/* Organize Bento Box Here - Spanning Full Width underneath without gaps */}
+            {isCurrentUserTeamLead && (
+              <div className="mb-6 w-full">
+                <Top3Showcase projectId={projectInfo.id} members={members?.data || []} />
+              </div>
+            )}
 
             {/* Team Members Grid */}
             {totalMembers > 0 ? (
