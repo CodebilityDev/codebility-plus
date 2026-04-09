@@ -546,8 +546,10 @@ export interface Comment {
     id: string;
     name: string;
     image_url: string | null;
+    username: string | null;
   };
   likes: number;
+  marked_as_solution: boolean;
   created_at: string;
   updated_at: string;
   post_id: string;
@@ -562,13 +564,14 @@ export interface PostCommentData {
 // Fetch comments for a specific post
 export async function fetchComments(postId: string): Promise<Comment[]> {
   const supabase = await createClientServerComponent();
-
+ 
   const { data, error } = await supabase
     .from('overflow_comments')
     .select(`
       id,
       comment,
       likes,
+      marked_as_solution,
       created_at,
       updated_at,
       post_id,
@@ -576,35 +579,86 @@ export async function fetchComments(postId: string): Promise<Comment[]> {
         id,
         first_name,
         last_name,
+        username,   
         image_url
       )
     `)
     .eq('post_id', postId)
     .order('created_at', { ascending: true });
-
-  if (error) {
-    return [];
-  }
-
-  if (!data || data.length === 0) {
-    return [];
-  }
-
-  const transformedComments: Comment[] = data.map((item: any) => ({
+ 
+  if (error || !data || data.length === 0) return [];
+ 
+  return data.map((item: any) => ({
     id: item.id.toString(),
     content: item.comment,
     author: {
       id: item.codev.id,
       name: `${item.codev.first_name} ${item.codev.last_name}`.trim(),
+      username: item.codev.username ?? null,
       image_url: item.codev.image_url,
     },
     likes: item.likes || 0,
+    marked_as_solution: item.marked_as_solution ?? false, // ← NEW
     created_at: item.created_at,
     updated_at: item.updated_at,
     post_id: item.post_id.toString(),
   }));
+}
 
-  return transformedComments;
+export async function markAsSolution(
+  commentId: string,
+  postId: string,
+) {
+  try {
+    const supabase = await createClientServerComponent();
+ 
+    const commentIdNum = parseInt(commentId);
+    const postIdNum    = parseInt(postId);
+ 
+    // Check whether this comment is already marked
+    const { data: current, error: checkErr } = await supabase
+      .from('overflow_comments')
+      .select('marked_as_solution')
+      .eq('id', commentIdNum)
+      .single();
+ 
+    if (checkErr) return { success: false, error: 'Failed to fetch comment' };
+ 
+    if (current.marked_as_solution) {
+      // Toggle OFF — just unmark this one
+      const { error } = await supabase
+        .from('overflow_comments')
+        .update({ marked_as_solution: false })
+        .eq('id', commentIdNum);
+ 
+      if (error) return { success: false, error: 'Failed to unmark solution' };
+ 
+      revalidatePath('/home/overflow');
+      return { success: true, marked: false };
+    }
+ 
+    // Toggle ON — first clear any existing solution for the post
+    const { error: clearErr } = await supabase
+      .from('overflow_comments')
+      .update({ marked_as_solution: false })
+      .eq('post_id', postIdNum)
+      .eq('marked_as_solution', true);
+ 
+    if (clearErr) return { success: false, error: 'Failed to clear previous solution' };
+ 
+    // Then mark the new one
+    const { error: markErr } = await supabase
+      .from('overflow_comments')
+      .update({ marked_as_solution: true })
+      .eq('id', commentIdNum);
+ 
+    if (markErr) return { success: false, error: 'Failed to mark solution' };
+ 
+    revalidatePath('/home/overflow');
+    return { success: true, marked: true };
+  } catch (err) {
+    return { success: false, error: 'Unexpected error' };
+  }
 }
 
 // Post a new comment
@@ -633,6 +687,7 @@ export async function postComment(data: PostCommentData) {
           id,
           first_name,
           last_name,
+          username,
           image_url
         )
       `)
@@ -672,15 +727,17 @@ export async function postComment(data: PostCommentData) {
       content: insertedComment.comment,
       author: {
         id: codevData?.id || data.codev_id,
-        name: codevData 
+        name: codevData
           ? `${codevData.first_name} ${codevData.last_name}`.trim()
           : 'Unknown User',
+        username: codevData?.username ?? null,
         image_url: codevData?.image_url || null,
       },
       likes: insertedComment.likes || 0,
       created_at: insertedComment.created_at,
       updated_at: insertedComment.updated_at,
       post_id: insertedComment.post_id.toString(),
+      marked_as_solution: false
     };
 
     revalidatePath('/home/overflow');
@@ -767,6 +824,7 @@ export async function updateComment(data: UpdateCommentData) {
           id,
           first_name,
           last_name,
+          username,
           image_url
         )
       `)
@@ -786,15 +844,17 @@ export async function updateComment(data: UpdateCommentData) {
       content: updatedComment.comment,
       author: {
         id: codevData?.id || '',
-        name: codevData 
+        name: codevData
           ? `${codevData.first_name} ${codevData.last_name}`.trim()
           : 'Unknown User',
+        username: codevData?.username ?? null,
         image_url: codevData?.image_url || null,
       },
       likes: updatedComment.likes || 0,
       created_at: updatedComment.created_at,
       updated_at: updatedComment.updated_at,
       post_id: updatedComment.post_id.toString(),
+      marked_as_solution: false
     };
 
     revalidatePath('/home/overflow');
@@ -1082,3 +1142,141 @@ export const getSocialPoints = async (userId: string): Promise<number | null> =>
     throw error;
   }
 };
+
+// trends
+
+export interface TrendingTopic {
+  rank: number;
+  tag: string;
+  posts: number;
+  engagement: number;
+  badge?: "Hot" | "Rising" | null;
+}
+
+
+export async function fetchTrendingTopics(): Promise<TrendingTopic[]> {
+  try {
+    const supabase = await createClientServerComponent();
+
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+    const { data, error } = await supabase
+      .from("overflow_post")
+      .select("tags, likes, comments")
+      .gte("created_at", sevenDaysAgo.toISOString());
+
+    if (error || !data || data.length === 0) return [];
+
+    const tagMap = new Map<string, { posts: number; engagement: number; display: string }>();
+
+    for (const row of data) {
+      const tags = row.tags ? (JSON.parse(row.tags) as string[]) : [];
+      const engagement = (row.likes || 0) + (row.comments || 0);
+
+      for (const tag of tags) {
+        const trimmed = tag.trim();
+        if (!trimmed) continue;
+
+        const key = trimmed.toLowerCase();
+        const existing = tagMap.get(key) ?? { posts: 0, engagement: 0, display: trimmed };
+        tagMap.set(key, {
+          posts: existing.posts + 1,
+          engagement: existing.engagement + engagement,
+          display: existing.display,
+        });
+      }
+    }
+
+    if (tagMap.size === 0) return [];
+
+    const sorted = Array.from(tagMap.entries())
+      .sort((a, b) => b[1].posts - a[1].posts)
+      .slice(0, 10);
+
+    return sorted.map(([key, stats], index) => {
+      const engagementRatio = stats.posts > 0 ? stats.engagement / stats.posts : 0;
+      const isHot = index < 3 && stats.engagement > 0;
+      const isRising = !isHot && engagementRatio >= 2;
+
+      return {
+        rank: index + 1,
+        tag: stats.display,
+        posts: stats.posts,
+        engagement: stats.engagement,
+        badge: isHot ? "Hot" : isRising ? "Rising" : null,
+      };
+    });
+  } catch (error) {
+    return [];
+  }
+}
+
+// top streak 
+
+export interface TopSolver {
+  id: string;
+  name: string;
+  initials: string;
+  image_url: string | null;
+  correct_answers: number;
+}
+ 
+export async function fetchTopSolvers(limit: number = 6): Promise<TopSolver[]> {
+  try {
+    const supabase = await createClientServerComponent();
+ 
+    // Get codev_id + count of marked_as_solution comments, joined with codev for name/avatar
+    const { data, error } = await supabase
+      .from('overflow_comments')
+      .select(`
+        codev_id,
+        codev (
+          id,
+          first_name,
+          last_name,
+          image_url
+        )
+      `)
+      .eq('marked_as_solution', true);
+ 
+    if (error || !data || data.length === 0) return [];
+ 
+    // Group by codev_id and count
+    const countMap = new Map<string, { count: number; codev: any }>();
+ 
+    for (const row of data) {
+      const codevData = Array.isArray(row.codev) ? row.codev[0] : row.codev;
+      if (!codevData) continue;
+ 
+      const key = row.codev_id;
+      const existing = countMap.get(key);
+      if (existing) {
+        existing.count += 1;
+      } else {
+        countMap.set(key, { count: 1, codev: codevData });
+      }
+    }
+ 
+    // Sort by count descending, take top N
+    const sorted = Array.from(countMap.entries())
+      .sort((a, b) => b[1].count - a[1].count)
+      .slice(0, limit);
+ 
+    return sorted.map(([codevId, { count, codev }]) => {
+      const firstName = codev.first_name ?? '';
+      const lastName = codev.last_name ?? '';
+      const initials = `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+ 
+      return {
+        id: codevId,
+        name: `${firstName} ${lastName}`.trim(),
+        initials,
+        image_url: codev.image_url ?? null,
+        correct_answers: count,
+      };
+    });
+  } catch (error) {
+    return [];
+  }
+}
