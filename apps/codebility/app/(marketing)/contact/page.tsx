@@ -17,7 +17,7 @@ const steps = [
   { label: "Set an Appointment", icon: <IconActivityLog /> },
 ];
 
-export interface FormData {
+export interface ContactFormData {
   // Step 1
   firstName: string;
   lastName: string;
@@ -36,7 +36,7 @@ export interface FormData {
 
 const Contact = () => {
   const [currentStep, setCurrentStep] = useState(0);
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<ContactFormData>({
     firstName: "", lastName: "", email: "",
     companyName: "", phoneNumber: "", industry: "",
     serviceInterest: "", projectType: "", featuresNeeded: "",
@@ -46,7 +46,7 @@ const Contact = () => {
   const goNext = () => setCurrentStep((s) => Math.min(s + 1, steps.length - 1));
   const goBack = () => setCurrentStep((s) => Math.max(s - 1, 0));
 
-  const updateFormData = (data: Partial<FormData>) =>
+  const updateFormData = (data: Partial<ContactFormData>) =>
     setFormData((prev) => ({ ...prev, ...data }));
 
   const progressWidth = `${(currentStep / (steps.length - 1)) * 100}%`;

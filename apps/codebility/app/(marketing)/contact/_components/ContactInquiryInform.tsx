@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from "@radix-ui/react-select";
 import { IconDropdown } from "@/public/assets/svgs";
-import { FormData } from "../page";
+import { ContactFormData } from "../page";
 
 const industries = [
   "Technology", "Healthcare", "Finance",
@@ -21,8 +21,8 @@ const industries = [
 ];
 
 interface InquiryFormProps {
-  defaultValues: FormData;
-  onNext: (data: Pick<FormData, "firstName" | "lastName" | "email" | "companyName" | "phoneNumber" | "industry">) => void;
+  defaultValues: ContactFormData;
+  onNext: (data: Pick<ContactFormData, "firstName" | "lastName" | "email" | "companyName" | "phoneNumber" | "industry">) => void;
 }
 
 export default function InquiryForm({ defaultValues, onNext }: InquiryFormProps) {

@@ -10,7 +10,7 @@ import {
 } from "@radix-ui/react-select";
 import { Label } from "@codevs/ui/label";
 import { Textarea } from "@codevs/ui/textarea";
-import { FormData } from "../page";
+import { ContactFormData } from "../page";
 
 const referralSources = [
   "Search engine", "Social media", "Referral / Word of mouth",
@@ -26,8 +26,8 @@ const existingWebsiteOptions = [
 const MAX_CHARS = 500;
 
 interface ShortSurveyProps {
-  defaultValues: FormData;
-  onNext: (data: Pick<FormData, "serviceInterest" | "projectType" | "featuresNeeded" | "referralSource" | "interestLevel" | "otherRequirements">) => void;
+  defaultValues: ContactFormData;
+  onNext: (data: Pick<ContactFormData, "serviceInterest" | "projectType" | "featuresNeeded" | "referralSource" | "interestLevel" | "otherRequirements">) => void;
   onBack: () => void;
 }
 

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { FormData } from "../page";
+import { ContactFormData } from "../page";
 
 const meetingTypes = [
   { value: "zoom", label: "Zoom", sub: "Via Zoom meeting link" },
@@ -50,7 +50,7 @@ const formatDisplay = (dateStr: string) => {
 };
 
 interface AppointmentProps {
-  formData: FormData;
+  formData: ContactFormData;
   onBack: () => void;
 }
 
@@ -163,7 +163,7 @@ export default function Appointment({ formData, onBack }: AppointmentProps) {
         <div className="flex flex-col items-center gap-2 text-center">
           <p className="text-xl font-semibold">You're all set!</p>
           <p className="max-w-xs text-sm text-white/40">
-            We've received your appointment request. Please kindly wait for us to contact you via email at{" "}
+            We've received your appointment request. A confirmation has been sent to{" "}
             <span className="text-violet-300">{formData.email}</span>.
           </p>
         </div>
