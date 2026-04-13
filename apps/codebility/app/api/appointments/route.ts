@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
       .select()
       .single();
 
-    if (error) {
+    if (error || !data) {
       console.error("[appointments] Supabase insert error:", error);
       return NextResponse.json(
         { error: "Failed to save appointment." },
