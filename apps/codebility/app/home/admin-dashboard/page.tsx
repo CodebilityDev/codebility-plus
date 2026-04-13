@@ -22,9 +22,8 @@ async function getDashboardData() {
     );
 
   // Fetch project categories junction table to count projects per category
-  const { data: projectCategories, error: projectCategoriesError } = await supabase
-    .from("project_categories")
-    .select("project_id, category_id");
+  const { data: projectCategories, error: projectCategoriesError } =
+    await supabase.from("project_categories").select("project_id, category_id");
 
   const { data: categories, error: categoriesError } = await supabase
     .from("projects_category")
@@ -36,7 +35,10 @@ async function getDashboardData() {
     return;
   }
   if (projectCategoriesError) {
-    console.error("Failed to fetch project categories:", projectCategoriesError.message);
+    console.error(
+      "Failed to fetch project categories:",
+      projectCategoriesError.message,
+    );
     return;
   }
   if (categoriesError) {
@@ -63,7 +65,9 @@ async function getDashboardData() {
 
   const applicantStatusCounts = applicantStatuses.reduce(
     (acc, status) => {
-      acc[status] = codev.filter((c) => c.application_status === status).length;
+      acc[status] = codev.filter(
+        (c) => c.application_status === status,
+      ).length;
       return acc;
     },
     {} as Record<string, number>,
@@ -95,7 +99,6 @@ async function getDashboardData() {
   //Projects - Count unique projects per category (many-to-many relationship)
   const projectCounts = categories.reduce(
     (acc, category) => {
-      // Count unique project_ids that have this category
       const count = projectCategories.filter(
         (pc) => pc.category_id === category.id,
       ).length;
@@ -106,7 +109,9 @@ async function getDashboardData() {
   );
 
   // Count total unique projects
-  const uniqueProjectIds = new Set(projectCategories.map((pc) => pc.project_id));
+  const uniqueProjectIds = new Set(
+    projectCategories.map((pc) => pc.project_id),
+  );
   const projectTotalCount = uniqueProjectIds.size;
 
   return {
@@ -122,6 +127,39 @@ async function getDashboardData() {
   };
 }
 
+// Reusable section label component
+function SectionLabel({
+  label,
+  description,
+}: {
+  label: string;
+  description?: string;
+}) {
+  return (
+    <div className="flex flex-col gap-0.5">
+      <p className="text-xs font-semibold uppercase tracking-widest text-blue-400/70">
+        {label}
+      </p>
+      {description && (
+        <p className="text-xs text-gray-500 dark:text-gray-500">{description}</p>
+      )}
+    </div>
+  );
+}
+
+// Subtle divider with label
+function SectionDivider({ label }: { label: string }) {
+  return (
+    <div className="flex items-center gap-3">
+      <div className="h-px flex-1 bg-white/5" />
+      <span className="text-[11px] font-medium uppercase tracking-widest text-white/20">
+        {label}
+      </span>
+      <div className="h-px flex-1 bg-white/5" />
+    </div>
+  );
+}
+
 export default async function AdminDashboard() {
   const dashboardData = await getOrSetCache(cacheKeys.dashboard.admin, () =>
     getDashboardData(),
@@ -129,26 +167,31 @@ export default async function AdminDashboard() {
 
   return (
     <div className="mx-auto max-w-screen-xl">
-      <div className="flex flex-col gap-4 pt-4">
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-500 shadow-lg">
-                <span className="text-xl">📊</span>
-              </div>
-              <div>
-                <H1 className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-3xl font-bold text-transparent">
-                  Dashboard
-                </H1>
-                <p className="text-gray-600 dark:text-gray-400">
-                  Monitor your platform metrics and analytics
-                </p>
-              </div>
+      <div className="flex flex-col gap-6 pt-4">
+        {/* ── Page Header ── */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-500 shadow-lg">
+              <span className="text-xl">📊</span>
+            </div>
+            <div>
+              <H1 className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-3xl font-bold text-transparent">
+                Dashboard
+              </H1>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Monitor your platform metrics and analytics
+              </p>
             </div>
           </div>
+        </div>
 
-          {/* Metrics Grid - UPDATED TO USE SHARED COMPONENT */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+        {/* ── Intern Metrics ── */}
+        <div className="space-y-3">
+          <SectionLabel
+            label="Intern Overview"
+            description="Headcount by activity status"
+          />
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <AdminDashboardStatsCard
               title="Total Active Interns"
               count={dashboardData?.activeInterns}
@@ -156,7 +199,6 @@ export default async function AdminDashboard() {
               iconName="UserCheck"
               colorTheme="blue"
             />
-            
             <AdminDashboardStatsCard
               title="Total Inactive Interns"
               count={dashboardData?.inactiveInterns}
@@ -164,7 +206,18 @@ export default async function AdminDashboard() {
               iconName="UserX"
               colorTheme="red"
             />
-            
+          </div>
+        </div>
+
+        <SectionDivider label="Platform" />
+
+        {/* ── Platform Metrics ── */}
+        <div className="space-y-3">
+          <SectionLabel
+            label="Platform Overview"
+            description="Registered roles and active projects"
+          />
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <AdminDashboardStatsCard
               title="Total Codevs"
               count={dashboardData?.codevs}
@@ -172,7 +225,6 @@ export default async function AdminDashboard() {
               iconName="Users"
               colorTheme="green"
             />
-            
             <AdminDashboardStatsCard
               title="Total Admins"
               count={dashboardData?.admins}
@@ -180,7 +232,6 @@ export default async function AdminDashboard() {
               iconName="UserCog"
               colorTheme="purple"
             />
-            
             <AdminDashboardStatsCard
               title="Total Mentors"
               count={dashboardData?.mentors}
@@ -188,7 +239,6 @@ export default async function AdminDashboard() {
               iconName="UserPen"
               colorTheme="orange"
             />
-            
             <AdminDashboardStatsCard
               title="Total Projects"
               count={dashboardData?.projectTotalCount}
@@ -197,16 +247,30 @@ export default async function AdminDashboard() {
               colorTheme="cyan"
             />
           </div>
+        </div>
 
-          {/* Charts Section */}
+        <SectionDivider label="Analytics" />
+
+        {/* ── Charts Section ── */}
+        <div className="space-y-3">
+          <SectionLabel
+            label="Distribution Charts"
+            description="Applicant pipeline and project category breakdown"
+          />
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             <AdminDashboardApplicantStatusPie
               data={dashboardData?.applicantStatusCounts}
             />
             <AdminDashboardProjectsPie data={dashboardData?.projectCounts} />
           </div>
+        </div>
 
-          {/* Line Chart */}
+        {/* ── Monthly Trend ── */}
+        <div className="space-y-3 pb-6">
+          <SectionLabel
+            label="Monthly Applicants"
+            description="Trend over the current and previous 5 months"
+          />
           <div className="w-full">
             <AdminDashboardMonthlyApplicantsLineChart
               dateApplied={dashboardData?.dateApplied}

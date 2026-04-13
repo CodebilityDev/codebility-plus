@@ -3,7 +3,6 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { Input } from "@mui/material";
 import { Loader2Icon } from "lucide-react";
 import { useForm } from "react-hook-form";
 
@@ -26,8 +25,8 @@ export default function ApplicantStep2({
   user: any;
   applicantData: ApplicantType;
 }) {
-  const takenTest = applicantData.test_taken ? true : false; // Replace with actual logic to check if the test has been taken
-  const submittedTest = applicantData.fork_url ? true : false; // Replace with actual logic to check if the test has been submitted
+  const takenTest = applicantData.test_taken ? true : false;
+  const submittedTest = applicantData.fork_url ? true : false;
 
   return (
     <div className="my-20 flex flex-col items-center gap-8 text-center lg:gap-10">
@@ -149,10 +148,9 @@ function PostReadInstructions({
   const onSubmit = async (data: any) => {
     setLoading(true);
     try {
-
       /* if non ui/ux role */
       if (user?.display_position.includes("UI/UX Designer") === false) {
-        //validate the fork url
+        // Validate the fork url
         const urlPattern =
           /^(https?:\/\/)?(www\.)?github\.com\/[a-zA-Z0-9_-]+\/codebility-assessment(\.git)?(\/.*)?$/;
 
@@ -204,7 +202,8 @@ function PostReadInstructions({
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="flex w-full max-w-md flex-col gap-4">
-            <Input
+            {/* FIX: replaced MUI Input with native input — MUI Input breaks react-hook-form's ref, causing data.fork_url to always be undefined on submit */}
+            <input
               {...register("fork_url", {
                 required: "This field is required",
               })}
@@ -222,6 +221,7 @@ function PostReadInstructions({
                 {String(errors.fork_url.message)}
               </p>
             )}
+
             <div className="flex flex-col gap-4 *:w-[16rem] sm:flex-row sm:*:w-auto">
               {user?.display_position.includes("UI/UX Designer") ? (
                 <TestQAInstruction applicantData={applicantData}>
@@ -281,10 +281,9 @@ function PostSubmitted({
   const onSubmit = async (data: any) => {
     setLoading(true);
     try {
-
       /* if non ui/ux role */
       if (user?.display_position.includes("UI/UX Designer") === false) {
-        //validate the fork url
+        // Validate the fork url
         const urlPattern =
           /^(https?:\/\/)?(www\.)?github\.com\/[a-zA-Z0-9_-]+\/codebility-assessment(\.git)?(\/.*)?$/;
 
@@ -322,6 +321,7 @@ function PostSubmitted({
     }
     setLoading(false);
   };
+
   return (
     <>
       <div className="flex flex-col items-center gap-4">
@@ -336,7 +336,8 @@ function PostSubmitted({
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="flex w-full max-w-md flex-col gap-4">
-            <Input
+            {/* FIX: replaced MUI Input with native input — same ref issue as PostReadInstructions */}
+            <input
               {...register("fork_url", {
                 required: "This field is required",
               })}

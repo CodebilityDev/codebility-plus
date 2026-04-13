@@ -19,6 +19,9 @@ interface MemberSelectionProps {
   onMemberAdd: (member: Codev) => void;
   onMemberRemove: (memberId: string) => void;
   excludeMembers?: string[]; // IDs of members to exclude (e.g., team leader)
+  // Added: allow callers to hide the built-in "Team Members" label when they
+  // already provide their own heading. Defaults to true (existing behavior).
+  showLabel?: boolean;
 }
 
 export const MemberSelection = ({
@@ -27,6 +30,7 @@ export const MemberSelection = ({
   onMemberAdd,
   onMemberRemove,
   excludeMembers = [],
+  showLabel = true, // default true — no change to existing callers
 }: MemberSelectionProps) => {
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -44,8 +48,12 @@ export const MemberSelection = ({
 
   return (
     <div className="space-y-2">
-      <label className="dark:text-light-900 text-black">Team Members</label>
-      <div className="flex gap-2">
+      {/* Only render label when showLabel is true (default).
+          Pass showLabel={false} from callers that provide their own heading. */}
+      {showLabel && (
+        <label className="dark:text-light-900 text-black">Team Members</label>
+      )}
+      <div className="flex flex-wrap items-center gap-2">
         <div className="flex flex-wrap items-center gap-2">
           {selectedMembers.map((member) => (
             <div
@@ -69,9 +77,12 @@ export const MemberSelection = ({
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="h-12 w-12 rounded-full p-0">
-              <IconPlus className="h-6 w-6" />
-            </Button>
+            <button 
+              className="h-12 w-12 rounded-full border border-gray-600 bg-transparent hover:bg-gray-700 transition-colors"
+              style={{ display: "grid", placeItems: "center" }}
+            >
+              <IconPlus className="h-5 w-5" style={{ transform: "translateX(3px) translateY(1px)" }} />
+            </button>
           </DropdownMenuTrigger>
 
           <DropdownMenuContent

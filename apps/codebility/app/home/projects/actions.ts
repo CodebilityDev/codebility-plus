@@ -67,7 +67,6 @@ export async function getUserProjects(): Promise<{
 }> {
   const supabase = await createClientServerComponent();
   try {
-    // Get the current logged-in user
     const {
       data: { user },
       error: userError,
@@ -77,8 +76,7 @@ export async function getUserProjects(): Promise<{
       return { error: { message: "User not authenticated" }, data: null };
     }
 
-
-    let { data: codevData, error: codevError } = await supabase
+    const { data: codevData, error: codevError } = await supabase
       .from("codev")
       .select("id, email_address")
       .eq("id", user.id)
@@ -104,14 +102,13 @@ export async function getUserProjects(): Promise<{
 
     const userCodevId = codevData.id;
 
-    // Define the shape of the project data returned by Supabase
     interface DbProject {
       id: string;
       name: string;
       status: string | null;
       kanban_display: boolean | null;
       meeting_link: string | null;
-      public_display: boolean | null;  // ← ADD THIS
+      public_display: boolean | null;
     }
 
     interface ProjectMember {
@@ -120,24 +117,24 @@ export async function getUserProjects(): Promise<{
       project: DbProject;
     }
 
-    // Fetch projects where the user is assigned ANY role
     const { data: projectMembers, error: projectMembersError } = await supabase
       .from("project_members")
       .select(
         `
-      project_id,
-      role,
-      project:project_id (
-        id,
-        name,
-        status,
-        kanban_display,
-        public_display,
-        meeting_link
+        project_id,
+        role,
+        project:project_id (
+          id,
+          name,
+          status,
+          kanban_display,
+          public_display,
+          meeting_link
+        )
+      `,
       )
-    `,
-      )
-      .eq("codev_id", userCodevId) as { data: ProjectMember[] | null; error: any };
+      .eq("codev_id", userCodevId)
+      .in("role", ["team_leader", "member"]) as { data: ProjectMember[] | null; error: any };
 
     if (projectMembersError) {
       console.error("Error fetching user projects:", projectMembersError);
@@ -148,7 +145,6 @@ export async function getUserProjects(): Promise<{
       return { error: null, data: null };
     }
 
-    // Map the project members to the expected return type
     const userProjects = projectMembers.map((pm) => ({
       project: {
         id: pm.project.id,
@@ -176,7 +172,6 @@ export async function createProject(
   const supabase = await createClientServerComponent();
 
   try {
-    // Parse tech stack if provided
     const techStackData = formData.get("tech_stack");
     let techStack: string[] | null = null;
     if (techStackData) {
@@ -187,7 +182,6 @@ export async function createProject(
       }
     }
 
-    // Parse category IDs if provided
     const categoryIdsData = formData.get("category_ids");
     let categoryIds: number[] = [];
     if (categoryIdsData) {
@@ -198,7 +192,6 @@ export async function createProject(
       }
     }
 
-    // Parse key_features and gallery if provided
     const keyFeaturesData = formData.get("key_features");
     let keyFeatures: string[] | null = null;
     if (keyFeaturesData) {
@@ -219,7 +212,6 @@ export async function createProject(
       }
     }
 
-    // Create project
     const { data: project, error: projectError } = await supabase
       .from("projects")
       .insert({
@@ -242,7 +234,6 @@ export async function createProject(
 
     if (projectError) throw projectError;
 
-    // Insert project categories into junction table
     if (categoryIds.length > 0) {
       const categoryInserts = categoryIds.map((categoryId) => ({
         project_id: project.id,
@@ -258,16 +249,13 @@ export async function createProject(
       }
     }
 
-    // Create project members including team leader
     const memberInserts = [
-      // Add team leader
       {
         project_id: project.id,
         codev_id: teamLeaderId,
         role: "team_leader",
         joined_at: new Date().toISOString(),
       },
-      // Add other members
       ...selectedMembers
         .filter((member) => member.id !== teamLeaderId)
         .map((member) => ({
@@ -284,7 +272,6 @@ export async function createProject(
 
     if (membersError) throw membersError;
 
-    // Create default kanban board
     const { error: boardError } = await supabase.from("kanban_boards").insert({
       name: `${project.name} Board`,
       project_id: project.id,
@@ -293,7 +280,6 @@ export async function createProject(
 
     if (boardError) throw boardError;
 
-    // Invalidate Redis cache for projects
     await invalidateCache(cacheKeys.projects.all);
 
     revalidatePath("/projects");
@@ -316,9 +302,7 @@ export async function updateStatus(
   const supabase = await createClientServerComponent();
   const { error: projectError } = await supabase
     .from("projects")
-    .update({
-      status: status,
-    })
+    .update({ status: status })
     .eq("id", projectId)
     .select();
 
@@ -340,9 +324,7 @@ export async function updateKanbanDisplaySwitch(
   const supabase = await createClientServerComponent();
   const { error: projectError } = await supabase
     .from("projects")
-    .update({
-      kanban_display: kanbanDisplay,
-    })
+    .update({ kanban_display: kanbanDisplay })
     .eq("id", projectId)
     .select();
 
@@ -359,9 +341,7 @@ export async function updatePublicDisplaySwitch(
   const supabase = await createClientServerComponent();
   const { error: projectError } = await supabase
     .from("projects")
-    .update({
-      public_display: publicDisplay,
-    })
+    .update({ public_display: publicDisplay })
     .eq("id", projectId)
     .select();
 
@@ -380,13 +360,11 @@ export async function updateProject(projectId: string, formData: FormData) {
   const supabase = await createClientServerComponent();
 
   try {
-    // Parse project members data
     const projectMembersData = formData.get("project_members");
     const projectMembers = projectMembersData
       ? (JSON.parse(projectMembersData as string) as ProjectMemberData[])
       : null;
 
-    // Parse tech stack if provided
     const techStackData = formData.get("tech_stack");
     let techStack: string[] | null = null;
     if (techStackData) {
@@ -397,7 +375,6 @@ export async function updateProject(projectId: string, formData: FormData) {
       }
     }
 
-    // Parse category IDs if provided
     const categoryIdsData = formData.get("category_ids");
     let categoryIds: number[] | null = null;
     if (categoryIdsData) {
@@ -408,7 +385,6 @@ export async function updateProject(projectId: string, formData: FormData) {
       }
     }
 
-    // Parse key_features and gallery if provided
     const keyFeaturesData = formData.get("key_features");
     let keyFeatures: string[] | null = null;
     if (keyFeaturesData) {
@@ -429,25 +405,22 @@ export async function updateProject(projectId: string, formData: FormData) {
       }
     }
 
-    // Update project details
     const updateData: any = {};
     for (const [key, value] of formData.entries()) {
-      if (key !== "project_members" && key !== "tech_stack" && key !== "category_ids" && key !== "key_features" && key !== "gallery") {
+      if (
+        key !== "project_members" &&
+        key !== "tech_stack" &&
+        key !== "category_ids" &&
+        key !== "key_features" &&
+        key !== "gallery"
+      ) {
         updateData[key] = value;
       }
     }
 
-    if (techStack) {
-      updateData.tech_stack = techStack;
-    }
-
-    if (keyFeatures) {
-      updateData.key_features = keyFeatures;
-    }
-
-    if (gallery) {
-      updateData.gallery = gallery;
-    }
+    if (techStack) updateData.tech_stack = techStack;
+    if (keyFeatures) updateData.key_features = keyFeatures;
+    if (gallery) updateData.gallery = gallery;
 
     const { data: projectData, error: projectError } = await supabase
       .from("projects")
@@ -463,9 +436,7 @@ export async function updateProject(projectId: string, formData: FormData) {
       throw projectError;
     }
 
-    // Handle project members with joined_at preservation
     if (projectMembers && Array.isArray(projectMembers)) {
-      // Fetch existing members to preserve joined_at dates
       const { data: existingMembers, error: membersError } = await supabase
         .from("project_members")
         .select("codev_id, joined_at")
@@ -473,12 +444,10 @@ export async function updateProject(projectId: string, formData: FormData) {
 
       if (membersError) throw membersError;
 
-      // Create lookup map for existing timestamps
       const joinedAtMap = new Map(
         existingMembers?.map(m => [m.codev_id, m.joined_at]) ?? []
       );
 
-      // Delete existing members
       const { error: deleteError } = await supabase
         .from("project_members")
         .delete()
@@ -486,7 +455,6 @@ export async function updateProject(projectId: string, formData: FormData) {
 
       if (deleteError) throw deleteError;
 
-      // Insert updated members with preserved timestamps
       const { error: insertError } = await supabase
         .from("project_members")
         .insert(
@@ -501,9 +469,7 @@ export async function updateProject(projectId: string, formData: FormData) {
       if (insertError) throw insertError;
     }
 
-    // Handle project categories update
     if (categoryIds !== null) {
-      // Delete existing project categories
       const { error: deleteCategoriesError } = await supabase
         .from("project_categories")
         .delete()
@@ -513,7 +479,6 @@ export async function updateProject(projectId: string, formData: FormData) {
         console.error("Error deleting project categories:", deleteCategoriesError);
       }
 
-      // Insert new project categories
       if (categoryIds.length > 0) {
         const categoryInserts = categoryIds.map((categoryId) => ({
           project_id: projectId,
@@ -549,7 +514,6 @@ export async function deleteProject(projectId: string) {
   const supabase = await createClientServerComponent();
 
   try {
-    // Get project data first to handle image deletion
     const { data: project, error: fetchError } = await supabase
       .from("projects")
       .select()
@@ -558,7 +522,6 @@ export async function deleteProject(projectId: string) {
 
     if (fetchError) throw fetchError;
 
-    // Delete project image if exists
     if (project.main_image) {
       const imagePath = await getImagePath(project.main_image);
       if (imagePath) {
@@ -566,7 +529,6 @@ export async function deleteProject(projectId: string) {
       }
     }
 
-    // Delete project (cascade will handle related records)
     const { error: deleteError } = await supabase
       .from("projects")
       .delete()
@@ -646,23 +608,10 @@ export const getTeamLead = async (
 };
 
 /**
- * ✅ ENHANCED: Fetch project members with two-query approach + comprehensive debug logging
- * 
- * FIXES:
- * - Prevents member dropout due to RLS policies or join failures
- * - Adds comprehensive debug logging to diagnose issues
- * - Members like Arishavelle and Reagan no longer dropped from results
- * 
- * DEBUG LOGS:
- * - Function entry with project ID
- * - Count of project_members found
- * - List of codev_ids being queried
- * - Count of codev records returned
- * - Warning for any missing codev records
- * - Final member list with names
- * 
- * @param projectId - The project ID to fetch members for
- * @returns Promise with error and data (array of SimpleMemberData)
+ * Fetch project members via two-query approach to avoid RLS/join dropouts.
+ * Step 1: get codev_ids from project_members
+ * Step 2: fetch codev records separately
+ * Step 3: merge manually
  */
 export const getMembers = async (
   projectId: string,
@@ -673,7 +622,6 @@ export const getMembers = async (
   const supabase = await createClientServerComponent();
 
   try {
-    // Step 1: Get all project_members with role = 'member'
     const { data: projectMembers, error: pmError } = await supabase
       .from("project_members")
       .select("codev_id, role, joined_at")
@@ -689,7 +637,6 @@ export const getMembers = async (
       return { error: null, data: [] };
     }
 
-    // Step 2: Get codev details separately (avoids RLS/join issues)
     const codevIds = projectMembers.map(pm => pm.codev_id);
 
     const { data: codevs, error: codevError } = await supabase
@@ -702,15 +649,11 @@ export const getMembers = async (
       return { error: codevError, data: null };
     }
 
-    // Step 3: Merge data manually
     const members = projectMembers.map(pm => {
       const codev = codevs?.find(c => c.id === pm.codev_id);
 
-      // If codev record is missing, log warning
       if (!codev) {
         console.warn(`⚠️ Missing codev record for member: ${pm.codev_id}`);
-        console.warn(`   - This member exists in project_members but not in codev table`);
-        console.warn(`   - OR RLS policy is blocking access to this codev record`);
         return null;
       }
 
@@ -734,8 +677,7 @@ export const getMembers = async (
 };
 
 /**
- * Update project members with joined_at preservation
- * Preserves existing joined_at dates when updating members
+ * Update project members with joined_at preservation.
  */
 export const updateProjectMembers = async (
   projectId: string,
@@ -745,7 +687,6 @@ export const updateProjectMembers = async (
   const supabase = await createClientServerComponent();
 
   try {
-    // Step 1: Fetch existing members to preserve joined_at dates
     const { data: existingMembers, error: fetchError } = await supabase
       .from("project_members")
       .select("codev_id, joined_at")
@@ -753,12 +694,10 @@ export const updateProjectMembers = async (
 
     if (fetchError) throw fetchError;
 
-    // Step 2: Create lookup map for existing timestamps
     const joinedAtMap = new Map(
       existingMembers?.map(m => [m.codev_id, m.joined_at]) ?? []
     );
 
-    // Step 3: Delete old records
     const { error: deleteError } = await supabase
       .from("project_members")
       .delete()
@@ -766,7 +705,6 @@ export const updateProjectMembers = async (
 
     if (deleteError) throw deleteError;
 
-    // Step 4: Insert with preserved timestamps for existing members
     const memberInserts = members.map((member) => ({
       project_id: projectId,
       codev_id: member.id,
@@ -829,7 +767,6 @@ export const getProjectCodevs = async (filters = {}): Promise<Codev[]> => {
 
   return (
     data?.map((codev: any) => {
-      // Transform projects array
       const projects = (codev.project_members || []).map(
         (pm: DbProjectMember) => {
           const project: Project & { role: string; joined_at: string } = {
@@ -839,13 +776,12 @@ export const getProjectCodevs = async (filters = {}): Promise<Codev[]> => {
             joined_at: pm.joined_at,
             status: pm.project.status,
             kanban_display: pm.project.kanban_display,
-            public_display: pm.project.public_display
+            public_display: pm.project.public_display,
           };
           return project;
         },
       );
 
-      // Transform codev data
       return {
         ...codev,
         positions: codev.positions || [],
@@ -885,9 +821,6 @@ export const getProjectCategories = async () => {
   return data || [];
 };
 
-/**
- * Get all categories for a specific project
- */
 export const getProjectCategoriesForProject = async (projectId: string) => {
   const supabase = await createClientServerComponent();
   const { data, error } = await supabase
@@ -910,9 +843,6 @@ export const getProjectCategoriesForProject = async (projectId: string) => {
   return data?.map((item: any) => item.projects_category).filter(Boolean) || [];
 };
 
-/**
- * Add categories to a project
- */
 export const addCategoriesToProject = async (
   projectId: string,
   categoryIds: number[]
@@ -936,9 +866,6 @@ export const addCategoriesToProject = async (
   return { success: true };
 };
 
-/**
- * Remove a category from a project
- */
 export const removeCategoryFromProject = async (
   projectId: string,
   categoryId: number
@@ -959,16 +886,12 @@ export const removeCategoryFromProject = async (
   return { success: true };
 };
 
-/**
- * Replace all categories for a project
- */
 export const replaceProjectCategories = async (
   projectId: string,
   categoryIds: number[]
 ) => {
   const supabase = await createClientServerComponent();
 
-  // Delete existing categories
   const { error: deleteError } = await supabase
     .from("project_categories")
     .delete()
@@ -979,7 +902,6 @@ export const replaceProjectCategories = async (
     throw new Error("Failed to delete project categories");
   }
 
-  // Insert new categories if any
   if (categoryIds.length > 0) {
     const inserts = categoryIds.map((categoryId) => ({
       project_id: projectId,
@@ -999,9 +921,6 @@ export const replaceProjectCategories = async (
   return { success: true };
 };
 
-/**
- * Get all projects with kanban boards display is true
- */
 export async function getAllProjects(kanbanBoardId?: string) {
   const supabase = await createClientServerComponent();
 
@@ -1019,7 +938,6 @@ export async function getAllProjects(kanbanBoardId?: string) {
 
     if (error) throw error;
 
-    // Flatten project info
     const flattenedProjects = data.map((item: any) => ({
       ...item.projects,
       kanban_board_id: item.id,
@@ -1038,7 +956,14 @@ export async function getAllProjects(kanbanBoardId?: string) {
 }
 
 /**
- * Get project by ID with full details
+ * Get project by ID with full details including project_members.
+ *
+ * ─── PATCH (CBP-95) ──────────────────────────────────────────────────────────
+ * Added display_position and email_address to the codev sub-select inside
+ * project_members. These fields are required by ProjectEditModal to construct
+ * a fallback Codev object when the team leader is absent from getProjectCodevs()
+ * results (e.g. filtered out by RLS or internal_status).
+ * ─────────────────────────────────────────────────────────────────────────────
  */
 export async function getProjectByID(id: string) {
   const supabase = await createClientServerComponent();
@@ -1056,7 +981,9 @@ export async function getProjectByID(id: string) {
           codev (
             first_name,
             last_name,
-            image_url
+            image_url,
+            display_position,
+            email_address
           )
         ),
         categories:project_categories(
@@ -1073,7 +1000,6 @@ export async function getProjectByID(id: string) {
 
   if (error) throw error;
 
-  // Flatten the categories structure
   const projectWithCategories = data ? {
     ...data,
     categories: data.categories?.map((cat: any) => cat.projects_category).filter(Boolean) || [],
