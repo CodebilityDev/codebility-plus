@@ -3,6 +3,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
+export const runtime = "nodejs"; // ✅ fixes Edge Runtime incompatibility
+
 // Use service role key directly — bypasses RLS for server-side inserts
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
