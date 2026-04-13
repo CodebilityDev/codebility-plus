@@ -3,13 +3,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-export const runtime = "nodejs"; // ✅ fixes Edge Runtime incompatibility
-
-// Use service role key directly — bypasses RLS for server-side inserts
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.DB_SERVICE_ROLE!
-);
+export const runtime = "nodejs";
 
 // ─── Request body type ─────────────────────────────────────────────────────
 
@@ -35,6 +29,20 @@ interface AppointmentBody {
 // ─── POST handler ──────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
+  // ✅ Initialized inside handler — runs at request time, not build time
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.DB_SERVICE_ROLE;
+
+  if (!supabaseUrl || !supabaseKey) {
+    console.error("[appointments] Missing Supabase environment variables.");
+    return NextResponse.json(
+      { error: "Server misconfiguration." },
+      { status: 500 }
+    );
+  }
+
+  const supabase = createClient(supabaseUrl, supabaseKey);
+
   try {
     const body = (await req.json()) as AppointmentBody;
 
