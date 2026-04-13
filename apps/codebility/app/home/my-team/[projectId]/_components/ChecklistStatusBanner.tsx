@@ -181,7 +181,7 @@ const ChecklistStatusBanner = ({ projectId }: ChecklistStatusBannerProps) => {
   }
 
   return (
-    <div className={`rounded-lg overflow-hidden ${
+    <div className={`h-full flex flex-col justify-center rounded-lg overflow-hidden ${
       membersWithPending > 0
         ? 'border-2 border-red-500 bg-red-50 dark:bg-red-950/20'
         : 'border-2 border-green-500 bg-green-50 dark:bg-green-950/20'
@@ -189,7 +189,7 @@ const ChecklistStatusBanner = ({ projectId }: ChecklistStatusBannerProps) => {
       {/* Compact Square Button */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className={`w-full p-3 flex items-center justify-between ${
+        className={`w-full h-full p-4 flex-1 flex items-center justify-between ${
           membersWithPending > 0
             ? 'hover:bg-red-100 dark:hover:bg-red-900/30'
             : 'hover:bg-green-100 dark:hover:bg-green-900/30'

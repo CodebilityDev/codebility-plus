@@ -23,6 +23,7 @@ interface ProjectData {
 
 interface TeamProjectCardProps {
   project: ProjectData;
+  userRole?: string;
   onAddMembers: () => void;
   isLoading: boolean;
 }
@@ -66,9 +67,10 @@ const MemberAvatar = memo(({ member, size = 40, showBorder = true }: { member: S
 
 MemberAvatar.displayName = 'MemberAvatar';
 
-const TeamProjectCard = memo(({ project, onAddMembers, isLoading }: TeamProjectCardProps) => {
+const TeamProjectCard = memo(({ project, userRole, onAddMembers, isLoading }: TeamProjectCardProps) => {
   const { project: projectInfo, teamLead, members } = project;
   const totalMembers = (members.data?.length ?? 0) + (teamLead.data ? 1 : 0);
+  const isTeamLead = userRole === "team_leader";
 
   return (
     <div className="group relative overflow-hidden rounded-2xl bg-white/20 backdrop-blur-md dark:bg-white/10 border border-white/30 dark:border-white/20 shadow-lg transition-all duration-500 hover:shadow-2xl hover:shadow-customBlue-500/20 hover:border-white/50 dark:hover:border-white/30 hover:-translate-y-2 hover:bg-white/30 dark:hover:bg-white/15 cursor-pointer">
@@ -106,20 +108,38 @@ const TeamProjectCard = memo(({ project, onAddMembers, isLoading }: TeamProjectC
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                onAddMembers();
-              }}
-              disabled={isLoading}
-              size="sm"
-              variant="outline"
-              className="relative z-20 shrink-0 border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 dark:border-blue-700 dark:text-blue-400 dark:hover:bg-blue-900/30 dark:hover:border-blue-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <UserPlus className="mr-2 h-4 w-4" />
-              {isLoading ? 'Adding...' : 'Add Member'}
-            </Button>
+            {isTeamLead && (
+              <Button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onAddMembers();
+                }}
+                disabled={isLoading}
+                size="sm"
+                variant="outline"
+                className="relative z-20 shrink-0 border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 dark:border-blue-700 dark:text-blue-400 dark:hover:bg-blue-900/30 dark:hover:border-blue-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <UserPlus className="mr-2 h-4 w-4" />
+                {isLoading ? 'Adding...' : 'Add Member'}
+              </Button>
+            )}
+            
+            {!isTeamLead && (
+              <Link 
+                href={`/home/my-team/${projectInfo.id}/leaderboard`}
+                className="relative z-20"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="shrink-0 border-purple-200 text-purple-600 hover:bg-purple-50 dark:border-purple-800 dark:text-purple-400 dark:hover:bg-purple-900/30"
+                >
+                  Leaderboard
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
 

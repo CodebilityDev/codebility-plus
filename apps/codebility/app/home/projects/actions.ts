@@ -78,13 +78,26 @@ export async function getUserProjects(): Promise<{
 
     const { data: codevData, error: codevError } = await supabase
       .from("codev")
-      .select("id")
-      .eq("email_address", user.email)
+      .select("id, email_address")
+      .eq("id", user.id)
       .single();
 
     if (codevError || !codevData) {
-      console.error("Error fetching codev_id:", codevError);
-      return { error: { message: "User profile not found" }, data: null };
+      // Fallback: search by email with case-insensitive check
+      const { data: fallbackData } = await supabase
+        .from("codev")
+        .select("id, email_address")
+        .ilike("email_address", user.email || "")
+        .single();
+
+      if (fallbackData) {
+        codevData = fallbackData;
+        codevError = null;
+      }
+    }
+
+    if (codevError || !codevData) {
+      return { error: { message: "User profile not found. Please complete your profile setup." }, data: null };
     }
 
     const userCodevId = codevData.id;
