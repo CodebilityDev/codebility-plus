@@ -78,26 +78,13 @@ export async function getUserProjects(): Promise<{
 
     const { data: codevData, error: codevError } = await supabase
       .from("codev")
-      .select("id, email_address")
-      .eq("id", user.id)
+      .select("id")
+      .eq("email_address", user.email)
       .single();
 
     if (codevError || !codevData) {
-      // Fallback: search by email with case-insensitive check
-      const { data: fallbackData } = await supabase
-        .from("codev")
-        .select("id, email_address")
-        .ilike("email_address", user.email || "")
-        .single();
-
-      if (fallbackData) {
-        codevData = fallbackData;
-        codevError = null;
-      }
-    }
-
-    if (codevError || !codevData) {
-      return { error: { message: "User profile not found. Please complete your profile setup." }, data: null };
+      console.error("Error fetching codev_id:", codevError);
+      return { error: { message: "User profile not found" }, data: null };
     }
 
     const userCodevId = codevData.id;
@@ -134,7 +121,8 @@ export async function getUserProjects(): Promise<{
       `,
       )
       .eq("codev_id", userCodevId)
-      .in("role", ["team_leader", "member"]) as { data: ProjectMember[] | null; error: any };
+      // ── CBP-116: added "sublead" so sublead-assigned users see their projects
+      .in("role", ["team_leader", "member", "sublead"]) as { data: ProjectMember[] | null; error: any };
 
     if (projectMembersError) {
       console.error("Error fetching user projects:", projectMembersError);
@@ -444,6 +432,7 @@ export async function updateProject(projectId: string, formData: FormData) {
 
       if (membersError) throw membersError;
 
+      // Preserve joined_at for all existing members (including sublead)
       const joinedAtMap = new Map(
         existingMembers?.map(m => [m.codev_id, m.joined_at]) ?? []
       );
@@ -606,6 +595,66 @@ export const getTeamLead = async (
     return { error, data: null };
   }
 };
+
+// ── CBP-116: getSubLead ───────────────────────────────────────────────────────
+// Mirrors getTeamLead() exactly. Uses maybeSingle() instead of single()
+// because sublead is optional — no row is valid and should not throw.
+export const getSubLead = async (
+  projectId: string,
+): Promise<{
+  error: any;
+  data: SimpleMemberData | null;
+}> => {
+  const supabase = await createClientServerComponent();
+
+  try {
+    const { data, error } = (await supabase
+      .from("project_members")
+      .select(
+        `
+        role,
+        joined_at,
+        codev:codev_id (
+          id,
+          first_name,
+          last_name,
+          email_address,
+          display_position,
+          image_url
+        )
+      `,
+      )
+      .eq("project_id", projectId)
+      .eq("role", "sublead")
+      .maybeSingle()) as { data: DbProjectMemberResponse | null; error: any };
+
+    if (error) {
+      console.error("Error fetching sublead:", error);
+      return { error, data: null };
+    }
+
+    if (!data?.codev) {
+      return { error: null, data: null };
+    }
+
+    const subLead: SimpleMemberData = {
+      id: data.codev.id,
+      first_name: data.codev.first_name,
+      last_name: data.codev.last_name,
+      email_address: data.codev.email_address,
+      display_position: data.codev.display_position,
+      image_url: data.codev.image_url,
+      role: data.role,
+      joined_at: data.joined_at,
+    };
+
+    return { error: null, data: subLead };
+  } catch (error) {
+    console.error("Unexpected error fetching sublead:", error);
+    return { error, data: null };
+  }
+};
+// ─────────────────────────────────────────────────────────────────────────────
 
 /**
  * Fetch project members via two-query approach to avoid RLS/join dropouts.
@@ -960,14 +1009,21 @@ export async function getAllProjects(kanbanBoardId?: string) {
  *
  * ─── PATCH (CBP-95) ──────────────────────────────────────────────────────────
  * Added display_position and email_address to the codev sub-select inside
- * project_members. These fields are required by ProjectEditModal to construct
- * a fallback Codev object when the team leader is absent from getProjectCodevs()
- * results (e.g. filtered out by RLS or internal_status).
+ * project_members for team leader fallback construction in ProjectEditModal.
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ * ─── PATCH (CBP-116) ─────────────────────────────────────────────────────────
+ * Switched project_members codev data to a two-query approach, mirroring
+ * getMembers(). The PostgREST foreign key join applies RLS on the codev table
+ * which silently drops members whose codev rows are filtered (e.g. Raineer).
+ * Two-query approach: fetch codev_ids from project_members, then fetch codev
+ * records via .in("id", codevIds) — this bypasses the join RLS issue.
  * ─────────────────────────────────────────────────────────────────────────────
  */
 export async function getProjectByID(id: string) {
   const supabase = await createClientServerComponent();
 
+  // Step 1: fetch project row + categories (no codev join here)
   const { data, error } = await supabase
     .from("projects")
     .select(
@@ -977,14 +1033,7 @@ export async function getProjectByID(id: string) {
           id,
           codev_id,
           role,
-          joined_at,
-          codev (
-            first_name,
-            last_name,
-            image_url,
-            display_position,
-            email_address
-          )
+          joined_at
         ),
         categories:project_categories(
           projects_category(
@@ -999,11 +1048,35 @@ export async function getProjectByID(id: string) {
     .single();
 
   if (error) throw error;
+  if (!data) return null;
 
-  const projectWithCategories = data ? {
+  // Step 2: fetch codev records separately to bypass join RLS filtering
+  const codevIds = (data.project_members ?? []).map((pm: any) => pm.codev_id);
+
+  let codevMap: Map<string, any> = new Map();
+
+  if (codevIds.length > 0) {
+    const { data: codevs, error: codevError } = await supabase
+      .from("codev")
+      .select("id, first_name, last_name, image_url, display_position, email_address")
+      .in("id", codevIds);
+
+    if (codevError) {
+      console.error("Error fetching codev records for project members:", codevError);
+    } else {
+      codevs?.forEach((c: any) => codevMap.set(c.id, c));
+    }
+  }
+
+  // Step 3: merge codev data back into project_members
+  const projectMembersWithCodev = (data.project_members ?? []).map((pm: any) => ({
+    ...pm,
+    codev: codevMap.get(pm.codev_id) ?? null,
+  }));
+
+  return {
     ...data,
+    project_members: projectMembersWithCodev,
     categories: data.categories?.map((cat: any) => cat.projects_category).filter(Boolean) || [],
-  } : null;
-
-  return projectWithCategories;
+  };
 }
