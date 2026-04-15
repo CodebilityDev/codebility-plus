@@ -4,7 +4,7 @@ import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import {
-  getProjectByID,           // ← ADDED: fetch full project data with project_members
+  getProjectByID,
   getProjectCategories,
   getProjectClients,
   getProjectCodevs,
@@ -33,13 +33,11 @@ import toast from "react-hot-toast";
 import { Button } from "@codevs/ui/button";
 import { Input } from "@codevs/ui/input";
 
-// Dynamically import the ImageCrop component with no SSR
 const ImageCrop = dynamic(() => import("./ImageCrop"), {
   ssr: false,
   loading: () => <Skeleton className="h-48 w-full rounded-lg" />,
 });
 
-// Define the available project statuses.
 const PROJECT_STATUSES = [
   { id: "pending", value: "pending", label: "Pending" },
   { id: "inprogress", value: "inprogress", label: "In Progress" },
@@ -77,9 +75,12 @@ const ProjectEditModal = () => {
   // Data states
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
   const [currentTeamLeader, setCurrentTeamLeader] = useState<Codev | null>(null);
+  // ── CBP-116: sublead state ────────────────────────────────────────────────
+  const [currentSubLead, setCurrentSubLead] = useState<Codev | null>(null);
+  // ─────────────────────────────────────────────────────────────────────────
   const [selectedMembers, setSelectedMembers] = useState<Codev[]>([]);
 
-  // Image states with optimized loading
+  // Image states
   const [projectImage, setProjectImage] = useState<string | null>(null);
   const [openImageCropper, setOpenImageCropper] = useState(false);
   const [croppedImage, setCroppedImage] = useState<string | null>(null);
@@ -92,7 +93,6 @@ const ProjectEditModal = () => {
   // Loading states
   const [isLoading, setIsLoading] = useState(false);
 
-  // Controlled status state
   const [selectedStatus, setSelectedStatus] = useState<string>(data?.status || "pending");
 
   const {
@@ -103,7 +103,6 @@ const ProjectEditModal = () => {
     formState: { errors },
   } = useForm<ProjectFormData>({ mode: "onChange" });
 
-  // Fetch users data with React Query
   const { data: users = [], isLoading: isUsersLoading } = useQuery({
     queryKey: ["projectCodevs"],
     queryFn: async () => {
@@ -114,7 +113,6 @@ const ProjectEditModal = () => {
     refetchOnWindowFocus: false,
   });
 
-  // Fetch clients data with React Query
   const { data: clients = [], isLoading: isClientsLoading } = useQuery({
     queryKey: ["projectClients"],
     queryFn: async () => {
@@ -125,7 +123,6 @@ const ProjectEditModal = () => {
     refetchOnWindowFocus: false,
   });
 
-  // Fetch categories data with React Query
   const { data: categories = [], isLoading: isCategoriesLoading } = useQuery({
     queryKey: ["projectCategories"],
     queryFn: async () => {
@@ -136,11 +133,9 @@ const ProjectEditModal = () => {
     refetchOnWindowFocus: false,
   });
 
-  // ─── FIX: Fetch full project data when modal opens ───────────────────────
-  // The modal hook's `data` object comes from the projects list query, which
-  // does NOT include project_members. getProjectByID returns the full shape
-  // including project_members with codev_id + role, which is needed to
-  // pre-populate the team leader and members selects.
+  // Fetch full project data (with project_members) when modal opens.
+  // The projects list query does NOT join project_members, so we need this
+  // separate fetch to pre-populate team leader, sublead, and members.
   const { data: fullProjectData, isLoading: isFullProjectLoading } = useQuery({
     queryKey: ["projectFull", data?.id],
     queryFn: async () => {
@@ -148,16 +143,14 @@ const ProjectEditModal = () => {
       const result = await getProjectByID(data.id);
       return result;
     },
-    enabled: !!data?.id && isModalOpen,   // only fetch when modal is open
-    staleTime: 0,                          // always fresh on open
+    enabled: !!data?.id && isModalOpen,
+    staleTime: 0,
     refetchOnWindowFocus: false,
   });
-  // ─────────────────────────────────────────────────────────────────────────
 
   const isSelectDataLoading =
     isUsersLoading || isClientsLoading || isCategoriesLoading || isFullProjectLoading;
 
-  // Prepare select options using useMemo
   const userOptions = useMemo(
     () =>
       users.map((user) => ({
@@ -182,39 +175,33 @@ const ProjectEditModal = () => {
     [clients],
   );
 
-  // ─── FIX: Inject team leader into dropdown if not in getProjectCodevs() ──
-  // getProjectCodevs() may exclude users due to RLS or internal_status.
-  // If the current team leader is absent from userOptions, the CustomSelect
-  // has no matching option — the dropdown won't display their name even when
-  // value is set correctly. We inject them from fullProjectData.project_members
-  // which always returns their codev data via the getProjectByID join.
+  // Inject ANY project member absent from getProjectCodevs() into dropdown options.
+  // getProjectCodevs() may exclude users due to RLS or internal_status filtering.
+  // We use fullProjectData.project_members (from getProjectByID join) as the
+  // source of truth — it always returns codev data regardless of RLS.
+  // This covers the team leader (CBP-95) and any member used as sublead (CBP-116).
   const enhancedUserOptions = useMemo(() => {
     if (!fullProjectData?.project_members) return userOptions;
 
-    const teamLeaderMember = fullProjectData.project_members.find(
-      (pm: any) => pm.role === "team_leader",
-    );
-    if (!teamLeaderMember?.codev) return userOptions;
+    // Build a set of codev_ids already present in userOptions for O(1) lookup
+    const existingIds = new Set(userOptions.map((opt) => opt.value));
 
-    // Already in the list — no injection needed
-    const alreadyInList = userOptions.find(
-      (opt) => opt.value === teamLeaderMember.codev_id,
-    );
-    if (alreadyInList) return userOptions;
+    // Collect all project members missing from userOptions
+    const missingMembers = fullProjectData.project_members
+      .filter((pm: any) => pm.codev && !existingIds.has(pm.codev_id))
+      .map((pm: any) => ({
+        id: pm.codev_id,
+        value: pm.codev_id,
+        label: `${pm.codev.first_name} ${pm.codev.last_name}`,
+        subLabel: pm.codev.display_position || "",
+        imageUrl: pm.codev.image_url || null,
+      }));
 
-    // Inject the team leader at the top of the list
-    return [
-      {
-        id: teamLeaderMember.codev_id,
-        value: teamLeaderMember.codev_id,
-        label: `${teamLeaderMember.codev.first_name} ${teamLeaderMember.codev.last_name}`,
-        subLabel: teamLeaderMember.codev.display_position || "",
-        imageUrl: teamLeaderMember.codev.image_url || null,
-      },
-      ...userOptions,
-    ];
+    if (missingMembers.length === 0) return userOptions;
+
+    // Inject missing members at the top so they are always findable
+    return [...missingMembers, ...userOptions];
   }, [userOptions, fullProjectData]);
-  // ─────────────────────────────────────────────────────────────────────────
 
   // Populate basic form fields when modal opens
   useEffect(() => {
@@ -256,29 +243,21 @@ const ProjectEditModal = () => {
     }
   }, [data, setValue, isModalOpen, setStack, clearStack]);
 
-  // ─── FIX: Initialize team leader + members from fullProjectData ──────────
-  // Uses fullProjectData (from getProjectByID) instead of data.project_members
-  // which is always undefined from the list query.
-  //
-  // Team leader lookup order:
-  //   1. Find in users array (from getProjectCodevs)
-  //   2. Fall back to codev data embedded in fullProjectData.project_members
-  //      — handles the case where the leader is filtered out of getProjectCodevs
-  //      (e.g. RLS policy, internal_status). Requires display_position and
-  //      email_address to be selected in getProjectByID's codev sub-select.
+  // Pre-populate team leader, sublead, and members from fullProjectData.
+  // fullProjectData comes from getProjectByID which includes project_members.
+  // The list page query does not join project_members so we cannot use data directly.
   useEffect(() => {
     if (!fullProjectData || !isModalOpen) return;
 
     const projectMembers = fullProjectData.project_members;
     if (!projectMembers?.length) return;
 
-    // ── Team leader ──────────────────────────────────────────────────────
+    // ── Team leader ──────────────────────────────────────────────────────────
     const teamLeaderMember = projectMembers.find(
       (pm: any) => pm.role === "team_leader",
     );
 
     if (teamLeaderMember) {
-      // Primary: find in users (full Codev object)
       const leaderFromUsers = users.find(
         (user) => user.id === teamLeaderMember.codev_id,
       );
@@ -286,11 +265,8 @@ const ProjectEditModal = () => {
       if (leaderFromUsers) {
         setCurrentTeamLeader(leaderFromUsers);
       } else if (teamLeaderMember.codev) {
-        // Fallback: construct minimal Codev from embedded project_members data.
-        // Requires getProjectByID to select display_position + email_address
-        // on the codev sub-relation (see actions.ts patch).
-        // Cast via unknown: Codev has fields we don't have here (username, etc.)
-        // but we only need this object for dropdown display — id + name + image.
+        // Fallback: build minimal Codev from embedded data when the leader
+        // is absent from getProjectCodevs() (RLS / internal_status filtered).
         setCurrentTeamLeader({
           id: teamLeaderMember.codev_id,
           first_name: teamLeaderMember.codev.first_name,
@@ -304,16 +280,46 @@ const ProjectEditModal = () => {
       }
     }
 
-    // ── Regular members ──────────────────────────────────────────────────
+    // ── CBP-116: Sublead pre-population ───────────────────────────────────────
+    const subLeadMember = projectMembers.find(
+      (pm: any) => pm.role === "sublead",
+    );
+
+    if (subLeadMember) {
+      // Primary: find full Codev object from users list
+      const subLeadFromUsers = users.find(
+        (user) => user.id === subLeadMember.codev_id,
+      );
+
+      if (subLeadFromUsers) {
+        setCurrentSubLead(subLeadFromUsers);
+      } else if (subLeadMember.codev) {
+        // Fallback: build minimal Codev from embedded data (same pattern as team leader)
+        setCurrentSubLead({
+          id: subLeadMember.codev_id,
+          first_name: subLeadMember.codev.first_name,
+          last_name: subLeadMember.codev.last_name,
+          image_url: subLeadMember.codev.image_url || null,
+          display_position: subLeadMember.codev.display_position || null,
+          email_address: subLeadMember.codev.email_address || "",
+          positions: [],
+          tech_stacks: [],
+        } as unknown as Codev);
+      }
+    } else {
+      // No sublead on this project — reset to null when reopening modal
+      setCurrentSubLead(null);
+    }
+    // ─────────────────────────────────────────────────────────────────────────
+
+    // ── Regular members ──────────────────────────────────────────────────────
     const memberIds = projectMembers
       .filter((pm: any) => pm.role === "member")
       .map((pm: any) => pm.codev_id);
 
     setSelectedMembers(users.filter((user) => memberIds.includes(user.id)));
   }, [fullProjectData, users, isModalOpen]);
-  // ─────────────────────────────────────────────────────────────────────────
 
-  // Handler for image change
   const handleImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
     try {
       setImageLoaded(false);
@@ -329,7 +335,6 @@ const ProjectEditModal = () => {
     }
   };
 
-  // Handler for image removal
   const handleRemoveImage = () => {
     setProjectImage(null);
     setValue("main_image", undefined);
@@ -346,6 +351,7 @@ const ProjectEditModal = () => {
     setGalleryImages([]);
     setSelectedMembers([]);
     setCurrentTeamLeader(null);
+    setCurrentSubLead(null); // ── CBP-116
     setImageLoaded(false);
     clearStack();
     onClose();
@@ -650,14 +656,15 @@ const ProjectEditModal = () => {
           Team Configuration
         </h4>
 
-        {/* Show skeleton while loading full project data or users */}
         {isFullProjectLoading || isUsersLoading ? (
           <div className="space-y-3">
+            <Skeleton className="h-10 w-full rounded-lg" />
             <Skeleton className="h-10 w-full rounded-lg" />
             <Skeleton className="h-10 w-full rounded-lg" />
           </div>
         ) : (
           <div className="space-y-6">
+            {/* Team Leader */}
             <div className="space-y-1">
               <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">
                 Team Leader *
@@ -677,12 +684,88 @@ const ProjectEditModal = () => {
               />
             </div>
 
+            {/* ── CBP-116: Sublead selector ─────────────────────────────────────
+                Optional — no asterisk, no toast validation required.
+                Excluded from members list and excluded from team leader list.
+                Clearing the select (empty string value) sets sublead to null.
+            ──────────────────────────────────────────────────────────────────── */}
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                Sub Lead{" "}
+                <span className="font-normal text-gray-500 dark:text-gray-400">
+                  (Optional — acts as team lead when lead is unavailable)
+                </span>
+              </label>
+              <CustomSelect
+                options={[
+                  // "None" option — value must not be empty string (Radix UI Select.Item constraint)
+                  { id: "none", value: "none", label: "No sublead assigned", subLabel: "" },
+                  // Only show members of this project, excluding the team leader.
+                  // Source: fullProjectData.project_members (bypasses RLS filtering
+                  // that drops some users from getProjectCodevs results).
+                  ...(fullProjectData?.project_members ?? [])
+                    .filter(
+                      (pm: any) =>
+                        pm.codev &&
+                        pm.codev_id !== currentTeamLeader?.id &&
+                        pm.role !== "team_leader",
+                    )
+                    .map((pm: any) => ({
+                      id: pm.codev_id,
+                      value: pm.codev_id,
+                      label: `${pm.codev.first_name} ${pm.codev.last_name}`,
+                      subLabel: pm.codev.display_position || "",
+                      imageUrl: pm.codev.image_url || null,
+                    })),
+                ]}
+                value={currentSubLead?.id || "none"}
+                onChange={(value) => {
+                  if (!value || value === "none") {
+                    // User selected "None" — clear the sublead
+                    setCurrentSubLead(null);
+                    return;
+                  }
+                  // Find in users first, fall back to project_members embedded data
+                  const subLeadFromUsers = users.find((u) => u.id === value);
+                  if (subLeadFromUsers) {
+                    setCurrentSubLead(subLeadFromUsers);
+                    return;
+                  }
+                  // Fallback: construct from fullProjectData (handles RLS-filtered users)
+                  const subLeadMember = fullProjectData?.project_members?.find(
+                    (pm: any) => pm.codev_id === value,
+                  );
+                  if (subLeadMember?.codev) {
+                    setCurrentSubLead({
+                      id: subLeadMember.codev_id,
+                      first_name: subLeadMember.codev.first_name,
+                      last_name: subLeadMember.codev.last_name,
+                      image_url: subLeadMember.codev.image_url || null,
+                      display_position: subLeadMember.codev.display_position || null,
+                      email_address: subLeadMember.codev.email_address || "",
+                      positions: [],
+                      tech_stacks: [],
+                    } as unknown as Codev);
+                  }
+                }}
+                placeholder="Select Sub Lead"
+                disabled={isUsersLoading}
+                searchable
+              />
+            </div>
+            {/* ─────────────────────────────────────────────────────────────── */}
+
+            {/* Team Members */}
             <div className="space-y-1">
               <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">
                 Team Members
               </label>
               <MemberSelection
-                users={users.filter((user) => user.id !== currentTeamLeader?.id)}
+                users={users.filter(
+                  (user) =>
+                    user.id !== currentTeamLeader?.id &&
+                    user.id !== currentSubLead?.id, // exclude sublead from member pool
+                )}
                 selectedMembers={selectedMembers}
                 onMemberAdd={(member) =>
                   setSelectedMembers((prev) => [...prev, member])
@@ -690,7 +773,10 @@ const ProjectEditModal = () => {
                 onMemberRemove={(memberId) =>
                   setSelectedMembers((prev) => prev.filter((m) => m.id !== memberId))
                 }
-                excludeMembers={currentTeamLeader ? [currentTeamLeader.id] : []}
+                excludeMembers={[
+                  ...(currentTeamLeader ? [currentTeamLeader.id] : []),
+                  ...(currentSubLead ? [currentSubLead.id] : []), // ── CBP-116
+                ]}
                 showLabel={false}
               />
             </div>
@@ -805,19 +891,29 @@ const ProjectEditModal = () => {
 
       form.set("status", selectedStatus);
 
+        // ── CBP-116: Build project members array including sublead if set ────────
       const projectMembers = [
         { codev_id: currentTeamLeader.id, role: "team_leader" },
-        ...selectedMembers.map((member) => ({ codev_id: member.id, role: "member" })),
+        // Only include sublead row if a sublead was selected
+        ...(currentSubLead
+          ? [{ codev_id: currentSubLead.id, role: "sublead" }]
+          : []),
+        // Filter sublead out of members — they may be an existing member promoted
+        // to sublead. Without this filter they'd get two rows: sublead + member.
+        ...selectedMembers
+          .filter((member) => member.id !== currentSubLead?.id)
+          .map((member) => ({ codev_id: member.id, role: "member" })),
       ];
+      // ─────────────────────────────────────────────────────────────────────────
 
       form.append("project_members", JSON.stringify(projectMembers));
 
       const response = await updateProject(data.id, form);
       if (response.success) {
-        // Invalidate all relevant queries so view modal and list reflect new data
         queryClient.invalidateQueries({ queryKey: ["teamLead", data.id] });
         queryClient.invalidateQueries({ queryKey: ["members", data.id] });
         queryClient.invalidateQueries({ queryKey: ["projectFull", data.id] });
+        queryClient.invalidateQueries({ queryKey: ["subLead", data.id] }); // ── CBP-116
         toast.success("Project updated successfully!");
         onClose();
       } else {
@@ -842,7 +938,6 @@ const ProjectEditModal = () => {
 
         <div className="flex-1 overflow-y-auto p-3" style={{ maxHeight: "calc(80vh - 200px)" }}>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            {/* Project Image Section */}
             <div className="rounded-lg bg-gray-50 p-3 dark:bg-gray-800/50">
               <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold">
                 <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-600 dark:bg-blue-900 dark:text-blue-400">
@@ -853,7 +948,6 @@ const ProjectEditModal = () => {
               <ImageUploadSection />
             </div>
 
-            {/* Project Details Section */}
             <div className="rounded-lg bg-gray-50 p-3 dark:bg-gray-800/50">
               <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold">
                 <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-600 dark:bg-blue-900 dark:text-blue-400">
@@ -864,7 +958,6 @@ const ProjectEditModal = () => {
               <ProjectDetailsSection />
             </div>
 
-            {/* Team & Configuration Section */}
             <div className="rounded-lg bg-gray-50 p-3 dark:bg-gray-800/50">
               <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold">
                 <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-600 dark:bg-blue-900 dark:text-blue-400">

@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   getMembers,
+  getSubLead,   // ── CBP-116
   getTeamLead,
   SimpleMemberData,
 } from "@/app/home/projects/actions";
@@ -23,14 +24,11 @@ import { IconFigma } from "@/public/assets/svgs/techstack";
 import { useQuery } from "@tanstack/react-query";
 import { format, parseISO } from "date-fns";
 
-// Note: Project categories are now fetched directly from the project data
-// No need for hardcoded mapping since categories are included in the project object
-
 const ProjectViewModal = () => {
   const { isOpen, type, onClose, onOpen, data } = useModal();
   const isModalOpen = isOpen && type === "projectViewModal";
 
-  // Using React Query to fetch team lead data
+  // Fetch team lead
   const { data: teamLead, isLoading: isTeamLeadLoading } = useQuery({
     queryKey: ["teamLead", data?.id],
     queryFn: async () => {
@@ -43,7 +41,21 @@ const ProjectViewModal = () => {
     refetchOnWindowFocus: false,
   });
 
-  // Using React Query to fetch members data
+  // ── CBP-116: Fetch sublead — optional, null when none assigned ────────────
+  const { data: subLead, isLoading: isSubLeadLoading } = useQuery({
+    queryKey: ["subLead", data?.id],
+    queryFn: async () => {
+      if (!data?.id) return null;
+      const result = await getSubLead(data.id);
+      return result.data;
+    },
+    enabled: !!data?.id && isModalOpen,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+  // ─────────────────────────────────────────────────────────────────────────
+
+  // Fetch members
   const { data: members = [], isLoading: isMembersLoading } = useQuery({
     queryKey: ["members", data?.id],
     queryFn: async () => {
@@ -56,9 +68,8 @@ const ProjectViewModal = () => {
     refetchOnWindowFocus: false,
   });
 
-  const isLoading = isTeamLeadLoading || isMembersLoading;
+  const isLoading = isTeamLeadLoading || isSubLeadLoading || isMembersLoading;
 
-  // Format dates if available.
   const startDate = data?.start_date
     ? format(parseISO(data.start_date), "MM/dd/yyyy")
     : null;
@@ -69,7 +80,6 @@ const ProjectViewModal = () => {
     ? format(parseISO(data.created_at), "MM/dd/yyyy hh:mm:ss a")
     : null;
 
-  // Image loading optimization
   const [imageLoaded, setImageLoaded] = useState(false);
 
   return (
@@ -138,7 +148,6 @@ const ProjectViewModal = () => {
               </h3>
 
               <div className="grid gap-6 md:grid-cols-2">
-                {/* Project Details */}
                 <div className="space-y-4">
                   <div>
                     <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
@@ -154,8 +163,7 @@ const ProjectViewModal = () => {
                       Tagline
                     </h4>
                     <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-300">
-                      {data?.tagline ||
-                        "Innovative solutions for modern challenges"}
+                      {data?.tagline || "Innovative solutions for modern challenges"}
                     </p>
                   </div>
 
@@ -175,13 +183,12 @@ const ProjectViewModal = () => {
                       Key Features
                     </h4>
                     <div className="space-y-1">
-                      {(data?.key_features && Array.isArray(data.key_features) && data.key_features.length > 0
-                        ? data.key_features
-                        : [
-                            "Responsive Design",
-                            "Modern UI/UX",
-                            "Cross-platform Compatibility",
-                          ]
+                      {(
+                        data?.key_features &&
+                        Array.isArray(data.key_features) &&
+                        data.key_features.length > 0
+                          ? data.key_features
+                          : ["Responsive Design", "Modern UI/UX", "Cross-platform Compatibility"]
                       ).map((feature, index) => (
                         <div key={index} className="flex items-start gap-2">
                           <span className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-blue-500"></span>
@@ -193,7 +200,6 @@ const ProjectViewModal = () => {
                     </div>
                   </div>
 
-                  {/* External Links */}
                   <div>
                     <h4 className="mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
                       External Links
@@ -229,18 +235,15 @@ const ProjectViewModal = () => {
                           <span className="text-sm font-medium">Figma</span>
                         </Link>
                       )}
-                      {!data?.github_link &&
-                        !data?.website_url &&
-                        !data?.figma_link && (
-                          <p className="text-sm text-gray-500 dark:text-gray-400">
-                            No external links available
-                          </p>
-                        )}
+                      {!data?.github_link && !data?.website_url && !data?.figma_link && (
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          No external links available
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
 
-                {/* Project Status & Metadata */}
                 <div className="space-y-4">
                   <div>
                     <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
@@ -258,8 +261,7 @@ const ProjectViewModal = () => {
                       {data?.status === "inprogress"
                         ? "In Progress"
                         : data?.status
-                          ? data.status.charAt(0).toUpperCase() +
-                            data.status.slice(1)
+                          ? data.status.charAt(0).toUpperCase() + data.status.slice(1)
                           : "Pending"}
                     </span>
                   </div>
@@ -307,7 +309,6 @@ const ProjectViewModal = () => {
                 </div>
               </div>
 
-              {/* Tech Stack Section */}
               {data?.tech_stack && data.tech_stack.length > 0 && (
                 <div className="mt-6 border-t pt-6">
                   <h4 className="text-md mb-4 font-medium text-gray-900 dark:text-gray-100">
@@ -338,9 +339,12 @@ const ProjectViewModal = () => {
                 Project Gallery
               </h3>
               <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-                {(data?.gallery && Array.isArray(data.gallery) && data.gallery.length > 0
-                  ? data.gallery
-                  : [data?.main_image]
+                {(
+                  data?.gallery &&
+                  Array.isArray(data.gallery) &&
+                  data.gallery.length > 0
+                    ? data.gallery
+                    : [data?.main_image]
                 )
                   .filter(Boolean)
                   .map((imageUrl, index) => (
@@ -374,6 +378,12 @@ const ProjectViewModal = () => {
                   <div>
                     <h4 className="mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
                       Team Leader
+                    </h4>
+                    <Skeleton className="h-16 w-64 rounded-lg" />
+                  </div>
+                  <div>
+                    <h4 className="mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      Sub Lead
                     </h4>
                     <Skeleton className="h-16 w-64 rounded-lg" />
                   </div>
@@ -429,6 +439,46 @@ const ProjectViewModal = () => {
                       </p>
                     </div>
                   )}
+
+                  {/* ── CBP-116: Sub Lead display ─────────────────────────────────────
+                      Always renders the section header. Shows avatar + name when assigned,
+                      plain text fallback when no sublead exists for this project.
+                  ──────────────────────────────────────────────────────────────────── */}
+                  <div>
+                    <h4 className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      Sub Lead
+                    </h4>
+                    {subLead ? (
+                      <div className="flex items-center gap-4 rounded-lg border border-gray-300 p-4 dark:border-gray-600">
+                        {subLead.image_url ? (
+                          <div className="relative h-12 w-12">
+                            <Image
+                              src={subLead.image_url}
+                              alt={`${subLead.first_name} ${subLead.last_name}`}
+                              fill
+                              className="rounded-full object-cover"
+                              loading="lazy"
+                            />
+                          </div>
+                        ) : (
+                          <DefaultAvatar size={48} />
+                        )}
+                        <div>
+                          <p className="font-medium text-gray-900 dark:text-gray-100">
+                            {subLead.first_name} {subLead.last_name}
+                          </p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            {subLead.display_position || "Sub Lead"}
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        No sublead assigned
+                      </p>
+                    )}
+                  </div>
+                  {/* ─────────────────────────────────────────────────────────────── */}
 
                   {/* Team Members */}
                   <div>
