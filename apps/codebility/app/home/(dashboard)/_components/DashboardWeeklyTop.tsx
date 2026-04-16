@@ -400,7 +400,7 @@ export default function WeeklyTop() {
             const category = item.skill_category?.name || "Uncategorized";
             
             // Priority Check: Attendance Date > Profile Updated_At
-            const codevDate = item.codev?.updated_at ? new Date(item.codev.updated_at) : null;
+            const codevDate = item.codev?.updated_at ? new Date(item.codev.updated_at) : undefined;
             const attDate = latestAttendance.get(item.codev_id);
             // Defaulting fallback string logic
             let userDate = attDate;
