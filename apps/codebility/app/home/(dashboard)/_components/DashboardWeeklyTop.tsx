@@ -347,9 +347,11 @@ export default function WeeklyTop() {
           .select(
             `
             points,
-            codev:codev_id!inner(first_name, updated_at),
+            codev_id,
+            codev:codev_id!inner(first_name, last_name, updated_at),
             skill_category:skill_category_id!inner(name),
-            created_at
+            created_at,
+            updated_at
           `,
           )
           .order("points", { ascending: false });
@@ -362,7 +364,13 @@ export default function WeeklyTop() {
           query = query.gte("created_at", monthStart.toISOString());
         }
 
-        const { data, error } = await query;
+        // Fetch both codev_points and attendance_points concurrently
+        const [pointsRes, attendanceRes] = await Promise.all([
+          query,
+          supabase.from("attendance_points").select("codev_id, last_updated, updated_at, created_at")
+        ]);
+
+        const { data, error } = pointsRes;
 
         if (error) {
           console.error("Error fetching top codevs:", error);
@@ -377,6 +385,21 @@ export default function WeeklyTop() {
             groupedData[category] = [];
           });
 
+          // Build a map of latest attendance activity per user
+          const latestAttendance = new Map<string, Date>();
+          if (attendanceRes.data) {
+            attendanceRes.data.forEach((row) => {
+              const dateStr = row.last_updated || row.updated_at || row.created_at;
+              if (dateStr) {
+                 const d = new Date(dateStr);
+                 const current = latestAttendance.get(row.codev_id);
+                 if (!current || d > current) {
+                   latestAttendance.set(row.codev_id, d);
+                 }
+              }
+            });
+          }
+
           // Calculate activity thresholds
           const now = new Date();
           const fiveMonthsAgo = new Date();
@@ -387,15 +410,24 @@ export default function WeeklyTop() {
 
           data.forEach((item: any) => {
             const category = item.skill_category?.name || "Uncategorized";
-            const userDate = item.codev?.updated_at ? new Date(item.codev.updated_at) : null;
+            
+            // Gather all available timestamps for "activity"
+            const profileDate = item.codev?.updated_at ? new Date(item.codev.updated_at) : null;
+            const pointsUpdatedDate = item.updated_at ? new Date(item.updated_at) : null;
+            const pointsCreatedDate = item.created_at ? new Date(item.created_at) : null;
+            const attDate = latestAttendance.get(item.codev_id) || null;
+
+            // Find the most recent date
+            const dates = [profileDate, pointsUpdatedDate, pointsCreatedDate, attDate].filter((d): d is Date => d !== null);
+            const mostRecentActivity = dates.length > 0 ? new Date(Math.max(...dates.map(d => d.getTime()))) : null;
             
             // 1. Remove users inactive for >= 5 months
-            if (!userDate || userDate < fiveMonthsAgo) {
+            if (!mostRecentActivity || mostRecentActivity < fiveMonthsAgo) {
               return;
             }
 
             if (groupedData[category]) {
-              const isRecentlyActive = userDate >= activeThreshold;
+              const isRecentlyActive = mostRecentActivity >= activeThreshold;
               groupedData[category].push({
                 points: item.points,
                 codev: item.codev,
