@@ -532,7 +532,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
             {/* Organize Bento Box Here - Spanning Full Width underneath without gaps */}
             {isCurrentUserTeamLead && (
               <div className="mb-6 w-full">
-                <Top3Showcase projectId={projectInfo.id} members={members?.data || []} />
+                <Top3Showcase projectId={projectInfo.id} />
               </div>
             )}
 

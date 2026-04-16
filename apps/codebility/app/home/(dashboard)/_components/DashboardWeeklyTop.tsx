@@ -343,7 +343,7 @@ export default function WeeklyTop() {
           .select(
             `
             points,
-            codev:codev_id!inner(first_name),
+            codev:codev_id!inner(first_name, updated_at),
             skill_category:skill_category_id!inner(name),
             created_at
           `,
@@ -366,25 +366,56 @@ export default function WeeklyTop() {
         }
 
         if (data) {
-          const groupedData: CategoryData = {};
+          // Group all records by category first
+          const groupedData: Record<string, any[]> = {};
 
           allCategories.forEach((category) => {
             groupedData[category] = [];
           });
 
+          // Calculate activity thresholds
+          const now = new Date();
+          const fiveMonthsAgo = new Date();
+          fiveMonthsAgo.setMonth(now.getMonth() - 5);
+          
+          const activeThreshold = new Date();
+          activeThreshold.setDate(now.getDate() - 30); // 30 days of inactivity threshold
+
           data.forEach((item: any) => {
             const category = item.skill_category?.name || "Uncategorized";
-            if (groupedData[category] && groupedData[category].length < 10) {
+            const userDate = item.codev?.updated_at ? new Date(item.codev.updated_at) : null;
+            
+            // 1. Remove users inactive for >= 5 months
+            if (!userDate || userDate < fiveMonthsAgo) {
+              return;
+            }
+
+            if (groupedData[category]) {
+              const isRecentlyActive = userDate >= activeThreshold;
               groupedData[category].push({
                 points: item.points,
                 codev: item.codev,
                 skill_category: item.skill_category,
+                isRecentlyActive,
               });
             }
           });
 
+          const finalCategoryData: CategoryData = {};
+
+          // 2. Sort to prioritize active users, then sort by points, finally slice top 10
+          Object.keys(groupedData).forEach((category) => {
+            const sorted = groupedData[category].sort((a, b) => {
+              if (a.isRecentlyActive && !b.isRecentlyActive) return -1;
+              if (!a.isRecentlyActive && b.isRecentlyActive) return 1;
+              return b.points - a.points;
+            });
+            
+            finalCategoryData[category] = sorted.slice(0, 10);
+          });
+
           if (isMounted) {
-            setCategoryData(groupedData);
+            setCategoryData(finalCategoryData);
           }
         }
       } catch (error) {
@@ -400,8 +431,21 @@ export default function WeeklyTop() {
 
     fetchTopCodevs();
 
+    // 3. Realtime subscription to points changes
+    const channel = supabase
+      .channel("public:codev_points_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "codev_points" },
+        () => {
+          if (isMounted) fetchTopCodevs();
+        }
+      )
+      .subscribe();
+
     return () => {
       isMounted = false;
+      supabase.removeChannel(channel);
     };
   }, [timePeriod, allCategories, leaderboardType]);
 
