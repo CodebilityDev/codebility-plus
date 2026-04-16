@@ -350,8 +350,7 @@ export default function WeeklyTop() {
             codev_id,
             codev:codev_id!inner(first_name, last_name, updated_at),
             skill_category:skill_category_id!inner(name),
-            created_at,
-            updated_at
+            created_at
           `,
           )
           .order("points", { ascending: false });
@@ -367,7 +366,7 @@ export default function WeeklyTop() {
         // Fetch both codev_points and attendance_points concurrently
         const [pointsRes, attendanceRes] = await Promise.all([
           query,
-          supabase.from("attendance_points").select("codev_id, last_updated, updated_at, created_at")
+          supabase.from("attendance_points").select("*")
         ]);
 
         const { data, error } = pointsRes;
