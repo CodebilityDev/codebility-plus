@@ -97,6 +97,7 @@ export default function WeeklyTop() {
   useEffect(() => {
     let isMounted = true;
     const supabase = createClientClientComponent();
+    if (!supabase) return;
 
     const fetchCategories = async () => {
       try {
@@ -125,14 +126,15 @@ export default function WeeklyTop() {
           );
           if (feIndex !== -1) {
             const [frontendDev] = reorderedCategories.splice(feIndex, 1);
-            reorderedCategories.unshift(frontendDev);
+            if (frontendDev) reorderedCategories.unshift(frontendDev);
           }
           
           // No soft skills category available due to database constraints
 
           setAllCategories(reorderedCategories);
           if (!selectedCategory && reorderedCategories.length > 0) {
-            setSelectedCategory(reorderedCategories[0]);
+            const firstCat = reorderedCategories[0];
+            if (firstCat) setSelectedCategory(firstCat);
           }
         }
       } catch (error) {
@@ -164,7 +166,7 @@ export default function WeeklyTop() {
           throw new Error('Failed to fetch soft skills leaderboard');
         }
         
-        const data = await response.json();
+        const data = await response.json() as { leaders?: SoftSkillsLeader[] };
         if (isMounted) {
           setSoftSkillsLeaders(data.leaders || []);
         }
@@ -193,6 +195,7 @@ export default function WeeklyTop() {
 
     let isMounted = true;
     const supabase = createClientClientComponent();
+    if (!supabase) return;
 
     const fetchProjectsLeaderboard = async () => {
       setIsLoading(true);
@@ -334,6 +337,7 @@ export default function WeeklyTop() {
 
     let isMounted = true;
     const supabase = createClientClientComponent();
+    if (!supabase) return;
 
     const fetchTopCodevs = async () => {
       setIsLoading(true);
@@ -405,7 +409,9 @@ export default function WeeklyTop() {
 
           // 2. Sort to prioritize active users, then sort by points, finally slice top 10
           Object.keys(groupedData).forEach((category) => {
-            const sorted = groupedData[category].sort((a, b) => {
+            const categoryArray = groupedData[category];
+            if (!categoryArray) return;
+            const sorted = categoryArray.sort((a, b) => {
               if (a.isRecentlyActive && !b.isRecentlyActive) return -1;
               if (!a.isRecentlyActive && b.isRecentlyActive) return 1;
               return b.points - a.points;
@@ -741,7 +747,7 @@ export default function WeeklyTop() {
         <div className="flex gap-4 mb-4">
           <Tabs
             value={leaderboardType}
-            onValueChange={(value: LeaderboardType) => setLeaderboardType(value)}
+            onValueChange={(value) => setLeaderboardType(value as LeaderboardType)}
             className="w-fit"
           >
             <TabsList className="grid h-10 bg-white/10 backdrop-blur-sm dark:bg-white/5 border border-white/20 dark:border-white/10 p-1 rounded-lg w-fit grid-cols-3">
