@@ -212,14 +212,7 @@ export default function WeeklyTop() {
           `,
           );
 
-        if (timePeriod === "weekly") {
-          const weekStart = startOfWeek(subWeeks(new Date(), 1));
-          query = query.gte("created_at", weekStart.toISOString());
-        } else if (timePeriod === "monthly") {
-          const monthStart = startOfMonth(subMonths(new Date(), 1));
-          query = query.gte("created_at", monthStart.toISOString());
-        }
-
+        // Removed .gte("created_at") from supabase query level to prevent dropping legacy users.
         const { data, error } = await query;
 
         if (!isMounted) return;
@@ -355,15 +348,8 @@ export default function WeeklyTop() {
           )
           .order("points", { ascending: false });
 
-        if (timePeriod === "weekly") {
-          const weekStart = startOfWeek(subWeeks(new Date(), 1));
-          query = query.gte("created_at", weekStart.toISOString());
-        } else if (timePeriod === "monthly") {
-          const monthStart = startOfMonth(subMonths(new Date(), 1));
-          query = query.gte("created_at", monthStart.toISOString());
-        }
-
         // Fetch both codev_points and attendance_points concurrently
+        // Note: We deliberately query without .gte("created_at") here, shifting boundary checks locally.
         const [pointsRes, attendanceRes] = await Promise.all([
           query,
           supabase.from("attendance_points").select("*")
@@ -404,29 +390,38 @@ export default function WeeklyTop() {
           const fiveMonthsAgo = new Date();
           fiveMonthsAgo.setMonth(now.getMonth() - 5);
           
+          const weekStart = startOfWeek(subWeeks(new Date(), 1));
+          const monthStart = startOfMonth(subMonths(new Date(), 1));
+          
           const activeThreshold = new Date();
           activeThreshold.setDate(now.getDate() - 30); // 30 days of inactivity threshold
 
           data.forEach((item: any) => {
             const category = item.skill_category?.name || "Uncategorized";
             
-            // Gather all available timestamps for "activity"
-            const profileDate = item.codev?.updated_at ? new Date(item.codev.updated_at) : null;
-            const pointsUpdatedDate = item.updated_at ? new Date(item.updated_at) : null;
-            const pointsCreatedDate = item.created_at ? new Date(item.created_at) : null;
-            const attDate = latestAttendance.get(item.codev_id) || null;
-
-            // Find the most recent date
-            const dates = [profileDate, pointsUpdatedDate, pointsCreatedDate, attDate].filter((d): d is Date => d !== null);
-            const mostRecentActivity = dates.length > 0 ? new Date(Math.max(...dates.map(d => d.getTime()))) : null;
+            // Priority Check: Attendance Date > Profile Updated_At
+            const codevDate = item.codev?.updated_at ? new Date(item.codev.updated_at) : null;
+            const attDate = latestAttendance.get(item.codev_id);
+            // Defaulting fallback string logic
+            let userDate = attDate;
+            if (!userDate || (codevDate && codevDate > userDate)) {
+               userDate = codevDate;
+            }
             
-            // 1. Remove users inactive for >= 5 months
-            if (!mostRecentActivity || mostRecentActivity < fiveMonthsAgo) {
+            // 1. Core Removal limit
+            if (!userDate || userDate < fiveMonthsAgo) {
+              return;
+            }
+            
+            // 2. Period Filter limit (Weekly / Monthly boundary)
+            if (timePeriod === "weekly" && userDate < weekStart) {
+              return;
+            } else if (timePeriod === "monthly" && userDate < monthStart) {
               return;
             }
 
             if (groupedData[category]) {
-              const isRecentlyActive = mostRecentActivity >= activeThreshold;
+              const isRecentlyActive = userDate >= activeThreshold;
               groupedData[category].push({
                 points: item.points,
                 codev: item.codev,
