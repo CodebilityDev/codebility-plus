@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { createClientClientComponent } from "@/utils/supabase/client";
-import { startOfMonth, startOfWeek, subDays } from "date-fns";
+import { startOfMonth, startOfWeek, subDays, subWeeks, subMonths } from "date-fns";
 import { Trophy, Medal, Award, Star, Zap, Heart, Users, Calendar, UserRoundPen } from "lucide-react";
 
 import {
@@ -213,10 +213,10 @@ export default function WeeklyTop() {
           );
 
         if (timePeriod === "weekly") {
-          const weekStart = startOfWeek(new Date());
+          const weekStart = startOfWeek(subWeeks(new Date(), 1));
           query = query.gte("created_at", weekStart.toISOString());
         } else if (timePeriod === "monthly") {
-          const monthStart = startOfMonth(new Date());
+          const monthStart = startOfMonth(subMonths(new Date(), 1));
           query = query.gte("created_at", monthStart.toISOString());
         }
 
@@ -357,10 +357,10 @@ export default function WeeklyTop() {
           .order("points", { ascending: false });
 
         if (timePeriod === "weekly") {
-          const weekStart = startOfWeek(new Date());
+          const weekStart = startOfWeek(subWeeks(new Date(), 1));
           query = query.gte("created_at", weekStart.toISOString());
         } else if (timePeriod === "monthly") {
-          const monthStart = startOfMonth(new Date());
+          const monthStart = startOfMonth(subMonths(new Date(), 1));
           query = query.gte("created_at", monthStart.toISOString());
         }
 
