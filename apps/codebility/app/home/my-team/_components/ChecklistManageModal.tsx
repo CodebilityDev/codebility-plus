@@ -1,5 +1,5 @@
 import { useState, useEffect, FormEvent, useMemo } from "react";
-import { X, Plus, Edit2, Trash2, Check, Lock, RefreshCw } from "lucide-react";
+import { X, Plus, Edit2, Trash2, Check, Lock, RefreshCw, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import Input from "@/components/ui/forms/input";
@@ -13,7 +13,7 @@ import { SimpleMemberData, getMembers, getTeamLead } from "@/app/home/projects/a
  * FEATURES:
  * 1. ✅ Self-fetching fresh member data (fixes stale data issue)
  * 2. ✅ Auto-sync function - backfills missing checklist records for all members
- * 3. ✅ UI/UX designer exceptions - excludes them from coding-related items
+ * 3. ✅ Role-based assignment - items assigned to specific roles via explicit input
  * 4. ✅ Preserves existing data - no deletion required
  * 5. ✅ Runs automatically on modal open
  * 6. ✅ Clean toast messages (no emoji, no double quotes)
@@ -37,16 +37,19 @@ const ChecklistManageModal = ({
   onClose
 }: ChecklistManageModalProps) => {
   // State
-  const [items, setItems] = useState<string[]>([]);
+  const [items, setItems] = useState<{ title: string; target_role: string | null }[]>([]);
   const [newItemTitle, setNewItemTitle] = useState("");
+  const [roleInput, setRoleInput] = useState("");
   const [editingTitle, setEditingTitle] = useState<string | null>(null);
   const [editingNewTitle, setEditingNewTitle] = useState("");
+  const [editingNewRole, setEditingNewRole] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [supabase, setSupabase] = useState<any>(null);
   
   // Fresh member data (fetched internally)
+  const [freshTeamLead, setFreshTeamLead] = useState<SimpleMemberData | null>(null);
   const [freshTeamMembers, setFreshTeamMembers] = useState<SimpleMemberData[]>([]);
   const [freshTeamLeadId, setFreshTeamLeadId] = useState<string>("");
   const [isFetchingMembers, setIsFetchingMembers] = useState(false);
@@ -60,18 +63,24 @@ const ChecklistManageModal = ({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
 
-  // UI/UX designer detection keywords
-  const UIUX_KEYWORDS = [
-    'ui', 'ux', 'design', 'designer', 'graphic', 'visual',
-    'product design', 'interface', 'user experience'
-  ];
+  // Role search suggestion state
+  const [showRoleSuggestions, setShowRoleSuggestions] = useState(false);
+  const [debouncedRole, setDebouncedRole] = useState("");
 
-  // Coding-related item keywords (items that UI/UX should skip)
-  const CODING_ITEM_KEYWORDS = [
-    'github', 'git', 'repository', 'code', 'coding', 'programming',
-    'supabase', 'database', 'api', 'backend', 'frontend', 'npm', 'yarn',
-    'typescript', 'javascript', 'react', 'next', 'deployment'
-  ];
+  // Parse target role from description JSON ({"target_role": "..."})
+  const parseTargetRole = (description: string | null): string | null => {
+    if (!description) return null;
+    try {
+      const parsed = JSON.parse(description);
+      return parsed?.target_role ?? null;
+    } catch {
+      return null;
+    }
+  };
+
+  // Serialize target role into description JSON
+  const makeDescription = (role: string): string | null =>
+    role.trim() ? JSON.stringify({ target_role: role.trim() }) : null;
 
   // Initialize Supabase
   useEffect(() => {
@@ -92,7 +101,8 @@ const ChecklistManageModal = ({
     
     try {
       const teamLeadResult = await getTeamLead(projectId);
-      if (teamLeadResult.data?.id) {
+      if (teamLeadResult.data) {
+        setFreshTeamLead(teamLeadResult.data);
         setFreshTeamLeadId(teamLeadResult.data.id);
       }
 
@@ -128,44 +138,47 @@ const ChecklistManageModal = ({
     });
   }, [supabase, freshTeamLeadId]);
 
-  // Check if member is UI/UX designer
-  const isUIUXDesigner = (member: SimpleMemberData): boolean => {
-    const position = (member.display_position || '').toLowerCase();
-    return UIUX_KEYWORDS.some(keyword => position.includes(keyword));
-  };
-
-  // Check if checklist item is coding-related
-  const isCodingItem = (itemTitle: string): boolean => {
-    const title = itemTitle.toLowerCase();
-    return CODING_ITEM_KEYWORDS.some(keyword => title.includes(keyword));
-  };
-
-  // Get member IDs that should have a specific item
-  const getMemberIdsForItem = (itemTitle: string): string[] => {
-    if (!freshTeamLeadId) return [];
-    
-    const teamLeadMember = freshTeamMembers.find(m => m.id === freshTeamLeadId) ?? null;
-    let validMembers = teamLeadMember ? [teamLeadMember] : [];
-    validMembers = [...validMembers, ...freshTeamMembers.filter(m => m.id !== freshTeamLeadId)];
-    
-    if (isCodingItem(itemTitle)) {
-      validMembers = validMembers.filter(m => !isUIUXDesigner(m));
-    }
-    
-    return validMembers.map(m => m.id);
-  };
+  // All team members including lead (deduped)
+  const allMembersWithData = useMemo((): SimpleMemberData[] => {
+    return [
+      ...(freshTeamLead ? [freshTeamLead] : []),
+      ...freshTeamMembers.filter(m => m.id !== freshTeamLeadId)
+    ];
+  }, [freshTeamLead, freshTeamMembers, freshTeamLeadId]);
 
   // Get all member IDs (for display purposes)
   const allMemberIds = useMemo(() => {
-    if (!freshTeamLeadId) return [];
-    
-    if (!freshTeamMembers || !Array.isArray(freshTeamMembers)) {
-      return [freshTeamLeadId];
-    }
-    
-    const memberIds = freshTeamMembers.map(m => m.id).filter(Boolean);
-    return [freshTeamLeadId, ...memberIds];
-  }, [freshTeamLeadId, freshTeamMembers]);
+    return allMembersWithData.map(m => m.id).filter(Boolean);
+  }, [allMembersWithData]);
+
+  // Unique roles from team members for suggestion dropdown
+  const availableRoles = useMemo(() => {
+    const roles = allMembersWithData
+      .map(m => m.display_position)
+      .filter((p): p is string => Boolean(p));
+    return [...new Set(roles)].sort();
+  }, [allMembersWithData]);
+
+  // Debounce role input for filtering suggestions
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedRole(roleInput), 300);
+    return () => clearTimeout(timer);
+  }, [roleInput]);
+
+  // Filtered roles based on debounced input
+  const filteredRoles = useMemo(() => {
+    if (!debouncedRole.trim()) return availableRoles;
+    const lower = debouncedRole.toLowerCase();
+    return availableRoles.filter(role => role.toLowerCase().includes(lower));
+  }, [debouncedRole, availableRoles]);
+
+  // Get member IDs that should have a specific item based on target role
+  const getMemberIdsForItem = (targetRole: string | null): string[] => {
+    if (!targetRole) return allMemberIds;
+    return allMembersWithData
+      .filter(m => m.display_position === targetRole)
+      .map(m => m.id);
+  };
 
   // Auto-sync function - backfills missing records
   const autoSyncChecklistItems = async () => {
@@ -176,7 +189,7 @@ const ChecklistManageModal = ({
     try {
       const { data: existingItems, error: fetchError } = await supabase
         .from("member_checklists")
-        .select("title, member_id")
+        .select("title, member_id, description")
         .eq("project_id", projectId);
 
       if (fetchError) {
@@ -185,14 +198,15 @@ const ChecklistManageModal = ({
 
       // Group by title to see which members have which items
       // FIX: Explicitly type the accumulator to avoid implicit 'undefined' on index access
+      type ItemInfo = { memberIds: string[]; description: string | null };
       const itemsByTitle = (existingItems ?? []).reduce(
-        (acc: Record<string, string[]>, item: { title: string; member_id: string }) => {
-          if (!acc[item.title]) acc[item.title] = [];
+        (acc: Record<string, ItemInfo>, item: { title: string; member_id: string; description: string | null }) => {
+          if (!acc[item.title]) acc[item.title] = { memberIds: [], description: item.description ?? null };
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          acc[item.title]!.push(item.member_id);
+          acc[item.title]!.memberIds.push(item.member_id);
           return acc;
         },
-        {} as Record<string, string[]>
+        {} as Record<string, ItemInfo>
       );
 
       const uniqueTitles = Object.keys(itemsByTitle);
@@ -200,8 +214,9 @@ const ChecklistManageModal = ({
 
       for (const title of uniqueTitles) {
         // FIX: Use nullish coalescing to guarantee string[] (never undefined)
-        const existingMemberIds: string[] = itemsByTitle[title] ?? [];
-        const requiredMemberIds = getMemberIdsForItem(title);
+        const { memberIds: existingMemberIds, description } = itemsByTitle[title]!;
+        const targetRole = parseTargetRole(description);
+        const requiredMemberIds = getMemberIdsForItem(targetRole);
         const missingMemberIds = requiredMemberIds.filter(id => !existingMemberIds.includes(id));
 
         if (missingMemberIds.length > 0) {
@@ -265,7 +280,7 @@ const ChecklistManageModal = ({
     try {
       const { data, error } = await supabase
         .from("member_checklists")
-        .select("title, created_at")
+        .select("title, description, created_at")
         .eq("project_id", projectId)
         .order("created_at", { ascending: true });
 
@@ -273,8 +288,16 @@ const ChecklistManageModal = ({
         toast.error("Failed to load checklist items");
         setItems([]);
       } else {
-        const uniqueTitles = [...new Set(data.map((item: any) => String(item.title)))] as string[];
-        setItems(uniqueTitles);
+        const seen = new Set<string>();
+        const uniqueItems: { title: string; target_role: string | null }[] = [];
+        for (const item of data) {
+          const titleStr = String(item.title);
+          if (!seen.has(titleStr)) {
+            seen.add(titleStr);
+            uniqueItems.push({ title: titleStr, target_role: parseTargetRole(item.description) });
+          }
+        }
+        setItems(uniqueItems);
       }
     } catch (error) {
       toast.error("Failed to load checklist items");
@@ -308,28 +331,27 @@ const ChecklistManageModal = ({
       return;
     }
 
-    if (items.includes(newItemTitle.trim())) {
+    if (items.some(i => i.title === newItemTitle.trim())) {
       toast.error("This item already exists");
       return;
     }
 
+    const targetRole = roleInput.trim() || null;
     setIsLoading(true);
     try {
-      const targetMemberIds = getMemberIdsForItem(newItemTitle.trim());
+      const targetMemberIds = getMemberIdsForItem(targetRole);
 
       if (targetMemberIds.length === 0) {
-        toast.error("No applicable members for this item");
+        toast.error(targetRole ? `No members found with role: ${targetRole}` : "No applicable members for this item");
         setIsLoading(false);
         return;
       }
-
-      const uiuxCount = allMemberIds.length - targetMemberIds.length;
 
       const itemsToInsert = targetMemberIds.map(memberId => ({
         project_id: projectId,
         member_id: memberId,
         title: newItemTitle.trim(),
-        description: null,
+        description: makeDescription(roleInput),
         priority: "medium",
         completed: false,
         created_by: freshTeamLeadId,
@@ -346,13 +368,11 @@ const ChecklistManageModal = ({
       if (error) {
         toast.error(`Failed: ${error.message}`);
       } else {
-        const memberText = targetMemberIds.length === allMemberIds.length
-          ? `all ${allMemberIds.length} members`
-          : `${targetMemberIds.length} members (excluded ${uiuxCount} UI/UX)`;
-        
-        toast.success(`${newItemTitle.trim()} added for ${memberText}`);
-        setItems(prev => [...prev, newItemTitle.trim()]);
+        const roleLabel = targetRole ?? "All Roles";
+        toast.success(`${newItemTitle.trim()} added for ${targetMemberIds.length} member${targetMemberIds.length !== 1 ? "s" : ""} (${roleLabel})`);
+        setItems(prev => [...prev, { title: newItemTitle.trim(), target_role: targetRole }]);
         setNewItemTitle("");
+        setRoleInput("");
       }
     } catch (error) {
       toast.error("Failed to create checklist item");
@@ -362,30 +382,43 @@ const ChecklistManageModal = ({
   };
 
   // Handle starting to edit an item
-  const handleStartEdit = (title: string) => {
+  const handleStartEdit = (item: { title: string; target_role: string | null }) => {
     if (!isTeamLead) {
       toast.error("Only team leads can edit checklist items");
       return;
     }
-    
-    setEditingTitle(title);
-    setEditingNewTitle(title);
+
+    setEditingTitle(item.title);
+    setEditingNewTitle(item.title);
+    setEditingNewRole(item.target_role ?? "");
   };
 
   // Handle canceling edit
   const handleCancelEdit = () => {
     setEditingTitle(null);
     setEditingNewTitle("");
+    setEditingNewRole("");
   };
 
   // Handle saving edited item
   const handleSaveEdit = async (oldTitle: string) => {
-    if (!editingNewTitle.trim() || editingNewTitle.trim() === oldTitle) {
+    const currentItem = items.find(i => i.title === oldTitle);
+    const newTitle = editingNewTitle.trim();
+    const newRole = editingNewRole.trim() || null;
+    const titleChanged = newTitle !== "" && newTitle !== oldTitle;
+    const roleChanged = newRole !== currentItem?.target_role;
+
+    if (!titleChanged && !roleChanged) {
       handleCancelEdit();
       return;
     }
 
-    if (items.includes(editingNewTitle.trim()) && editingNewTitle.trim() !== oldTitle) {
+    if (!newTitle) {
+      handleCancelEdit();
+      return;
+    }
+
+    if (titleChanged && items.some(i => i.title === newTitle)) {
       toast.error("An item with this name already exists");
       return;
     }
@@ -399,8 +432,9 @@ const ChecklistManageModal = ({
     try {
       const { error } = await supabase
         .from("member_checklists")
-        .update({ 
-          title: editingNewTitle.trim(),
+        .update({
+          title: newTitle,
+          description: makeDescription(editingNewRole),
           updated_at: new Date().toISOString()
         })
         .eq("project_id", projectId)
@@ -409,8 +443,8 @@ const ChecklistManageModal = ({
       if (error) {
         toast.error("Failed to update item");
       } else {
-        toast.success(`${oldTitle} updated to ${editingNewTitle.trim()}`);
-        setItems(prev => prev.map(item => item === oldTitle ? editingNewTitle.trim() : item));
+        toast.success(`Updated: ${newTitle}`);
+        setItems(prev => prev.map(item => item.title === oldTitle ? { title: newTitle, target_role: newRole } : item));
         handleCancelEdit();
       }
     } catch (error) {
@@ -456,7 +490,7 @@ const ChecklistManageModal = ({
         toast.error("Failed to delete item");
       } else {
         toast.success(`${itemToDelete} removed from checklist`);
-        setItems(prev => prev.filter(item => item !== itemToDelete));
+        setItems(prev => prev.filter(item => item.title !== itemToDelete));
         handleCancelDelete();
       }
     } catch (error) {
@@ -471,7 +505,9 @@ const ChecklistManageModal = ({
     if (!isLoading) {
       setEditingTitle(null);
       setEditingNewTitle("");
+      setEditingNewRole("");
       setNewItemTitle("");
+      setRoleInput("");
       onClose();
     }
   };
@@ -526,7 +562,7 @@ const ChecklistManageModal = ({
               Project: <span className="font-semibold">{projectName}</span>
             </p>
             <p className="text-xs text-blue-600 dark:text-blue-400">
-              Items assigned to all {allMemberIds.length} team members (excluding UI/UX from coding items)
+              {allMemberIds.length} team member{allMemberIds.length !== 1 ? "s" : ""}. Items can be assigned to a specific role or all members.
             </p>
             
             {/* Auto-sync indicator */}
@@ -540,20 +576,48 @@ const ChecklistManageModal = ({
             )}
             
             {/* Permission indicator for non-team leads */}
-            {!isTeamLead && (
+            {/* {!isTeamLead && (
               <div className="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500 p-3 rounded mt-2">
                 <p className="text-xs text-yellow-700 dark:text-yellow-300 flex items-center gap-2">
                   <Lock className="h-4 w-4" />
                   <span>You are viewing in read-only mode. Only team leads can add, edit, or delete items.</span>
                 </p>
               </div>
-            )}
+            )} */}
           </DialogHeader>
 
           <div className="space-y-4 mt-4">
             {/* Add Item Form - Only visible to team leads */}
-            {isTeamLead && (
+            {/* {isTeamLead && ( */}
               <form onSubmit={handleAddItem} className="flex gap-2">
+                <div className="relative w-44 flex-shrink-0">
+                  <Input
+                    value={roleInput}
+                    onChange={(e) => setRoleInput(e.target.value)}
+                    onFocus={() => setShowRoleSuggestions(true)}
+                    onBlur={() => setTimeout(() => setShowRoleSuggestions(false), 150)}
+                    placeholder="Target role (optional)"
+                    className="bg-light-900 dark:bg-dark-200 dark:text-light-900"
+                    disabled={isLoading || isFetching || isSyncing}
+                  />
+                  {showRoleSuggestions && filteredRoles.length > 0 && (
+                    <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg max-h-40 overflow-y-auto">
+                      {filteredRoles.map(role => (
+                        <button
+                          key={role}
+                          type="button"
+                          onMouseDown={() => {
+                            setRoleInput(role);
+                            setShowRoleSuggestions(false);
+                          }}
+                          className="w-full text-left px-3 py-2 text-sm text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                        >
+                          {role}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 <Input
                   value={newItemTitle}
                   onChange={(e) => setNewItemTitle(e.target.value)}
@@ -563,13 +627,13 @@ const ChecklistManageModal = ({
                 />
                 <Button
                   type="submit"
-                  disabled={isLoading || isFetching || isSyncing || !newItemTitle.trim()}
+                  disabled={isLoading || isFetching || isSyncing || (!newItemTitle.trim() && !roleInput.trim())}
                   className="bg-blue-500 hover:bg-blue-600 text-white px-4"
                 >
                   <Plus className="h-5 w-5" />
                 </Button>
               </form>
-            )}
+            {/* )} */}
 
             {/* Items List */}
             <div className="space-y-2">
@@ -589,14 +653,21 @@ const ChecklistManageModal = ({
                   )}
                 </div>
               ) : (
-                items.map((title) => (
-                  <div 
-                    key={title} 
+                items.map((item) => (
+                  <div
+                    key={item.title}
                     className="flex items-center gap-2 p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
                   >
-                    {editingTitle === title ? (
+                    {editingTitle === item.title ? (
                       <>
                         {/* EDITING MODE */}
+                        <Input
+                          value={editingNewRole}
+                          onChange={(e) => setEditingNewRole(e.target.value)}
+                          className="w-36 flex-shrink-0"
+                          placeholder="Role (optional)"
+                          disabled={isLoading}
+                        />
                         <Input
                           value={editingNewTitle}
                           onChange={(e) => setEditingNewTitle(e.target.value)}
@@ -604,18 +675,18 @@ const ChecklistManageModal = ({
                           disabled={isLoading}
                           autoFocus
                         />
-                        <Button 
-                          onClick={() => handleSaveEdit(title)} 
-                          disabled={isLoading || !editingNewTitle.trim()} 
-                          size="sm" 
+                        <Button
+                          onClick={() => handleSaveEdit(item.title)}
+                          disabled={isLoading || !editingNewTitle.trim()}
+                          size="sm"
                           className="bg-green-500 hover:bg-green-600 text-white w-10 h-10 p-0"
                         >
                           <Check className="h-4 w-4" />
                         </Button>
-                        <Button 
-                          onClick={handleCancelEdit} 
-                          disabled={isLoading} 
-                          size="sm" 
+                        <Button
+                          onClick={handleCancelEdit}
+                          disabled={isLoading}
+                          size="sm"
                           variant="outline"
                           className="w-10 h-10 p-0"
                         >
@@ -625,39 +696,44 @@ const ChecklistManageModal = ({
                     ) : (
                       <>
                         {/* VIEW MODE */}
-                        <div className="flex-1">
-                          <span className="text-gray-900 dark:text-white">{title}</span>
-                          {isCodingItem(title) && (
-                            <span className="ml-2 text-xs text-blue-600 dark:text-blue-400">
-                              (coding-related)
+                        <div className="flex-1 flex items-center gap-2 flex-wrap">
+                          <span className="text-gray-900 dark:text-white">{item.title}</span>
+                          {item.target_role ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                              <Tag className="h-3 w-3" />
+                              {item.target_role}
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400">
+                              All roles
                             </span>
                           )}
                         </div>
-                        
+
                         {/* Action buttons */}
                         <div className="flex gap-2">
-                          <Button 
-                            onClick={() => handleStartEdit(title)} 
+                          <Button
+                            onClick={() => handleStartEdit(item)}
                             disabled={isLoading || !isTeamLead}
-                            size="sm" 
-                            variant="outline" 
+                            size="sm"
+                            variant="outline"
                             className={`w-10 h-10 p-0 ${
-                              !isTeamLead 
-                                ? 'opacity-50 cursor-not-allowed border-gray-300 text-gray-400' 
+                              !isTeamLead
+                                ? 'opacity-50 cursor-not-allowed border-gray-300 text-gray-400'
                                 : 'border-blue-300 text-blue-600 hover:bg-blue-50'
                             }`}
                             title={!isTeamLead ? "Only team leads can edit" : "Edit item"}
                           >
                             <Edit2 className="h-4 w-4" />
                           </Button>
-                          <Button 
-                            onClick={() => handleDeleteItem(title)} 
+                          <Button
+                            onClick={() => handleDeleteItem(item.title)}
                             disabled={isLoading || !isTeamLead}
-                            size="sm" 
-                            variant="outline" 
+                            size="sm"
+                            variant="outline"
                             className={`w-10 h-10 p-0 ${
-                              !isTeamLead 
-                                ? 'opacity-50 cursor-not-allowed border-gray-300 text-gray-400' 
+                              !isTeamLead
+                                ? 'opacity-50 cursor-not-allowed border-gray-300 text-gray-400'
                                 : 'border-red-300 text-red-600 hover:bg-red-50'
                             }`}
                             title={!isTeamLead ? "Only team leads can delete" : "Delete item"}
