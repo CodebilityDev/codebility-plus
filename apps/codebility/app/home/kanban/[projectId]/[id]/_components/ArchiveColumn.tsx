@@ -35,7 +35,7 @@ export default function ArchiveColumn({ projectId, boardId }: ArchiveColumnProps
     const fetchArchivedTasks = async () => {
       setIsLoading(true);
       try {
-        // First get all column IDs for this board
+        
         const { data: columns, error: columnsError } = await supabase
           .from("kanban_columns")
           .select("id")
@@ -50,7 +50,7 @@ export default function ArchiveColumn({ projectId, boardId }: ArchiveColumnProps
           return;
         }
 
-        // Then fetch archived tasks for these columns
+      
         const { data: tasks, error: tasksError } = await supabase
           .from("tasks")
           .select(`
@@ -61,6 +61,7 @@ export default function ArchiveColumn({ projectId, boardId }: ArchiveColumnProps
             difficulty,
             type,
             due_date,
+            deadline,
             points,
             pr_link,
             sidekick_ids,
@@ -70,6 +71,7 @@ export default function ArchiveColumn({ projectId, boardId }: ArchiveColumnProps
             created_at,
             updated_at,
             skill_category_id,
+            codev_id,
             codev!tasks_codev_id_fkey (
               id,
               first_name,
@@ -99,7 +101,7 @@ export default function ArchiveColumn({ projectId, boardId }: ArchiveColumnProps
     fetchArchivedTasks();
   }, [supabase, boardId]);
 
-  // Automatically open the task modal if a taskId is highlighted in the URL
+ 
   useEffect(() => {
     if (highlightTaskId && archivedTasks.length > 0) {
       const task = archivedTasks.find(t => t.id === highlightTaskId);
@@ -113,6 +115,10 @@ export default function ArchiveColumn({ projectId, boardId }: ArchiveColumnProps
     if (!supabase) return;
 
     try {
+     
+      await supabase.from("tasks_comments").delete().eq("task_id", taskId);
+      await supabase.from("task_ticket_codes").delete().eq("task_id", taskId);
+
       const { error } = await supabase
         .from("tasks")
         .delete()
@@ -120,7 +126,7 @@ export default function ArchiveColumn({ projectId, boardId }: ArchiveColumnProps
 
       if (error) throw error;
 
-      // Remove from local state
+      
       setArchivedTasks(prev => prev.filter(task => task.id !== taskId));
       toast.success("Task deleted successfully");
     } catch (error) {

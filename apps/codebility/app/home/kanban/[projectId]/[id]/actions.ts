@@ -220,11 +220,10 @@ export const createNewTask = async (
       if (boardData?.project_id) {
         revalidatePath(`/home/kanban/${boardData.project_id}/${columnData.board_id}`);
 
-        // Send notification if task is assigned to someone other than the creator
         if (codev_id && newTask?.id) {
           const { data: { user } } = await supabase.auth.getUser();
 
-          // Only send notification if assigning to someone else
+          
           if (user && user.id !== codev_id) {
             await createNotificationAction({
               recipientId: codev_id,
@@ -366,6 +365,9 @@ export const deleteTask = async (
       .select("kanban_column_id")
       .eq("id", taskId)
       .single();
+
+    await supabase.from("tasks_comments").delete().eq("task_id", taskId);
+    await supabase.from("task_ticket_codes").delete().eq("task_id", taskId);
 
     const { error } = await supabase.from("tasks").delete().eq("id", taskId);
 
