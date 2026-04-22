@@ -115,6 +115,10 @@ export default function ArchiveColumn({ projectId, boardId }: ArchiveColumnProps
     if (!supabase) return;
 
     try {
+     
+      await supabase.from("tasks_comments").delete().eq("task_id", taskId);
+      await supabase.from("task_ticket_codes").delete().eq("task_id", taskId);
+
       const { error } = await supabase
         .from("tasks")
         .delete()
