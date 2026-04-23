@@ -517,6 +517,9 @@ const ChecklistManageModal = ({
     return (
       <Dialog open={isOpen} onOpenChange={handleClose}>
         <DialogContent className="max-w-md bg-white dark:bg-gray-900">
+          <DialogHeader>
+            <DialogTitle className="sr-only">Loading Checklist</DialogTitle>
+          </DialogHeader>
           <div className="flex items-center justify-center py-8">
             <div className="text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
