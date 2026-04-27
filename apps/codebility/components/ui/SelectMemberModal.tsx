@@ -37,30 +37,42 @@ export const SelectMemberModal = ({
 
   // Filter users based on active filter
   const filteredByStatus = useMemo(() => {
-    let statusFilters: string[] = [];
+    let filtered: typeof users = [];
 
     switch (activeFilter) {
       case 'smart':
-        statusFilters = ['MENTOR', 'GRADUATED', 'ADMIN'];
+        // Smart filter: role_id = 5 (Mentor) OR role_id = 1 (Admin) OR internal_status = GRADUATED
+        filtered = users.filter(user =>
+          (user.role_id === 5 || user.role_id === 1 || user.internal_status === 'GRADUATED') &&
+          !excludeUserIds.includes(user.id)
+        );
         break;
       case 'mentor':
-        statusFilters = ['MENTOR'];
+        // Mentor filter: use role_id = 5 (like landing page) instead of internal_status
+        filtered = users.filter(user =>
+          user.role_id === 5 &&
+          !excludeUserIds.includes(user.id)
+        );
         break;
       case 'graduated':
-        statusFilters = ['GRADUATED'];
+        filtered = users.filter(user =>
+          user.internal_status === 'GRADUATED' &&
+          !excludeUserIds.includes(user.id)
+        );
         break;
       case 'admin':
-        statusFilters = ['ADMIN'];
+        // Admin filter: use role_id = 1 instead of internal_status
+        filtered = users.filter(user =>
+          user.role_id === 1 &&
+          !excludeUserIds.includes(user.id)
+        );
         break;
       case 'all':
-        statusFilters = ['GRADUATED', 'INTERN', 'MENTOR', 'TRAINING', 'ADMIN', 'ONBOARDING'];
+        filtered = users.filter(user => !excludeUserIds.includes(user.id));
         break;
     }
 
-    return users.filter(user =>
-      statusFilters.includes(user.internal_status || '') &&
-      !excludeUserIds.includes(user.id)
-    );
+    return filtered;
   }, [users, activeFilter, excludeUserIds]);
 
   // Apply search filter
@@ -87,9 +99,9 @@ export const SelectMemberModal = ({
 
   const filterCounts = useMemo(() => {
     return {
-      mentor: users.filter(u => u.internal_status === 'MENTOR' && !excludeUserIds.includes(u.id)).length,
+      mentor: users.filter(u => u.role_id === 5 && !excludeUserIds.includes(u.id)).length,
       graduated: users.filter(u => u.internal_status === 'GRADUATED' && !excludeUserIds.includes(u.id)).length,
-      admin: users.filter(u => u.internal_status === 'ADMIN' && !excludeUserIds.includes(u.id)).length,
+      admin: users.filter(u => u.role_id === 1 && !excludeUserIds.includes(u.id)).length,
       all: users.filter(u => !excludeUserIds.includes(u.id)).length,
     };
   }, [users, excludeUserIds]);

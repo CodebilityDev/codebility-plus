@@ -18,14 +18,13 @@ import {
 } from "@codevs/ui/dropdown-menu";
 
 import { StatusBadge } from "../shared/StatusBadge";
-import { MobileEditableForm } from "./MobileEditableForm";
 import { TableActions } from "./TableActions";
 
 interface InHouseMobileTableProps {
   data: Codev[];
   onDataChange: (updatedItem: Codev) => void;
   onDelete: (deletedId: string) => void;
-  onEdit?: (id: string) => void;
+  onEdit?: (member: Codev | null) => void;
   roles: { id: number; name: string }[];
   handleSendNdaEmail: (
     codevId: string,
@@ -105,27 +104,13 @@ export function InHouseMobileTable({
   sortConfig,
   onSort,
 }: InHouseMobileTableProps) {
-  const [editingId, setEditingId] = useState<string | null>(null);
-
   return (
     <div className="block space-y-2 xl:hidden">
-      {data.map((item) =>
-        editingId === item.id ? (
-          <MobileEditableForm
-            key={item.id}
-            data={item}
-            onSave={(updatedItem) => {
-              onDataChange(updatedItem);
-              setEditingId(null);
-            }}
-            onCancel={() => setEditingId(null)}
-            roles={roles}
-          />
-        ) : (
-          <div
-            key={item.id}
-            className="border-light-700 bg-light-300 dark:border-dark-200 dark:bg-dark-100 rounded-lg border p-3 shadow-sm"
-          >
+      {data.map((item) => (
+        <div
+          key={item.id}
+          className="border-light-700 bg-light-300 dark:border-dark-200 dark:bg-dark-100 rounded-lg border p-3 shadow-sm"
+        >
             {/* Compact header with photo, name, status, and actions */}
             <div className="mb-2 flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -152,7 +137,7 @@ export function InHouseMobileTable({
                 <StatusBadge status={item.internal_status as InternalStatus} />
                 <TableActions
                   item={item}
-                  onEdit={() => setEditingId(item.id)}
+                  onEdit={() => onEdit?.(item)}
                   onDelete={() => onDelete(item.id)}
                 />
               </div>
@@ -290,7 +275,7 @@ export function InHouseMobileTable({
               </div>
             )}
           </div>
-        ),
+        )
       )}
     </div>
   );

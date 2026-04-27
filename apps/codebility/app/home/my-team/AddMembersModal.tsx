@@ -383,39 +383,39 @@ const AddMembersModal = ({
     }
 
     try {
-      let statusFilters: string[] = [];
-
-      switch (filter) {
-        case 'smart':
-          // Smart default: Show mentors, graduated, and admins (most likely team members)
-          statusFilters = ['MENTOR', 'GRADUATED', 'ADMIN'];
-          break;
-        case 'mentor':
-          statusFilters = ['MENTOR'];
-          break;
-        case 'graduated':
-          statusFilters = ['GRADUATED'];
-          break;
-        case 'admin':
-          statusFilters = ['ADMIN'];
-          break;
-        case 'training':
-          statusFilters = ['TRAINING', 'INTERN', 'ONBOARDING'];
-          break;
-        case 'all':
-          statusFilters = ['GRADUATED', 'INTERN', 'MENTOR', 'TRAINING', 'ADMIN', 'ONBOARDING'];
-          break;
-      }
-
       const PAGE_SIZE = 1000;
       let allData: Codev[] = [];
       let from = 0;
 
       while (true) {
-        const { data, error } = await supabase
-          .from('codev')
-          .select('*')
-          .in('internal_status', statusFilters)
+        let query = supabase.from('codev').select('*');
+
+        // Apply filters based on type
+        switch (filter) {
+          case 'smart':
+            // Smart filter: role_id = 5 (Mentor) OR role_id = 1 (Admin) OR internal_status = GRADUATED
+            query = query.or('role_id.eq.5,role_id.eq.1,internal_status.eq.GRADUATED');
+            break;
+          case 'mentor':
+            // Use role_id = 5 (like landing page)
+            query = query.eq('role_id', 5);
+            break;
+          case 'graduated':
+            query = query.eq('internal_status', 'GRADUATED');
+            break;
+          case 'admin':
+            // Use role_id = 1 for admins
+            query = query.eq('role_id', 1);
+            break;
+          case 'training':
+            query = query.in('internal_status', ['TRAINING', 'INTERN', 'ONBOARDING']);
+            break;
+          case 'all':
+            // No filter for 'all'
+            break;
+        }
+
+        const { data, error } = await query
           .order('first_name', { ascending: true })
           .range(from, from + PAGE_SIZE - 1);
 
@@ -451,7 +451,7 @@ const AddMembersModal = ({
       const { data, error } = await supabase
         .from('codev')
         .select('*')
-        .in('internal_status', ['MENTOR', 'GRADUATED', 'ADMIN', 'TRAINING'])
+        .or('role_id.eq.5,role_id.eq.1,internal_status.eq.GRADUATED,internal_status.eq.TRAINING')
         .gte('created_at', sevenDaysAgo.toISOString())
         .order('created_at', { ascending: false })
         .limit(10);
@@ -470,11 +470,11 @@ const AddMembersModal = ({
 
     try {
       const [mentorRes, graduatedRes, adminRes, trainingRes, allRes] = await Promise.all([
-        supabase.from('codev').select('id', { count: 'exact', head: true }).eq('internal_status', 'MENTOR'),
+        supabase.from('codev').select('id', { count: 'exact', head: true }).eq('role_id', 5),
         supabase.from('codev').select('id', { count: 'exact', head: true }).eq('internal_status', 'GRADUATED'),
-        supabase.from('codev').select('id', { count: 'exact', head: true }).eq('internal_status', 'ADMIN'),
+        supabase.from('codev').select('id', { count: 'exact', head: true }).eq('role_id', 1),
         supabase.from('codev').select('id', { count: 'exact', head: true }).in('internal_status', ['TRAINING', 'INTERN', 'ONBOARDING']),
-        supabase.from('codev').select('id', { count: 'exact', head: true }).in('internal_status', ['GRADUATED', 'INTERN', 'MENTOR', 'TRAINING', 'ADMIN', 'ONBOARDING'])
+        supabase.from('codev').select('id', { count: 'exact', head: true })
       ]);
 
       setFilterCounts({
@@ -497,10 +497,10 @@ const AddMembersModal = ({
       setIsSearching(true);
       const searchLower = query.toLowerCase().trim();
 
+      // Search all users without status filtering - let user find anyone
       const { data, error } = await supabase
         .from('codev')
         .select('*')
-        .in('internal_status', ['GRADUATED', 'INTERN', 'MENTOR', 'TRAINING', 'ADMIN', 'ONBOARDING'])
         .or(`first_name.ilike.%${searchLower}%,last_name.ilike.%${searchLower}%,display_position.ilike.%${searchLower}%`)
         .order('first_name', { ascending: true })
         .limit(50);

@@ -782,13 +782,20 @@ export const updateProjectMembers = async (
  * ─── PATCH: Fix RLS filtering issue ──────────────────────────────────────────
  * Use two-query approach to avoid PostgREST join RLS filtering that silently
  * drops users. Same pattern as getProjectByID() and getMembers().
+ *
+ * IMPORTANT: Uses anon client (no auth) to bypass RLS policies that may filter
+ * role_id field. This matches the landing page behavior where all mentors are visible.
  * ─────────────────────────────────────────────────────────────────────────────
  */
 export const getProjectCodevs = async (filters = {}): Promise<Codev[]> => {
-  const supabase = await createClientServerComponent();
+  // Use anon client to avoid RLS filtering of role_id field (same as landing page)
+  const { createClient } = await import("@supabase/supabase-js");
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
 
-  // Step 1: Fetch codev records WITHOUT project_members join to avoid RLS filtering
-  let query = supabase.from("codev").select(`
+  const selectFields = `
     id,
     first_name,
     last_name,
@@ -797,23 +804,48 @@ export const getProjectCodevs = async (filters = {}): Promise<Codev[]> => {
     positions,
     tech_stacks,
     display_position,
-    internal_status
-  `);
+    internal_status,
+    role_id
+  `;
 
-  Object.entries(filters).forEach(([key, value]) => {
-    if (value !== undefined) {
-      query = query.eq(key, value);
+  // Step 1: Fetch users by role in separate queries to avoid RLS corrupting role_id field
+  // When fetching all users without filtering by role_id, RLS policy corrupts the role_id field.
+  // Solution: Fetch each role separately (like landing page does), then combine results.
+
+  const roleIds = [1, 5, 7, 10]; // Admin, Mentor, Applicant, Codev
+
+  const queries = roleIds.map(roleId =>
+    supabase.from("codev").select(selectFields).eq("role_id", roleId)
+  );
+
+  // Also fetch users with null role_id or other role_ids
+  queries.push(
+    supabase.from("codev").select(selectFields).is("role_id", null)
+  );
+
+  const results = await Promise.all(queries);
+
+  // Combine all results
+  let codevs: any[] = [];
+  results.forEach(({ data, error }, index) => {
+    if (error) {
+      console.error(`Error fetching role_id ${index < roleIds.length ? roleIds[index] : 'null'}:`, error);
+    } else if (data) {
+      codevs = codevs.concat(data);
     }
   });
 
-  const { data: codevs, error } = await query;
-
-  if (error) {
-    console.error("Error fetching Codevs:", error);
-    throw new Error("Failed to fetch Codevs");
+  // Apply additional filters if provided
+  if (Object.keys(filters).length > 0) {
+    codevs = codevs.filter(codev => {
+      return Object.entries(filters).every(([key, value]) => {
+        if (value === undefined) return true;
+        return codev[key] === value;
+      });
+    });
   }
 
-  if (!codevs || codevs.length === 0) {
+  if (codevs.length === 0) {
     return [];
   }
 

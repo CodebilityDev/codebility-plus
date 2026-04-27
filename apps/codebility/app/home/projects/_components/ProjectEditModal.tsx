@@ -109,7 +109,7 @@ const ProjectEditModal = () => {
   } = useForm<ProjectFormData>({ mode: "onChange" });
 
   const { data: users = [], isLoading: isUsersLoading } = useQuery({
-    queryKey: ["projectCodevs"],
+    queryKey: ["projectCodevs", "v3"], // v2: Added role_id field + anon client
     queryFn: async () => {
       const result = await getProjectCodevs();
       return result || [];

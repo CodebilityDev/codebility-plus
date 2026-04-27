@@ -37,7 +37,7 @@ import {
 
 import { StatusBadge } from "../shared/StatusBadge";
 import { columns } from "./columns";
-import { EditableRow, Role } from "./EditableRow";
+import { EditDialog, Role } from "../EditDialog";
 import { TableActions } from "./TableActions";
 import { InHouseMobileTable } from "./InHouseMobileTable";
 import InHousePreviewSidebar from "./InHousePreviewSidebar";
@@ -133,7 +133,7 @@ export function InHouseTable({
   onSort,
 }: InHouseTableProps) {
   const [supabase, setSupabase] = useState<any>(null);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingMember, setEditingMember] = useState<Codev | null>(null);
   const [roles, setRoles] = useState<Role[]>([]);
   const [selectedMember, setSelectedMember] = useState<Codev | null>(null);
 
@@ -353,7 +353,7 @@ export function InHouseTable({
         data={data}
         onDataChange={onDataChange}
         onDelete={handleDelete}
-        onEdit={setEditingId}
+        onEdit={setEditingMember}
         roles={roles}
         handleSendNdaEmail={handleSendNdaEmail}
         handleDownloadNda={handleDownloadNda}
@@ -391,15 +391,15 @@ export function InHouseTable({
                   /* COMPACT: Name columns - medium width */
                   <TableHead
                     key={column.key}
-                    className="dark:text-light-900 w-24 px-2 py-2 text-xs font-bold text-black"
+                    className="dark:text-light-900 w-32 px-2 py-2 text-xs font-bold text-black"
                   >
                     {column.label}
                   </TableHead>
                 ) : column.key === "email_address" ? (
-                  /* COMPACT: Email column - larger width */
+                  /* COMPACT: Email column - flexible width to fill available space */
                   <TableHead
                     key={column.key}
-                    className="dark:text-light-900 w-40 px-2 py-2 text-xs font-bold text-black"
+                    className="dark:text-light-900 px-2 py-2 text-xs font-bold text-black"
                   >
                     {column.label}
                   </TableHead>
@@ -447,85 +447,75 @@ export function InHouseTable({
           </TableHeader>
 
           <TableBody>
-            {data.map((item) =>
-              editingId === item.id ? (
-                <EditableRow
-                  key={item.id}
-                  data={item}
-                  onSave={(updatedItem) => {
-                    onDataChange(updatedItem);
-                    setEditingId(null);
-                  }}
-                  onCancel={() => setEditingId(null)}
-                  roles={roles}
-                />
-              ) : (
-                <TableRow
-                  key={item.id}
-                  onClick={() => setSelectedMember(item)}
-                  className="cursor-pointer border-light-700 dark:border-dark-200 hover:bg-light-800 dark:hover:bg-dark-300 odd:dark:bg-dark-200 odd:bg-grey-100/10 border-b"
-                >
-                  {/* COMPACT: Avatar px-6 → px-2, h-10 w-10 → h-8 w-8 */}
-                  <TableCell className="dark:text-light-900 px-2 py-2 text-xs text-black">
-                    <div className="h-8 w-8 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
-                      <Image
-                        src={item.image_url || defaultImage}
-                        alt={`${item.first_name} avatar`}
-                        width={32}
-                        height={32}
-                        unoptimized={true}
-                        className="h-full w-full object-cover"
-                      />
-                    </div>
-                  </TableCell>
-
-                  {/* COMPACT: First Name px-6 → px-2, text-base → text-xs */}
-                  <TableCell className="dark:text-light-900 px-2 py-2 text-xs text-black">
-                    {capitalize(item.first_name)}
-                  </TableCell>
-
-                  {/* COMPACT: Last Name px-6 → px-2, text-base → text-xs */}
-                  <TableCell className="dark:text-light-900 px-2 py-2 text-xs text-black">
-                    {capitalize(item.last_name)}
-                  </TableCell>
-
-                  {/* COMPACT: Email px-5 → px-2, text-base → text-xs */}
-                  <TableCell className="dark:text-light-900 px-2 py-2 text-xs text-black">
-                    {item.email_address}
-                  </TableCell>
-
-                  {/* COMPACT: All desktop columns px-4 → px-2, py-3 → py-2, text-base → text-xs */}
-                  <TableCell className="dark:text-light-900 px-2 py-2 text-xs text-black">
-                    {item.role_id
-                      ? roles.find((role) => role.id === item.role_id)?.name ||
-                        "-"
-                      : "-"}
-                  </TableCell>
-
-                  <TableCell className="dark:text-light-900 px-2 py-2 text-xs text-black">
-                    {typeof item.display_position === "string"
-                      ? capitalize(item.display_position)
-                      : "-"}
-                  </TableCell>
-
-                  <TableCell className="px-2 py-2">
-                    <StatusBadge
-                      status={item.internal_status as InternalStatus}
+            {data.map((item) => (
+              <TableRow
+                key={item.id}
+                onClick={() => setSelectedMember(item)}
+                className="cursor-pointer border-light-700 dark:border-dark-200 hover:bg-light-800 dark:hover:bg-dark-300 odd:dark:bg-dark-200 odd:bg-grey-100/10 border-b"
+              >
+                {/* Avatar */}
+                <TableCell className="dark:text-light-900 px-2 py-2 text-xs text-black">
+                  <div className="h-8 w-8 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+                    <Image
+                      src={item.image_url || defaultImage}
+                      alt={`${item.first_name} avatar`}
+                      width={32}
+                      height={32}
+                      unoptimized={true}
+                      className="h-full w-full object-cover"
                     />
-                  </TableCell>
+                  </div>
+                </TableCell>
 
-                  <TableCell className="px-2 py-2">
-                    <div onClick={(e) => e.stopPropagation()}>
-                      <TableActions
-                        item={item}
-                        onEdit={() => setEditingId(item.id)}
-                        onDelete={() => handleDelete(item.id)}
-                      />
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ),
-            )}
+                {/* First Name */}
+                <TableCell className="dark:text-light-900 px-2 py-2 text-xs text-black">
+                  {capitalize(item.first_name)}
+                </TableCell>
+
+                {/* Last Name */}
+                <TableCell className="dark:text-light-900 px-2 py-2 text-xs text-black">
+                  {capitalize(item.last_name)}
+                </TableCell>
+
+                {/* Email */}
+                <TableCell className="dark:text-light-900 px-2 py-2 text-xs text-black">
+                  {item.email_address}
+                </TableCell>
+
+                {/* Role */}
+                <TableCell className="dark:text-light-900 px-2 py-2 text-xs text-black">
+                  {item.role_id
+                    ? roles.find((role) => role.id === item.role_id)?.name ||
+                      "-"
+                    : "-"}
+                </TableCell>
+
+                {/* Position */}
+                <TableCell className="dark:text-light-900 px-2 py-2 text-xs text-black">
+                  {typeof item.display_position === "string"
+                    ? capitalize(item.display_position)
+                    : "-"}
+                </TableCell>
+
+                {/* Status Badge */}
+                <TableCell className="px-2 py-2">
+                  <StatusBadge
+                    status={item.internal_status as InternalStatus}
+                  />
+                </TableCell>
+
+                {/* Actions */}
+                <TableCell className="px-2 py-2">
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <TableActions
+                      item={item}
+                      onEdit={() => setEditingMember(item)}
+                      onDelete={() => handleDelete(item.id)}
+                    />
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </div>
@@ -542,6 +532,20 @@ export function InHouseTable({
             />
           )}
         </div>
+      )}
+
+      {/* Edit Dialog */}
+      {editingMember && (
+        <EditDialog
+          isOpen={!!editingMember}
+          onClose={() => setEditingMember(null)}
+          data={editingMember}
+          onSave={(updatedMember) => {
+            onDataChange(updatedMember);
+            setEditingMember(null);
+          }}
+          roles={roles}
+        />
       )}
     </div>
   );
