@@ -669,7 +669,7 @@ const ProjectEditModal = () => {
           </div>
         ) : (
           <div className="space-y-6">
-            {/* Team Leader */}
+            {/* Team Leader - Modal Based Selection */}
             <div className="space-y-1">
               <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">
                 Team Leader *
