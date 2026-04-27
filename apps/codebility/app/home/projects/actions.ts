@@ -778,9 +778,16 @@ export const updateProjectMembers = async (
   }
 };
 
+/**
+ * ─── PATCH: Fix RLS filtering issue ──────────────────────────────────────────
+ * Use two-query approach to avoid PostgREST join RLS filtering that silently
+ * drops users. Same pattern as getProjectByID() and getMembers().
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
 export const getProjectCodevs = async (filters = {}): Promise<Codev[]> => {
   const supabase = await createClientServerComponent();
 
+  // Step 1: Fetch codev records WITHOUT project_members join to avoid RLS filtering
   let query = supabase.from("codev").select(`
     id,
     first_name,
@@ -790,15 +797,7 @@ export const getProjectCodevs = async (filters = {}): Promise<Codev[]> => {
     positions,
     tech_stacks,
     display_position,
-    internal_status,
-    project_members!codev_id (
-      project:project_id (
-        id,
-        name
-      ),
-      role,
-      joined_at
-    )
+    internal_status
   `);
 
   Object.entries(filters).forEach(([key, value]) => {
@@ -807,38 +806,65 @@ export const getProjectCodevs = async (filters = {}): Promise<Codev[]> => {
     }
   });
 
-  const { data, error } = await query;
+  const { data: codevs, error } = await query;
 
   if (error) {
     console.error("Error fetching Codevs:", error);
     throw new Error("Failed to fetch Codevs");
   }
 
-  return (
-    data?.map((codev: any) => {
-      const projects = (codev.project_members || []).map(
-        (pm: DbProjectMember) => {
-          const project: Project & { role: string; joined_at: string } = {
-            id: pm.project.id,
-            name: pm.project.name,
-            role: pm.role,
-            joined_at: pm.joined_at,
-            status: pm.project.status,
-            kanban_display: pm.project.kanban_display,
-            public_display: pm.project.public_display,
-          };
-          return project;
-        },
-      );
+  if (!codevs || codevs.length === 0) {
+    return [];
+  }
 
-      return {
-        ...codev,
-        positions: codev.positions || [],
-        tech_stacks: codev.tech_stacks || [],
-        projects,
-      } as Codev;
-    }) || []
-  );
+  // Step 2: Fetch project_members separately for all codevs
+  const codevIds = codevs.map(c => c.id);
+
+  const { data: projectMembers, error: pmError } = await supabase
+    .from("project_members")
+    .select(`
+      codev_id,
+      project_id,
+      role,
+      joined_at,
+      project:project_id (
+        id,
+        name,
+        status,
+        kanban_display,
+        public_display
+      )
+    `)
+    .in("codev_id", codevIds);
+
+  if (pmError) {
+    console.error("Error fetching project members:", pmError);
+  }
+
+  // Step 3: Merge project_members data back into codevs
+  return codevs.map((codev: any) => {
+    const codevProjectMembers = projectMembers?.filter(pm => pm.codev_id === codev.id) || [];
+
+    const projects = codevProjectMembers.map((pm: any) => {
+      const project: Project & { role: string; joined_at: string } = {
+        id: pm.project.id,
+        name: pm.project.name,
+        role: pm.role,
+        joined_at: pm.joined_at,
+        status: pm.project.status,
+        kanban_display: pm.project.kanban_display,
+        public_display: pm.project.public_display,
+      };
+      return project;
+    });
+
+    return {
+      ...codev,
+      positions: codev.positions || [],
+      tech_stacks: codev.tech_stacks || [],
+      projects,
+    } as Codev;
+  });
 };
 
 export const getProjectClients = async (): Promise<Client[]> => {
