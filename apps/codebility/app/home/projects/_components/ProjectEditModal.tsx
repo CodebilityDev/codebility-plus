@@ -109,8 +109,8 @@ const ProjectEditModal = () => {
       const result = await getProjectCodevs();
       return result || [];
     },
-    staleTime: 10 * 60 * 1000,
-    refetchOnWindowFocus: false,
+    staleTime: 2 * 60 * 1000, // Reduce to 2 minutes for fresher data
+    refetchOnWindowFocus: true, // Refetch when window focused to get latest users
   });
 
   const { data: clients = [], isLoading: isClientsLoading } = useQuery({
