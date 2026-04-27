@@ -1,4 +1,4 @@
-import { ChangeEvent, useMemo, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import DefaultAvatar from "@/components/DefaultAvatar";
 import {
   Select,
@@ -41,7 +41,16 @@ export const CustomSelect = ({
   searchable = false,
 }: CustomSelectProps) => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isOpen && searchable && searchInputRef.current) {
+      setTimeout(() => {
+        searchInputRef.current?.focus();
+      }, 0);
+    }
+  }, [isOpen, searchable]);
 
   const filteredOptions = useMemo(() => {
     if (!searchable) return options;
@@ -66,7 +75,7 @@ export const CustomSelect = ({
       {label && (
         <Label className="dark:text-light-900 text-black">{label}</Label>
       )}
-      <Select value={value} onValueChange={onChange} disabled={disabled}>
+      <Select value={value} onValueChange={onChange} disabled={disabled} onOpenChange={setIsOpen}>
         <SelectTrigger className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 w-full text-black">
           {(() => {
             const selected = options.find((o) => o.value === value);
@@ -102,9 +111,14 @@ export const CustomSelect = ({
           })()}
         </SelectTrigger>
 
-        <SelectContent side="bottom" position="popper" sideOffset={4} className="bg-light-800 dark:bg-dark-200">
+        <SelectContent
+          side="bottom"
+          position="popper"
+          sideOffset={4}
+          className="bg-light-800 dark:bg-dark-200 max-h-[min(var(--radix-select-content-available-height,400px),400px)] overflow-hidden"
+        >
           {searchable && (
-            <div className="p-2">
+            <div className="sticky top-0 z-10 bg-light-800 dark:bg-dark-200 p-2 border-b border-gray-200 dark:border-gray-700">
               <input
                 ref={searchInputRef}
                 type="text"
@@ -116,16 +130,16 @@ export const CustomSelect = ({
                 onKeyDown={(e) => {
                   e.stopPropagation();
                 }}
-                autoFocus={false}
-                className="dark:bg-dark-100 w-full rounded-md bg-white p-2 text-sm dark:text-white"
+                className="dark:bg-dark-100 w-full rounded-md bg-white p-2 text-sm dark:text-white focus:outline-none focus:ring-2 focus:ring-customBlue-500"
               />
             </div>
           )}
 
-          {filteredOptions.length === 0 ? (
-            <div className="p-2 text-sm text-gray-500">No options found</div>
-          ) : (
-            <SelectGroup>
+          <div className="overflow-y-auto max-h-[340px]">
+            {filteredOptions.length === 0 ? (
+              <div className="p-4 text-sm text-gray-500 text-center">No options found</div>
+            ) : (
+              <SelectGroup>
               {filteredOptions.map((option) => (
                 <SelectItem
                   key={option.id}
@@ -166,8 +180,9 @@ export const CustomSelect = ({
                   )}
                 </SelectItem>
               ))}
-            </SelectGroup>
-          )}
+              </SelectGroup>
+            )}
+          </div>
         </SelectContent>
       </Select>
     </div>

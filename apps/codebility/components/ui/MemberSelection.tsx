@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import DefaultAvatar from "@/components/DefaultAvatar";
 import { IconPlus } from "@/public/assets/svgs";
 import { Codev } from "@/types/home/codev";
@@ -33,6 +33,16 @@ export const MemberSelection = ({
   showLabel = true, // default true — no change to existing callers
 }: MemberSelectionProps) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isOpen && searchInputRef.current) {
+      setTimeout(() => {
+        searchInputRef.current?.focus();
+      }, 0);
+    }
+  }, [isOpen]);
 
   const availableMembers = users.filter(
     (user) =>
@@ -75,7 +85,7 @@ export const MemberSelection = ({
           ))}
         </div>
 
-        <DropdownMenu>
+        <DropdownMenu onOpenChange={setIsOpen}>
           <DropdownMenuTrigger asChild>
             <button 
               className="h-12 w-12 rounded-full border border-gray-600 bg-transparent hover:bg-gray-700 transition-colors"
@@ -88,34 +98,38 @@ export const MemberSelection = ({
           <DropdownMenuContent
             side="bottom"
             align="start"
-            className="dark:bg-dark-100 z-[100] max-h-[200px] w-[250px] overflow-y-auto rounded-lg bg-white"
+            className="dark:bg-dark-100 z-[100] w-[280px] rounded-lg bg-white shadow-lg overflow-hidden"
+            sideOffset={4}
           >
-            <DropdownMenuLabel className="pb-2 text-center text-sm">
+            <DropdownMenuLabel className="py-3 text-center text-sm font-semibold border-b dark:border-gray-700">
               Add Members
             </DropdownMenuLabel>
 
-            <div className="px-2">
+            <div className="sticky top-0 z-10 bg-white dark:bg-dark-100 p-3 border-b dark:border-gray-700">
               <input
+                ref={searchInputRef}
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search members"
-                className="dark:bg-dark-200 mb-2 h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm focus:outline-none"
+                onPointerDown={(e) => e.stopPropagation()}
+                onFocus={(e) => e.stopPropagation()}
+                onKeyDown={(e) => e.stopPropagation()}
+                placeholder="Search members..."
+                className="dark:bg-dark-200 w-full h-10 rounded-lg border border-gray-300 dark:border-gray-600 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-customBlue-500 dark:text-white"
               />
             </div>
 
-            <DropdownMenuSeparator />
+            <div className="max-h-[320px] overflow-y-auto">
+              <DropdownMenuLabel className="px-4 py-2 text-xs text-gray-500 uppercase tracking-wide sticky top-0 bg-white dark:bg-dark-100">
+                Available Members ({filteredMembers.length})
+              </DropdownMenuLabel>
 
-            <DropdownMenuLabel className="px-4 py-2 text-xs">
-              Available Members
-            </DropdownMenuLabel>
-
-            {filteredMembers.length === 0 ? (
-              <div className="px-4 py-2 text-sm text-gray-500">
-                No members available
-              </div>
-            ) : (
-              filteredMembers.map((user) => (
+              {filteredMembers.length === 0 ? (
+                <div className="px-4 py-8 text-sm text-gray-500 text-center">
+                  {searchQuery ? 'No members found matching your search' : 'No members available'}
+                </div>
+              ) : (
+                filteredMembers.map((user) => (
                 <DropdownMenuItem
                   key={user.id}
                   onClick={() => onMemberAdd(user)}
@@ -138,6 +152,7 @@ export const MemberSelection = ({
                 </DropdownMenuItem>
               ))
             )}
+            </div>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

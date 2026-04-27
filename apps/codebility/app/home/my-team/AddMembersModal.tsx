@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { SimpleMemberData, getProjectCodevs, updateProjectMembers } from "@/app/home/projects/actions";
 import { Button } from "@/components/ui/button";
 import {
@@ -367,17 +367,46 @@ const AddMembersModal = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
   const [availableMembers, setAvailableMembers] = useState<Codev[]>([]);
+  const [recentMembers, setRecentMembers] = useState<Codev[]>([]);
   const [isLoadingMembers, setIsLoadingMembers] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [activeFilter, setActiveFilter] = useState<'smart' | 'all' | 'mentor' | 'graduated' | 'admin' | 'training'>('smart');
+  const [filterCounts, setFilterCounts] = useState({ mentor: 0, graduated: 0, admin: 0, training: 0, all: 0 });
+  const [isSearching, setIsSearching] = useState(false);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // ✅ Paginated fetch to bypass Supabase's 1000-row default limit
-  const fetchAllCodevs = useCallback(async (): Promise<Codev[]> => {
+  // ✅ Fetch codevs based on filter with smart defaults
+  const fetchCodevsByFilter = useCallback(async (filter: 'smart' | 'all' | 'mentor' | 'graduated' | 'admin' | 'training'): Promise<Codev[]> => {
     if (!supabase) {
       console.error('Supabase client not available');
       return [];
     }
 
     try {
+      let statusFilters: string[] = [];
+
+      switch (filter) {
+        case 'smart':
+          // Smart default: Show mentors, graduated, and admins (most likely team members)
+          statusFilters = ['MENTOR', 'GRADUATED', 'ADMIN'];
+          break;
+        case 'mentor':
+          statusFilters = ['MENTOR'];
+          break;
+        case 'graduated':
+          statusFilters = ['GRADUATED'];
+          break;
+        case 'admin':
+          statusFilters = ['ADMIN'];
+          break;
+        case 'training':
+          statusFilters = ['TRAINING', 'INTERN', 'ONBOARDING'];
+          break;
+        case 'all':
+          statusFilters = ['GRADUATED', 'INTERN', 'MENTOR', 'TRAINING', 'ADMIN', 'ONBOARDING'];
+          break;
+      }
+
       const PAGE_SIZE = 1000;
       let allData: Codev[] = [];
       let from = 0;
@@ -386,7 +415,7 @@ const AddMembersModal = ({
         const { data, error } = await supabase
           .from('codev')
           .select('*')
-          .in('internal_status', ['GRADUATED', 'INTERN', 'MENTOR', 'TRAINING', 'ADMIN', 'ONBOARDING'])
+          .in('internal_status', statusFilters)
           .order('first_name', { ascending: true })
           .range(from, from + PAGE_SIZE - 1);
 
@@ -410,6 +439,106 @@ const AddMembersModal = ({
       throw error;
     }
   }, [supabase]);
+
+  // ✅ Fetch recently added members (last 7 days)
+  const fetchRecentMembers = useCallback(async (): Promise<Codev[]> => {
+    if (!supabase) return [];
+
+    try {
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+      const { data, error } = await supabase
+        .from('codev')
+        .select('*')
+        .in('internal_status', ['MENTOR', 'GRADUATED', 'ADMIN', 'TRAINING'])
+        .gte('created_at', sevenDaysAgo.toISOString())
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Failed to fetch recent members:', error);
+      return [];
+    }
+  }, [supabase]);
+
+  // ✅ Fetch filter counts
+  const fetchFilterCounts = useCallback(async () => {
+    if (!supabase) return;
+
+    try {
+      const [mentorRes, graduatedRes, adminRes, trainingRes, allRes] = await Promise.all([
+        supabase.from('codev').select('id', { count: 'exact', head: true }).eq('internal_status', 'MENTOR'),
+        supabase.from('codev').select('id', { count: 'exact', head: true }).eq('internal_status', 'GRADUATED'),
+        supabase.from('codev').select('id', { count: 'exact', head: true }).eq('internal_status', 'ADMIN'),
+        supabase.from('codev').select('id', { count: 'exact', head: true }).in('internal_status', ['TRAINING', 'INTERN', 'ONBOARDING']),
+        supabase.from('codev').select('id', { count: 'exact', head: true }).in('internal_status', ['GRADUATED', 'INTERN', 'MENTOR', 'TRAINING', 'ADMIN', 'ONBOARDING'])
+      ]);
+
+      setFilterCounts({
+        mentor: mentorRes.count || 0,
+        graduated: graduatedRes.count || 0,
+        admin: adminRes.count || 0,
+        training: trainingRes.count || 0,
+        all: allRes.count || 0
+      });
+    } catch (error) {
+      console.error('Failed to fetch filter counts:', error);
+    }
+  }, [supabase]);
+
+  // ✅ Server-side search with debouncing
+  const searchMembers = useCallback(async (query: string): Promise<Codev[]> => {
+    if (!supabase || !query.trim()) return [];
+
+    try {
+      setIsSearching(true);
+      const searchLower = query.toLowerCase().trim();
+
+      const { data, error } = await supabase
+        .from('codev')
+        .select('*')
+        .in('internal_status', ['GRADUATED', 'INTERN', 'MENTOR', 'TRAINING', 'ADMIN', 'ONBOARDING'])
+        .or(`first_name.ilike.%${searchLower}%,last_name.ilike.%${searchLower}%,display_position.ilike.%${searchLower}%`)
+        .order('first_name', { ascending: true })
+        .limit(50);
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Failed to search members:', error);
+      return [];
+    } finally {
+      setIsSearching(false);
+    }
+  }, [supabase]);
+
+  // ✅ Debounced search handler
+  const handleSearchChange = useCallback((query: string) => {
+    setSearchQuery(query);
+
+    // Clear previous timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    // If search is empty, reload filtered members
+    if (!query.trim()) {
+      fetchCodevsByFilter(activeFilter).then(users => {
+        setAvailableMembers(users || []);
+      });
+      return;
+    }
+
+    // Debounce search by 300ms
+    searchTimeoutRef.current = setTimeout(() => {
+      searchMembers(query).then(results => {
+        setAvailableMembers(results);
+      });
+    }, 300);
+  }, [activeFilter, fetchCodevsByFilter, searchMembers]);
 
   // ✅ Enhanced profile fetching with timeout protection
   const getCompleteCodevProfileSafe = useCallback(async (codevId: string): Promise<Codev | null> => {
@@ -499,17 +628,17 @@ const AddMembersModal = ({
     }
   }, [getCompleteCodevProfileSafe, openProfileModal]);
 
-  // ✅ Load available members
+  // ✅ Load available members based on active filter
   useEffect(() => {
     let isMounted = true;
     let timeoutId: NodeJS.Timeout;
 
     const loadMembers = async () => {
       if (!isOpen || !supabase) return;
-      
+
       setIsLoadingMembers(true);
       setLoadError(null);
-      
+
       try {
         timeoutId = setTimeout(() => {
           if (isMounted) {
@@ -517,27 +646,35 @@ const AddMembersModal = ({
           }
         }, 30000);
 
-        const users = await fetchAllCodevs();
-        
+        // Load members based on active filter
+        const users = await fetchCodevsByFilter(activeFilter);
+
+        // Load recent members separately
+        const recent = await fetchRecentMembers();
+
+        // Fetch filter counts (non-blocking)
+        fetchFilterCounts();
+
         clearTimeout(timeoutId);
-        
+
         if (isMounted) {
           setAvailableMembers(users || []);
+          setRecentMembers(recent || []);
           setLoadError(null);
         }
       } catch (error: any) {
         console.error('Failed to fetch members:', error);
-        
+
         if (isMounted) {
           const errorMessage = error?.message || 'Failed to load members';
           setLoadError(errorMessage);
-          
+
           if (errorMessage.includes('timeout')) {
             toast.error('Loading members is taking longer than expected. Please try again.');
           } else {
             toast.error('Failed to load members. Please try again.');
           }
-          
+
           setAvailableMembers([]);
         }
       } finally {
@@ -555,7 +692,7 @@ const AddMembersModal = ({
         clearTimeout(timeoutId);
       }
     };
-  }, [isOpen, supabase, fetchAllCodevs]);
+  }, [isOpen, supabase, activeFilter, fetchCodevsByFilter, fetchRecentMembers, fetchFilterCounts]);
 
   // ✅ Initialize selected members
   useEffect(() => {
@@ -599,26 +736,17 @@ const AddMembersModal = ({
     [currentMembers]
   );
 
-  // ✅ Filter available members
+  // ✅ Filter available members (client-side filtering when not searching server-side)
   const filteredUsers = useMemo(() => {
     if (!availableMembers.length) return [];
-    
-    const searchLower = searchQuery.toLowerCase().trim();
-    
+
+    // Filter out team lead
     return availableMembers.filter(user => {
       if (!user?.id || !user?.first_name || !user?.last_name) return false;
-      
       const isTeamLead = teamLeadData?.id === user.id;
-      if (isTeamLead) return false;
-      
-      if (!searchLower) return true;
-      
-      const fullName = `${user.first_name} ${user.last_name}`.toLowerCase();
-      const position = user.display_position?.toLowerCase() || '';
-      
-      return fullName.includes(searchLower) || position.includes(searchLower);
+      return !isTeamLead;
     });
-  }, [availableMembers, teamLeadData, searchQuery]);
+  }, [availableMembers, teamLeadData]);
 
   // ✅ Reset state on close
   useEffect(() => {
@@ -626,6 +754,13 @@ const AddMembersModal = ({
       setSearchQuery("");
       setSelectedMembers([]);
       setLoadError(null);
+      setIsSearching(false);
+
+      // Clear any pending search timeouts
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+        searchTimeoutRef.current = null;
+      }
     }
   }, [isOpen]);
 
@@ -683,10 +818,14 @@ const AddMembersModal = ({
   const handleRetryLoad = async () => {
     setLoadError(null);
     setIsLoadingMembers(true);
-    
+
     try {
-      const users = await fetchAllCodevs();
+      const users = await fetchCodevsByFilter(activeFilter);
+      const recent = await fetchRecentMembers();
+      fetchFilterCounts();
+
       setAvailableMembers(users || []);
+      setRecentMembers(recent || []);
       setLoadError(null);
     } catch (error) {
       console.error('Retry failed:', error);
@@ -769,16 +908,168 @@ const AddMembersModal = ({
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <input
                   type="text"
-                  placeholder="Search members..."
+                  placeholder="Search members by name or position..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 sm:py-3 bg-white/20 backdrop-blur-sm dark:bg-white/10 border border-white/30 dark:border-white/20 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-customBlue-500 focus:border-white/50 transition-colors text-sm sm:text-base"
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  className="w-full pl-10 pr-10 py-2 sm:py-3 bg-white/20 backdrop-blur-sm dark:bg-white/10 border border-white/30 dark:border-white/20 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-customBlue-500 focus:border-white/50 transition-colors text-sm sm:text-base"
                 />
+                {isSearching && (
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-customBlue-500 border-t-transparent"></div>
+                  </div>
+                )}
+              </div>
+
+              {/* Filter Tabs */}
+              <div className="flex flex-wrap gap-2 mb-3 sm:mb-4">
+                <button
+                  onClick={() => setActiveFilter('smart')}
+                  className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ${
+                    activeFilter === 'smart'
+                      ? 'bg-customBlue-600 text-white ring-2 ring-customBlue-400'
+                      : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                  }`}
+                >
+                  Smart Filter
+                </button>
+                <button
+                  onClick={() => setActiveFilter('mentor')}
+                  className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ${
+                    activeFilter === 'mentor'
+                      ? 'bg-customBlue-600 text-white ring-2 ring-customBlue-400'
+                      : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                  }`}
+                >
+                  Mentors {filterCounts.mentor > 0 && `(${filterCounts.mentor})`}
+                </button>
+                <button
+                  onClick={() => setActiveFilter('graduated')}
+                  className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ${
+                    activeFilter === 'graduated'
+                      ? 'bg-customBlue-600 text-white ring-2 ring-customBlue-400'
+                      : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                  }`}
+                >
+                  Graduated {filterCounts.graduated > 0 && `(${filterCounts.graduated})`}
+                </button>
+                <button
+                  onClick={() => setActiveFilter('admin')}
+                  className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ${
+                    activeFilter === 'admin'
+                      ? 'bg-customBlue-600 text-white ring-2 ring-customBlue-400'
+                      : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                  }`}
+                >
+                  Admins {filterCounts.admin > 0 && `(${filterCounts.admin})`}
+                </button>
+                <button
+                  onClick={() => setActiveFilter('training')}
+                  className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ${
+                    activeFilter === 'training'
+                      ? 'bg-customBlue-600 text-white ring-2 ring-customBlue-400'
+                      : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                  }`}
+                >
+                  Training {filterCounts.training > 0 && `(${filterCounts.training})`}
+                </button>
+                <button
+                  onClick={() => setActiveFilter('all')}
+                  className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ${
+                    activeFilter === 'all'
+                      ? 'bg-customBlue-600 text-white ring-2 ring-customBlue-400'
+                      : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                  }`}
+                >
+                  All {filterCounts.all > 0 && `(${filterCounts.all})`}
+                </button>
               </div>
             </div>
 
             <div className="flex-1 px-3 sm:px-6 pb-4 overflow-y-auto min-h-0">
               <div className="space-y-2 sm:space-y-3">
+                {/* Recently Added Section */}
+                {!searchQuery && recentMembers.length > 0 && !isLoadingMembers && (
+                  <div className="mb-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="h-px flex-1 bg-gradient-to-r from-green-500/50 to-transparent"></div>
+                      <span className="text-xs font-semibold text-green-400 uppercase tracking-wider">Recently Added (Last 7 Days)</span>
+                      <div className="h-px flex-1 bg-gradient-to-l from-green-500/50 to-transparent"></div>
+                    </div>
+                    {recentMembers
+                      .filter(user => user.id !== teamLeadData?.id)
+                      .slice(0, 5)
+                      .map((user) => (
+                        <div
+                          key={`recent-${user.id}`}
+                          onClick={() => toggleMember(user)}
+                          className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg cursor-pointer transition-all duration-200 border border-green-500/30 ${
+                            isSelected(user.id)
+                              ? 'bg-customBlue-600/30 ring-2 ring-customBlue-500'
+                              : 'hover:bg-gray-700/30 bg-green-500/5'
+                          }`}
+                        >
+                          <div className="flex-shrink-0">
+                            <div
+                              className={`relative rounded-full overflow-hidden ring-2 transition-all duration-200 cursor-pointer hover:ring-customBlue-300 ${
+                                isSelected(user.id)
+                                  ? 'ring-customBlue-500'
+                                  : 'ring-green-400'
+                              }`}
+                              style={{ width: 40, height: 40 }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleProfileClick(user);
+                              }}
+                              title="Click to view profile"
+                            >
+                              <img
+                                src={
+                                  user.image_url ||
+                                  "https://codebility-cdn.pages.dev/assets/images/default-avatar-200x200.jpg"
+                                }
+                                alt={`${user.first_name} ${user.last_name}`}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.src = "https://codebility-cdn.pages.dev/assets/images/default-avatar-200x200.jpg";
+                                }}
+                              />
+                            </div>
+                          </div>
+
+                          <div className="flex-1 min-w-0">
+                            <div className="text-white font-semibold text-sm sm:text-base truncate flex items-center gap-2">
+                              {user.first_name} {user.last_name}
+                              <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-green-500/20 text-green-400 border border-green-500/30">
+                                NEW
+                              </span>
+                            </div>
+                            {user.display_position && (
+                              <div className="text-gray-300 text-xs sm:text-sm truncate">
+                                {user.display_position}
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex-shrink-0">
+                            <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded border-2 flex items-center justify-center transition-all duration-200 ${
+                              isSelected(user.id)
+                                ? 'bg-white border-white'
+                                : 'bg-transparent border-gray-400'
+                            }`}>
+                              {isSelected(user.id) && (
+                                <svg className="w-4 h-4 text-black font-bold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                </svg>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent my-3"></div>
+                  </div>
+                )}
+
                 {isLoadingMembers ? (
                   <div className="text-center py-8 text-gray-400">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-customBlue-500 mx-auto mb-3"></div>
@@ -799,9 +1090,13 @@ const AddMembersModal = ({
                     </Button>
                   </div>
                 ) : filteredUsers.length > 0 ? (
-                  filteredUsers
-                    .slice(0, searchQuery ? filteredUsers.length : 50)
-                    .map((user) => (
+                  <>
+                    {searchQuery && (
+                      <div className="mb-3 text-sm text-gray-400">
+                        Found {filteredUsers.length} result{filteredUsers.length !== 1 ? 's' : ''} for "{searchQuery}"
+                      </div>
+                    )}
+                    {filteredUsers.map((user) => (
                       <div
                         key={user.id}
                         onClick={() => toggleMember(user)}
@@ -868,7 +1163,8 @@ const AddMembersModal = ({
                           </div>
                         </div>
                       </div>
-                    ))
+                    ))}
+                  </>
                 ) : (
                   <div className="text-center py-8 text-gray-400">
                     <Users className="h-12 w-12 mx-auto mb-3 opacity-50" />
