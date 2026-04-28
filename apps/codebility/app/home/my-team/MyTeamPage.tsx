@@ -308,66 +308,49 @@ const MyTeamPage = ({ projectData }: MyTeamPageProps) => {
     if (!selectedProject) return;
 
     try {
+      // Note: updateProjectMembers is already called in AddMembersModal
+      // This callback just updates the local UI state
       const teamLeadResult = await getTeamLead(selectedProject.project.id);
       const teamLead = teamLeadResult.data;
-      
+
       if (!teamLead) {
         throw new Error('Team leader not found');
       }
 
-      // ✅ FIXED: Added username and username_updated_at to teamLead spread object (line ~342 area)
-      const updatedMembers = [
-        {
-          ...teamLead,
-          username: null,
-          username_updated_at: null,
-          positions: [],
-          tech_stacks: [],
-          display_position: teamLead.display_position ?? undefined,
-        } as unknown as Codev,
-        ...selectedMembers
-          .filter((member) => member.id !== teamLead.id)
-          .map((member) => ({
-            ...member,
-            display_position: member.display_position ?? undefined,
-          })),
-      ];
+      // Update local state with all selected members
+      const updatedProjectMembers: SimpleMemberData[] = selectedMembers
+        .filter(member => member.id !== teamLead.id)
+        .map(member => ({
+          id: member.id,
+          first_name: member.first_name,
+          last_name: member.last_name,
+          email_address: member.email_address,
+          image_url: member.image_url ?? null,
+          role: 'member',
+          display_position: member.display_position ?? null,
+          joined_at: new Date().toISOString(),
+        }));
 
-      const result = await updateProjectMembers(
-        selectedProject.project.id,
-        updatedMembers,
-        teamLead.id,
-      );
+      setProjects(prev => prev.map(p =>
+        p.project.id === selectedProject.project.id
+          ? { ...p, members: { data: updatedProjectMembers } }
+          : p
+      ));
 
-      if (result.success) {
-        toast.success("Project members updated successfully.");
-        
-        const updatedProjectMembers: SimpleMemberData[] = selectedMembers
-          .filter(member => member.id !== teamLead.id)
-          .map(member => ({
-            id: member.id,
-            first_name: member.first_name,
-            last_name: member.last_name,
-            email_address: member.email_address,
-            image_url: member.image_url ?? null,
-            role: 'member',
-            display_position: member.display_position ?? null,
-            joined_at: new Date().toISOString(),
-          }));
-
-        setProjects(prev => prev.map(p => 
-          p.project.id === selectedProject.project.id 
-            ? { ...p, members: { data: updatedProjectMembers } }
+      handleCloseModal();
+    } catch (error) {
+      console.error('❌ Error updating local state:', error);
+      // Don't show error toast since the database update already succeeded
+      // Just refresh the page data instead
+      const membersResult = await getMembers(selectedProject.project.id);
+      if (membersResult.data) {
+        setProjects(prev => prev.map(p =>
+          p.project.id === selectedProject.project.id
+            ? { ...p, members: { data: membersResult.data } }
             : p
         ));
-        
-        handleCloseModal();
-      } else {
-        toast.error(result.error || "Failed to update project members.");
       }
-    } catch (error) {
-      console.error('Failed to update members:', error);
-      toast.error("An unexpected error occurred.");
+      handleCloseModal();
     }
   };
 
