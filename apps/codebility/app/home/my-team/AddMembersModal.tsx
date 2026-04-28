@@ -740,13 +740,27 @@ const AddMembersModal = ({
   const filteredUsers = useMemo(() => {
     if (!availableMembers.length) return [];
 
-    // Filter out team lead
-    return availableMembers.filter(user => {
+    // Filter out team lead and get base filtered list
+    const baseFiltered = availableMembers.filter(user => {
       if (!user?.id || !user?.first_name || !user?.last_name) return false;
       const isTeamLead = teamLeadData?.id === user.id;
       return !isTeamLead;
     });
-  }, [availableMembers, teamLeadData]);
+
+    // When searching, include already selected members who aren't in search results
+    // This prevents selected members from disappearing when you search for someone else
+    if (searchQuery.trim()) {
+      const selectedNotInResults = selectedMembers.filter(selected =>
+        !baseFiltered.some(user => user.id === selected.id) &&
+        selected.id !== teamLeadData?.id
+      );
+
+      // Combine: selected members first, then search results
+      return [...selectedNotInResults, ...baseFiltered];
+    }
+
+    return baseFiltered;
+  }, [availableMembers, teamLeadData, searchQuery, selectedMembers]);
 
   // ✅ Reset state on close
   useEffect(() => {
@@ -1092,8 +1106,20 @@ const AddMembersModal = ({
                 ) : filteredUsers.length > 0 ? (
                   <>
                     {searchQuery && (
-                      <div className="mb-3 text-sm text-gray-400">
-                        Found {filteredUsers.length} result{filteredUsers.length !== 1 ? 's' : ''} for "{searchQuery}"
+                      <div className="mb-3 flex justify-between items-center text-sm">
+                        <span className="text-gray-400">
+                          Found {filteredUsers.length} result{filteredUsers.length !== 1 ? 's' : ''} for "{searchQuery}"
+                        </span>
+                        {selectedMembers.length > 0 && (
+                          <span className="text-customBlue-400 font-semibold">
+                            {selectedMembers.length} selected
+                          </span>
+                        )}
+                      </div>
+                    )}
+                    {!searchQuery && selectedMembers.length > 0 && (
+                      <div className="mb-3 text-sm text-customBlue-400 font-semibold">
+                        {selectedMembers.length} member{selectedMembers.length !== 1 ? 's' : ''} selected
                       </div>
                     )}
                     {filteredUsers.map((user) => (
