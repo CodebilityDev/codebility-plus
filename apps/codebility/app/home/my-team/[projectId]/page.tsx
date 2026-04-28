@@ -87,11 +87,11 @@ const TeamDetailPage = async ({ params }: TeamDetailPageProps) => {
     });
 
     if (!project) {
-      console.error('Project not found or user has no access:', {
-        requestedProjectId: projectId,
-        userProjectIds: userProjects.map(p => p.project.id),
-        codevUserId: codevUser.id
-      });
+      console.error('❌ Project not found or user has no access');
+      console.error('   Requested Project ID:', projectId);
+      console.error('   User Project IDs:', userProjects.map(p => p.project.id));
+      console.error('   Codev User ID:', codevUser.id);
+      console.error('   Total user projects:', userProjects.length);
       notFound();
     }
 
@@ -184,13 +184,14 @@ const TeamDetailPage = async ({ params }: TeamDetailPageProps) => {
     );
 
   } catch (error) {
-    console.error('TeamDetailPage error:', {
-      error,
-      message: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined,
-      projectId
-    });
-    
+    console.error('❌ TeamDetailPage error');
+    console.error('   Project ID:', projectId);
+    console.error('   Error message:', error instanceof Error ? error.message : 'Unknown error');
+    console.error('   Error:', error);
+    if (error instanceof Error && error.stack) {
+      console.error('   Stack trace:', error.stack);
+    }
+
     return (
       <div className="mx-auto max-w-screen-xl">
         <H1>Team Details</H1>
