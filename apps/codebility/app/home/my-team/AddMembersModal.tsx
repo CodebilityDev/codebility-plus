@@ -785,9 +785,14 @@ const AddMembersModal = ({
       return;
     }
 
+    console.log('🚀 [AddMembersModal] Starting member update');
+    console.log('   Selected members count:', selectedMembers.length);
+    console.log('   Selected member names:', selectedMembers.map(m => `${m.first_name} ${m.last_name}`));
+    console.log('   Team leader:', `${teamLeadData.first_name} ${teamLeadData.last_name}`);
+
     const loadingToast = toast.loading('Updating team members...');
     setIsUpdating(true);
-    
+
     try {
       const updatedMembers = [
         {
@@ -806,6 +811,10 @@ const AddMembersModal = ({
           })),
       ];
 
+      console.log('📤 [AddMembersModal] Sending to database');
+      console.log('   Total members (including team leader):', updatedMembers.length);
+      console.log('   Project ID:', project.id);
+
       const result = await updateProjectMembers(
         project.id,
         updatedMembers,
@@ -813,10 +822,13 @@ const AddMembersModal = ({
       );
 
       if (result.success) {
+        console.log('✅ [AddMembersModal] Update successful!');
+        console.log('   Members added:', selectedMembers.length);
         toast.success("Team members updated successfully!", { id: loadingToast });
         await onUpdate(selectedMembers);
         onClose();
       } else {
+        console.error('❌ [AddMembersModal] Update failed:', result.error);
         toast.error(result.error || "Failed to update members", { id: loadingToast });
       }
     } catch (error) {

@@ -733,6 +733,11 @@ export const updateProjectMembers = async (
   members: Codev[],
   teamLeaderId: string,
 ): Promise<{ success: boolean; error?: string }> => {
+  console.log('🔧 [updateProjectMembers] Server-side update starting');
+  console.log('   Project ID:', projectId);
+  console.log('   Members to add:', members.length);
+  console.log('   Team Leader ID:', teamLeaderId);
+
   const supabase = await createClientServerComponent();
 
   try {
@@ -742,6 +747,8 @@ export const updateProjectMembers = async (
       .eq("project_id", projectId);
 
     if (fetchError) throw fetchError;
+
+    console.log('   Existing members in DB:', existingMembers?.length ?? 0);
 
     const joinedAtMap = new Map(
       existingMembers?.map(m => [m.codev_id, m.joined_at]) ?? []
@@ -754,6 +761,8 @@ export const updateProjectMembers = async (
 
     if (deleteError) throw deleteError;
 
+    console.log('   Old members deleted, preparing inserts...');
+
     const memberInserts = members.map((member) => ({
       project_id: projectId,
       codev_id: member.id,
@@ -761,16 +770,22 @@ export const updateProjectMembers = async (
       joined_at: joinedAtMap.get(member.id) ?? new Date().toISOString(),
     }));
 
+    console.log('   Inserting members:', memberInserts.length);
+    console.log('   Member IDs:', memberInserts.map(m => m.codev_id));
+    console.log('   Roles:', memberInserts.map(m => m.role));
+
     const { error: insertError } = await supabase
       .from("project_members")
       .insert(memberInserts);
 
     if (insertError) throw insertError;
 
+    console.log('✅ [updateProjectMembers] Successfully inserted', memberInserts.length, 'members');
+
     revalidatePath("/projects");
     return { success: true };
   } catch (error) {
-    console.error("Error updating project members:", error);
+    console.error("❌ [updateProjectMembers] Error updating project members:", error);
     return {
       success: false,
       error: error instanceof Error ? error.message : "Unknown error occurred",
