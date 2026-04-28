@@ -8,6 +8,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Codev, InternalStatus } from "@/types/home/codev";
 import { Search, Users, X } from "lucide-react";
@@ -902,6 +903,9 @@ const AddMembersModal = ({
           <DialogTitle className="text-lg sm:text-xl lg:text-2xl font-bold text-white">
             Add Members to {project.name}
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            Search and select team members to add to your project. Selected members will appear in the preview on the left.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col lg:flex-row flex-1 min-h-0 overflow-hidden">
@@ -923,9 +927,9 @@ const AddMembersModal = ({
               <h3 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 flex items-center gap-2">
                 <Users className="h-4 w-4 sm:h-5 sm:w-5 text-customBlue-400" />
                 <span className="truncate">
-                  Available Members 
-                  {newlySelectedMembers.length > 0 && (
-                    <span className="ml-2 text-green-400">({newlySelectedMembers.length} new)</span>
+                  Available Members
+                  {selectedMembers.length > 0 && (
+                    <span className="ml-2 text-green-400">({selectedMembers.length} selected)</span>
                   )}
                 </span>
               </h3>
