@@ -40,19 +40,14 @@ export default function Feed({
   // Filter posts
   const filteredPosts = useMemo(() => {
     if (!searchQuery || searchQuery.trim() === "") return allPosts;
-    
+
     const query = searchQuery.toLowerCase();
     return allPosts.filter((post) => {
-      // Always include system post
       if (post.id === "00000000-0000-0000-0000-000000000001") return true;
-      
+
       const titleMatch = post.title?.toLowerCase().includes(query);
-      const firstNameMatch = post.author_id?.first_name
-        ?.toLowerCase()
-        .includes(query);
-      const lastNameMatch = post.author_id?.last_name
-        ?.toLowerCase()
-        .includes(query);
+      const firstNameMatch = post.author_id?.first_name?.toLowerCase().includes(query);
+      const lastNameMatch = post.author_id?.last_name?.toLowerCase().includes(query);
       return titleMatch || firstNameMatch || lastNameMatch;
     });
   }, [allPosts, searchQuery]);
@@ -61,7 +56,7 @@ export default function Feed({
   const sortedPosts = useMemo(() => {
     const sorted = [...filteredPosts];
     sorted.sort((a, b) => {
-      // Always keep system post at the top regardless of sorting
+      // Always keep system post at the top
       if (a.id === "00000000-0000-0000-0000-000000000001") return -1;
       if (b.id === "00000000-0000-0000-0000-000000000001") return 1;
 
@@ -85,6 +80,9 @@ export default function Feed({
           aVal = a.comment_count ?? 0;
           bVal = b.comment_count ?? 0;
           break;
+        default:
+          aVal = new Date(a.created_at).getTime();
+          bVal = new Date(b.created_at).getTime();
       }
 
       if (aVal < bVal) return sortOrder === "asc" ? -1 : 1;
@@ -96,6 +94,7 @@ export default function Feed({
 
   const visiblePosts = sortedPosts.slice(0, visibleCount);
 
+  // Reset visible count when search changes
   useEffect(() => {
     setVisibleCount(POSTS_PER_PAGE);
   }, [searchQuery]);
@@ -122,9 +121,7 @@ export default function Feed({
   }, [sortedPosts.length]);
 
   const handleDeletePost = (deletedPostId: string | number) => {
-    // Prevent deletion of system post
     if (deletedPostId === "00000000-0000-0000-0000-000000000001") return;
-    
     useFeedsStore.setState((state) => ({
       posts: state.posts.filter((post) => post.id !== deletedPostId),
     }));
@@ -132,8 +129,7 @@ export default function Feed({
 
   return (
     <>
-      {/* Posts grid */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {isFetchingPosts
           ? Array.from({ length: 6 }).map((_, i) => (
               <PostCardSkeleton key={i} />
@@ -148,7 +144,7 @@ export default function Feed({
             ))}
       </div>
 
-      {/* Loader */}
+      {/* Infinite scroll loader */}
       {!isFetchingPosts && visibleCount < sortedPosts.length && (
         <div
           ref={loaderRef}
