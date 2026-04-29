@@ -214,20 +214,20 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
             variant={viewMode === "team" ? "default" : "outline"}
             size="sm"
             onClick={() => setViewMode("team")}
-            title="Team View"
-            className={`h-7 w-7 p-0 ${viewMode !== "team" ? "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800" : ""}`}
+            className={`flex h-7 items-center gap-1 px-2 ${viewMode !== "team" ? "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800" : ""}`}
           >
             <Users className="h-3.5 w-3.5" />
+            <span className="text-xs">Team</span>
           </Button>
 
           <Button
             variant={viewMode === "attendance" ? "default" : "outline"}
             size="sm"
             onClick={() => setViewMode("attendance")}
-            title="Attendance"
-            className={`h-7 w-7 p-0 ${viewMode !== "attendance" ? "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800" : ""}`}
+            className={`flex h-7 items-center gap-1 px-2 ${viewMode !== "attendance" ? "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800" : ""}`}
           >
             <Table className="h-3.5 w-3.5" />
+            <span className="text-xs">Attendance</span>
           </Button>
 
           {isCurrentUserTeamLead && (
@@ -235,10 +235,10 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
               variant="outline"
               size="sm"
               onClick={handleOpenChecklistModal}
-              title="Checklist"
-              className="h-7 w-7 border-purple-300 p-0 text-purple-700 hover:bg-purple-50 dark:border-purple-600 dark:text-purple-300 dark:hover:bg-purple-900/20"
+              className="flex h-7 items-center gap-1 border-purple-300 px-2 text-purple-700 hover:bg-purple-50 dark:border-purple-600 dark:text-purple-300 dark:hover:bg-purple-900/20"
             >
               <CheckSquare className="h-3.5 w-3.5" />
+              <span className="text-xs">Checklist</span>
             </Button>
           )}
 
@@ -247,21 +247,21 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
           <Button
             variant="outline"
             size="sm"
-            className="h-7 w-7 border-gray-300 p-0 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
-            title="Schedule Meeting"
+            className="flex h-7 items-center gap-1 border-gray-300 px-2 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
             onClick={() => setShowScheduleMeetingModal(true)}
           >
             <CalendarDays className="h-3.5 w-3.5" />
+            <span className="text-xs">Schedule</span>
           </Button>
 
           <Button
             variant="outline"
             size="sm"
-            className="h-7 w-7 border-purple-300 p-0 text-purple-700 hover:bg-purple-50 dark:border-purple-600 dark:text-purple-300 dark:hover:bg-purple-900/20"
-            title="Kanban Board"
+            className="flex h-7 items-center gap-1 border-purple-300 px-2 text-purple-700 hover:bg-purple-50 dark:border-purple-600 dark:text-purple-300 dark:hover:bg-purple-900/20"
             onClick={() => router.push(`/home/kanban/${projectInfo.id}`)}
           >
             <Kanban className="h-3.5 w-3.5" />
+            <span className="text-xs">Kanban</span>
           </Button>
 
           {viewMode === "team" && isCurrentUserTeamLead && (
@@ -269,10 +269,10 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
               onClick={handleOpenAddModal}
               disabled={isLoadingMembers}
               size="sm"
-              title="Manage Members"
-              className="h-7 w-7 p-0"
+              className="flex h-7 items-center gap-1 px-2"
             >
               <UserPlus className="h-3.5 w-3.5" />
+              <span className="text-xs">Members</span>
             </Button>
           )}
 
@@ -283,10 +283,10 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
                   onClick={handleSaveAttendance}
                   variant="default"
                   size="sm"
-                  title="Save Changes"
-                  className="h-7 w-7 p-0"
+                  className="flex h-7 items-center gap-1 px-2"
                 >
                   <Save className="h-3.5 w-3.5" />
+                  <span className="text-xs">Save</span>
                 </Button>
               )}
               <SyncAllAttendance projectId={projectInfo.id} isTeamLead={isCurrentUserTeamLead} />
@@ -316,7 +316,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
                 </div>
               )}
 
-              <div className={formatSchedule() ? "" : "col-span-2"}>
+              <div className="col-span-2">
                 <ChecklistStatusBanner
                   projectId={projectInfo.id}
                   teamMembers={members?.data || []}
