@@ -299,14 +299,14 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
 
           <div className="space-y-4">
 
-            <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <div className="mb-4 flex flex-wrap items-center gap-2">
 
               {formatSchedule() && (
-                <div className="col-span-2 flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-2 dark:border-gray-700 dark:bg-gray-800">
+                <div className="flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-2 dark:border-gray-700 dark:bg-gray-800">
                   <CalendarDays className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs font-medium text-gray-900 dark:text-white">Meeting Schedule</p>
-                    <p className="truncate text-xs text-gray-600 dark:text-gray-400">{formatSchedule()}</p>
+                  <div className="flex flex-col">
+                    <p className="text-xs font-medium text-gray-900 dark:text-white">Schedule</p>
+                    <p className="whitespace-nowrap text-xs text-gray-600 dark:text-gray-400">{formatSchedule()}</p>
                   </div>
                   {projectInfo.meeting_link && (
                     <a href={projectInfo.meeting_link} target="_blank" rel="noopener noreferrer" className="shrink-0">
@@ -316,27 +316,25 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
                 </div>
               )}
 
-              <div className="col-span-2">
-                <ChecklistStatusBanner
-                  projectId={projectInfo.id}
-                  teamMembers={members?.data || []}
-                  teamLead={teamLead?.data || null}
-                />
-              </div>
+              <ChecklistStatusBanner
+                projectId={projectInfo.id}
+                teamMembers={members?.data || []}
+                teamLead={teamLead?.data || null}
+              />
 
               <div className="flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-2 dark:border-gray-700 dark:bg-gray-800">
                 <Users className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-                <div className="min-w-0 flex-1">
+                <div className="flex flex-col">
                   <p className="text-xs font-medium text-gray-900 dark:text-white">Members</p>
-                  <p className="text-lg font-bold text-gray-900 dark:text-white">{totalMembers}</p>
+                  <p className="text-lg font-bold leading-none text-gray-900 dark:text-white">{totalMembers}</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-2 dark:border-gray-700 dark:bg-gray-800">
                 <TrendingUp className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                <div className="min-w-0 flex-1">
+                <div className="flex flex-col">
                   <p className="text-xs font-medium text-gray-900 dark:text-white">Attendance</p>
-                  <p className="text-lg font-bold text-blue-600 dark:text-blue-400">+{monthlyAttendancePoints.totalPoints}</p>
+                  <p className="text-lg font-bold leading-none text-blue-600 dark:text-blue-400">+{monthlyAttendancePoints.totalPoints}</p>
                 </div>
               </div>
 
