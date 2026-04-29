@@ -214,7 +214,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
             variant={viewMode === "team" ? "default" : "outline"}
             size="sm"
             onClick={() => setViewMode("team")}
-            className={`flex h-7 items-center gap-1 px-2 ${viewMode !== "team" ? "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800" : ""}`}
+            className={`inline-flex h-7 w-auto items-center gap-1 px-2 ${viewMode !== "team" ? "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800" : ""}`}
           >
             <Users className="h-3.5 w-3.5" />
             <span className="text-xs">Team</span>
@@ -224,7 +224,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
             variant={viewMode === "attendance" ? "default" : "outline"}
             size="sm"
             onClick={() => setViewMode("attendance")}
-            className={`flex h-7 items-center gap-1 px-2 ${viewMode !== "attendance" ? "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800" : ""}`}
+            className={`inline-flex h-7 w-auto items-center gap-1 px-2 ${viewMode !== "attendance" ? "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800" : ""}`}
           >
             <Table className="h-3.5 w-3.5" />
             <span className="text-xs">Attendance</span>
@@ -235,7 +235,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
               variant="outline"
               size="sm"
               onClick={handleOpenChecklistModal}
-              className="flex h-7 items-center gap-1 border-purple-300 px-2 text-purple-700 hover:bg-purple-50 dark:border-purple-600 dark:text-purple-300 dark:hover:bg-purple-900/20"
+              className="inline-flex h-7 w-auto items-center gap-1 border-purple-300 px-2 text-purple-700 hover:bg-purple-50 dark:border-purple-600 dark:text-purple-300 dark:hover:bg-purple-900/20"
             >
               <CheckSquare className="h-3.5 w-3.5" />
               <span className="text-xs">Checklist</span>
@@ -247,7 +247,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
           <Button
             variant="outline"
             size="sm"
-            className="flex h-7 items-center gap-1 border-gray-300 px-2 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
+            className="inline-flex h-7 w-auto items-center gap-1 border-gray-300 px-2 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
             onClick={() => setShowScheduleMeetingModal(true)}
           >
             <CalendarDays className="h-3.5 w-3.5" />
@@ -257,7 +257,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
           <Button
             variant="outline"
             size="sm"
-            className="flex h-7 items-center gap-1 border-purple-300 px-2 text-purple-700 hover:bg-purple-50 dark:border-purple-600 dark:text-purple-300 dark:hover:bg-purple-900/20"
+            className="inline-flex h-7 w-auto items-center gap-1 border-purple-300 px-2 text-purple-700 hover:bg-purple-50 dark:border-purple-600 dark:text-purple-300 dark:hover:bg-purple-900/20"
             onClick={() => router.push(`/home/kanban/${projectInfo.id}`)}
           >
             <Kanban className="h-3.5 w-3.5" />
@@ -269,7 +269,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
               onClick={handleOpenAddModal}
               disabled={isLoadingMembers}
               size="sm"
-              className="flex h-7 items-center gap-1 px-2"
+              className="inline-flex h-7 w-auto items-center gap-1 px-2"
             >
               <UserPlus className="h-3.5 w-3.5" />
               <span className="text-xs">Members</span>
@@ -283,7 +283,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
                   onClick={handleSaveAttendance}
                   variant="default"
                   size="sm"
-                  className="flex h-7 items-center gap-1 px-2"
+                  className="inline-flex h-7 w-auto items-center gap-1 px-2"
                 >
                   <Save className="h-3.5 w-3.5" />
                   <span className="text-xs">Save</span>
