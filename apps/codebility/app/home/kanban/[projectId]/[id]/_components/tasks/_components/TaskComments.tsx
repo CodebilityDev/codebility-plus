@@ -1062,6 +1062,40 @@ export default function TaskCommentsSection({
   const formRef = useRef<HTMLFormElement>(null);
   const [currentUserName, setCurrentUserName] = useState("");
 
+  // Helper function to fetch codev data separately and merge with comments (avoid RLS join filtering)
+  const fetchAndMergeCodevData = useCallback(async (
+    comments: any[],
+    supabaseClient: any
+  ): Promise<any[]> => {
+    if (!comments || comments.length === 0) return [];
+
+    // Collect unique author_ids
+    const authorIds = [...new Set(comments.map(c => c.author_id).filter(Boolean))];
+
+    if (authorIds.length === 0) return comments;
+
+    // Fetch codev records separately to bypass RLS join filtering
+    const { data: codevs, error } = await supabaseClient
+      .from('codev')
+      .select('id, first_name, last_name, image_url')
+      .in('id', authorIds);
+
+    if (error) {
+      console.error('Error fetching codev records for task comments:', error);
+      // Return comments with null codev data
+      return comments.map(c => ({ ...c, codev: null }));
+    }
+
+    // Create codev map
+    const codevMap = new Map(codevs?.map(c => [c.id, c]) || []);
+
+    // Merge codev data into comments
+    return comments.map(comment => ({
+      ...comment,
+      codev: codevMap.get(comment.author_id) || null
+    }));
+  }, []);
+
   const transformComment = (dbComment: DbComment | any): TaskComment => {
     const user = Array.isArray(dbComment.codev)
       ? dbComment.codev[0]
@@ -1160,30 +1194,19 @@ export default function TaskCommentsSection({
     const fetchComments = async () => {
       if (!supabase) return;
       try {
+        // Fetch comments without codev join to avoid RLS filtering
         const { data, error } = await supabase
           .from("tasks_comments")
-          .select(`
-            id,
-            task_id,
-            content,
-            author_id,
-            parent_comment_id,
-            created_at,
-            updated_at,
-            codev (
-              id,
-              first_name,
-              last_name,
-              image_url
-            )
-          `)
+          .select('*')
           .eq("task_id", taskId)
           .order("created_at", { ascending: true });
 
         if (error) throw error;
 
         if (data) {
-          const transformedComments = data.map(transformComment);
+          // Fetch and merge codev data separately
+          const commentsWithAuthors = await fetchAndMergeCodevData(data, supabase);
+          const transformedComments = commentsWithAuthors.map(transformComment);
           const organizedComments = organizeComments(transformedComments);
           setComments(organizedComments);
         }
@@ -1213,27 +1236,17 @@ export default function TaskCommentsSection({
         },
         async (payload) => {
           if (payload.eventType === "INSERT" || payload.eventType === "UPDATE") {
+            // Fetch comment without codev join to avoid RLS filtering
             const { data, error } = await supabase
               .from("tasks_comments")
-              .select(`
-                id,
-                task_id,
-                content,
-                author_id,
-                parent_comment_id,
-                created_at,
-                updated_at,
-                codev (
-                  id,
-                  first_name,
-                  last_name,
-                  image_url
-                )
-              `)
+              .select('*')
               .eq("id", payload.new.id)
               .single();
 
             if (!error && data) {
+              // Fetch and merge codev data separately
+              const [commentWithAuthor] = await fetchAndMergeCodevData([data], supabase);
+
               setComments((prev) => {
                 const flatComments: TaskComment[] = [];
                 prev.forEach(comment => {
@@ -1243,11 +1256,11 @@ export default function TaskCommentsSection({
                   }
                 });
 
-                const existingIndex = flatComments.findIndex(c => c.id === data.id);
+                const existingIndex = flatComments.findIndex(c => c.id === commentWithAuthor.id);
                 if (existingIndex >= 0) {
-                  flatComments[existingIndex] = transformComment(data);
+                  flatComments[existingIndex] = transformComment(commentWithAuthor);
                 } else {
-                  flatComments.push(transformComment(data));
+                  flatComments.push(transformComment(commentWithAuthor));
                 }
 
                 return organizeComments(flatComments);
@@ -1358,30 +1371,20 @@ export default function TaskCommentsSection({
 
       setIsSubmitting(true);
       try {
+        // Insert comment without codev join to avoid RLS filtering
         const { data, error } = await supabase.from("tasks_comments").insert({
           task_id: taskId,
           content: newComment.trim(),
           author_id: currentUserId,
           parent_comment_id: null,
-        }).select(`
-        id,
-        task_id,
-        content,
-        author_id,
-        parent_comment_id,
-        created_at,
-        updated_at,
-        codev (
-          id,
-          first_name,
-          last_name,
-          image_url
-        )
-      `).single();
+        }).select('*').single();
 
         if (error) throw error;
 
         if (data) {
+          // Fetch and merge codev data separately
+          const [commentWithAuthor] = await fetchAndMergeCodevData([data], supabase);
+
           setComments((prev) => {
             const flatComments: TaskComment[] = [];
             prev.forEach(comment => {
@@ -1391,7 +1394,7 @@ export default function TaskCommentsSection({
               }
             });
 
-            flatComments.push(transformComment(data));
+            flatComments.push(transformComment(commentWithAuthor));
             return organizeComments(flatComments);
           });
 
@@ -1449,30 +1452,20 @@ export default function TaskCommentsSection({
       if (!supabase) return;
 
       try {
+        // Insert reply without codev join to avoid RLS filtering
         const { data, error } = await supabase.from("tasks_comments").insert({
           task_id: taskId,
           content: content,
           author_id: currentUserId,
           parent_comment_id: parentId,
-        }).select(`
-        id,
-        task_id,
-        content,
-        author_id,
-        parent_comment_id,
-        created_at,
-        updated_at,
-        codev (
-          id,
-          first_name,
-          last_name,
-          image_url
-        )
-      `).single();
+        }).select('*').single();
 
         if (error) throw error;
 
         if (data) {
+          // Fetch and merge codev data separately
+          const [commentWithAuthor] = await fetchAndMergeCodevData([data], supabase);
+
           setComments((prev) => {
             const flatComments: TaskComment[] = [];
             prev.forEach(comment => {
@@ -1482,7 +1475,7 @@ export default function TaskCommentsSection({
               }
             });
 
-            flatComments.push(transformComment(data));
+            flatComments.push(transformComment(commentWithAuthor));
             return organizeComments(flatComments);
           });
 
@@ -1537,6 +1530,7 @@ export default function TaskCommentsSection({
       if (!supabase) return;
 
       try {
+        // Update comment without codev join to avoid RLS filtering
         const { data, error } = await supabase
           .from("tasks_comments")
           .update({
@@ -1544,26 +1538,15 @@ export default function TaskCommentsSection({
             updated_at: new Date().toISOString(),
           })
           .eq("id", commentId)
-          .select(`
-          id,
-          task_id,
-          content,
-          author_id,
-          parent_comment_id,
-          created_at,
-          updated_at,
-          codev (
-            id,
-            first_name,
-            last_name,
-            image_url
-          )
-        `)
+          .select('*')
           .single();
 
         if (error) throw error;
 
         if (data) {
+          // Fetch and merge codev data separately
+          const [commentWithAuthor] = await fetchAndMergeCodevData([data], supabase);
+
           setComments((prev) => {
             const flatComments: TaskComment[] = [];
             prev.forEach(comment => {
@@ -1574,7 +1557,7 @@ export default function TaskCommentsSection({
             });
 
             const updatedComments = flatComments.map(c =>
-              c.id === data.id ? transformComment(data) : c
+              c.id === commentWithAuthor.id ? transformComment(commentWithAuthor) : c
             );
             return organizeComments(updatedComments);
           });

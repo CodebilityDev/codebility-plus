@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
-import { SimpleMemberData, getProjectCodevs, updateProjectMembers } from "@/app/home/projects/actions";
+import { SimpleMemberData, updateProjectMembers } from "@/app/home/projects/actions";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -695,22 +695,42 @@ const AddMembersModal = ({
     };
   }, [isOpen, supabase, activeFilter, fetchCodevsByFilter, fetchRecentMembers, fetchFilterCounts]);
 
-  // ✅ Initialize selected members
-  useEffect(() => {
-    if (isOpen && currentMembers && availableMembers.length > 0) {
-      const currentMemberIds = currentMembers.map(m => m.id);
-      const preSelected = availableMembers.filter(user => 
-        currentMemberIds.includes(user.id)
-      );
-      setSelectedMembers(preSelected);
-    }
-  }, [isOpen, currentMembers, availableMembers]);
+  // ✅ Initialize selected members - only on modal open, not when availableMembers changes
+  const membersInitialized = useRef(false);
 
-  // Calculate newly selected members
-  const newlySelectedMembers = useMemo(() => {
-    const currentMemberIds = currentMembers.map(m => m.id);
-    return selectedMembers.filter(member => !currentMemberIds.includes(member.id));
-  }, [selectedMembers, currentMembers]);
+  useEffect(() => {
+    if (!isOpen) {
+      membersInitialized.current = false;
+      setSelectedMembers([]); // Reset when modal closes
+      return;
+    }
+
+    // Skip if already initialized to prevent reset when search changes availableMembers
+    if (membersInitialized.current) return;
+
+    // Initialize directly from currentMembers (already fetched from DB by server)
+    // Don't filter from availableMembers because current members might not match the smart filter
+    if (currentMembers.length > 0) {
+      // Convert SimpleMemberData to Codev format for selectedMembers
+      const membersAsCodev = currentMembers.map(m => ({
+        id: m.id,
+        first_name: m.first_name,
+        last_name: m.last_name,
+        email_address: m.email_address,
+        display_position: m.display_position,
+        image_url: m.image_url,
+        positions: [],
+        tech_stacks: [],
+      } as Codev));
+
+      setSelectedMembers(membersAsCodev);
+      membersInitialized.current = true;
+    }
+    // Mark as initialized even with no current members (new project)
+    else if (currentMembers.length === 0) {
+      membersInitialized.current = true;
+    }
+  }, [isOpen, currentMembers]);
 
   // ✅ Member selection logic
   const toggleMember = useCallback((member: Codev) => {
@@ -926,12 +946,7 @@ const AddMembersModal = ({
             <div className="flex-shrink-0 px-3 sm:px-6 pt-3 sm:pt-6 pb-4">
               <h3 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 flex items-center gap-2">
                 <Users className="h-4 w-4 sm:h-5 sm:w-5 text-customBlue-400" />
-                <span className="truncate">
-                  Available Members
-                  {selectedMembers.length > 0 && (
-                    <span className="ml-2 text-green-400">({selectedMembers.length} selected)</span>
-                  )}
-                </span>
+                <span className="truncate">Available Members</span>
               </h3>
               
               <div className="relative mb-3 sm:mb-4">
@@ -1040,17 +1055,12 @@ const AddMembersModal = ({
                         >
                           <div className="flex-shrink-0">
                             <div
-                              className={`relative rounded-full overflow-hidden ring-2 transition-all duration-200 cursor-pointer hover:ring-customBlue-300 ${
+                              className={`relative rounded-full overflow-hidden ring-2 transition-all duration-200 ${
                                 isSelected(user.id)
                                   ? 'ring-customBlue-500'
                                   : 'ring-green-400'
                               }`}
                               style={{ width: 40, height: 40 }}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleProfileClick(user);
-                              }}
-                              title="Click to view profile"
                             >
                               <img
                                 src={
@@ -1122,20 +1132,8 @@ const AddMembersModal = ({
                 ) : filteredUsers.length > 0 ? (
                   <>
                     {searchQuery && (
-                      <div className="mb-3 flex justify-between items-center text-sm">
-                        <span className="text-gray-400">
-                          Found {filteredUsers.length} result{filteredUsers.length !== 1 ? 's' : ''} for "{searchQuery}"
-                        </span>
-                        {selectedMembers.length > 0 && (
-                          <span className="text-customBlue-400 font-semibold">
-                            {selectedMembers.length} selected
-                          </span>
-                        )}
-                      </div>
-                    )}
-                    {!searchQuery && selectedMembers.length > 0 && (
-                      <div className="mb-3 text-sm text-customBlue-400 font-semibold">
-                        {selectedMembers.length} member{selectedMembers.length !== 1 ? 's' : ''} selected
+                      <div className="mb-3 text-sm text-gray-400">
+                        Found {filteredUsers.length} result{filteredUsers.length !== 1 ? 's' : ''} for "{searchQuery}"
                       </div>
                     )}
                     {filteredUsers.map((user) => (
@@ -1149,18 +1147,13 @@ const AddMembersModal = ({
                         }`}
                       >
                         <div className="flex-shrink-0">
-                          <div 
-                            className={`relative rounded-full overflow-hidden ring-2 transition-all duration-200 cursor-pointer hover:ring-customBlue-300 ${
-                              isSelected(user.id) 
-                                ? 'ring-customBlue-500' 
+                          <div
+                            className={`relative rounded-full overflow-hidden ring-2 transition-all duration-200 ${
+                              isSelected(user.id)
+                                ? 'ring-customBlue-500'
                                 : 'ring-customBlue-400'
                             }`}
                             style={{ width: 40, height: 40 }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleProfileClick(user);
-                            }}
-                            title="Click to view profile"
                           >
                             <img
                               src={
@@ -1241,7 +1234,7 @@ const AddMembersModal = ({
                 Updating...
               </span>
             ) : (
-              `Update Members (${newlySelectedMembers.length} new)`
+              `Update Members (${selectedMembers.length})`
             )}
           </Button>
         </div>

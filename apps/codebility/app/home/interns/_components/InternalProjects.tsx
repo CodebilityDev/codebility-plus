@@ -49,6 +49,7 @@ export default function InternalProjects() {
       // If no Codebility client found, try to get internal projects another way
       if (!clients || clients.length === 0) {
         // Alternative: fetch all projects and filter by name patterns
+        // Step 1: Fetch projects with project_members (no codev join!)
         const { data: allProjects, error: projectsError } = await supabase
           .from("projects")
           .select(
@@ -56,14 +57,9 @@ export default function InternalProjects() {
             *,
             project_members (
               id,
+              codev_id,
               role,
-              joined_at,
-              codev (
-                id,
-                first_name,
-                last_name,
-                image_url
-              )
+              joined_at
             )
           `,
           )
@@ -78,7 +74,45 @@ export default function InternalProjects() {
           throw new Error("Failed to fetch projects");
         }
 
-        setProjects(allProjects || []);
+        if (!allProjects || allProjects.length === 0) {
+          setProjects([]);
+          return;
+        }
+
+        // Step 2: Collect all unique codev_ids from all projects
+        const allCodevIds = new Set<string>();
+        allProjects.forEach((project) => {
+          project.project_members?.forEach((pm: any) => {
+            if (pm.codev_id) allCodevIds.add(pm.codev_id);
+          });
+        });
+
+        // Step 3: Fetch codev records separately to bypass RLS join filtering
+        let codevMap = new Map<string, any>();
+
+        if (allCodevIds.size > 0) {
+          const { data: codevs, error: codevError } = await supabase
+            .from("codev")
+            .select("id, first_name, last_name, image_url")
+            .in("id", Array.from(allCodevIds));
+
+          if (codevError) {
+            console.error("Error fetching codev records for internal projects:", codevError);
+          } else {
+            codevs?.forEach((c: any) => codevMap.set(c.id, c));
+          }
+        }
+
+        // Step 4: Merge codev data back into project_members
+        const projectsWithMembers = allProjects.map((project) => ({
+          ...project,
+          project_members: project.project_members?.map((pm: any) => ({
+            ...pm,
+            codev: codevMap.get(pm.codev_id) ?? null,
+          })),
+        }));
+
+        setProjects(projectsWithMembers);
         return;
       }
 
@@ -88,6 +122,7 @@ export default function InternalProjects() {
       }
 
       // Now fetch all projects for this client with their members
+      // Step 1: Fetch projects with project_members (no codev join!)
       const { data: projectsData, error: projectError } = await supabase
         .from("projects")
         .select(
@@ -95,14 +130,9 @@ export default function InternalProjects() {
           *,
           project_members (
             id,
+            codev_id,
             role,
-            joined_at,
-            codev (
-              id,
-              first_name,
-              last_name,
-              image_url
-            )
+            joined_at
           )
         `,
         )
@@ -115,7 +145,44 @@ export default function InternalProjects() {
         throw new Error("Failed to fetch projects");
       }
 
-      setProjects(projectsData || []);
+      if (!projectsData || projectsData.length === 0) {
+        setProjects([]);
+      } else {
+        // Step 2: Collect all unique codev_ids from all projects
+        const allCodevIds = new Set<string>();
+        projectsData.forEach((project) => {
+          project.project_members?.forEach((pm: any) => {
+            if (pm.codev_id) allCodevIds.add(pm.codev_id);
+          });
+        });
+
+        // Step 3: Fetch codev records separately to bypass RLS join filtering
+        let codevMap = new Map<string, any>();
+
+        if (allCodevIds.size > 0) {
+          const { data: codevs, error: codevError } = await supabase
+            .from("codev")
+            .select("id, first_name, last_name, image_url")
+            .in("id", Array.from(allCodevIds));
+
+          if (codevError) {
+            console.error("Error fetching codev records for client projects:", codevError);
+          } else {
+            codevs?.forEach((c: any) => codevMap.set(c.id, c));
+          }
+        }
+
+        // Step 4: Merge codev data back into project_members
+        const projectsWithMembers = projectsData.map((project) => ({
+          ...project,
+          project_members: project.project_members?.map((pm: any) => ({
+            ...pm,
+            codev: codevMap.get(pm.codev_id) ?? null,
+          })),
+        }));
+
+        setProjects(projectsWithMembers);
+      }
 
       // Set first project as selected by default
       if (projectsData && projectsData.length > 0) {

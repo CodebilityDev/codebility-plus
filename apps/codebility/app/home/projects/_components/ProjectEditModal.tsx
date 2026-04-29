@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import {
@@ -251,8 +251,19 @@ const ProjectEditModal = () => {
   // Pre-populate team leader, sublead, and members from fullProjectData.
   // fullProjectData comes from getProjectByID which includes project_members.
   // The list page query does not join project_members so we cannot use data directly.
+  //
+  // IMPORTANT: Only run when modal opens (isModalOpen changes to true) to avoid
+  // resetting selectedMembers when users list refetches during editing.
+  const hasInitialized = useRef(false);
+
   useEffect(() => {
-    if (!fullProjectData || !isModalOpen) return;
+    if (!fullProjectData || !isModalOpen) {
+      hasInitialized.current = false;
+      return;
+    }
+
+    // Skip if already initialized and users are available
+    if (hasInitialized.current && users.length > 0) return;
 
     const projectMembers = fullProjectData.project_members;
     if (!projectMembers?.length) return;
@@ -323,6 +334,9 @@ const ProjectEditModal = () => {
       .map((pm: any) => pm.codev_id);
 
     setSelectedMembers(users.filter((user) => memberIds.includes(user.id)));
+
+    // Mark as initialized to prevent resets when users list refetches
+    hasInitialized.current = true;
   }, [fullProjectData, users, isModalOpen]);
 
   const handleImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
