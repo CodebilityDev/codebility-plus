@@ -800,6 +800,9 @@ export const updateProjectMembers = async (
  *
  * IMPORTANT: Uses anon client (no auth) to bypass RLS policies that may filter
  * role_id field. This matches the landing page behavior where all mentors are visible.
+ *
+ * Updated to match Add Members Modal filtering logic - includes users based on
+ * both role_id AND internal_status to ensure GRADUATED users are included.
  * ─────────────────────────────────────────────────────────────────────────────
  */
 export const getProjectCodevs = async (filters = {}): Promise<Codev[]> => {
@@ -823,32 +826,38 @@ export const getProjectCodevs = async (filters = {}): Promise<Codev[]> => {
     role_id
   `;
 
-  // Step 1: Fetch users by role in separate queries to avoid RLS corrupting role_id field
-  // When fetching all users without filtering by role_id, RLS policy corrupts the role_id field.
-  // Solution: Fetch each role separately (like landing page does), then combine results.
-
-  const roleIds = [1, 5, 7, 10]; // Admin, Mentor, Applicant, Codev
-
-  const queries = roleIds.map(roleId =>
-    supabase.from("codev").select(selectFields).eq("role_id", roleId)
-  );
-
-  // Also fetch users with null role_id or other role_ids
-  queries.push(
-    supabase.from("codev").select(selectFields).is("role_id", null)
-  );
+  // Step 1: Fetch users using same logic as Add Members Modal "smart filter"
+  // This ensures consistency between both modals
+  // Smart filter: role_id = 5 (Mentor) OR role_id = 1 (Admin) OR internal_status = GRADUATED
+  const queries = [
+    // Mentors (role_id = 5)
+    supabase.from("codev").select(selectFields).eq("role_id", 5),
+    // Admins (role_id = 1)
+    supabase.from("codev").select(selectFields).eq("role_id", 1),
+    // Graduated users (any role_id)
+    supabase.from("codev").select(selectFields).eq("internal_status", "GRADUATED"),
+    // Training/Intern/Onboarding users
+    supabase.from("codev").select(selectFields).in("internal_status", ["TRAINING", "INTERN", "ONBOARDING"]),
+  ];
 
   const results = await Promise.all(queries);
 
-  // Combine all results
-  let codevs: any[] = [];
+  // Combine all results and deduplicate by id
+  const codevMap = new Map<string, any>();
+
   results.forEach(({ data, error }, index) => {
     if (error) {
-      console.error(`Error fetching role_id ${index < roleIds.length ? roleIds[index] : 'null'}:`, error);
+      console.error(`Error fetching codevs (query ${index}):`, error);
     } else if (data) {
-      codevs = codevs.concat(data);
+      data.forEach(codev => {
+        if (!codevMap.has(codev.id)) {
+          codevMap.set(codev.id, codev);
+        }
+      });
     }
   });
+
+  let codevs = Array.from(codevMap.values());
 
   // Apply additional filters if provided
   if (Object.keys(filters).length > 0) {
