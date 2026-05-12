@@ -286,7 +286,6 @@ const ProjectEditModal = () => {
     );
 
     if (subLeadMember) {
-      // Primary: find full Codev object from users list
       const subLeadFromUsers = users.find(
         (user) => user.id === subLeadMember.codev_id,
       );
@@ -294,7 +293,6 @@ const ProjectEditModal = () => {
       if (subLeadFromUsers) {
         setCurrentSubLead(subLeadFromUsers);
       } else if (subLeadMember.codev) {
-        // Fallback: build minimal Codev from embedded data (same pattern as team leader)
         setCurrentSubLead({
           id: subLeadMember.codev_id,
           first_name: subLeadMember.codev.first_name,
@@ -307,17 +305,49 @@ const ProjectEditModal = () => {
         } as unknown as Codev);
       }
     } else {
-      // No sublead on this project — reset to null when reopening modal
       setCurrentSubLead(null);
     }
     // ─────────────────────────────────────────────────────────────────────────
 
     // ── Regular members ──────────────────────────────────────────────────────
-    const memberIds = projectMembers
-      .filter((pm: any) => pm.role === "member")
-      .map((pm: any) => pm.codev_id);
+    // FIX (project-members-update-conflict): Previously used
+    //   users.filter(u => memberIds.includes(u.id))
+    // which silently excluded RLS-filtered members from selectedMembers.
+    // On submit, those missing members were deleted from project_members DB.
+    // Fix: use pm.codev fallback (same pattern as team leader / sublead above)
+    // so every member in DB is represented in the form payload on save.
+    const memberPMs = projectMembers.filter((pm: any) => pm.role === "member");
 
-    setSelectedMembers(users.filter((user) => memberIds.includes(user.id)));
+    const resolvedMembers = memberPMs
+      .map((pm: any) => {
+        // Try full Codev object from users first
+        const fromUsers = users.find((u) => u.id === pm.codev_id);
+        if (fromUsers) return fromUsers;
+
+        // Fallback: construct minimal Codev from embedded codev data.
+        // Handles users absent from getProjectCodevs() due to RLS filtering.
+        if (pm.codev) {
+          return {
+            id: pm.codev_id,
+            first_name: pm.codev.first_name,
+            last_name: pm.codev.last_name,
+            image_url: pm.codev.image_url || null,
+            display_position: pm.codev.display_position || null,
+            email_address: pm.codev.email_address || "",
+            positions: [],
+            tech_stacks: [],
+          } as unknown as Codev;
+        }
+
+        // pm.codev is null — RLS dropped the codev row even from the two-query
+        // approach. Log a warning; skip this member to avoid a null in the array.
+        console.warn(`⚠️ Could not resolve member codev data for: ${pm.codev_id}`);
+        return null;
+      })
+      .filter(Boolean) as Codev[];
+
+    setSelectedMembers(resolvedMembers);
+    // ─────────────────────────────────────────────────────────────────────────
   }, [fullProjectData, users, isModalOpen]);
 
   const handleImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -721,11 +751,9 @@ const ProjectEditModal = () => {
                 value={currentSubLead?.id || "none"}
                 onChange={(value) => {
                   if (!value || value === "none") {
-                    // User selected "None" — clear the sublead
                     setCurrentSubLead(null);
                     return;
                   }
-                  // Find in users first, fall back to project_members embedded data
                   const subLeadFromUsers = users.find((u) => u.id === value);
                   if (subLeadFromUsers) {
                     setCurrentSubLead(subLeadFromUsers);
@@ -764,7 +792,7 @@ const ProjectEditModal = () => {
                 users={users.filter(
                   (user) =>
                     user.id !== currentTeamLeader?.id &&
-                    user.id !== currentSubLead?.id, // exclude sublead from member pool
+                    user.id !== currentSubLead?.id,
                 )}
                 selectedMembers={selectedMembers}
                 onMemberAdd={(member) =>
@@ -775,7 +803,7 @@ const ProjectEditModal = () => {
                 }
                 excludeMembers={[
                   ...(currentTeamLeader ? [currentTeamLeader.id] : []),
-                  ...(currentSubLead ? [currentSubLead.id] : []), // ── CBP-116
+                  ...(currentSubLead ? [currentSubLead.id] : []),
                 ]}
                 showLabel={false}
               />
@@ -891,15 +919,12 @@ const ProjectEditModal = () => {
 
       form.set("status", selectedStatus);
 
-        // ── CBP-116: Build project members array including sublead if set ────────
+      // ── CBP-116: Build project members array including sublead if set ────────
       const projectMembers = [
         { codev_id: currentTeamLeader.id, role: "team_leader" },
-        // Only include sublead row if a sublead was selected
         ...(currentSubLead
           ? [{ codev_id: currentSubLead.id, role: "sublead" }]
           : []),
-        // Filter sublead out of members — they may be an existing member promoted
-        // to sublead. Without this filter they'd get two rows: sublead + member.
         ...selectedMembers
           .filter((member) => member.id !== currentSubLead?.id)
           .map((member) => ({ codev_id: member.id, role: "member" })),
@@ -913,7 +938,7 @@ const ProjectEditModal = () => {
         queryClient.invalidateQueries({ queryKey: ["teamLead", data.id] });
         queryClient.invalidateQueries({ queryKey: ["members", data.id] });
         queryClient.invalidateQueries({ queryKey: ["projectFull", data.id] });
-        queryClient.invalidateQueries({ queryKey: ["subLead", data.id] }); // ── CBP-116
+        queryClient.invalidateQueries({ queryKey: ["subLead", data.id] });
         toast.success("Project updated successfully!");
         onClose();
       } else {

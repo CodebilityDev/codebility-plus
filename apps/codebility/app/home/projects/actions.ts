@@ -726,7 +726,14 @@ export const getMembers = async (
 };
 
 /**
- * Update project members with joined_at preservation.
+ * Update project members from My Team page with joined_at and sublead preservation.
+ *
+ * ── FIX (project-members-update-conflict) ────────────────────────────────────
+ * This function is called from TeamDetailView (My Team page) which has no sublead UI.
+ * Without preservation, the delete-reinsert wipes the sublead row every time a team
+ * lead manages members from My Team. Fix: fetch the existing sublead row before
+ * deletion, then re-insert it after the new members are written.
+ * ─────────────────────────────────────────────────────────────────────────────
  */
 export const updateProjectMembers = async (
   projectId: string,
@@ -736,16 +743,22 @@ export const updateProjectMembers = async (
   const supabase = await createClientServerComponent();
 
   try {
+    // Fetch all existing rows: need joined_at for every member AND the sublead row
     const { data: existingMembers, error: fetchError } = await supabase
       .from("project_members")
-      .select("codev_id, joined_at")
+      .select("codev_id, joined_at, role")
       .eq("project_id", projectId);
 
     if (fetchError) throw fetchError;
 
+    // Preserve joined_at timestamps
     const joinedAtMap = new Map(
       existingMembers?.map(m => [m.codev_id, m.joined_at]) ?? []
     );
+
+    // Capture sublead row before deletion — My Team has no sublead UI so it
+    // would otherwise be permanently lost on every member update
+    const existingSubLead = existingMembers?.find(m => m.role === "sublead");
 
     const { error: deleteError } = await supabase
       .from("project_members")
@@ -754,12 +767,24 @@ export const updateProjectMembers = async (
 
     if (deleteError) throw deleteError;
 
-    const memberInserts = members.map((member) => ({
-      project_id: projectId,
-      codev_id: member.id,
-      role: member.id === teamLeaderId ? "team_leader" : "member",
-      joined_at: joinedAtMap.get(member.id) ?? new Date().toISOString(),
-    }));
+    const memberInserts = [
+      // Team lead + regular members
+      ...members.map((member) => ({
+        project_id: projectId,
+        codev_id: member.id,
+        role: member.id === teamLeaderId ? "team_leader" : "member",
+        joined_at: joinedAtMap.get(member.id) ?? new Date().toISOString(),
+      })),
+      // Re-insert sublead if one existed — preserves their joined_at too
+      ...(existingSubLead
+        ? [{
+            project_id: projectId,
+            codev_id: existingSubLead.codev_id,
+            role: "sublead" as const,
+            joined_at: existingSubLead.joined_at,
+          }]
+        : []),
+    ];
 
     const { error: insertError } = await supabase
       .from("project_members")
