@@ -889,34 +889,6 @@ const AddMembersModal = ({
 
   return (
     <>
-      <style>{`
-        /* Members grid: scrollbar gutter always reserved (no layout shift), thumb hidden until hover */
-        .members-scroll {
-          scrollbar-width: thin;
-          scrollbar-color: transparent transparent;
-        }
-        .members-scroll:hover {
-          scrollbar-color: rgba(99, 120, 255, 0.45) transparent;
-        }
-        .members-scroll::-webkit-scrollbar {
-          width: 4px;
-          background: transparent;
-        }
-        .members-scroll::-webkit-scrollbar-track {
-          background: transparent;
-          border: none;
-          box-shadow: none;
-        }
-        .members-scroll::-webkit-scrollbar-thumb {
-          background-color: transparent;
-          border-radius: 4px;
-          border: none;
-          box-shadow: none;
-        }
-        .members-scroll:hover::-webkit-scrollbar-thumb {
-          background-color: rgba(99, 120, 255, 0.45);
-        }
-      `}</style>
       <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-full w-[85vw] sm:w-[80vw] lg:w-[80vw] h-[80vh] flex flex-col dark:bg-slate-950 border-2 border-slate-300 dark:border-blue-900/60 p-4 sm:p-0">
         <DialogHeader className="flex-shrink-0 px-3 sm:px-6 pt-1 pb-1">
