@@ -1,6 +1,7 @@
 import { H1 } from "@/components/shared/dashboard";
 import AsyncErrorBoundary from "@/components/AsyncErrorBoundary";
-import { getMembers, getTeamLead, getUserProjects } from "../../projects/actions";
+// ✅ Added getSubLead import
+import { getMembers, getSubLead, getTeamLead, getUserProjects } from "../../projects/actions";
 import TeamDetailView from "./_components/TeamDetailView";
 import { notFound } from "next/navigation";
 import CustomBreadcrumb from "@/components/shared/dashboard/CustomBreadcrumb";
@@ -33,7 +34,7 @@ const TeamDetailPage = async ({ params }: TeamDetailPageProps) => {
       .from('codev')
       .select('id, email_address')
       .ilike('email_address', user.email?.trim() || '')
-      .maybeSingle(); // Use maybeSingle() instead of single() to handle no results gracefully
+      .maybeSingle();
 
     if (codevError || !codevUser) {
       console.warn("User profile not found by email, bypassing for Codebility Portal Team Leader.");
@@ -78,7 +79,7 @@ const TeamDetailPage = async ({ params }: TeamDetailPageProps) => {
 
     const userProjects = userProjectsResponse.data;
 
-    // ✅ FIXED: Type-safe project ID comparison (handles string/number mismatch)
+    // Type-safe project ID comparison (handles string/number mismatch)
     const project = userProjects.find(p => {
       const projectIdFromList = String(p.project.id).trim();
       const requestedProjectId = String(projectId).trim();
@@ -86,21 +87,22 @@ const TeamDetailPage = async ({ params }: TeamDetailPageProps) => {
     });
 
     if (!project) {
-      console.error('Project not found or user has no access:', {
-        requestedProjectId: projectId,
-        userProjectIds: userProjects.map(p => p.project.id),
-        codevUserId: codevUser.id
-      });
+      console.error('❌ Project not found or user has no access');
+      console.error('   Requested Project ID:', projectId);
+      console.error('   User Project IDs:', userProjects.map(p => p.project.id));
+      console.error('   Codev User ID:', codevUser.id);
+      console.error('   Total user projects:', userProjects.length);
       notFound();
     }
 
-    // ✅ FIXED: Better error handling for team data with individual catch
-    const [teamLeadResponse, membersResponse] = await Promise.allSettled([
+    // ✅ Added getSubLead as third parallel fetch — failure is non-blocking
+    const [teamLeadResponse, membersResponse, subLeadResponse] = await Promise.allSettled([
       getTeamLead(projectId),
-      getMembers(projectId)
+      getMembers(projectId),
+      getSubLead(projectId),
     ]);
 
-    // Handle team lead response with proper typing
+    // Handle team lead response
     let teamLead: Awaited<ReturnType<typeof getTeamLead>>;
     if (teamLeadResponse.status === 'fulfilled' && !teamLeadResponse.value.error) {
       teamLead = teamLeadResponse.value;
@@ -114,7 +116,7 @@ const TeamDetailPage = async ({ params }: TeamDetailPageProps) => {
       teamLead = { data: null, error: 'Failed to load team lead' };
     }
 
-    // Handle members response with proper typing
+    // Handle members response
     let members: Awaited<ReturnType<typeof getMembers>>;
     if (membersResponse.status === 'fulfilled' && !membersResponse.value.error) {
       members = membersResponse.value;
@@ -128,17 +130,30 @@ const TeamDetailPage = async ({ params }: TeamDetailPageProps) => {
       members = { data: [], error: 'Failed to load members' };
     }
 
-    // ✅ FIXED: Only throw if BOTH fail, otherwise show partial data
+    // ✅ Handle subLead response — null is a valid state (no sublead assigned)
+    let subLead: Awaited<ReturnType<typeof getSubLead>>;
+    if (subLeadResponse.status === 'fulfilled') {
+      subLead = subLeadResponse.value;
+    } else {
+      console.error('Failed to load sublead:', {
+        projectId,
+        reason: subLeadResponse.reason
+      });
+      subLead = { data: null, error: 'Failed to load sublead' };
+    }
+
+    // Only throw if BOTH core fetches fail — sublead failure is acceptable
     if (teamLead.error && members.error) {
       throw new Error("Failed to load any team data");
     }
 
-    // Construct project data with proper types
+    // ✅ Added subLead to projectData
     const projectData = {
       project: project.project,
       teamLead: teamLead,
       members: members,
-      currentUserId: codevUser.id  // This is the codev table ID
+      subLead: subLead,
+      currentUserId: codevUser.id
     };
 
     return (
@@ -169,13 +184,14 @@ const TeamDetailPage = async ({ params }: TeamDetailPageProps) => {
     );
 
   } catch (error) {
-    console.error('TeamDetailPage error:', {
-      error,
-      message: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined,
-      projectId
-    });
-    
+    console.error('❌ TeamDetailPage error');
+    console.error('   Project ID:', projectId);
+    console.error('   Error message:', error instanceof Error ? error.message : 'Unknown error');
+    console.error('   Error:', error);
+    if (error instanceof Error && error.stack) {
+      console.error('   Stack trace:', error.stack);
+    }
+
     return (
       <div className="mx-auto max-w-screen-xl">
         <H1>Team Details</H1>

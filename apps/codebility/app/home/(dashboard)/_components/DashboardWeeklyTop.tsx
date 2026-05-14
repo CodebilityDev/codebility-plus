@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { createClientClientComponent } from "@/utils/supabase/client";
-import { startOfMonth, startOfWeek, subDays } from "date-fns";
+import { startOfMonth, startOfWeek, subDays, subWeeks, subMonths } from "date-fns";
 import { Trophy, Medal, Award, Star, Zap, Heart, Users, Calendar, UserRoundPen } from "lucide-react";
 
 import {
@@ -97,6 +97,7 @@ export default function WeeklyTop() {
   useEffect(() => {
     let isMounted = true;
     const supabase = createClientClientComponent();
+    if (!supabase) return;
 
     const fetchCategories = async () => {
       try {
@@ -125,14 +126,15 @@ export default function WeeklyTop() {
           );
           if (feIndex !== -1) {
             const [frontendDev] = reorderedCategories.splice(feIndex, 1);
-            reorderedCategories.unshift(frontendDev);
+            if (frontendDev) reorderedCategories.unshift(frontendDev);
           }
           
           // No soft skills category available due to database constraints
 
           setAllCategories(reorderedCategories);
           if (!selectedCategory && reorderedCategories.length > 0) {
-            setSelectedCategory(reorderedCategories[0]);
+            const firstCat = reorderedCategories[0];
+            if (firstCat) setSelectedCategory(firstCat);
           }
         }
       } catch (error) {
@@ -164,7 +166,7 @@ export default function WeeklyTop() {
           throw new Error('Failed to fetch soft skills leaderboard');
         }
         
-        const data = await response.json();
+        const data = await response.json() as { leaders?: SoftSkillsLeader[] };
         if (isMounted) {
           setSoftSkillsLeaders(data.leaders || []);
         }
@@ -193,6 +195,7 @@ export default function WeeklyTop() {
 
     let isMounted = true;
     const supabase = createClientClientComponent();
+    if (!supabase) return;
 
     const fetchProjectsLeaderboard = async () => {
       setIsLoading(true);
@@ -209,14 +212,7 @@ export default function WeeklyTop() {
           `,
           );
 
-        if (timePeriod === "weekly") {
-          const weekStart = startOfWeek(new Date());
-          query = query.gte("created_at", weekStart.toISOString());
-        } else if (timePeriod === "monthly") {
-          const monthStart = startOfMonth(new Date());
-          query = query.gte("created_at", monthStart.toISOString());
-        }
-
+        // Removed .gte("created_at") from supabase query level to prevent dropping legacy users.
         const { data, error } = await query;
 
         if (!isMounted) return;
@@ -334,6 +330,7 @@ export default function WeeklyTop() {
 
     let isMounted = true;
     const supabase = createClientClientComponent();
+    if (!supabase) return;
 
     const fetchTopCodevs = async () => {
       setIsLoading(true);
@@ -343,22 +340,22 @@ export default function WeeklyTop() {
           .select(
             `
             points,
-            codev:codev_id!inner(first_name),
+            codev_id,
+            codev:codev_id!inner(first_name, last_name, updated_at),
             skill_category:skill_category_id!inner(name),
             created_at
           `,
           )
           .order("points", { ascending: false });
 
-        if (timePeriod === "weekly") {
-          const weekStart = startOfWeek(new Date());
-          query = query.gte("created_at", weekStart.toISOString());
-        } else if (timePeriod === "monthly") {
-          const monthStart = startOfMonth(new Date());
-          query = query.gte("created_at", monthStart.toISOString());
-        }
+        // Fetch both codev_points and attendance_points concurrently
+        // Note: We deliberately query without .gte("created_at") here, shifting boundary checks locally.
+        const [pointsRes, attendanceRes] = await Promise.all([
+          query,
+          supabase.from("attendance_points").select("*")
+        ]);
 
-        const { data, error } = await query;
+        const { data, error } = pointsRes;
 
         if (error) {
           console.error("Error fetching top codevs:", error);
@@ -366,25 +363,91 @@ export default function WeeklyTop() {
         }
 
         if (data) {
-          const groupedData: CategoryData = {};
+          // Group all records by category first
+          const groupedData: Record<string, any[]> = {};
 
           allCategories.forEach((category) => {
             groupedData[category] = [];
           });
 
+          // Build a map of latest attendance activity per user
+          const latestAttendance = new Map<string, Date>();
+          if (attendanceRes.data) {
+            attendanceRes.data.forEach((row) => {
+              const dateStr = row.last_updated || row.updated_at || row.created_at;
+              if (dateStr) {
+                 const d = new Date(dateStr);
+                 const current = latestAttendance.get(row.codev_id);
+                 if (!current || d > current) {
+                   latestAttendance.set(row.codev_id, d);
+                 }
+              }
+            });
+          }
+
+          // Calculate activity thresholds
+          const now = new Date();
+          const fiveMonthsAgo = new Date();
+          fiveMonthsAgo.setMonth(now.getMonth() - 5);
+          
+          const weekStart = startOfWeek(subWeeks(new Date(), 1));
+          const monthStart = startOfMonth(subMonths(new Date(), 1));
+          
+          const activeThreshold = new Date();
+          activeThreshold.setDate(now.getDate() - 30); // 30 days of inactivity threshold
+
           data.forEach((item: any) => {
             const category = item.skill_category?.name || "Uncategorized";
-            if (groupedData[category] && groupedData[category].length < 10) {
+            
+            // Priority Check: Attendance Date > Profile Updated_At
+            const codevDate = item.codev?.updated_at ? new Date(item.codev.updated_at) : undefined;
+            const attDate = latestAttendance.get(item.codev_id);
+            // Defaulting fallback string logic
+            let userDate = attDate;
+            if (!userDate || (codevDate && codevDate > userDate)) {
+               userDate = codevDate;
+            }
+            
+            // 1. Core Removal limit
+            if (!userDate || userDate < fiveMonthsAgo) {
+              return;
+            }
+            
+            // 2. Period Filter limit (Weekly / Monthly boundary)
+            if (timePeriod === "weekly" && userDate < weekStart) {
+              return;
+            } else if (timePeriod === "monthly" && userDate < monthStart) {
+              return;
+            }
+
+            if (groupedData[category]) {
+              const isRecentlyActive = userDate >= activeThreshold;
               groupedData[category].push({
                 points: item.points,
                 codev: item.codev,
                 skill_category: item.skill_category,
+                isRecentlyActive,
               });
             }
           });
 
+          const finalCategoryData: CategoryData = {};
+
+          // 2. Sort to prioritize active users, then sort by points, finally slice top 10
+          Object.keys(groupedData).forEach((category) => {
+            const categoryArray = groupedData[category];
+            if (!categoryArray) return;
+            const sorted = categoryArray.sort((a, b) => {
+              if (a.isRecentlyActive && !b.isRecentlyActive) return -1;
+              if (!a.isRecentlyActive && b.isRecentlyActive) return 1;
+              return b.points - a.points;
+            });
+            
+            finalCategoryData[category] = sorted.slice(0, 10);
+          });
+
           if (isMounted) {
-            setCategoryData(groupedData);
+            setCategoryData(finalCategoryData);
           }
         }
       } catch (error) {
@@ -400,8 +463,21 @@ export default function WeeklyTop() {
 
     fetchTopCodevs();
 
+    // 3. Realtime subscription to points changes
+    const channel = supabase
+      .channel("public:codev_points_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "codev_points" },
+        () => {
+          if (isMounted) fetchTopCodevs();
+        }
+      )
+      .subscribe();
+
     return () => {
       isMounted = false;
+      supabase.removeChannel(channel);
     };
   }, [timePeriod, allCategories, leaderboardType]);
 
@@ -697,7 +773,7 @@ export default function WeeklyTop() {
         <div className="flex gap-4 mb-4">
           <Tabs
             value={leaderboardType}
-            onValueChange={(value: LeaderboardType) => setLeaderboardType(value)}
+            onValueChange={(value) => setLeaderboardType(value as LeaderboardType)}
             className="w-fit"
           >
             <TabsList className="grid h-10 bg-white/10 backdrop-blur-sm dark:bg-white/5 border border-white/20 dark:border-white/10 p-1 rounded-lg w-fit grid-cols-3">

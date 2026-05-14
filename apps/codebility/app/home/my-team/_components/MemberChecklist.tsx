@@ -32,6 +32,7 @@ interface TeamMember {
   last_name: string;
   email_address: string;
   image_url: string | null;
+  display_position: string | null;
 }
 
 interface MemberChecklistStatus {
@@ -49,7 +50,17 @@ interface MemberChecklistProps {
   viewMode?: 'profile' | 'team';
 }
 
-const MemberChecklist = ({ 
+const parseTargetRole = (description: string | null): string | null => {
+  if (!description) return null;
+  try {
+    const parsed = JSON.parse(description);
+    return parsed?.target_role ?? null;
+  } catch {
+    return null;
+  }
+};
+
+const MemberChecklist = ({
   memberId,
   projectId, 
   isTeamLead: _unusedProp,
@@ -153,6 +164,7 @@ const MemberChecklist = ({
           uniqueTitlesMap.set(item.title, {
             title: item.title,
             description: item.description,
+            target_role: parseTargetRole(item.description),
             priority: item.priority,
             due_date: item.due_date,
             created_by: item.created_by,
@@ -163,6 +175,7 @@ const MemberChecklist = ({
           
           if (item.description && !existing.description) {
             updatedItem.description = item.description;
+            updatedItem.target_role = parseTargetRole(item.description);
           }
           
           if (new Date(item.created_at) < new Date(existing.created_at)) {
@@ -175,11 +188,10 @@ const MemberChecklist = ({
       });
       
       const uniqueTitles = Array.from(uniqueTitlesMap.values());
-      const totalChecklistItems = uniqueTitles.length;
 
       const { data: memberDetails, error: memberDetailsError } = await supabase
         .from("codev")
-        .select("id, first_name, last_name, email_address, image_url")
+        .select("id, first_name, last_name, email_address, image_url, display_position")
         .in("id", membersToShow);
 
       if (memberDetailsError) throw memberDetailsError;
@@ -194,6 +206,11 @@ const MemberChecklist = ({
         const memberChecklistItems: ChecklistItem[] = [];
         
         for (const templateItem of uniqueTitles) {
+          // Skip items targeted to a different role than this member's
+          if (templateItem.target_role && member.display_position !== templateItem.target_role) {
+            continue;
+          }
+
           const existingItem = memberItems.find(
             (item: ChecklistItem) => item.title === templateItem.title
           );
@@ -219,12 +236,13 @@ const MemberChecklist = ({
         }
 
         const completedCount = memberChecklistItems.filter(item => item.completed).length;
+        const memberTotalCount = memberChecklistItems.length;
 
         statuses.push({
           member,
           completedCount,
-          totalCount: totalChecklistItems,
-          allComplete: completedCount === totalChecklistItems && totalChecklistItems > 0,
+          totalCount: memberTotalCount,
+          allComplete: completedCount === memberTotalCount && memberTotalCount > 0,
           checklistItems: memberChecklistItems
         });
       }
@@ -537,10 +555,10 @@ const MemberChecklist = ({
                           {item.title}
                         </h5>
                         
-                        {item.description && (
+                        {item.description && !parseTargetRole(item.description) && (
                           <p className={`text-xs mt-1 ${
-                            item.completed 
-                              ? 'text-green-700 dark:text-green-300' 
+                            item.completed
+                              ? 'text-green-700 dark:text-green-300'
                               : 'text-gray-600 dark:text-gray-400'
                           }`}>
                             {item.description}
