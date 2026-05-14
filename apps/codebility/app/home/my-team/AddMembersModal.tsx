@@ -720,9 +720,11 @@ const AddMembersModal = ({
         email_address: m.email_address,
         display_position: m.display_position,
         image_url: m.image_url,
+        username: null,
+        username_updated_at: null,
         positions: [],
         tech_stacks: [],
-      } as Codev));
+      } as unknown as Codev));
 
       setSelectedMembers(membersAsCodev);
       membersInitialized.current = true;
