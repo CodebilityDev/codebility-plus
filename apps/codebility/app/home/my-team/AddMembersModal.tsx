@@ -1003,9 +1003,6 @@ const AddMembersModal = ({
             </div>
 
             <div className="flex-1 px-3 sm:px-6 pb-4 overflow-y-auto min-h-0">
-<<<<<<< HEAD
-              <div className="flex flex-col gap-3 sm:gap-4">
-=======
               <div className="space-y-2 sm:space-y-3">
                 {/* Recently Added Section */}
                 {!searchQuery && recentMembers.length > 0 && !isLoadingMembers && (
@@ -1084,8 +1081,6 @@ const AddMembersModal = ({
                     <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent my-3"></div>
                   </div>
                 )}
-
->>>>>>> origin/dev
                 {isLoadingMembers ? (
                   <div className="text-center py-8 text-gray-400">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-customBlue-500 mx-auto mb-3"></div>
