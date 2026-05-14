@@ -32,62 +32,32 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Try to use the optimized database function first
-    const { data: leaders, error } = await supabase
-      .rpc('get_project_leaderboard', { 
-        time_filter: timeFilter,
-        result_limit: limit 
-      });
+    let processedLeaders: ProjectLeader[] = [];
 
-    if (error) {
-      // Fallback to manual query if RPC doesn't exist
-      console.warn("RPC function not found, using fallback query:", error);
-      
-      // Optimized fallback - single query with joins
-      let baseQuery = `
-        projects!inner(*),
-        project_members!inner(
-          codev_id,
-          codev_points!inner(
-            points,
-            created_at,
-            skill_category:skill_category_id!inner(name)
-          )
-        )
-      `;
-
-      let query = supabase
+    if (timeFilter === "all") {
+      // All-time leaderboard uses the codev_points/project_members relationship for historical data
+      const { data: rawData, error: fallbackError } = await supabase
         .from("projects")
-        .select(baseQuery);
-
-      // Apply time filters through the relationship
-      if (timeFilter === "weekly") {
-        const weekStart = new Date();
-        weekStart.setDate(weekStart.getDate() - weekStart.getDay());
-        weekStart.setHours(0, 0, 0, 0);
-        query = query.gte("project_members.codev_points.created_at", weekStart.toISOString());
-      } else if (timeFilter === "monthly") {
-        const monthStart = new Date();
-        monthStart.setDate(1);
-        monthStart.setHours(0, 0, 0, 0);
-        query = query.gte("project_members.codev_points.created_at", monthStart.toISOString());
-      }
-
-      const { data: rawData, error: fallbackError } = await query.limit(100); // Get more projects to filter later
+        .select(`
+          id,
+          name,
+          project_members(
+            codev_id,
+            codev_points(
+              points,
+              skill_category:skill_category_id(name)
+            )
+          )
+        `);
 
       if (fallbackError) {
-        console.error("Error fetching project leaderboard:", fallbackError);
+        console.error("Error fetching all-time project leaderboard:", fallbackError);
         return NextResponse.json(
           { error: "Failed to fetch leaderboard data", details: fallbackError.message },
           { status: 500 }
         );
       }
 
-      if (!rawData || rawData.length === 0) {
-        return NextResponse.json({ leaders: [], totalCount: 0 });
-      }
-
-      // Process the complex nested data structure
       const projectMap = new Map<string, {
         project_id: string;
         project_name: string;
@@ -96,11 +66,8 @@ export async function GET(request: NextRequest) {
         skill_breakdown: Record<string, number>;
       }>();
 
-      rawData.forEach((project: any) => {
-        if (!project.project_members || project.project_members.length === 0) return;
-
+      rawData?.forEach((project: any) => {
         const projectId = project.id;
-        
         if (!projectMap.has(projectId)) {
           projectMap.set(projectId, {
             project_id: projectId,
@@ -110,62 +77,125 @@ export async function GET(request: NextRequest) {
             skill_breakdown: {}
           });
         }
-
         const projectData = projectMap.get(projectId)!;
 
-        project.project_members.forEach((member: any) => {
+        project.project_members?.forEach((member: any) => {
           projectData.members.add(member.codev_id);
-
-          if (member.codev_points && member.codev_points.length > 0) {
-            member.codev_points.forEach((point: any) => {
-              const skillName = point.skill_category?.name || "Other";
-              const pointValue = point.points || 0;
-              
-              projectData.total_points += pointValue;
-              projectData.skill_breakdown[skillName] = 
-                (projectData.skill_breakdown[skillName] || 0) + pointValue;
-            });
-          }
+          member.codev_points?.forEach((point: any) => {
+            const skillName = point.skill_category?.name || "Other";
+            const val = point.points || 0;
+            projectData.total_points += val;
+            projectData.skill_breakdown[skillName] = (projectData.skill_breakdown[skillName] || 0) + val;
+          });
         });
       });
 
-      // Convert to array and sort
-      const processedLeaders: ProjectLeader[] = Array.from(projectMap.values())
-        .map(project => ({
-          project_id: project.project_id,
-          project_name: project.project_name,
-          total_points: project.total_points,
-          member_count: project.members.size,
-          skill_breakdown: project.skill_breakdown
+      processedLeaders = Array.from(projectMap.values())
+        .map(p => ({
+          project_id: p.project_id,
+          project_name: p.project_name,
+          total_points: p.total_points,
+          member_count: p.members.size,
+          skill_breakdown: p.skill_breakdown
         }))
-        .filter(project => project.total_points > 0)
-        .sort((a, b) => {
-          if (b.total_points === a.total_points) {
-            return a.project_name.localeCompare(b.project_name);
-          }
-          return b.total_points - a.total_points;
-        })
+        .filter(p => p.total_points > 0)
+        .sort((a, b) => b.total_points - a.total_points)
         .slice(0, limit);
 
-      return NextResponse.json({ 
-        leaders: processedLeaders,
-        totalCount: processedLeaders.length 
-      });
-    }
+    } else {
+      // Weekly/Monthly leaderboard calculates points from completed tasks based on approval date (updated_at)
+      const startDate = new Date();
+      if (timeFilter === "weekly") {
+        startDate.setDate(startDate.getDate() - startDate.getDay());
+        startDate.setHours(0, 0, 0, 0);
+      } else {
+        startDate.setDate(1);
+        startDate.setHours(0, 0, 0, 0);
+      }
 
-    // Process RPC results
-    const processedLeaders = leaders?.map((leader: any) => ({
-      project_id: leader.project_id,
-      project_name: leader.project_name || "Unknown Project",
-      total_points: leader.total_points || 0,
-      member_count: leader.member_count || 0,
-      skill_breakdown: leader.skill_breakdown || {}
-    })) || [];
+      const { data: rawTasks, error: tasksError } = await supabase
+        .from("tasks")
+        .select(`
+          points,
+          updated_at,
+          project_id,
+          codev_id,
+          sidekick_ids,
+          project:project_id!inner(name),
+          skill_category:skill_category_id!inner(name)
+        `)
+        .eq("is_archive", true)
+        .gte("updated_at", startDate.toISOString());
+
+      if (tasksError) {
+        console.error(`Error fetching ${timeFilter} project leaderboard tasks:`, tasksError);
+        return NextResponse.json(
+          { error: "Failed to fetch tasks data", details: tasksError.message },
+          { status: 500 }
+        );
+      }
+
+      const projectMap = new Map<string, {
+        project_id: string;
+        project_name: string;
+        total_points: number;
+        members: Set<string>;
+        skill_breakdown: Record<string, number>;
+      }>();
+
+      rawTasks?.forEach((task: any) => {
+        const projectId = task.project_id;
+        if (!projectId) return;
+
+        if (!projectMap.has(projectId)) {
+          projectMap.set(projectId, {
+            project_id: projectId,
+            project_name: task.project?.name || "Unknown Project",
+            total_points: 0,
+            members: new Set(),
+            skill_breakdown: {}
+          });
+        }
+        const projectData = projectMap.get(projectId)!;
+        const skillName = task.skill_category?.name || "Other";
+        const points = task.points || 0;
+        const sidekickPoints = Math.floor(points * 0.5);
+
+        // Add primary assignee points
+        if (task.codev_id) {
+          projectData.members.add(task.codev_id);
+          projectData.total_points += points;
+          projectData.skill_breakdown[skillName] = (projectData.skill_breakdown[skillName] || 0) + points;
+        }
+
+        // Add sidekick points
+        if (task.sidekick_ids && Array.isArray(task.sidekick_ids)) {
+          task.sidekick_ids.forEach((sid: string) => {
+            projectData.members.add(sid);
+            projectData.total_points += sidekickPoints;
+            projectData.skill_breakdown[skillName] = (projectData.skill_breakdown[skillName] || 0) + sidekickPoints;
+          });
+        }
+      });
+
+      processedLeaders = Array.from(projectMap.values())
+        .map(p => ({
+          project_id: p.project_id,
+          project_name: p.project_name,
+          total_points: p.total_points,
+          member_count: p.members.size,
+          skill_breakdown: p.skill_breakdown
+        }))
+        .filter(p => p.total_points > 0)
+        .sort((a, b) => b.total_points - a.total_points)
+        .slice(0, limit);
+    }
 
     return NextResponse.json({ 
       leaders: processedLeaders,
       totalCount: processedLeaders.length 
     });
+
 
   } catch (error) {
     console.error("API error:", error);
