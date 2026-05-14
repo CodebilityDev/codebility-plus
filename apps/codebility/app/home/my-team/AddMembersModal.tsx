@@ -778,7 +778,7 @@ const AddMembersModal = ({
             </div>
 
             <div className="flex-1 px-3 sm:px-6 pb-4 overflow-y-auto min-h-0">
-              <div className="space-y-2 sm:space-y-3">
+              <div className="flex flex-col gap-3 sm:gap-4">
                 {isLoadingMembers ? (
                   <div className="text-center py-8 text-gray-400">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-customBlue-500 mx-auto mb-3"></div>
@@ -805,10 +805,10 @@ const AddMembersModal = ({
                       <div
                         key={user.id}
                         onClick={() => toggleMember(user)}
-                        className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg cursor-pointer transition-all duration-200 ${
+                        className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg cursor-pointer transition-all duration-200 border-2 ${
                           isSelected(user.id) 
-                            ? 'bg-customBlue-600/30 ring-2 ring-customBlue-500' 
-                            : 'hover:bg-gray-700/30'
+                            ? 'bg-customGreen/10 border-customGreen shadow-[0_0_10px_rgba(75,206,151,0.2)]' 
+                            : 'bg-transparent border-transparent hover:bg-white/5'
                         }`}
                       >
                         <div className="flex-shrink-0">
@@ -857,11 +857,11 @@ const AddMembersModal = ({
                         <div className="flex-shrink-0">
                           <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded border-2 flex items-center justify-center transition-all duration-200 ${
                             isSelected(user.id) 
-                              ? 'bg-white border-white' 
-                              : 'bg-transparent border-gray-400'
+                              ? 'bg-customGreen border-customGreen' 
+                              : 'bg-transparent border-gray-500'
                           }`}>
                             {isSelected(user.id) && (
-                              <svg className="w-4 h-4 text-black font-bold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <svg className="w-4 h-4 text-white font-bold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                               </svg>
                             )}
