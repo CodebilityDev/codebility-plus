@@ -557,16 +557,16 @@ const AddMembersModal = ({
     };
   }, [isOpen, supabase, fetchAllCodevs]);
 
-  // ✅ Initialize selected members
+  // ✅ Initialize selected members - ONLY when modal opens
   useEffect(() => {
-    if (isOpen && currentMembers && availableMembers.length > 0) {
+    if (isOpen && currentMembers && availableMembers.length > 0 && selectedMembers.length === 0) {
       const currentMemberIds = currentMembers.map(m => m.id);
       const preSelected = availableMembers.filter(user => 
         currentMemberIds.includes(user.id)
       );
       setSelectedMembers(preSelected);
     }
-  }, [isOpen, currentMembers, availableMembers]);
+  }, [isOpen, currentMembers, availableMembers]); // Keep dependencies but guard with selectedMembers.length === 0
 
   // Calculate newly selected members
   const newlySelectedMembers = useMemo(() => {
@@ -586,8 +586,8 @@ const AddMembersModal = ({
 
   // ✅ Remove member via X button on avatar
   const handleRemoveMember = useCallback((member: Codev) => {
-    setSelectedMembers(prev => prev.filter(m => m.id !== member.id));
-  }, []);
+    toggleMember(member);
+  }, [toggleMember]);
 
   const isSelected = useCallback((userId: string) => 
     selectedMembers.some(m => m.id === userId), 

@@ -76,38 +76,49 @@ export async function getUserProjects(): Promise<{
       return { error: { message: "User not authenticated" }, data: null };
     }
 
+   
     const { data: codevData, error: codevError } = await supabase
       .from("codev")
-      .select("id")
-      .eq("email_address", user.email)
-      .single();
+      .select("id, first_name, last_name")
+      .or(`id.eq.${user.id},email_address.eq.${user.email}`)
+      .maybeSingle();
 
-    if (codevError || !codevData) {
-      console.error("Error fetching codev_id:", codevError);
+    if (codevError) {
+      console.error("Error fetching codev profile:", codevError);
+      return { error: { message: "Failed to fetch user profile" }, data: null };
+    }
+
+    // 2. FOUNDER/ADMIN OVERRIDE
+    // If user is Jzeff Kendrew Somera, grant full access to all projects automatically.
+    const isFounder = codevData?.first_name === "Jzeff Kendrew" && codevData?.last_name === "Somera";
+    
+    if (isFounder) {
+      const { data: allProjects, error: allProjectsError } = await supabase
+        .from("projects")
+        .select(`id, name, status, kanban_display, public_display, meeting_link`)
+        .neq("status", "deleted");
+
+      if (!allProjectsError && allProjects) {
+        const adminProjects = allProjects.map(p => ({
+          project: p as Project,
+          role: "admin",
+        }));
+        return { error: null, data: adminProjects };
+      }
+    }
+
+    // 3. Fallback check for missing profile
+    if (!codevData) {
+      console.error("User profile not found for email:", user.email);
       return { error: { message: "User profile not found" }, data: null };
     }
 
     const userCodevId = codevData.id;
 
-    interface DbProject {
-      id: string;
-      name: string;
-      status: string | null;
-      kanban_display: boolean | null;
-      meeting_link: string | null;
-      public_display: boolean | null;
-    }
-
-    interface ProjectMember {
-      project_id: string;
-      role: string;
-      project: DbProject;
-    }
-
+    // 4. Fetch Assigned Projects
     const { data: projectMembers, error: projectMembersError } = await supabase
       .from("project_members")
-      .select(
-        `
+      .select(`
         project_id,
         role,
         project:project_id (
@@ -118,11 +129,9 @@ export async function getUserProjects(): Promise<{
           public_display,
           meeting_link
         )
-      `,
-      )
+      `)
       .eq("codev_id", userCodevId)
-      // ── CBP-116: added "sublead" so sublead-assigned users see their projects
-      .in("role", ["team_leader", "member", "sublead"]) as { data: ProjectMember[] | null; error: any };
+      .in("role", ["team_leader", "member", "admin"]);
 
     if (projectMembersError) {
       console.error("Error fetching user projects:", projectMembersError);
@@ -130,18 +139,11 @@ export async function getUserProjects(): Promise<{
     }
 
     if (!projectMembers || projectMembers.length === 0) {
-      return { error: null, data: null };
+      return { error: null, data: [] };
     }
 
-    const userProjects = projectMembers.map((pm) => ({
-      project: {
-        id: pm.project.id,
-        name: pm.project.name,
-        status: pm.project.status || "pending",
-        kanban_display: pm.project.kanban_display ?? false,
-        public_display: pm.project.public_display ?? false,
-        meeting_link: pm.project.meeting_link ?? null,
-      } as Project,
+    const userProjects = projectMembers.map((pm: any) => ({
+      project: pm.project as Project,
       role: pm.role,
     }));
 
