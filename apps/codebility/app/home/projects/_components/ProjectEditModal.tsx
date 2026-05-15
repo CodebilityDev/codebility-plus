@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import {
@@ -104,13 +104,13 @@ const ProjectEditModal = () => {
   } = useForm<ProjectFormData>({ mode: "onChange" });
 
   const { data: users = [], isLoading: isUsersLoading } = useQuery({
-    queryKey: ["projectCodevs"],
+    queryKey: ["projectCodevs", "v3"],
     queryFn: async () => {
       const result = await getProjectCodevs();
       return result || [];
     },
-    staleTime: 10 * 60 * 1000,
-    refetchOnWindowFocus: false,
+    staleTime: 2 * 60 * 1000,
+    refetchOnWindowFocus: true,
   });
 
   const { data: clients = [], isLoading: isClientsLoading } = useQuery({
@@ -179,14 +179,11 @@ const ProjectEditModal = () => {
   // getProjectCodevs() may exclude users due to RLS or internal_status filtering.
   // We use fullProjectData.project_members (from getProjectByID join) as the
   // source of truth — it always returns codev data regardless of RLS.
-  // This covers the team leader (CBP-95) and any member used as sublead (CBP-116).
   const enhancedUserOptions = useMemo(() => {
     if (!fullProjectData?.project_members) return userOptions;
 
-    // Build a set of codev_ids already present in userOptions for O(1) lookup
     const existingIds = new Set(userOptions.map((opt) => opt.value));
 
-    // Collect all project members missing from userOptions
     const missingMembers = fullProjectData.project_members
       .filter((pm: any) => pm.codev && !existingIds.has(pm.codev_id))
       .map((pm: any) => ({
@@ -199,7 +196,6 @@ const ProjectEditModal = () => {
 
     if (missingMembers.length === 0) return userOptions;
 
-    // Inject missing members at the top so they are always findable
     return [...missingMembers, ...userOptions];
   }, [userOptions, fullProjectData]);
 
@@ -246,8 +242,19 @@ const ProjectEditModal = () => {
   // Pre-populate team leader, sublead, and members from fullProjectData.
   // fullProjectData comes from getProjectByID which includes project_members.
   // The list page query does not join project_members so we cannot use data directly.
+  //
+  // IMPORTANT: Only run when modal opens (isModalOpen changes to true) to avoid
+  // resetting selectedMembers when users list refetches during editing.
+  const hasInitialized = useRef(false);
+
   useEffect(() => {
-    if (!fullProjectData || !isModalOpen) return;
+    if (!fullProjectData || !isModalOpen) {
+      hasInitialized.current = false;
+      return;
+    }
+
+    // Skip if already initialized and users are available
+    if (hasInitialized.current && users.length > 0) return;
 
     const projectMembers = fullProjectData.project_members;
     if (!projectMembers?.length) return;
@@ -314,18 +321,14 @@ const ProjectEditModal = () => {
     //   users.filter(u => memberIds.includes(u.id))
     // which silently excluded RLS-filtered members from selectedMembers.
     // On submit, those missing members were deleted from project_members DB.
-    // Fix: use pm.codev fallback (same pattern as team leader / sublead above)
-    // so every member in DB is represented in the form payload on save.
+    // Fix: use pm.codev fallback so every member in DB is in the form payload.
     const memberPMs = projectMembers.filter((pm: any) => pm.role === "member");
 
     const resolvedMembers = memberPMs
       .map((pm: any) => {
-        // Try full Codev object from users first
         const fromUsers = users.find((u) => u.id === pm.codev_id);
         if (fromUsers) return fromUsers;
 
-        // Fallback: construct minimal Codev from embedded codev data.
-        // Handles users absent from getProjectCodevs() due to RLS filtering.
         if (pm.codev) {
           return {
             id: pm.codev_id,
@@ -339,14 +342,15 @@ const ProjectEditModal = () => {
           } as unknown as Codev;
         }
 
-        // pm.codev is null — RLS dropped the codev row even from the two-query
-        // approach. Log a warning; skip this member to avoid a null in the array.
         console.warn(`⚠️ Could not resolve member codev data for: ${pm.codev_id}`);
         return null;
       })
       .filter(Boolean) as Codev[];
 
     setSelectedMembers(resolvedMembers);
+
+    // Mark as initialized to prevent resets when users list refetches
+    hasInitialized.current = true;
     // ─────────────────────────────────────────────────────────────────────────
   }, [fullProjectData, users, isModalOpen]);
 
@@ -715,9 +719,8 @@ const ProjectEditModal = () => {
             </div>
 
             {/* ── CBP-116: Sublead selector ─────────────────────────────────────
-                Optional — no asterisk, no toast validation required.
-                Excluded from members list and excluded from team leader list.
-                Clearing the select (empty string value) sets sublead to null.
+                Optional. Sourced from fullProjectData.project_members to bypass
+                RLS filtering that drops some users from getProjectCodevs().
             ──────────────────────────────────────────────────────────────────── */}
             <div className="space-y-1">
               <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">
@@ -728,11 +731,7 @@ const ProjectEditModal = () => {
               </label>
               <CustomSelect
                 options={[
-                  // "None" option — value must not be empty string (Radix UI Select.Item constraint)
                   { id: "none", value: "none", label: "No sublead assigned", subLabel: "" },
-                  // Only show members of this project, excluding the team leader.
-                  // Source: fullProjectData.project_members (bypasses RLS filtering
-                  // that drops some users from getProjectCodevs results).
                   ...(fullProjectData?.project_members ?? [])
                     .filter(
                       (pm: any) =>
@@ -759,7 +758,6 @@ const ProjectEditModal = () => {
                     setCurrentSubLead(subLeadFromUsers);
                     return;
                   }
-                  // Fallback: construct from fullProjectData (handles RLS-filtered users)
                   const subLeadMember = fullProjectData?.project_members?.find(
                     (pm: any) => pm.codev_id === value,
                   );
