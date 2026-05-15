@@ -188,6 +188,17 @@ export function EditableRow({
 
   const renderCell = (key: keyof Codev) => {
     switch (key) {
+      case "email_address":
+        return (
+          <Input
+            type="email"
+            value={String(editForm[key] || "")}
+            onChange={(e) => handleLocalChange(key, e.target.value)}
+            disabled={isSubmitting || isUploading}
+            className="border-light-700 dark:border-dark-200 bg-light-800 dark:bg-dark-300 h-9 w-full border px-3 text-xs text-black dark:text-white"
+          />
+        );
+
       case "image_url":
         return (
           <div className="relative inline-block">
@@ -247,7 +258,7 @@ export function EditableRow({
             }
             disabled={isSubmitting || isUploading}
           >
-            <SelectTrigger className="border-light-700 dark:border-dark-200 bg-light-800 dark:bg-dark-300 h-8 border text-xs text-black dark:text-white">
+            <SelectTrigger className="border-light-700 dark:border-dark-200 bg-light-800 dark:bg-dark-300 h-9 border text-xs text-black dark:text-white">
               <SelectValue placeholder="Select status" />
             </SelectTrigger>
             <SelectContent className="bg-light-800 dark:bg-dark-300 text-xs text-black dark:text-white">
@@ -269,7 +280,7 @@ export function EditableRow({
             }
             disabled={isSubmitting || isUploading}
           >
-            <SelectTrigger className="border-light-700 dark:border-dark-200 bg-light-800 dark:bg-dark-300 h-8 border text-xs text-black dark:text-white">
+            <SelectTrigger className="border-light-700 dark:border-dark-200 bg-light-800 dark:bg-dark-300 h-9 border text-xs text-black dark:text-white">
               <SelectValue placeholder="Select role" />
             </SelectTrigger>
             <SelectContent className="bg-light-800 dark:bg-dark-300 text-xs text-black dark:text-white">
@@ -291,7 +302,7 @@ export function EditableRow({
             }
             disabled={isSubmitting || isUploading}
           >
-            <SelectTrigger className="border-light-700 dark:border-dark-200 bg-light-800 dark:bg-dark-300 h-8 border text-xs text-black dark:text-white">
+            <SelectTrigger className="border-light-700 dark:border-dark-200 bg-light-800 dark:bg-dark-300 h-9 border text-xs text-black dark:text-white">
               <SelectValue placeholder="Select position" />
             </SelectTrigger>
             <SelectContent className="bg-light-800 dark:bg-dark-300 text-xs text-black dark:text-white">
@@ -325,7 +336,7 @@ export function EditableRow({
             }
             disabled={isSubmitting || isUploading}
           >
-            <SelectTrigger className="border-light-700 dark:border-dark-200 bg-light-800 dark:bg-dark-300 h-8 border text-xs text-black dark:text-white">
+            <SelectTrigger className="border-light-700 dark:border-dark-200 bg-light-800 dark:bg-dark-300 h-9 border text-xs text-black dark:text-white">
               <SelectValue placeholder="Select NDA status" />
             </SelectTrigger>
             <SelectContent className="bg-light-800 dark:bg-dark-300 text-xs text-black dark:text-white">
@@ -365,7 +376,7 @@ export function EditableRow({
               handleLocalChange("date_joined", dateValue);
             }}
             disabled={isSubmitting || isUploading}
-            className="border-light-700 dark:border-dark-200 bg-light-800 dark:bg-dark-300 h-8 border text-xs text-black dark:text-white"
+            className="border-light-700 dark:border-dark-200 bg-light-800 dark:bg-dark-300 h-9 border px-3 text-xs text-black dark:text-white"
           />
         );
 
@@ -375,7 +386,7 @@ export function EditableRow({
             value={String(editForm[key] || "")}
             onChange={(e) => handleLocalChange(key, e.target.value)}
             disabled={isSubmitting || isUploading}
-            className="border-light-700 dark:border-dark-200 bg-light-800 dark:bg-dark-300 h-8 w-full border text-xs text-black dark:text-white"
+            className="border-light-700 dark:border-dark-200 bg-light-800 dark:bg-dark-300 h-9 w-full border px-3 text-xs text-black dark:text-white"
           />
         );
     }
@@ -385,9 +396,9 @@ export function EditableRow({
     <TableRow className="bg-light-200 dark:bg-dark-200 hover:bg-light-300 dark:hover:bg-dark-300">
       {/* COMPACT: All columns px-2 py-2, constrained widths to match table */}
       <TableCell className="w-12 px-2 py-2">{renderCell("image_url")}</TableCell>
-      <TableCell className="w-24 px-2 py-2">{renderCell("first_name")}</TableCell>
-      <TableCell className="w-24 px-2 py-2">{renderCell("last_name")}</TableCell>
-      <TableCell className="w-40 px-2 py-2">{renderCell("email_address")}</TableCell>
+      <TableCell className="w-32 px-2 py-2">{renderCell("first_name")}</TableCell>
+      <TableCell className="w-32 px-2 py-2">{renderCell("last_name")}</TableCell>
+      <TableCell className="px-2 py-2">{renderCell("email_address")}</TableCell>
       <TableCell className="hidden w-24 px-2 py-2 2xl:table-cell">{renderCell("internal_status")}</TableCell>
       <TableCell className="hidden w-20 px-2 py-2 2xl:table-cell">{renderCell("role_id")}</TableCell>
       <TableCell className="hidden w-32 px-2 py-2 2xl:table-cell">{renderCell("display_position")}</TableCell>

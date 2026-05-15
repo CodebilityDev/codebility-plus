@@ -35,18 +35,10 @@ export async function fetchQuestions(page: number = 1, pageSize: number = 5): Pr
   const start = (page - 1) * pageSize
   const end = start + pageSize - 1
 
-  // Fetch questions with pagination
+  // Step 1: Fetch questions with pagination (no codev join to avoid RLS filtering)
   const { data, error, count } = await supabase
     .from('overflow_post')
-    .select(`
-      *,
-      codev (
-        id,
-        first_name,
-        last_name,
-        image_url
-      )
-    `, { count: 'exact' })
+    .select('*', { count: 'exact' })
     .order('created_at', { ascending: false })
     .range(start, end)
 
@@ -55,30 +47,53 @@ export async function fetchQuestions(page: number = 1, pageSize: number = 5): Pr
   }
 
   if (!data || data.length === 0) {
-    return { 
-      questions: [], 
-      currentPage: page, 
-      totalPages: count ? Math.ceil(count / pageSize) : 0, 
-      totalCount: count || 0 
+    return {
+      questions: [],
+      currentPage: page,
+      totalPages: count ? Math.ceil(count / pageSize) : 0,
+      totalCount: count || 0
     }
   }
 
-  const transformedQuestions: Question[] = data.map((item: any) => ({
-    id: item.id.toString(),
-    title: item.title || '',
-    content: item.question_details || '',
-    author: {
-      id: item.codev.id,
-      name: `${item.codev.first_name} ${item.codev.last_name}`.trim(),
-      image_url: item.codev.image_url,
-    },
-    tags: item.tags ? JSON.parse(item.tags) as string[] : [],
-    images: item.image_url ? JSON.parse(item.image_url) as string[] : [],
-    likes: item.likes || 0,
-    comments: item.comments || 0,
-    created_at: item.created_at,
-    updated_at: item.updated_at,
-  }))
+  // Step 2: Collect unique codev_ids from posts
+  const codevIds = [...new Set(data.map(post => post.codev_id).filter(Boolean))];
+
+  // Step 3: Fetch codev records separately to bypass RLS join filtering
+  let codevMap = new Map<string, any>();
+
+  if (codevIds.length > 0) {
+    const { data: codevs, error: codevError } = await supabase
+      .from('codev')
+      .select('id, first_name, last_name, image_url')
+      .in('id', codevIds);
+
+    if (codevError) {
+      console.error('Error fetching codev records for overflow posts:', codevError);
+    } else {
+      codevs?.forEach(c => codevMap.set(c.id, c));
+    }
+  }
+
+  // Step 4: Transform with manually merged codev data
+  const transformedQuestions: Question[] = data.map((item: any) => {
+    const author = codevMap.get(item.codev_id);
+    return {
+      id: item.id.toString(),
+      title: item.title || '',
+      content: item.question_details || '',
+      author: {
+        id: author?.id || item.codev_id || '',
+        name: author ? `${author.first_name} ${author.last_name}`.trim() : 'Unknown User',
+        image_url: author?.image_url || null,
+      },
+      tags: item.tags ? JSON.parse(item.tags) as string[] : [],
+      images: item.image_url ? JSON.parse(item.image_url) as string[] : [],
+      likes: item.likes || 0,
+      comments: item.comments || 0,
+      created_at: item.created_at,
+      updated_at: item.updated_at,
+    };
+  })
 
   const totalPages = count ? Math.ceil(count / pageSize) : 0
 
@@ -228,7 +243,7 @@ export async function postQuestion(data: PostQuestionData) {
     // Filter out any failed uploads (nulls)
     const validFileUrls = uploadedFileUrls.filter((url): url is string => url !== null);
 
-    // Insert the question into overflow_post table
+    // Insert the question into overflow_post table (no codev join to avoid RLS filtering)
     const { data: insertedQuestion, error } = await supabase
       .from('overflow_post')
       .insert({
@@ -241,31 +256,23 @@ export async function postQuestion(data: PostQuestionData) {
         comments: 0,
         fields: null,
       })
-      .select(`
-        id,
-        codev_id,
-        title,
-        question_details,
-        tags,
-        image_url,
-        likes,
-        comments,
-        created_at,
-        updated_at,
-        codev:codev_id (
-          id,
-          first_name,
-          last_name,
-          image_url
-        )
-      `)
+      .select('*')
       .single();
 
     if (error) {
       throw new Error(`Failed to post question: ${error.message}`);
     }
 
-    const authorData = insertedQuestion.codev?.[0];
+    // Fetch author data separately to bypass RLS join filtering
+    const { data: authorData, error: authorError } = await supabase
+      .from('codev')
+      .select('id, first_name, last_name, image_url')
+      .eq('id', insertedQuestion.codev_id)
+      .single();
+
+    if (authorError) {
+      console.error('Error fetching author for created post:', authorError);
+    }
 
     // Transform the database response to match Question interface
     const question = {
@@ -273,8 +280,8 @@ export async function postQuestion(data: PostQuestionData) {
       title: insertedQuestion.title,
       content: insertedQuestion.question_details,
       author: {
-        id: authorData?.id,
-        name: `${authorData?.first_name ?? ''} ${authorData?.last_name ?? ''}`.trim(),
+        id: authorData?.id || insertedQuestion.codev_id || '',
+        name: authorData ? `${authorData.first_name} ${authorData.last_name}`.trim() : 'Unknown User',
         image_url: authorData?.image_url ?? null,
       },
       tags: JSON.parse(insertedQuestion.tags || '[]') as string[],
@@ -394,40 +401,30 @@ export async function updateQuestion(data: UpdateQuestionData) {
         updated_at: new Date().toISOString(),
       })
       .eq('id', parseInt(data.question_id))
-      .select(`
-        id,
-        codev_id,
-        title,
-        question_details,
-        tags,
-        image_url,
-        likes,
-        comments,
-        created_at,
-        updated_at,
-        codev:codev_id (
-          id,
-          first_name,
-          last_name,
-          image_url
-        )
-      `)
+      .select('*')
       .single();
 
     if (updateError) {
       return { success: false, error: `Database error: ${updateError.message}` };
     }
 
-    const authorData = Array.isArray(updatedQuestion.codev)
-      ? updatedQuestion.codev[0]
-      : updatedQuestion.codev;
+    // Fetch author data separately to bypass RLS join filtering
+    const { data: authorData, error: authorError } = await supabase
+      .from('codev')
+      .select('id, first_name, last_name, image_url')
+      .eq('id', updatedQuestion.codev_id)
+      .single();
+
+    if (authorError) {
+      console.error('Error fetching author for updated post:', authorError);
+    }
 
     const question = {
       id: updatedQuestion.id.toString(),
       title: updatedQuestion.title,
       content: updatedQuestion.question_details,
       author: {
-        id: authorData?.id || data.authorId,
+        id: authorData?.id || updatedQuestion.codev_id || data.authorId,
         name: authorData
           ? `${authorData.first_name} ${authorData.last_name}`.trim()
           : 'Unknown User',
@@ -564,45 +561,54 @@ export interface PostCommentData {
 // Fetch comments for a specific post
 export async function fetchComments(postId: string): Promise<Comment[]> {
   const supabase = await createClientServerComponent();
- 
+
+  // Step 1: Fetch comments (no codev join to avoid RLS filtering)
   const { data, error } = await supabase
     .from('overflow_comments')
-    .select(`
-      id,
-      comment,
-      likes,
-      marked_as_solution,
-      created_at,
-      updated_at,
-      post_id,
-      codev (
-        id,
-        first_name,
-        last_name,
-        username,   
-        image_url
-      )
-    `)
+    .select('*')
     .eq('post_id', postId)
     .order('created_at', { ascending: true });
- 
+
   if (error || !data || data.length === 0) return [];
- 
-  return data.map((item: any) => ({
-    id: item.id.toString(),
-    content: item.comment,
-    author: {
-      id: item.codev.id,
-      name: `${item.codev.first_name} ${item.codev.last_name}`.trim(),
-      username: item.codev.username ?? null,
-      image_url: item.codev.image_url,
-    },
-    likes: item.likes || 0,
-    marked_as_solution: item.marked_as_solution ?? false, // ← NEW
-    created_at: item.created_at,
-    updated_at: item.updated_at,
-    post_id: item.post_id.toString(),
-  }));
+
+  // Step 2: Collect unique codev_ids from comments
+  const codevIds = [...new Set(data.map(comment => comment.codev_id).filter(Boolean))];
+
+  // Step 3: Fetch codev records separately to bypass RLS join filtering
+  let codevMap = new Map<string, any>();
+
+  if (codevIds.length > 0) {
+    const { data: codevs, error: codevError } = await supabase
+      .from('codev')
+      .select('id, first_name, last_name, username, image_url')
+      .in('id', codevIds);
+
+    if (codevError) {
+      console.error('Error fetching codev records for comments:', codevError);
+    } else {
+      codevs?.forEach(c => codevMap.set(c.id, c));
+    }
+  }
+
+  // Step 4: Transform with manually merged codev data
+  return data.map((item: any) => {
+    const author = codevMap.get(item.codev_id);
+    return {
+      id: item.id.toString(),
+      content: item.comment,
+      author: {
+        id: author?.id || item.codev_id || '',
+        name: author ? `${author.first_name} ${author.last_name}`.trim() : 'Unknown User',
+        username: author?.username ?? null,
+        image_url: author?.image_url || null,
+      },
+      likes: item.likes || 0,
+      marked_as_solution: item.marked_as_solution ?? false,
+      created_at: item.created_at,
+      updated_at: item.updated_at,
+      post_id: item.post_id.toString(),
+    };
+  });
 }
 
 export async function markAsSolution(
@@ -669,6 +675,7 @@ export async function postComment(data: PostCommentData) {
     // Convert post_id to number for insertion
     const postIdNumber = parseInt(data.post_id);
 
+    // Insert comment (no codev join to avoid RLS filtering)
     const { data: insertedComment, error } = await supabase
       .from('overflow_comments')
       .insert({
@@ -676,31 +683,23 @@ export async function postComment(data: PostCommentData) {
         post_id: postIdNumber,
         comment: data.comment,
       })
-      .select(`
-        id,
-        comment,
-        likes,
-        created_at,
-        updated_at,
-        post_id,
-        codev:codev_id (
-          id,
-          first_name,
-          last_name,
-          username,
-          image_url
-        )
-      `)
+      .select('*')
       .single();
 
     if (error) {
       return { success: false, error: `Database error: ${error.message}` };
     }
 
-    // Handle codev data (could be array or object)
-    const codevData = Array.isArray(insertedComment.codev) 
-      ? insertedComment.codev[0] 
-      : insertedComment.codev;
+    // Fetch author data separately to bypass RLS join filtering
+    const { data: codevData, error: codevError } = await supabase
+      .from('codev')
+      .select('id, first_name, last_name, username, image_url')
+      .eq('id', insertedComment.codev_id)
+      .single();
+
+    if (codevError) {
+      console.error('Error fetching author for created comment:', codevError);
+    }
 
     const { data: postData, error: fetchError } = await supabase
     .from('overflow_post')
@@ -805,7 +804,7 @@ export async function updateComment(data: UpdateCommentData) {
     // Convert comment_id to number for the query
     const commentIdNumber = parseInt(data.comment_id);
 
-    // Update the comment
+    // Update the comment (no codev join to avoid RLS filtering)
     const { data: updatedComment, error } = await supabase
       .from('overflow_comments')
       .update({
@@ -813,31 +812,23 @@ export async function updateComment(data: UpdateCommentData) {
         updated_at: new Date().toISOString(),
       })
       .eq('id', commentIdNumber)
-      .select(`
-        id,
-        comment,
-        likes,
-        created_at,
-        updated_at,
-        post_id,
-        codev:codev_id (
-          id,
-          first_name,
-          last_name,
-          username,
-          image_url
-        )
-      `)
+      .select('*')
       .single();
 
     if (error) {
       return { success: false, error: `Database error: ${error.message}` };
     }
 
-    // Handle codev data (could be array or object)
-    const codevData = Array.isArray(updatedComment.codev) 
-      ? updatedComment.codev[0] 
-      : updatedComment.codev;
+    // Fetch author data separately to bypass RLS join filtering
+    const { data: codevData, error: codevError } = await supabase
+      .from('codev')
+      .select('id, first_name, last_name, username, image_url')
+      .eq('id', updatedComment.codev_id)
+      .single();
+
+    if (codevError) {
+      console.error('Error fetching author for updated comment:', codevError);
+    }
 
     const comment: Comment = {
       id: updatedComment.id.toString(),
@@ -1226,53 +1217,57 @@ export async function fetchTopSolvers(limit: number = 6): Promise<TopSolver[]> {
   try {
     const supabase = await createClientServerComponent();
  
-    // Get codev_id + count of marked_as_solution comments, joined with codev for name/avatar
+    // Step 1: Get marked_as_solution comments (no codev join to avoid RLS filtering)
     const { data, error } = await supabase
       .from('overflow_comments')
-      .select(`
-        codev_id,
-        codev (
-          id,
-          first_name,
-          last_name,
-          image_url
-        )
-      `)
+      .select('codev_id')
       .eq('marked_as_solution', true);
- 
+
     if (error || !data || data.length === 0) return [];
- 
-    // Group by codev_id and count
-    const countMap = new Map<string, { count: number; codev: any }>();
- 
+
+    // Step 2: Group by codev_id and count
+    const countMap = new Map<string, number>();
+
     for (const row of data) {
-      const codevData = Array.isArray(row.codev) ? row.codev[0] : row.codev;
-      if (!codevData) continue;
- 
-      const key = row.codev_id;
-      const existing = countMap.get(key);
-      if (existing) {
-        existing.count += 1;
-      } else {
-        countMap.set(key, { count: 1, codev: codevData });
-      }
+      if (!row.codev_id) continue;
+      const existing = countMap.get(row.codev_id);
+      countMap.set(row.codev_id, (existing || 0) + 1);
     }
- 
-    // Sort by count descending, take top N
+
+    // Step 3: Sort by count descending, take top N codev_ids
     const sorted = Array.from(countMap.entries())
-      .sort((a, b) => b[1].count - a[1].count)
+      .sort((a, b) => b[1] - a[1])
       .slice(0, limit);
- 
-    return sorted.map(([codevId, { count, codev }]) => {
-      const firstName = codev.first_name ?? '';
-      const lastName = codev.last_name ?? '';
+
+    if (sorted.length === 0) return [];
+
+    // Step 4: Fetch codev data separately for top solution providers
+    const topCodevIds = sorted.map(([codevId]) => codevId);
+
+    const { data: codevs, error: codevError } = await supabase
+      .from('codev')
+      .select('id, first_name, last_name, image_url')
+      .in('id', topCodevIds);
+
+    if (codevError) {
+      console.error('Error fetching top solution providers:', codevError);
+      return [];
+    }
+
+    // Step 5: Create codev map and merge data
+    const codevMap = new Map(codevs?.map(c => [c.id, c]) || []);
+
+    return sorted.map(([codevId, count]) => {
+      const codev = codevMap.get(codevId);
+      const firstName = codev?.first_name ?? '';
+      const lastName = codev?.last_name ?? '';
       const initials = `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
- 
+
       return {
         id: codevId,
-        name: `${firstName} ${lastName}`.trim(),
-        initials,
-        image_url: codev.image_url ?? null,
+        name: codev ? `${firstName} ${lastName}`.trim() : 'Unknown User',
+        initials: codev ? initials : '??',
+        image_url: codev?.image_url ?? null,
         correct_answers: count,
       };
     });

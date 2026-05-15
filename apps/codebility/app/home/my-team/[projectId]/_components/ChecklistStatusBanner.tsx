@@ -166,11 +166,9 @@ const ChecklistStatusBanner = ({ projectId }: ChecklistStatusBannerProps) => {
 
   if (isFetchingMembers) {
     return (
-      <div className="rounded-lg border-2 border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/20 p-3">
-        <div className="flex items-center gap-2">
-          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-500"></div>
-          <p className="text-xs text-gray-600 dark:text-gray-400">Loading checklist status...</p>
-        </div>
+      <div className="flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-2 dark:border-gray-700 dark:bg-gray-800">
+        <div className="h-4 w-4 animate-spin rounded-full border-b-2 border-gray-500"></div>
+        <p className="text-xs text-gray-600 dark:text-gray-400">Loading...</p>
       </div>
     );
   }
@@ -181,51 +179,43 @@ const ChecklistStatusBanner = ({ projectId }: ChecklistStatusBannerProps) => {
   }
 
   return (
-    <div className={`h-full flex flex-col justify-center rounded-lg overflow-hidden ${
+    <div className={`rounded-md overflow-hidden border ${
       membersWithPending > 0
-        ? 'border-2 border-red-500 bg-red-50 dark:bg-red-950/20'
-        : 'border-2 border-green-500 bg-green-50 dark:bg-green-950/20'
+        ? 'border-red-300 bg-white dark:border-red-800 dark:bg-gray-800'
+        : 'border-green-300 bg-white dark:border-green-800 dark:bg-gray-800'
     }`}>
-      {/* Compact Square Button */}
+      {/* Compact Header */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className={`w-full h-full p-4 flex-1 flex items-center justify-between ${
+        className={`w-full px-3 py-2 flex items-center justify-between ${
           membersWithPending > 0
-            ? 'hover:bg-red-100 dark:hover:bg-red-900/30'
-            : 'hover:bg-green-100 dark:hover:bg-green-900/30'
+            ? 'hover:bg-red-50 dark:hover:bg-red-900/20'
+            : 'hover:bg-green-50 dark:hover:bg-green-900/20'
         } transition-colors`}
       >
-        <div className="flex items-center gap-2">
-          <div className={`rounded p-1.5 ${
-            membersWithPending > 0
-              ? 'bg-red-100 dark:bg-red-900/50'
-              : 'bg-green-100 dark:bg-green-900/50'
-          }`}>
-            {membersWithPending > 0 ? (
-              <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
-            ) : (
-              <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
-            )}
-          </div>
-          <div className="text-left">
-            <p className="text-xs font-semibold text-gray-900 dark:text-white">
-              Checklist
-            </p>
+        <div className="flex items-center gap-2 min-w-0 flex-1">
+          {membersWithPending > 0 ? (
+            <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400 shrink-0" />
+          ) : (
+            <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400 shrink-0" />
+          )}
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-medium text-gray-900 dark:text-white">Checklist</p>
             {isLoading ? (
-              <p className="text-xs text-gray-600 dark:text-gray-400">...</p>
-            ) : membersWithPending > 0 ? (
-              <p className="text-xs text-red-700 dark:text-red-300 font-medium">
-                {membersWithPending} pending
-              </p>
+              <p className="text-xs text-gray-600 dark:text-gray-400">Loading...</p>
             ) : (
-              <p className="text-xs text-green-700 dark:text-green-300 font-medium">
-                All complete ✓
+              <p className={`text-xs font-medium ${
+                membersWithPending > 0
+                  ? 'text-red-700 dark:text-red-300'
+                  : 'text-green-700 dark:text-green-300'
+              }`}>
+                {membersWithPending > 0 ? `${totalPendingItems} pending` : 'Complete'}
               </p>
             )}
           </div>
         </div>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 shrink-0">
           {!isLoading && (
             <div className="text-xs text-gray-600 dark:text-gray-400 font-medium">
               {membersFullyCompleted}/{memberStatuses.length}

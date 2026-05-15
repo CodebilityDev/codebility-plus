@@ -758,7 +758,10 @@ export const updateProjectMembers = async (
 
     console.log('   Existing members in DB:', existingMembers?.length ?? 0);
 
+<<<<<<< HEAD
     // Preserve joined_at timestamps
+=======
+>>>>>>> 8a73b995cf8189a2945ead225875c9a3e76f8ee8
     const joinedAtMap = new Map(
       existingMembers?.map(m => [m.codev_id, m.joined_at]) ?? []
     );
@@ -776,6 +779,7 @@ export const updateProjectMembers = async (
 
     console.log('   Old members deleted, preparing inserts...');
 
+<<<<<<< HEAD
     const memberInserts = [
       // Team lead + regular members
       ...members.map((member) => ({
@@ -794,6 +798,18 @@ export const updateProjectMembers = async (
           }]
         : []),
     ];
+
+    console.log('   Inserting members:', memberInserts.length);
+    console.log('   Member IDs:', memberInserts.map(m => m.codev_id));
+    console.log('   Roles:', memberInserts.map(m => m.role));
+=======
+    const memberInserts = members.map((member) => ({
+      project_id: projectId,
+      codev_id: member.id,
+      role: member.id === teamLeaderId ? "team_leader" : "member",
+      joined_at: joinedAtMap.get(member.id) ?? new Date().toISOString(),
+    }));
+>>>>>>> 8a73b995cf8189a2945ead225875c9a3e76f8ee8
 
     console.log('   Inserting members:', memberInserts.length);
     console.log('   Member IDs:', memberInserts.map(m => m.codev_id));
@@ -852,11 +868,24 @@ export const getProjectCodevs = async (filters = {}): Promise<Codev[]> => {
   `;
 
   // Step 1: Fetch users using same logic as Add Members Modal "smart filter"
+<<<<<<< HEAD
   // Smart filter: role_id = 5 (Mentor) OR role_id = 1 (Admin) OR internal_status = GRADUATED
   const queries = [
     supabase.from("codev").select(selectFields).eq("role_id", 5),
     supabase.from("codev").select(selectFields).eq("role_id", 1),
     supabase.from("codev").select(selectFields).eq("internal_status", "GRADUATED"),
+=======
+  // This ensures consistency between both modals
+  // Smart filter: role_id = 5 (Mentor) OR role_id = 1 (Admin) OR internal_status = GRADUATED
+  const queries = [
+    // Mentors (role_id = 5)
+    supabase.from("codev").select(selectFields).eq("role_id", 5),
+    // Admins (role_id = 1)
+    supabase.from("codev").select(selectFields).eq("role_id", 1),
+    // Graduated users (any role_id)
+    supabase.from("codev").select(selectFields).eq("internal_status", "GRADUATED"),
+    // Training/Intern/Onboarding users
+>>>>>>> 8a73b995cf8189a2945ead225875c9a3e76f8ee8
     supabase.from("codev").select(selectFields).in("internal_status", ["TRAINING", "INTERN", "ONBOARDING"]),
   ];
 

@@ -144,7 +144,7 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
   function renderMobileFilters() {
     return (
       <>
-        {/* Status Filter */}
+        {/* Internal Status Filter */}
         <Select
           value={filters.status || "all"}
           onValueChange={(val) =>
@@ -152,10 +152,10 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
           }
         >
           <SelectTrigger className="border-light-700 bg-white dark:border-dark-200 dark:bg-dark-200 dark:text-light-900 h-8 w-full rounded-md border px-2 text-xs text-black">
-            <SelectValue placeholder="Status" />
+            <SelectValue placeholder="Internal Status" />
           </SelectTrigger>
           <SelectContent className="bg-light-800 dark:bg-dark-200">
-            <SelectItem value="all">All Statuses</SelectItem>
+            <SelectItem value="all">All Internal Statuses</SelectItem>
             {Object.entries(INTERNAL_STATUS).map(([key, label]) => (
               <SelectItem key={key} value={key}>
                 {label}
@@ -264,9 +264,9 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
   function renderFilters() {
     return (
       <>
-        {/* Status Filter */}
+        {/* Internal Status Filter */}
         <div>
-          <Label className="dark:text-light-900 mb-1.5 block text-sm font-medium text-black">Status</Label>
+          <Label className="dark:text-light-900 mb-1.5 block text-sm font-medium text-black">Internal Status</Label>
           <Select
             value={filters.status || "all"}
             onValueChange={(val) =>
@@ -283,10 +283,10 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
                 text-xs sm:text-sm text-black
               "
             >
-              <SelectValue placeholder="Filter by status" />
+              <SelectValue placeholder="Filter by internal status" />
             </SelectTrigger>
             <SelectContent className="bg-light-800 dark:bg-dark-200">
-              <SelectItem value="all">All Statuses</SelectItem>
+              <SelectItem value="all">All Internal Statuses</SelectItem>
               {Object.entries(INTERNAL_STATUS).map(([key, label]) => (
                 <SelectItem key={key} value={key}>
                   {label}

@@ -20,6 +20,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { MemberSelection } from "@/components/ui/MemberSelection";
+import { SelectMemberModal } from "@/components/ui/SelectMemberModal";
 import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import { useModal as useGlobalModal } from "@/hooks/use-modal";
 import { useModal } from "@/hooks/use-modal-projects";
@@ -80,6 +81,10 @@ const ProjectEditModal = () => {
   // ─────────────────────────────────────────────────────────────────────────
   const [selectedMembers, setSelectedMembers] = useState<Codev[]>([]);
 
+  // Modal states for member selection
+  const [teamLeaderModalOpen, setTeamLeaderModalOpen] = useState(false);
+  const [subLeadModalOpen, setSubLeadModalOpen] = useState(false);
+
   // Image states
   const [projectImage, setProjectImage] = useState<string | null>(null);
   const [openImageCropper, setOpenImageCropper] = useState(false);
@@ -104,13 +109,22 @@ const ProjectEditModal = () => {
   } = useForm<ProjectFormData>({ mode: "onChange" });
 
   const { data: users = [], isLoading: isUsersLoading } = useQuery({
+<<<<<<< HEAD
     queryKey: ["projectCodevs", "v3"],
+=======
+    queryKey: ["projectCodevs", "v3"], // v2: Added role_id field + anon client
+>>>>>>> 8a73b995cf8189a2945ead225875c9a3e76f8ee8
     queryFn: async () => {
       const result = await getProjectCodevs();
       return result || [];
     },
+<<<<<<< HEAD
     staleTime: 2 * 60 * 1000,
     refetchOnWindowFocus: true,
+=======
+    staleTime: 2 * 60 * 1000, // Reduce to 2 minutes for fresher data
+    refetchOnWindowFocus: true, // Refetch when window focused to get latest users
+>>>>>>> 8a73b995cf8189a2945ead225875c9a3e76f8ee8
   });
 
   const { data: clients = [], isLoading: isClientsLoading } = useQuery({
@@ -324,6 +338,7 @@ const ProjectEditModal = () => {
     // Fix: use pm.codev fallback so every member in DB is in the form payload.
     const memberPMs = projectMembers.filter((pm: any) => pm.role === "member");
 
+<<<<<<< HEAD
     const resolvedMembers = memberPMs
       .map((pm: any) => {
         const fromUsers = users.find((u) => u.id === pm.codev_id);
@@ -352,6 +367,12 @@ const ProjectEditModal = () => {
     // Mark as initialized to prevent resets when users list refetches
     hasInitialized.current = true;
     // ─────────────────────────────────────────────────────────────────────────
+=======
+    setSelectedMembers(users.filter((user) => memberIds.includes(user.id)));
+
+    // Mark as initialized to prevent resets when users list refetches
+    hasInitialized.current = true;
+>>>>>>> 8a73b995cf8189a2945ead225875c9a3e76f8ee8
   }, [fullProjectData, users, isModalOpen]);
 
   const handleImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -698,30 +719,48 @@ const ProjectEditModal = () => {
           </div>
         ) : (
           <div className="space-y-6">
-            {/* Team Leader */}
+            {/* Team Leader - Modal Based Selection */}
             <div className="space-y-1">
               <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">
                 Team Leader *
               </label>
-              <CustomSelect
-                options={enhancedUserOptions.filter(
-                  (user) => !selectedMembers.find((member) => member.id === user.value),
+              <button
+                type="button"
+                onClick={() => setTeamLeaderModalOpen(true)}
+                className="w-full h-11 px-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-left flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              >
+                {currentTeamLeader ? (
+                  <>
+                    <img
+                      src={currentTeamLeader.image_url || "https://codebility-cdn.pages.dev/assets/images/default-avatar-200x200.jpg"}
+                      alt={`${currentTeamLeader.first_name} ${currentTeamLeader.last_name}`}
+                      className="w-8 h-8 rounded-full object-cover"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                        {currentTeamLeader.first_name} {currentTeamLeader.last_name}
+                      </div>
+                      {currentTeamLeader.display_position && (
+                        <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                          {currentTeamLeader.display_position}
+                        </div>
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <span className="text-gray-400">Select Team Leader</span>
                 )}
-                value={currentTeamLeader?.id || ""}
-                onChange={(value) => {
-                  const leader = users.find((u) => u.id === value);
-                  if (leader) setCurrentTeamLeader(leader);
-                }}
-                placeholder="Select Team Leader"
-                disabled={isUsersLoading}
-                searchable
-              />
+              </button>
             </div>
 
+<<<<<<< HEAD
             {/* ── CBP-116: Sublead selector ─────────────────────────────────────
                 Optional. Sourced from fullProjectData.project_members to bypass
                 RLS filtering that drops some users from getProjectCodevs().
             ──────────────────────────────────────────────────────────────────── */}
+=======
+            {/* Sub Lead */}
+>>>>>>> 8a73b995cf8189a2945ead225875c9a3e76f8ee8
             <div className="space-y-1">
               <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">
                 Sub Lead{" "}
@@ -729,6 +768,7 @@ const ProjectEditModal = () => {
                   (Optional — acts as team lead when lead is unavailable)
                 </span>
               </label>
+<<<<<<< HEAD
               <CustomSelect
                 options={[
                   { id: "none", value: "none", label: "No sublead assigned", subLabel: "" },
@@ -778,8 +818,36 @@ const ProjectEditModal = () => {
                 disabled={isUsersLoading}
                 searchable
               />
+=======
+              <button
+                type="button"
+                onClick={() => setSubLeadModalOpen(true)}
+                className="w-full h-11 px-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-left flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              >
+                {currentSubLead ? (
+                  <>
+                    <img
+                      src={currentSubLead.image_url || "https://codebility-cdn.pages.dev/assets/images/default-avatar-200x200.jpg"}
+                      alt={`${currentSubLead.first_name} ${currentSubLead.last_name}`}
+                      className="w-8 h-8 rounded-full object-cover"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                        {currentSubLead.first_name} {currentSubLead.last_name}
+                      </div>
+                      {currentSubLead.display_position && (
+                        <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                          {currentSubLead.display_position}
+                        </div>
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <span className="text-gray-400">No sublead assigned</span>
+                )}
+              </button>
+>>>>>>> 8a73b995cf8189a2945ead225875c9a3e76f8ee8
             </div>
-            {/* ─────────────────────────────────────────────────────────────── */}
 
             {/* Team Members */}
             <div className="space-y-1">
@@ -1028,6 +1096,30 @@ const ProjectEditModal = () => {
           </div>
         </DialogFooter>
       </DialogContent>
+
+      {/* Team Leader Selection Modal */}
+      <SelectMemberModal
+        isOpen={teamLeaderModalOpen}
+        onClose={() => setTeamLeaderModalOpen(false)}
+        onSelect={(member) => setCurrentTeamLeader(member)}
+        users={users}
+        selectedMember={currentTeamLeader}
+        title="Select Team Leader"
+        mode="single"
+        excludeUserIds={selectedMembers.map(m => m.id)}
+      />
+
+      {/* Sub Lead Selection Modal */}
+      <SelectMemberModal
+        isOpen={subLeadModalOpen}
+        onClose={() => setSubLeadModalOpen(false)}
+        onSelect={(member) => setCurrentSubLead(member)}
+        users={users}
+        selectedMember={currentSubLead}
+        title="Select Sub Lead"
+        mode="optional-single"
+        excludeUserIds={[currentTeamLeader?.id || '', ...selectedMembers.map(m => m.id)].filter(Boolean)}
+      />
     </Dialog>
   );
 };
