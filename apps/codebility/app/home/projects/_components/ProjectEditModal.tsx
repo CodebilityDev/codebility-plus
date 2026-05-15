@@ -1,1127 +1,1129 @@
-"use client";
+"use server";
 
-import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
-import dynamic from "next/dynamic";
-import Image from "next/image";
-import {
-  getProjectByID,
-  getProjectCategories,
-  getProjectClients,
-  getProjectCodevs,
-  updateProject,
-} from "@/app/home/projects/actions";
-import ProjectAvatar from "@/components/ProjectAvatar";
-import { CustomSelect } from "@/components/ui/CustomSelect";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { MemberSelection } from "@/components/ui/MemberSelection";
-import { SelectMemberModal } from "@/components/ui/SelectMemberModal";
-import { Skeleton } from "@/components/ui/skeleton/skeleton";
-import { useModal as useGlobalModal } from "@/hooks/use-modal";
-import { useModal } from "@/hooks/use-modal-projects";
-import { useTechStackStore } from "@/hooks/use-techstack";
-import { Client, Codev, Project, SkillCategory } from "@/types/home/codev";
-import { uploadImage } from "@/utils/uploadImage";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
-import toast from "react-hot-toast";
+import { revalidatePath } from "next/cache";
+import { Client, Codev, Project } from "@/types/home/codev";
+import { deleteImage, getImagePath } from "@/utils/uploadImage";
+import { createClientServerComponent } from "@/utils/supabase/server";
+import { invalidateCache } from "@/lib/server/redis-cache";
+import { cacheKeys } from "@/lib/server/redis-cache-keys";
 
-import { Button } from "@codevs/ui/button";
-import { Input } from "@codevs/ui/input";
-
-const ImageCrop = dynamic(() => import("./ImageCrop"), {
-  ssr: false,
-  loading: () => <Skeleton className="h-48 w-full rounded-lg" />,
-});
-
-const PROJECT_STATUSES = [
-  { id: "pending", value: "pending", label: "Pending" },
-  { id: "inprogress", value: "inprogress", label: "In Progress" },
-  { id: "completed", value: "completed", label: "Completed" },
-];
-
-export interface ProjectFormData {
-  name: string;
-  description?: string;
-  tagline?: string;
-  key_features?: string;
-  gallery?: string;
-  github_link?: string;
-  website_url?: string;
-  figma_link?: string;
-  start_date: string;
-  category_ids?: number[];
-  client_id?: string;
-  status?: string;
-  main_image?: string;
-  tech_stack?: string[];
+interface DbProjectMember {
+  project: {
+    id: string;
+    name: string;
+    status: string;
+    kanban_display: boolean;
+    public_display: boolean
+  };
+  role: string;
+  joined_at: string;
 }
 
-const ProjectEditModal = () => {
-  const { isOpen, onClose, type, data } = useModal();
-  const { onOpen: openGlobalModal } = useGlobalModal();
-  const {
-    stack: selectedTechStack,
-    clearStack,
-    setStack,
-  } = useTechStackStore();
-  const isModalOpen = isOpen && type === "projectEditModal";
-  const queryClient = useQueryClient();
+interface ProjectMemberData {
+  codev_id: string;
+  role: string;
+}
 
-  // Data states
-  const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
-  const [currentTeamLeader, setCurrentTeamLeader] = useState<Codev | null>(null);
-  // ── CBP-116: sublead state ────────────────────────────────────────────────
-  const [currentSubLead, setCurrentSubLead] = useState<Codev | null>(null);
-  // ─────────────────────────────────────────────────────────────────────────
-  const [selectedMembers, setSelectedMembers] = useState<Codev[]>([]);
+export interface SimpleMemberData {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email_address: string;
+  display_position: string | null;
+  image_url: string | null;
+  role: string;
+  joined_at: string;
+}
 
-  // Modal states for member selection
-  const [teamLeaderModalOpen, setTeamLeaderModalOpen] = useState(false);
-  const [subLeadModalOpen, setSubLeadModalOpen] = useState(false);
+interface ProjectMemberResponse {
+  role: string;
+  joined_at: string;
+  codev: {
+    id: string;
+    first_name: string;
+    last_name: string;
+    email_address: string;
+    display_position: string | null;
+    image_url: string | null;
+  };
+}
 
-  // Image states
-  const [projectImage, setProjectImage] = useState<string | null>(null);
-  const [openImageCropper, setOpenImageCropper] = useState(false);
-  const [croppedImage, setCroppedImage] = useState<string | null>(null);
-  const [croppedFile, setCroppedFile] = useState<File | null>(null);
-  const [imageLoaded, setImageLoaded] = useState(false);
+interface DbProjectMemberResponse {
+  role: string;
+  joined_at: string;
+  codev: {
+    id: string;
+    first_name: string;
+    last_name: string;
+    email_address: string;
+    display_position: string | null;
+    image_url: string | null;
+  };
+}
 
-  // Gallery states
-  const [galleryImages, setGalleryImages] = useState<{ url: string; file: File }[]>([]);
+export async function getUserProjects(): Promise<{
+  error: any;
+  data: { project: Project; role: string }[] | null;
+}> {
+  const supabase = await createClientServerComponent();
+  try {
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+    if (userError || !user) {
+      console.error("Error fetching user:", userError);
+      return { error: { message: "User not authenticated" }, data: null };
+    }
 
-  // Loading states
-  const [isLoading, setIsLoading] = useState(false);
+    const { data: codevData, error: codevError } = await supabase
+      .from("codev")
+      .select("id")
+      .eq("email_address", user.email)
+      .single();
 
-  const [selectedStatus, setSelectedStatus] = useState<string>(data?.status || "pending");
+    if (codevError || !codevData) {
+      console.error("Error fetching codev_id:", codevError);
+      return { error: { message: "User profile not found" }, data: null };
+    }
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    reset,
-    formState: { errors },
-  } = useForm<ProjectFormData>({ mode: "onChange" });
+    const userCodevId = codevData.id;
 
-  const { data: users = [], isLoading: isUsersLoading } = useQuery({
-<<<<<<< HEAD
-    queryKey: ["projectCodevs", "v3"],
-=======
-    queryKey: ["projectCodevs", "v3"], // v2: Added role_id field + anon client
->>>>>>> 8a73b995cf8189a2945ead225875c9a3e76f8ee8
-    queryFn: async () => {
-      const result = await getProjectCodevs();
-      return result || [];
-    },
-<<<<<<< HEAD
-    staleTime: 2 * 60 * 1000,
-    refetchOnWindowFocus: true,
-=======
-    staleTime: 2 * 60 * 1000, // Reduce to 2 minutes for fresher data
-    refetchOnWindowFocus: true, // Refetch when window focused to get latest users
->>>>>>> 8a73b995cf8189a2945ead225875c9a3e76f8ee8
-  });
+    interface DbProject {
+      id: string;
+      name: string;
+      status: string | null;
+      kanban_display: boolean | null;
+      meeting_link: string | null;
+      public_display: boolean | null;
+    }
 
-  const { data: clients = [], isLoading: isClientsLoading } = useQuery({
-    queryKey: ["projectClients"],
-    queryFn: async () => {
-      const result = await getProjectClients();
-      return result || [];
-    },
-    staleTime: 10 * 60 * 1000,
-    refetchOnWindowFocus: false,
-  });
+    interface ProjectMember {
+      project_id: string;
+      role: string;
+      project: DbProject;
+    }
 
-  const { data: categories = [], isLoading: isCategoriesLoading } = useQuery({
-    queryKey: ["projectCategories"],
-    queryFn: async () => {
-      const result = await getProjectCategories();
-      return result || [];
-    },
-    staleTime: 10 * 60 * 1000,
-    refetchOnWindowFocus: false,
-  });
+    const { data: projectMembers, error: projectMembersError } = await supabase
+      .from("project_members")
+      .select(
+        `
+        project_id,
+        role,
+        project:project_id (
+          id,
+          name,
+          status,
+          kanban_display,
+          public_display,
+          meeting_link
+        )
+      `,
+      )
+      .eq("codev_id", userCodevId)
+      .in("role", ["team_leader", "member", "sublead"]) as { data: ProjectMember[] | null; error: any };
 
-  // Fetch full project data (with project_members) when modal opens.
-  // The projects list query does NOT join project_members, so we need this
-  // separate fetch to pre-populate team leader, sublead, and members.
-  const { data: fullProjectData, isLoading: isFullProjectLoading } = useQuery({
-    queryKey: ["projectFull", data?.id],
-    queryFn: async () => {
-      if (!data?.id) return null;
-      const result = await getProjectByID(data.id);
-      return result;
-    },
-    enabled: !!data?.id && isModalOpen,
-    staleTime: 0,
-    refetchOnWindowFocus: false,
-  });
+    if (projectMembersError) {
+      console.error("Error fetching user projects:", projectMembersError);
+      return { error: { message: "Failed to fetch user projects" }, data: null };
+    }
 
-  const isSelectDataLoading =
-    isUsersLoading || isClientsLoading || isCategoriesLoading || isFullProjectLoading;
+    if (!projectMembers || projectMembers.length === 0) {
+      return { error: null, data: null };
+    }
 
-  const userOptions = useMemo(
-    () =>
-      users.map((user) => ({
-        id: user.id,
-        value: user.id,
-        label: `${user.first_name} ${user.last_name}`,
-        subLabel: user.display_position,
-        imageUrl: user.image_url,
-      })),
-    [users],
-  );
+    const userProjects = projectMembers.map((pm) => ({
+      project: {
+        id: pm.project.id,
+        name: pm.project.name,
+        status: pm.project.status || "pending",
+        kanban_display: pm.project.kanban_display ?? false,
+        public_display: pm.project.public_display ?? false,
+        meeting_link: pm.project.meeting_link ?? null,
+      } as Project,
+      role: pm.role,
+    }));
 
-  const clientOptions = useMemo(
-    () =>
-      clients.map((client) => ({
-        id: client.id,
-        value: client.id,
-        label: client.name,
-        subLabel: client.name,
-        imageUrl: client.company_logo,
-      })),
-    [clients],
-  );
+    return { error: null, data: userProjects };
+  } catch (error) {
+    console.error("Unexpected error fetching user projects:", error);
+    return { error: { message: "Unexpected error occurred" }, data: null };
+  }
+}
 
-  // Inject ANY project member absent from getProjectCodevs() into dropdown options.
-  // getProjectCodevs() may exclude users due to RLS or internal_status filtering.
-  // We use fullProjectData.project_members (from getProjectByID join) as the
-  // source of truth — it always returns codev data regardless of RLS.
-  const enhancedUserOptions = useMemo(() => {
-    if (!fullProjectData?.project_members) return userOptions;
+export async function createProject(
+  formData: FormData,
+  selectedMembers: Codev[],
+  teamLeaderId: string,
+) {
+  const supabase = await createClientServerComponent();
 
-    const existingIds = new Set(userOptions.map((opt) => opt.value));
+  try {
+    const techStackData = formData.get("tech_stack");
+    let techStack: string[] | null = null;
+    if (techStackData) {
+      try {
+        techStack = JSON.parse(techStackData as string) as string[];
+      } catch (error) {
+        console.warn("Invalid tech stack data:", error);
+      }
+    }
 
-    const missingMembers = fullProjectData.project_members
-      .filter((pm: any) => pm.codev && !existingIds.has(pm.codev_id))
-      .map((pm: any) => ({
-        id: pm.codev_id,
-        value: pm.codev_id,
-        label: `${pm.codev.first_name} ${pm.codev.last_name}`,
-        subLabel: pm.codev.display_position || "",
-        imageUrl: pm.codev.image_url || null,
+    const categoryIdsData = formData.get("category_ids");
+    let categoryIds: number[] = [];
+    if (categoryIdsData) {
+      try {
+        categoryIds = JSON.parse(categoryIdsData as string) as number[];
+      } catch (error) {
+        console.warn("Invalid category IDs data:", error);
+      }
+    }
+
+    const keyFeaturesData = formData.get("key_features");
+    let keyFeatures: string[] | null = null;
+    if (keyFeaturesData) {
+      try {
+        keyFeatures = JSON.parse(keyFeaturesData as string) as string[];
+      } catch (error) {
+        console.warn("Invalid key_features data:", error);
+      }
+    }
+
+    const galleryData = formData.get("gallery");
+    let gallery: string[] | null = null;
+    if (galleryData) {
+      try {
+        gallery = JSON.parse(galleryData as string) as string[];
+      } catch (error) {
+        console.warn("Invalid gallery data:", error);
+      }
+    }
+
+    const { data: project, error: projectError } = await supabase
+      .from("projects")
+      .insert({
+        name: formData.get("name"),
+        description: formData.get("description"),
+        tagline: formData.get("tagline"),
+        key_features: keyFeatures,
+        gallery: gallery,
+        github_link: formData.get("github_link"),
+        website_url: formData.get("website_url"),
+        figma_link: formData.get("figma_link"),
+        client_id: formData.get("client_id"),
+        start_date: formData.get("start_date"),
+        main_image: formData.get("main_image"),
+        tech_stack: techStack,
+        status: "pending",
+      })
+      .select()
+      .single();
+
+    if (projectError) throw projectError;
+
+    if (categoryIds.length > 0) {
+      const categoryInserts = categoryIds.map((categoryId) => ({
+        project_id: project.id,
+        category_id: categoryId,
       }));
 
-    if (missingMembers.length === 0) return userOptions;
+      const { error: categoryError } = await supabase
+        .from("project_categories")
+        .insert(categoryInserts);
 
-    return [...missingMembers, ...userOptions];
-  }, [userOptions, fullProjectData]);
-
-  // Populate basic form fields when modal opens
-  useEffect(() => {
-    if (data && isModalOpen) {
-      setImageLoaded(false);
-      setValue("name", data.name || "");
-      setValue("description", data.description || "");
-      setValue("tagline", data.tagline || "");
-      setValue(
-        "key_features",
-        data.key_features && Array.isArray(data.key_features)
-          ? data.key_features.join(", ")
-          : "",
-      );
-      setValue("github_link", data.github_link || "");
-      setValue("website_url", data.website_url || "");
-      setValue("figma_link", data.figma_link || "");
-      setValue("client_id", data.client_id || "");
-
-      if (data.categories && Array.isArray(data.categories)) {
-        setSelectedCategoryIds(data.categories.map((cat: any) => cat.id));
-      } else {
-        setSelectedCategoryIds([]);
-      }
-
-      setValue("status", data.status || "pending");
-      if (data.start_date) {
-        setValue("start_date", data.start_date);
-      }
-      setProjectImage(data.main_image || null);
-      setCroppedImage(data.main_image || null);
-      setSelectedStatus(data.status || "pending");
-
-      if (data.tech_stack && Array.isArray(data.tech_stack)) {
-        setStack(data.tech_stack);
-      } else {
-        clearStack();
-      }
-    }
-  }, [data, setValue, isModalOpen, setStack, clearStack]);
-
-  // Pre-populate team leader, sublead, and members from fullProjectData.
-  // fullProjectData comes from getProjectByID which includes project_members.
-  // The list page query does not join project_members so we cannot use data directly.
-  //
-  // IMPORTANT: Only run when modal opens (isModalOpen changes to true) to avoid
-  // resetting selectedMembers when users list refetches during editing.
-  const hasInitialized = useRef(false);
-
-  useEffect(() => {
-    if (!fullProjectData || !isModalOpen) {
-      hasInitialized.current = false;
-      return;
-    }
-
-    // Skip if already initialized and users are available
-    if (hasInitialized.current && users.length > 0) return;
-
-    const projectMembers = fullProjectData.project_members;
-    if (!projectMembers?.length) return;
-
-    // ── Team leader ──────────────────────────────────────────────────────────
-    const teamLeaderMember = projectMembers.find(
-      (pm: any) => pm.role === "team_leader",
-    );
-
-    if (teamLeaderMember) {
-      const leaderFromUsers = users.find(
-        (user) => user.id === teamLeaderMember.codev_id,
-      );
-
-      if (leaderFromUsers) {
-        setCurrentTeamLeader(leaderFromUsers);
-      } else if (teamLeaderMember.codev) {
-        // Fallback: build minimal Codev from embedded data when the leader
-        // is absent from getProjectCodevs() (RLS / internal_status filtered).
-        setCurrentTeamLeader({
-          id: teamLeaderMember.codev_id,
-          first_name: teamLeaderMember.codev.first_name,
-          last_name: teamLeaderMember.codev.last_name,
-          image_url: teamLeaderMember.codev.image_url || null,
-          display_position: teamLeaderMember.codev.display_position || null,
-          email_address: teamLeaderMember.codev.email_address || "",
-          positions: [],
-          tech_stacks: [],
-        } as unknown as Codev);
+      if (categoryError) {
+        console.error("Error inserting project categories:", categoryError);
       }
     }
 
-    // ── CBP-116: Sublead pre-population ───────────────────────────────────────
-    const subLeadMember = projectMembers.find(
-      (pm: any) => pm.role === "sublead",
-    );
+    const memberInserts = [
+      {
+        project_id: project.id,
+        codev_id: teamLeaderId,
+        role: "team_leader",
+        joined_at: new Date().toISOString(),
+      },
+      ...selectedMembers
+        .filter((member) => member.id !== teamLeaderId)
+        .map((member) => ({
+          project_id: project.id,
+          codev_id: member.id,
+          role: "member",
+          joined_at: new Date().toISOString(),
+        })),
+    ];
 
-    if (subLeadMember) {
-      const subLeadFromUsers = users.find(
-        (user) => user.id === subLeadMember.codev_id,
-      );
+    const { error: membersError } = await supabase
+      .from("project_members")
+      .insert(memberInserts);
 
-      if (subLeadFromUsers) {
-        setCurrentSubLead(subLeadFromUsers);
-      } else if (subLeadMember.codev) {
-        setCurrentSubLead({
-          id: subLeadMember.codev_id,
-          first_name: subLeadMember.codev.first_name,
-          last_name: subLeadMember.codev.last_name,
-          image_url: subLeadMember.codev.image_url || null,
-          display_position: subLeadMember.codev.display_position || null,
-          email_address: subLeadMember.codev.email_address || "",
-          positions: [],
-          tech_stacks: [],
-        } as unknown as Codev);
+    if (membersError) throw membersError;
+
+    const { error: boardError } = await supabase.from("kanban_boards").insert({
+      name: `${project.name} Board`,
+      project_id: project.id,
+      description: `Default board for ${project.name}`,
+    });
+
+    if (boardError) throw boardError;
+
+    await invalidateCache(cacheKeys.projects.all);
+
+    revalidatePath("/projects");
+    revalidatePath("/services");
+    return { success: true, data: project };
+  } catch (error) {
+    console.error("Error creating project:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Failed to create project",
+    };
+  }
+}
+
+export async function updateStatus(
+  status: string,
+  projectId: string,
+) {
+  const supabase = await createClientServerComponent();
+  const { error: projectError } = await supabase
+    .from("projects")
+    .update({ status: status })
+    .eq("id", projectId)
+    .select();
+
+  if (projectError)
+    console.error("Error in updating projects and kanban board:", projectError);
+
+  await invalidateCache(cacheKeys.projects.all);
+
+  revalidatePath("/home/projects");
+  revalidatePath("/services");
+
+  return { success: true, projectId, status };
+}
+
+export async function updateKanbanDisplaySwitch(
+  kanbanDisplay: boolean,
+  projectId: string,
+) {
+  const supabase = await createClientServerComponent();
+  const { error: projectError } = await supabase
+    .from("projects")
+    .update({ kanban_display: kanbanDisplay })
+    .eq("id", projectId)
+    .select();
+
+  if (projectError)
+    console.error("Error in updating projects and kanban board:", projectError);
+
+  return { success: true, projectId, kanbanDisplay };
+}
+
+export async function updatePublicDisplaySwitch(
+  publicDisplay: boolean,
+  projectId: string,
+) {
+  const supabase = await createClientServerComponent();
+  const { error: projectError } = await supabase
+    .from("projects")
+    .update({ public_display: publicDisplay })
+    .eq("id", projectId)
+    .select();
+
+  if (projectError)
+    console.error("Error in updating projects and kanban board:", projectError);
+
+  await invalidateCache(cacheKeys.projects.all);
+
+  revalidatePath("/home/projects");
+  revalidatePath("/services");
+
+  return { success: true, projectId, publicDisplay };
+}
+
+export async function updateProject(projectId: string, formData: FormData) {
+  const supabase = await createClientServerComponent();
+
+  try {
+    const projectMembersData = formData.get("project_members");
+    const projectMembers = projectMembersData
+      ? (JSON.parse(projectMembersData as string) as ProjectMemberData[])
+      : null;
+
+    const techStackData = formData.get("tech_stack");
+    let techStack: string[] | null = null;
+    if (techStackData) {
+      try {
+        techStack = JSON.parse(techStackData as string) as string[];
+      } catch (error) {
+        console.warn("Invalid tech stack data:", error);
       }
-    } else {
-      setCurrentSubLead(null);
     }
-    // ─────────────────────────────────────────────────────────────────────────
 
-    // ── Regular members ──────────────────────────────────────────────────────
-    // FIX (project-members-update-conflict): Previously used
-    //   users.filter(u => memberIds.includes(u.id))
-    // which silently excluded RLS-filtered members from selectedMembers.
-    // On submit, those missing members were deleted from project_members DB.
-    // Fix: use pm.codev fallback so every member in DB is in the form payload.
-    const memberPMs = projectMembers.filter((pm: any) => pm.role === "member");
+    const categoryIdsData = formData.get("category_ids");
+    let categoryIds: number[] | null = null;
+    if (categoryIdsData) {
+      try {
+        categoryIds = JSON.parse(categoryIdsData as string) as number[];
+      } catch (error) {
+        console.warn("Invalid category IDs data:", error);
+      }
+    }
 
-<<<<<<< HEAD
-    const resolvedMembers = memberPMs
-      .map((pm: any) => {
-        const fromUsers = users.find((u) => u.id === pm.codev_id);
-        if (fromUsers) return fromUsers;
+    const keyFeaturesData = formData.get("key_features");
+    let keyFeatures: string[] | null = null;
+    if (keyFeaturesData) {
+      try {
+        keyFeatures = JSON.parse(keyFeaturesData as string) as string[];
+      } catch (error) {
+        console.warn("Invalid key_features data:", error);
+      }
+    }
 
-        if (pm.codev) {
-          return {
-            id: pm.codev_id,
-            first_name: pm.codev.first_name,
-            last_name: pm.codev.last_name,
-            image_url: pm.codev.image_url || null,
-            display_position: pm.codev.display_position || null,
-            email_address: pm.codev.email_address || "",
-            positions: [],
-            tech_stacks: [],
-          } as unknown as Codev;
-        }
+    const galleryData = formData.get("gallery");
+    let gallery: string[] | null = null;
+    if (galleryData) {
+      try {
+        gallery = JSON.parse(galleryData as string) as string[];
+      } catch (error) {
+        console.warn("Invalid gallery data:", error);
+      }
+    }
 
-        console.warn(`⚠️ Could not resolve member codev data for: ${pm.codev_id}`);
-        return null;
+    const updateData: any = {};
+    for (const [key, value] of formData.entries()) {
+      if (
+        key !== "project_members" &&
+        key !== "tech_stack" &&
+        key !== "category_ids" &&
+        key !== "key_features" &&
+        key !== "gallery"
+      ) {
+        updateData[key] = value;
+      }
+    }
+
+    if (techStack) updateData.tech_stack = techStack;
+    if (keyFeatures) updateData.key_features = keyFeatures;
+    if (gallery) updateData.gallery = gallery;
+
+    const { data: projectData, error: projectError } = await supabase
+      .from("projects")
+      .update({
+        ...updateData,
+        updated_at: new Date().toISOString(),
       })
-      .filter(Boolean) as Codev[];
+      .eq("id", projectId)
+      .select();
 
-    setSelectedMembers(resolvedMembers);
-
-    // Mark as initialized to prevent resets when users list refetches
-    hasInitialized.current = true;
-    // ─────────────────────────────────────────────────────────────────────────
-=======
-    setSelectedMembers(users.filter((user) => memberIds.includes(user.id)));
-
-    // Mark as initialized to prevent resets when users list refetches
-    hasInitialized.current = true;
->>>>>>> 8a73b995cf8189a2945ead225875c9a3e76f8ee8
-  }, [fullProjectData, users, isModalOpen]);
-
-  const handleImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
-    try {
-      setImageLoaded(false);
-      const file = e.target.files?.[0];
-      if (!file) return;
-      const objectUrl = URL.createObjectURL(file);
-      setProjectImage(objectUrl);
-      setCroppedImage(objectUrl);
-      setCroppedFile(file);
-      setOpenImageCropper(true);
-    } catch (error) {
-      toast.error("Failed to upload image");
-    }
-  };
-
-  const handleRemoveImage = () => {
-    setProjectImage(null);
-    setValue("main_image", undefined);
-    setCroppedImage(null);
-    setCroppedFile(null);
-    setImageLoaded(false);
-  };
-
-  const resetForm = () => {
-    reset();
-    setProjectImage(null);
-    setCroppedImage(null);
-    setCroppedFile(null);
-    setGalleryImages([]);
-    setSelectedMembers([]);
-    setCurrentTeamLeader(null);
-    setCurrentSubLead(null); // ── CBP-116
-    setImageLoaded(false);
-    clearStack();
-    onClose();
-  };
-
-  // Subcomponent: ImageUploadSection
-  const ImageUploadSection = () => (
-    <div className="flex flex-col items-center gap-6">
-      <div className="relative w-full max-w-md">
-        {croppedImage ? (
-          <div className="relative h-48 w-full overflow-hidden rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600">
-            {!imageLoaded && (
-              <div className="absolute inset-0 flex items-center justify-center bg-gray-200 dark:bg-gray-700">
-                <Skeleton className="h-full w-full" />
-              </div>
-            )}
-            <Image
-              src={croppedImage}
-              alt="Project Preview"
-              fill
-              className={`cursor-pointer object-cover transition-opacity hover:opacity-80 ${
-                imageLoaded ? "opacity-100" : "opacity-0"
-              }`}
-              onClick={() => setOpenImageCropper(true)}
-              onLoad={() => setImageLoaded(true)}
-            />
-            <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity hover:opacity-100">
-              <span className="text-sm font-medium text-white">Click to edit</span>
-            </div>
-          </div>
-        ) : (
-          <div className="flex h-48 w-full flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800">
-            <ProjectAvatar size={64} />
-            <p className="text-sm text-gray-500 dark:text-gray-400">No image selected</p>
-          </div>
-        )}
-      </div>
-
-      <div className="flex gap-3">
-        <label
-          htmlFor="image-upload"
-          className="inline-flex cursor-pointer items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
-        >
-          {croppedImage ? "Change Image" : "Upload Image"}
-        </label>
-        <input
-          id="image-upload"
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={handleImageChange}
-        />
-        {projectImage && (
-          <button
-            type="button"
-            onClick={handleRemoveImage}
-            className="inline-flex items-center rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700"
-          >
-            Remove
-          </button>
-        )}
-      </div>
-
-      <ImageCrop
-        image={projectImage || ""}
-        setImage={setCroppedImage}
-        setFile={setCroppedFile}
-        open={openImageCropper}
-        setOpen={setOpenImageCropper}
-      />
-    </div>
-  );
-
-  // Subcomponent: ProjectDetailsSection
-  const ProjectDetailsSection = () => (
-    <div className="space-y-6">
-      <div className="grid gap-4">
-        <div className="space-y-2">
-          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">
-            Project Name *
-          </label>
-          <Input
-            type="text"
-            placeholder="Enter a descriptive project name"
-            {...register("name", { required: "Project name is required" })}
-            className="h-11 border-gray-300 focus:ring-2 focus:ring-blue-500 dark:border-gray-600"
-          />
-          {errors.name && (
-            <p className="flex items-center gap-1 text-sm text-red-500">
-              <span className="h-4 w-4 text-red-500">⚠</span>
-              {errors.name.message}
-            </p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">
-            Tagline
-          </label>
-          <Input
-            type="text"
-            placeholder="A catchy tagline for your project"
-            {...register("tagline")}
-            className="h-11 border-gray-300 focus:ring-2 focus:ring-blue-500 dark:border-gray-600"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">
-            Project Description
-          </label>
-          <textarea
-            placeholder="Describe what this project is about, its goals, and key features"
-            {...register("description")}
-            rows={3}
-            className="w-full resize-none rounded-lg border border-gray-300 bg-white px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">
-            Key Features
-          </label>
-          <textarea
-            placeholder="Enter key features separated by commas (e.g., Responsive Design, Modern UI/UX, Cross-platform)"
-            {...register("key_features")}
-            rows={2}
-            className="w-full resize-none rounded-lg border border-gray-300 bg-white px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">
-            Gallery Images
-          </label>
-          <div className="space-y-3">
-            <label
-              htmlFor="gallery-upload"
-              className="inline-flex cursor-pointer items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
-            >
-              + Add Gallery Images
-            </label>
-            <input
-              id="gallery-upload"
-              type="file"
-              accept="image/*"
-              multiple
-              className="hidden"
-              onChange={async (e: ChangeEvent<HTMLInputElement>) => {
-                const files = Array.from(e.target.files || []);
-                for (const file of files) {
-                  const objectUrl = URL.createObjectURL(file);
-                  setGalleryImages((prev) => [...prev, { url: objectUrl, file }]);
-                }
-                e.target.value = "";
-              }}
-            />
-            {galleryImages.length > 0 && (
-              <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-                {galleryImages.map((image, index) => (
-                  <div key={index} className="group relative">
-                    <div className="relative h-24 w-full overflow-hidden rounded-lg border border-gray-300 dark:border-gray-600">
-                      <Image src={image.url} alt={`Gallery ${index + 1}`} fill className="object-cover" />
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setGalleryImages((prev) => prev.filter((_, i) => i !== index))}
-                      className="absolute -right-2 -top-2 h-6 w-6 rounded-full bg-red-500 text-xs text-white transition-colors hover:bg-red-600"
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">
-            Start Date
-          </label>
-          <Input
-            type="date"
-            {...register("start_date")}
-            className="h-11 border-gray-300 focus:ring-2 focus:ring-blue-500 dark:border-gray-600"
-          />
-        </div>
-      </div>
-
-      <div className="border-t pt-3">
-        <h4 className="mb-2 text-xs font-medium text-gray-900 dark:text-gray-100">
-          External Links (Optional)
-        </h4>
-        <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
-          <div className="space-y-1">
-            <label className="text-xs font-medium text-gray-700 dark:text-gray-300">
-              GitHub Repository
-            </label>
-            <Input
-              type="url"
-              placeholder="https://github.com/..."
-              {...register("github_link")}
-              className="h-11 border-gray-300 focus:ring-2 focus:ring-blue-500 dark:border-gray-600"
-            />
-          </div>
-          <div className="space-y-1">
-            <label className="text-xs font-medium text-gray-700 dark:text-gray-300">
-              Live Website
-            </label>
-            <Input
-              type="url"
-              placeholder="https://yourproject.com"
-              {...register("website_url")}
-              className="h-11 border-gray-300 focus:ring-2 focus:ring-blue-500 dark:border-gray-600"
-            />
-          </div>
-          <div className="space-y-1">
-            <label className="text-xs font-medium text-gray-700 dark:text-gray-300">
-              Figma Design
-            </label>
-            <Input
-              type="url"
-              placeholder="https://figma.com/..."
-              {...register("figma_link")}
-              className="h-11 border-gray-300 focus:ring-2 focus:ring-blue-500 dark:border-gray-600"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  // Subcomponent: SelectSection
-  const SelectSection = () => (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 gap-4">
-        <div className="space-y-2">
-          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">
-            Project Categories * (Select at least one)
-          </label>
-          <div className="grid grid-cols-2 gap-3 rounded-lg border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-800">
-            {categories.map((category) => (
-              <label
-                key={category.id}
-                className="flex cursor-pointer items-center space-x-2 rounded p-2 transition-colors hover:bg-gray-50 dark:hover:bg-gray-700/50"
-              >
-                <input
-                  type="checkbox"
-                  checked={selectedCategoryIds.includes(category.id)}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      setSelectedCategoryIds([...selectedCategoryIds, category.id]);
-                    } else {
-                      setSelectedCategoryIds(selectedCategoryIds.filter((id) => id !== category.id));
-                    }
-                  }}
-                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:focus:ring-blue-600"
-                />
-                <span className="text-sm text-gray-700 dark:text-gray-300">{category.name}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-        <div className="space-y-2">
-          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">
-            Client *
-          </label>
-          <CustomSelect
-            label="Client"
-            options={clientOptions}
-            onChange={(value) => setValue("client_id", value)}
-            value={data?.client_id || ""}
-            placeholder={isClientsLoading ? "Loading clients..." : "Select Client"}
-            disabled={isClientsLoading}
-            searchable
-          />
-        </div>
-      </div>
-
-      <div className="border-t pt-6">
-        <h4 className="text-md mb-4 font-medium text-gray-900 dark:text-gray-100">
-          Project Status
-        </h4>
-        <div className="space-y-2">
-          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">
-            Status *
-          </label>
-          <CustomSelect
-            label="Status"
-            options={PROJECT_STATUSES}
-            value={selectedStatus}
-            onChange={(value) => setSelectedStatus(value)}
-            placeholder="Select Status"
-            variant="simple"
-          />
-        </div>
-      </div>
-
-      <div className="border-t pt-6">
-        <h4 className="text-md mb-4 font-medium text-gray-900 dark:text-gray-100">
-          Team Configuration
-        </h4>
-
-        {isFullProjectLoading || isUsersLoading ? (
-          <div className="space-y-3">
-            <Skeleton className="h-10 w-full rounded-lg" />
-            <Skeleton className="h-10 w-full rounded-lg" />
-            <Skeleton className="h-10 w-full rounded-lg" />
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {/* Team Leader - Modal Based Selection */}
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">
-                Team Leader *
-              </label>
-              <button
-                type="button"
-                onClick={() => setTeamLeaderModalOpen(true)}
-                className="w-full h-11 px-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-left flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-              >
-                {currentTeamLeader ? (
-                  <>
-                    <img
-                      src={currentTeamLeader.image_url || "https://codebility-cdn.pages.dev/assets/images/default-avatar-200x200.jpg"}
-                      alt={`${currentTeamLeader.first_name} ${currentTeamLeader.last_name}`}
-                      className="w-8 h-8 rounded-full object-cover"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                        {currentTeamLeader.first_name} {currentTeamLeader.last_name}
-                      </div>
-                      {currentTeamLeader.display_position && (
-                        <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                          {currentTeamLeader.display_position}
-                        </div>
-                      )}
-                    </div>
-                  </>
-                ) : (
-                  <span className="text-gray-400">Select Team Leader</span>
-                )}
-              </button>
-            </div>
-
-<<<<<<< HEAD
-            {/* ── CBP-116: Sublead selector ─────────────────────────────────────
-                Optional. Sourced from fullProjectData.project_members to bypass
-                RLS filtering that drops some users from getProjectCodevs().
-            ──────────────────────────────────────────────────────────────────── */}
-=======
-            {/* Sub Lead */}
->>>>>>> 8a73b995cf8189a2945ead225875c9a3e76f8ee8
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">
-                Sub Lead{" "}
-                <span className="font-normal text-gray-500 dark:text-gray-400">
-                  (Optional — acts as team lead when lead is unavailable)
-                </span>
-              </label>
-<<<<<<< HEAD
-              <CustomSelect
-                options={[
-                  { id: "none", value: "none", label: "No sublead assigned", subLabel: "" },
-                  ...(fullProjectData?.project_members ?? [])
-                    .filter(
-                      (pm: any) =>
-                        pm.codev &&
-                        pm.codev_id !== currentTeamLeader?.id &&
-                        pm.role !== "team_leader",
-                    )
-                    .map((pm: any) => ({
-                      id: pm.codev_id,
-                      value: pm.codev_id,
-                      label: `${pm.codev.first_name} ${pm.codev.last_name}`,
-                      subLabel: pm.codev.display_position || "",
-                      imageUrl: pm.codev.image_url || null,
-                    })),
-                ]}
-                value={currentSubLead?.id || "none"}
-                onChange={(value) => {
-                  if (!value || value === "none") {
-                    setCurrentSubLead(null);
-                    return;
-                  }
-                  const subLeadFromUsers = users.find((u) => u.id === value);
-                  if (subLeadFromUsers) {
-                    setCurrentSubLead(subLeadFromUsers);
-                    return;
-                  }
-                  const subLeadMember = fullProjectData?.project_members?.find(
-                    (pm: any) => pm.codev_id === value,
-                  );
-                  if (subLeadMember?.codev) {
-                    setCurrentSubLead({
-                      id: subLeadMember.codev_id,
-                      first_name: subLeadMember.codev.first_name,
-                      last_name: subLeadMember.codev.last_name,
-                      image_url: subLeadMember.codev.image_url || null,
-                      display_position: subLeadMember.codev.display_position || null,
-                      email_address: subLeadMember.codev.email_address || "",
-                      positions: [],
-                      tech_stacks: [],
-                    } as unknown as Codev);
-                  }
-                }}
-                placeholder="Select Sub Lead"
-                disabled={isUsersLoading}
-                searchable
-              />
-=======
-              <button
-                type="button"
-                onClick={() => setSubLeadModalOpen(true)}
-                className="w-full h-11 px-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-left flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-              >
-                {currentSubLead ? (
-                  <>
-                    <img
-                      src={currentSubLead.image_url || "https://codebility-cdn.pages.dev/assets/images/default-avatar-200x200.jpg"}
-                      alt={`${currentSubLead.first_name} ${currentSubLead.last_name}`}
-                      className="w-8 h-8 rounded-full object-cover"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                        {currentSubLead.first_name} {currentSubLead.last_name}
-                      </div>
-                      {currentSubLead.display_position && (
-                        <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                          {currentSubLead.display_position}
-                        </div>
-                      )}
-                    </div>
-                  </>
-                ) : (
-                  <span className="text-gray-400">No sublead assigned</span>
-                )}
-              </button>
->>>>>>> 8a73b995cf8189a2945ead225875c9a3e76f8ee8
-            </div>
-
-            {/* Team Members */}
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">
-                Team Members
-              </label>
-              <MemberSelection
-                users={users.filter(
-                  (user) =>
-                    user.id !== currentTeamLeader?.id &&
-                    user.id !== currentSubLead?.id,
-                )}
-                selectedMembers={selectedMembers}
-                onMemberAdd={(member) =>
-                  setSelectedMembers((prev) => [...prev, member])
-                }
-                onMemberRemove={(memberId) =>
-                  setSelectedMembers((prev) => prev.filter((m) => m.id !== memberId))
-                }
-                excludeMembers={[
-                  ...(currentTeamLeader ? [currentTeamLeader.id] : []),
-                  ...(currentSubLead ? [currentSubLead.id] : []),
-                ]}
-                showLabel={false}
-              />
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Tech Stack Selection */}
-      <div className="border-t pt-6">
-        <h4 className="text-md mb-4 font-medium text-gray-900 dark:text-gray-100">
-          Technology Stack
-        </h4>
-        <div className="space-y-4">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => openGlobalModal("techStackModal")}
-            className="h-12 w-full justify-start border-2 border-dashed border-gray-300 text-left transition-colors hover:border-blue-500 hover:bg-blue-50 dark:border-gray-600 dark:hover:bg-blue-950"
-          >
-            <div className="flex items-center gap-3">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-600 dark:bg-blue-900 dark:text-blue-400">
-                +
-              </span>
-              {selectedTechStack.length > 0
-                ? `${selectedTechStack.length} technology(ies) selected`
-                : "Select Technologies Used"}
-            </div>
-          </Button>
-
-          {selectedTechStack.length > 0 && (
-            <div className="rounded-lg bg-blue-50 p-4 dark:bg-blue-950/30">
-              <div className="flex flex-wrap gap-2">
-                {selectedTechStack.map((tech, index) => (
-                  <span
-                    key={index}
-                    className="inline-flex items-center rounded-full bg-blue-600 px-3 py-1 text-sm font-medium text-white shadow-sm"
-                  >
-                    {tech}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-
-  const onSubmit = async (formData: ProjectFormData) => {
-    if (!data?.id) {
-      toast.error("Project ID is missing");
-      return;
-    }
-    if (!currentTeamLeader) {
-      toast.error("Team leader is required");
-      return;
-    }
-    if (!formData.client_id) {
-      toast.error("Client is required");
-      return;
-    }
-    if (!selectedCategoryIds || selectedCategoryIds.length === 0) {
-      toast.error("At least one project category is required");
-      return;
+    if (projectError) {
+      console.error("Supabase error updating project:", projectError);
+      throw projectError;
     }
 
-    setIsLoading(true);
-    try {
-      const form = new FormData();
+    if (projectMembers && Array.isArray(projectMembers)) {
+      const { data: existingMembers, error: membersError } = await supabase
+        .from("project_members")
+        .select("codev_id, joined_at")
+        .eq("project_id", projectId);
 
-      if (croppedFile) {
-        const uploadResult = await uploadImage(croppedFile, {
-          bucket: "codebility",
-          folder: `projectImage/${Date.now()}_${croppedFile.name.replace(/\s+/g, "_")}`,
-        });
-        if (!uploadResult) throw new Error("Failed to upload image");
-        form.append("main_image", uploadResult);
-      } else if (data.main_image && croppedImage) {
-        form.append("main_image", data.main_image);
+      if (membersError) throw membersError;
+
+      const joinedAtMap = new Map(
+        existingMembers?.map(m => [m.codev_id, m.joined_at]) ?? []
+      );
+
+      const { error: deleteError } = await supabase
+        .from("project_members")
+        .delete()
+        .eq("project_id", projectId);
+
+      if (deleteError) throw deleteError;
+
+      const { error: insertError } = await supabase
+        .from("project_members")
+        .insert(
+          projectMembers.map((member: ProjectMemberData) => ({
+            project_id: projectId,
+            codev_id: member.codev_id,
+            role: member.role,
+            joined_at: joinedAtMap.get(member.codev_id) ?? new Date().toISOString(),
+          })),
+        );
+
+      if (insertError) throw insertError;
+    }
+
+    if (categoryIds !== null) {
+      const { error: deleteCategoriesError } = await supabase
+        .from("project_categories")
+        .delete()
+        .eq("project_id", projectId);
+
+      if (deleteCategoriesError) {
+        console.error("Error deleting project categories:", deleteCategoriesError);
       }
 
-      if (galleryImages.length > 0) {
-        const galleryUrls: string[] = [];
-        for (const galleryImage of galleryImages) {
-          const uploadResult = await uploadImage(galleryImage.file, {
-            bucket: "codebility",
-            folder: `projectGallery/${Date.now()}_${galleryImage.file.name.replace(/\s+/g, "_")}`,
-          });
-          if (uploadResult) galleryUrls.push(uploadResult);
-        }
-        if (galleryUrls.length > 0) {
-          form.append("gallery", JSON.stringify(galleryUrls));
+      if (categoryIds.length > 0) {
+        const categoryInserts = categoryIds.map((categoryId) => ({
+          project_id: projectId,
+          category_id: categoryId,
+        }));
+
+        const { error: insertCategoriesError } = await supabase
+          .from("project_categories")
+          .insert(categoryInserts);
+
+        if (insertCategoriesError) {
+          console.error("Error inserting project categories:", insertCategoriesError);
         }
       }
-
-      Object.entries(formData).forEach(([key, value]) => {
-        if (value !== undefined && value !== null && value !== "" && key !== "main_image" && key !== "gallery") {
-          if (key === "key_features") {
-            const arrayValue = value.split(",").map((item: string) => item.trim()).filter(Boolean);
-            if (arrayValue.length > 0) form.append(key, JSON.stringify(arrayValue));
-          } else {
-            form.append(key, value);
-          }
-        }
-      });
-
-      form.append("category_ids", JSON.stringify(selectedCategoryIds));
-
-      if (selectedTechStack.length > 0) {
-        form.append("tech_stack", JSON.stringify(selectedTechStack));
-      }
-
-      form.set("status", selectedStatus);
-
-      // ── CBP-116: Build project members array including sublead if set ────────
-      const projectMembers = [
-        { codev_id: currentTeamLeader.id, role: "team_leader" },
-        ...(currentSubLead
-          ? [{ codev_id: currentSubLead.id, role: "sublead" }]
-          : []),
-        ...selectedMembers
-          .filter((member) => member.id !== currentSubLead?.id)
-          .map((member) => ({ codev_id: member.id, role: "member" })),
-      ];
-      // ─────────────────────────────────────────────────────────────────────────
-
-      form.append("project_members", JSON.stringify(projectMembers));
-
-      const response = await updateProject(data.id, form);
-      if (response.success) {
-        queryClient.invalidateQueries({ queryKey: ["teamLead", data.id] });
-        queryClient.invalidateQueries({ queryKey: ["members", data.id] });
-        queryClient.invalidateQueries({ queryKey: ["projectFull", data.id] });
-        queryClient.invalidateQueries({ queryKey: ["subLead", data.id] });
-        toast.success("Project updated successfully!");
-        onClose();
-      } else {
-        toast.error(response.error || "Failed to update project");
-      }
-    } catch (error) {
-      toast.error("Failed to update project");
-    } finally {
-      setIsLoading(false);
     }
-  };
 
-  return (
-    <Dialog open={isModalOpen} onOpenChange={resetForm}>
-      <DialogContent className="max-h-[80vh] max-w-2xl overflow-hidden">
-        <DialogHeader className="border-b pb-2">
-          <DialogTitle className="text-lg font-bold">Edit Project</DialogTitle>
-          <p className="text-xs text-gray-600 dark:text-gray-400">
-            Update the project details below to modify your project.
-          </p>
-        </DialogHeader>
+    await invalidateCache(cacheKeys.projects.all);
 
-        <div className="flex-1 overflow-y-auto p-3" style={{ maxHeight: "calc(80vh - 200px)" }}>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="rounded-lg bg-gray-50 p-3 dark:bg-gray-800/50">
-              <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold">
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-600 dark:bg-blue-900 dark:text-blue-400">
-                  1
-                </span>
-                Project Image
-              </h3>
-              <ImageUploadSection />
-            </div>
+    revalidatePath("/projects");
+    revalidatePath("/services");
+    return { success: true, data: projectData };
+  } catch (error) {
+    console.error("Error updating project:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Failed to update project",
+    };
+  }
+}
 
-            <div className="rounded-lg bg-gray-50 p-3 dark:bg-gray-800/50">
-              <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold">
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-600 dark:bg-blue-900 dark:text-blue-400">
-                  2
-                </span>
-                Project Information
-              </h3>
-              <ProjectDetailsSection />
-            </div>
+export async function deleteProject(projectId: string) {
+  const supabase = await createClientServerComponent();
 
-            <div className="rounded-lg bg-gray-50 p-3 dark:bg-gray-800/50">
-              <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold">
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-600 dark:bg-blue-900 dark:text-blue-400">
-                  3
-                </span>
-                Team & Configuration
-                {isSelectDataLoading && (
-                  <div className="ml-2 flex items-center gap-2 text-sm text-gray-500">
-                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600" />
-                    Loading...
-                  </div>
-                )}
-              </h3>
-              <SelectSection />
-            </div>
-          </form>
-        </div>
+  try {
+    const { data: project, error: fetchError } = await supabase
+      .from("projects")
+      .select()
+      .eq("id", projectId)
+      .single();
 
-        <DialogFooter className="border-t bg-gray-50 pt-4 dark:bg-gray-800/30">
-          <div className="flex w-full justify-end gap-3">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={resetForm}
-              disabled={isLoading}
-              className="min-w-[100px]"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              disabled={isLoading}
-              onClick={handleSubmit(onSubmit)}
-              className="min-w-[120px] bg-blue-600 text-white hover:bg-blue-700"
-            >
-              {isLoading ? (
-                <div className="flex items-center gap-2">
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                  Updating...
-                </div>
-              ) : (
-                "Update Project"
-              )}
-            </Button>
-          </div>
-        </DialogFooter>
-      </DialogContent>
+    if (fetchError) throw fetchError;
 
-      {/* Team Leader Selection Modal */}
-      <SelectMemberModal
-        isOpen={teamLeaderModalOpen}
-        onClose={() => setTeamLeaderModalOpen(false)}
-        onSelect={(member) => setCurrentTeamLeader(member)}
-        users={users}
-        selectedMember={currentTeamLeader}
-        title="Select Team Leader"
-        mode="single"
-        excludeUserIds={selectedMembers.map(m => m.id)}
-      />
+    if (project.main_image) {
+      const imagePath = await getImagePath(project.main_image);
+      if (imagePath) {
+        await deleteImage(imagePath, "projects");
+      }
+    }
 
-      {/* Sub Lead Selection Modal */}
-      <SelectMemberModal
-        isOpen={subLeadModalOpen}
-        onClose={() => setSubLeadModalOpen(false)}
-        onSelect={(member) => setCurrentSubLead(member)}
-        users={users}
-        selectedMember={currentSubLead}
-        title="Select Sub Lead"
-        mode="optional-single"
-        excludeUserIds={[currentTeamLeader?.id || '', ...selectedMembers.map(m => m.id)].filter(Boolean)}
-      />
-    </Dialog>
-  );
+    const { error: deleteError } = await supabase
+      .from("projects")
+      .delete()
+      .eq("id", projectId);
+
+    if (deleteError) throw deleteError;
+
+    await invalidateCache(cacheKeys.projects.all);
+
+    revalidatePath("/projects");
+    revalidatePath("/services");
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting project:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Failed to delete project",
+    };
+  }
+}
+
+export const getTeamLead = async (
+  projectId: string,
+): Promise<{
+  error: any;
+  data: SimpleMemberData | null;
+}> => {
+  const supabase = await createClientServerComponent();
+
+  try {
+    const { data, error } = (await supabase
+      .from("project_members")
+      .select(
+        `
+        role,
+        joined_at,
+        codev:codev_id (
+          id,
+          first_name,
+          last_name,
+          email_address,
+          display_position,
+          image_url
+        )
+      `,
+      )
+      .eq("project_id", projectId)
+      .eq("role", "team_leader")
+      .single()) as { data: DbProjectMemberResponse | null; error: any };
+
+    if (error) {
+      console.error("Error fetching team lead:", error);
+      return { error, data: null };
+    }
+
+    if (!data?.codev) {
+      return { error: null, data: null };
+    }
+
+    const teamLead: SimpleMemberData = {
+      id: data.codev.id,
+      first_name: data.codev.first_name,
+      last_name: data.codev.last_name,
+      email_address: data.codev.email_address,
+      display_position: data.codev.display_position,
+      image_url: data.codev.image_url,
+      role: data.role,
+      joined_at: data.joined_at,
+    };
+
+    return { error: null, data: teamLead };
+  } catch (error) {
+    console.error("Unexpected error fetching team lead:", error);
+    return { error, data: null };
+  }
 };
 
-export default ProjectEditModal;
+export const getSubLead = async (
+  projectId: string,
+): Promise<{
+  error: any;
+  data: SimpleMemberData | null;
+}> => {
+  const supabase = await createClientServerComponent();
+
+  try {
+    const { data, error } = (await supabase
+      .from("project_members")
+      .select(
+        `
+        role,
+        joined_at,
+        codev:codev_id (
+          id,
+          first_name,
+          last_name,
+          email_address,
+          display_position,
+          image_url
+        )
+      `,
+      )
+      .eq("project_id", projectId)
+      .eq("role", "sublead")
+      .maybeSingle()) as { data: DbProjectMemberResponse | null; error: any };
+
+    if (error) {
+      console.error("Error fetching sublead:", error);
+      return { error, data: null };
+    }
+
+    if (!data?.codev) {
+      return { error: null, data: null };
+    }
+
+    const subLead: SimpleMemberData = {
+      id: data.codev.id,
+      first_name: data.codev.first_name,
+      last_name: data.codev.last_name,
+      email_address: data.codev.email_address,
+      display_position: data.codev.display_position,
+      image_url: data.codev.image_url,
+      role: data.role,
+      joined_at: data.joined_at,
+    };
+
+    return { error: null, data: subLead };
+  } catch (error) {
+    console.error("Unexpected error fetching sublead:", error);
+    return { error, data: null };
+  }
+};
+
+export const getMembers = async (
+  projectId: string,
+): Promise<{
+  error: any;
+  data: SimpleMemberData[] | null;
+}> => {
+  const supabase = await createClientServerComponent();
+
+  try {
+    const { data: projectMembers, error: pmError } = await supabase
+      .from("project_members")
+      .select("codev_id, role, joined_at")
+      .eq("project_id", projectId)
+      .eq("role", "member");
+
+    if (pmError) {
+      console.error("❌ Error fetching project members:", pmError);
+      return { error: pmError, data: null };
+    }
+
+    if (!projectMembers || projectMembers.length === 0) {
+      return { error: null, data: [] };
+    }
+
+    const codevIds = projectMembers.map(pm => pm.codev_id);
+
+    const { data: codevs, error: codevError } = await supabase
+      .from("codev")
+      .select("id, first_name, last_name, email_address, display_position, image_url")
+      .in("id", codevIds);
+
+    if (codevError) {
+      console.error("❌ Error fetching codev details:", codevError);
+      return { error: codevError, data: null };
+    }
+
+    const members = projectMembers.map(pm => {
+      const codev = codevs?.find(c => c.id === pm.codev_id);
+
+      if (!codev) {
+        console.warn(`⚠️ Missing codev record for member: ${pm.codev_id}`);
+        return null;
+      }
+
+      return {
+        id: codev.id,
+        first_name: codev.first_name,
+        last_name: codev.last_name,
+        email_address: codev.email_address,
+        display_position: codev.display_position,
+        image_url: codev.image_url,
+        role: pm.role,
+        joined_at: pm.joined_at,
+      };
+    }).filter(Boolean) as SimpleMemberData[];
+
+    return { error: null, data: members };
+  } catch (error) {
+    console.error("❌ Unexpected error fetching members:", error);
+    return { error, data: null };
+  }
+};
+
+export const updateProjectMembers = async (
+  projectId: string,
+  members: Codev[],
+  teamLeaderId: string,
+): Promise<{ success: boolean; error?: string }> => {
+  console.log('🔧 [updateProjectMembers] Server-side update starting');
+  console.log('   Project ID:', projectId);
+  console.log('   Members to add:', members.length);
+  console.log('   Team Leader ID:', teamLeaderId);
+
+  const supabase = await createClientServerComponent();
+
+  try {
+    const { data: existingMembers, error: fetchError } = await supabase
+      .from("project_members")
+      .select("codev_id, joined_at, role")
+      .eq("project_id", projectId);
+
+    if (fetchError) throw fetchError;
+
+    console.log('   Existing members in DB:', existingMembers?.length ?? 0);
+
+    // Preserve joined_at timestamps
+    const joinedAtMap = new Map(
+      existingMembers?.map(m => [m.codev_id, m.joined_at]) ?? []
+    );
+
+    // Capture sublead row before deletion — My Team has no sublead UI so it
+    // would otherwise be permanently lost on every member update
+    const existingSubLead = existingMembers?.find(m => m.role === "sublead");
+
+    const { error: deleteError } = await supabase
+      .from("project_members")
+      .delete()
+      .eq("project_id", projectId);
+
+    if (deleteError) throw deleteError;
+
+    console.log('   Old members deleted, preparing inserts...');
+
+    const memberInserts = [
+      // Team lead + regular members
+      ...members.map((member) => ({
+        project_id: projectId,
+        codev_id: member.id,
+        role: member.id === teamLeaderId ? "team_leader" : "member",
+        joined_at: joinedAtMap.get(member.id) ?? new Date().toISOString(),
+      })),
+      // Re-insert sublead if one existed — preserves their joined_at too
+      ...(existingSubLead
+        ? [{
+            project_id: projectId,
+            codev_id: existingSubLead.codev_id,
+            role: "sublead" as const,
+            joined_at: existingSubLead.joined_at,
+          }]
+        : []),
+    ];
+
+    console.log('   Inserting members:', memberInserts.length);
+    console.log('   Member IDs:', memberInserts.map(m => m.codev_id));
+    console.log('   Roles:', memberInserts.map(m => m.role));
+
+    const { error: insertError } = await supabase
+      .from("project_members")
+      .insert(memberInserts);
+
+    if (insertError) throw insertError;
+
+    console.log('✅ [updateProjectMembers] Successfully inserted', memberInserts.length, 'members');
+
+    revalidatePath("/projects");
+    return { success: true };
+  } catch (error) {
+    console.error("❌ [updateProjectMembers] Error updating project members:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error occurred",
+    };
+  }
+};
+
+export const getProjectCodevs = async (filters = {}): Promise<Codev[]> => {
+  const { createClient } = await import("@supabase/supabase-js");
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  const selectFields = `
+    id,
+    first_name,
+    last_name,
+    email_address,
+    image_url,
+    positions,
+    tech_stacks,
+    display_position,
+    internal_status,
+    role_id
+  `;
+
+  // Step 1: Fetch users — same logic as Add Members Modal smart filter
+  // This ensures consistency between both modals
+  const queries = [
+    // Mentors (role_id = 5)
+    supabase.from("codev").select(selectFields).eq("role_id", 5),
+    // Admins (role_id = 1)
+    supabase.from("codev").select(selectFields).eq("role_id", 1),
+    // Graduated users (any role_id)
+    supabase.from("codev").select(selectFields).eq("internal_status", "GRADUATED"),
+    // Training/Intern/Onboarding users
+    supabase.from("codev").select(selectFields).in("internal_status", ["TRAINING", "INTERN", "ONBOARDING"]),
+  ];
+
+  const results = await Promise.all(queries);
+
+  const codevMap = new Map<string, any>();
+
+  results.forEach(({ data, error }, index) => {
+    if (error) {
+      console.error(`Error fetching codevs (query ${index}):`, error);
+    } else if (data) {
+      data.forEach(codev => {
+        if (!codevMap.has(codev.id)) {
+          codevMap.set(codev.id, codev);
+        }
+      });
+    }
+  });
+
+  let codevs = Array.from(codevMap.values());
+
+  if (Object.keys(filters).length > 0) {
+    codevs = codevs.filter(codev => {
+      return Object.entries(filters).every(([key, value]) => {
+        if (value === undefined) return true;
+        return codev[key] === value;
+      });
+    });
+  }
+
+  if (codevs.length === 0) {
+    return [];
+  }
+
+  const codevIds = codevs.map(c => c.id);
+
+  const { data: projectMembers, error: pmError } = await supabase
+    .from("project_members")
+    .select(`
+      codev_id,
+      project_id,
+      role,
+      joined_at,
+      project:project_id (
+        id,
+        name,
+        status,
+        kanban_display,
+        public_display
+      )
+    `)
+    .in("codev_id", codevIds);
+
+  if (pmError) {
+    console.error("Error fetching project members:", pmError);
+  }
+
+  return codevs.map((codev: any) => {
+    const codevProjectMembers = projectMembers?.filter(pm => pm.codev_id === codev.id) || [];
+
+    const projects = codevProjectMembers.map((pm: any) => {
+      const project: Project & { role: string; joined_at: string } = {
+        id: pm.project.id,
+        name: pm.project.name,
+        role: pm.role,
+        joined_at: pm.joined_at,
+        status: pm.project.status,
+        kanban_display: pm.project.kanban_display,
+        public_display: pm.project.public_display,
+      };
+      return project;
+    });
+
+    return {
+      ...codev,
+      positions: codev.positions || [],
+      tech_stacks: codev.tech_stacks || [],
+      projects,
+    } as Codev;
+  });
+};
+
+export const getProjectClients = async (): Promise<Client[]> => {
+  const supabase = await createClientServerComponent();
+
+  const { data, error } = await supabase
+    .from("clients")
+    .select("id, name, email, company_logo");
+
+  if (error) {
+    console.error("Error fetching Clients:", error);
+    throw new Error("Failed to fetch Clients");
+  }
+
+  return data || [];
+};
+
+export const getProjectCategories = async () => {
+  const supabase = await createClientServerComponent();
+  const { data, error } = await supabase
+    .from("projects_category")
+    .select("id, name, description");
+
+  if (error) {
+    console.error("Error fetching categories:", error);
+    throw new Error("Failed to fetch categories");
+  }
+
+  return data || [];
+};
+
+export const getProjectCategoriesForProject = async (projectId: string) => {
+  const supabase = await createClientServerComponent();
+  const { data, error } = await supabase
+    .from("project_categories")
+    .select(`
+      category_id,
+      projects_category (
+        id,
+        name,
+        description
+      )
+    `)
+    .eq("project_id", projectId);
+
+  if (error) {
+    console.error("Error fetching project categories:", error);
+    throw new Error("Failed to fetch project categories");
+  }
+
+  return data?.map((item: any) => item.projects_category).filter(Boolean) || [];
+};
+
+export const addCategoriesToProject = async (
+  projectId: string,
+  categoryIds: number[]
+) => {
+  const supabase = await createClientServerComponent();
+
+  const inserts = categoryIds.map((categoryId) => ({
+    project_id: projectId,
+    category_id: categoryId,
+  }));
+
+  const { error } = await supabase
+    .from("project_categories")
+    .insert(inserts);
+
+  if (error) {
+    console.error("Error adding categories to project:", error);
+    throw new Error("Failed to add categories to project");
+  }
+
+  return { success: true };
+};
+
+export const removeCategoryFromProject = async (
+  projectId: string,
+  categoryId: number
+) => {
+  const supabase = await createClientServerComponent();
+
+  const { error } = await supabase
+    .from("project_categories")
+    .delete()
+    .eq("project_id", projectId)
+    .eq("category_id", categoryId);
+
+  if (error) {
+    console.error("Error removing category from project:", error);
+    throw new Error("Failed to remove category from project");
+  }
+
+  return { success: true };
+};
+
+export const replaceProjectCategories = async (
+  projectId: string,
+  categoryIds: number[]
+) => {
+  const supabase = await createClientServerComponent();
+
+  const { error: deleteError } = await supabase
+    .from("project_categories")
+    .delete()
+    .eq("project_id", projectId);
+
+  if (deleteError) {
+    console.error("Error deleting project categories:", deleteError);
+    throw new Error("Failed to delete project categories");
+  }
+
+  if (categoryIds.length > 0) {
+    const inserts = categoryIds.map((categoryId) => ({
+      project_id: projectId,
+      category_id: categoryId,
+    }));
+
+    const { error: insertError } = await supabase
+      .from("project_categories")
+      .insert(inserts);
+
+    if (insertError) {
+      console.error("Error inserting project categories:", insertError);
+      throw new Error("Failed to insert project categories");
+    }
+  }
+
+  return { success: true };
+};
+
+export async function getAllProjects(kanbanBoardId?: string) {
+  const supabase = await createClientServerComponent();
+
+  try {
+    let query = supabase
+      .from("kanban_boards")
+      .select("id, name, project_id, projects (id, name, main_image)")
+      .eq("projects.kanban_display", true);
+
+    if (kanbanBoardId) {
+      query = query.eq("id", kanbanBoardId);
+    }
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+
+    const flattenedProjects = data.map((item: any) => ({
+      ...item.projects,
+      kanban_board_id: item.id,
+      kanban_board_name: item.name,
+    }));
+
+    return flattenedProjects;
+  } catch (error) {
+    console.error("Error fetching projects:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Failed to fetch projects",
+    };
+  }
+}
+
+export async function getProjectByID(id: string) {
+  const supabase = await createClientServerComponent();
+
+  const { data, error } = await supabase
+    .from("projects")
+    .select(
+      `
+        *,
+        project_members (
+          id,
+          codev_id,
+          role,
+          joined_at
+        ),
+        categories:project_categories(
+          projects_category(
+            id,
+            name,
+            description
+          )
+        )
+      `
+    )
+    .eq("id", id)
+    .single();
+
+  if (error) throw error;
+  if (!data) return null;
+
+  const codevIds = (data.project_members ?? []).map((pm: any) => pm.codev_id);
+
+  let codevMap: Map<string, any> = new Map();
+
+  if (codevIds.length > 0) {
+    const { data: codevs, error: codevError } = await supabase
+      .from("codev")
+      .select("id, first_name, last_name, image_url, display_position, email_address")
+      .in("id", codevIds);
+
+    if (codevError) {
+      console.error("Error fetching codev records for project members:", codevError);
+    } else {
+      codevs?.forEach((c: any) => codevMap.set(c.id, c));
+    }
+  }
+
+  const projectMembersWithCodev = (data.project_members ?? []).map((pm: any) => ({
+    ...pm,
+    codev: codevMap.get(pm.codev_id) ?? null,
+  }));
+
+  return {
+    ...data,
+    project_members: projectMembersWithCodev,
+    categories: data.categories?.map((cat: any) => cat.projects_category).filter(Boolean) || [],
+  };
+}
