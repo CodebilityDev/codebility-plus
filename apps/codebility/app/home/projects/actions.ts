@@ -121,7 +121,6 @@ export async function getUserProjects(): Promise<{
       `,
       )
       .eq("codev_id", userCodevId)
-      // ── CBP-116: added "sublead" so sublead-assigned users see their projects
       .in("role", ["team_leader", "member", "sublead"]) as { data: ProjectMember[] | null; error: any };
 
     if (projectMembersError) {
@@ -432,7 +431,6 @@ export async function updateProject(projectId: string, formData: FormData) {
 
       if (membersError) throw membersError;
 
-      // Preserve joined_at for all existing members (including sublead)
       const joinedAtMap = new Map(
         existingMembers?.map(m => [m.codev_id, m.joined_at]) ?? []
       );
@@ -596,9 +594,6 @@ export const getTeamLead = async (
   }
 };
 
-// ── CBP-116: getSubLead ───────────────────────────────────────────────────────
-// Mirrors getTeamLead() exactly. Uses maybeSingle() instead of single()
-// because sublead is optional — no row is valid and should not throw.
 export const getSubLead = async (
   projectId: string,
 ): Promise<{
@@ -654,14 +649,7 @@ export const getSubLead = async (
     return { error, data: null };
   }
 };
-// ─────────────────────────────────────────────────────────────────────────────
 
-/**
- * Fetch project members via two-query approach to avoid RLS/join dropouts.
- * Step 1: get codev_ids from project_members
- * Step 2: fetch codev records separately
- * Step 3: merge manually
- */
 export const getMembers = async (
   projectId: string,
 ): Promise<{
@@ -725,9 +713,6 @@ export const getMembers = async (
   }
 };
 
-/**
- * Update project members with joined_at preservation.
- */
 export const updateProjectMembers = async (
   projectId: string,
   members: Codev[],
@@ -743,16 +728,21 @@ export const updateProjectMembers = async (
   try {
     const { data: existingMembers, error: fetchError } = await supabase
       .from("project_members")
-      .select("codev_id, joined_at")
+      .select("codev_id, joined_at, role")
       .eq("project_id", projectId);
 
     if (fetchError) throw fetchError;
 
     console.log('   Existing members in DB:', existingMembers?.length ?? 0);
 
+    // Preserve joined_at timestamps
     const joinedAtMap = new Map(
       existingMembers?.map(m => [m.codev_id, m.joined_at]) ?? []
     );
+
+    // Capture sublead row before deletion — My Team has no sublead UI so it
+    // would otherwise be permanently lost on every member update
+    const existingSubLead = existingMembers?.find(m => m.role === "sublead");
 
     const { error: deleteError } = await supabase
       .from("project_members")
@@ -763,12 +753,24 @@ export const updateProjectMembers = async (
 
     console.log('   Old members deleted, preparing inserts...');
 
-    const memberInserts = members.map((member) => ({
-      project_id: projectId,
-      codev_id: member.id,
-      role: member.id === teamLeaderId ? "team_leader" : "member",
-      joined_at: joinedAtMap.get(member.id) ?? new Date().toISOString(),
-    }));
+    const memberInserts = [
+      // Team lead + regular members
+      ...members.map((member) => ({
+        project_id: projectId,
+        codev_id: member.id,
+        role: member.id === teamLeaderId ? "team_leader" : "member",
+        joined_at: joinedAtMap.get(member.id) ?? new Date().toISOString(),
+      })),
+      // Re-insert sublead if one existed — preserves their joined_at too
+      ...(existingSubLead
+        ? [{
+            project_id: projectId,
+            codev_id: existingSubLead.codev_id,
+            role: "sublead" as const,
+            joined_at: existingSubLead.joined_at,
+          }]
+        : []),
+    ];
 
     console.log('   Inserting members:', memberInserts.length);
     console.log('   Member IDs:', memberInserts.map(m => m.codev_id));
@@ -793,20 +795,7 @@ export const updateProjectMembers = async (
   }
 };
 
-/**
- * ─── PATCH: Fix RLS filtering issue ──────────────────────────────────────────
- * Use two-query approach to avoid PostgREST join RLS filtering that silently
- * drops users. Same pattern as getProjectByID() and getMembers().
- *
- * IMPORTANT: Uses anon client (no auth) to bypass RLS policies that may filter
- * role_id field. This matches the landing page behavior where all mentors are visible.
- *
- * Updated to match Add Members Modal filtering logic - includes users based on
- * both role_id AND internal_status to ensure GRADUATED users are included.
- * ─────────────────────────────────────────────────────────────────────────────
- */
 export const getProjectCodevs = async (filters = {}): Promise<Codev[]> => {
-  // Use anon client to avoid RLS filtering of role_id field (same as landing page)
   const { createClient } = await import("@supabase/supabase-js");
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -826,9 +815,8 @@ export const getProjectCodevs = async (filters = {}): Promise<Codev[]> => {
     role_id
   `;
 
-  // Step 1: Fetch users using same logic as Add Members Modal "smart filter"
+  // Step 1: Fetch users — same logic as Add Members Modal smart filter
   // This ensures consistency between both modals
-  // Smart filter: role_id = 5 (Mentor) OR role_id = 1 (Admin) OR internal_status = GRADUATED
   const queries = [
     // Mentors (role_id = 5)
     supabase.from("codev").select(selectFields).eq("role_id", 5),
@@ -842,7 +830,6 @@ export const getProjectCodevs = async (filters = {}): Promise<Codev[]> => {
 
   const results = await Promise.all(queries);
 
-  // Combine all results and deduplicate by id
   const codevMap = new Map<string, any>();
 
   results.forEach(({ data, error }, index) => {
@@ -859,7 +846,6 @@ export const getProjectCodevs = async (filters = {}): Promise<Codev[]> => {
 
   let codevs = Array.from(codevMap.values());
 
-  // Apply additional filters if provided
   if (Object.keys(filters).length > 0) {
     codevs = codevs.filter(codev => {
       return Object.entries(filters).every(([key, value]) => {
@@ -873,7 +859,6 @@ export const getProjectCodevs = async (filters = {}): Promise<Codev[]> => {
     return [];
   }
 
-  // Step 2: Fetch project_members separately for all codevs
   const codevIds = codevs.map(c => c.id);
 
   const { data: projectMembers, error: pmError } = await supabase
@@ -897,7 +882,6 @@ export const getProjectCodevs = async (filters = {}): Promise<Codev[]> => {
     console.error("Error fetching project members:", pmError);
   }
 
-  // Step 3: Merge project_members data back into codevs
   return codevs.map((codev: any) => {
     const codevProjectMembers = projectMembers?.filter(pm => pm.codev_id === codev.id) || [];
 
@@ -1086,26 +1070,9 @@ export async function getAllProjects(kanbanBoardId?: string) {
   }
 }
 
-/**
- * Get project by ID with full details including project_members.
- *
- * ─── PATCH (CBP-95) ──────────────────────────────────────────────────────────
- * Added display_position and email_address to the codev sub-select inside
- * project_members for team leader fallback construction in ProjectEditModal.
- * ─────────────────────────────────────────────────────────────────────────────
- *
- * ─── PATCH (CBP-116) ─────────────────────────────────────────────────────────
- * Switched project_members codev data to a two-query approach, mirroring
- * getMembers(). The PostgREST foreign key join applies RLS on the codev table
- * which silently drops members whose codev rows are filtered (e.g. Raineer).
- * Two-query approach: fetch codev_ids from project_members, then fetch codev
- * records via .in("id", codevIds) — this bypasses the join RLS issue.
- * ─────────────────────────────────────────────────────────────────────────────
- */
 export async function getProjectByID(id: string) {
   const supabase = await createClientServerComponent();
 
-  // Step 1: fetch project row + categories (no codev join here)
   const { data, error } = await supabase
     .from("projects")
     .select(
@@ -1132,7 +1099,6 @@ export async function getProjectByID(id: string) {
   if (error) throw error;
   if (!data) return null;
 
-  // Step 2: fetch codev records separately to bypass join RLS filtering
   const codevIds = (data.project_members ?? []).map((pm: any) => pm.codev_id);
 
   let codevMap: Map<string, any> = new Map();
@@ -1150,7 +1116,6 @@ export async function getProjectByID(id: string) {
     }
   }
 
-  // Step 3: merge codev data back into project_members
   const projectMembersWithCodev = (data.project_members ?? []).map((pm: any) => ({
     ...pm,
     codev: codevMap.get(pm.codev_id) ?? null,
