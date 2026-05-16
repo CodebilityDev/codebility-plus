@@ -32,20 +32,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Try to use the optimized database function first
-    const { data: leaders, error } = await supabase
-      .rpc('get_technical_leaderboard', { 
-        category_name: category,
-        time_filter: timeFilter,
-        result_limit: limit 
-      });
+    let processedLeaders: TechnicalLeader[] = [];
 
-    if (error) {
-      // Fallback to manual query if RPC doesn't exist
-      console.warn("RPC function not found, using fallback query:", error);
-      
-      // Optimized fallback using database-side aggregation
-      let query = supabase
+    // All-time leaderboard uses the codev_points running total for performance
+    if (timeFilter === "all") {
+      const { data: rawData, error: fallbackError } = await supabase
         .from("codev_points")
         .select(`
           codev_id,
@@ -57,44 +48,20 @@ export async function GET(request: NextRequest) {
         .eq("skill_category.name", category)
         .not("codev.first_name", "is", null);
 
-      // Apply time filters
-      if (timeFilter === "weekly") {
-        const weekStart = new Date();
-        weekStart.setDate(weekStart.getDate() - weekStart.getDay());
-        weekStart.setHours(0, 0, 0, 0);
-        query = query.gte("created_at", weekStart.toISOString());
-      } else if (timeFilter === "monthly") {
-        const monthStart = new Date();
-        monthStart.setDate(1);
-        monthStart.setHours(0, 0, 0, 0);
-        query = query.gte("created_at", monthStart.toISOString());
-      }
-
-      const { data: rawData, error: fallbackError } = await query;
-
       if (fallbackError) {
-        console.error("Error fetching technical leaderboard:", fallbackError);
+        console.error("Error fetching all-time technical leaderboard:", fallbackError);
         return NextResponse.json(
           { error: "Failed to fetch leaderboard data", details: fallbackError.message },
           { status: 500 }
         );
       }
 
-      if (!rawData || rawData.length === 0) {
-        return NextResponse.json({ leaders: [], totalCount: 0 });
-      }
+      // Aggregate points (already aggregated in table, but handling duplicates just in case)
+      const userPointsMap = new Map<string, TechnicalLeader>();
 
-      // Aggregate points by user (database should do this, but fallback for compatibility)
-      const userPoints = new Map<string, {
-        codev_id: string;
-        first_name: string;
-        total_points: number;
-        latest_update: string;
-      }>();
-
-      rawData.forEach((item: any) => {
+      rawData?.forEach((item: any) => {
         const userId = item.codev_id;
-        const existing = userPoints.get(userId);
+        const existing = userPointsMap.get(userId);
         
         if (existing) {
           existing.total_points += item.points || 0;
@@ -102,7 +69,7 @@ export async function GET(request: NextRequest) {
             existing.latest_update = item.created_at;
           }
         } else {
-          userPoints.set(userId, {
+          userPointsMap.set(userId, {
             codev_id: userId,
             first_name: item.codev?.first_name || "Unknown",
             total_points: item.points || 0,
@@ -111,30 +78,111 @@ export async function GET(request: NextRequest) {
         }
       });
 
-      // Convert to array and sort
-      const processedLeaders: TechnicalLeader[] = Array.from(userPoints.values())
+      processedLeaders = Array.from(userPointsMap.values())
         .filter(leader => leader.total_points > 0)
-        .sort((a, b) => {
-          if (b.total_points === a.total_points) {
-            return a.first_name.localeCompare(b.first_name);
-          }
-          return b.total_points - a.total_points;
-        })
+        .sort((a, b) => b.total_points - a.total_points)
         .slice(0, limit);
 
-      return NextResponse.json({ 
-        leaders: processedLeaders,
-        totalCount: processedLeaders.length 
-      });
-    }
+    } else {
+      // Weekly/Monthly leaderboard calculates points from completed tasks based on approval date (updated_at)
+      const startDate = new Date();
+      if (timeFilter === "weekly") {
+        startDate.setDate(startDate.getDate() - startDate.getDay()); // Sunday
+        startDate.setHours(0, 0, 0, 0);
+      } else {
+        startDate.setDate(1); // 1st of month
+        startDate.setHours(0, 0, 0, 0);
+      }
 
-    // Process RPC results
-    const processedLeaders = leaders?.map((leader: any) => ({
-      codev_id: leader.codev_id,
-      first_name: leader.first_name || "Unknown",
-      total_points: leader.total_points || 0,
-      latest_update: leader.latest_update
-    })) || [];
+      const { data: rawTasks, error: tasksError } = await supabase
+        .from("tasks")
+        .select(`
+          points,
+          updated_at,
+          codev_id,
+          sidekick_ids,
+          codev:codev_id(first_name),
+          skill_category:skill_category_id!inner(name)
+        `)
+        .eq("skill_category.name", category)
+        .eq("is_archive", true)
+        .gte("updated_at", startDate.toISOString());
+
+      if (tasksError) {
+        console.error(`Error fetching ${timeFilter} technical leaderboard tasks:`, tasksError);
+        return NextResponse.json(
+          { error: "Failed to fetch tasks data", details: tasksError.message },
+          { status: 500 }
+        );
+      }
+
+      const userPointsMap = new Map<string, { total_points: number; latest_update: string; first_name?: string }>();
+      const involvedUserIds = new Set<string>();
+
+      rawTasks?.forEach((task: any) => {
+        const points = task.points || 0;
+        const sidekickPoints = Math.floor(points * 0.5);
+
+        // Add points to primary assignee
+        if (task.codev_id) {
+          involvedUserIds.add(task.codev_id);
+          const existing = userPointsMap.get(task.codev_id);
+          if (existing) {
+            existing.total_points += points;
+            if (task.updated_at > existing.latest_update) existing.latest_update = task.updated_at;
+          } else {
+            userPointsMap.set(task.codev_id, {
+              total_points: points,
+              latest_update: task.updated_at,
+              first_name: task.codev?.first_name
+            });
+          }
+        }
+
+        // Add points to sidekicks
+        if (task.sidekick_ids && Array.isArray(task.sidekick_ids)) {
+          task.sidekick_ids.forEach((sidekickId: string) => {
+            involvedUserIds.add(sidekickId);
+            const existing = userPointsMap.get(sidekickId);
+            if (existing) {
+              existing.total_points += sidekickPoints;
+              if (task.updated_at > existing.latest_update) existing.latest_update = task.updated_at;
+            } else {
+              userPointsMap.set(sidekickId, {
+                total_points: sidekickPoints,
+                latest_update: task.updated_at
+              });
+            }
+          });
+        }
+      });
+
+      // Fetch missing first names (for sidekicks)
+      const missingNameIds = Array.from(involvedUserIds).filter(id => !userPointsMap.get(id)?.first_name);
+      
+      if (missingNameIds.length > 0) {
+        const { data: namesData } = await supabase
+          .from("codev")
+          .select("id, first_name")
+          .in("id", missingNameIds);
+        
+        namesData?.forEach(n => {
+          const user = userPointsMap.get(n.id);
+          if (user) user.first_name = n.first_name;
+        });
+      }
+
+      processedLeaders = Array.from(userPointsMap.entries())
+        .map(([id, data]) => ({
+          codev_id: id,
+          first_name: data.first_name || "Unknown",
+          total_points: data.total_points,
+          latest_update: data.latest_update
+        }))
+        .filter(leader => leader.total_points > 0)
+        .sort((a, b) => b.total_points - a.total_points)
+        .slice(0, limit);
+    }
 
     return NextResponse.json({ 
       leaders: processedLeaders,
