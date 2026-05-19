@@ -42,14 +42,27 @@ const TeamLeadersDisplay = ({ teamLead, subLead }: TeamLeadersDisplayProps) => {
         {/* Team Lead card */}
         <LeaderCard member={teamLead} roleLabel="Lead" />
 
-        {/* Sublead card — or placeholder if none assigned */}
+        {/* Sublead card — or placeholder if none assigned.
+            Sublead assignment is admin-only; the tooltip communicates this
+            so team leads don't hunt for a non-existent edit affordance. */}
         {subLead ? (
           <LeaderCard member={subLead} roleLabel="Sublead" />
         ) : (
-          <div className="flex items-center gap-3 rounded-lg border border-dashed border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-600 dark:bg-gray-700/30">
+          <div
+            title="Contact your admin to assign a sublead"
+            className="group relative flex cursor-default items-center gap-3 rounded-lg border border-dashed border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-600 dark:bg-gray-700/30"
+          >
             <Users className="h-5 w-5 text-gray-400" />
             <span className="text-sm text-gray-400 dark:text-gray-500">
               No sublead assigned
+            </span>
+            {/* Visible tooltip on hover — supplements the native title for
+                browsers / screen readers that surface it differently */}
+            <span
+              role="tooltip"
+              className="pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100 dark:bg-gray-700"
+            >
+              Contact your admin to assign a sublead
             </span>
           </div>
         )}
