@@ -3,8 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Trophy, ArrowRight, User } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Trophy, User, AlertTriangle, RefreshCw } from "lucide-react";
 import { getWeeklyLeaderboard, LeaderboardMember } from "../leaderboard/actions";
 
 interface Contributor {
@@ -23,24 +22,28 @@ export default function Top3Showcase({ projectId }: Top3ShowcaseProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
 
-  useEffect(() => {
-    async function fetchLeaderboard() {
-      setIsLoading(true);
-      setError(false);
-      try {
-        const result = await getWeeklyLeaderboard(projectId);
-        if (result.success && result.data.length > 0) {
-          setLeaders(result.data.slice(0, 3));
-        } else if (!result.success) {
-          setError(true);
-        }
-      } catch (err) {
-        console.error("Failed to fetch leaderboard:", err);
+  const fetchLeaderboard = async () => {
+    setIsLoading(true);
+    setError(false);
+    try {
+      const result = await getWeeklyLeaderboard(projectId);
+      if (result.success && result.data.length > 0) {
+        setLeaders(result.data.slice(0, 3));
+      } else if (!result.success) {
         setError(true);
-      } finally {
-        setIsLoading(false);
+      } else {
+        // success but empty — clear leaders so empty state shows
+        setLeaders([]);
       }
+    } catch (err) {
+      console.error("Failed to fetch leaderboard:", err);
+      setError(true);
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  useEffect(() => {
     fetchLeaderboard();
   }, [projectId]);
 
@@ -63,7 +66,7 @@ export default function Top3Showcase({ projectId }: Top3ShowcaseProps) {
   return (
     <div className="flex flex-col h-full w-full">
       <div className="relative overflow-hidden rounded-lg bg-white dark:bg-gray-800/50 p-6 shadow-sm border border-gray-200 dark:border-gray-700/50 flex-1 group hover:border-customBlue-500/30 transition-all duration-500">
-        
+
         {/* Codebility Boomerang Backdrop */}
         <div className="absolute -right-4 -bottom-4 opacity-[0.10] dark:opacity-[0.08] pointer-events-none scale-150 rotate-[-15deg] group-hover:scale-[1.6] group-hover:rotate-[-10deg] transition-all duration-700">
           <Image src="/assets/svgs/icon-codebility.svg" width={180} height={180} alt="" className="object-contain" />
@@ -86,6 +89,21 @@ export default function Top3Showcase({ projectId }: Top3ShowcaseProps) {
 
           {isLoading ? (
             <LeaderboardSkeleton />
+          ) : error ? (
+            // Fix #5: Distinct error state — not conflated with "no activity"
+            <div className="flex flex-col items-center justify-center py-8 text-center bg-red-50 dark:bg-red-900/10 rounded-2xl border border-dashed border-red-200 dark:border-red-800">
+              <AlertTriangle className="h-8 w-8 text-red-400 mb-2" />
+              <p className="text-xs font-bold text-red-500 dark:text-red-400 uppercase tracking-widest mb-3">
+                Failed to load leaderboard
+              </p>
+              <button
+                onClick={fetchLeaderboard}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-red-600 dark:text-red-400 border border-red-300 dark:border-red-700 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/20 transition-colors"
+              >
+                <RefreshCw className="h-3 w-3" />
+                Retry
+              </button>
+            </div>
           ) : leaders.length > 0 ? (
             <div className="flex flex-col gap-3">
               {leaders.map((leader, index) => {
@@ -132,13 +150,14 @@ export default function Top3Showcase({ projectId }: Top3ShowcaseProps) {
               })}
             </div>
           ) : (
+            // Empty state — nobody scored this week (not an error)
             <div className="flex flex-col items-center justify-center py-8 text-center bg-gray-50 dark:bg-gray-900/40 rounded-2xl border border-dashed border-gray-200 dark:border-gray-800">
               <User className="h-8 w-8 text-gray-300 mb-2" />
               <p className="text-xs font-bold text-gray-500 dark:text-gray-500 uppercase tracking-widest">No Activity Recorded</p>
             </div>
           )}
 
-          {!isLoading && leaders.length > 0 && (
+          {!isLoading && !error && leaders.length > 0 && (
             <div className="mt-5 text-center">
               <Link href={`/home/my-team/${projectId}/leaderboard`} className="text-xs font-bold uppercase tracking-widest text-customBlue-500 hover:text-customBlue-600 hover:underline transition-all">
                 View all
