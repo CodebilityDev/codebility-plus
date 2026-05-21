@@ -7,7 +7,8 @@ import {
   startOfMonth,
   endOfMonth,
   subWeeks,
-  subMonths
+  subMonths,
+  format
 } from "date-fns";
 
 export type LeaderboardTimeRange = "this-week" | "last-week" | "this-month" | "last-month";
@@ -120,35 +121,40 @@ export async function getLeaderboardData(
     const codevIds = projectMembers.map((pm) => pm.codev_id);
 
     // 2. Fetch Attendance for the period
+    // Fix #8: Use format() from date-fns instead of toISOString().split("T")[0]
+    // to avoid UTC conversion causing off-by-one errors at DST boundaries
     const { data: attendanceData, error: attendanceError } = await supabase
       .from("attendance")
       .select("*")
       .eq("project_id", projectId)
       .in("codev_id", codevIds)
-      .gte("date", startDate.toISOString().split("T")[0])
-      .lte("date", endDate.toISOString().split("T")[0]);
+      .gte("date", format(startDate, "yyyy-MM-dd"))
+      .lte("date", format(endDate, "yyyy-MM-dd"));
 
     if (attendanceError) throw attendanceError;
 
     // 3. Fetch Completed Tasks for the period
+    // Fix #10: Select only needed columns instead of select("*") to reduce bandwidth
+    // Fix #7: Fetch all tasks updated in the period and filter completed status in JS
+    // instead of using the brittle foreignTable or() filter
     const { data: taskData, error: tasksError } = await supabase
       .from("tasks")
-      .select(`
-        *,
-        kanban_column:kanban_columns!inner(
-          name,
-          board:kanban_boards!inner(project_id)
-        )
-      `)
+      .select("codev_id, points, difficulty, updated_at, kanban_column:kanban_columns!inner(name, board:kanban_boards!inner(project_id))")
       .eq("kanban_column.board.project_id", projectId)
       .in("codev_id", codevIds)
-      .or('name.ilike.Done,name.ilike.Completed', { foreignTable: 'kanban_columns' })
       .gte("updated_at", startDate.toISOString())
       .lte("updated_at", endDate.toISOString());
 
     if (tasksError) {
       console.warn("Task fetch error:", tasksError);
     }
+
+    // Fix #7: Filter completed tasks in JS — handles column name variations like
+    // "Done ✅", "Completed Tasks", "Done & Verified" that the DB filter missed
+    const completedTaskData = (taskData ?? []).filter((task) => {
+      const columnName = (task.kanban_column as any)?.name?.toLowerCase() ?? "";
+      return columnName.includes("done") || columnName.includes("complete");
+    });
 
     // 4. Calculate Points for each member
     const leaderboard: LeaderboardMember[] = projectMembers.map((pm) => {
@@ -157,12 +163,14 @@ export async function getLeaderboardData(
 
       // Attendance Calculation
       const memberAttendance = attendanceData?.filter(a => a.codev_id === memberCodevId) || [];
-      const presentCount = memberAttendance.filter(a => a.status === "present").length;
-      const lateCount = memberAttendance.filter(a => a.status === "late").length;
+      // Fix #9: Normalize status to lowercase before comparing to handle
+      // NULL status and differently-cased values like "PRESENT"
+      const presentCount = memberAttendance.filter(a => a.status?.toLowerCase() === "present").length;
+      const lateCount = memberAttendance.filter(a => a.status?.toLowerCase() === "late").length;
       const attPoints = (presentCount * 10) + (lateCount * 5);
 
-      // Task Completion Calculation
-      const memberTasks = taskData?.filter(t => t.codev_id === memberCodevId) || [];
+      // Task Completion Calculation — uses JS-filtered completed tasks (Fix #7)
+      const memberTasks = completedTaskData.filter(t => t.codev_id === memberCodevId);
       const tasksCompleted = memberTasks.length;
       const taskPoints = memberTasks.reduce((sum, task) => {
         // Fix #1: Use != null so explicit 0 is respected, not treated as falsy
