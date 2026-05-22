@@ -568,7 +568,8 @@ export const completeTask = async (
       .from("tasks")
       .update({
         is_archive: true,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
+        approved_at: new Date().toISOString()
       })
       .eq("id", task.id);
 
