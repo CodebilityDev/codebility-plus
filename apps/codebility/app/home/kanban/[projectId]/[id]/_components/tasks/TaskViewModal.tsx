@@ -357,11 +357,15 @@ const TaskViewModal = ({
   const hasPrLinkChanges = prLink.trim() !== originalPrLink;
   const hasUnsavedChanges = manualSaveChanges || hasPrLinkChanges;
 
-  const canModifyTask = true;
+  const canModifyTask = 
+   user?.role_id === 1 ||
+   user?.role_id === 5 ||
+   user?.role_id === 4 ||
+   user?.role_id === 10;;
   const canMarkAsDone = user?.role_id === 1 || user?.role_id === 5;
 
   // Only team leads and admins can transfer tasks between sprints
-  const canTransferTask = true;
+  const canTransferTask = user?.role_id === 1 || user?.role_id === 5;
 
   const searchParams = useSearchParams();
   const [showComments, setShowComments] = useState(false);
