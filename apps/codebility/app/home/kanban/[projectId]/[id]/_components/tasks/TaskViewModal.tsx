@@ -746,7 +746,6 @@ const TaskViewModal = ({
                         }}
                         className="flex items-center gap-2"
                       >
-                        <ArrowRightLeft className="h-4 w-4" />
                         Move to Sprint
                       </DropdownMenuItem>
                     )}
