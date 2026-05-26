@@ -41,6 +41,36 @@ export async function getLeaderboardData(
   error?: string;
 }> {
   const supabase = await createClientServerComponent();
+
+  // Fix #3: Verify the caller is authenticated and is a member of this project
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) {
+    return { success: false, data: [], error: "Unauthorized" };
+  }
+
+  // Resolve auth user to codev record
+  const { data: codevUser, error: codevError } = await supabase
+    .from("codev")
+    .select("id")
+    .ilike("email_address", user.email?.trim() || "")
+    .maybeSingle();
+
+  if (codevError || !codevUser) {
+    return { success: false, data: [], error: "Unauthorized" };
+  }
+
+  // Verify caller is a member of the requested project
+  const { data: membership, error: membershipError } = await supabase
+    .from("project_members")
+    .select("codev_id")
+    .eq("project_id", projectId)
+    .eq("codev_id", codevUser.id)
+    .maybeSingle();
+
+  if (membershipError || !membership) {
+    return { success: false, data: [], error: "Forbidden" };
+  }
+
   const now = new Date();
 
   let startDate: Date;
@@ -135,7 +165,8 @@ export async function getLeaderboardData(
       const memberTasks = taskData?.filter(t => t.codev_id === memberCodevId) || [];
       const tasksCompleted = memberTasks.length;
       const taskPoints = memberTasks.reduce((sum, task) => {
-        if (task.points) return sum + task.points;
+        // Fix #1: Use != null so explicit 0 is respected, not treated as falsy
+        if (task.points != null) return sum + task.points;
         const diff = task.difficulty?.toLowerCase();
         if (diff === "hard") return sum + 200;
         if (diff === "medium") return sum + 100;
