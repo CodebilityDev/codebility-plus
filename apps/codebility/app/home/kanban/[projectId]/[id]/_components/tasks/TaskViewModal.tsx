@@ -33,6 +33,7 @@ import {
   Loader2Icon,
   MessageCircle,
   Pencil,
+  ArrowRightLeft,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -53,6 +54,9 @@ import DifficultyPointsTooltip, {
 } from "../DifficultyPointsTooltip";
 import TaskCommentsSection from "./_components/TaskComments";
 import KanbanRichTextDisplay from "../kanban_modals/KanbanRichTextDisplay";
+
+// NEW: Import the Move to Sprint modal
+import MoveToSprintModal from "../kanban_modals/MoveToSprintModal";
 
 
 const fetchAvailableMembers = async (
@@ -111,7 +115,6 @@ interface CodevMember {
 
 const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
-// Fixed AssigneeSelector component with proper removal functionality
 function AssigneeSelector({
   primaryAssignee,
   onAssigneeChange,
@@ -321,12 +324,13 @@ const TaskViewModal = ({
   const [prLink, setPrLink] = useState("");
   const [originalPrLink, setOriginalPrLink] = useState("");
 
-  // NEW: Controls whether PR Link shows as hyperlink (false) or input (true)
-  // Starts as false so a saved link renders as a clickable <a> tag immediately
   const [isEditingPrLink, setIsEditingPrLink] = useState(false);
 
   const [supabase, setSupabase] = useState<any>(null);
   const [boardId, setBoardId] = useState<string>("");
+
+  // NEW: project id derived from the board — needed by MoveToSprintModal
+  const [projectId, setProjectId] = useState<string>("");
 
   const [skillCategory, setSkillCategory] = useState<SkillCategory | null>(
     null,
@@ -344,22 +348,29 @@ const TaskViewModal = ({
     string | undefined
   >(undefined);
 
+  // NEW: controls visibility of MoveToSprintModal
+  const [isMoveToSprintOpen, setIsMoveToSprintOpen] = useState(false);
+
   const isModalOpen = isOpen && type === "taskViewModal";
   const task = data as Task | null;
 
   const hasPrLinkChanges = prLink.trim() !== originalPrLink;
   const hasUnsavedChanges = manualSaveChanges || hasPrLinkChanges;
 
-  const canModifyTask =
-    user?.role_id === 1 ||
-    user?.role_id === 5 ||
-    user?.role_id === 4 ||
-    user?.role_id === 10;
+  const canModifyTask = 
+   user?.role_id === 1 ||
+   user?.role_id === 5 ||
+   user?.role_id === 4 ||
+   user?.role_id === 10;;
   const canMarkAsDone = user?.role_id === 1 || user?.role_id === 5;
+
+  // Only team leads and admins can transfer tasks between sprints
+  const canTransferTask = user?.role_id === 1 || user?.role_id === 5;
 
   const searchParams = useSearchParams();
   const [showComments, setShowComments] = useState(false);
   const [commentCount, setCommentCount] = useState(0);
+
   useEffect(() => {
     if (searchParams.get("commentId")) {
       setShowComments(true);
@@ -395,32 +406,46 @@ const TaskViewModal = ({
   useEffect(() => {
     if (!supabase || !task?.kanban_column_id) {
       setBoardId("");
+      setProjectId("");
       return;
     }
 
     const fetchBoardId = async () => {
       try {
-        const { data, error } = await supabase
+        const { data: columnData, error: columnError } = await supabase
           .from("kanban_columns")
           .select("board_id")
           .eq("id", task.kanban_column_id)
           .single();
 
-        if (error) {
+        if (columnError || !columnData?.board_id) {
           setBoardId("");
-        } else if (data?.board_id) {
-          setBoardId(data.board_id);
+          setProjectId("");
+          return;
+        }
+
+        setBoardId(columnData.board_id);
+
+        // NEW: also resolve project_id so MoveToSprintModal can use it
+        const { data: boardData, error: boardError } = await supabase
+          .from("kanban_boards")
+          .select("project_id")
+          .eq("id", columnData.board_id)
+          .single();
+
+        if (!boardError && boardData?.project_id) {
+          setProjectId(boardData.project_id);
         }
       } catch (err) {
         console.error("Exception fetching board ID:", err);
         setBoardId("");
+        setProjectId("");
       }
     };
 
     fetchBoardId();
   }, [task?.kanban_column_id, supabase]);
 
-  // Reset all state when a different task is opened
   useEffect(() => {
     if (!task?.id || !supabase) return;
 
@@ -431,11 +456,8 @@ const TaskViewModal = ({
     setPendingAssigneeId(undefined);
     setForceRefreshKey(Date.now().toString());
 
-    // NEW: If task already has a PR link, show it as hyperlink (not editing mode)
-    // If no PR link, go straight to edit mode so user can enter one
     setIsEditingPrLink(!taskPrLink);
 
-    // Fetch and set assignee
     const assigneeId = task.codev_id || task?.codev?.id;
     if (assigneeId) {
       supabase
@@ -515,8 +537,6 @@ const TaskViewModal = ({
       toast.success("PR Link updated successfully");
       setOriginalPrLink(prLink);
       if (task) task.pr_link = prLink;
-
-      // NEW: After successful save, switch back to hyperlink display mode
       setIsEditingPrLink(false);
     } else {
       toast.error(response.error || "Failed to update PR Link");
@@ -605,7 +625,6 @@ const TaskViewModal = ({
       setPendingAssigneeId(undefined);
       setPrLink(originalPrLink);
 
-      // NEW: Reset edit mode — if original has a link, go back to hyperlink view
       setIsEditingPrLink(!originalPrLink);
 
       if (task?.codev_id || task?.codev?.id) {
@@ -636,7 +655,7 @@ const TaskViewModal = ({
 
     try {
       if (hasPrLinkChanges) {
-        await handleUpdate(); // handleUpdate already switches to hyperlink view on success
+        await handleUpdate();
       }
 
       if (manualSaveChanges) {
@@ -681,279 +700,351 @@ const TaskViewModal = ({
     }
   };
 
-  if (!isModalOpen) return null;
+  if (!isModalOpen && !isMoveToSprintOpen) return null;
 
   return (
-    <Dialog open={isModalOpen} onOpenChange={onClose}>
-      <DialogContent className="h-auto max-h-[90vh] w-[95vw] max-w-3xl overflow-y-auto bg-white p-3 dark:bg-gray-900 sm:max-h-[900px] sm:w-[90vw] sm:p-4">
-        <div className="flex flex-col gap-6">
-          <div className="h-4 md:h-0"></div>
+    <>
+      <Dialog open={isModalOpen} onOpenChange={onClose}>
+        <DialogContent className="h-auto max-h-[90vh] w-[95vw] max-w-3xl overflow-y-auto bg-white p-3 dark:bg-gray-900 sm:max-h-[900px] sm:w-[90vw] sm:p-4">
+          <div className="flex flex-col gap-6">
+            <div className="h-4 md:h-0"></div>
 
-          {/* Title and Menu Row */}
-          <div className="-mt-4 flex items-start justify-between">
-            <DialogHeader className="flex-1">
-              <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
-                {task?.title}{" "}
-                {task?.ticket_code && (
-                  <span className="ml-1 font-normal text-gray-500 dark:text-gray-400">
-                    #{task.ticket_code}
-                  </span>
-                )}
-              </DialogTitle>
-            </DialogHeader>
-            {canModifyTask && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 w-8 rounded-full p-0 hover:bg-gray-100 dark:hover:bg-gray-800"
-                  >
-                    <Ellipsis className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-32">
-                  <DropdownMenuItem
-                    onClick={() => onOpen("taskEditModal", task)}
-                  >
-                    Edit
-                  </DropdownMenuItem>
-                  {user?.role_id !== 4 && (
-                    <DropdownMenuItem
-                      onClick={() => onOpen("taskDeleteModal", task)}
-                      className="text-red-500 focus:text-red-500"
-                    >
-                      Delete
-                    </DropdownMenuItem>
+            {/* Title and Menu Row */}
+            <div className="-mt-4 flex items-start justify-between">
+              <DialogHeader className="flex-1">
+                <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
+                  {task?.title}{" "}
+                  {task?.ticket_code && (
+                    <span className="ml-1 font-normal text-gray-500 dark:text-gray-400">
+                      #{task.ticket_code}
+                    </span>
                   )}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-          </div>
-
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Task Title</Label>
-              <Input
-                value={task?.title || ""}
-                disabled
-                className="text-grey-100 bg-light-900 border border-gray-300 dark:border-gray-700 dark:bg-gray-800"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Points</Label>
-              <Input
-                type="number"
-                value={task?.points || 0}
-                disabled
-                className="text-grey-100 bg-light-900 border border-gray-300 dark:border-gray-700 dark:bg-gray-800"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Priority</Label>
-              <Select disabled value={task?.priority || ""}>
-                <SelectTrigger className="text-grey-100 bg-light-900 border border-gray-300 dark:border-gray-700 dark:bg-gray-800">
-                  <SelectValue placeholder="None" />
-                </SelectTrigger>
-                <SelectContent>
-                  {PRIORITY_LEVELS.map((level) => (
-                    <SelectItem
-                      key={level}
-                      value={level}
-                      className="capitalize"
-                    >
-                      {level}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Label className="text-sm font-medium pt-1">Difficulty</Label>
-                <DifficultyPointsTooltip />
-              </div>
-              <Select disabled value={task?.difficulty || ""}>
-                <SelectTrigger className="text-grey-100 bg-light-900 border border-gray-300 dark:border-gray-700 dark:bg-gray-800">
-                  <SelectValue placeholder="None" />
-                </SelectTrigger>
-                <SelectContent>
-                  {DIFFICULTY_LEVELS.map((level) => (
-                    <SelectItem
-                      key={level}
-                      value={level}
-                      className="capitalize"
-                    >
-                      {capitalize(level)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Task Type</Label>
-              <Input
-                value={task?.type || "None"}
-                disabled
-                className="text-grey-100 bg-light-900 border border-gray-300 dark:border-gray-700 dark:bg-gray-800"
-              />
-            </div>
-
-            {/* ============================================================
-                PR LINK SECTION — CBP-58
-                3 states:
-                  1. Has link, view mode   → full-width clickable URL + "Edit PR Link" button below
-                  2. No link               → empty state label + "Add PR Link" button
-                  3. Editing               → full-width input (stacked), Update + Cancel buttons below
-                ============================================================ */}
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">PR Link</Label>
-
-              {/* STATE 1: Saved PR link exists and NOT in edit mode → show full URL as hyperlink */}
-              {!isEditingPrLink && prLink ? (
-                <div className="flex flex-col gap-2">
-                  {/* Full-width link row — user can clearly see and click the URL */}
-                  <a
-                    href={prLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex w-full items-center gap-2 overflow-hidden rounded-md border pt-2.5 pb-2.5 border-blue-300 bg-blue-50 px-3 py-2 text-sm text-blue-700 transition-colors hover:border-blue-500 hover:bg-blue-100 dark:border-blue-700 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:bg-blue-900/40"
-                    title={`Open: ${prLink}`}
-                  >
-                    {/* Icon stays fixed width, URL text fills remaining space */}
-                    <ExternalLink className="h-4 w-4 shrink-0 text-blue-500" />
-                    <span className="min-w-0 flex-1 truncate font-medium">{prLink}</span>
-                    <span className="shrink-0 text-xs text-blue-400">open</span>
-                  </a>
-
-                  {/* Edit button — only for users with modify permission */}
-                  {canModifyTask && (
-                    <button
-                      type="button"
-                      onClick={() => setIsEditingPrLink(true)}
-                      className="flex w-fit items-center gap-1 text-xs text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400"
-                    >
-                      <Pencil className="h-3 w-3" />
-                      Edit
-                    </button>
-                  )}
-                </div>
-              ) : isEditingPrLink ? (
-                /* STATE 3: Currently editing — full-width input stacked above action buttons */
-                <div className="flex flex-col gap-2">
-                  {/* Full-width input — no competition with buttons */}
-                  <Input
-                    autoFocus
-                    value={prLink}
-                    onChange={(e) => setPrLink(e.target.value)}
-                    className="w-full border border-blue-400 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
-                    placeholder="https://github.com/org/repo/pull/123"
-                  />
-
-                  {/* Action buttons row — below the input so input keeps full width */}
-                  <div className="flex items-center gap-2">
+                </DialogTitle>
+              </DialogHeader>
+              {canModifyTask && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
                     <Button
-                      onClick={handleUpdate}
-                      disabled={updateLoading || !prLink.trim()}
-                      className="flex-1 bg-blue-600 px-4 text-white hover:bg-blue-700 disabled:opacity-50"
+                      variant="ghost"
                       size="sm"
+                      className="h-8 w-8 rounded-full p-0 hover:bg-gray-100 dark:hover:bg-gray-800"
                     >
-                      {updateLoading && (
-                        <Loader2Icon className="mr-2 h-3 w-3 animate-spin" />
-                      )}
-                      Update
+                      <Ellipsis className="h-4 w-4" />
                     </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-44">
+                    <DropdownMenuItem
+                      onClick={() => onOpen("taskEditModal", task)}
+                    >
+                      Edit
+                    </DropdownMenuItem>
 
-                    {originalPrLink && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
+                    {/* NEW: Move to Sprint — only for team leads / admins */}
+                    {canTransferTask && projectId && (
+                      <DropdownMenuItem
                         onClick={() => {
-                          setPrLink(originalPrLink);
-                          setIsEditingPrLink(false);
+                          onClose();
+                          setTimeout(() => {
+                            setIsMoveToSprintOpen(true);
+                          }, 150);
                         }}
-                        className="flex-1 border-gray-300 text-gray-500 hover:text-gray-700 dark:border-gray-600 dark:text-gray-400 dark:hover:text-gray-200"
+                        className="flex items-center gap-2"
                       >
-                        Cancel
-                      </Button>
+                        Move to Sprint
+                      </DropdownMenuItem>
+                    )}
+
+                    {user?.role_id !== 4 && (
+                      <DropdownMenuItem
+                        onClick={() => onOpen("taskDeleteModal", task)}
+                        className="text-red-500 focus:text-red-500"
+                      >
+                        Delete
+                      </DropdownMenuItem>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Task Title</Label>
+                <Input
+                  value={task?.title || ""}
+                  disabled
+                  className="text-grey-100 bg-light-900 border border-gray-300 dark:border-gray-700 dark:bg-gray-800"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Points</Label>
+                <Input
+                  type="number"
+                  value={task?.points || 0}
+                  disabled
+                  className="text-grey-100 bg-light-900 border border-gray-300 dark:border-gray-700 dark:bg-gray-800"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Priority</Label>
+                <Select disabled value={task?.priority || ""}>
+                  <SelectTrigger className="text-grey-100 bg-light-900 border border-gray-300 dark:border-gray-700 dark:bg-gray-800">
+                    <SelectValue placeholder="None" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PRIORITY_LEVELS.map((level) => (
+                      <SelectItem
+                        key={level}
+                        value={level}
+                        className="capitalize"
+                      >
+                        {level}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Label className="text-sm font-medium pt-1">Difficulty</Label>
+                  <DifficultyPointsTooltip />
+                </div>
+                <Select disabled value={task?.difficulty || ""}>
+                  <SelectTrigger className="text-grey-100 bg-light-900 border border-gray-300 dark:border-gray-700 dark:bg-gray-800">
+                    <SelectValue placeholder="None" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {DIFFICULTY_LEVELS.map((level) => (
+                      <SelectItem
+                        key={level}
+                        value={level}
+                        className="capitalize"
+                      >
+                        {capitalize(level)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Task Type</Label>
+                <Input
+                  value={task?.type || "None"}
+                  disabled
+                  className="text-grey-100 bg-light-900 border border-gray-300 dark:border-gray-700 dark:bg-gray-800"
+                />
+              </div>
+
+              {/* PR Link Section */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">PR Link</Label>
+
+                {!isEditingPrLink && prLink ? (
+                  <div className="flex flex-col gap-2">
+                    <a
+                      href={prLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex w-full items-center gap-2 overflow-hidden rounded-md border pt-2.5 pb-2.5 border-blue-300 bg-blue-50 px-3 py-2 text-sm text-blue-700 transition-colors hover:border-blue-500 hover:bg-blue-100 dark:border-blue-700 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:bg-blue-900/40"
+                      title={`Open: ${prLink}`}
+                    >
+                      <ExternalLink className="h-4 w-4 shrink-0 text-blue-500" />
+                      <span className="min-w-0 flex-1 truncate font-medium">{prLink}</span>
+                      <span className="shrink-0 text-xs text-blue-400">open</span>
+                    </a>
+                    {canModifyTask && (
+                      <button
+                        type="button"
+                        onClick={() => setIsEditingPrLink(true)}
+                        className="flex w-fit items-center gap-1 text-xs text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400"
+                      >
+                        <Pencil className="h-3 w-3" />
+                        Edit
+                      </button>
                     )}
                   </div>
-                </div>
-              ) : (
-                /* STATE 2: No PR link set — clear empty state so user knows it's editable */
-                <div className="flex flex-col gap-2">
-                  {/* Empty state — dashed border signals "add something here" */}
-                  <div className="flex items-center gap-2 rounded-md border border-dashed border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-400 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-500">
-                    <ExternalLink className="h-4 w-4 shrink-0" />
-                    <span>No PR link set</span>
+                ) : isEditingPrLink ? (
+                  <div className="flex flex-col gap-2">
+                    <Input
+                      autoFocus
+                      value={prLink}
+                      onChange={(e) => setPrLink(e.target.value)}
+                      className="w-full border border-blue-400 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                      placeholder="https://github.com/org/repo/pull/123"
+                    />
+                    <div className="flex items-center gap-2">
+                      <Button
+                        onClick={handleUpdate}
+                        disabled={updateLoading || !prLink.trim()}
+                        className="flex-1 bg-blue-600 px-4 text-white hover:bg-blue-700 disabled:opacity-50"
+                        size="sm"
+                      >
+                        {updateLoading && (
+                          <Loader2Icon className="mr-2 h-3 w-3 animate-spin" />
+                        )}
+                        Update
+                      </Button>
+                      {originalPrLink && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setPrLink(originalPrLink);
+                            setIsEditingPrLink(false);
+                          }}
+                          className="flex-1 border-gray-300 text-gray-500 hover:text-gray-700 dark:border-gray-600 dark:text-gray-400 dark:hover:text-gray-200"
+                        >
+                          Cancel
+                        </Button>
+                      )}
+                    </div>
                   </div>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2 rounded-md border border-dashed border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-400 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-500">
+                      <ExternalLink className="h-4 w-4 shrink-0" />
+                      <span>No PR link set</span>
+                    </div>
+                    {canModifyTask && (
+                      <button
+                        type="button"
+                        onClick={() => setIsEditingPrLink(true)}
+                        className="flex w-fit items-center gap-1 text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                      >
+                        <Pencil className="h-3 w-3" />
+                        Add PR Link
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
 
-                  {/* Add button — only for users with modify permission */}
-                  {canModifyTask && (
-                    <button
-                      type="button"
-                      onClick={() => setIsEditingPrLink(true)}
-                      className="flex w-fit items-center gap-1 text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
-                    >
-                      <Pencil className="h-3 w-3" />
-                      Add PR Link
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Skill Category</Label>
+                {skillCategory ? (
+                  <div className="rounded-md bg-blue-50 p-2 text-sm font-medium text-blue-700 dark:bg-blue-900/20 dark:text-blue-300">
+                    {skillCategory.name}
+                  </div>
+                ) : (
+                  <div className="text-sm text-gray-500">None assigned</div>
+                )}
+              </div>
 
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Skill Category</Label>
-              {skillCategory ? (
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Deadline</Label>
                 <div className="rounded-md bg-blue-50 p-2 text-sm font-medium text-blue-700 dark:bg-blue-900/20 dark:text-blue-300">
-                  {skillCategory.name}
+                  {task?.deadline
+                    ? new Date(task.deadline).toLocaleString()
+                    : "Not Set"}
                 </div>
-              ) : (
-                <div className="text-sm text-gray-500">None assigned</div>
-              )}
-            </div>
+              </div>
 
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Deadline</Label>
-              <div className="rounded-md bg-blue-50 p-2 text-sm font-medium text-blue-700 dark:bg-blue-900/20 dark:text-blue-300">
-                {task?.deadline
-                  ? new Date(task.deadline).toLocaleString()
-                  : "Not Set"}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Primary Assignee</Label>
+                {canModifyTask ? (
+                  <div className="space-y-2">
+                    {boardId ? (
+                      <AssigneeSelector
+                        key={`assignee-selector-${forceRefreshKey}`}
+                        primaryAssignee={primaryAssignee}
+                        onAssigneeChange={handleAssigneeChange}
+                        boardId={boardId}
+                        user={user}
+                        forceRefreshKey={forceRefreshKey}
+                      />
+                    ) : (
+                      <div className="text-sm text-gray-500">
+                        Loading board...
+                      </div>
+                    )}
+                  </div>
+                ) : primaryAssignee ? (
+                  <div className="flex items-center gap-2">
+                    {primaryAssignee.image_url ? (
+                      <Image
+                        src={primaryAssignee.image_url}
+                        alt={`${primaryAssignee.first_name} ${primaryAssignee.last_name}`}
+                        width={32}
+                        height={32}
+                        className="rounded-full"
+                      />
+                    ) : (
+                      <DefaultAvatar size={32} />
+                    )}
+                    <span>
+                      {`${primaryAssignee.first_name} ${primaryAssignee.last_name}`}
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 text-gray-500">
+                    <DefaultAvatar size={32} />
+                    <span>Unassigned</span>
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Primary Assignee - allows modification even when assigned */}
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Primary Assignee</Label>
-              {canModifyTask ? (
-                <div className="space-y-2">
-                  {boardId ? (
-                    <AssigneeSelector
-                      key={`assignee-selector-${forceRefreshKey}`}
-                      primaryAssignee={primaryAssignee}
-                      onAssigneeChange={handleAssigneeChange}
-                      boardId={boardId}
-                      user={user}
-                      forceRefreshKey={forceRefreshKey}
-                    />
-                  ) : (
-                    <div className="text-sm text-gray-500">
-                      Loading board...
-                    </div>
-                  )}
+            {task?.sidekick_ids && task.sidekick_ids.length > 0 && (
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Team Members</Label>
+                <div className="flex -space-x-2">
+                  {sidekickDetails.length > 0
+                    ? sidekickDetails.map((member) => (
+                      <div
+                        key={member.id}
+                        className="relative h-8 w-8 rounded-full border-2 border-white dark:border-gray-800"
+                      >
+                        {member.image_url ? (
+                          <Image
+                            src={member.image_url}
+                            alt={`${member.first_name} ${member.last_name}`}
+                            width={32}
+                            height={32}
+                            className="rounded-full object-cover"
+                          />
+                        ) : (
+                          <DefaultAvatar size={32} />
+                        )}
+                      </div>
+                    ))
+                    : task.sidekick_ids.map((memberId) => (
+                      <div
+                        key={memberId}
+                        className="relative h-8 w-8 rounded-full border-2 border-white dark:border-gray-800"
+                      >
+                        <DefaultAvatar size={32} />
+                      </div>
+                    ))}
                 </div>
-              ) : primaryAssignee ? (
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Description</Label>
+              <div className="rounded-md border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-800">
+                {task?.description ? (
+                  <KanbanRichTextDisplay content={task.description} />
+                ) : (
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    No description provided
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Created By</Label>
                 <div className="flex items-center gap-2">
-                  {primaryAssignee.image_url ? (
+                  {createdBy?.image_url ? (
                     <Image
-                      src={primaryAssignee.image_url}
-                      alt={`${primaryAssignee.first_name} ${primaryAssignee.last_name}`}
+                      src={createdBy.image_url}
+                      alt={`${createdBy.first_name} ${createdBy.last_name}`}
                       width={32}
                       height={32}
                       className="rounded-full"
@@ -962,162 +1053,68 @@ const TaskViewModal = ({
                     <DefaultAvatar size={32} />
                   )}
                   <span>
-                    {`${primaryAssignee.first_name} ${primaryAssignee.last_name}`}
+                    {createdBy
+                      ? `${createdBy.first_name} ${createdBy.last_name}`
+                      : "Unknown"}
                   </span>
                 </div>
-              ) : (
-                <div className="flex items-center gap-2 text-gray-500">
-                  <DefaultAvatar size={32} />
-                  <span>Unassigned</span>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Created At</Label>
+                <div className="bg-light-900 rounded-md px-3 py-2 text-sm text-gray-700 dark:bg-gray-800 dark:text-gray-200">
+                  {task?.created_at
+                    ? new Date(task.created_at).toLocaleString()
+                    : "Unknown"}
+                </div>
+              </div>
+            </div>
+
+            {/* Comments Section */}
+            <div className="space-y-3 border-t border-gray-200 pt-4 dark:border-gray-700">
+              <Button
+                variant="ghost"
+                onClick={toggleComments}
+                className="w-full justify-between rounded-lg bg-gray-50 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+              >
+                <div className="flex items-center gap-2">
+                  <MessageCircle className="h-4 w-4" />
+                  <span>Comments ({commentCount})</span>
+                </div>
+                {showComments ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
+                  <ChevronDown className="h-4 w-4" />
+                )}
+              </Button>
+
+              {showComments && (
+                <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-800/50 sm:p-4">
+                  <TaskCommentsSection
+                    taskId={task?.id || ""}
+                    currentUserId={user?.id || ""}
+                    onCommentCountChange={setCommentCount}
+                  />
                 </div>
               )}
             </div>
-          </div>
 
-          {task?.sidekick_ids && task.sidekick_ids.length > 0 && (
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Team Members</Label>
-              <div className="flex -space-x-2">
-                {sidekickDetails.length > 0
-                  ? sidekickDetails.map((member) => (
-                    <div
-                      key={member.id}
-                      className="relative h-8 w-8 rounded-full border-2 border-white dark:border-gray-800"
-                    >
-                      {member.image_url ? (
-                        <Image
-                          src={member.image_url}
-                          alt={`${member.first_name} ${member.last_name}`}
-                          width={32}
-                          height={32}
-                          className="rounded-full object-cover"
-                        />
-                      ) : (
-                        <DefaultAvatar size={32} />
-                      )}
-                    </div>
-                  ))
-                  : task.sidekick_ids.map((memberId) => (
-                    <div
-                      key={memberId}
-                      className="relative h-8 w-8 rounded-full border-2 border-white dark:border-gray-800"
-                    >
-                      <DefaultAvatar size={32} />
-                    </div>
-                  ))}
-              </div>
-            </div>
-          )}
-
-          {/* Description Section */}
-          <div className="space-y-2">
-            <Label className="text-sm font-medium">Description</Label>
-            <div className="rounded-md border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-800">
-              {task?.description ? (
-                <KanbanRichTextDisplay content={task.description} />
-              ) : (
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  No description provided
-                </p>
-              )}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Created By</Label>
-              <div className="flex items-center gap-2">
-                {createdBy?.image_url ? (
-                  <Image
-                    src={createdBy.image_url}
-                    alt={`${createdBy.first_name} ${createdBy.last_name}`}
-                    width={32}
-                    height={32}
-                    className="rounded-full"
-                  />
-                ) : (
-                  <DefaultAvatar size={32} />
-                )}
-                <span>
-                  {createdBy
-                    ? `${createdBy.first_name} ${createdBy.last_name}`
-                    : "Unknown"}
-                </span>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Created At</Label>
-              <div className="bg-light-900 rounded-md px-3 py-2 text-sm text-gray-700 dark:bg-gray-800 dark:text-gray-200">
-                {task?.created_at
-                  ? new Date(task.created_at).toLocaleString()
-                  : "Unknown"}
-              </div>
-            </div>
-          </div>
-
-          {/* Comments Section */}
-          <div className="space-y-3 border-t border-gray-200 pt-4 dark:border-gray-700">
-            <Button
-              variant="ghost"
-              onClick={toggleComments}
-              className="w-full justify-between rounded-lg bg-gray-50 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-            >
-              <div className="flex items-center gap-2">
-                <MessageCircle className="h-4 w-4" />
-                <span>Comments ({commentCount})</span>
-              </div>
-              {showComments ? (
-                <ChevronUp className="h-4 w-4" />
-              ) : (
-                <ChevronDown className="h-4 w-4" />
-              )}
-            </Button>
-
-            {showComments && (
-              <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-800/50 sm:p-4">
-                <TaskCommentsSection
-                  taskId={task?.id || ""}
-                  currentUserId={user?.id || ""}
-                  onCommentCountChange={setCommentCount}
-                />
-              </div>
-            )}
-          </div>
-
-          <DialogFooter className="mt-4 flex justify-end">
-            <Button
-              onClick={() => {
-                if (!task?.id) {
-                  toast.error("Cannot copy URL: Task ID is missing");
-                  return;
-                }
-
-                const baseUrl = window.location.origin;
-                const url = task.ticket_code
-                  ? `${baseUrl}/home/kanban/ticket/${task.ticket_code}`
-                  : new URL(window.location.href).toString();
-
-                navigator.clipboard.writeText(url);
-                toast.success("Task URL copied to clipboard");
-              }}
-              style={{
-                backgroundColor: "#2563EB",
-                color: "white",
-                padding: "6px 16px",
-                fontSize: "14px",
-                borderRadius: "4px",
-                border: "none",
-                minWidth: "auto",
-                width: "auto",
-              }}
-            >
-              Copy URL
-            </Button>
-
-            {!hasUnsavedChanges && (
+            <DialogFooter className="mt-4 flex justify-end">
               <Button
-                onClick={onClose}
+                onClick={() => {
+                  if (!task?.id) {
+                    toast.error("Cannot copy URL: Task ID is missing");
+                    return;
+                  }
+
+                  const baseUrl = window.location.origin;
+                  const url = task.ticket_code
+                    ? `${baseUrl}/home/kanban/ticket/${task.ticket_code}`
+                    : new URL(window.location.href).toString();
+
+                  navigator.clipboard.writeText(url);
+                  toast.success("Task URL copied to clipboard");
+                }}
                 style={{
                   backgroundColor: "#2563EB",
                   color: "white",
@@ -1129,14 +1126,12 @@ const TaskViewModal = ({
                   width: "auto",
                 }}
               >
-                Close
+                Copy URL
               </Button>
-            )}
 
-            {hasUnsavedChanges && (
-              <>
+              {!hasUnsavedChanges && (
                 <Button
-                  onClick={handleClose}
+                  onClick={onClose}
                   style={{
                     backgroundColor: "#2563EB",
                     color: "white",
@@ -1148,12 +1143,54 @@ const TaskViewModal = ({
                     width: "auto",
                   }}
                 >
-                  Cancel
+                  Close
                 </Button>
+              )}
 
+              {hasUnsavedChanges && (
+                <>
+                  <Button
+                    onClick={handleClose}
+                    style={{
+                      backgroundColor: "#2563EB",
+                      color: "white",
+                      padding: "6px 16px",
+                      fontSize: "14px",
+                      borderRadius: "4px",
+                      border: "none",
+                      minWidth: "auto",
+                      width: "auto",
+                    }}
+                  >
+                    Cancel
+                  </Button>
+
+                  <Button
+                    onClick={handleSaveChanges}
+                    disabled={isSavingChanges}
+                    style={{
+                      backgroundColor: "#2563EB",
+                      color: "white",
+                      padding: "6px 16px",
+                      fontSize: "14px",
+                      borderRadius: "4px",
+                      border: "none",
+                      minWidth: "auto",
+                      width: "auto",
+                    }}
+                  >
+                    {isSavingChanges && (
+                      <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    Save Changes
+                  </Button>
+                </>
+              )}
+
+              {canMarkAsDone && task?.pr_link && !task?.is_archive && (
                 <Button
-                  onClick={handleSaveChanges}
-                  disabled={isSavingChanges}
+                  onClick={handleMarkAsDone}
+                  disabled={isLoading}
                   style={{
                     backgroundColor: "#2563EB",
                     color: "white",
@@ -1165,39 +1202,27 @@ const TaskViewModal = ({
                     width: "auto",
                   }}
                 >
-                  {isSavingChanges && (
+                  {isLoading && (
                     <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
                   )}
-                  Save Changes
+                  Mark as Done
                 </Button>
-              </>
-            )}
+              )}
+            </DialogFooter>
+          </div>
+        </DialogContent>
+      </Dialog>
 
-            {canMarkAsDone && task?.pr_link && !task?.is_archive && (
-              <Button
-                onClick={handleMarkAsDone}
-                disabled={isLoading}
-                style={{
-                  backgroundColor: "#2563EB",
-                  color: "white",
-                  padding: "6px 16px",
-                  fontSize: "14px",
-                  borderRadius: "4px",
-                  border: "none",
-                  minWidth: "auto",
-                  width: "auto",
-                }}
-              >
-                {isLoading && (
-                  <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-                )}
-                Mark as Done
-              </Button>
-            )}
-          </DialogFooter>
-        </div>
-      </DialogContent>
-    </Dialog>
+      {/* NEW: Move to Sprint modal — rendered outside the main Dialog to avoid nesting issues */}
+      {task && isMoveToSprintOpen && (
+        <MoveToSprintModal
+          isOpen={isMoveToSprintOpen}
+          onClose={() => setIsMoveToSprintOpen(false)}
+          task={task}
+          projectId={projectId}
+        />
+      )}
+    </>
   );
 };
 

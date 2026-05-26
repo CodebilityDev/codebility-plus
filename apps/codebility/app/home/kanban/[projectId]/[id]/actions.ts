@@ -1215,3 +1215,153 @@ export const getDraftCount = async (
     };
   }
 };
+
+export async function transferTaskToSprint(
+  taskId: string,
+  destinationSprintId: string,
+  destinationColumnId?: string,
+): Promise<{ success: boolean; error?: string }> {
+  const supabase = await createClientServerComponent();
+ 
+  try {
+    // -------------------------------------------------------------------------
+    // 1. Fetch the task's current column so we can get the source board/project
+    // -------------------------------------------------------------------------
+    const { data: task, error: taskError } = await supabase
+      .from("tasks")
+      .select("id, kanban_column_id, title")
+      .eq("id", taskId)
+      .single();
+ 
+    if (taskError || !task) {
+      console.error("Error fetching task:", taskError);
+      return { success: false, error: "Task not found." };
+    }
+ 
+    const { data: sourceColumn, error: sourceColumnError } = await supabase
+      .from("kanban_columns")
+      .select("board_id")
+      .eq("id", task.kanban_column_id)
+      .single();
+ 
+    if (sourceColumnError || !sourceColumn) {
+      console.error("Error fetching source column:", sourceColumnError);
+      return { success: false, error: "Source column not found." };
+    }
+ 
+    const sourceBoardId = sourceColumn.board_id;
+ 
+    // -------------------------------------------------------------------------
+    // 2. Fetch the source board's project_id (for permission check + revalidation)
+    // -------------------------------------------------------------------------
+    const { data: sourceBoard, error: sourceBoardError } = await supabase
+      .from("kanban_boards")
+      .select("project_id")
+      .eq("id", sourceBoardId)
+      .single();
+ 
+    if (sourceBoardError || !sourceBoard) {
+      console.error("Error fetching source board:", sourceBoardError);
+      return { success: false, error: "Source board not found." };
+    }
+ 
+    const projectId = sourceBoard.project_id;
+ 
+    // -------------------------------------------------------------------------
+    // 3. Fetch the destination sprint and verify it belongs to the same project
+    // -------------------------------------------------------------------------
+    const { data: destinationSprint, error: sprintError } = await supabase
+      .from("kanban_sprints")
+      .select("id, board_id, project_id, name")
+      .eq("id", destinationSprintId)
+      .single();
+ 
+    if (sprintError || !destinationSprint) {
+      console.error("Error fetching destination sprint:", sprintError);
+      return { success: false, error: "Destination sprint not found." };
+    }
+ 
+    if (destinationSprint.project_id !== projectId) {
+      return {
+        success: false,
+        error: "Cannot transfer task to a sprint in a different project.",
+      };
+    }
+ 
+    const destinationBoardId = destinationSprint.board_id;
+ 
+    // -------------------------------------------------------------------------
+    // 4. Resolve the target column on the destination board
+    //    - Use provided destinationColumnId if given and valid
+    //    - Otherwise fall back to the first column by position
+    // -------------------------------------------------------------------------
+    let targetColumnId: string | null = null;
+ 
+    if (destinationColumnId) {
+      // Verify the provided column actually belongs to the destination board
+      const { data: providedColumn, error: providedColumnError } = await supabase
+        .from("kanban_columns")
+        .select("id")
+        .eq("id", destinationColumnId)
+        .eq("board_id", destinationBoardId)
+        .single();
+ 
+      if (!providedColumnError && providedColumn) {
+        targetColumnId = providedColumn.id;
+      }
+    }
+ 
+    // Fall back: pick the first column by position on the destination board
+    if (!targetColumnId) {
+      const { data: firstColumn, error: firstColumnError } = await supabase
+        .from("kanban_columns")
+        .select("id, name")
+        .eq("board_id", destinationBoardId)
+        .order("position", { ascending: true })
+        .limit(1)
+        .single();
+ 
+      if (firstColumnError || !firstColumn) {
+        return {
+          success: false,
+          error:
+            "The destination sprint's board has no columns. Please add at least one column before transferring.",
+        };
+      }
+ 
+      targetColumnId = firstColumn.id;
+    }
+ 
+    // -------------------------------------------------------------------------
+    // 5. Update tasks.kanban_column_id — this is the single source of truth
+    // -------------------------------------------------------------------------
+    const { error: updateError } = await supabase
+      .from("tasks")
+      .update({
+        kanban_column_id: targetColumnId,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", taskId);
+ 
+    if (updateError) {
+      console.error("Error transferring task:", updateError);
+      return { success: false, error: updateError.message };
+    }
+ 
+    // -------------------------------------------------------------------------
+    // 6. Revalidate both boards so changes are visible immediately
+    // -------------------------------------------------------------------------
+    revalidatePath(`/home/kanban/${projectId}/${sourceBoardId}`);
+    revalidatePath(`/home/kanban/${projectId}/${destinationBoardId}`);
+    revalidatePath(`/home/kanban/${projectId}`);
+ 
+    return { success: true };
+  } catch (error) {
+    console.error("Unexpected error in transferTaskToSprint:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Failed to transfer task.",
+    };
+  }
+}
