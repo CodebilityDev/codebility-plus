@@ -1,12 +1,42 @@
 import { Suspense } from "react";
+import { redirect } from "next/navigation"; // Required for safe server-side routing redirects
 import { createClientServerComponent } from "@/utils/supabase/server"; 
 import { AppointmentTable } from "./_components/AppointmentTable";
 
-export const revalidate = 0;
+export const revalidate = 0; // Ensures fresh real-time parameters on view loads
 
 export default async function AppointmentsAdminPage() {
   const supabase = await createClientServerComponent();
 
+  // 1. Session boundary validation
+  const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
+  if (authError || !authUser) {
+    redirect("/login");
+  }
+
+  // 2. Fetch profile from 'codev' table to resolve the user's role_id
+  const { data: codev, error: codevError } = await supabase
+    .from("codev")
+    .select("role_id")
+    .eq("id", authUser.id)
+    .single();
+
+  if (codevError || !codev) {
+    redirect("/home"); // Redirect to basic dashboard if profile is missing
+  }
+
+  // 3. Match the exact role gating ('applicants' permission) that guards /home/admin-controls
+  const { data: rolePerms, error: roleError } = await supabase
+    .from("roles")
+    .select("applicants")
+    .eq("id", codev.role_id)
+    .single();
+
+  if (roleError || !rolePerms?.applicants) {
+    redirect("/home"); // Boot unauthorized users back to the standard home workspace
+  }
+
+  // 4. Authorized query execution matching the validated database columns
   const { data: appointmentsData, error } = await supabase
     .from("appointments")
     .select("*")

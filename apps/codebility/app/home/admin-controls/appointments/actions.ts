@@ -72,7 +72,7 @@ export async function updateAppointmentStatus(
       .eq("id", appointmentId);
 
     if (error) {
-      console.error("Supabase Database Mutation Error:", error.message);
+      console.error("Supabase Database Mutation Error:", error?.message);
       return {
         success: false,
         error: "Failed to persist database updates.",
