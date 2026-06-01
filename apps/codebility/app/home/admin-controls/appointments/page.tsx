@@ -2,12 +2,11 @@ import { Suspense } from "react";
 import { createClientServerComponent } from "@/utils/supabase/server"; 
 import { AppointmentTable } from "./_components/AppointmentTable";
 
-export const revalidate = 0; // Ensures fresh real-time parameters on view loads
+export const revalidate = 0;
 
 export default async function AppointmentsAdminPage() {
   const supabase = await createClientServerComponent();
 
-  // Queries row elements straight from your verified "appointments" table
   const { data: appointmentsData, error } = await supabase
     .from("appointments")
     .select("*")
@@ -16,33 +15,30 @@ export default async function AppointmentsAdminPage() {
   if (error) {
     console.error("Supabase Admin Initial Data Fetch Exception:", error.message);
     return (
-      <div className="flex h-64 items-center justify-center rounded-xl border border-red-500/20 bg-red-500/5 p-6 text-center text-red-400">
+      <div className="flex h-64 items-center justify-center rounded-xl border border-red-500/20 bg-red-500/5 p-6 text-center text-red-600 dark:text-red-400">
         <p className="text-sm font-medium">
-          An error occurred while retrieving appointment data. Please check connection scopes.
+          An error occurred while retrieving appointment data.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-6 p-6 max-w-7xl mx-auto w-full min-h-screen text-neutral-200">
-      {/* Header Info Meta Panels */}
+    <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-6 p-6">
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-bold tracking-tight text-white font-sans">
+        <h1 className="text-dark200_light900 text-2xl font-bold tracking-tight">
           Client Appointment Management
         </h1>
-        <p className="text-xs text-neutral-400 max-w-2xl">
-          Review prospect information fields captured through the three-step contact pipeline widget. 
-          Click on any list row entry to open the full survey analytics drawer layout.
+        <p className="max-w-2xl text-xs text-slate-600 dark:text-slate-400">
+          Review inquiries submitted through the contact flow. Click any row to view full details and update status.
         </p>
       </div>
 
-      {/* Replaced unknown Loader with a clean inline CSS custom loader layout block */}
       <Suspense 
         fallback={
-          <div className="flex h-64 w-full flex-col gap-3 items-center justify-center rounded-xl border border-neutral-800 bg-neutral-900/10">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-neutral-700 border-t-purple-500" />
-            <p className="text-xs text-neutral-500 animate-pulse">Gathering pipeline entries...</p>
+          <div className="background-light900_dark300 border-light_dark flex h-64 w-full flex-col items-center justify-center gap-3 rounded-xl border">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-300 border-t-purple-500 dark:border-slate-700" />
+            <p className="animate-pulse text-xs text-slate-600 dark:text-slate-400">Loading appointments...</p>
           </div>
         }
       >

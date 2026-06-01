@@ -12,6 +12,7 @@ import TaskAddModal from "@/app/home/kanban/[projectId]/[id]/_components/tasks/T
 import TaskViewModal from "@/app/home/kanban/[projectId]/[id]/_components/tasks/TaskViewModal";
 import ProjectAddModal from "@/app/home/projects/_components/ProjectAddModal";
 import ProjectDeleteModal from "@/app/home/projects/_components/ProjectDeleteModal";
+import ProjectEditModal from "@/app/home/projects/_components/ProjectEditModal";
 import ProjectViewModal from "@/app/home/projects/_components/ProjectViewModal";
 import ApplicantsEditModal from "@/components/modals/ApplicantsEditModal";
 import PrivacyPolicyModal from "@/components/modals/PrivacyPolicyModal";
@@ -59,6 +60,7 @@ export const ModalProviderHome = ({ children }: ModalProviderHomeProps = {}) => 
       <KanbanAddMembersModal />
 
       <ProjectAddModal />
+      <ProjectEditModal />
       <ProjectViewModal />
       <ProjectDeleteModal />
 

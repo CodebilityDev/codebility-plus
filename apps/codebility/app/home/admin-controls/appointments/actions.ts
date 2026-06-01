@@ -15,7 +15,6 @@ export async function updateAppointmentStatus(
   appointmentId: string,
   rawStatus: string
 ) {
-  // 1. Enforce strict type validation on the server boundary
   const parsedStatus = appointmentStatusSchema.safeParse(rawStatus);
 
   if (!parsedStatus.success) {
@@ -28,10 +27,45 @@ export async function updateAppointmentStatus(
   const status = parsedStatus.data;
   
   try {
-    // 2. Await the async server client initialization to bind header cookies properly
     const supabase = await createClientServerComponent();
 
-    // 3. Execute the update query on your verified "appointments" table
+    const {
+      data: { user: authUser },
+    } = await supabase.auth.getUser();
+
+    if (!authUser) {
+      return {
+        success: false,
+        error: "Not authenticated.",
+      };
+    }
+
+    const { data: codev, error: codevError } = await supabase
+      .from("codev")
+      .select("role_id")
+      .eq("id", authUser.id)
+      .single();
+
+    if (codevError || !codev) {
+      return {
+        success: false,
+        error: "User profile not found.",
+      };
+    }
+
+    const { data: rolePerms, error: roleError } = await supabase
+      .from("roles")
+      .select("applicants")
+      .eq("id", codev.role_id)
+      .single();
+
+    if (roleError || !rolePerms?.applicants) {
+      return {
+        success: false,
+        error: "You don't have permission to update appointments.",
+      };
+    }
+
     const { error } = await supabase
       .from("appointments")
       .update({ status })
@@ -45,17 +79,16 @@ export async function updateAppointmentStatus(
       };
     }
 
-    // 4. Force Next.js to purge cached layouts and fetch clean data instantly
     revalidatePath("/home/admin-controls/appointments");
 
     return {
       success: true,
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Unexpected Server Action Exception Block:", error);
     return {
       success: false,
-      error: error?.message || "An internal unexpected server error occurred.",
+      error: error instanceof Error ? error.message : "An internal unexpected server error occurred.",
     };
   }
 }

@@ -47,19 +47,20 @@ export interface AppAppointmentRow {
   phone_number: string | null;
   company_name: string | null;
   industry: string | null;
-  
-  // Step 2 Fields
-  services_interested?: string | null;
-  website_status?: string | null;
-  required_features?: string | null;
-  referral_source?: string | null;
-  interest_rating?: number | null;
-  message: string | null; // Mapped from comments/requirements text blocks
-  
+
+  // Step 2 Fields (must match appointments table columns)
+  service_interest: string | null;
+  project_type: string | null;
+  features_needed: string | null;
+  referral_source: string | null;
+  interest_level: number | null;
+  other_requirements: string | null;
+
   // Step 3 Fields
-  appointment_date: string | null; // Selected slot timestamp string value
-  meeting_type: string | null; // "Zoom" | "Google Meet"
-  meeting_tool_other?: string | null;
+  appointment_date: string | null;
+  appointment_time: string | null;
+  meeting_type: string | null;
+  meeting_tool_other: string | null;
   status: string | null;
   created_at: string;
 }
