@@ -3,6 +3,7 @@
 
 import { Codev } from "@/types/home/codev";
 import { createClientServerComponent } from "@/utils/supabase/server";
+import { requireRole } from "@/lib/server/auth-guard";
 import { revalidatePath } from "next/cache";
 
 /**
@@ -14,7 +15,7 @@ export const updateCodev = async (
   value: any,
   { codevId }: { codevId: string },
 ) => {
-  const supabase = await createClientServerComponent();
+  const { supabase } = await requireRole("inhouse");
 
   // Define keys and their corresponding target tables
   const keys = {
@@ -134,7 +135,7 @@ export const updateNdaUrls = async (
   signatureUrl: string,
   documentUrl: string
 ) => {
-  const supabase = await createClientServerComponent();
+  const { supabase } = await requireRole("inhouse");
 
   try {
     const { error } = await supabase
@@ -170,7 +171,7 @@ export const sendNdaEmailAction = async (
   subject: string,
   message: string
 ) => {
-  const supabase = await createClientServerComponent();
+  const { supabase } = await requireRole("inhouse");
 
   try {
     // Generate unique token with 7-day expiration
@@ -243,7 +244,7 @@ export const sendNdaEmailAction = async (
  * Handles foreign key relationships and file cleanup
  */
 export const deleteCodevAction = async (codevId: string) => {
-  const supabase = await createClientServerComponent();
+  const { supabase } = await requireRole("inhouse");
 
   try {
     // Get codev data first for cleanup

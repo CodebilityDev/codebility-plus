@@ -5,6 +5,7 @@ import { createClientServerComponent } from "@/utils/supabase/server";
 
 
 import { z } from "zod";
+import { requireSelfOrRole } from "@/lib/server/auth-guard";
 
 export const updateUserSchedule = async (
   {
@@ -16,7 +17,7 @@ export const updateUserSchedule = async (
   },
   codevId: string,
 ) => {
-  const supabase = await createClientServerComponent();
+  const { supabase } = await requireSelfOrRole(codevId, "dashboard");
   const { error } = await supabase
     .from("codev")
     .update({
@@ -29,7 +30,7 @@ export const updateUserSchedule = async (
 };
 
 export const startUserTimer = async (codevId: string) => {
-  const supabase = await createClientServerComponent();
+  const { supabase } = await requireSelfOrRole(codevId, "dashboard");
   const currentDate = new Date();
 
   const { error } = await supabase
@@ -43,7 +44,7 @@ export const startUserTimer = async (codevId: string) => {
 };
 
 const stopUserTimer = async (codevId: string) => {
-  const supabase = await createClientServerComponent();
+  const { supabase } = await requireSelfOrRole(codevId, "dashboard");
 
   const { error } = await supabase
     .from("codev")
@@ -55,9 +56,9 @@ const stopUserTimer = async (codevId: string) => {
 };
 
 export const logUserTime = async (formData: FormData) => {
-  const supabase = await createClientServerComponent();
-
   const codevId = formData.get("codevId") as string;
+  if (!codevId) throw new Error("codevId is required");
+  const { supabase } = await requireSelfOrRole(codevId, "dashboard");
   const taskId = formData.get("taskId");
 
   const { data: codevData, error: fetchingCodevError } = await supabase
@@ -93,7 +94,7 @@ export const logUserTime = async (formData: FormData) => {
 };
 
 export const updateUserTaskOnHand = async (codevId: string, taskId: string) => {
-  const supabase = await createClientServerComponent();
+  const { supabase } = await requireSelfOrRole(codevId, "dashboard");
 
   const formData = new FormData();
   formData.append("codevId", codevId);
@@ -121,7 +122,7 @@ export const updateUserAvailabilityStatus = async ({
 }
 ) => {
   try {
-    const supabase = await createClientServerComponent();
+    const { supabase } = await requireSelfOrRole(userId, "dashboard");
 
     const { error } = await supabase
       .from("codev")
