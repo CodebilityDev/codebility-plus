@@ -1,6 +1,7 @@
 "use server";
 
 import { createClientServerComponent } from "@/utils/supabase/server";
+import { requireRole } from "@/lib/server/auth-guard";
 import { FeatureModal } from "./type";
 
 export async function fetchActiveModal(): Promise<FeatureModal | null> {
@@ -55,7 +56,7 @@ export async function upsertActiveModal(
   data: Partial<FeatureModal>
 ): Promise<{ error: string | null }> {
   try {
-    const supabase = await createClientServerComponent();
+    const { supabase } = await requireRole("settings");
     const { error } = await supabase.from("feature_modals").upsert({
       ...data,
       updated_at: new Date().toISOString(),
@@ -72,7 +73,7 @@ export async function createModal(): Promise<{
   error: string | null;
 }> {
   try {
-    const supabase = await createClientServerComponent();
+    const { supabase } = await requireRole("settings");
     const { data, error } = await supabase
       .from("feature_modals")
       .insert({
@@ -102,7 +103,7 @@ export async function uploadModalImage(
   formData: FormData
 ): Promise<{ url: string | null; error: string | null }> {
   try {
-    const supabase = await createClientServerComponent();
+    const { supabase } = await requireRole("settings");
     const file = formData.get("file") as File;
 
     const ext = file.name.split(".").pop();
@@ -129,7 +130,7 @@ export async function deleteModal(
   id: string
 ): Promise<{ error: string | null }> {
   try {
-    const supabase = await createClientServerComponent();
+    const { supabase } = await requireRole("settings");
     const { error } = await supabase
       .from("feature_modals")
       .delete()
@@ -146,7 +147,7 @@ export async function toggleModalActive(
   is_active: boolean
 ): Promise<{ error: string | null }> {
   try {
-    const supabase = await createClientServerComponent();
+    const { supabase } = await requireRole("settings");
 
     const { error } = await supabase
       .from("feature_modals")
