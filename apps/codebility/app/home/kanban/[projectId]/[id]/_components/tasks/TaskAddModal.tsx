@@ -54,7 +54,6 @@ import KanbanRichTextEditor from "../kanban_modals/KanbanRichTextEditor";
 const PRIORITY_LEVELS = ["critical", "high", "medium", "low"];
 const TASK_TYPES = ["FEATURE", "BUG", "IMPROVEMENT", "DOCUMENTATION"];
 
-// Auto-save interval (30 seconds)
 const AUTO_SAVE_INTERVAL = 30000;
 
 interface CodevMember {
@@ -64,9 +63,6 @@ interface CodevMember {
   image_url?: string | null;
 }
 
-// ============================================================================
-// HELPER: Fetch Available Members
-// ============================================================================
 const fetchAvailableMembers = async (
   projectId: string,
 ): Promise<CodevMember[]> => {
@@ -104,9 +100,6 @@ const fetchAvailableMembers = async (
   }
 };
 
-// ============================================================================
-// COMPONENT: Member Selector
-// ============================================================================
 function MemberSelector({
   selectedMemberIds = [],
   onMembersChange,
@@ -252,9 +245,6 @@ function MemberSelector({
                 placeholder="Search members..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                // FIX CBP-102: Prevents Radix DropdownMenu typeahead from
-                // intercepting keystrokes and shifting focus away from this
-                // input to a matching DropdownMenuItem while the user is typing.
                 onKeyDown={(e) => e.stopPropagation()}
                 className="w-full rounded-md border px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800"
               />
@@ -322,14 +312,10 @@ function MemberSelector({
   );
 }
 
-// ============================================================================
-// MAIN COMPONENT: TaskAddModal with Auto-Save Draft
-// ============================================================================
 const TaskAddModal = () => {
   const { isOpen, onClose, type, data } = useModal();
   const isModalOpen = isOpen && type === "taskAddModal";
-  
-  // Form state
+
   const [mainAssignee, setMainAssignee] = useState<string>("");
   const [sidekicks, setSidekicks] = useState<string[]>([]);
   const [skillCategories, setSkillCategories] = useState<SkillCategory[]>([]);
@@ -342,18 +328,16 @@ const TaskAddModal = () => {
   const [priority, setPriority] = useState<string>("");
   const [taskType, setTaskType] = useState<string>("");
   const [skillCategory, setSkillCategory] = useState<string>("");
-  
-  // Draft state
+
   const [draftId, setDraftId] = useState<string | null>(null);
   const [availableDrafts, setAvailableDrafts] = useState<TaskDraft[]>([]);
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
   const [isSavingDraft, setIsSavingDraft] = useState(false);
-  
-  // Auto-save state
+
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
   const isAutoSavingRef = useRef(false);
-  
+
   const user = useUserStore((state) => state.user);
   const [supabase, setSupabase] = useState<any>(null);
   const { fetchBoardData } = useKanbanStore();
@@ -363,7 +347,6 @@ const TaskAddModal = () => {
     setHasUnsavedChanges(true);
   };
 
-  // Calculate points based on difficulty
   const getPointsFromDifficulty = (difficulty: string): number => {
     return DIFFICULTY_POINTS[difficulty as keyof typeof DIFFICULTY_POINTS] || 0;
   };
@@ -373,13 +356,6 @@ const TaskAddModal = () => {
     setHasUnsavedChanges(true);
   };
 
-  // ============================================================================
-  // AUTO-SAVE LOGIC (Gmail-style)
-  // ============================================================================
-
-  /**
-   * Check if form has any content worth saving
-   */
   const hasContent = useCallback(() => {
     return !!(
       title ||
@@ -394,9 +370,6 @@ const TaskAddModal = () => {
     );
   }, [title, description, selectedDifficulty, priority, taskType, skillCategory, mainAssignee, sidekicks, deadline]);
 
-  /**
-   * Auto-save draft silently without user interaction
-   */
   const autoSaveDraft = useCallback(async () => {
     if (!user?.id || !data?.projectId || !data?.listId || !hasContent() || isAutoSavingRef.current) {
       return;
@@ -406,13 +379,11 @@ const TaskAddModal = () => {
 
     try {
       const formData = new FormData();
-      
-      // Required fields for draft
+
       formData.append("created_by", user.id);
       formData.append("project_id", data.projectId);
       formData.append("intended_column_id", data.listId);
-      
-      // Optional fields
+
       if (title) formData.append("title", title);
       if (description) formData.append("description", description);
       if (selectedDifficulty) {
@@ -427,12 +398,11 @@ const TaskAddModal = () => {
       if (skillCategory) formData.append("skill_category_id", skillCategory);
 
       const result = await saveDraft(formData, draftId);
-      
+
       if (result.success) {
         setDraftId(result.draftId || null);
         setLastSavedAt(new Date());
         setHasUnsavedChanges(false);
-        // Silent save - no toast notification
       }
     } catch (error) {
       console.error("Auto-save error:", error);
@@ -441,23 +411,17 @@ const TaskAddModal = () => {
     }
   }, [user?.id, data?.projectId, data?.listId, title, description, selectedDifficulty, deadline, mainAssignee, sidekicks, priority, taskType, skillCategory, draftId, hasContent]);
 
-  /**
-   * Track changes and trigger auto-save timer
-   */
   useEffect(() => {
     if (!isModalOpen) return;
 
-    // Mark as changed if form has content
     if (hasContent()) {
       setHasUnsavedChanges(true);
     }
 
-    // Clear existing timer
     if (autoSaveTimerRef.current) {
       clearTimeout(autoSaveTimerRef.current);
     }
 
-    // Set new auto-save timer (30 seconds)
     if (hasUnsavedChanges && hasContent()) {
       autoSaveTimerRef.current = setTimeout(() => {
         autoSaveDraft();
@@ -471,18 +435,12 @@ const TaskAddModal = () => {
     };
   }, [isModalOpen, hasUnsavedChanges, hasContent, autoSaveDraft]);
 
-  /**
-   * Save draft before browser close/refresh
-   */
   useEffect(() => {
     if (!isModalOpen) return;
 
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (hasUnsavedChanges && hasContent()) {
-        // Try to save synchronously (best effort)
         autoSaveDraft();
-        
-        // Show browser confirmation dialog
         e.preventDefault();
         e.returnValue = "";
       }
@@ -492,11 +450,6 @@ const TaskAddModal = () => {
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [isModalOpen, hasUnsavedChanges, hasContent, autoSaveDraft]);
 
-  // ============================================================================
-  // DRAFT MANAGEMENT FUNCTIONS
-  // ============================================================================
-
-  // Load user's drafts when modal opens
   useEffect(() => {
     if (isModalOpen && data?.projectId && user?.id) {
       loadUserDrafts();
@@ -512,14 +465,12 @@ const TaskAddModal = () => {
     }
   };
 
-  // Handle loading a draft into the form
   const handleLoadDraft = async (selectedDraftId: string) => {
     const result = await loadDraft(selectedDraftId);
-    
+
     if (result.success && result.draft) {
       const draft = result.draft;
-      
-      // Populate all form fields
+
       setTitle(draft.title || "");
       setDescription(draft.description || "");
       setSelectedDifficulty(draft.difficulty || "");
@@ -529,18 +480,17 @@ const TaskAddModal = () => {
       setPriority(draft.priority || "");
       setTaskType(draft.type || "");
       setSkillCategory(draft.skill_category_id || "");
-      
+
       setDraftId(selectedDraftId);
       setLastSavedAt(new Date(draft.last_saved_at));
       setHasUnsavedChanges(false);
-      
+
       toast.success("Draft loaded");
     } else {
       toast.error(result.error || "Failed to load draft");
     }
   };
 
-  // Handle manual save (button click)
   const handleSaveAsDraft = async () => {
     if (!user?.id || !data?.projectId || !data?.listId) {
       toast.error("Missing required information");
@@ -556,11 +506,11 @@ const TaskAddModal = () => {
 
     try {
       const formData = new FormData();
-      
+
       formData.append("created_by", user.id);
       formData.append("project_id", data.projectId);
       formData.append("intended_column_id", data.listId);
-      
+
       if (title) formData.append("title", title);
       if (description) formData.append("description", description);
       if (selectedDifficulty) {
@@ -575,7 +525,7 @@ const TaskAddModal = () => {
       if (skillCategory) formData.append("skill_category_id", skillCategory);
 
       const result = await saveDraft(formData, draftId);
-      
+
       if (result.success) {
         setDraftId(result.draftId || null);
         setLastSavedAt(new Date());
@@ -593,7 +543,6 @@ const TaskAddModal = () => {
     }
   };
 
-  // Handle deleting current draft
   const handleDeleteDraft = async () => {
     if (!draftId) return;
 
@@ -601,7 +550,7 @@ const TaskAddModal = () => {
     if (!confirmed) return;
 
     const result = await deleteDraft(draftId);
-    
+
     if (result.success) {
       toast.success("Draft deleted");
       handleClose();
@@ -611,19 +560,15 @@ const TaskAddModal = () => {
     }
   };
 
-  // Reset form when modal closes
   const handleClose = async () => {
-    // Auto-save before closing if there are unsaved changes
     if (hasUnsavedChanges && hasContent()) {
       await autoSaveDraft();
     }
 
-    // Clear auto-save timer
     if (autoSaveTimerRef.current) {
       clearTimeout(autoSaveTimerRef.current);
     }
 
-    // Reset all form state
     setTitle("");
     setSelectedDifficulty("");
     setDescription("");
@@ -636,7 +581,7 @@ const TaskAddModal = () => {
     setTaskType("");
     setSkillCategory("");
     setHasUnsavedChanges(false);
-    
+
     onClose();
   };
 
@@ -674,10 +619,10 @@ const TaskAddModal = () => {
       formData.append("title", title);
       formData.append("skill_category_id", skillCategory);
       formData.append("difficulty", selectedDifficulty);
-      
+
       if (priority) formData.append("priority", priority);
       if (taskType) formData.append("type", taskType);
-      
+
       formData.append(
         "description",
         description.trim() || "<p>No description provided</p>",
@@ -694,11 +639,10 @@ const TaskAddModal = () => {
 
       const response = await createNewTask(formData);
       if (response.success) {
-        // If this was from a draft, delete the draft
         if (draftId) {
           await deleteDraft(draftId);
         }
-        
+
         toast.success("Task created successfully");
         handleClose();
         await fetchBoardData();
@@ -718,7 +662,11 @@ const TaskAddModal = () => {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={handleClose}>
-      <DialogContent className="phone:h-full phone:w-full tablet:h-full tablet:w-full h-auto max-h-[900px] w-[95vw] max-w-3xl overflow-y-auto bg-white p-4 dark:bg-gray-900">
+      {/* CHANGED: replaced max-h-[900px] with max-h-[90vh] — the fixed 900px had no
+          viewport cap at laptop widths (phone:/tablet: only cover ≤767px). On 1366x768
+          the base max-h-[900px] exceeded usable height (~650px), clipping the modal.
+          max-h-[90vh] caps it within the viewport at every breakpoint. */}
+      <DialogContent className="phone:h-full phone:w-full tablet:h-full tablet:w-full h-auto max-h-[90vh] w-[95vw] max-w-3xl overflow-y-auto bg-white p-4 dark:bg-gray-900">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -733,16 +681,14 @@ const TaskAddModal = () => {
                 <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
                   {draftId ? "Edit Draft Task" : "Add New Task"}
                 </DialogTitle>
-                
-                {/* Unsaved Changes Indicator */}
+
                 {hasUnsavedChanges && (
                   <span className="text-xs text-orange-500 dark:text-orange-400 animate-pulse">
                     ● Unsaved changes
                   </span>
                 )}
               </div>
-              
-              {/* Draft Selector Dropdown */}
+
               {availableDrafts.length > 0 && !draftId && (
                 <Select onValueChange={handleLoadDraft}>
                   <SelectTrigger className="w-[180px] text-xs">
@@ -760,15 +706,13 @@ const TaskAddModal = () => {
                 </Select>
               )}
             </div>
-            
-            {/* Draft Status Indicator */}
+
             {draftId && lastSavedAt && (
               <div className="text-xs text-gray-500 dark:text-gray-400">
                 💾 Last saved: {lastSavedAt.toLocaleTimeString()} • Auto-saving every 30s
               </div>
             )}
-            
-            {/* Auto-save Status */}
+
             {!draftId && hasContent() && (
               <div className="text-xs text-gray-500 dark:text-gray-400">
                 💡 Your work will be auto-saved as a draft
@@ -826,9 +770,9 @@ const TaskAddModal = () => {
 
             <div className="space-y-2">
               <Label className="text-sm font-medium">Priority  <span className="text-red-500">*</span></Label>
-              <Select 
-                name="priority" 
-                value={priority} 
+              <Select
+                name="priority"
+                value={priority}
                 onValueChange={(val) => {
                   setPriority(val);
                   setHasUnsavedChanges(true);
@@ -890,9 +834,9 @@ const TaskAddModal = () => {
 
             <div className="space-y-2">
               <Label className="text-sm font-medium">Task Type  <span className="text-red-500">*</span></Label>
-              <Select 
-                name="type" 
-                value={taskType} 
+              <Select
+                name="type"
+                value={taskType}
                 onValueChange={(val) => {
                   setTaskType(val);
                   setHasUnsavedChanges(true);
@@ -920,9 +864,9 @@ const TaskAddModal = () => {
 
             <div className="space-y-2">
               <Label className="text-sm font-medium">Skill Category  <span className="text-red-500">*</span></Label>
-              <Select 
-                name="skill_category_id" 
-                value={skillCategory} 
+              <Select
+                name="skill_category_id"
+                value={skillCategory}
                 onValueChange={(val) => {
                   setSkillCategory(val);
                   setHasUnsavedChanges(true);
@@ -1014,10 +958,8 @@ const TaskAddModal = () => {
             <KanbanRichTextEditor value={description} onChange={onChange} />
           </div>
 
-          {/* Enhanced Footer with Draft Actions */}
           <DialogFooter className="flex flex-col gap-2 sm:flex-row sm:justify-between pt-4">
             <div className="flex gap-2">
-              {/* Save as Draft Button */}
               <Button
                 type="button"
                 onClick={handleSaveAsDraft}
@@ -1037,8 +979,7 @@ const TaskAddModal = () => {
                 <Save className="mr-2 h-4 w-4" />
                 {isSavingDraft ? "Saving..." : "Save Draft"}
               </Button>
-              
-              {/* Delete Draft Button */}
+
               {draftId && (
                 <Button
                   type="button"
@@ -1060,9 +1001,8 @@ const TaskAddModal = () => {
                 </Button>
               )}
             </div>
-            
+
             <div className="flex gap-2 justify-end">
-              {/* Cancel Button */}
               <Button
                 type="button"
                 onClick={handleClose}
@@ -1080,8 +1020,7 @@ const TaskAddModal = () => {
               >
                 Cancel
               </Button>
-              
-              {/* Create Task Button */}
+
               <Button
                 type="submit"
                 style={{
