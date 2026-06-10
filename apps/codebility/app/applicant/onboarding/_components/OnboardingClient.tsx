@@ -16,11 +16,15 @@ interface OnboardingClientProps {
   applicantData: any;
 }
 
-const VIDEO_URLS = {
-  1: "https://hibnlysaokybrsufrdwp.supabase.co/storage/v1/object/public/codebility/onboarding-videos/part1.mp4", // Introduction - About Codebility
-  2: "https://hibnlysaokybrsufrdwp.supabase.co/storage/v1/object/public/codebility/onboarding-videos/part2.mp4", // Benefits, Culture & Expectations
-  3: "https://hibnlysaokybrsufrdwp.supabase.co/storage/v1/object/public/codebility/onboarding-videos/part3.mp4", // Roadmaps, Milestones & Tech Stack
-  4: "https://hibnlysaokybrsufrdwp.supabase.co/storage/v1/object/public/codebility/onboarding-videos/part4.mp4", // Portal Tour - Gamification & Workflow
+// Onboarding videos are hosted as UNLISTED YouTube videos to avoid Supabase
+// Storage egress costs. Each value is a YouTube video ID (the part after
+// `watch?v=` or `youtu.be/`), configured per environment via env vars:
+//   NEXT_PUBLIC_ONBOARDING_VIDEO_ID_1 ... _4
+const VIDEO_IDS: Record<number, string> = {
+  1: process.env.NEXT_PUBLIC_ONBOARDING_VIDEO_ID_1 ?? "", // Introduction - About Codebility
+  2: process.env.NEXT_PUBLIC_ONBOARDING_VIDEO_ID_2 ?? "", // Benefits, Culture & Expectations
+  3: process.env.NEXT_PUBLIC_ONBOARDING_VIDEO_ID_3 ?? "", // Roadmaps, Milestones & Tech Stack
+  4: process.env.NEXT_PUBLIC_ONBOARDING_VIDEO_ID_4 ?? "", // Portal Tour - Gamification & Workflow
 };
 
 const VIDEO_TITLES = {
@@ -236,7 +240,7 @@ export default function OnboardingClient({
 
           <VideoPlayer
             videoNumber={progress.currentVideo}
-            videoUrl={VIDEO_URLS[progress.currentVideo as keyof typeof VIDEO_URLS]}
+            videoId={VIDEO_IDS[progress.currentVideo] ?? ""}
             applicantId={applicantId}
             onVideoComplete={handleVideoComplete}
             canWatch={canWatchVideo(progress.currentVideo)}
