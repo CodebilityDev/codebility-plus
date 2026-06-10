@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import OnboardingStepper from "./OnboardingStepper";
 import VideoPlayer from "./VideoPlayer";
@@ -162,7 +163,7 @@ export default function OnboardingClient({
     if (result.success) {
       router.push("/applicant/waiting");
     } else {
-      alert("Failed to complete onboarding. Please try again.");
+      toast.error("Failed to complete onboarding. Please try again.");
       setIsCompleting(false);
     }
   };
