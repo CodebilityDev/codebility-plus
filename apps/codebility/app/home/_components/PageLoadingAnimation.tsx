@@ -1,3 +1,4 @@
+// apps/codebility/app/home/_components/PageLoadingAnimation.tsx
 "use client";
 
 import { motion } from "framer-motion";
@@ -80,8 +81,14 @@ export default function PageLoadingAnimation() {
         }}
       />
 
-      {/* Main content container */}
-      <div className="relative z-10">
+      {/*
+        FIX (CBP-131): Changed from `relative` to `relative flex flex-col items-center gap-8`
+        so the polygon and the status group stack vertically and center naturally.
+        Previously, the status group was `absolute` positioned relative to this div,
+        which was only as wide as the hexagon (128px), causing the wider status content
+        to overflow rightward ("lower-right drift").
+      */}
+      <div className="relative z-10 flex flex-col items-center gap-8">
         {/* Hexagonal container */}
         <motion.div
           className="relative"
@@ -203,7 +210,7 @@ export default function PageLoadingAnimation() {
           </div>
         </motion.div>
 
-        {/* Matrix-style code rain */}
+        {/* Matrix-style code rain — kept as absolute so it doesn't affect flex layout */}
         <div className="absolute -inset-20 pointer-events-none">
           {['01010', '11001', '10110', '00111'].map((code, i) => (
             <motion.div
@@ -244,9 +251,14 @@ export default function PageLoadingAnimation() {
           ))}
         </div>
 
-        {/* Advanced loading text with typewriter effect */}
+        {/*
+          FIX (CBP-131): Removed `absolute -bottom-20 left-1/2 transform -translate-x-1/2`.
+          Now a normal flex child — centers automatically under the polygon via the
+          parent's `flex flex-col items-center`. `w-full max-w-xs sm:max-w-sm md:max-w-md`
+          is preserved for responsive width capping.
+        */}
         <motion.div
-          className="absolute -bottom-20 left-1/2 transform -translate-x-1/2 w-full max-w-xs sm:max-w-sm md:max-w-md px-4"
+          className="w-full max-w-xs sm:max-w-sm md:max-w-md px-4"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1 }}
