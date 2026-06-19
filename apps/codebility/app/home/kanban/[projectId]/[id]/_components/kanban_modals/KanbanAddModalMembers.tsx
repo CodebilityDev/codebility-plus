@@ -46,6 +46,7 @@ import {
 import DifficultyPointsTooltip, {
   DIFFICULTY_LEVELS,
 } from "../DifficultyPointsTooltip";
+import { sanitizeHtml } from "@/utils/sanitize-html";
 
 // ============================================================================
 // CONSTANTS - Following DRY principle
@@ -824,7 +825,8 @@ const TaskViewModal = ({
             <div
               className="text-black-100 overflow-wrap tiptap-description resize-none whitespace-pre-wrap break-words dark:text-white"
               dangerouslySetInnerHTML={{
-                __html: task?.description || "No description provided",
+                //sanitize the description to prevent XSS attacks before rendering
+                __html: sanitizeHtml(task?.description || "No description provided"),
               }}
             />
           </div>
