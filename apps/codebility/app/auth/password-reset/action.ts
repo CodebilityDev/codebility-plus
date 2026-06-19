@@ -28,7 +28,7 @@ export const resetUserPassword = async (email: string) => {
         }
 
         const url = data.availability_status === "passed" 
-            ? `${origin}/auth/callback?redirect_to=/home/settings/account-settings` 
+            ? `${origin}/auth/callback?redirect_to=/home/account-settings` 
             : `${origin}/auth/callback?redirect_to=/applicant/account-settings`;
 
         /* 
