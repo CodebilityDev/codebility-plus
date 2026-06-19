@@ -111,7 +111,6 @@ interface CodevMember {
 
 const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
-// Fixed AssigneeSelector component with proper removal functionality
 function AssigneeSelector({
   primaryAssignee,
   onAssigneeChange,
@@ -321,8 +320,6 @@ const TaskViewModal = ({
   const [prLink, setPrLink] = useState("");
   const [originalPrLink, setOriginalPrLink] = useState("");
 
-  // NEW: Controls whether PR Link shows as hyperlink (false) or input (true)
-  // Starts as false so a saved link renders as a clickable <a> tag immediately
   const [isEditingPrLink, setIsEditingPrLink] = useState(false);
 
   const [supabase, setSupabase] = useState<any>(null);
@@ -420,7 +417,6 @@ const TaskViewModal = ({
     fetchBoardId();
   }, [task?.kanban_column_id, supabase]);
 
-  // Reset all state when a different task is opened
   useEffect(() => {
     if (!task?.id || !supabase) return;
 
@@ -431,11 +427,8 @@ const TaskViewModal = ({
     setPendingAssigneeId(undefined);
     setForceRefreshKey(Date.now().toString());
 
-    // NEW: If task already has a PR link, show it as hyperlink (not editing mode)
-    // If no PR link, go straight to edit mode so user can enter one
     setIsEditingPrLink(!taskPrLink);
 
-    // Fetch and set assignee
     const assigneeId = task.codev_id || task?.codev?.id;
     if (assigneeId) {
       supabase
@@ -516,7 +509,6 @@ const TaskViewModal = ({
       setOriginalPrLink(prLink);
       if (task) task.pr_link = prLink;
 
-      // NEW: After successful save, switch back to hyperlink display mode
       setIsEditingPrLink(false);
     } else {
       toast.error(response.error || "Failed to update PR Link");
@@ -605,7 +597,6 @@ const TaskViewModal = ({
       setPendingAssigneeId(undefined);
       setPrLink(originalPrLink);
 
-      // NEW: Reset edit mode — if original has a link, go back to hyperlink view
       setIsEditingPrLink(!originalPrLink);
 
       if (task?.codev_id || task?.codev?.id) {
@@ -636,7 +627,7 @@ const TaskViewModal = ({
 
     try {
       if (hasPrLinkChanges) {
-        await handleUpdate(); // handleUpdate already switches to hyperlink view on success
+        await handleUpdate();
       }
 
       if (manualSaveChanges) {
@@ -685,7 +676,10 @@ const TaskViewModal = ({
 
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
-      <DialogContent className="h-auto max-h-[90vh] w-[95vw] max-w-3xl overflow-y-auto bg-white p-3 dark:bg-gray-900 sm:max-h-[900px] sm:w-[90vw] sm:p-4">
+      {/* FIX: removed sm:max-h-[900px] — that override caused the modal to exceed
+          viewport height on 1366x768 laptops (sm: fires at >=640px, 900px > ~650px usable).
+          max-h-[90vh] now applies at all breakpoints, capping the modal within the viewport. */}
+      <DialogContent className="h-auto max-h-[90vh] w-[95vw] max-w-3xl overflow-y-auto bg-white p-3 dark:bg-gray-900 sm:w-[90vw] sm:p-4">
         <div className="flex flex-col gap-6">
           <div className="h-4 md:h-0"></div>
 
@@ -803,20 +797,11 @@ const TaskViewModal = ({
               />
             </div>
 
-            {/* ============================================================
-                PR LINK SECTION — CBP-58
-                3 states:
-                  1. Has link, view mode   → full-width clickable URL + "Edit PR Link" button below
-                  2. No link               → empty state label + "Add PR Link" button
-                  3. Editing               → full-width input (stacked), Update + Cancel buttons below
-                ============================================================ */}
             <div className="space-y-2">
               <Label className="text-sm font-medium">PR Link</Label>
 
-              {/* STATE 1: Saved PR link exists and NOT in edit mode → show full URL as hyperlink */}
               {!isEditingPrLink && prLink ? (
                 <div className="flex flex-col gap-2">
-                  {/* Full-width link row — user can clearly see and click the URL */}
                   <a
                     href={prLink}
                     target="_blank"
@@ -824,13 +809,11 @@ const TaskViewModal = ({
                     className="flex w-full items-center gap-2 overflow-hidden rounded-md border pt-2.5 pb-2.5 border-blue-300 bg-blue-50 px-3 py-2 text-sm text-blue-700 transition-colors hover:border-blue-500 hover:bg-blue-100 dark:border-blue-700 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:bg-blue-900/40"
                     title={`Open: ${prLink}`}
                   >
-                    {/* Icon stays fixed width, URL text fills remaining space */}
                     <ExternalLink className="h-4 w-4 shrink-0 text-blue-500" />
                     <span className="min-w-0 flex-1 truncate font-medium">{prLink}</span>
                     <span className="shrink-0 text-xs text-blue-400">open</span>
                   </a>
 
-                  {/* Edit button — only for users with modify permission */}
                   {canModifyTask && (
                     <button
                       type="button"
@@ -843,9 +826,7 @@ const TaskViewModal = ({
                   )}
                 </div>
               ) : isEditingPrLink ? (
-                /* STATE 3: Currently editing — full-width input stacked above action buttons */
                 <div className="flex flex-col gap-2">
-                  {/* Full-width input — no competition with buttons */}
                   <Input
                     autoFocus
                     value={prLink}
@@ -854,7 +835,6 @@ const TaskViewModal = ({
                     placeholder="https://github.com/org/repo/pull/123"
                   />
 
-                  {/* Action buttons row — below the input so input keeps full width */}
                   <div className="flex items-center gap-2">
                     <Button
                       onClick={handleUpdate}
@@ -885,15 +865,12 @@ const TaskViewModal = ({
                   </div>
                 </div>
               ) : (
-                /* STATE 2: No PR link set — clear empty state so user knows it's editable */
                 <div className="flex flex-col gap-2">
-                  {/* Empty state — dashed border signals "add something here" */}
                   <div className="flex items-center gap-2 rounded-md border border-dashed border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-400 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-500">
                     <ExternalLink className="h-4 w-4 shrink-0" />
                     <span>No PR link set</span>
                   </div>
 
-                  {/* Add button — only for users with modify permission */}
                   {canModifyTask && (
                     <button
                       type="button"
@@ -928,7 +905,6 @@ const TaskViewModal = ({
               </div>
             </div>
 
-            {/* Primary Assignee - allows modification even when assigned */}
             <div className="space-y-2">
               <Label className="text-sm font-medium">Primary Assignee</Label>
               {canModifyTask ? (
@@ -1009,7 +985,6 @@ const TaskViewModal = ({
             </div>
           )}
 
-          {/* Description Section */}
           <div className="space-y-2">
             <Label className="text-sm font-medium">Description</Label>
             <div className="rounded-md border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-800">
@@ -1056,7 +1031,6 @@ const TaskViewModal = ({
             </div>
           </div>
 
-          {/* Comments Section */}
           <div className="space-y-3 border-t border-gray-200 pt-4 dark:border-gray-700">
             <Button
               variant="ghost"
