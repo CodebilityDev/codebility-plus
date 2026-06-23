@@ -193,6 +193,7 @@ export default function MoveToSprintModal({
     setIsTransferring(true);
 
     // Optimistically remove task from the current board view
+    if (!task) return;
     removeTaskOptimistic(task.id);
     onClose();
     toast.success("Transferring task to sprint...");

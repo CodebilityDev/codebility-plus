@@ -704,6 +704,7 @@ const TaskViewModal = ({
   if (!isModalOpen && !isMoveToSprintOpen) return null;
 
   return (
+    <>
     <Dialog open={isModalOpen} onOpenChange={onClose}>
       {/* FIX: removed sm:max-h-[900px] — that override caused the modal to exceed
           viewport height on 1366x768 laptops (sm: fires at >=640px, 900px > ~650px usable).
@@ -1073,23 +1074,23 @@ const TaskViewModal = ({
               </div>
             </div>
 
-            {/* Comments Section */}
-            <div className="space-y-3 border-t border-gray-200 pt-4 dark:border-gray-700">
-              <Button
-                variant="ghost"
-                onClick={toggleComments}
-                className="w-full justify-between rounded-lg bg-gray-50 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-              >
-                <div className="flex items-center gap-2">
-                  <MessageCircle className="h-4 w-4" />
-                  <span>Comments ({commentCount})</span>
-                </div>
-                {showComments ? (
-                  <ChevronUp className="h-4 w-4" />
-                ) : (
-                  <ChevronDown className="h-4 w-4" />
-                )}
-              </Button>
+          {/* Comments Section */}
+          <div className="space-y-3 border-t border-gray-200 pt-4 dark:border-gray-700">
+            <Button
+              variant="ghost"
+              onClick={toggleComments}
+              className="w-full justify-between rounded-lg bg-gray-50 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+            >
+              <div className="flex items-center gap-2">
+                <MessageCircle className="h-4 w-4" />
+                <span>Comments ({commentCount})</span>
+              </div>
+              {showComments ? (
+                <ChevronUp className="h-4 w-4" />
+              ) : (
+                <ChevronDown className="h-4 w-4" />
+              )}
+            </Button>
 
               {showComments && (
                 <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-800/50 sm:p-4">
