@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClientServerComponent } from "@/utils/supabase/server";
 import { z } from "zod";
+import { getWeekRange, getMonthRange } from "@/lib/leaderboard-utils";
 
 interface TechnicalLeader {
   codev_id: string;
@@ -34,155 +35,106 @@ export async function GET(request: NextRequest) {
 
     let processedLeaders: TechnicalLeader[] = [];
 
-    // All-time leaderboard uses the codev_points running total for performance
-    if (timeFilter === "all") {
-      const { data: rawData, error: fallbackError } = await supabase
-        .from("codev_points")
-        .select(`
-          codev_id,
-          points,
-          created_at,
-          codev:codev_id!inner(first_name),
-          skill_category:skill_category_id!inner(name)
-        `)
-        .eq("skill_category.name", category)
-        .not("codev.first_name", "is", null);
+    // The tasks table is the single source of truth for points to ensure consistency
+    // across all-time, monthly, and weekly leaderboards.
+    let query = supabase
+      .from("tasks")
+      .select(`
+        points,
+        approved_at,
+        codev_id,
+        sidekick_ids,
+        codev:codev_id(first_name),
+        skill_category:skill_category_id!inner(name)
+      `)
+      .eq("skill_category.name", category)
+      .eq("is_archive", true);
 
-      if (fallbackError) {
-        console.error("Error fetching all-time technical leaderboard:", fallbackError);
-        return NextResponse.json(
-          { error: "Failed to fetch leaderboard data", details: fallbackError.message },
-          { status: 500 }
-        );
-      }
+    if (timeFilter === "weekly") {
+      const { startDate, endDate } = getWeekRange();
+      query = query.gte("approved_at", startDate.toISOString()).lte("approved_at", endDate.toISOString());
+    } else if (timeFilter === "monthly") {
+      const { startDate, endDate } = getMonthRange();
+      query = query.gte("approved_at", startDate.toISOString()).lte("approved_at", endDate.toISOString());
+    }
 
-      // Aggregate points (already aggregated in table, but handling duplicates just in case)
-      const userPointsMap = new Map<string, TechnicalLeader>();
+    const { data: rawTasks, error: tasksError } = await query;
 
-      rawData?.forEach((item: any) => {
-        const userId = item.codev_id;
-        const existing = userPointsMap.get(userId);
-        
+    if (tasksError) {
+      console.error(`Error fetching ${timeFilter} technical leaderboard tasks:`, tasksError);
+      return NextResponse.json(
+        { error: "Failed to fetch tasks data", details: tasksError.message },
+        { status: 500 }
+      );
+    }
+
+    const userPointsMap = new Map<string, { total_points: number; latest_update: string; first_name?: string }>();
+    const involvedUserIds = new Set<string>();
+
+    rawTasks?.forEach((task: any) => {
+      const points = task.points || 0;
+      const sidekickPoints = Math.floor(points * 0.5);
+
+      // Add points to primary assignee
+      if (task.codev_id) {
+        involvedUserIds.add(task.codev_id);
+        const existing = userPointsMap.get(task.codev_id);
         if (existing) {
-          existing.total_points += item.points || 0;
-          if (item.created_at > existing.latest_update) {
-            existing.latest_update = item.created_at;
-          }
+          existing.total_points += points;
+          // Use approved_at instead of updated_at
+          if (task.approved_at && task.approved_at > existing.latest_update) existing.latest_update = task.approved_at;
         } else {
-          userPointsMap.set(userId, {
-            codev_id: userId,
-            first_name: item.codev?.first_name || "Unknown",
-            total_points: item.points || 0,
-            latest_update: item.created_at
+          userPointsMap.set(task.codev_id, {
+            total_points: points,
+            latest_update: task.approved_at || new Date(0).toISOString(),
+            first_name: task.codev?.first_name
           });
         }
-      });
-
-      processedLeaders = Array.from(userPointsMap.values())
-        .filter(leader => leader.total_points > 0)
-        .sort((a, b) => b.total_points - a.total_points)
-        .slice(0, limit);
-
-    } else {
-      // Weekly/Monthly leaderboard calculates points from completed tasks based on approval date (updated_at)
-      const startDate = new Date();
-      if (timeFilter === "weekly") {
-        startDate.setDate(startDate.getDate() - startDate.getDay()); // Sunday
-        startDate.setHours(0, 0, 0, 0);
-      } else {
-        startDate.setDate(1); // 1st of month
-        startDate.setHours(0, 0, 0, 0);
       }
 
-      const { data: rawTasks, error: tasksError } = await supabase
-        .from("tasks")
-        .select(`
-          points,
-          updated_at,
-          codev_id,
-          sidekick_ids,
-          codev:codev_id(first_name),
-          skill_category:skill_category_id!inner(name)
-        `)
-        .eq("skill_category.name", category)
-        .eq("is_archive", true)
-        .gte("updated_at", startDate.toISOString());
-
-      if (tasksError) {
-        console.error(`Error fetching ${timeFilter} technical leaderboard tasks:`, tasksError);
-        return NextResponse.json(
-          { error: "Failed to fetch tasks data", details: tasksError.message },
-          { status: 500 }
-        );
-      }
-
-      const userPointsMap = new Map<string, { total_points: number; latest_update: string; first_name?: string }>();
-      const involvedUserIds = new Set<string>();
-
-      rawTasks?.forEach((task: any) => {
-        const points = task.points || 0;
-        const sidekickPoints = Math.floor(points * 0.5);
-
-        // Add points to primary assignee
-        if (task.codev_id) {
-          involvedUserIds.add(task.codev_id);
-          const existing = userPointsMap.get(task.codev_id);
+      // Add points to sidekicks
+      if (task.sidekick_ids && Array.isArray(task.sidekick_ids)) {
+        task.sidekick_ids.forEach((sidekickId: string) => {
+          involvedUserIds.add(sidekickId);
+          const existing = userPointsMap.get(sidekickId);
           if (existing) {
-            existing.total_points += points;
-            if (task.updated_at > existing.latest_update) existing.latest_update = task.updated_at;
+            existing.total_points += sidekickPoints;
+            if (task.approved_at && task.approved_at > existing.latest_update) existing.latest_update = task.approved_at;
           } else {
-            userPointsMap.set(task.codev_id, {
-              total_points: points,
-              latest_update: task.updated_at,
-              first_name: task.codev?.first_name
+            userPointsMap.set(sidekickId, {
+              total_points: sidekickPoints,
+              latest_update: task.approved_at || new Date(0).toISOString()
             });
           }
-        }
-
-        // Add points to sidekicks
-        if (task.sidekick_ids && Array.isArray(task.sidekick_ids)) {
-          task.sidekick_ids.forEach((sidekickId: string) => {
-            involvedUserIds.add(sidekickId);
-            const existing = userPointsMap.get(sidekickId);
-            if (existing) {
-              existing.total_points += sidekickPoints;
-              if (task.updated_at > existing.latest_update) existing.latest_update = task.updated_at;
-            } else {
-              userPointsMap.set(sidekickId, {
-                total_points: sidekickPoints,
-                latest_update: task.updated_at
-              });
-            }
-          });
-        }
-      });
-
-      // Fetch missing first names (for sidekicks)
-      const missingNameIds = Array.from(involvedUserIds).filter(id => !userPointsMap.get(id)?.first_name);
-      
-      if (missingNameIds.length > 0) {
-        const { data: namesData } = await supabase
-          .from("codev")
-          .select("id, first_name")
-          .in("id", missingNameIds);
-        
-        namesData?.forEach(n => {
-          const user = userPointsMap.get(n.id);
-          if (user) user.first_name = n.first_name;
         });
       }
+    });
 
-      processedLeaders = Array.from(userPointsMap.entries())
-        .map(([id, data]) => ({
-          codev_id: id,
-          first_name: data.first_name || "Unknown",
-          total_points: data.total_points,
-          latest_update: data.latest_update
-        }))
-        .filter(leader => leader.total_points > 0)
-        .sort((a, b) => b.total_points - a.total_points)
-        .slice(0, limit);
+    // Fetch missing first names (for sidekicks)
+    const missingNameIds = Array.from(involvedUserIds).filter(id => !userPointsMap.get(id)?.first_name);
+    
+    if (missingNameIds.length > 0) {
+      const { data: namesData } = await supabase
+        .from("codev")
+        .select("id, first_name")
+        .in("id", missingNameIds);
+      
+      namesData?.forEach(n => {
+        const user = userPointsMap.get(n.id);
+        if (user) user.first_name = n.first_name;
+      });
     }
+
+    processedLeaders = Array.from(userPointsMap.entries())
+      .map(([id, data]) => ({
+        codev_id: id,
+        first_name: data.first_name || "Unknown",
+        total_points: data.total_points,
+        latest_update: data.latest_update
+      }))
+      .filter(leader => leader.total_points > 0)
+      .sort((a, b) => b.total_points - a.total_points)
+      .slice(0, limit);
 
     return NextResponse.json({ 
       leaders: processedLeaders,

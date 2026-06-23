@@ -77,40 +77,46 @@ export async function getUserProjects(): Promise<{
     }
 
    
-    const { data: codevData, error: codevError } = await supabase
+    // Look up the caller's codev profile. Try by Supabase auth user id first
+    // (UUID is stable across email changes); fall back to email for legacy
+    // rows seeded before auth.users.id was linked.
+    let { data: codevData, error: codevError } = await supabase
       .from("codev")
-      .select("id, first_name, last_name")
-      .or(`id.eq.${user.id},email_address.eq.${user.email}`)
+      .select("id, role_id")
+      .eq("id", user.id)
       .maybeSingle();
+
+    if (!codevError && !codevData && user.email) {
+      ({ data: codevData, error: codevError } = await supabase
+        .from("codev")
+        .select("id, role_id")
+        .eq("email_address", user.email)
+        .maybeSingle());
+    }
 
     if (codevError) {
       console.error("Error fetching codev profile:", codevError);
       return { error: { message: "Failed to fetch user profile" }, data: null };
     }
 
-    // 2. FOUNDER/ADMIN OVERRIDE
-    // If user is Jzeff Kendrew Somera, grant full access to all projects automatically.
-    const isFounder = codevData?.first_name === "Jzeff Kendrew" && codevData?.last_name === "Somera";
-    
-    if (isFounder) {
+    if (!codevData) {
+      console.error("User profile not found for user:", user.id);
+      return { error: { message: "User profile not found" }, data: null };
+    }
+
+    // Admins get global project visibility for oversight.
+    if (codevData.role_id === 1) {
       const { data: allProjects, error: allProjectsError } = await supabase
         .from("projects")
         .select(`id, name, status, kanban_display, public_display, meeting_link`)
         .neq("status", "deleted");
 
       if (!allProjectsError && allProjects) {
-        const adminProjects = allProjects.map(p => ({
-          project: p as Project,
-          role: "admin",
-        }));
-        return { error: null, data: adminProjects };
+        return {
+          error: null,
+          data: allProjects.map(p => ({ project: p as Project, role: "admin" })),
+        };
       }
-    }
-
-    // 3. Fallback check for missing profile
-    if (!codevData) {
-      console.error("User profile not found for email:", user.email);
-      return { error: { message: "User profile not found" }, data: null };
     }
 
     const userCodevId = codevData.id;
@@ -130,7 +136,6 @@ export async function getUserProjects(): Promise<{
       project: DbProject;
     }
 
-    // 4. Fetch Assigned Projects
     const { data: projectMembers, error: projectMembersError } = await supabase
       .from("project_members")
       .select(`

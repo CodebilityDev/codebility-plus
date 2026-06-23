@@ -1,6 +1,7 @@
 "use server";
 
 import { createClientServerComponent } from "@/utils/supabase/server";
+import { requireUser } from "@/lib/server/auth-guard";
 
 interface SubmitTicketData {
   userId: string | null;
@@ -17,14 +18,14 @@ interface SubmitTicketData {
 }
 
 export async function submitTicket(data: SubmitTicketData) {
-  const supabase = await createClientServerComponent();
+  const { user, supabase } = await requireUser();
 
   // Generate a ticket number: TIC-XXXXX
   const ticketNumber = `TIC-${Math.floor(10000 + Math.random() * 90000)}`;
 
   const { error } = await supabase.from("ticket_support").insert({
     ticket_number: ticketNumber,
-    user_id: data.userId || null,
+    user_id: user.id,
     full_name: data.fullName,
     email: data.email || null,
     role_position: data.rolePosition || null,

@@ -59,4 +59,11 @@ export const adminControlsCardData: SettingsCardDataProps[] = [
     title: "Promotional Feature",
     description: "Edit promotional feature popups displayed on home page.",
   },
+  {
+    path: "/home/admin-controls/appointments",
+    imageName: "icon-admin-dashboard",
+    imageAlt: "Icon Client Appointments",
+    title: "Appointments",
+    description: "View three-step client form inquiries, survey details, and manage meeting schedules.",
+  },
 ];

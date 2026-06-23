@@ -6,7 +6,7 @@ This module implements a video-based onboarding system for applicants with seque
 
 - **Sequential Video Watching**: Users must complete videos in order (1 → 2 → 3 → 4)
 - **Progress Tracking**: Real-time tracking of video watch progress
-- **Validation**: Users must watch at least 90% of each video to unlock the next one
+- **Validation**: Users must watch at least 98% of each video to unlock the next one
 - **Visual Progress**: Stepper UI showing completion status
 - **Database Persistence**: All progress is saved to the database
 
@@ -26,34 +26,25 @@ Or use Supabase Dashboard:
 
 ## Video Setup
 
-### Option 1: Supabase Storage (Recommended)
+Onboarding videos are hosted as **unlisted YouTube videos** and embedded via the
+YouTube IFrame Player API. They are **not** stored on Supabase Storage — doing so
+generated excessive cached egress and repeatedly restricted the whole project.
 
-1. Create a storage bucket named `onboarding-videos` in Supabase
-2. Upload your 4 videos with the following naming convention:
-   - `onboarding-1.mp4` - Introduction
-   - `onboarding-2.mp4` - Company Culture
-   - `onboarding-3.mp4` - Tools & Processes
-   - `onboarding-4.mp4` - Getting Started
+Each video is referenced by its **YouTube ID** through environment variables:
 
-3. Update the `VIDEO_URLS` in `_components/OnboardingClient.tsx`:
-```typescript
-const VIDEO_URLS = {
-  1: "https://your-project.supabase.co/storage/v1/object/public/onboarding-videos/onboarding-1.mp4",
-  2: "https://your-project.supabase.co/storage/v1/object/public/onboarding-videos/onboarding-2.mp4",
-  3: "https://your-project.supabase.co/storage/v1/object/public/onboarding-videos/onboarding-3.mp4",
-  4: "https://your-project.supabase.co/storage/v1/object/public/onboarding-videos/onboarding-4.mp4",
-};
+```bash
+NEXT_PUBLIC_ONBOARDING_VIDEO_ID_1=<id>  # Introduction - About Codebility
+NEXT_PUBLIC_ONBOARDING_VIDEO_ID_2=<id>  # Benefits, Culture & Expectations
+NEXT_PUBLIC_ONBOARDING_VIDEO_ID_3=<id>  # Roadmaps, Milestones & Tech Stack
+NEXT_PUBLIC_ONBOARDING_VIDEO_ID_4=<id>  # Portal Tour - Gamification & Workflow
 ```
 
-### Option 2: Public Folder
+`OnboardingClient.tsx` reads these into `VIDEO_IDS` and passes them to
+`VideoPlayer.tsx`. To swap a video, upload a new **Unlisted** (not Private) video
+to YouTube and update the matching env var — no code change needed. Remember that
+`NEXT_PUBLIC_*` vars are inlined at build time, so production must be rebuilt.
 
-1. Create a `public/videos` folder in the root of your Next.js app
-2. Add your 4 videos with the naming convention above
-3. The current URLs in `OnboardingClient.tsx` are already configured for this option
-
-### Option 3: External Video Hosting
-
-Use any video hosting service (Vimeo, YouTube, AWS S3, etc.) and update the URLs accordingly.
+See `apps/codebility/docs/VIDEO_UPLOAD_GUIDE.md` for full upload steps.
 
 ## Flow
 
@@ -65,7 +56,7 @@ Use any video hosting service (Vimeo, YouTube, AWS S3, etc.) and update the URLs
 2. **Video Watching** (`/applicant/onboarding` - Step 1-4):
    - Shows progress stepper with 5 steps
    - Displays current video with player controls
-   - Tracks watch progress (must watch 90%+ to complete)
+   - Tracks watch progress (must watch 98%+ to complete)
    - Next video unlocks only after completing previous one
    - "Proceed to Quiz" button appears after all 4 videos
 
@@ -124,9 +115,9 @@ Main client component that manages the complete onboarding flow:
 
 ### `VideoPlayer.tsx`
 Video player component with:
-- HTML5 video controls
-- Progress tracking
-- Watch validation (90% threshold)
+- YouTube IFrame Player API embed (unlisted videos)
+- Progress tracking (polls playback position)
+- Watch validation (98% threshold)
 - Locked state for sequential videos
 - Auto-save progress to database
 
@@ -186,10 +177,8 @@ const VIDEO_DESCRIPTIONS = {
 ### Watch Threshold
 Change the completion percentage in `VideoPlayer.tsx`:
 ```typescript
-// Current: 90% threshold
-if (percentWatched >= 90 && !hasWatched) {
-  // Change 90 to your desired percentage
-}
+// Current: 98% threshold
+const COMPLETION_THRESHOLD = 98; // change to your desired percentage
 ```
 
 ### Styling
@@ -198,17 +187,16 @@ All components use Tailwind CSS and can be customized by modifying the className
 ## Security Features
 
 - Row Level Security (RLS) policies ensure users can only access their own progress
-- Video right-click disabled to prevent easy downloading
-- Download controls disabled
+- Videos are unlisted on YouTube (not indexed/searchable) and embedded without a direct download path
 - Progress validation on server-side
 
 ## Troubleshooting
 
 ### Videos not loading
-- Check video URLs in `VIDEO_URLS`
-- Ensure videos are in correct format (MP4 recommended)
-- Check browser console for network errors
-- Verify Supabase storage bucket permissions (if using Supabase)
+- Check the YouTube IDs in the `NEXT_PUBLIC_ONBOARDING_VIDEO_ID_*` env vars (IDs, not URLs)
+- Ensure each YouTube video is **Unlisted** (not Private) and allows embedding
+- In production, confirm you rebuilt after setting/changing the env vars
+- Check browser console for IFrame API errors
 
 ### Progress not saving
 - Check database connection

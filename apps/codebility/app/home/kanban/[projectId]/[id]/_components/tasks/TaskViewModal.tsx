@@ -656,6 +656,7 @@ const TaskViewModal = ({
     try {
       if (hasPrLinkChanges) {
         await handleUpdate();
+        await handleUpdate();
       }
 
       if (manualSaveChanges) {
@@ -703,11 +704,13 @@ const TaskViewModal = ({
   if (!isModalOpen && !isMoveToSprintOpen) return null;
 
   return (
-    <>
-      <Dialog open={isModalOpen} onOpenChange={onClose}>
-        <DialogContent className="h-auto max-h-[90vh] w-[95vw] max-w-3xl overflow-y-auto bg-white p-3 dark:bg-gray-900 sm:max-h-[900px] sm:w-[90vw] sm:p-4">
-          <div className="flex flex-col gap-6">
-            <div className="h-4 md:h-0"></div>
+    <Dialog open={isModalOpen} onOpenChange={onClose}>
+      {/* FIX: removed sm:max-h-[900px] — that override caused the modal to exceed
+          viewport height on 1366x768 laptops (sm: fires at >=640px, 900px > ~650px usable).
+          max-h-[90vh] now applies at all breakpoints, capping the modal within the viewport. */}
+      <DialogContent className="h-auto max-h-[90vh] w-[95vw] max-w-3xl overflow-y-auto bg-white p-3 dark:bg-gray-900 sm:w-[90vw] sm:p-4">
+        <div className="flex flex-col gap-6">
+          <div className="h-4 md:h-0"></div>
 
             {/* Title and Menu Row */}
             <div className="-mt-4 flex items-start justify-between">
