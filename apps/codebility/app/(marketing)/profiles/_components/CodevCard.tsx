@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import CodevBadge from "@/components/CodevBadge";
+import { item } from "@/components/FramerAnimation/Framer";
 import {
   AnimatePresence,
   motion,
@@ -116,19 +117,21 @@ const CodevCard = ({ codev, color }: Props) => {
   }, [codev.level, codev.codev_points]);
 
   return (
-    <div
-      className="h-64"
+    <motion.div
+      variants={item}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      className="h-80"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <div 
+      <div
         onClick={() => window.location.href = `https://www.codebility.tech/profiles/${codev.id}`}
-        className="group relative flex h-full w-full flex-col items-center justify-between rounded-lg border border-white/20 bg-white/10 p-4 shadow-2xl backdrop-blur-md transition-all duration-300 cursor-pointer hover:bg-white/20 hover:scale-[1.02] dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10"
+        className="group relative flex h-full w-full flex-col items-center justify-between rounded-lg border border-white/20 bg-white/10 p-6 shadow-2xl backdrop-blur-md transition-all duration-300 ease-out cursor-pointer hover:bg-white/20 hover:scale-[1.02] dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10"
       >
         {/* Background decoration */}
         <div className="from-customBlue-50/30 dark:from-customBlue-950/10 absolute inset-0 bg-gradient-to-br to-purple-50/30 opacity-0 transition-opacity duration-300 group-hover:opacity-100 dark:to-purple-950/10" />
         <div className="absolute -right-4 -top-4 h-32 w-32 rounded-full bg-gradient-to-br from-yellow-400/10 to-orange-400/10 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100" />
-        
+
         <div className="grid w-full grid-cols-4 gap-2">
           <div className="col-span-1" />
           <div className="relative col-span-2 flex justify-center">
@@ -141,9 +144,9 @@ const CodevCard = ({ codev, color }: Props) => {
                   ? codev.image_url
                   : "/assets/svgs/icon-codebility-black.svg"
               }
-              width={70}
-              height={70}
-              className={`${color} h-[70px] w-[70px] rounded-full bg-cover object-cover p-0.5`}
+              width={96}
+              height={96}
+              className={`${color} h-24 w-24 rounded-full bg-cover object-cover p-0.5 transition-transform duration-300 group-hover:scale-105`}
               onMouseMove={handleMouseMove}
               onError={(e) => {
                 console.error(
@@ -186,7 +189,7 @@ const CodevCard = ({ codev, color }: Props) => {
             <div className="absolute bottom-[1px] right-[1px]">
               <p
                 className={cn(
-                  "rounded-full border-2 p-2 text-[9px]",
+                  "rounded-full border-2 p-2.5 text-[9px]",
                   codev.availability_status
                     ? "border-green-600 bg-green-500"
                     : "border-red-600 bg-red-500",
@@ -202,9 +205,9 @@ const CodevCard = ({ codev, color }: Props) => {
                     <Button
                       variant="outline"
                       size="icon"
-                      className="h-8 w-8 rounded-full border-white/30 bg-white/20 backdrop-blur-sm transition-all duration-300 hover:bg-white/30 dark:border-white/20 dark:bg-white/10 dark:hover:bg-white/20"
+                      className="relative z-10 h-9 w-9 rounded-full border-white/30 bg-white/20 backdrop-blur-sm transition-all duration-300 hover:bg-white/30 active:scale-95 dark:border-white/20 dark:bg-white/10 dark:hover:bg-white/20"
                     >
-                      <BookOpenIcon className="h-3.5 w-3.5" />
+                      <BookOpenIcon className="h-4 w-4" />
                     </Button>
                   </Link>
                 </TooltipTrigger>
@@ -217,11 +220,11 @@ const CodevCard = ({ codev, color }: Props) => {
         </div>
         <div className="flex flex-col items-center gap-0.5">
           <div className="flex flex-col gap-1 text-center">
-            <p className="md:text-md relative z-10 text-sm capitalize text-white dark:text-white lg:text-base">
+            <p className="relative z-10 text-base capitalize text-white dark:text-white lg:text-lg">
               {codev.first_name} {codev.last_name}
             </p>
             {codev.display_position ? (
-              <p className="relative z-10 text-sm text-gray-200 dark:text-gray-300">
+              <p className="relative z-10 text-sm text-gray-200 dark:text-gray-300 lg:text-base">
                 {codev.display_position}
               </p>
             ) : (
@@ -229,7 +232,7 @@ const CodevCard = ({ codev, color }: Props) => {
             )}
           </div>
         </div>
-        <div className="flex min-h-[20px] items-center justify-center">
+        <div className="flex min-h-[24px] items-center justify-center">
           {filteredLevel && Object.keys(filteredLevel).length > 0 ? (
             <CodevBadge
               level={filteredLevel}
@@ -237,9 +240,11 @@ const CodevCard = ({ codev, color }: Props) => {
             />
           ) : null}
         </div>
-        <CodevHireCodevButton codevId={codev.id} />
+        <div className="relative z-10">
+          <CodevHireCodevButton codevId={codev.id} />
+        </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
