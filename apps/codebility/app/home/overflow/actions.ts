@@ -2,8 +2,40 @@
 "use server";
 
 import { createClientServerComponent } from "@/utils/supabase/server";
+import { requireUser } from "@/lib/server/auth-guard";
 import { revalidatePath } from "next/cache";
 import sharp from 'sharp';
+
+// Ownership guard for edit/delete actions: caller must own the row, or be an admin.
+// Returns { ok } on success; { notFound } if the row is missing.
+async function assertOwnerOrAdmin(
+  supabase: Awaited<ReturnType<typeof createClientServerComponent>>,
+  userId: string,
+  table: "overflow_post" | "overflow_comments",
+  id: number,
+): Promise<{ ok: boolean; notFound?: boolean }> {
+  const { data: row, error } = await supabase
+    .from(table)
+    .select("codev_id")
+    .eq("id", id)
+    .single();
+
+  if (error || !row) {
+    return { ok: false, notFound: true };
+  }
+
+  if (row.codev_id === userId) {
+    return { ok: true };
+  }
+
+  const { data: me } = await supabase
+    .from("codev")
+    .select("role_id")
+    .eq("id", userId)
+    .single();
+
+  return { ok: me?.role_id === 1 };
+}
 
 // Question 
 export interface Question {
@@ -230,11 +262,14 @@ export interface PostQuestionData {
 
 export async function postQuestion(data: PostQuestionData) {
   try {
-    const supabase = await createClientServerComponent();
+    const { supabase, user } = await requireUser();
+
+    // Never trust the client-supplied authorId — derive it from the session.
+    const authorId = user.id;
 
     // Upload all files in parallel (images with compression, documents as-is)
     const fileUploadPromises = data.images.map((base64File, index) => 
-      uploadImageToStorage(supabase, base64File, data.authorId)
+      uploadImageToStorage(supabase, base64File, authorId)
         .then(url => url)
     );
 
@@ -247,7 +282,7 @@ export async function postQuestion(data: PostQuestionData) {
     const { data: insertedQuestion, error } = await supabase
       .from('overflow_post')
       .insert({
-        codev_id: data.authorId,
+        codev_id: authorId,
         title: data.title,
         question_details: data.content,
         tags: JSON.stringify(data.tags),
@@ -342,7 +377,21 @@ async function deleteImageFromStorage(supabase: any, imageUrl: string): Promise<
 
 export async function updateQuestion(data: UpdateQuestionData) {
   try {
-    const supabase = await createClientServerComponent();
+    const { supabase, user } = await requireUser();
+
+    // Only the post owner (or an admin) may edit it.
+    const ownership = await assertOwnerOrAdmin(
+      supabase,
+      user.id,
+      "overflow_post",
+      parseInt(data.question_id),
+    );
+    if (ownership.notFound) {
+      return { success: false, error: "Post not found" };
+    }
+    if (!ownership.ok) {
+      return { success: false, error: "Forbidden" };
+    }
 
     // Fetch the current files from the database
     const { data: existingPost, error: fetchError } = await supabase
@@ -460,9 +509,29 @@ export async function updateQuestion(data: UpdateQuestionData) {
 
 
 export async function deletePostAndImages(postId: number) {
-  const supabase = await createClientServerComponent();
+  let supabase;
+  let user;
+  try {
+    ({ supabase, user } = await requireUser());
+  } catch {
+    return { success: false, error: "Unauthorized" };
+  }
 
   try {
+    // Only the post owner (or an admin) may delete it.
+    const ownership = await assertOwnerOrAdmin(
+      supabase,
+      user.id,
+      "overflow_post",
+      postId,
+    );
+    if (ownership.notFound) {
+      return { success: false, error: "Post not found" };
+    }
+    if (!ownership.ok) {
+      return { success: false, error: "Forbidden" };
+    }
+
     // 1. Fetch post by id to get file URLs
     const { data: post, error: fetchError } = await supabase
       .from("overflow_post")
@@ -616,10 +685,24 @@ export async function markAsSolution(
   postId: string,
 ) {
   try {
-    const supabase = await createClientServerComponent();
+    const { supabase, user } = await requireUser();
  
     const commentIdNum = parseInt(commentId);
     const postIdNum    = parseInt(postId);
+
+    // Only the post owner (or an admin) may accept/unaccept a solution.
+    const ownership = await assertOwnerOrAdmin(
+      supabase,
+      user.id,
+      "overflow_post",
+      postIdNum,
+    );
+    if (ownership.notFound) {
+      return { success: false, error: "Post not found" };
+    }
+    if (!ownership.ok) {
+      return { success: false, error: "Forbidden" };
+    }
  
     // Check whether this comment is already marked
     const { data: current, error: checkErr } = await supabase
@@ -670,7 +753,10 @@ export async function markAsSolution(
 // Post a new comment
 export async function postComment(data: PostCommentData) {
   try {
-    const supabase = await createClientServerComponent();
+    const { supabase, user } = await requireUser();
+
+    // Never trust client-supplied codev_id — derive it from the session.
+    const authorId = user.id;
 
     // Convert post_id to number for insertion
     const postIdNumber = parseInt(data.post_id);
@@ -679,7 +765,7 @@ export async function postComment(data: PostCommentData) {
     const { data: insertedComment, error } = await supabase
       .from('overflow_comments')
       .insert({
-        codev_id: data.codev_id,
+        codev_id: authorId,
         post_id: postIdNumber,
         comment: data.comment,
       })
@@ -725,7 +811,7 @@ export async function postComment(data: PostCommentData) {
       id: insertedComment.id.toString(),
       content: insertedComment.comment,
       author: {
-        id: codevData?.id || data.codev_id,
+        id: codevData?.id || authorId,
         name: codevData
           ? `${codevData.first_name} ${codevData.last_name}`.trim()
           : 'Unknown User',
@@ -799,10 +885,24 @@ export interface UpdateCommentData {
 // Add this function to your actions.ts file
 export async function updateComment(data: UpdateCommentData) {
   try {
-    const supabase = await createClientServerComponent();
+    const { supabase, user } = await requireUser();
 
     // Convert comment_id to number for the query
     const commentIdNumber = parseInt(data.comment_id);
+
+    // Only the comment owner (or an admin) may edit it.
+    const ownership = await assertOwnerOrAdmin(
+      supabase,
+      user.id,
+      "overflow_comments",
+      commentIdNumber,
+    );
+    if (ownership.notFound) {
+      return { success: false, error: "Comment not found" };
+    }
+    if (!ownership.ok) {
+      return { success: false, error: "Forbidden" };
+    }
 
     // Update the comment (no codev join to avoid RLS filtering)
     const { data: updatedComment, error } = await supabase
@@ -863,9 +963,23 @@ export async function updateComment(data: UpdateCommentData) {
 // Delete a comment
 export async function deleteComment(commentId: string) {
   try {
-    const supabase = await createClientServerComponent();
+    const { supabase, user } = await requireUser();
 
     const commentIdNumber = parseInt(commentId);
+
+    // Only the comment owner (or an admin) may delete it.
+    const ownership = await assertOwnerOrAdmin(
+      supabase,
+      user.id,
+      "overflow_comments",
+      commentIdNumber,
+    );
+    if (ownership.notFound) {
+      return { success: false, error: "Comment not found" };
+    }
+    if (!ownership.ok) {
+      return { success: false, error: "Forbidden" };
+    }
 
     // First, get the post_id before deleting
     const { data: commentData, error: fetchError } = await supabase
@@ -920,9 +1034,12 @@ export async function deleteComment(commentId: string) {
 
 
 // Toggle like for a post
-export async function togglePostLike(postId: string, userId: string) {
+export async function togglePostLike(postId: string, _userId?: string) {
   try {
-    const supabase = await createClientServerComponent();
+    const { supabase, user } = await requireUser();
+
+    // Never trust the client-supplied userId — derive it from the session.
+    const userId = user.id;
 
     // Check if user already liked this post
     const { data: existingLike, error: checkError } = await supabase
@@ -1056,9 +1173,12 @@ export async function fetchCommentLikes(userId: string, questionId: string): Pro
 }
 
 // Toggle like for a comment
-export async function toggleCommentLike(commentId: string, userId: string) {
+export async function toggleCommentLike(commentId: string, _userId?: string) {
   try {
-    const supabase = await createClientServerComponent();
+    const { supabase, user } = await requireUser();
+
+    // Never trust the client-supplied userId — derive it from the session.
+    const userId = user.id;
 
     const { data: existingLike, error: checkError } = await supabase
       .from("overflow_likes")

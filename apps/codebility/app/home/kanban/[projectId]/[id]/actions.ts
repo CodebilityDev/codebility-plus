@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { Task, TaskDraft } from "@/types/home/codev";
 import { createClientServerComponent } from "@/utils/supabase/server";
+import { requireUser } from "@/lib/server/auth-guard";
 import { createNotificationAction } from "@/lib/actions/notification.actions";
 
 interface CodevMember {
@@ -10,6 +11,85 @@ interface CodevMember {
   first_name: string;
   last_name: string;
   image_url?: string | null;
+}
+
+type GuardSupabase = Awaited<ReturnType<typeof createClientServerComponent>>;
+
+// ── Authorization helpers ────────────────────────────────────────────────────
+// All kanban actions here operate on a task/column/draft id, so we resolve the
+// owning project and verify membership (admins bypass) before mutating.
+
+async function getProjectIdForColumn(
+  supabase: GuardSupabase,
+  columnId: string | null | undefined,
+): Promise<string | null> {
+  if (!columnId) return null;
+  const { data: column } = await supabase
+    .from("kanban_columns")
+    .select("board_id")
+    .eq("id", columnId)
+    .single();
+  if (!column?.board_id) return null;
+  const { data: board } = await supabase
+    .from("kanban_boards")
+    .select("project_id")
+    .eq("id", column.board_id)
+    .single();
+  return board?.project_id ?? null;
+}
+
+async function getProjectIdForTask(
+  supabase: GuardSupabase,
+  taskId: string,
+): Promise<string | null> {
+  const { data: task } = await supabase
+    .from("tasks")
+    .select("kanban_column_id")
+    .eq("id", taskId)
+    .single();
+  return getProjectIdForColumn(supabase, task?.kanban_column_id);
+}
+
+async function getProjectIdForBoard(
+  supabase: GuardSupabase,
+  boardId: string,
+): Promise<string | null> {
+  const { data: board } = await supabase
+    .from("kanban_boards")
+    .select("project_id")
+    .eq("id", boardId)
+    .single();
+  return board?.project_id ?? null;
+}
+
+// Throws "Forbidden" unless the caller is a member of the project or an admin.
+async function assertProjectMembership(
+  supabase: GuardSupabase,
+  userId: string,
+  projectId: string | null,
+): Promise<void> {
+  // If we could not resolve a project (e.g. missing row), the mutation will be a
+  // no-op against a non-existent target; authentication alone is sufficient.
+  if (!projectId) return;
+
+  const { data: me } = await supabase
+    .from("codev")
+    .select("role_id")
+    .eq("id", userId)
+    .single();
+
+  if (me?.role_id === 1) return; // admin bypass
+
+  const { data: member } = await supabase
+    .from("project_members")
+    .select("id")
+    .eq("project_id", projectId)
+    .eq("codev_id", userId)
+    .maybeSingle();
+
+  if (!member) {
+    throw new Error("Forbidden");
+  }
 }
 
 const updateDeveloperLevels = async (codevId?: string) => {
@@ -73,7 +153,9 @@ export const updateTaskColumnId = async (
   taskId: string,
   newColumnId: string,
 ): Promise<Task> => {
-  const supabase = await createClientServerComponent();
+  const { supabase, user } = await requireUser();
+  const projectId = await getProjectIdForTask(supabase, taskId);
+  await assertProjectMembership(supabase, user.id, projectId);
 
   try {
     const { data, error } = await supabase
@@ -156,7 +238,13 @@ export const fetchAvailableMembers = async (
 export const createNewTask = async (
   formData: FormData,
 ): Promise<{ success: boolean; error?: string }> => {
-  const supabase = await createClientServerComponent();
+  let supabase: GuardSupabase;
+  let user;
+  try {
+    ({ supabase, user } = await requireUser());
+  } catch {
+    return { success: false, error: "Unauthorized" };
+  }
 
   try {
     const title = formData.get("title")?.toString();
@@ -174,11 +262,20 @@ export const createNewTask = async (
       .split(",")
       .filter(Boolean);
     const skill_category_id = formData.get("skill_category_id")?.toString();
-    const created_by = formData.get("created_by")?.toString();
+    // Never trust a client-supplied creator — derive it from the session.
+    const created_by = user.id;
     const deadline = formData.get("deadline")?.toString() || null;
 
     if (!title || !kanban_column_id || !skill_category_id) {
       return { success: false, error: "Required fields are missing (title, column, and skill category)" };
+    }
+
+    // Verify the caller belongs to the project that owns the target column.
+    const projectId = await getProjectIdForColumn(supabase, kanban_column_id);
+    try {
+      await assertProjectMembership(supabase, user.id, projectId);
+    } catch {
+      return { success: false, error: "Forbidden" };
     }
 
     const { data: newTask, error } = await supabase.from("tasks").insert([
@@ -221,9 +318,7 @@ export const createNewTask = async (
         revalidatePath(`/home/kanban/${boardData.project_id}/${columnData.board_id}`);
 
         if (codev_id && newTask?.id) {
-          const { data: { user } } = await supabase.auth.getUser();
-
-          
+          // Reuse the already-authenticated caller (checked before the mutation).
           if (user && user.id !== codev_id) {
             await createNotificationAction({
               recipientId: codev_id,
@@ -257,7 +352,20 @@ export const updateTask = async (
   formData: FormData,
   taskId: string,
 ): Promise<{ success: boolean; error?: string }> => {
-  const supabase = await createClientServerComponent();
+  let supabase: GuardSupabase;
+  let user;
+  try {
+    ({ supabase, user } = await requireUser());
+  } catch {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  const projectId = await getProjectIdForTask(supabase, taskId);
+  try {
+    await assertProjectMembership(supabase, user.id, projectId);
+  } catch {
+    return { success: false, error: "Forbidden" };
+  }
 
   try {
     const rawCodevId = formData.get("codev_id")?.toString();
@@ -316,9 +424,7 @@ export const updateTask = async (
 
     // 3. NOTIFICATION LOGIC: Trigger if assignee changed and isn't null
     if (codev_id && codev_id !== existingTask.codev_id) {
-      // Get current user to avoid self-notification
-      const { data: { user } } = await supabase.auth.getUser();
-
+      // Reuse the already-authenticated caller (checked before the mutation).
       // Only send notification if assigning to someone else
       if (user && user.id !== codev_id) {
         // Fetch project info to build the action URL
@@ -357,7 +463,20 @@ export const updateTask = async (
 export const deleteTask = async (
   taskId: string,
 ): Promise<{ success: boolean; error?: string }> => {
-  const supabase = await createClientServerComponent();
+  let supabase: GuardSupabase;
+  let user;
+  try {
+    ({ supabase, user } = await requireUser());
+  } catch {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  const projectId = await getProjectIdForTask(supabase, taskId);
+  try {
+    await assertProjectMembership(supabase, user.id, projectId);
+  } catch {
+    return { success: false, error: "Forbidden" };
+  }
 
   try {
     const { data: taskData } = await supabase
@@ -410,7 +529,21 @@ export const createNewColumn = async (
   columnName: string,
   boardId: string,
 ): Promise<{ success: boolean; error?: string }> => {
-  const supabase = await createClientServerComponent();
+  let supabase: GuardSupabase;
+  let user;
+  try {
+    ({ supabase, user } = await requireUser());
+  } catch {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  const projectId = await getProjectIdForBoard(supabase, boardId);
+  try {
+    await assertProjectMembership(supabase, user.id, projectId);
+  } catch {
+    return { success: false, error: "Forbidden" };
+  }
+
   try {
     const { data: existingColumns, error: queryError } = await supabase
       .from("kanban_columns")
@@ -454,7 +587,20 @@ export const updateColumnPosition = async (
   columnId: string,
   newPosition: number,
 ): Promise<{ success: boolean; error?: string }> => {
-  const supabase = await createClientServerComponent();
+  let supabase: GuardSupabase;
+  let user;
+  try {
+    ({ supabase, user } = await requireUser());
+  } catch {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  const projectId = await getProjectIdForColumn(supabase, columnId);
+  try {
+    await assertProjectMembership(supabase, user.id, projectId);
+  } catch {
+    return { success: false, error: "Forbidden" };
+  }
 
   try {
     const { error } = await supabase
@@ -482,7 +628,21 @@ export const updateColumnPosition = async (
 export const deleteColumn = async (
   columnId: string,
 ): Promise<{ success: boolean; error?: string }> => {
-  const supabase = await createClientServerComponent();
+  let supabase: GuardSupabase;
+  let user;
+  try {
+    ({ supabase, user } = await requireUser());
+  } catch {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  const projectId = await getProjectIdForColumn(supabase, columnId);
+  try {
+    await assertProjectMembership(supabase, user.id, projectId);
+  } catch {
+    return { success: false, error: "Forbidden" };
+  }
+
   try {
     const { error } = await supabase
       .from("kanban_columns")
@@ -506,7 +666,20 @@ export const updateColumnName = async (
   columnId: string,
   newName: string,
 ): Promise<{ success: boolean; error?: string }> => {
-  const supabase = await createClientServerComponent();
+  let supabase: GuardSupabase;
+  let user;
+  try {
+    ({ supabase, user } = await requireUser());
+  } catch {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  const projectId = await getProjectIdForColumn(supabase, columnId);
+  try {
+    await assertProjectMembership(supabase, user.id, projectId);
+  } catch {
+    return { success: false, error: "Forbidden" };
+  }
 
   try {
     const { error } = await supabase
@@ -534,7 +707,23 @@ export const updateColumnName = async (
 export const completeTask = async (
   task: Task,
 ): Promise<{ success: boolean; error?: string }> => {
-  const supabase = await createClientServerComponent();
+  let supabase: GuardSupabase;
+  let user;
+  try {
+    ({ supabase, user } = await requireUser());
+  } catch {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  const guardProjectId = await getProjectIdForColumn(
+    supabase,
+    task.kanban_column_id,
+  );
+  try {
+    await assertProjectMembership(supabase, user.id, guardProjectId);
+  } catch {
+    return { success: false, error: "Forbidden" };
+  }
 
   try {
     // Extract IDs safely from both flat and nested structures
@@ -728,7 +917,29 @@ export const completeTask = async (
 export async function batchUpdateTasks(
   updates: Array<{ taskId: string; newColumnId: string }>,
 ) {
-  const supabase = await createClientServerComponent();
+  let supabase: GuardSupabase;
+  let user;
+  try {
+    ({ supabase, user } = await requireUser());
+  } catch {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  try {
+    // Verify membership for every distinct project touched by the batch.
+    const projectIds = await Promise.all(
+      updates.map((u) => getProjectIdForTask(supabase, u.taskId)),
+    );
+    const uniqueProjectIds = [
+      ...new Set(projectIds.filter((id): id is string => Boolean(id))),
+    ];
+    for (const projectId of uniqueProjectIds) {
+      await assertProjectMembership(supabase, user.id, projectId);
+    }
+  } catch {
+    return { success: false, error: "Forbidden" };
+  }
+
   try {
     const updatePromises = updates.map(async (update) => {
       const { error } = await supabase
@@ -755,7 +966,21 @@ export async function batchUpdateTasks(
 }
 
 export async function updateTaskPRLink(taskId: string, prLink: string) {
-  const supabase = await createClientServerComponent();
+  let supabase: GuardSupabase;
+  let user;
+  try {
+    ({ supabase, user } = await requireUser());
+  } catch {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  const projectId = await getProjectIdForTask(supabase, taskId);
+  try {
+    await assertProjectMembership(supabase, user.id, projectId);
+  } catch {
+    return { success: false, error: "Forbidden" };
+  }
+
   try {
     const { error } = await supabase
       .from("tasks")
@@ -804,7 +1029,21 @@ export async function updateTaskPRLink(taskId: string, prLink: string) {
 }
 
 export async function unarchiveTask(taskId: string) {
-  const supabase = await createClientServerComponent();
+  let supabase: GuardSupabase;
+  let user;
+  try {
+    ({ supabase, user } = await requireUser());
+  } catch {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  const projectId = await getProjectIdForTask(supabase, taskId);
+  try {
+    await assertProjectMembership(supabase, user.id, projectId);
+  } catch {
+    return { success: false, error: "Forbidden" };
+  }
+
   try {
     const { error } = await supabase
       .from("tasks")
@@ -873,19 +1112,33 @@ export const saveDraft = async (
   formData: FormData,
   draftId?: string | null
 ): Promise<{ success: boolean; draftId?: string; error?: string }> => {
-  const supabase = await createClientServerComponent();
+  let supabase: GuardSupabase;
+  let user;
+  try {
+    ({ supabase, user } = await requireUser());
+  } catch {
+    return { success: false, error: "Unauthorized" };
+  }
 
   try {
-    const created_by = formData.get("created_by")?.toString();
+    // Never trust a client-supplied creator — derive it from the session.
+    const created_by = user.id;
     const project_id = formData.get("project_id")?.toString();
     const intended_column_id = formData.get("intended_column_id")?.toString();
 
     // Validate required fields
-    if (!created_by || !project_id || !intended_column_id) {
+    if (!project_id || !intended_column_id) {
       return {
         success: false,
-        error: "Missing required fields: created_by, project_id, or intended_column_id"
+        error: "Missing required fields: project_id or intended_column_id"
       };
+    }
+
+    // Only project members (or admins) may create/edit drafts in this project.
+    try {
+      await assertProjectMembership(supabase, user.id, project_id);
+    } catch {
+      return { success: false, error: "Forbidden" };
     }
 
     // Extract all form fields
@@ -1038,7 +1291,24 @@ export const loadDraft = async (
 export const deleteDraft = async (
   draftId: string
 ): Promise<{ success: boolean; error?: string }> => {
-  const supabase = await createClientServerComponent();
+  let supabase: GuardSupabase;
+  let user;
+  try {
+    ({ supabase, user } = await requireUser());
+  } catch {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  const { data: draftRow } = await supabase
+    .from("task_drafts")
+    .select("project_id")
+    .eq("id", draftId)
+    .single();
+  try {
+    await assertProjectMembership(supabase, user.id, draftRow?.project_id ?? null);
+  } catch {
+    return { success: false, error: "Forbidden" };
+  }
 
   try {
     const { error } = await supabase
@@ -1070,7 +1340,13 @@ export const deleteDraft = async (
 export const promoteDraft = async (
   draftId: string
 ): Promise<{ success: boolean; taskId?: string; error?: string }> => {
-  const supabase = await createClientServerComponent();
+  let supabase: GuardSupabase;
+  let user;
+  try {
+    ({ supabase, user } = await requireUser());
+  } catch {
+    return { success: false, error: "Unauthorized" };
+  }
 
   try {
     // Step 1: Fetch the draft
@@ -1082,6 +1358,13 @@ export const promoteDraft = async (
 
     if (fetchError || !draft) {
       return { success: false, error: "Draft not found" };
+    }
+
+    // Only project members (or admins) may promote a draft into a task.
+    try {
+      await assertProjectMembership(supabase, user.id, draft.project_id ?? null);
+    } catch {
+      return { success: false, error: "Forbidden" };
     }
 
     // Step 2: Validate required fields for task creation
@@ -1122,9 +1405,7 @@ export const promoteDraft = async (
 
     // Step 3.5: Trigger Notification if assignee exists in the draft
     if (draft.codev_id) {
-      // Get current user to avoid self-notification
-      const { data: { user } } = await supabase.auth.getUser();
-
+      // Reuse the already-authenticated caller (checked before the mutation).
       // Only send notification if assigning to someone else
       if (user && user.id !== draft.codev_id) {
         await createNotificationAction({
@@ -1222,7 +1503,13 @@ export async function transferTaskToSprint(
   destinationSprintId: string,
   destinationColumnId?: string,
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = await createClientServerComponent();
+  let supabase: GuardSupabase;
+  let user;
+  try {
+    ({ supabase, user } = await requireUser());
+  } catch {
+    return { success: false, error: "Unauthorized" };
+  }
  
   try {
     // -------------------------------------------------------------------------
@@ -1267,6 +1554,13 @@ export async function transferTaskToSprint(
     }
  
     const projectId = sourceBoard.project_id;
+
+    // Only members of the source project (or admins) may transfer its tasks.
+    try {
+      await assertProjectMembership(supabase, user.id, projectId);
+    } catch {
+      return { success: false, error: "Forbidden" };
+    }
  
     // -------------------------------------------------------------------------
     // 3. Fetch the destination sprint and verify it belongs to the same project
