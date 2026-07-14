@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@codevs/ui/tabs";
 import { useApplicantModal } from "./ApplicantClientWrapper";
+import ApplicantProcessTimeline from "./ApplicantProcessTimeline";
 
 const ApplicantProfileModal = () => {
   const { isModalOpen, selectedApplicant, closeModal } = useApplicantModal();
@@ -185,6 +186,9 @@ const ApplicantProfileModal = () => {
 
           {/* About Tab */}
           <TabsContent value="about" className="mt-4 space-y-4 overflow-y-auto pr-2">
+            {/* Application Progress Timeline */}
+            <ApplicantProcessTimeline applicant={selectedApplicant} />
+
             {/* About Section */}
             {selectedApplicant.about && (
               <Section title="About">

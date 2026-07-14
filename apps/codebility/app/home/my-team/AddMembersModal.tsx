@@ -698,6 +698,7 @@ const AddMembersModal = ({
   // ✅ Initialize selected members - only on modal open, not when availableMembers changes
   const membersInitialized = useRef(false);
 
+  // ✅ Initialize selected members - ONLY when modal opens
   useEffect(() => {
     if (!isOpen) {
       membersInitialized.current = false;
@@ -710,7 +711,7 @@ const AddMembersModal = ({
 
     // Initialize directly from currentMembers (already fetched from DB by server)
     // Don't filter from availableMembers because current members might not match the smart filter
-    if (currentMembers.length > 0) {
+    if (currentMembers && currentMembers.length > 0) {
       // Convert SimpleMemberData to Codev format for selectedMembers
       const membersAsCodev = currentMembers.map(m => ({
         id: m.id,
@@ -719,15 +720,17 @@ const AddMembersModal = ({
         email_address: m.email_address,
         display_position: m.display_position,
         image_url: m.image_url,
+        username: null,
+        username_updated_at: null,
         positions: [],
         tech_stacks: [],
-      } as Codev));
+      } as unknown as Codev));
 
       setSelectedMembers(membersAsCodev);
       membersInitialized.current = true;
     }
     // Mark as initialized even with no current members (new project)
-    else if (currentMembers.length === 0) {
+    else if (currentMembers && currentMembers.length === 0) {
       membersInitialized.current = true;
     }
   }, [isOpen, currentMembers]);
@@ -744,8 +747,8 @@ const AddMembersModal = ({
 
   // ✅ Remove member via X button on avatar
   const handleRemoveMember = useCallback((member: Codev) => {
-    setSelectedMembers(prev => prev.filter(m => m.id !== member.id));
-  }, []);
+    toggleMember(member);
+  }, [toggleMember]);
 
   const isSelected = useCallback((userId: string) => 
     selectedMembers.some(m => m.id === userId), 
@@ -888,36 +891,7 @@ const AddMembersModal = ({
 
   return (
     <>
-    <style>{`
-      /* Members grid: scrollbar gutter always reserved (no layout shift), thumb hidden until hover */
-      .members-scroll {
-        scrollbar-width: thin;
-        scrollbar-color: transparent transparent;
-      }
-      .members-scroll:hover {
-        scrollbar-color: rgba(99, 120, 255, 0.45) transparent;
-      }
-      .members-scroll::-webkit-scrollbar {
-        width: 4px;
-        background: transparent;
-      }
-      .members-scroll::-webkit-scrollbar-track {
-        background: transparent;
-        border: none;
-        box-shadow: none;
-      }
-      .members-scroll::-webkit-scrollbar-thumb {
-        background-color: transparent;
-        border-radius: 4px;
-        border: none;
-        box-shadow: none;
-      }
-      .members-scroll:hover::-webkit-scrollbar-thumb {
-        background-color: rgba(99, 120, 255, 0.45);
-      }
-    `}</style>
-    <div style={{display:'contents'}}>
-    <Dialog open={isOpen} onOpenChange={onClose}>
+      <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-full w-[85vw] sm:w-[80vw] lg:w-[80vw] h-[80vh] flex flex-col dark:bg-slate-950 border-2 border-slate-300 dark:border-blue-900/60 p-4 sm:p-0">
         <DialogHeader className="flex-shrink-0 px-3 sm:px-6 pt-1 pb-1">
           <DialogTitle className="text-lg sm:text-xl lg:text-2xl font-bold text-white">
@@ -1109,7 +1083,6 @@ const AddMembersModal = ({
                     <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent my-3"></div>
                   </div>
                 )}
-
                 {isLoadingMembers ? (
                   <div className="text-center py-8 text-gray-400">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-customBlue-500 mx-auto mb-3"></div>
@@ -1140,10 +1113,10 @@ const AddMembersModal = ({
                       <div
                         key={user.id}
                         onClick={() => toggleMember(user)}
-                        className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg cursor-pointer transition-all duration-200 ${
+                        className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg cursor-pointer transition-all duration-200 border-2 ${
                           isSelected(user.id) 
-                            ? 'bg-customBlue-600/30 ring-2 ring-customBlue-500' 
-                            : 'hover:bg-gray-700/30'
+                            ? 'bg-customGreen/10 border-customGreen shadow-[0_0_10px_rgba(75,206,151,0.2)]' 
+                            : 'bg-transparent border-transparent hover:bg-white/5'
                         }`}
                       >
                         <div className="flex-shrink-0">
@@ -1187,11 +1160,11 @@ const AddMembersModal = ({
                         <div className="flex-shrink-0">
                           <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded border-2 flex items-center justify-center transition-all duration-200 ${
                             isSelected(user.id) 
-                              ? 'bg-white border-white' 
-                              : 'bg-transparent border-gray-400'
+                              ? 'bg-customGreen border-customGreen' 
+                              : 'bg-transparent border-gray-500'
                           }`}>
                             {isSelected(user.id) && (
-                              <svg className="w-4 h-4 text-black font-bold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <svg className="w-4 h-4 text-white font-bold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                               </svg>
                             )}
@@ -1240,7 +1213,6 @@ const AddMembersModal = ({
         </div>
       </DialogContent>
     </Dialog>
-    </div>
     </>
   );
 };

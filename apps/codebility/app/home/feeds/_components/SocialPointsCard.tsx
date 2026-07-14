@@ -54,9 +54,9 @@ export default function SocialPointsCard() {
             ) : (
               <>
                 <p className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-2xl font-bold text-transparent">
-                  {points ?? 0}
+                  {points ?? 0} 
+                <span className="text-xs text-gray-500">points</span>
                 </p>
-                <p className="text-xs text-gray-500">points</p>
               </>
             )}
           </div>

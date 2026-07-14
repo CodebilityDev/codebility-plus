@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClientServerComponent } from "@/utils/supabase/server";
 import { z } from "zod";
+import { getWeekRange, getMonthRange } from "@/lib/leaderboard-utils";
 
 interface TechnicalLeader {
   codev_id: string;
@@ -32,109 +33,108 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Try to use the optimized database function first
-    const { data: leaders, error } = await supabase
-      .rpc('get_technical_leaderboard', { 
-        category_name: category,
-        time_filter: timeFilter,
-        result_limit: limit 
-      });
+    let processedLeaders: TechnicalLeader[] = [];
 
-    if (error) {
-      // Fallback to manual query if RPC doesn't exist
-      console.warn("RPC function not found, using fallback query:", error);
-      
-      // Optimized fallback using database-side aggregation
-      let query = supabase
-        .from("codev_points")
-        .select(`
-          codev_id,
-          points,
-          created_at,
-          codev:codev_id!inner(first_name),
-          skill_category:skill_category_id!inner(name)
-        `)
-        .eq("skill_category.name", category)
-        .not("codev.first_name", "is", null);
+    // The tasks table is the single source of truth for points to ensure consistency
+    // across all-time, monthly, and weekly leaderboards.
+    let query = supabase
+      .from("tasks")
+      .select(`
+        points,
+        approved_at,
+        codev_id,
+        sidekick_ids,
+        codev:codev_id(first_name),
+        skill_category:skill_category_id!inner(name)
+      `)
+      .eq("skill_category.name", category)
+      .eq("is_archive", true);
 
-      // Apply time filters
-      if (timeFilter === "weekly") {
-        const weekStart = new Date();
-        weekStart.setDate(weekStart.getDate() - weekStart.getDay());
-        weekStart.setHours(0, 0, 0, 0);
-        query = query.gte("created_at", weekStart.toISOString());
-      } else if (timeFilter === "monthly") {
-        const monthStart = new Date();
-        monthStart.setDate(1);
-        monthStart.setHours(0, 0, 0, 0);
-        query = query.gte("created_at", monthStart.toISOString());
-      }
+    if (timeFilter === "weekly") {
+      const { startDate, endDate } = getWeekRange();
+      query = query.gte("approved_at", startDate.toISOString()).lte("approved_at", endDate.toISOString());
+    } else if (timeFilter === "monthly") {
+      const { startDate, endDate } = getMonthRange();
+      query = query.gte("approved_at", startDate.toISOString()).lte("approved_at", endDate.toISOString());
+    }
 
-      const { data: rawData, error: fallbackError } = await query;
+    const { data: rawTasks, error: tasksError } = await query;
 
-      if (fallbackError) {
-        console.error("Error fetching technical leaderboard:", fallbackError);
-        return NextResponse.json(
-          { error: "Failed to fetch leaderboard data", details: fallbackError.message },
-          { status: 500 }
-        );
-      }
+    if (tasksError) {
+      console.error(`Error fetching ${timeFilter} technical leaderboard tasks:`, tasksError);
+      return NextResponse.json(
+        { error: "Failed to fetch tasks data", details: tasksError.message },
+        { status: 500 }
+      );
+    }
 
-      if (!rawData || rawData.length === 0) {
-        return NextResponse.json({ leaders: [], totalCount: 0 });
-      }
+    const userPointsMap = new Map<string, { total_points: number; latest_update: string; first_name?: string }>();
+    const involvedUserIds = new Set<string>();
 
-      // Aggregate points by user (database should do this, but fallback for compatibility)
-      const userPoints = new Map<string, {
-        codev_id: string;
-        first_name: string;
-        total_points: number;
-        latest_update: string;
-      }>();
+    rawTasks?.forEach((task: any) => {
+      const points = task.points || 0;
+      const sidekickPoints = Math.floor(points * 0.5);
 
-      rawData.forEach((item: any) => {
-        const userId = item.codev_id;
-        const existing = userPoints.get(userId);
-        
+      // Add points to primary assignee
+      if (task.codev_id) {
+        involvedUserIds.add(task.codev_id);
+        const existing = userPointsMap.get(task.codev_id);
         if (existing) {
-          existing.total_points += item.points || 0;
-          if (item.created_at > existing.latest_update) {
-            existing.latest_update = item.created_at;
-          }
+          existing.total_points += points;
+          // Use approved_at instead of updated_at
+          if (task.approved_at && task.approved_at > existing.latest_update) existing.latest_update = task.approved_at;
         } else {
-          userPoints.set(userId, {
-            codev_id: userId,
-            first_name: item.codev?.first_name || "Unknown",
-            total_points: item.points || 0,
-            latest_update: item.created_at
+          userPointsMap.set(task.codev_id, {
+            total_points: points,
+            latest_update: task.approved_at || new Date(0).toISOString(),
+            first_name: task.codev?.first_name
           });
         }
-      });
+      }
 
-      // Convert to array and sort
-      const processedLeaders: TechnicalLeader[] = Array.from(userPoints.values())
-        .filter(leader => leader.total_points > 0)
-        .sort((a, b) => {
-          if (b.total_points === a.total_points) {
-            return a.first_name.localeCompare(b.first_name);
+      // Add points to sidekicks
+      if (task.sidekick_ids && Array.isArray(task.sidekick_ids)) {
+        task.sidekick_ids.forEach((sidekickId: string) => {
+          involvedUserIds.add(sidekickId);
+          const existing = userPointsMap.get(sidekickId);
+          if (existing) {
+            existing.total_points += sidekickPoints;
+            if (task.approved_at && task.approved_at > existing.latest_update) existing.latest_update = task.approved_at;
+          } else {
+            userPointsMap.set(sidekickId, {
+              total_points: sidekickPoints,
+              latest_update: task.approved_at || new Date(0).toISOString()
+            });
           }
-          return b.total_points - a.total_points;
-        })
-        .slice(0, limit);
+        });
+      }
+    });
 
-      return NextResponse.json({ 
-        leaders: processedLeaders,
-        totalCount: processedLeaders.length 
+    // Fetch missing first names (for sidekicks)
+    const missingNameIds = Array.from(involvedUserIds).filter(id => !userPointsMap.get(id)?.first_name);
+    
+    if (missingNameIds.length > 0) {
+      const { data: namesData } = await supabase
+        .from("codev")
+        .select("id, first_name")
+        .in("id", missingNameIds);
+      
+      namesData?.forEach(n => {
+        const user = userPointsMap.get(n.id);
+        if (user) user.first_name = n.first_name;
       });
     }
 
-    // Process RPC results
-    const processedLeaders = leaders?.map((leader: any) => ({
-      codev_id: leader.codev_id,
-      first_name: leader.first_name || "Unknown",
-      total_points: leader.total_points || 0,
-      latest_update: leader.latest_update
-    })) || [];
+    processedLeaders = Array.from(userPointsMap.entries())
+      .map(([id, data]) => ({
+        codev_id: id,
+        first_name: data.first_name || "Unknown",
+        total_points: data.total_points,
+        latest_update: data.latest_update
+      }))
+      .filter(leader => leader.total_points > 0)
+      .sort((a, b) => b.total_points - a.total_points)
+      .slice(0, limit);
 
     return NextResponse.json({ 
       leaders: processedLeaders,

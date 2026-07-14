@@ -133,6 +133,9 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
       .filter(Boolean)
       .join(", ");
     const convertTo12Hour = (time24: string) => {
+      if (!time24 || !/^\d{1,2}:\d{2}$/.test(time24.trim())) {
+          return time24 || "—";
+        }
       const parts = time24.split(":");
       const hours = parts[0] || "0";
       const minutes = parts[1] || "00";

@@ -70,7 +70,7 @@ MemberAvatar.displayName = 'MemberAvatar';
 const TeamProjectCard = memo(({ project, userRole, onAddMembers, isLoading }: TeamProjectCardProps) => {
   const { project: projectInfo, teamLead, members } = project;
   const totalMembers = (members.data?.length ?? 0) + (teamLead.data ? 1 : 0);
-  const isTeamLead = userRole === "team_leader";
+  const isPrivileged = userRole === "team_leader" || userRole === "admin";
 
   return (
     <div className="group relative overflow-hidden rounded-2xl bg-white/20 backdrop-blur-md dark:bg-white/10 border border-white/30 dark:border-white/20 shadow-lg transition-all duration-500 hover:shadow-2xl hover:shadow-customBlue-500/20 hover:border-white/50 dark:hover:border-white/30 hover:-translate-y-2 hover:bg-white/30 dark:hover:bg-white/15 cursor-pointer">
@@ -108,7 +108,7 @@ const TeamProjectCard = memo(({ project, userRole, onAddMembers, isLoading }: Te
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {isTeamLead && (
+            {isPrivileged && (
               <Button
                 onClick={(e) => {
                   e.preventDefault();
@@ -125,7 +125,7 @@ const TeamProjectCard = memo(({ project, userRole, onAddMembers, isLoading }: Te
               </Button>
             )}
             
-            {!isTeamLead && (
+            {!isPrivileged && (
               <Link 
                 href={`/home/my-team/${projectInfo.id}/leaderboard`}
                 className="relative z-20"

@@ -9,6 +9,7 @@ import {
   subWeeks,
   subMonths
 } from "date-fns";
+import { getWeekRange, getMonthRange } from "@/lib/leaderboard-utils";
 
 export type LeaderboardTimeRange = "this-week" | "last-week" | "this-month" | "last-month";
 
@@ -41,6 +42,36 @@ export async function getLeaderboardData(
   error?: string;
 }> {
   const supabase = await createClientServerComponent();
+
+  // Fix #3: Verify the caller is authenticated and is a member of this project
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) {
+    return { success: false, data: [], error: "Unauthorized" };
+  }
+
+  // Resolve auth user to codev record
+  const { data: codevUser, error: codevError } = await supabase
+    .from("codev")
+    .select("id")
+    .ilike("email_address", user.email?.trim() || "")
+    .maybeSingle();
+
+  if (codevError || !codevUser) {
+    return { success: false, data: [], error: "Unauthorized" };
+  }
+
+  // Verify caller is a member of the requested project
+  const { data: membership, error: membershipError } = await supabase
+    .from("project_members")
+    .select("codev_id")
+    .eq("project_id", projectId)
+    .eq("codev_id", codevUser.id)
+    .maybeSingle();
+
+  if (membershipError || !membership) {
+    return { success: false, data: [], error: "Forbidden" };
+  }
+
   const now = new Date();
 
   let startDate: Date;
@@ -52,20 +83,25 @@ export async function getLeaderboardData(
       startDate = startOfWeek(prevWeek, { weekStartsOn: 1 });
       endDate = endOfWeek(prevWeek, { weekStartsOn: 1 });
       break;
-    case "this-month":
-      startDate = startOfMonth(now);
-      endDate = endOfMonth(now);
+    case "this-month": {
+      const currentMonth = getMonthRange();
+      startDate = currentMonth.startDate;
+      endDate = currentMonth.endDate;
       break;
-    case "last-month":
+    }
+    case "last-month": {
       const prevMonth = subMonths(now, 1);
       startDate = startOfMonth(prevMonth);
       endDate = endOfMonth(prevMonth);
       break;
+    }
     case "this-week":
-    default:
-      startDate = startOfWeek(now, { weekStartsOn: 1 });
-      endDate = endOfWeek(now, { weekStartsOn: 1 });
+    default: {
+      const currentWeek = getWeekRange();
+      startDate = currentWeek.startDate;
+      endDate = currentWeek.endDate;
       break;
+    }
   }
 
   try {
@@ -106,15 +142,14 @@ export async function getLeaderboardData(
       .select(`
         *,
         kanban_column:kanban_columns!inner(
-          name,
           board:kanban_boards!inner(project_id)
         )
       `)
       .eq("kanban_column.board.project_id", projectId)
       .in("codev_id", codevIds)
-      .or('name.ilike.Done,name.ilike.Completed', { foreignTable: 'kanban_columns' })
-      .gte("updated_at", startDate.toISOString())
-      .lte("updated_at", endDate.toISOString());
+      .eq("is_archive", true)
+      .gte("approved_at", startDate.toISOString())
+      .lte("approved_at", endDate.toISOString());
 
     if (tasksError) {
       console.warn("Task fetch error:", tasksError);
@@ -135,7 +170,8 @@ export async function getLeaderboardData(
       const memberTasks = taskData?.filter(t => t.codev_id === memberCodevId) || [];
       const tasksCompleted = memberTasks.length;
       const taskPoints = memberTasks.reduce((sum, task) => {
-        if (task.points) return sum + task.points;
+        // Fix #1: Use != null so explicit 0 is respected, not treated as falsy
+        if (task.points != null) return sum + task.points;
         const diff = task.difficulty?.toLowerCase();
         if (diff === "hard") return sum + 200;
         if (diff === "medium") return sum + 100;

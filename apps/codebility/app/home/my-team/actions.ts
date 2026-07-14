@@ -1,6 +1,7 @@
 "use server";
 
 import { createClientServerComponent } from "@/utils/supabase/server";
+import { requireUser } from "@/lib/server/auth-guard";
 import { revalidatePath } from "next/cache";
 
 // ============================================================================
@@ -12,20 +13,14 @@ import { revalidatePath } from "next/cache";
  * Only team leads can create checklist items
  */
 export async function createChecklistItem(formData: FormData) {
-  const supabase = await createClientServerComponent();
-
   try {
-    // Get current user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return { success: false, error: "Authentication required" };
-    }
+    const { user, supabase } = await requireUser();
 
     // Get user's codev profile
     const { data: codevProfile, error: codevError } = await supabase
       .from("codev")
       .select("id")
-      .eq("email_address", user.email)
+      .eq("id", user.id)
       .single();
 
     if (codevError || !codevProfile) {
@@ -135,20 +130,14 @@ export async function updateChecklistItem(
     due_date?: string;
   }
 ) {
-  const supabase = await createClientServerComponent();
-
   try {
-    // Get current user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return { success: false, error: "Authentication required" };
-    }
+    const { user, supabase } = await requireUser();
 
     // Get user's codev profile
     const { data: codevProfile, error: codevError } = await supabase
       .from("codev")
       .select("id")
-      .eq("email_address", user.email)
+      .eq("id", user.id)
       .single();
 
     if (codevError || !codevProfile) {
@@ -217,20 +206,14 @@ export async function updateChecklistItem(
  * Only team leads can delete checklist items
  */
 export async function deleteChecklistItem(itemId: string) {
-  const supabase = await createClientServerComponent();
-
   try {
-    // Get current user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return { success: false, error: "Authentication required" };
-    }
+    const { user, supabase } = await requireUser();
 
     // Get user's codev profile
     const { data: codevProfile, error: codevError } = await supabase
       .from("codev")
       .select("id")
-      .eq("email_address", user.email)
+      .eq("id", user.id)
       .single();
 
     if (codevError || !codevProfile) {
