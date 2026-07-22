@@ -18,59 +18,80 @@ type GuardSupabase = Awaited<ReturnType<typeof createClientServerComponent>>;
 // ── Authorization helpers ────────────────────────────────────────────────────
 // All kanban actions here operate on a task/column/draft id, so we resolve the
 // owning project and verify membership (admins bypass) before mutating.
+//
+// Resolvers return a discriminated result so assertProjectMembership can
+// distinguish "target row doesn't exist" (safe no-op) from "target exists but
+// no project could be resolved" (deny — fail closed).  See PR #609 review.
+
+type ProjectResolution =
+  | { found: false }
+  | { found: true; projectId: string | null };
 
 async function getProjectIdForColumn(
   supabase: GuardSupabase,
   columnId: string | null | undefined,
-): Promise<string | null> {
-  if (!columnId) return null;
+): Promise<ProjectResolution> {
+  if (!columnId) return { found: false };
   const { data: column } = await supabase
     .from("kanban_columns")
     .select("board_id")
     .eq("id", columnId)
     .single();
-  if (!column?.board_id) return null;
+  if (!column) return { found: false };
+  if (!column.board_id) return { found: true, projectId: null };
   const { data: board } = await supabase
     .from("kanban_boards")
     .select("project_id")
     .eq("id", column.board_id)
     .single();
-  return board?.project_id ?? null;
+  return { found: true, projectId: board?.project_id ?? null };
 }
 
 async function getProjectIdForTask(
   supabase: GuardSupabase,
   taskId: string,
-): Promise<string | null> {
+): Promise<ProjectResolution> {
   const { data: task } = await supabase
     .from("tasks")
     .select("kanban_column_id")
     .eq("id", taskId)
     .single();
-  return getProjectIdForColumn(supabase, task?.kanban_column_id);
+  if (!task) return { found: false };
+  return getProjectIdForColumn(supabase, task.kanban_column_id);
 }
 
 async function getProjectIdForBoard(
   supabase: GuardSupabase,
   boardId: string,
-): Promise<string | null> {
+): Promise<ProjectResolution> {
   const { data: board } = await supabase
     .from("kanban_boards")
     .select("project_id")
     .eq("id", boardId)
     .single();
-  return board?.project_id ?? null;
+  if (!board) return { found: false };
+  return { found: true, projectId: board.project_id ?? null };
 }
 
-// Throws "Forbidden" unless the caller is a member of the project or an admin.
+/**
+ * Throws "Forbidden" unless the caller is a member of the resolved project or
+ * an admin.  Fail-closed: if the target row exists but no project could be
+ * resolved (orphaned board, null FK, transient query failure) access is DENIED.
+ * Only when the target row itself doesn't exist (genuine no-op) is the check
+ * skipped — the subsequent mutation will harmlessly match zero rows.
+ */
 async function assertProjectMembership(
   supabase: GuardSupabase,
   userId: string,
-  projectId: string | null,
+  resolution: ProjectResolution,
 ): Promise<void> {
-  // If we could not resolve a project (e.g. missing row), the mutation will be a
-  // no-op against a non-existent target; authentication alone is sufficient.
-  if (!projectId) return;
+  // Target row doesn't exist → the mutation will be a real no-op.
+  if (!resolution.found) return;
+
+  // Target exists but project could not be resolved → DENY (fail closed).
+  if (!resolution.projectId) throw new Error("Forbidden");
+
+  const projectId = resolution.projectId;
 
   const { data: me } = await supabase
     .from("codev")
@@ -715,12 +736,12 @@ export const completeTask = async (
     return { success: false, error: "Unauthorized" };
   }
 
-  const guardProjectId = await getProjectIdForColumn(
-    supabase,
-    task.kanban_column_id,
-  );
+  // Authorize against the DB-trusted task id, NOT the client-supplied
+  // task.kanban_column_id — the whole `task` object is attacker-controlled.
+  // See PR #609 review, should-fix #2.
+  const guardResolution = await getProjectIdForTask(supabase, task.id);
   try {
-    await assertProjectMembership(supabase, user.id, guardProjectId);
+    await assertProjectMembership(supabase, user.id, guardResolution);
   } catch {
     return { success: false, error: "Forbidden" };
   }
@@ -927,14 +948,26 @@ export async function batchUpdateTasks(
 
   try {
     // Verify membership for every distinct project touched by the batch.
-    const projectIds = await Promise.all(
+    const resolutions = await Promise.all(
       updates.map((u) => getProjectIdForTask(supabase, u.taskId)),
     );
+
+    // Fail-closed: if any target exists but has no resolvable project, deny.
+    for (const res of resolutions) {
+      if (res.found && !res.projectId) {
+        throw new Error("Forbidden");
+      }
+    }
+
     const uniqueProjectIds = [
-      ...new Set(projectIds.filter((id): id is string => Boolean(id))),
+      ...new Set(
+        resolutions
+          .filter((r): r is { found: true; projectId: string } => r.found && r.projectId !== null)
+          .map((r) => r.projectId),
+      ),
     ];
     for (const projectId of uniqueProjectIds) {
-      await assertProjectMembership(supabase, user.id, projectId);
+      await assertProjectMembership(supabase, user.id, { found: true, projectId });
     }
   } catch {
     return { success: false, error: "Forbidden" };
@@ -1136,7 +1169,7 @@ export const saveDraft = async (
 
     // Only project members (or admins) may create/edit drafts in this project.
     try {
-      await assertProjectMembership(supabase, user.id, project_id);
+      await assertProjectMembership(supabase, user.id, { found: true, projectId: project_id ?? null });
     } catch {
       return { success: false, error: "Forbidden" };
     }
@@ -1305,7 +1338,7 @@ export const deleteDraft = async (
     .eq("id", draftId)
     .single();
   try {
-    await assertProjectMembership(supabase, user.id, draftRow?.project_id ?? null);
+    await assertProjectMembership(supabase, user.id, draftRow ? { found: true, projectId: draftRow.project_id ?? null } : { found: false });
   } catch {
     return { success: false, error: "Forbidden" };
   }
@@ -1362,7 +1395,7 @@ export const promoteDraft = async (
 
     // Only project members (or admins) may promote a draft into a task.
     try {
-      await assertProjectMembership(supabase, user.id, draft.project_id ?? null);
+      await assertProjectMembership(supabase, user.id, { found: true, projectId: draft.project_id ?? null });
     } catch {
       return { success: false, error: "Forbidden" };
     }
@@ -1557,7 +1590,7 @@ export async function transferTaskToSprint(
 
     // Only members of the source project (or admins) may transfer its tasks.
     try {
-      await assertProjectMembership(supabase, user.id, projectId);
+      await assertProjectMembership(supabase, user.id, { found: true, projectId });
     } catch {
       return { success: false, error: "Forbidden" };
     }
