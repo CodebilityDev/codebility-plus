@@ -275,7 +275,7 @@ export async function acceptApplicantAction(applicantId: string) {
             .from("codev")
             .update({
                 application_status: "passed",
-                role_id: 4,
+                role_id: 10,
                 date_joined: new Date().toISOString(),
                 updated_at: new Date().toISOString()
             })
@@ -305,7 +305,7 @@ export async function multipleAcceptApplicantAction(applicantIds: string[]) {
             .from("codev")
             .update({
                 application_status: "passed",
-                role_id: 4,
+                role_id: 10,
                 date_joined: new Date().toISOString(),
                 updated_at: new Date().toISOString()
             })

@@ -15,7 +15,7 @@ export const revalidate = 0;
 
 export default async function CodevsProfiles() {
   const [{ data: allCodevs, error }] = await Promise.all([
-    getCodevs({ filters: { role_id: 10 } }), // show only Codevs with role_id 10 which is Codev
+    getCodevs({ filters: { application_status: "passed" } }), // show only accepted Codevs (application_status is the source of truth)
   ]);
 
   if (error) {
