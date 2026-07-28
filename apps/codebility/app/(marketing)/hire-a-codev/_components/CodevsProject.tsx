@@ -37,13 +37,15 @@ export default async function ProjectSection() {
     return (
       <section className="bg-black-400 relative flex min-h-screen w-full flex-col justify-center text-center ">
         <div className="mb-10 space-y-2">
-          <h1 className="text-2xl font-bold uppercase tracking-[0.7em] text-white lg:text-4xl">
+          {/* CBP-135 follow-up: was <h1>, duplicated a second <h1> below for
+              one visual title. Demoted to non-heading eyebrow label. */}
+          <span className="block text-2xl font-bold uppercase tracking-[0.7em] text-white lg:text-4xl">
             Our Featured
-          </h1>
+          </span>
           <p className="text-customTeal text-lg font-bold lg:text-2xl">internal</p>
-          <h1 className="text-3xl font-normal uppercase -tracking-widest text-white lg:text-5xl">
+          <h2 className="text-3xl font-normal uppercase -tracking-widest text-white lg:text-5xl">
             Projects
-          </h1>
+          </h2>
         </div>
         <div className="text-center text-white">
           Error loading projects. Please try again.
@@ -65,7 +67,7 @@ export default async function ProjectSection() {
   if (activeProjects && activeProjects.length > 0) {
     for (const project of activeProjects) {
       let imageUrl = '';
-      
+
       if (project.main_image && project.main_image.trim()) {
         imageUrl = project.main_image.trim();
 
@@ -92,7 +94,7 @@ export default async function ProjectSection() {
         // Use fallback image for projects without images
         imageUrl = '/assets/images/index/projects-large.jpg';
       }
-      
+
       // Store both the image URL and project data
       projectsWithImages.push({
         ...project,
@@ -107,13 +109,15 @@ export default async function ProjectSection() {
   return (
     <Section className="bg-black-400 relative mt-10 flex  w-full flex-col justify-center text-center ">
       <div className="mb-10 space-y-2">
-        <h1 className="text-2xl font-bold uppercase tracking-[0.7em] text-white lg:text-4xl">
+        {/* CBP-135 follow-up: was <h1>, duplicated a second <h1> below for
+            one visual title. Demoted to non-heading eyebrow label. */}
+        <span className="block text-2xl font-bold uppercase tracking-[0.7em] text-white lg:text-4xl">
           Our Featured
-        </h1>
+        </span>
         <p className="text-customTeal text-lg font-bold lg:text-2xl">internal</p>
-        <h1 className="text-3xl font-normal uppercase -tracking-widest text-white lg:text-5xl">
+        <h2 className="text-3xl font-normal uppercase -tracking-widest text-white lg:text-5xl">
           Projects
-        </h1>
+        </h2>
       </div>
 
       {slides.length > 0 ? (
