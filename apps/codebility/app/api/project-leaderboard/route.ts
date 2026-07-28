@@ -35,8 +35,87 @@ export async function GET(request: NextRequest) {
 
     let processedLeaders: ProjectLeader[] = [];
 
-    // The tasks table is the single source of truth for points to ensure consistency
-    // across all-time, monthly, and weekly leaderboards.
+    // All-time totals come from the codev_points ledger via project membership, NOT from
+    // the tasks table. codev_points is append-only; the tasks table is mutable, so
+    // recomputing all-time totals from tasks silently drops points whose originating task
+    // was later deleted, un-archived, or had its skill_category cleared. Time-ranged views
+    // below still derive from tasks, where the approval date is the whole point.
+    if (timeFilter === "all") {
+      const { data: rawData, error: allTimeError } = await supabase
+        .from("projects")
+        .select(`
+          id,
+          name,
+          project_members(
+            codev_id,
+            codev_points(
+              points,
+              skill_category:skill_category_id(name)
+            )
+          )
+        `);
+
+      if (allTimeError) {
+        console.error("Error fetching all-time project leaderboard:", allTimeError);
+        return NextResponse.json(
+          { error: "Failed to fetch leaderboard data", details: allTimeError.message },
+          { status: 500 }
+        );
+      }
+
+      const allTimeMap = new Map<string, {
+        project_id: string;
+        project_name: string;
+        total_points: number;
+        members: Set<string>;
+        skill_breakdown: Record<string, number>;
+      }>();
+
+      rawData?.forEach((project: any) => {
+        const projectId = project.id;
+        if (!projectId) return;
+
+        if (!allTimeMap.has(projectId)) {
+          allTimeMap.set(projectId, {
+            project_id: projectId,
+            project_name: project.name || "Unknown Project",
+            total_points: 0,
+            members: new Set(),
+            skill_breakdown: {}
+          });
+        }
+        const projectData = allTimeMap.get(projectId)!;
+
+        project.project_members?.forEach((member: any) => {
+          if (member.codev_id) projectData.members.add(member.codev_id);
+          member.codev_points?.forEach((point: any) => {
+            const skillName = point.skill_category?.name || "Other";
+            const val = point.points || 0;
+            projectData.total_points += val;
+            projectData.skill_breakdown[skillName] = (projectData.skill_breakdown[skillName] || 0) + val;
+          });
+        });
+      });
+
+      processedLeaders = Array.from(allTimeMap.values())
+        .map(p => ({
+          project_id: p.project_id,
+          project_name: p.project_name,
+          total_points: p.total_points,
+          member_count: p.members.size,
+          skill_breakdown: p.skill_breakdown
+        }))
+        .filter(p => p.total_points > 0)
+        .sort((a, b) => b.total_points - a.total_points)
+        .slice(0, limit);
+
+      return NextResponse.json({
+        leaders: processedLeaders,
+        totalCount: processedLeaders.length
+      });
+    }
+
+    // Weekly/monthly are derived from approved tasks within the requested window.
     let query = supabase
       .from("tasks")
       .select(`
@@ -53,7 +132,7 @@ export async function GET(request: NextRequest) {
     if (timeFilter === "weekly") {
       const { startDate, endDate } = getWeekRange();
       query = query.gte("approved_at", startDate.toISOString()).lte("approved_at", endDate.toISOString());
-    } else if (timeFilter === "monthly") {
+    } else {
       const { startDate, endDate } = getMonthRange();
       query = query.gte("approved_at", startDate.toISOString()).lte("approved_at", endDate.toISOString());
     }
