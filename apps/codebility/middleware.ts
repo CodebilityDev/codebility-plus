@@ -34,9 +34,10 @@ const EMAIL_VERIFICATION_ROUTE = "/auth/verify";
 const WAITING_APPROVAL_ROUTE = "/auth/waiting";
 const APPLICATION_DECLINED_ROUTE = "/auth/declined";
 const APPLICANT_ROUTE = "/applicant";
+const TWO_FACTOR_ROUTE = "/auth/2fa-challenge";
 
 // Routes that authenticated users can always access regardless of application status
-const AUTH_STATUS_ROUTES = [APPLICATION_DECLINED_ROUTE, EMAIL_VERIFICATION_ROUTE] as const;
+const AUTH_STATUS_ROUTES = [APPLICATION_DECLINED_ROUTE, EMAIL_VERIFICATION_ROUTE, TWO_FACTOR_ROUTE] as const;
 
 const routePermissionMap: Record<string, keyof RolePermissions> = {
   "/home/interns": "interns",
@@ -121,6 +122,19 @@ export async function middleware(req: NextRequest) {
     // Handle non-authenticated users for protected routes
     if (authError || !user) {
       return redirectToLogin(req);
+    }
+
+    // Check Supabase MFA assurance level (2FA)
+    const { data: mfaData } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (mfaData) {
+      const { currentLevel, nextLevel } = mfaData;
+      if (nextLevel === "aal2" && currentLevel === "aal1") {
+        if (pathname !== TWO_FACTOR_ROUTE) {
+          return redirectTo(req, TWO_FACTOR_ROUTE);
+        }
+      } else if (currentLevel === "aal2" && pathname === TWO_FACTOR_ROUTE) {
+        return redirectTo(req, "/home");
+      }
     }
 
     // Allow authenticated users to access auth status routes without further checks
