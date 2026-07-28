@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { motion } from "framer-motion";
+import { fadeInOutDownToUp } from "@/components/FramerAnimation/Framer";
 import { SectionWrapper } from "@/components/shared/home";
 import { User, MessageSquare, UserCheck, Handshake } from "lucide-react";
 
@@ -248,30 +250,81 @@ const HiringProcess = () => {
           })}
         </div>
 
-        {/* ── Call to Action (unchanged from original) ── */}
-        <div className="mt-16 text-center">
-          <h3 className="mb-4 text-2xl font-semibold text-white">
-            Ready to Build Your Dream Team?
-          </h3>
-          <p className="mb-6 text-gray-300 max-w-2xl mx-auto">
-            Start your hiring journey today. Get matched with skilled developers
-            who can bring your vision to life.
-          </p>
-          <div className="flex flex-col gap-4 items-center sm:flex-row sm:justify-center">
-            <a
-              href="/contact"
-              className="inline-flex items-center justify-center rounded-full bg-customViolet-100 px-8 py-3 text-sm font-medium text-white transition-all hover:bg-customViolet-100/90"
-            >
-              Start Hiring Process
-            </a>
-            <a
-              href="/bookacall"
-              className="inline-flex items-center justify-center rounded-full border border-customTeal/20 bg-customTeal/10 px-8 py-3 text-sm font-medium text-customTeal transition-all hover:bg-customTeal/20 hover:border-customTeal/40"
-            >
-              Schedule a Call
-            </a>
+        {/* Call to Action */}
+        <motion.div
+          variants={fadeInOutDownToUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: false, amount: 0.3 }}
+          className="mt-16 px-4 sm:px-6 lg:px-0"
+        >
+          <div className="relative mx-auto max-w-5xl overflow-hidden rounded-2xl p-6 sm:p-8 lg:p-10 backdrop-blur-sm transition-all duration-300">
+
+            {/* Ambient animated glow background */}
+            <div className="absolute inset-0 -z-10 overflow-hidden rounded-2xl">
+              <motion.div
+                className="pointer-events-none absolute inset-0"
+                animate={{
+                  background: [
+                    "radial-gradient(circle at 30% 50%, rgba(45,212,191,0.15), transparent 60%)",
+                    "radial-gradient(circle at 70% 50%, rgba(124,58,237,0.15), transparent 60%)",
+                    "radial-gradient(circle at 30% 50%, rgba(45,212,191,0.15), transparent 60%)",
+                  ],
+                }}
+                transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+              />
+            </div>
+
+            <div className="relative flex flex-col gap-10 text-center md:flex-row md:items-center md:justify-between md:gap-8 md:text-left">
+
+              {/* Column 1: Text */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: false, amount: 0.3 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                className="flex flex-col gap-4 min-w-0"
+              >
+                <h3 className="text-3xl sm:text-4xl lg:text-4xl font-bold text-white leading-tight">
+                  Ready to Build Your Dream Team?
+                </h3>
+                <p className="text-base sm:text-xs text-gray-300">
+                  Start your hiring journey today. Get matched with skilled developers who can bring your vision to life.
+                </p>
+              </motion.div>
+
+              {/* Column 2: Buttons */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: false, amount: 0.3 }}
+                transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
+                className="flex flex-col sm:flex-row gap-3 items-center justify-center md:justify-end shrink-0 w-full md:w-auto"
+              >
+                <motion.a
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: false, amount: 0.3 }}
+                  transition={{ duration: 0.5, delay: 0.3 }}
+                  href="/contact"
+                  className="inline-flex w-full sm:w-auto items-center justify-center rounded-full bg-[#7C3AED] px-8 py-2.5 text-sm sm:text-base font-medium text-white transition-all hover:bg-[#7C3AED]/90"
+                >
+                  Start Hiring
+                </motion.a>
+                <motion.a
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: false, amount: 0.3 }}
+                  transition={{ duration: 0.5, delay: 0.45 }}
+                  href="/bookacall"
+                  className="inline-flex w-full sm:w-auto items-center justify-center rounded-full border border-customTeal/20 bg-transparent px-8 py-2.5 text-sm sm:text-base font-medium text-customTeal transition-all hover:bg-customTeal/20 hover:border-customTeal/40"
+                >
+                  Schedule a Call
+                </motion.a>
+              </motion.div>
+            </div>
           </div>
-        </div>
+        </motion.div>
       </div>
 
       {/* Background decoration (unchanged from original) */}

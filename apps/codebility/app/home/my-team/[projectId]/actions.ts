@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClientServerComponent } from "@/utils/supabase/server";
+import { requireProjectMember, requireUser } from "@/lib/server/auth-guard";
 
 const ATTENDANCE_POINTS_PER_DAY = 2;
 
@@ -91,7 +92,12 @@ export async function saveAttendance(record: {
   check_out?: string;
   notes?: string;
 }) {
-  const supabase = await createClientServerComponent();
+  let supabase;
+  try {
+    ({ supabase } = await requireProjectMember(record.project_id));
+  } catch {
+    return { success: false, error: "Forbidden" };
+  }
 
   try {
     const result = await saveAttendanceRecord(supabase, record);
@@ -155,7 +161,24 @@ export async function bulkSaveAttendance(
     notes?: string;
   }[]
 ) {
-  const supabase = await createClientServerComponent();
+  if (records.length === 0) {
+    return { success: true, results: [] };
+  }
+
+  let supabase;
+  try {
+    // Verify membership for every distinct project referenced by the batch.
+    const uniqueProjectIds = [
+      ...new Set(records.map((r) => r.project_id)),
+    ];
+    const primary = await requireProjectMember(uniqueProjectIds[0]!);
+    supabase = primary.supabase;
+    for (const projectId of uniqueProjectIds.slice(1)) {
+      await requireProjectMember(projectId);
+    }
+  } catch {
+    return { success: false, error: "Forbidden" };
+  }
 
   try {
     // ✅ Use saveAttendanceRecord (not saveAttendance) to avoid:
@@ -192,7 +215,14 @@ export async function bulkSaveAttendance(
 // If attendance_points ever drifts out of sync (e.g. after a migration),
 // run this once. Normal operation doesn't need it — the trigger handles everything.
 export async function syncAllAttendancePoints(projectId?: string) {
-  const supabase = await createClientServerComponent();
+  let supabase;
+  try {
+    ({ supabase } = projectId
+      ? await requireProjectMember(projectId)
+      : await requireUser());
+  } catch {
+    return { success: false, error: "Forbidden" };
+  }
 
   try {
 
@@ -288,7 +318,12 @@ export async function saveMeetingSchedule(
   projectId: string,
   schedule: { selectedDays: string[]; time: string; meetingLink?: string }
 ) {
-  const supabase = await createClientServerComponent();
+  let supabase;
+  try {
+    ({ supabase } = await requireProjectMember(projectId));
+  } catch {
+    return { success: false, error: "Forbidden" };
+  }
   try {
     const { data, error } = await supabase
       .from("projects")
@@ -346,13 +381,21 @@ export async function createMeeting(meetingData: {
   duration_minutes?: number;
   location?: string;
   meeting_link?: string;
-  created_by: string;
+  created_by?: string;
 }) {
-  const supabase = await createClientServerComponent();
+  let supabase;
+  let user;
   try {
+    ({ supabase, user } = await requireProjectMember(meetingData.project_id));
+  } catch {
+    return { success: false, error: "Forbidden" };
+  }
+  try {
+    // Never trust client-supplied identity — always derive from the session.
+    const { created_by: _ignoredClientCreatedBy, ...meetingFields } = meetingData;
     const { data, error } = await supabase
       .from("meetings")
-      .insert({ ...meetingData })
+      .insert({ ...meetingFields, created_by: user.id })
       .select()
       .single();
 
@@ -375,7 +418,12 @@ export async function sendMeetingNotification(
     meetingLink?: string;
   }
 ) {
-  const supabase = await createClientServerComponent();
+  let supabase;
+  try {
+    ({ supabase } = await requireProjectMember(projectId));
+  } catch {
+    return { success: false, error: "Forbidden", sent: 0, failed: 0 };
+  }
   try {
     const { data: project, error: projectError } = await supabase
       .from("projects")

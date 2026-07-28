@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { box } from "@/components/FramerAnimation/Framer";
 import DefaultPagination from "@/components/ui/pagination";
-import { pageSize } from "@/constants";
 import usePagination from "@/hooks/use-pagination";
 import getRandomColor from "@/lib/getRandomColor";
 import { Codev } from "@/types/home/codev";
@@ -13,6 +14,8 @@ import CodevListFilter from "./CodevListFilter";
 interface Props {
   codevs: Codev[];
 }
+
+const CODEVS_PER_PAGE = 5;
 
 export default function CodevList({ codevs }: Props) {
   const [toPaginateUser, setToPaginateUser] = useState<Codev[]>([]);
@@ -25,7 +28,7 @@ export default function CodevList({ codevs }: Props) {
     handleNextPage,
     handlePreviousPage,
     setCurrentPage,
-  } = usePagination(toPaginateUser, pageSize.codevsList);
+  } = usePagination(toPaginateUser, CODEVS_PER_PAGE);
 
   useEffect(() => {
     const filteredPosition = () => {
@@ -34,7 +37,6 @@ export default function CodevList({ codevs }: Props) {
         return;
       }
 
-      // Filter users based on the selected displayed position
       const filteredUser = codevs.filter(
         (codev) => codev.display_position === selectedPosition,
       );
@@ -57,10 +59,13 @@ export default function CodevList({ codevs }: Props) {
         setSelectedPosition={setSelectedPosition}
         users={codevs}
       />
-      <div
-        className={`grid h-full w-full grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 ${
-          paginatedUsers.length < 5 ? "xl:grid-cols-4" : "xl:grid-cols-5"
-        }`}
+      <motion.div
+        key={`${selectedPosition}-${currentPage}`}
+        variants={box}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: false, amount: 0.2 }}
+        className="grid h-full w-full grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
       >
         {paginatedUsers.map((codev) => (
           <CodevCard
@@ -69,9 +74,9 @@ export default function CodevList({ codevs }: Props) {
             codev={codev}
           />
         ))}
-      </div>
+      </motion.div>
       <div className="mt-6">
-        {codevs.length > pageSize.codevsList && (
+        {toPaginateUser.length > CODEVS_PER_PAGE && (
           <DefaultPagination
             currentPage={currentPage}
             handleNextPage={handleNextPage}

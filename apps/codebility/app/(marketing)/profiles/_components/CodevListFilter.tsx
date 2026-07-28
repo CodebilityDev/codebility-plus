@@ -46,7 +46,7 @@ const CodevListFilter: React.FC<Props> = ({
             aria-label="Position"
             className="text-md bg-white/10 backdrop-blur-sm dark:bg-white/5 h-12 w-full rounded-full border border-white/20 dark:border-white/10 px-6 text-white dark:text-white shadow-lg hover:bg-white/20 dark:hover:bg-white/10 transition-all duration-300"
           >
-            <SelectValue placeholder="Filter" />
+            <SelectValue placeholder="Filter by Role" />
           </SelectTrigger>
           <SelectContent
             ref={selectGroupRef}
