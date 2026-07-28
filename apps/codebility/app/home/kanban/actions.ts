@@ -1,6 +1,6 @@
 "use server";
 
-import { createClientServerComponent } from "@/utils/supabase/server";
+import { requireRole } from "@/lib/server/auth-guard";
 import { revalidatePath } from "next/cache";
 
 
@@ -14,7 +14,12 @@ interface CreateBoardResult {
 export const createNewBoard = async (
   formData: FormData,
 ): Promise<CreateBoardResult> => {
-  const supabase = await createClientServerComponent();
+  let supabase;
+  try {
+    ({ supabase } = await requireRole("kanban"));
+  } catch {
+    return { success: false, error: "Forbidden" };
+  }
 
   const name = formData.get("name")?.toString();
   const description = formData.get("description")?.toString();
