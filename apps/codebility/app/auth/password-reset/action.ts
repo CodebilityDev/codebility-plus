@@ -5,17 +5,17 @@ import { headers } from "next/headers";
 
 export const resetUserPassword = async (email: string) => {
     try {
-
+        const normalizedEmail = email.toLowerCase().trim();
         const supabase = await createClientServerComponent();
         const headersList = await headers();
-        const origin = headersList.get("origin") || process.env.NEXT_PUBLIC_APP_BASE_URL;
+        const origin = headersList.get("origin") || process.env.NEXT_PUBLIC_APP_BASE_URL || "http://localhost:3000";
 
-        // check the user of the email
+        // Check user record by email
         const { data, error: userError } = await supabase
             .from("codev")
-            .select()
-            .eq("email_address", email)
-            .single();
+            .select("id, application_status")
+            .eq("email_address", normalizedEmail)
+            .maybeSingle();
 
         if (userError) {
             console.error("Database query error:", userError);
@@ -23,19 +23,18 @@ export const resetUserPassword = async (email: string) => {
         }
 
         if (!data) {
-            console.error("User not found for email:", email);
-            throw new Error("User not found");
+            console.error("User not found for email:", normalizedEmail);
+            throw new Error("No account found with this email address");
         }
 
-        const url = data.availability_status === "passed" 
+        // Determine redirect destination after magic link callback
+        const isPassed = data.application_status === "passed";
+        const url = isPassed 
             ? `${origin}/auth/callback?redirect_to=/home/account-settings` 
-            : `${origin}/auth/callback?redirect_to=/applicant/account-settings`;
+            : `${origin}/auth/callback?redirect_to=/applicant/waiting`;
 
-        /* 
-        * Send password reset email using Supabase
-        * The redirectTo URL is where the user will be redirected after clicking the link in the email
-        */
-        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        // Send password reset email using Supabase Auth
+        const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
             redirectTo: url,
         });
 
@@ -44,8 +43,9 @@ export const resetUserPassword = async (email: string) => {
             throw new Error(error.message || "Failed to send reset email");
         }
 
-    } catch (error) {
+        return { success: true };
+    } catch (error: any) {
         console.error("Error resetting password:", error);
-        throw new Error(`Failed to reset password: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        throw new Error(error.message || "Failed to reset password");
     }
 };

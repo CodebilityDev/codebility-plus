@@ -28,6 +28,7 @@ import {
 import { Input } from "@codevs/ui/input";
 
 import AccountSettingsBackdrop from "./AccountSettingsBackDrop";
+import { updateEmail } from "../action";
 import { createClientClientComponent } from "@/utils/supabase/client";
 
 const emailChangeSchema = z.object({
