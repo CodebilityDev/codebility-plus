@@ -11,7 +11,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { createClientClientComponent } from "@/utils/supabase/client";
-import { startOfMonth, startOfWeek, subDays, subWeeks, subMonths } from "date-fns";
 import { Trophy, Medal, Award, Star, Zap, Heart, Users, Calendar, UserRoundPen } from "lucide-react";
 
 import {
@@ -194,117 +193,23 @@ export default function WeeklyTop() {
     if (leaderboardType !== "projects") return;
 
     let isMounted = true;
-    const supabase = createClientClientComponent();
-    if (!supabase) return;
 
     const fetchProjectsLeaderboard = async () => {
       setIsLoading(true);
-      
+
       try {
-        let query = supabase
-          .from("codev_points")
-          .select(
-            `
-            points,
-            codev_id,
-            skill_category:skill_category_id!inner(name),
-            created_at
-          `,
-          );
+        const response = await fetch(
+          `/api/project-leaderboard?timeFilter=${timePeriod}&limit=10`,
+        );
 
-        // Removed .gte("created_at") from supabase query level to prevent dropping legacy users.
-        const { data, error } = await query;
-
-        if (!isMounted) return;
-
-        if (error) {
-          console.error("Error fetching project points:", error);
-          return;
+        if (!response.ok) {
+          throw new Error("Failed to fetch project leaderboard");
         }
 
-        if (data) {
+        const data = (await response.json()) as { leaders?: ProjectLeader[] };
 
-          // First, get all projects
-          const { data: projects, error: projectsError } = await supabase
-            .from("projects")
-            .select("id, name");
-
-          if (!isMounted) return;
-
-          if (projectsError) {
-            console.error("Error fetching projects:", projectsError);
-            setProjectLeaders([]);
-            return;
-          }
-
-          // Get project members to map codevs to projects
-          const { data: projectMembers, error: membersError } = await supabase
-            .from("project_members")
-            .select("codev_id, project_id");
-
-          if (!isMounted) return;
-
-          if (membersError) {
-            console.error("Error fetching project members:", membersError);
-            setProjectLeaders([]);
-            return;
-          }
-
-          // Create a map of codev_id to project_id
-          const codevToProjectMap = new Map<string, string>();
-          projectMembers?.forEach((member: any) => {
-            codevToProjectMap.set(member.codev_id, member.project_id);
-          });
-
-          // Initialize project map with all projects
-          const projectMap = new Map<string, {
-            project_id: string;
-            project_name: string;
-            total_points: number;
-            members: Set<string>;
-            skill_breakdown: Record<string, number>;
-          }>();
-
-          projects?.forEach((project: any) => {
-            projectMap.set(project.id, {
-              project_id: project.id,
-              project_name: project.name,
-              total_points: 0,
-              members: new Set(),
-              skill_breakdown: {}
-            });
-          });
-
-          // Add points to projects based on member assignments
-          data.forEach((item: any) => {
-            const projectId = codevToProjectMap.get(item.codev_id);
-            if (!projectId || !projectMap.has(projectId)) {
-              return; // Skip if developer isn't assigned to any project
-            }
-
-            const project = projectMap.get(projectId)!;
-            const skillCategory = item.skill_category?.name || "Other";
-            
-            project.total_points += item.points || 0;
-            project.members.add(item.codev_id);
-            project.skill_breakdown[skillCategory] = (project.skill_breakdown[skillCategory] || 0) + (item.points || 0);
-          });
-
-          // Convert to array and sort by total points
-          const projectsArray: ProjectLeader[] = Array.from(projectMap.values())
-            .map(project => ({
-              project_id: project.project_id,
-              project_name: project.project_name,
-              total_points: project.total_points,
-              member_count: project.members.size,
-              skill_breakdown: project.skill_breakdown
-            }))
-            .sort((a, b) => b.total_points - a.total_points)
-            .slice(0, 10);
-
-          if (isMounted) {
-            setProjectLeaders(projectsArray);
-          }
+        if (isMounted) {
+          setProjectLeaders(data.leaders || []);
         }
       } catch (error) {
         if (isMounted) {
@@ -326,133 +231,42 @@ export default function WeeklyTop() {
   }, [leaderboardType, timePeriod]);
 
   useEffect(() => {
-    if (allCategories.length === 0 || leaderboardType !== "technical") return;
+    if (leaderboardType !== "technical" || !selectedCategory) return;
 
     let isMounted = true;
     const supabase = createClientClientComponent();
-    if (!supabase) return;
 
     const fetchTopCodevs = async () => {
       setIsLoading(true);
       try {
-        let query = supabase
-          .from("codev_points")
-          .select(
-            `
-            points,
-            codev_id,
-            codev:codev_id!inner(first_name, last_name, updated_at),
-            skill_category:skill_category_id!inner(name),
-            created_at
-          `,
-          )
-          .order("points", { ascending: false });
+        const response = await fetch(
+          `/api/technical-leaderboard?category=${encodeURIComponent(selectedCategory)}&timeFilter=${timePeriod}&limit=10`,
+        );
 
-        // Fetch both codev_points and attendance_points concurrently
-        // Note: We deliberately query without .gte("created_at") here, shifting boundary checks locally.
-        const [pointsRes, attendanceRes] = await Promise.all([
-          query,
-          supabase.from("attendance_points").select("*")
-        ]);
-
-        const { data, error } = pointsRes;
-
-        if (error) {
-          console.error("Error fetching top codevs:", error);
-          return;
+        if (!response.ok) {
+          throw new Error("Failed to fetch technical leaderboard");
         }
 
-        if (data) {
-          // Group all records by category first
-          const groupedData: Record<string, any[]> = {};
+        const data = (await response.json()) as {
+          leaders?: { codev_id: string; first_name: string; total_points: number }[];
+        };
 
-          allCategories.forEach((category) => {
-            groupedData[category] = [];
-          });
+        if (!isMounted) return;
 
-          // Build a map of latest attendance activity per user
-          const latestAttendance = new Map<string, Date>();
-          if (attendanceRes.data) {
-            attendanceRes.data.forEach((row) => {
-              const dateStr = row.last_updated || row.updated_at || row.created_at;
-              if (dateStr) {
-                 const d = new Date(dateStr);
-                 const current = latestAttendance.get(row.codev_id);
-                 if (!current || d > current) {
-                   latestAttendance.set(row.codev_id, d);
-                 }
-              }
-            });
-          }
+        // Ranking is by points alone. All-time totals come from the codev_points ledger;
+        // weekly/monthly are summed from tasks approved inside the window. Activity is
+        // deliberately not part of the ordering — a leaderboard ranks scores.
+        const leaders: TopCodev[] = (data.leaders || []).map((leader) => ({
+          points: leader.total_points,
+          codev: { first_name: leader.first_name },
+          skill_category: { name: selectedCategory },
+        }));
 
-          // Calculate activity thresholds
-          const now = new Date();
-          const fiveMonthsAgo = new Date();
-          fiveMonthsAgo.setMonth(now.getMonth() - 5);
-          
-          const weekStart = startOfWeek(subWeeks(new Date(), 1));
-          const monthStart = startOfMonth(subMonths(new Date(), 1));
-          
-          const activeThreshold = new Date();
-          activeThreshold.setDate(now.getDate() - 30); // 30 days of inactivity threshold
-
-          data.forEach((item: any) => {
-            const category = item.skill_category?.name || "Uncategorized";
-            
-            // Priority Check: Attendance Date > Profile Updated_At
-            const codevDate = item.codev?.updated_at ? new Date(item.codev.updated_at) : undefined;
-            const attDate = latestAttendance.get(item.codev_id);
-            // Defaulting fallback string logic
-            let userDate = attDate;
-            if (!userDate || (codevDate && codevDate > userDate)) {
-               userDate = codevDate;
-            }
-            
-            // 1. Core Removal limit
-            if (!userDate || userDate < fiveMonthsAgo) {
-              return;
-            }
-            
-            // 2. Period Filter limit (Weekly / Monthly boundary)
-            if (timePeriod === "weekly" && userDate < weekStart) {
-              return;
-            } else if (timePeriod === "monthly" && userDate < monthStart) {
-              return;
-            }
-
-            if (groupedData[category]) {
-              const isRecentlyActive = userDate >= activeThreshold;
-              groupedData[category].push({
-                points: item.points,
-                codev: item.codev,
-                skill_category: item.skill_category,
-                isRecentlyActive,
-              });
-            }
-          });
-
-          const finalCategoryData: CategoryData = {};
-
-          // 2. Sort to prioritize active users, then sort by points, finally slice top 10
-          Object.keys(groupedData).forEach((category) => {
-            const categoryArray = groupedData[category];
-            if (!categoryArray) return;
-            const sorted = categoryArray.sort((a, b) => {
-              if (a.isRecentlyActive && !b.isRecentlyActive) return -1;
-              if (!a.isRecentlyActive && b.isRecentlyActive) return 1;
-              return b.points - a.points;
-            });
-            
-            finalCategoryData[category] = sorted.slice(0, 10);
-          });
-
-          if (isMounted) {
-            setCategoryData(finalCategoryData);
-          }
-        }
+        setCategoryData((prev) => ({ ...prev, [selectedCategory]: leaders }));
       } catch (error) {
         if (isMounted) {
           console.error("Error in fetchTopCodevs:", error);
+          setCategoryData((prev) => ({ ...prev, [selectedCategory]: [] }));
         }
       } finally {
         if (isMounted) {
@@ -463,7 +277,13 @@ export default function WeeklyTop() {
 
     fetchTopCodevs();
 
-    // 3. Realtime subscription to points changes
+    // Realtime subscription so the board reflects newly awarded points.
+    if (!supabase) {
+      return () => {
+        isMounted = false;
+      };
+    }
+
     const channel = supabase
       .channel("public:codev_points_changes")
       .on(
@@ -479,7 +299,7 @@ export default function WeeklyTop() {
       isMounted = false;
       supabase.removeChannel(channel);
     };
-  }, [timePeriod, allCategories, leaderboardType]);
+  }, [timePeriod, selectedCategory, leaderboardType]);
 
   const getRankIcon = (rank: number, isTraditional: boolean = true) => {
     if (!isTraditional) {

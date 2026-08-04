@@ -1,11 +1,9 @@
 "use server";
 
-import { createClientServerComponent } from "@/utils/supabase/server";
+import { requireProjectMember } from "@/lib/server/auth-guard";
 import { revalidatePath } from "next/cache";
 
 export async function createNewSprint(formData: FormData) {
-  const supabase = await createClientServerComponent();
-
 	const projectId = formData.get("projectId") as string;
 	const sprintStartAt = formData.get("sprint.startAt") as string;
 	const sprintEndAt = formData.get("sprint.endAt") as string;
@@ -15,6 +13,13 @@ export async function createNewSprint(formData: FormData) {
 
 	if (!projectId || !sprintStartAt || !sprintEndAt || !boardName) {
 		return { success: false, error: "Missing required fields" };
+	}
+
+	let supabase;
+	try {
+		({ supabase } = await requireProjectMember(projectId));
+	} catch {
+		return { success: false, error: "Forbidden" };
 	}
 
 	try {
@@ -83,8 +88,6 @@ export async function createNewSprint(formData: FormData) {
 }
 
 export async function EditSprint(formData: FormData) {
-  const supabase = await createClientServerComponent();
-
 	const sprintName = formData.get("sprintName") as string;
 	const boardName = formData.get("boardName") as string;
 	const sprintId = formData.get("sprintId") as string;
@@ -93,6 +96,13 @@ export async function EditSprint(formData: FormData) {
 
 	if (!sprintName || !boardName || !sprintId || !projectId) {
 		return { isSuccess: false, error: "Missing required fields" };
+	}
+
+	let supabase;
+	try {
+		({ supabase } = await requireProjectMember(projectId));
+	} catch {
+		return { isSuccess: false, error: "Forbidden" };
 	}
 
 	try {

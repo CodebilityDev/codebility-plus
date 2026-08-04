@@ -15,7 +15,11 @@ export const revalidate = 0;
 
 export default async function CodevsProfiles() {
   const [{ data: allCodevs, error }] = await Promise.all([
-    getCodevs({ filters: { role_id: 10 } }), // show only Codevs with role_id 10 which is Codev
+    // Accepted developers are identified by application_status, not by role_id.
+    // The accept flow sets application_status "passed" while role_id tracks the
+    // Intern → Codev → Mentor progression, so filtering on role_id 10 hid every
+    // newly accepted developer. /profiles already uses this same filter.
+    getCodevs({ filters: { application_status: "passed" } }),
   ]);
 
   if (error) {
