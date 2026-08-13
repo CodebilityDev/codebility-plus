@@ -4,7 +4,7 @@
 
 The public marketing pages still have more than one `<h1>` each, which is the last piece of the on-page SEO markup. A page should have exactly one `<h1>` describing what that page is, with everything below it stepping down through `<h2>` and `<h3>`. Right now the homepage has two and the services page can show three at once. There is also a group of unused files carrying `<h1>`s that keep turning up whenever anyone looks into this.
 
-Separate from the markup, two image assets the pages already reference do not exist yet. They are listed at the bottom under Assets Still Missing. They are not part of this task and not frontend work, but they are the other half of what is still open on SEO, so they are recorded here rather than being forgotten.
+Separate from the markup, the OpenGraph image every public page references does not exist yet, so link previews come up blank. It is covered at the bottom under Assets Still Missing. It is not part of this task and not frontend work, but it is the other half of what is still open on SEO, so it is recorded here rather than being forgotten.
 
 ## Background
 
@@ -94,15 +94,16 @@ That covers the homepage, services, careers, codevs, hire-a-codev, contact, prof
 
 This is easy to miss because the metadata is correct. The recent `metadataBase` fix is what made these URLs resolve to a full address instead of a broken relative path, so they now point at a real location that returns a 404. Link previews on Facebook, LinkedIn, X, Slack and Discord stay blank until the file exists.
 
-The four icons declared in `app/layout.tsx` lines 46 to 50 have the same problem:
+The icon block in `app/layout.tsx` lines 21 to 32 declares a few more files that are also absent, but they matter much less:
 
-- `/favicon.ico`
-- `/favicon-16x16.png`
-- `/favicon-32x32.png`
-- `/apple-touch-icon.png`
+- `/apple-touch-icon.png` — only affects the icon when someone adds the site to an iOS home screen
+- `/favicon-16x16.png` and `/favicon-32x32.png` — browsers fall back to `favicon.ico`, so nothing visibly breaks
+- `/safari-pinned-tab.svg` — only affects pinned tabs in Safari
 
-None of them are in `public/` either, so browser tabs and the iOS home screen fall back to defaults. `site.webmanifest` is fine, it points at an SVG under `assets/svgs` that does exist.
+The browser tab icon itself is fine. `app/favicon.ico` exists and Next serves it at `/favicon.ico` through the App Router convention. `site.webmanifest` is fine too, it points at an SVG under `assets/svgs` that does exist.
 
-No code changes are needed for any of this. Every page already references the right paths. Dropping the files into `public/` makes them work immediately. The OG image has to be designed at 1200x630, and the favicons are normally generated from a single source logo, so this needs whoever handles design rather than a developer.
+So the one that actually needs doing is the OG image. The rest are optional polish, and the three lines could just as reasonably be deleted from `layout.tsx`.
+
+No code changes are needed for any of this. Every page already references the right paths. Dropping the file into `public/` makes it work immediately. The OG image has to be designed at 1200x630, so this needs whoever handles design rather than a developer.
 
 Once the OG image is in place, run the homepage through the Facebook sharing debugger or any link preview checker to confirm it picks up.
