@@ -5,13 +5,12 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { createClientClientComponent } from "@/utils/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@codevs/ui/input";
-import { ShieldCheck, KeyRound, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import toast from "react-hot-toast";
 
 export default function TwoFactorForm() {
   const [supabase] = useState(() => createClientClientComponent());
   const [code, setCode] = useState("");
-  const [isBackupMode, setIsBackupMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [factorId, setFactorId] = useState<string | null>(null);
   const router = useRouter();
@@ -45,7 +44,7 @@ export default function TwoFactorForm() {
       return;
     }
 
-    if (!factorId && !isBackupMode) {
+    if (!factorId) {
       toast.error("Authentication factor not ready. Please try logging in again.");
       return;
     }
@@ -53,13 +52,6 @@ export default function TwoFactorForm() {
     setIsLoading(true);
 
     try {
-      if (isBackupMode) {
-        // Backup Recovery Code check placeholder / code verification
-        toast.error("Invalid recovery code. Please check your backup codes or try TOTP.");
-        setIsLoading(false);
-        return;
-      }
-
       // Standard TOTP Challenge & Verify
       const { data, error } = await supabase.auth.mfa.challengeAndVerify({
         factorId: factorId!,
@@ -90,14 +82,14 @@ export default function TwoFactorForm() {
     <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
       <div className="space-y-2">
         <label htmlFor="2fa-code" className="text-sm text-gray font-medium block text-center">
-          {isBackupMode ? "Enter 9-character Recovery Code" : "Enter 6-digit Authenticator Code"}
+          Enter 6-digit Authenticator Code
         </label>
         <Input
           id="2fa-code"
           type="text"
-          placeholder={isBackupMode ? "XXXX-XXXX" : "123456"}
+          placeholder="123456"
           value={code}
-          maxLength={isBackupMode ? 10 : 6}
+          maxLength={6}
           onChange={(e) => setCode(e.target.value.trim())}
           className="text-center font-mono text-xl tracking-widest bg-dark-200 text-white border-dark-100 h-12"
           autoFocus
@@ -106,24 +98,17 @@ export default function TwoFactorForm() {
 
       <Button
         type="submit"
-        disabled={isLoading || (!isBackupMode && code.length < 6)}
+        disabled={isLoading || code.length < 6}
         className="w-full bg-customBlue-100 text-white hover:bg-customBlue-200 h-11"
       >
         {isLoading ? "Verifying Identity..." : "Verify & Continue"}
       </Button>
 
       <div className="flex flex-col gap-2 pt-2 text-center text-xs text-gray">
-        <button
-          type="button"
-          onClick={() => {
-            setIsBackupMode(!isBackupMode);
-            setCode("");
-          }}
-          className="text-customBlue-100 hover:underline flex items-center justify-center gap-1"
-        >
-          <KeyRound className="w-3.5 h-3.5" />
-          {isBackupMode ? "Use Authenticator App Code instead" : "Use Backup Recovery Code"}
-        </button>
+        <p>
+          Lost access to your authenticator app? Contact an admin to have 2FA
+          reset on your account.
+        </p>
 
         <button
           type="button"
