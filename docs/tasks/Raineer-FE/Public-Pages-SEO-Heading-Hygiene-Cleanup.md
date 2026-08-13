@@ -4,7 +4,7 @@
 
 The public marketing pages still have more than one `<h1>` each, which is the last piece of the on-page SEO markup. A page should have exactly one `<h1>` describing what that page is, with everything below it stepping down through `<h2>` and `<h3>`. Right now the homepage has two and the services page can show three at once. There is also a group of unused files carrying `<h1>`s that keep turning up whenever anyone looks into this.
 
-Separate from the markup, the OpenGraph image every public page references does not exist yet, so link previews come up blank. It is covered at the bottom under Assets Still Missing. It is not part of this task and not frontend work, but it is the other half of what is still open on SEO, so it is recorded here rather than being forgotten.
+Separate from the markup, the OpenGraph image every public page references does not exist yet, so link previews come up blank. That now has its own task, Add Missing OG Image For Link Previews, and is not part of this one. The background at the bottom under Assets Still Missing is kept for context.
 
 ## Background
 
