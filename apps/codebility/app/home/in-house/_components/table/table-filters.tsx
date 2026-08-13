@@ -60,8 +60,11 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
       if (error) {
         console.error("Failed to fetch projects:", error);
       } else if (data) {
+        const sortedProjects = [...data].sort((a: any, b: any) =>
+          (a.name || "").localeCompare(b.name || ""),
+        );
         setProjects(
-          data.map((proj: any) => ({
+          sortedProjects.map((proj: any) => ({
             ...proj,
             start_date: proj.start_date || "",
           })) as Project[],
@@ -84,16 +87,22 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
               .filter((pos: any) => pos !== null && pos !== ""),
           ),
         ) as string[];
+        distinctPositions.sort((a, b) => a.localeCompare(b));
         setDisplayPositions(distinctPositions);
       }
     }
 
     async function fetchRoles() {
-      const { data, error } = await supabase.from("roles").select("id, name");
+      const { data, error } = await supabase
+        .from("roles")
+        .select("id, name");
       if (error) {
         console.error("Failed to fetch roles:", error);
       } else if (data) {
-        setRoles(data as Role[]);
+        const sortedRoles = [...data].sort((a: any, b: any) =>
+          (a.name || "").localeCompare(b.name || ""),
+        );
+        setRoles(sortedRoles as Role[]);
       }
     }
 
