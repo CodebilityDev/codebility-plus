@@ -8,7 +8,12 @@ export const resetUserPassword = async (email: string) => {
         const normalizedEmail = email.toLowerCase().trim();
         const supabase = await createClientServerComponent();
         const headersList = await headers();
-        const origin = headersList.get("origin") || process.env.NEXT_PUBLIC_APP_BASE_URL || "http://localhost:3000";
+        const origin = headersList.get("origin") || process.env.NEXT_PUBLIC_APP_BASE_URL;
+
+        if (!origin) {
+            console.error("Password reset error: missing origin header or NEXT_PUBLIC_APP_BASE_URL");
+            throw new Error("Unable to determine application URL for password reset");
+        }
 
         // Check user record by email
         const { data, error: userError } = await supabase
@@ -22,9 +27,10 @@ export const resetUserPassword = async (email: string) => {
             throw new Error(`Database error: ${userError.message}`);
         }
 
+        // Close user-enumeration leak: return success even if user not found
         if (!data) {
-            console.error("User not found for email:", normalizedEmail);
-            throw new Error("No account found with this email address");
+            console.warn("Password reset requested for non-existent email:", normalizedEmail);
+            return { success: true };
         }
 
         // Determine redirect destination after magic link callback
