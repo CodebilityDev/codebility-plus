@@ -3,6 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import { AnnouncementPage } from "./types";
+import { sanitizeHtml } from "@/utils/sanitize-html";
 
 interface AnnouncementContentProps {
   page: AnnouncementPage;
@@ -44,7 +45,8 @@ export const AnnouncementContent: React.FC<AnnouncementContentProps> = ({
       <div className="prose prose-sm sm:prose-base md:prose-lg dark:prose-invert max-w-none">
         <div
           className="text-gray-700 dark:text-gray-300 text-base sm:text-lg leading-relaxed"
-          dangerouslySetInnerHTML={{ __html: page.content }}
+          // Sanitize the content to prevent XSS attacks before rendering
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content) }}
         />
       </div>
     </div>

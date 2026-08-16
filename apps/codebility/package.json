@@ -63,6 +63,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "country-calling-code": "^0.0.3",
+    "dompurify": "^3.4.11",
     "embla-carousel": "^8.1.8",
     "embla-carousel-autoplay": "^8.1.6",
     "embla-carousel-react": "^8.0.0",
