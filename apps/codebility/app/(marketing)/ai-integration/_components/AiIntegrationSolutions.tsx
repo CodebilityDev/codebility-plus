@@ -64,7 +64,7 @@ const AISolutions = () => {
             <div className="col-start-1 col-end-2 row-start-3 row-end-5 hidden overflow-hidden rounded-xl bg-customBlue-100 lg:block">
               <Image
                 src="/assets/images/ai-integration/woman.jpg"
-                alt="woman"
+                alt="Woman working on a laptop"
                 width={300}
                 height={450}
                 className="h-full w-full object-cover"
@@ -74,7 +74,7 @@ const AISolutions = () => {
               <div className="flex h-full flex-col place-items-center justify-around gap-3">
                 <Image
                   src="/assets/images/ai-integration/scalable.png"
-                  alt="tailored"
+                  alt="Seamless scalability icon"
                   width={200}
                   height={200}
                   className="h-[150px] w-[150px] object-contain lg:h-[200px] lg:w-[200px]"
@@ -104,7 +104,7 @@ const AISolutions = () => {
               <div className="flex h-full flex-col place-items-center justify-around gap-3  xl:px-10 xl:py-5">
                 <Image
                   src="/assets/images/index/choose-heart.png"
-                  alt="tailored"
+                  alt="Customer support icon"
                   width={200}
                   height={200}
                   className="h-[150px] w-[150px] object-contain lg:h-[200px] lg:w-[200px]"
@@ -125,7 +125,7 @@ const AISolutions = () => {
               <div className="flex h-full flex-col place-items-center justify-around gap-3 xl:px-12 xl:py-5">
                 <Image
                   src="/assets/images/ai-integration/robot.png"
-                  alt="tailored"
+                  alt="AI robot icon representing automated content management"
                   width={200}
                   height={200}
                   className="h-[150px] w-[150px] object-contain lg:h-[200px] lg:w-[200px]"

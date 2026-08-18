@@ -6,6 +6,7 @@ import { createClientServerComponent } from "@/utils/supabase/server";
 
 import Footer from "../_components/MarketingFooter";
 import Navigation from "../_components/MarketingNavigation";
+import JsonLd from "../_components/JsonLd";
 import { ServicesPageContent } from "./_components/layout";
 import { ClientTechyBackground } from "./_components/visuals";
 import { ServiceProvider } from "./_context";
@@ -95,8 +96,31 @@ const ServicesPage = async () => {
         tech_stack: item.tech_stack || [],
     }));
 
+    // CBP-135 follow-up: ItemList of CreativeWork, not "Service" schema.
+    // This page renders a project portfolio (name, gallery, github_link, members,
+    // tech_stack) — it has no serviceType/provider fields "Service" schema requires.
+    // ItemList/CreativeWork matches what's actually on the page.
+    const portfolioSchema = {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        name: "Codebility Project Portfolio",
+        itemListElement: mappedData.map((project, index) => ({
+            "@type": "ListItem",
+            position: index + 1,
+            item: {
+                "@type": "CreativeWork",
+                name: project.name,
+                description: project.description || project.tagline || undefined,
+                image: project.main_image || undefined,
+                url: project.website_url || undefined,
+                keywords: project.tech_stack?.length ? project.tech_stack.join(", ") : undefined,
+            },
+        })),
+    };
+
     return (
         <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden overflow-y-hidden bg-[#030303]">
+            <JsonLd data={portfolioSchema} />
             <ClientTechyBackground />
             <div className="relative z-10">
                 <Navigation />
