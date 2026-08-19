@@ -28,6 +28,7 @@ const PathsSchema = z.object({
     admin_dashboard: z.string().min(1),
     overflow: z.string().min(1),
     ticket_support: z.string().min(1),
+    help_center: z.string().min(1),
   }),
 });
 
@@ -59,6 +60,7 @@ const pathsConfig = PathsSchema.parse({
     admin_dashboard: "/home/admin-dashboard",
     overflow: "/home/overflow",
     ticket_support: "/home/ticket-support",
+    help_center: "/home/help-center",
   },
 } satisfies z.infer<typeof PathsSchema>);
 
