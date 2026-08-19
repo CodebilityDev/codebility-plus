@@ -42,9 +42,6 @@ export default function AccountSettings2FA() {
   const [verificationCode, setVerificationCode] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
 
-  // Recovery Codes
-  const [recoveryCodes, setRecoveryCodes] = useState<string[]>([]);
-
   const fetchMfaFactors = async () => {
     try {
       setLoading(true);
@@ -115,12 +112,6 @@ export default function AccountSettings2FA() {
       toast.success("Two-Factor Authentication successfully enabled!");
       setIsEnrollOpen(false);
 
-      // Generate 10 random single-use backup recovery codes
-      const generatedCodes = Array.from({ length: 10 }, () =>
-        Math.random().toString(36).substring(2, 6).toUpperCase() + "-" +
-        Math.random().toString(36).substring(2, 6).toUpperCase()
-      );
-      setRecoveryCodes(generatedCodes);
       setIsRecoveryOpen(true);
 
       await fetchMfaFactors();
@@ -277,36 +268,27 @@ export default function AccountSettings2FA() {
         </DialogContent>
       </Dialog>
 
-      {/* RECOVERY CODES MODAL */}
+      {/* ENABLED CONFIRMATION MODAL */}
       <Dialog open={isRecoveryOpen} onOpenChange={setIsRecoveryOpen}>
         <DialogContent className="background-box text-foreground sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-green-500">
-              <CheckCircle2 className="w-5 h-5" /> Save Backup Recovery Codes
+              <CheckCircle2 className="w-5 h-5" /> Two-Factor Authentication Enabled
             </DialogTitle>
             <DialogDescription>
-              Keep these emergency backup codes in a secure location. You can use them to access your account if you lose your phone or authenticator device.
+              You will now be asked for a code from your authenticator app each time you sign in.
             </DialogDescription>
           </DialogHeader>
 
-          <div className="bg-muted p-4 rounded-lg border border-border space-y-2">
-            <div className="grid grid-cols-2 gap-2 text-center font-mono text-xs">
-              {recoveryCodes.map((code, idx) => (
-                <div key={idx} className="bg-background/80 p-1.5 rounded border border-border/50">
-                  {code}
-                </div>
-              ))}
-            </div>
+          <div className="bg-muted p-4 rounded-lg border border-border">
+            <p className="text-sm">
+              Keep your authenticator app safe. Backup recovery codes are not
+              available yet, so if you lose access to your device you will need
+              an admin to reset 2FA on your account.
+            </p>
           </div>
 
-          <DialogFooter className="flex flex-col sm:flex-row gap-2">
-            <Button
-              variant="outline"
-              onClick={() => copyToClipboard(recoveryCodes.join("\n"), "Backup codes")}
-              className="w-full sm:w-auto"
-            >
-              <Copy className="w-4 h-4 mr-2" /> Copy All
-            </Button>
+          <DialogFooter>
             <Button
               onClick={() => setIsRecoveryOpen(false)}
               className="bg-customBlue-200 text-white hover:bg-customBlue-300 w-full sm:w-auto"
