@@ -121,7 +121,7 @@ export type HelpTicketRow = {
   title: string;
   description: string;
   author_id: string;
-  status: "open" | "answered" | "closed";
+  status: "open" | "closed";
   tags: string[];
   created_at: string;
   updated_at: string;

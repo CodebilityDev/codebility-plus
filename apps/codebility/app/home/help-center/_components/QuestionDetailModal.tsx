@@ -30,19 +30,16 @@ import { toast } from "sonner";
 
 const statusIconStyles: Record<HelpTicketRow["status"], string> = {
   open: "bg-indigo-100 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-400",
-  answered: "bg-amber-100 text-amber-600 dark:bg-amber-950 dark:text-amber-400",
   closed: "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400",
 };
 
 const statusPillStyles: Record<HelpTicketRow["status"], string> = {
   open: "bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400",
-  answered: "bg-amber-50 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400",
   closed: "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400",
 };
 
 const statusLabels: Record<HelpTicketRow["status"], string> = {
   open: "Open",
-  answered: "Answered",
   closed: "Closed",
 };
 

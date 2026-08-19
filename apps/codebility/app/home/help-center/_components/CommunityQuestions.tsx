@@ -40,15 +40,13 @@ import { toast } from "sonner";
 
 const statusIconStyles: Record<string, string> = {
   open: "bg-indigo-100 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-400",
-  answered: "bg-amber-100 text-amber-600 dark:bg-amber-950 dark:text-amber-400",
   closed: "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400",
 };
 
 const tabs = [
   { id: "all", label: "All questions" },
   { id: "open", label: "Open" },
-  { id: "answered", label: "Answered" },
-  { id: "closed", label: "Closed" },
+  { id: "closed", label: "Answered" },
 ] as const;
 
 type SortOption = "newest" | "oldest" | "a-z";
