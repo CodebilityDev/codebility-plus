@@ -186,11 +186,11 @@ export function CommunityQuestions({
       <div className="flex flex-wrap items-center justify-between gap-3 p-4">
         <Button
           size="sm"
-          className="h-7 w-auto shrink-0 gap-1.5 rounded-full bg-indigo-50 px-3 text-[11px] font-semibold uppercase tracking-wide text-indigo-600 hover:bg-indigo-100 dark:bg-indigo-950/40 dark:text-indigo-400 dark:hover:bg-indigo-950/70"
+          className="h-7 w-auto shrink-0 gap-1.5 rounded-full bg-indigo-50 px-3 text-[14px] lg:text-[14px] font-semibold uppercase tracking-wide text-indigo-600 hover:bg-indigo-100 dark:bg-indigo-950/40 dark:text-indigo-400 dark:hover:bg-indigo-950/70"
           onClick={onNewQuestion}
         >
           <Pencil className="h-3 w-3" />
-          New question
+          New Ticket
         </Button>
 
         <div className="flex items-center gap-2">
