@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 
 import Footer from "../_components/MarketingFooter";
-import Navigation from "../_components/MarketingNavigation";
+import MarketingSCNavigation from "../_components/MarketingSCNavigation";
 import Profiles from "../profiles/page";
 import FeaturedSection from "../_shared/CodevsFeaturedCection";
 import Hero from "./_components/CodevsHero";
@@ -32,7 +32,7 @@ export const revalidate = 0;
 export default function HireACodev() {
     return (
         <div className="bg-black-400 relative flex w-full flex-col">
-            <Navigation />
+            <MarketingSCNavigation />
             <Hero />
             <HiringProcess />
             <Profiles />

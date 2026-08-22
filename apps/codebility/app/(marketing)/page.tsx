@@ -10,7 +10,7 @@ import WhyChooseUs from "./_components/landing/LandingWhyChoose-us";
 import WorkWithUs from "./_components/landing/LandingWorkWithUs";
 import Calendly from "./_components/MarketingCalendly";
 import Footer from "./_components/MarketingFooter";
-import Navigation from "./_components/MarketingNavigation";
+import MarketingSCNavigation from "./_components/MarketingSCNavigation";
 import Testimonials from "./_components/testimonial/Testimonials";
 
 export const metadata: Metadata = {
@@ -31,13 +31,10 @@ export const metadata: Metadata = {
     },
 };
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
-
 export default async function Index() {
     return (
         <div className="bg-black-400 relative w-full overflow-x-hidden">
-            <Navigation />
+            <MarketingSCNavigation />
             <Hero />
             <Features />
             <WhyChooseUs />

@@ -1,5 +1,5 @@
 import React from "react";
-import Navigation from "@/app/(marketing)/_components/MarketingNavigation";
+import MarketingSCNavigation from "@/app/(marketing)/_components/MarketingSCNavigation";
 
 export default function AuthWaitingLayout({
   children,
@@ -8,7 +8,7 @@ export default function AuthWaitingLayout({
 }) {
   return (
     <div>
-      <Navigation />
+      <MarketingSCNavigation />
       {children}
     </div>
   );

@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { signOut } from "@/app/auth/actions";
 import Logo from "@/components/shared/home/Logo";
 import { Button } from "@/components/ui/button";
 import useChangeBgNavigation from "@/hooks/useChangeBgNavigation";
@@ -17,8 +16,7 @@ import {
   IconProfile,
 } from "@/public/assets/svgs";
 import applicationStatusIcon from "@/public/assets/svgs/icon-applicant.svg";
-import { createClientClientComponent } from "@/utils/supabase/client";
-import { ChevronDown, ChevronUp, SettingsIcon } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 import {
   DropdownMenu,
@@ -86,25 +84,61 @@ const getMenuItems = (
   ];
 };
 
+export type NavUserData = {
+  first_name: string;
+  last_name: string;
+  email: string;
+  image_url: string;
+  application_status: string;
+  role_id: number;
+  applicant: {
+    id: string;
+    codev_id: string;
+  } | null;
+} | null;
+
+export const DrawerAuthSection = ({
+  userData,
+  handleLogout,
+  onNavigate,
+}: {
+  userData: NonNullable<NavUserData>;
+  handleLogout: () => void | Promise<void>;
+  onNavigate?: () => void;
+}) => (
+  <>
+    <div className="border-t border-zinc-700 my-2" />
+    {getMenuItems(
+      userData.application_status,
+      userData.role_id,
+      userData.applicant,
+    ).map((item) => (
+      <Link onClick={onNavigate} href={item.href} key={item.label}>
+        <div className="flex items-center gap-4 p-4 text-left text-xl font-semibold">
+          <item.icon className="h-6 w-6" style={{ color: "#ffffff" }} />
+          {item.label}
+        </div>
+      </Link>
+    ))}
+    <div className="border-t border-zinc-700 my-2" />
+    <button
+      onClick={handleLogout}
+      className="flex items-center gap-4 w-full cursor-pointer border-none p-4 text-left text-xl font-semibold"
+    >
+      <IconLogout className="h-6 w-6 text-white" />
+      Logout
+    </button>
+  </>
+);
+
 const MobileDrawer = ({
-  isLoggedIn,
   openSheet,
   setOpenSheet,
-  handleLogout,
-  userData,
+  drawerAuth,
 }: {
-  isLoggedIn: boolean;
   openSheet: boolean;
   setOpenSheet: (open: boolean) => void;
-  handleLogout: () => void;
-  userData?: {
-    application_status: string;
-    role_id: number;
-    applicant: {
-      id: string;
-      codev_id: string;
-    } | null;
-  } | null;
+  drawerAuth?: React.ReactNode;
 }) => (
   <Sheet open={openSheet} onOpenChange={setOpenSheet}>
     <SheetTrigger>
@@ -118,57 +152,48 @@ const MobileDrawer = ({
       <SheetDescription className="sr-only">
         Navbar that contains links
       </SheetDescription>
-      {NAV_ITEMS.map((item) => {
-        if (isLoggedIn && ["Sign In", "Sign Up"].includes(item.title)) {
-          return null;
-        }
-        return (
-          <Link
-            onClick={() => setOpenSheet(false)}
-            href={item.path}
-            key={item.id}
-          >
-            <p className="w-full cursor-pointer p-4 text-left text-xl font-semibold">
-              {item.title}
-            </p>
-          </Link>
-        );
-      })}
-      
-      {/* User menu items */}
-      {isLoggedIn && userData && (
-        <>
-          <div className="border-t border-zinc-700 my-2" />
-          {getMenuItems(userData.application_status, userData.role_id, userData.applicant).map((item) => (
-            <Link
-              onClick={() => setOpenSheet(false)}
-              href={item.href}
-              key={item.label}
-            >
-              <div className="flex items-center gap-4 p-4 text-left text-xl font-semibold">
-                <item.icon className="h-6 w-6" style={{ color: "#ffffff" }} />
-                {item.label}
-              </div>
-            </Link>
-          ))}
-          <div className="border-t border-zinc-700 my-2" />
-        </>
-      )}
-      
-      {isLoggedIn && (
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-4 w-full cursor-pointer border-none p-4 text-left text-xl font-semibold"
+      {NAV_ITEMS.map((item) => (
+        <Link
+          onClick={() => setOpenSheet(false)}
+          href={item.path}
+          key={item.id}
         >
-          <IconLogout className="h-6 w-6 text-white" />
-          Logout
-        </button>
-      )}
+          <p className="w-full cursor-pointer p-4 text-left text-xl font-semibold">
+            {item.title}
+          </p>
+        </Link>
+      ))}
+      <div
+        onClick={(e) => {
+          if ((e.target as HTMLElement).closest("a, button")) {
+            setOpenSheet(false);
+          }
+        }}
+      >
+        {drawerAuth}
+      </div>
     </SheetContent>
   </Sheet>
 );
 
-const UserMenu = ({
+export const CareersSignIn = () => {
+  const pathname = usePathname();
+  if (pathname !== "/careers") return null;
+  return (
+    <Link href="/auth/sign-in">
+      <Button
+        variant="default"
+        rounded="full"
+        size="lg"
+        className="hidden lg:block"
+      >
+        Sign In
+      </Button>
+    </Link>
+  );
+};
+
+export const UserMenu = ({
   first_name,
   last_name,
   email,
@@ -188,7 +213,7 @@ const UserMenu = ({
     id: string;
     codev_id: string;
   } | null;
-  handleLogout: () => void;
+  handleLogout: () => void | Promise<void>;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isHovered, setIsHovered] = useState<string | null>(null);
@@ -256,71 +281,15 @@ const UserMenu = ({
   );
 };
 
-const Navigation = () => {
+const Navigation = ({
+  userMenu,
+  drawerAuth,
+}: {
+  userMenu?: React.ReactNode;
+  drawerAuth?: React.ReactNode;
+}) => {
   const { color } = useChangeBgNavigation();
-  const pathname = usePathname();
   const [openSheet, setOpenSheet] = useState(false);
-  const [userData, setUserData] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [supabase, setSupabase] = useState<any>(null);
-
-  useEffect(() => {
-    const supabaseClient = createClientClientComponent();
-    setSupabase(supabaseClient);
-  }, []);
-
-  useEffect(() => {
-    if (!supabase) return;
-
-    async function fetchUser() {
-      try {
-        // Use getUser() for proper auth check
-        const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-        if (authError) {
-          setUserData(null);
-          return;
-        }
-
-        if (!user) {
-          setUserData(null);
-          return;
-        }
-
-        const { data: userRow, error: fetchError } = await supabase
-          .from("codev")
-          .select(`*, applicant (id, codev_id)`)
-          .eq("id", user.id)
-          .single();
-
-        if (fetchError) {
-          console.error("Error fetching codev:", fetchError.message);
-          setUserData(null);
-        } else {
-          setUserData(userRow);
-        }
-      } catch (err) {
-        console.error("Unexpected error fetching user data:", err);
-        setUserData(null);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    fetchUser();
-  }, [supabase]);
-
-  const handleLogout = async () => {
-    try {
-      await signOut();
-      setUserData(null);
-      setOpenSheet(false);
-    } catch (error) {
-      console.error("Failed to log out:", error);
-    }
-  };
-
-  if (isLoading) return null;
 
   return (
     <div
@@ -332,32 +301,11 @@ const Navigation = () => {
         <div className="flex w-full items-center gap-4">
           <Logo />
         </div>
-        <div className="flex items-center gap-2">
-          {!userData ? (
-            <>
-              {pathname === "/careers" && (
-                <Link href="/auth/sign-in">
-                  <Button
-                    variant="default"
-                    rounded="full"
-                    size="lg"
-                    className="hidden lg:block"
-                  >
-                    Sign In
-                  </Button>
-                </Link>
-              )}
-            </>
-          ) : (
-            <UserMenu {...userData} handleLogout={handleLogout} />
-          )}
-        </div>
+        <div className="flex items-center gap-2">{userMenu}</div>
         <MobileDrawer
-          isLoggedIn={!!userData}
           openSheet={openSheet}
           setOpenSheet={setOpenSheet}
-          handleLogout={handleLogout}
-          userData={userData}
+          drawerAuth={drawerAuth}
         />
       </div>
     </div>

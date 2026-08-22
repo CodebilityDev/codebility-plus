@@ -16,10 +16,13 @@ export default async function Admins() {
    *
    * Fix: createClient() with anon key = no auth context = no token refresh attempt.
    */
+
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
+
+
 
   // Fetch admins (role_id: 1) and mentors (role_id: 5) in parallel
   const [
