@@ -35,8 +35,8 @@ export default async function Index() {
         <>
             <Hero />
             <Features />
-            {/* <WhyChooseUs />
-            <WorkWithUs />
+            <WhyChooseUs />
+            {/* <WorkWithUs />
             <Admins />
             <InternSectionContainer />
             <Partners />
