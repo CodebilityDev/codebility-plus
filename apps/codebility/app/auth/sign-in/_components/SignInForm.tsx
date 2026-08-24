@@ -37,16 +37,9 @@ const SignInForm = () => {
 
       // If the response indicates failure, log and show the error toast
       if (!response.success) {
-        /* console.error("Sign in failed:", response.error); */
-        /*      toast.error(response.error || "Invalid email or password");
-         */
         throw new Error(response.error);
-        /* // Delay a bit to let the toast show before returning
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-        return; // Exit early so no redirect is attempted */
       }
 
-      // Otherwise, handle redirection based on the redirectTo value
       if (response.redirectTo) {
         switch (response.redirectTo) {
           case "/applicant/waiting":

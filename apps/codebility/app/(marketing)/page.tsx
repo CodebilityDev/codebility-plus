@@ -1,6 +1,5 @@
 import { Metadata } from "next";
 
-import ForceScrollTop from "./_components/landing/ForceScrollTop";
 import Admins from "./_components/landing/LandingAdmins";
 import Features from "./_components/landing/LandingFeatures";
 import Hero from "./_components/landing/LandingHero";
@@ -10,8 +9,8 @@ import WhyChooseUs from "./_components/landing/LandingWhyChoose-us";
 import WorkWithUs from "./_components/landing/LandingWorkWithUs";
 import Calendly from "./_components/MarketingCalendly";
 import Footer from "./_components/MarketingFooter";
-import MarketingSCNavigation from "./_components/MarketingSCNavigation";
 import Testimonials from "./_components/testimonial/Testimonials";
+import Navigation from "./_components/MarketingNavigation";
 
 export const metadata: Metadata = {
     title: "Codebility — Hire Skilled Filipino Developers",
@@ -34,8 +33,8 @@ export const metadata: Metadata = {
 export default async function Index() {
     return (
         <div className="bg-black-400 relative w-full overflow-x-hidden">
-            <MarketingSCNavigation />
-            <Hero />
+            <Navigation />
+            {/* <Hero />
             <Features />
             <WhyChooseUs />
             <WorkWithUs />
@@ -44,7 +43,7 @@ export default async function Index() {
             <Partners />
             <Testimonials />
             <Calendly />
-            <Footer />
+            <Footer /> */}
         </div>
     );
 }

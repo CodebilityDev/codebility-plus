@@ -338,7 +338,10 @@ export const signinUser = async (email: string, password: string) => {
       redirectTo = "/auth/declined";
     }
 
-    return { success: true, redirectTo };
+    return { 
+      success: true, 
+      redirectTo, 
+     };
   } catch (error: any) {
     console.error("Sign in error:", error);
     return { success: false, error: error.message || "Failed to sign in" };
