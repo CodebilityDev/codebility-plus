@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import { motion, useInView, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import { Button } from "@/components/ui/button";
 
 import { MarketingCardData } from "@/constants/landing_data";
@@ -18,71 +17,43 @@ const HIGHLIGHT_METRICS = [
   { label: "Specialists on demand", value: 80, suffix: "+", format: "number" },
 ];
 
-// Animated Counter Component
-const AnimatedCounter = ({ 
-  value, 
-  suffix = "", 
+const AnimatedCounter = ({
+  value,
+  suffix = "",
   format = "number",
-  delay = 0 
-}: { 
-  value: number; 
-  suffix?: string; 
+  delay = 0,
+}: {
+  value: number;
+  suffix?: string;
   format?: "number" | "decimal";
   delay?: number;
 }) => {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, amount: 0.5 });
-  const [displayValue, setDisplayValue] = useState(0);
-
-  useEffect(() => {
-    if (inView) {
-      const timer = setTimeout(() => {
-        const duration = 2000; // 2 seconds
-        const steps = 60; // 60 fps
-        const increment = value / steps;
-        let current = 0;
-        let step = 0;
-
-        const counter = setInterval(() => {
-          step++;
-          current = (step / steps) * value;
-          
-          if (step >= steps) {
-            setDisplayValue(value);
-            clearInterval(counter);
-          } else {
-            setDisplayValue(current);
-          }
-        }, duration / steps);
-
-        return () => clearInterval(counter);
-      }, delay);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [inView, value, delay]);
-
-  const formatValue = (val: number): string => {
-    if (format === "decimal") {
-      return val.toFixed(1);
-    }
-    return Math.floor(val).toString();
-  };
-
+  const count = useMotionValue(0);
+  const display = useTransform(count, (v) =>
+    format === "decimal" ? v.toFixed(1) : Math.floor(v).toString(),
+  );
   return (
-    <motion.p 
-      ref={ref}
+    <motion.p
       className="text-2xl font-semibold text-white md:text-3xl"
       initial={{ scale: 0, opacity: 0 }}
-      animate={inView ? { scale: 1, opacity: 1 } : { scale: 0, opacity: 0 }}
-      transition={{ 
-        duration: 0.6, 
+      whileInView={{ scale: 1, opacity: 1 }}
+      viewport={{ once: true, amount: 0.5 }}
+      transition={{
+        duration: 0.6,
         delay: delay / 1000,
         type: "spring",
-        bounce: 0.4
+        bounce: 0.4,
+      }}
+      onViewportEnter={() => {
+        animate(count, value, {
+          duration: 2,
+          delay: delay / 1000,
+          ease: "easeOut",
+        });
       }}
     >
-      {formatValue(displayValue)}{suffix}
+      <motion.span>{display}</motion.span>
+      {suffix}
     </motion.p>
   );
 };

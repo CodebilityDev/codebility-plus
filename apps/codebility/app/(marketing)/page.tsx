@@ -32,18 +32,16 @@ export const metadata: Metadata = {
 
 export default async function Index() {
     return (
-        <div className="bg-black-400 relative w-full overflow-x-hidden">
-            <Navigation />
-            {/* <Hero />
+        <>
+            <Hero />
             <Features />
-            <WhyChooseUs />
+            {/* <WhyChooseUs />
             <WorkWithUs />
             <Admins />
             <InternSectionContainer />
             <Partners />
             <Testimonials />
-            <Calendly />
-            <Footer /> */}
-        </div>
+            <Calendly />   */}
+        </>
     );
 }
