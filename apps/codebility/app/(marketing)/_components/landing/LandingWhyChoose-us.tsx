@@ -1,89 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { motion, useInView, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { useRef, useEffect, useState } from "react";
+import { motion, useInView } from "framer-motion";
+import { useRef } from "react";
 
 import Container from "../MarketingContainer";
 import Section from "../MarketingSection";
-
-// Animated counter component for stats
-const AnimatedStat = ({ 
-  value, 
-  suffix = "", 
-  prefix = "",
-  label,
-  delay = 0 
-}: { 
-  value: number; 
-  suffix?: string; 
-  prefix?: string;
-  label: string;
-  delay?: number;
-}) => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.5 });
-  const [displayValue, setDisplayValue] = useState(0);
-
-  useEffect(() => {
-    if (isInView) {
-      const timer = setTimeout(() => {
-        const duration = 2500;
-        const steps = 80;
-        let current = 0;
-        let step = 0;
-
-        const counter = setInterval(() => {
-          step++;
-          current = (step / steps) * value;
-          
-          if (step >= steps) {
-            setDisplayValue(value);
-            clearInterval(counter);
-          } else {
-            setDisplayValue(current);
-          }
-        }, duration / steps);
-
-        return () => clearInterval(counter);
-      }, delay);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [isInView, value, delay]);
-
-  return (
-    <motion.div
-      ref={ref}
-      className="text-center"
-      initial={{ opacity: 0, scale: 0.5 }}
-      animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.5 }}
-      transition={{ 
-        duration: 0.6, 
-        delay: delay / 1000,
-        type: "spring",
-        bounce: 0.4
-      }}
-    >
-      <motion.div 
-        className="text-2xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent"
-        animate={isInView ? { scale: [1, 1.1, 1] } : {}}
-        transition={{ duration: 0.5, delay: (delay / 1000) + 0.3 }}
-      >
-        {prefix}{Math.floor(displayValue)}{suffix}
-      </motion.div>
-      <motion.p 
-        className="text-sm md:text-base text-gray-300 mt-1"
-        initial={{ opacity: 0, y: 10 }}
-        animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
-        transition={{ duration: 0.4, delay: (delay / 1000) + 0.5 }}
-      >
-        {label}
-      </motion.p>
-    </motion.div>
-  );
-};
-
+import AnimatedMetrics from "./AnimatedMetrics";
 // Animation variants
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -154,7 +77,7 @@ const WhyChooseUs = () => {
               transition={{ duration: 0.8, delay: 0.3 }}
             >
               {stats.map((stat, index) => (
-                <AnimatedStat key={index} {...stat} />
+                <AnimatedMetrics key={index} variant="stat" {...stat} />
               ))}
             </motion.div>
           </motion.div>

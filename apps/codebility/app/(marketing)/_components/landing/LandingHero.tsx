@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { motion, useMotionValue, useTransform, animate } from "framer-motion";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 
 import { MarketingCardData } from "@/constants/landing_data";
@@ -10,53 +10,13 @@ import SideNavMenu from "../MarketingSidenavMenu";
 import HeroBackground from "./LandingHeroBg";
 import HeroCard from "./LandingHeroCard";
 import FloatingParticles from "./FloatingParticles";
+import AnimatedMetrics from "./AnimatedMetrics";
 
 const HIGHLIGHT_METRICS = [
   { label: "Projects shipped", value: 120, suffix: "+", format: "number" },
   { label: "Avg. client satisfaction", value: 4.9, suffix: "/5", format: "decimal" },
   { label: "Specialists on demand", value: 80, suffix: "+", format: "number" },
 ];
-
-const AnimatedCounter = ({
-  value,
-  suffix = "",
-  format = "number",
-  delay = 0,
-}: {
-  value: number;
-  suffix?: string;
-  format?: "number" | "decimal";
-  delay?: number;
-}) => {
-  const count = useMotionValue(0);
-  const display = useTransform(count, (v) =>
-    format === "decimal" ? v.toFixed(1) : Math.floor(v).toString(),
-  );
-  return (
-    <motion.p
-      className="text-2xl font-semibold text-white md:text-3xl"
-      initial={{ scale: 0, opacity: 0 }}
-      whileInView={{ scale: 1, opacity: 1 }}
-      viewport={{ once: true, amount: 0.5 }}
-      transition={{
-        duration: 0.6,
-        delay: delay / 1000,
-        type: "spring",
-        bounce: 0.4,
-      }}
-      onViewportEnter={() => {
-        animate(count, value, {
-          duration: 2,
-          delay: delay / 1000,
-          ease: "easeOut",
-        });
-      }}
-    >
-      <motion.span>{display}</motion.span>
-      {suffix}
-    </motion.p>
-  );
-};
 
 // Animation variants
 const containerVariants = {
@@ -261,7 +221,7 @@ const Hero = () => {
                     }
                   }}
                 >
-                  <AnimatedCounter
+                  <AnimatedMetrics
                     value={metric.value}
                     suffix={metric.suffix}
                     format={metric.format as "number" | "decimal"}
