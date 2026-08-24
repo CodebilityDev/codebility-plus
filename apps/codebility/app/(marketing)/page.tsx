@@ -36,12 +36,12 @@ export default async function Index() {
             <Hero />
             <Features />
             <WhyChooseUs />
-            {/* <WorkWithUs />
+            <WorkWithUs />
             <Admins />
-            <InternSectionContainer />
+            {/* <InternSectionContainer />
             <Partners />
             <Testimonials />
-            <Calendly />   */}
+            <Calendly /> */}
         </>
     );
 }
