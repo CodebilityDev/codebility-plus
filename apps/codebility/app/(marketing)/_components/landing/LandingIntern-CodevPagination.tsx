@@ -1,12 +1,10 @@
 "use client";
 
-import { Suspense, use, useSyncExternalStore } from "react";
-import { useSearchParams } from "next/navigation";
+import { Suspense, use, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import InternCards from "./LandingIntern-CodevCard";
-import {
-  LandingInternCardsSkeleton,
-} from "./LandingInternSkeleton";
+import { LandingInternCardsSkeleton } from "./LandingInternSkeleton";
+import type { LandingInternsPage } from "@/lib/server/landing-interns-cached";
 import { fetchApiJson } from "@/utils/api-fetch";
 
 export type PersonRole = "Intern" | "Codev";
@@ -19,28 +17,10 @@ export type LandingInternMember = {
   display_position?: string;
 };
 
-export type LandingInternsApiResponse = {
-  TEAM_MEMBERS: Array<{
-    id: string;
-    name: string;
-    role: string;
-    image?: string;
-    display_position?: string;
-  }>;
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
-  error?: string;
-};
-
-const PAGE_EVENT = "landing-interns-page";
-const pagePromises = new Map<string, Promise<LandingInternsApiResponse>>();
+const pagePromises = new Map<string, Promise<LandingInternsPage>>();
 
 function toTeamMembers(
-  members: LandingInternsApiResponse["TEAM_MEMBERS"],
+  members: LandingInternsPage["TEAM_MEMBERS"],
 ): LandingInternMember[] {
   return members.map((member) => ({
     id: member.id,
@@ -51,40 +31,11 @@ function toTeamMembers(
   }));
 }
 
-function parsePage(value: string | null): number {
-  const parsed = Number.parseInt(value ?? "1", 10);
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
-}
-
-function pageHref(page: number) {
-  if (page <= 1) return "/#codevs";
-  return `/?page=${page}#codevs`;
-}
-
-function getPageFromLocation(): number {
-  if (typeof window === "undefined") return 1;
-  return parsePage(new URL(window.location.href).searchParams.get("page"));
-}
-
-function subscribePage(onStoreChange: () => void) {
-  window.addEventListener("popstate", onStoreChange);
-  window.addEventListener(PAGE_EVENT, onStoreChange);
-  return () => {
-    window.removeEventListener("popstate", onStoreChange);
-    window.removeEventListener(PAGE_EVENT, onStoreChange);
-  };
-}
-
-function goToPage(page: number) {
-  window.history.pushState(null, "", pageHref(page));
-  window.dispatchEvent(new Event(PAGE_EVENT));
-}
-
 function loadPage(
   page: number,
   pageSize: number,
-  initialData: LandingInternsApiResponse,
-): Promise<LandingInternsApiResponse> {
+  initialData: LandingInternsPage,
+): Promise<LandingInternsPage> {
   const key = `rank:${page}:${pageSize}`;
   const cached = pagePromises.get(key);
   if (cached) return cached;
@@ -95,9 +46,8 @@ function loadPage(
     return resolved;
   }
 
-  const promise = fetchApiJson<LandingInternsApiResponse>(
-    `/api/landing-interns?page=${page}&limit=${pageSize}&sort=rank`,
-    { cache: "force-cache" },
+  const promise = fetchApiJson<LandingInternsPage>(
+    `/api/landing-interns?page=${page}&limit=${pageSize}`,
   ).then((result) => {
     if (!result.ok) {
       console.error("Error fetching landing interns page:", result.error);
@@ -127,7 +77,9 @@ function PaginationControls({
   totalPages: number;
   onPageChange: (page: number) => void;
 }) {
-  if (totalPages <= 1) return <div className="mt-8 min-h-9" aria-hidden="true" />;
+  if (totalPages <= 1) {
+    return <div className="mt-8 min-h-9" aria-hidden="true" />;
+  }
 
   return (
     <div className="flex items-center gap-3 relative z-[100] mt-8 min-h-9">
@@ -179,7 +131,7 @@ function LandingInternCardsRemote({
 }: {
   page: number;
   pageSize: number;
-  initialData: LandingInternsApiResponse;
+  initialData: LandingInternsPage;
 }) {
   const data = use(loadPage(page, pageSize, initialData));
   return (
@@ -194,7 +146,7 @@ function LandingInternCards({
 }: {
   page: number;
   pageSize: number;
-  initialData: LandingInternsApiResponse;
+  initialData: LandingInternsPage;
 }) {
   if (page === initialData.pagination.page) {
     return (
@@ -218,15 +170,12 @@ export default function LandingInternPagination({
   initialData,
   pageSize = 10,
 }: {
-  initialData: LandingInternsApiResponse;
+  initialData: LandingInternsPage;
   pageSize?: number;
 }) {
-  const searchParams = useSearchParams();
-  const page = useSyncExternalStore(
-    subscribePage,
-    getPageFromLocation,
-    () => parsePage(searchParams.get("page")),
-  );
+  // In-memory only. Do not pushState ?page= — Next.js patches history and
+  // soft-navigates the static homepage, remounting this section on page 1 data.
+  const [page, setPage] = useState(initialData.pagination.page);
   const totalPages = Math.max(1, initialData.pagination.totalPages);
 
   return (
@@ -243,7 +192,7 @@ export default function LandingInternPagination({
       <PaginationControls
         page={page}
         totalPages={totalPages}
-        onPageChange={goToPage}
+        onPageChange={setPage}
       />
     </div>
   );

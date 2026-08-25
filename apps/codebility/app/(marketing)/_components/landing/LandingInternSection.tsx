@@ -2,36 +2,15 @@ import { Suspense } from "react";
 import Link from "next/link";
 import BlueBg from "./LandingBlueBg";
 import Section from "../MarketingSection";
-import LandingInternPagination, {
-  type LandingInternsApiResponse,
-} from "./LandingIntern-CodevPagination";
+import LandingInternPagination from "./LandingIntern-CodevPagination";
 import LandingInternSkeleton from "./LandingInternSkeleton";
 import { Button } from "@/components/ui/button";
-import { fetchApiJson } from "@/utils/api-fetch";
+import { getCachedLandingInternsPage } from "@/lib/server/landing-interns-cached";
 
 const PAGE_SIZE = 10;
 
-async function getLandingInternsPage(page: number) {
-  const result = await fetchApiJson<LandingInternsApiResponse>(
-    `/api/landing-interns?page=${page}&limit=${PAGE_SIZE}&sort=rank`,
-    {
-      next: {
-        revalidate: 3600,
-        tags: ["landing-interns"],
-      },
-    },
-  );
-
-  if (!result.ok) {
-    console.error("Error fetching landing interns:", result.error);
-    return null;
-  }
-
-  return result.data;
-}
-
 async function LandingIntern() {
-  const data = await getLandingInternsPage(1);
+  const data = await getCachedLandingInternsPage(1, PAGE_SIZE);
 
   if (!data || data.TEAM_MEMBERS.length === 0) {
     return (

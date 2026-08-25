@@ -1,4 +1,4 @@
-// @deprecated Prefer /api/landing-interns for the marketing intern section.
+// @deprecated Prefer lib/server/landing-interns-cached (+ /api/landing-interns) for the marketing intern section.
 // app/api/all-active-interns-codev-prioritized/route.ts
 import { NextResponse } from "next/server";
 import { createClientServerComponent } from "@/utils/supabase/server";

@@ -4,12 +4,6 @@ import { ensureSupabaseEnv } from "./ensure-env";
 
 let anonClient: SupabaseClient | null = null;
 
-/**
- * Cookie-less anon client for server-side/public reads.
- *
- * ponytail: Singleton only. No unbounded growth because this module stores
- * exactly one client instance.
- */
 export const createClientAnon = (): SupabaseClient => {
   if (anonClient) return anonClient;
 
