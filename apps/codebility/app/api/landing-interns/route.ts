@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { unstable_cache } from "next/cache";
 import { createClientAnon } from "@/utils/supabase/anon";
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 10;
 const MAX_LIMIT = 50;
-const REVALIDATE_SECONDS = 3600;
 
 const LANDING_INTERN_SELECT =
   "id, first_name, last_name, display_position, image_url, role_id";
@@ -36,78 +34,6 @@ type LandingInternRow = {
   role_id: number | null;
 };
 
-type LandingInternsPage = {
-  TEAM_MEMBERS: Array<{
-    id: string;
-    name: string;
-    role: "Intern" | "Codev" | "Member";
-    image?: string;
-    display_position?: string;
-  }>;
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
-  error?: string;
-};
-
-async function queryLandingInternsPage(
-  page: number,
-  limit: number,
-): Promise<LandingInternsPage> {
-  const supabase = createClientAnon();
-  const from = (page - 1) * limit;
-  const to = from + limit - 1;
-
-  const { data, error, count } = await supabase
-    .from("codev")
-    .select(LANDING_INTERN_SELECT, { count: "exact" })
-    .eq("availability_status", true)
-    .in("role_id", [4, 10])
-    .order("landing_rank_score", { ascending: false })
-    .order("id", { ascending: true })
-    .range(from, to);
-
-  if (error) {
-    console.error("Supabase query error (landing-interns):", error);
-    return {
-      TEAM_MEMBERS: [],
-      pagination: { page, limit, total: 0, totalPages: 0 },
-      error: error.message ?? "DB error",
-    };
-  }
-
-  const total = count ?? 0;
-  const totalPages = total === 0 ? 0 : Math.ceil(total / limit);
-  const rows = (data ?? []) as LandingInternRow[];
-
-  return {
-    TEAM_MEMBERS: rows.map((row) => ({
-      id: row.id,
-      name: `${row.first_name ?? ""} ${row.last_name ?? ""}`.trim(),
-      role: roleName(row.role_id ?? undefined),
-      image: row.image_url ?? undefined,
-      display_position: row.display_position ?? undefined,
-    })),
-    pagination: {
-      page,
-      limit,
-      total,
-      totalPages,
-    },
-  };
-}
-
-function getCachedLandingInternsPage(page: number, limit: number) {
-  return unstable_cache(
-    async () => queryLandingInternsPage(page, limit),
-    ["landing-interns", String(page), String(limit)],
-    { revalidate: REVALIDATE_SECONDS, tags: ["landing-interns"] },
-  )();
-}
-
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = request.nextUrl;
@@ -118,13 +44,49 @@ export async function GET(request: NextRequest) {
       MAX_LIMIT,
     );
 
-    const payload = await getCachedLandingInternsPage(page, limit);
-    const status = payload.error ? 500 : 200;
+    const supabase = createClientAnon();
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
 
-    return NextResponse.json(payload, {
-      status,
-      headers: {
-        "Cache-Control": `public, s-maxage=${REVALIDATE_SECONDS}, stale-while-revalidate=86400`,
+    const { data, error, count } = await supabase
+      .from("codev")
+      .select(LANDING_INTERN_SELECT, { count: "exact" })
+      .eq("availability_status", true)
+      .in("role_id", [4, 10])
+      // Ranking via landing_rank_score (migration) — re-enable when column is live
+      // .order("landing_rank_score", { ascending: false })
+      .order("id", { ascending: true })
+      .range(from, to);
+
+    if (error) {
+      console.error("Supabase query error (landing-interns):", error);
+      return NextResponse.json(
+        {
+          TEAM_MEMBERS: [],
+          pagination: { page, limit, total: 0, totalPages: 0 },
+          error: error.message ?? "DB error",
+        },
+        { status: 500 },
+      );
+    }
+
+    const total = count ?? 0;
+    const totalPages = total === 0 ? 0 : Math.ceil(total / limit);
+    const rows = (data ?? []) as LandingInternRow[];
+
+    return NextResponse.json({
+      TEAM_MEMBERS: rows.map((row) => ({
+        id: row.id,
+        name: `${row.first_name ?? ""} ${row.last_name ?? ""}`.trim(),
+        role: roleName(row.role_id ?? undefined),
+        image: row.image_url ?? undefined,
+        display_position: row.display_position ?? undefined,
+      })),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
       },
     });
   } catch (err) {

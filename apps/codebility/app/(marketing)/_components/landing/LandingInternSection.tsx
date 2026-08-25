@@ -5,12 +5,13 @@ import Section from "../MarketingSection";
 import LandingInternPagination, {
   type LandingInternsApiResponse,
 } from "./LandingIntern-CodevPagination";
+import LandingInternSkeleton from "./LandingInternSkeleton";
 import { Button } from "@/components/ui/button";
 import { fetchApiJson } from "@/utils/api-fetch";
 
 const PAGE_SIZE = 10;
 
-const getLandingInternsPage = async (page = 1) => {
+async function getLandingInternsPage(page: number) {
   const result = await fetchApiJson<LandingInternsApiResponse>(
     `/api/landing-interns?page=${page}&limit=${PAGE_SIZE}`,
     {
@@ -27,10 +28,11 @@ const getLandingInternsPage = async (page = 1) => {
   }
 
   return result.data;
-};
+}
 
 async function LandingIntern() {
   const data = await getLandingInternsPage(1);
+
   if (!data || data.TEAM_MEMBERS.length === 0) {
     return (
       <div className="py-12 text-sm text-gray-400 flex items-center justify-center">
@@ -39,7 +41,11 @@ async function LandingIntern() {
     );
   }
 
-  return <LandingInternPagination initialData={data} pageSize={PAGE_SIZE} />;
+  return (
+    <Suspense fallback={<LandingInternSkeleton />}>
+      <LandingInternPagination initialData={data} pageSize={PAGE_SIZE} />
+    </Suspense>
+  );
 }
 
 export default function InternSectionContainer() {
@@ -50,7 +56,7 @@ export default function InternSectionContainer() {
           Codebility CoDevs
         </h1>
         <div className="flex flex-col items-center justify-center">
-          <div className="max-w-[1100px] px-4">
+          <div className="max-w-[1100px] px-4 w-full">
             <p className="pt-8 pb-10 text-center md:px-44 text-gray-300">
               Discover the driving force behind CODEVS&apos; success. Our
               CoDevs bring fresh advantage, high-level performance, and the
@@ -58,13 +64,7 @@ export default function InternSectionContainer() {
               and determination.
             </p>
 
-            <Suspense
-              fallback={
-                <div className="py-12 text-sm text-gray-500 flex items-center justify-center">
-                  Loading team members…
-                </div>
-              }
-            >
+            <Suspense fallback={<LandingInternSkeleton />}>
               <LandingIntern />
             </Suspense>
 
