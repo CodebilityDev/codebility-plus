@@ -1,7 +1,6 @@
 import { Metadata } from "next";
 
 import Footer from "../_components/MarketingFooter";
-import MarketingSCNavigation from "../_components/MarketingSCNavigation";
 import WorkplaceCulture from "./_components/WorkplaceCulture";
 import CodevHero from "./_components/CodevsHero";
 import JobListings from "./_components/JobListings";
@@ -32,7 +31,6 @@ export const revalidate = 0;
 export default function Careers() {
     return (
         <div className="bg-black-400 relative flex w-full flex-col">
-            <MarketingSCNavigation />
             <CodevHero />
             <JobListings />
             <WorkplaceCulture />

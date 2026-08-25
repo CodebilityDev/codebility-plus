@@ -4,8 +4,6 @@ import { getOrSetCache } from "@/lib/server/redis-cache";
 import { cacheKeys } from "@/lib/server/redis-cache-keys";
 import { createClientServerComponent } from "@/utils/supabase/server";
 
-import Footer from "../_components/MarketingFooter";
-import MarketingSCNavigation from "../_components/MarketingSCNavigation";
 import { ServicesPageContent } from "./_components/layout";
 import { ClientTechyBackground } from "./_components/visuals";
 import { ServiceProvider } from "./_context";
@@ -99,7 +97,6 @@ const ServicesPage = async () => {
         <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden overflow-y-hidden bg-[#030303]">
             <ClientTechyBackground />
             <div className="relative z-10">
-                <MarketingSCNavigation />
                 <ServiceProvider>
                     <ServicesPageContent servicesData={mappedData} />
                 </ServiceProvider>

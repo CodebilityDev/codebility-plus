@@ -1,7 +1,6 @@
 import { Metadata } from "next";
 
 import Footer from "../_components/MarketingFooter";
-import MarketingSCNavigation from "../_components/MarketingSCNavigation";
 import FeaturedSection from "../_shared/CodevsFeaturedCection";
 import Hero from "./_components/CodevsHero";
 import Project from "./_components/CodevsProject";
@@ -34,7 +33,6 @@ export const revalidate = 0;
 export default function Codevs() {
     return (
         <div className="bg-black-400 relative flex w-full flex-col">
-            <MarketingSCNavigation />
             <Hero />
             <CodevsProfiles />
             <FeaturedSection />

@@ -3,7 +3,6 @@ import React from "react";
 
 import Container from "../_components/MarketingContainer";
 import Footer from "../_components/MarketingFooter";
-import MarketingSCNavigation from "../_components/MarketingSCNavigation";
 import SideNavMenu from "../_components/MarketingSidenavMenu";
 import BookACallCalendlyWidgetContainer from "./_components/BookACallCalendlyWidgetContainer";
 
@@ -31,7 +30,6 @@ export const revalidate = 0;
 export default function BookCallPage() {
     return (
         <div className="bg-black-400 relative flex min-h-screen w-full flex-col items-center overflow-x-hidden overflow-y-hidden">
-            <MarketingSCNavigation />
             <SideNavMenu />
             <Container className="relative z-10 flex w-full max-w-screen-sm flex-col gap-6 pt-10 text-white lg:mx-60 lg:max-w-screen-lg lg:flex-row lg:justify-between lg:gap-10 lg:pt-32">
                 <div className="flex w-full flex-col gap-2 text-center lg:pt-64 lg:text-left">
