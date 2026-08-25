@@ -53,8 +53,7 @@ export async function GET(request: NextRequest) {
       .select(LANDING_INTERN_SELECT, { count: "exact" })
       .eq("availability_status", true)
       .in("role_id", [4, 10])
-      // Ranking via landing_rank_score (migration) — re-enable when column is live
-      // .order("landing_rank_score", { ascending: false })
+      .order("landing_rank_score", { ascending: false })
       .order("id", { ascending: true })
       .range(from, to);
 
@@ -66,7 +65,10 @@ export async function GET(request: NextRequest) {
           pagination: { page, limit, total: 0, totalPages: 0 },
           error: error.message ?? "DB error",
         },
-        { status: 500 },
+        {
+          status: 500,
+          headers: { "Cache-Control": "no-store" },
+        },
       );
     }
 
@@ -74,21 +76,29 @@ export async function GET(request: NextRequest) {
     const totalPages = total === 0 ? 0 : Math.ceil(total / limit);
     const rows = (data ?? []) as LandingInternRow[];
 
-    return NextResponse.json({
-      TEAM_MEMBERS: rows.map((row) => ({
-        id: row.id,
-        name: `${row.first_name ?? ""} ${row.last_name ?? ""}`.trim(),
-        role: roleName(row.role_id ?? undefined),
-        image: row.image_url ?? undefined,
-        display_position: row.display_position ?? undefined,
-      })),
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages,
+    return NextResponse.json(
+      {
+        TEAM_MEMBERS: rows.map((row) => ({
+          id: row.id,
+          name: `${row.first_name ?? ""} ${row.last_name ?? ""}`.trim(),
+          role: roleName(row.role_id ?? undefined),
+          image: row.image_url ?? undefined,
+          display_position: row.display_position ?? undefined,
+        })),
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages,
+        },
       },
-    });
+      {
+        headers: {
+          "Cache-Control":
+            "public, max-age=60, s-maxage=3600, stale-while-revalidate=86400",
+        },
+      },
+    );
   } catch (err) {
     console.error("Unexpected error in /api/landing-interns:", err);
     return NextResponse.json(
@@ -97,7 +107,10 @@ export async function GET(request: NextRequest) {
         pagination: { page: 1, limit: DEFAULT_LIMIT, total: 0, totalPages: 0 },
         error: "Unexpected server error",
       },
-      { status: 500 },
+      {
+        status: 500,
+        headers: { "Cache-Control": "no-store" },
+      },
     );
   }
 }

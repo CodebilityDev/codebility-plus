@@ -13,7 +13,7 @@ const PAGE_SIZE = 10;
 
 async function getLandingInternsPage(page: number) {
   const result = await fetchApiJson<LandingInternsApiResponse>(
-    `/api/landing-interns?page=${page}&limit=${PAGE_SIZE}`,
+    `/api/landing-interns?page=${page}&limit=${PAGE_SIZE}&sort=rank`,
     {
       next: {
         revalidate: 3600,
@@ -42,7 +42,14 @@ async function LandingIntern() {
   }
 
   return (
-    <Suspense fallback={<LandingInternSkeleton />}>
+    <Suspense
+      fallback={
+        <LandingInternSkeleton
+          page={1}
+          totalPages={Math.max(1, data.pagination.totalPages)}
+        />
+      }
+    >
       <LandingInternPagination initialData={data} pageSize={PAGE_SIZE} />
     </Suspense>
   );
