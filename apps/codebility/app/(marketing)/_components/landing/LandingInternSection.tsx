@@ -1,9 +1,74 @@
-import React from "react";
+import React, { Suspense } from "react";
 import Link from "next/link";
 import BlueBg from "./LandingBlueBg";
 import Section from "../MarketingSection";
 import LandingInternPagination from "./LandingIntern-CodevPagination";
 import { Button } from "@/components/ui/button";
+import { fetchApiJson } from "@/utils/api-fetch";
+
+const isCodevRole = (role: string): boolean => role === TEAM_ROLES.CODEV;
+type PersonRole = 'Intern' | 'Codev';
+
+const TEAM_ROLES = {
+    INTERN: 'Intern' as const,
+    CODEV: 'Codev' as const,
+  } as const;
+
+const validateTeamRole = (role: string): PersonRole => {
+    return isCodevRole(role) ? TEAM_ROLES.CODEV : TEAM_ROLES.INTERN;
+};
+interface TeamMembersApiResponse {
+    TEAM_MEMBERS: {
+      id: string;
+      name: string; 
+      role: string; 
+      image?: string; 
+      display_position?: string;
+      years_of_experience?: number;
+      internal_status?: string;
+      level?: Record<string, any>;
+      codev_points?: Array<{
+        id: string;
+        codev_id?: string;
+        skill_category_id?: string;
+        points: number;
+      }>;
+      work_experience?: Array<any>;
+    }[];
+    error?: string;
+  }
+
+const getAllTeamMembers = async () => {
+  const result = await fetchApiJson<TeamMembersApiResponse>(
+    "/api/all-active-interns-codev-prioritized",
+    {
+      next: {
+        revalidate: 3600,
+        tags: ["active-interns"],
+      },
+    },
+  );
+
+  if (!result.ok) {
+    console.error("Error fetching team members:", result.error);
+    return null;
+  }
+
+  return result.data;
+};
+
+const LandingIntern = async () => {
+    const users = await getAllTeamMembers();
+    if (!users) return (
+        <div className="py-12 text-sm text-gray-400 flex items-center justify-center">
+            No team members available (Interns or Codevs)
+        </div>
+    );
+
+
+    return <LandingInternPagination allTeamMembers={users} />
+    
+}
 
 export default function InternSectionContainer(){
     return (
@@ -20,10 +85,15 @@ export default function InternSectionContainer(){
                             us forward with energy and determination.
                         </p>
                         
-                        <div>
-                            <LandingInternPagination />
-                        </div>
-                        
+                            <Suspense fallback={
+                                <div className="py-12 text-sm text-gray-500 flex items-center justify-center">
+                                    Loading team members…
+                                </div>}
+                            >
+                                <LandingIntern />
+                            </Suspense>
+                  
+                    
                         {/* Hire a CoDevs Button */}
                         <div className="flex justify-center mt-8 mb-12">
                             <div className="relative">
