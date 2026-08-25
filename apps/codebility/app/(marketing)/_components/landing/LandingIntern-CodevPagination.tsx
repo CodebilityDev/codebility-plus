@@ -48,6 +48,7 @@ function loadPage(
 
   const promise = fetchApiJson<LandingInternsPage>(
     `/api/landing-interns?page=${page}&limit=${pageSize}`,
+    { cache: "force-cache" },
   ).then((result) => {
     if (!result.ok) {
       console.error("Error fetching landing interns page:", result.error);
