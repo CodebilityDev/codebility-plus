@@ -48,7 +48,6 @@ const AiIntegration = () => {
             <Partner />
             <PartnerReactFlow />
             <NextStep />
-            <Footer />
         </div>
     );
 };
