@@ -6,7 +6,6 @@ import Link from "next/link";
 import { defaultAvatar } from "@/public/assets/images";
 import type { ServicesProjectDetail } from "@/lib/server/services-projects-cached";
 import { fetchApiJson } from "@/utils/api-fetch";
-import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Crown } from "lucide-react";
 
@@ -92,17 +91,6 @@ function getImageUrl(mainImage?: string) {
   return defaultAvatar;
 }
 
-function SkeletonBone({ className }: { className?: string }) {
-  return (
-    <div
-      className={cn(
-        "animate-pulse rounded bg-gray-200 dark:bg-gray-700",
-        className,
-      )}
-    />
-  );
-}
-
 function ServiceDetailSkeleton() {
   return (
     <>
@@ -113,112 +101,31 @@ function ServiceDetailSkeleton() {
         <DialogTitle>
           <VisuallyHidden>Loading project</VisuallyHidden>
         </DialogTitle>
-        <div className="flex justify-center">
-          <SkeletonBone className="h-7 w-48 sm:h-8 sm:w-64" />
-        </div>
+        <div className="mx-auto h-7 w-40 animate-pulse rounded-md bg-gray-200 dark:bg-gray-700 sm:h-8 sm:w-56" />
       </DialogHeader>
 
       <div className="flex-1 overflow-y-auto px-4 sm:px-6 pb-6">
-        <div className="relative mb-6 h-[200px] sm:h-[300px] w-full overflow-hidden rounded-xl bg-gray-200 shadow-lg dark:bg-gray-800">
-          <div className="absolute left-3 top-3">
-            <SkeletonBone className="h-7 w-24 rounded-full bg-gray-300/80 dark:bg-gray-600/80" />
+        <div className="mb-6 h-[200px] w-full animate-pulse rounded-xl bg-gray-200 dark:bg-gray-700 sm:h-[300px]" />
+
+        <div className="space-y-6">
+          <div className="rounded-lg bg-gray-50 p-4 dark:bg-gray-800/50 sm:p-6">
+            <div className="mb-4 h-6 w-44 animate-pulse rounded-md bg-gray-200 dark:bg-gray-700 sm:h-7 sm:w-52" />
+            <div className="grid gap-6 lg:grid-cols-2">
+              <div className="h-40 animate-pulse rounded-md bg-gray-200 dark:bg-gray-700 sm:h-48" />
+              <div className="h-40 animate-pulse rounded-md bg-gray-200 dark:bg-gray-700 sm:h-48" />
+            </div>
           </div>
-          <div className="absolute inset-0 flex flex-col justify-end p-4 sm:p-6">
-            <SkeletonBone className="mb-2 h-7 w-3/5 max-w-md bg-gray-300/90 dark:bg-gray-600/90 sm:h-9" />
-            <SkeletonBone className="h-4 w-4/5 max-w-lg bg-gray-300/70 dark:bg-gray-600/70 sm:h-5" />
+
+          <div className="rounded-lg bg-gray-50 p-4 dark:bg-gray-800/50 sm:p-6">
+            <div className="mb-4 h-6 w-36 animate-pulse rounded-md bg-gray-200 dark:bg-gray-700 sm:h-7 sm:w-40" />
+            <div className="flex gap-3">
+              <div className="h-12 w-12 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700" />
+              <div className="h-10 w-10 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700" />
+              <div className="h-10 w-10 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700" />
+              <div className="h-10 w-10 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700" />
+            </div>
           </div>
         </div>
-
-        <section id="service-detail-info" className="space-y-6">
-          <div className="rounded-lg bg-gray-50 p-4 dark:bg-gray-800/50 sm:p-6">
-            <div className="mb-4 flex items-center gap-3">
-              <SkeletonBone className="h-6 w-6 shrink-0 rounded-full sm:h-8 sm:w-8" />
-              <SkeletonBone className="h-6 w-44 sm:h-7 sm:w-52" />
-            </div>
-
-            <div className="grid gap-6 lg:grid-cols-2">
-              <div className="space-y-4">
-                <div>
-                  <SkeletonBone className="mb-2 h-5 w-48" />
-                  <div className="space-y-2">
-                    <SkeletonBone className="h-4 w-full" />
-                    <SkeletonBone className="h-4 w-full" />
-                    <SkeletonBone className="h-4 w-5/6" />
-                    <SkeletonBone className="h-4 w-4/5" />
-                  </div>
-                </div>
-
-                <div>
-                  <SkeletonBone className="mb-2 h-5 w-28" />
-                  <div className="space-y-2">
-                    <div className="flex items-start gap-2">
-                      <SkeletonBone className="mt-1.5 h-2 w-2 shrink-0 rounded-full" />
-                      <SkeletonBone className="h-4 w-3/4" />
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <SkeletonBone className="mt-1.5 h-2 w-2 shrink-0 rounded-full" />
-                      <SkeletonBone className="h-4 w-2/3" />
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <SkeletonBone className="mt-1.5 h-2 w-2 shrink-0 rounded-full" />
-                      <SkeletonBone className="h-4 w-4/5" />
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <SkeletonBone className="mb-3 h-5 w-32" />
-                  <div className="flex flex-wrap gap-2 sm:gap-3">
-                    <SkeletonBone className="h-9 w-24 rounded-lg" />
-                    <SkeletonBone className="h-9 w-28 rounded-lg" />
-                    <SkeletonBone className="h-9 w-20 rounded-lg" />
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <SkeletonBone className="mb-2 h-5 w-24" />
-                  <div className="flex flex-wrap gap-2">
-                    <SkeletonBone className="h-6 w-16 rounded-full" />
-                    <SkeletonBone className="h-6 w-20 rounded-full" />
-                    <SkeletonBone className="h-6 w-14 rounded-full" />
-                    <SkeletonBone className="h-6 w-24 rounded-full" />
-                    <SkeletonBone className="h-6 w-16 rounded-full" />
-                  </div>
-                </div>
-
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div>
-                    <SkeletonBone className="mb-2 h-5 w-20" />
-                    <SkeletonBone className="h-4 w-36" />
-                  </div>
-                  <div>
-                    <SkeletonBone className="mb-2 h-5 w-16" />
-                    <SkeletonBone className="h-4 w-36" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div
-            id="service-detail-team"
-            className="rounded-lg bg-gray-50 p-4 dark:bg-gray-800/50 sm:p-6"
-          >
-            <div className="mb-4 flex items-center gap-3">
-              <SkeletonBone className="h-6 w-6 shrink-0 rounded-full sm:h-8 sm:w-8" />
-              <SkeletonBone className="h-6 w-36 sm:h-7 sm:w-40" />
-            </div>
-            <div className="flex flex-wrap gap-3 sm:flex-nowrap sm:overflow-x-auto sm:pb-2">
-              <SkeletonBone className="h-12 w-12 shrink-0 rounded-full" />
-              <SkeletonBone className="h-10 w-10 shrink-0 rounded-full" />
-              <SkeletonBone className="h-10 w-10 shrink-0 rounded-full" />
-              <SkeletonBone className="h-10 w-10 shrink-0 rounded-full" />
-              <SkeletonBone className="h-10 w-10 shrink-0 rounded-full" />
-            </div>
-          </div>
-        </section>
       </div>
     </>
   );
