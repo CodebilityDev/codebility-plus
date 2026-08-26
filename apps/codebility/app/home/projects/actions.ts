@@ -820,6 +820,8 @@ export const updateProjectMembers = async (
     console.log('✅ [updateProjectMembers] Successfully inserted', memberInserts.length, 'members');
 
     revalidatePath("/projects");
+    revalidatePath("/services");
+    revalidateTag("services-projects");
     return { success: true };
   } catch (error) {
     console.error("❌ [updateProjectMembers] Error updating project members:", error);
