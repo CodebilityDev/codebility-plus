@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, use, useState } from "react";
+import { Suspense, use, useState, useTransition } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import InternCards from "./LandingIntern-CodevCard";
 import { LandingInternCardsSkeleton } from "./LandingInternSkeleton";
@@ -135,9 +135,7 @@ function LandingInternCardsRemote({
   initialData: LandingInternsPage;
 }) {
   const data = use(loadPage(page, pageSize, initialData));
-  return (
-    <InternCards key={page} interns={toTeamMembers(data.TEAM_MEMBERS)} />
-  );
+  return <InternCards interns={toTeamMembers(data.TEAM_MEMBERS)} />;
 }
 
 function LandingInternCards({
@@ -151,10 +149,7 @@ function LandingInternCards({
 }) {
   if (page === initialData.pagination.page) {
     return (
-      <InternCards
-        key={page}
-        interns={toTeamMembers(initialData.TEAM_MEMBERS)}
-      />
+      <InternCards interns={toTeamMembers(initialData.TEAM_MEMBERS)} />
     );
   }
 
@@ -174,14 +169,17 @@ export default function LandingInternPagination({
   initialData: LandingInternsPage;
   pageSize?: number;
 }) {
-  // In-memory only. Do not pushState ?page= — Next.js patches history and
-  // soft-navigates the static homepage, remounting this section on page 1 data.
   const [page, setPage] = useState(initialData.pagination.page);
+  const [isPending, startTransition] = useTransition();
   const totalPages = Math.max(1, initialData.pagination.totalPages);
 
   return (
-    <div className="w-full flex flex-col items-center gap-6">
-      <div className="w-full min-h-[300px]">
+    <div className="flex w-full flex-col items-center gap-6">
+      <div
+        className={`w-full min-h-[300px] transition-opacity duration-200 ${
+          isPending ? "opacity-60" : "opacity-100"
+        }`}
+      >
         <Suspense fallback={<LandingInternCardsSkeleton />}>
           <LandingInternCards
             page={page}
@@ -193,7 +191,11 @@ export default function LandingInternPagination({
       <PaginationControls
         page={page}
         totalPages={totalPages}
-        onPageChange={setPage}
+        onPageChange={(nextPage) => {
+          startTransition(() => {
+            setPage(nextPage);
+          });
+        }}
       />
     </div>
   );

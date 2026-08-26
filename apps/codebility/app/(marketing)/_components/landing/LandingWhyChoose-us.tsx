@@ -1,13 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
+import { motion } from "framer-motion";
 
 import Container from "../MarketingContainer";
 import Section from "../MarketingSection";
 import AnimatedMetrics from "./AnimatedMetrics";
-// Animation variants
+
+const VIEWPORT = { once: true, amount: 0.2 } as const;
+
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -20,8 +21,8 @@ const containerVariants = {
 };
 
 const cardVariants = {
-  hidden: { 
-    opacity: 0, 
+  hidden: {
+    opacity: 0,
     y: 60,
     scale: 0.9,
   },
@@ -37,10 +38,6 @@ const cardVariants = {
 };
 
 const WhyChooseUs = () => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.2 });
-
-  // Stats data
   const stats = [
     { value: 120, suffix: "+", label: "Projects Completed", delay: 200 },
     { value: 98, suffix: "%", label: "Client Satisfaction", delay: 400 },
@@ -52,28 +49,28 @@ const WhyChooseUs = () => {
     <Section id="whychooseus" className="relative w-full pt-10 text-white">
       <Container className="text-white">
         <div className="flex flex-col gap-6 md:gap-10">
-          {/* Header with stats */}
-          <motion.div 
-            ref={ref}
+          <motion.div
             className="text-center lg:text-left"
             initial={{ opacity: 0, y: 30 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={VIEWPORT}
             transition={{ duration: 0.8 }}
           >
-            <motion.h2 
-              className="text-xl md:text-3xl mb-8"
+            <motion.h2
+              className="mb-8 text-xl md:text-3xl"
               initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={VIEWPORT}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
               Why Choose Codebility?
             </motion.h2>
-            
-            {/* Animated stats */}
-            <motion.div 
-              className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10 p-6 rounded-xl bg-gradient-to-r from-purple-900/20 via-blue-900/20 to-cyan-900/20 backdrop-blur border border-white/10"
+
+            <motion.div
+              className="mb-10 grid grid-cols-2 gap-6 rounded-xl border border-white/10 bg-gradient-to-r from-purple-900/20 via-blue-900/20 to-cyan-900/20 p-6 backdrop-blur md:grid-cols-4"
               initial={{ opacity: 0, scale: 0.9 }}
-              animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={VIEWPORT}
               transition={{ duration: 0.8, delay: 0.3 }}
             >
               {stats.map((stat, index) => (
@@ -81,17 +78,18 @@ const WhyChooseUs = () => {
               ))}
             </motion.div>
           </motion.div>
-          <motion.div 
+          <motion.div
             className="flex grid-cols-1 grid-rows-4 flex-col gap-3 md:grid md:grid-cols-4 lg:gap-4"
             variants={containerVariants}
             initial="hidden"
-            animate={isInView ? "visible" : "hidden"}
+            whileInView="visible"
+            viewport={VIEWPORT}
           >
-            <motion.div 
-              className="border-dark-100 bg-black-600 col-start-1 col-end-1 row-start-1 row-end-1 rounded-lg border-2 p-4 md:col-end-3 md:row-end-3 md:p-6 relative overflow-hidden"
+            <motion.div
+              className="border-dark-100 bg-black-600 relative col-start-1 col-end-1 row-start-1 row-end-1 overflow-hidden rounded-lg border-2 p-4 md:col-end-3 md:row-end-3 md:p-6"
               variants={cardVariants}
             >
-              <div className="flex h-full flex-col place-items-center justify-around gap-3 text-center relative z-10">
+              <div className="relative z-10 flex h-full flex-col place-items-center justify-around gap-3 text-center">
                 <div>
                   <Image
                     src="https://codebility-cdn.pages.dev/assets/images/index/choose-approach.png"
@@ -101,10 +99,11 @@ const WhyChooseUs = () => {
                     className="h-[150px] w-[150px] object-contain lg:h-[300px] lg:w-[300px]"
                   />
                 </div>
-                <motion.div 
+                <motion.div
                   className="flex flex-col gap-2"
                   initial={{ opacity: 0, y: 20 }}
-                  animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={VIEWPORT}
                   transition={{ duration: 0.6, delay: 0.8 }}
                 >
                   <h3 className="text-lg font-medium md:text-2xl lg:text-3xl">
@@ -118,11 +117,11 @@ const WhyChooseUs = () => {
               </div>
             </motion.div>
 
-            <motion.div 
-              className="border-dark-100 bg-black-600 col-start-1 col-end-1 row-start-2 row-end-2 rounded-lg border-2 p-4 md:col-start-3 md:col-end-5 md:row-start-1 md:row-end-4 md:p-6 relative overflow-hidden"
+            <motion.div
+              className="border-dark-100 bg-black-600 relative col-start-1 col-end-1 row-start-2 row-end-2 overflow-hidden rounded-lg border-2 p-4 md:col-start-3 md:col-end-5 md:row-start-1 md:row-end-4 md:p-6"
               variants={cardVariants}
             >
-              <div className="flex h-full flex-col place-items-center justify-around gap-3 relative z-10">
+              <div className="relative z-10 flex h-full flex-col place-items-center justify-around gap-3">
                 <div>
                   <Image
                     src="https://codebility-cdn.pages.dev/assets/images/index/choose-shield.png"
@@ -132,10 +131,11 @@ const WhyChooseUs = () => {
                     className="h-[150px] w-[150px] object-contain lg:h-[400px] lg:w-[400px]"
                   />
                 </div>
-                <motion.div 
+                <motion.div
                   className="flex flex-col gap-2 text-center"
                   initial={{ opacity: 0, y: 20 }}
-                  animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={VIEWPORT}
                   transition={{ duration: 0.6, delay: 1.0 }}
                 >
                   <h3 className="text-lg font-medium md:text-2xl lg:text-3xl">
@@ -150,8 +150,8 @@ const WhyChooseUs = () => {
               </div>
             </motion.div>
 
-            <motion.div 
-              className="col-start-1 col-end-2 row-start-3 row-end-5 hidden overflow-hidden rounded-xl bg-customBlue-100 lg:block relative"
+            <motion.div
+              className="relative col-start-1 col-end-2 row-start-3 row-end-5 hidden overflow-hidden rounded-xl bg-customBlue-100 lg:block"
               variants={cardVariants}
             >
               <div>
@@ -165,11 +165,11 @@ const WhyChooseUs = () => {
               </div>
             </motion.div>
 
-            <motion.div 
-              className="border-dark-100 bg-black-600 col-start-1 col-end-1 row-start-3 row-end-3 rounded-lg border-2 p-4 md:col-end-3 md:row-end-5 md:p-6 lg:col-start-2 relative overflow-hidden"
+            <motion.div
+              className="border-dark-100 bg-black-600 relative col-start-1 col-end-1 row-start-3 row-end-3 overflow-hidden rounded-lg border-2 p-4 md:col-end-3 md:row-end-5 md:p-6 lg:col-start-2"
               variants={cardVariants}
             >
-              <div className="flex h-full flex-col place-items-center justify-around gap-3 relative z-10">
+              <div className="relative z-10 flex h-full flex-col place-items-center justify-around gap-3">
                 <motion.div
                   animate={{
                     y: [0, -5, 0],
@@ -177,7 +177,7 @@ const WhyChooseUs = () => {
                   transition={{
                     duration: 3,
                     repeat: Infinity,
-                    ease: "easeInOut"
+                    ease: "easeInOut",
                   }}
                 >
                   <Image
@@ -188,10 +188,11 @@ const WhyChooseUs = () => {
                     className="h-[150px] w-[150px] object-contain lg:h-[200px] lg:w-[200px]"
                   />
                 </motion.div>
-                <motion.div 
+                <motion.div
                   className="flex flex-col gap-2 text-center"
                   initial={{ opacity: 0, y: 20 }}
-                  animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={VIEWPORT}
                   transition={{ duration: 0.6, delay: 1.2 }}
                 >
                   <h3 className="font-medium md:text-2xl">
@@ -205,11 +206,10 @@ const WhyChooseUs = () => {
               </div>
             </motion.div>
 
-            <motion.div 
-              className="col-start-1 col-end-1 row-start-4 row-end-4 grid place-items-center rounded-xl bg-gradient-to-r from-[#00738B] via-[#0C3FDB] to-[#9707DD] md:col-start-3 md:col-end-5 md:row-end-5 relative overflow-hidden"
+            <motion.div
+              className="relative col-start-1 col-end-1 row-start-4 row-end-4 grid place-items-center overflow-hidden rounded-xl bg-gradient-to-r from-[#00738B] via-[#0C3FDB] to-[#9707DD] md:col-start-3 md:col-end-5 md:row-end-5"
               variants={cardVariants}
             >
-              {/* Animated gradient overlay */}
               <motion.div
                 className="absolute inset-0 bg-gradient-to-r from-purple-600/20 via-blue-600/20 to-cyan-600/20"
                 animate={{
@@ -218,15 +218,21 @@ const WhyChooseUs = () => {
                 transition={{
                   duration: 4,
                   repeat: Infinity,
-                  ease: "easeInOut"
+                  ease: "easeInOut",
                 }}
               />
-              
-              <motion.p 
-                className="py-10 text-lg font-medium md:text-2xl lg:text-3xl relative z-10"
+
+              <motion.p
+                className="relative z-10 py-10 text-lg font-medium md:text-2xl lg:text-3xl"
                 initial={{ opacity: 0, scale: 0.8 }}
-                animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
-                transition={{ duration: 0.8, delay: 1.4, type: "spring", bounce: 0.4 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={VIEWPORT}
+                transition={{
+                  duration: 0.8,
+                  delay: 1.4,
+                  type: "spring",
+                  bounce: 0.4,
+                }}
               >
                 Your Uniqueness is our focus
               </motion.p>

@@ -13,6 +13,8 @@ interface AnimatedAdminsSectionProps {
   sectionId: string;
 }
 
+const VIEWPORT = { once: true, amount: 0.15 } as const;
+
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -47,11 +49,12 @@ const AnimatedAdminsSection = ({
       className="w-full"
       variants={containerVariants}
       initial="hidden"
-      animate="visible"
+      whileInView="visible"
+      viewport={VIEWPORT}
       data-section={sectionId}
     >
       <motion.h1
-        className="text-center text-3xl font-bold bg-gradient-to-r from-white via-purple-200 to-cyan-200 bg-clip-text text-transparent"
+        className="bg-gradient-to-r from-white via-purple-200 to-cyan-200 bg-clip-text text-center text-3xl font-bold text-transparent"
         variants={itemVariants}
       >
         {title}
@@ -60,7 +63,7 @@ const AnimatedAdminsSection = ({
       <div className="flex flex-col items-center justify-center">
         <div className="max-w-[1100px] px-4">
           <motion.p
-            className="pt-8 text-center md:px-44 text-gray-300"
+            className="pt-8 text-center text-gray-300 md:px-44"
             variants={itemVariants}
           >
             {description}
@@ -74,7 +77,7 @@ const AnimatedAdminsSection = ({
             {members.map((member: Codev) => (
               <motion.div
                 key={member.id}
-                className="h-full relative"
+                className="relative h-full"
                 variants={itemVariants}
               >
                 <AdminCard admin={member} />

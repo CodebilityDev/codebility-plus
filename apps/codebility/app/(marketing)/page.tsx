@@ -43,7 +43,7 @@ export default function Index() {
       <Admins />
       <InternSectionContainer />
       <Partners />
-      <Testimonials />
+      {/* <Testimonials /> */}
       <Calendly />
     </>
   );

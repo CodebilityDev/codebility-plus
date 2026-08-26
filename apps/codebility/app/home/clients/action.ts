@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { deleteImage, uploadImage } from "@/utils/uploadImage";
 import { createClientServerComponent } from "@/utils/supabase/server";
 
@@ -53,6 +53,7 @@ export const createClientAction = async (formData: FormData): Promise<ActionResu
     }
 
     revalidatePath("/home/clients");
+    revalidateTag("landing-testimonials");
     return { success: true, data };
     
   } catch (error) {
@@ -124,6 +125,7 @@ export const updateClientAction = async (
     }
 
     revalidatePath("/home/clients");
+    revalidateTag("landing-testimonials");
     return { success: true, data };
     
   } catch (error) {
@@ -164,6 +166,7 @@ export const toggleClientStatusAction = async (clientId: string): Promise<Action
     }
 
     revalidatePath("/home/clients");
+    revalidateTag("landing-testimonials");
     return { success: true, data };
     
   } catch (error) {
@@ -208,6 +211,7 @@ export const deleteClientAction = async (clientId: string): Promise<ActionResult
     }
 
     revalidatePath("/home/clients");
+    revalidateTag("landing-testimonials");
     return { success: true };
     
   } catch (error) {

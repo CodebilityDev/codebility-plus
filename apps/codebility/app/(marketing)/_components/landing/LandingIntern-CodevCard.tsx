@@ -1,8 +1,9 @@
 // components/landing/LandingIntern-CodevCard.tsx
 
 "use client";
-import { useState, useEffect, useRef } from "react";
-import { motion, useInView } from "framer-motion";
+
+import { useState } from "react";
+import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 
 type Person = {
@@ -73,23 +74,7 @@ function Avatar({
   const initials = getInitials();
   const [imgError, setImgError] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
-  const [forceRender, setForceRender] = useState(false);
   const hasImage = Boolean(person.image) && !imgError;
-
-  // Force image preloading and rendering
-  useEffect(() => {
-    if (person.image && person.image !== "/avatars/default.png") {
-      const img = new Image();
-      img.onload = () => {
-        setImgLoaded(true);
-        setForceRender(true);
-      };
-      img.onerror = () => {
-        setImgError(true);
-      };
-      img.src = person.image;
-    }
-  }, [person.image]);
 
   if (hasImage) {
     return (
@@ -101,28 +86,23 @@ function Avatar({
           src={person.image}
           alt={person.name}
           onError={() => setImgError(true)}
-          onLoad={() => {
-            setImgLoaded(true);
-          }}
+          onLoad={() => setImgLoaded(true)}
           className={`absolute top-1/2 left-1/2 object-cover transition-opacity duration-200 ${
-            imgLoaded ? 'opacity-100' : 'opacity-0'
+            imgLoaded ? "opacity-100" : "opacity-0"
           }`}
           style={{
             objectPosition: position,
             width: `${size * 1.2}px`,
             height: `${size * 1.2}px`,
             transform: "translate(-50%, -50%)",
-            display: "block"
+            display: "block",
           }}
           loading="eager"
-          decoding="sync"
+          decoding="async"
           fetchPriority="high"
         />
-        {/* Loading placeholder */}
         {!imgLoaded && (
-          <div
-            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center"
-          >
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
             <span
               className="font-bold text-white opacity-50"
               style={{ fontSize: Math.max(12, size * 0.38), lineHeight: 1 }}
@@ -182,32 +162,21 @@ const cardVariants = {
   },
 };
 
-export default function InternCards({ interns }: { interns: Person[] }) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.1 });
-  
-  // Helper function to check if person is Codev
-  const isCodev = (person: Person): boolean => person.role === ROLE_CONFIG.CODEV;
-  
-  // Helper function to check if person is Intern
-  const isIntern = (person: Person): boolean => person.role === ROLE_CONFIG.INTERN;
+let hasEnteredInternCards = false;
 
-  // Preload all images for current page immediately
-  useEffect(() => {
-    interns.forEach(intern => {
-      if (intern.image && intern.image !== "/avatars/default.png") {
-        const img = new Image();
-        img.src = intern.image;
-      }
-    });
-  }, [interns]);
+export default function InternCards({ interns }: { interns: Person[] }) {
+  const isCodev = (person: Person): boolean => person.role === ROLE_CONFIG.CODEV;
+  const startVisible = hasEnteredInternCards;
 
   return (
-    <motion.div 
-      ref={ref}
-      className="w-full max-w-6xl mx-auto py-10"
-      initial="hidden"
-      animate={isInView ? "visible" : "hidden"}
+    <motion.div
+      className="mx-auto w-full max-w-6xl py-10"
+      initial={startVisible ? "visible" : "hidden"}
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.1 }}
+      onViewportEnter={() => {
+        hasEnteredInternCards = true;
+      }}
       variants={containerVariants}
     >
       {/* Responsive grid with proper mobile layout */}

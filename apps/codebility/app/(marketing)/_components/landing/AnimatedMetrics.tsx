@@ -12,7 +12,7 @@ type AnimatedMetricsProps = {
   variant?: "hero" | "stat";
 };
 
-const VIEWPORT = { once: true, amount: 0.5 } as const;
+const VIEWPORT = { once: true, amount: 0.2 } as const;
 
 const VARIANT_CONFIG = {
   hero: {
