@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { Client, Codev, Project } from "@/types/home/codev";
 import { deleteImage, getImagePath } from "@/utils/uploadImage";
 import { createClientServerComponent } from "@/utils/supabase/server";
@@ -301,6 +301,7 @@ export async function createProject(
 
     revalidatePath("/projects");
     revalidatePath("/services");
+    revalidateTag("services-projects");
     return { success: true, data: project };
   } catch (error) {
     console.error("Error creating project:", error);
@@ -330,6 +331,7 @@ export async function updateStatus(
 
   revalidatePath("/home/projects");
   revalidatePath("/services");
+  revalidateTag("services-projects");
 
   return { success: true, projectId, status };
 }
@@ -369,6 +371,7 @@ export async function updatePublicDisplaySwitch(
 
   revalidatePath("/home/projects");
   revalidatePath("/services");
+  revalidateTag("services-projects");
 
   return { success: true, projectId, publicDisplay };
 }
@@ -516,6 +519,7 @@ export async function updateProject(projectId: string, formData: FormData) {
 
     revalidatePath("/projects");
     revalidatePath("/services");
+    revalidateTag("services-projects");
     return { success: true, data: projectData };
   } catch (error) {
     console.error("Error updating project:", error);
@@ -557,6 +561,7 @@ export async function deleteProject(projectId: string) {
 
     revalidatePath("/projects");
     revalidatePath("/services");
+    revalidateTag("services-projects");
     return { success: true };
   } catch (error) {
     console.error("Error deleting project:", error);
