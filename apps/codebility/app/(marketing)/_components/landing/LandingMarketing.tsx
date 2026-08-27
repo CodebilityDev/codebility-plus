@@ -1,5 +1,5 @@
 import React from "react";
-import Image from "next/image";
+import LandingImage from "./LandingImage";
 import { Button } from "@/components/ui/button";
 
 import { MarketingCardData } from "@/constants/landing_data";
@@ -17,9 +17,8 @@ const Marketing = () => {
         className="text-light-900 relative flex min-h-screen w-full md:flex-row  md:justify-between "
       >
         <div className="hidden pt-32 md:block">
-          <Image
+          <LandingImage
             src="/assets/images/campaign/left-task.png"
-
             alt=""
             width={200}
             height={100}
@@ -62,9 +61,8 @@ const Marketing = () => {
           </div>
         </div>
         <div className="hidden md:block md:pt-80">
-          <Image
+          <LandingImage
             src="/assets/images/campaign/right-task.png"
-
             alt=""
             width={200}
             height={100}

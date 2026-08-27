@@ -5,7 +5,6 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import pathsConfig from "@/config/paths.config";
 
-import SideNavMenu from "../../_components/MarketingSidenavMenu";
 import OrbitingCirclesBackground from "./CodevsOrbitingCirclesBg";
 
 const rowdies = Rowdies({

@@ -6,6 +6,8 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 
+import LandingImage from "./LandingImage";
+
 type Person = {
   id: string; // ✅ Added id field for navigation
   name: string;
@@ -73,44 +75,25 @@ function Avatar({
 
   const initials = getInitials();
   const [imgError, setImgError] = useState(false);
-  const [imgLoaded, setImgLoaded] = useState(false);
   const hasImage = Boolean(person.image) && !imgError;
 
   if (hasImage) {
     return (
       <div
-        className="rounded-full overflow-hidden border-2 border-neutral-700 flex-shrink-0 relative bg-gray-800"
+        className="relative flex-shrink-0 overflow-hidden rounded-full border-2 border-neutral-700 bg-gray-800"
         style={{ height: size, width: size }}
       >
-        <img
-          src={person.image}
+        <LandingImage
+          src={person.image!}
           alt={person.name}
+          fill
+          sizes={`${size}px`}
           onError={() => setImgError(true)}
-          onLoad={() => setImgLoaded(true)}
-          className={`absolute top-1/2 left-1/2 object-cover transition-opacity duration-200 ${
-            imgLoaded ? "opacity-100" : "opacity-0"
-          }`}
+          className="object-cover"
           style={{
             objectPosition: position,
-            width: `${size * 1.2}px`,
-            height: `${size * 1.2}px`,
-            transform: "translate(-50%, -50%)",
-            display: "block",
           }}
-          loading="eager"
-          decoding="async"
-          fetchPriority="high"
         />
-        {!imgLoaded && (
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
-            <span
-              className="font-bold text-white opacity-50"
-              style={{ fontSize: Math.max(12, size * 0.38), lineHeight: 1 }}
-            >
-              {initials || "?"}
-            </span>
-          </div>
-        )}
       </div>
     );
   }
@@ -260,17 +243,11 @@ export default function InternCards({ interns }: { interns: Person[] }) {
                     </motion.div>
                     
                     {/* Content Section - Close to avatar with minimal spacing */}
-                    <div className="flex flex-col items-center justify-center flex-grow w-full space-y-2 sm:space-y-3">
-                      {/* Name - Responsive text and spacing */}
-                      <motion.div 
-                        className="flex items-center justify-center"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.2 }}
-                      >
-                        <motion.h3 
-                          className="text-xs sm:text-sm font-medium text-center break-words line-clamp-2 leading-tight px-1 sm:px-2"
-                          whileHover={{ 
+                    <div className="flex flex-grow w-full flex-col items-center justify-center space-y-2 sm:space-y-3">
+                      <div className="flex items-center justify-center">
+                        <motion.h3
+                          className="line-clamp-2 break-words px-1 text-center text-xs font-medium leading-tight sm:px-2 sm:text-sm"
+                          whileHover={{
                             color: isCodev(intern) ? "#60a5fa" : "#4ade80",
                             scale: 1.02,
                           }}
@@ -278,40 +255,28 @@ export default function InternCards({ interns }: { interns: Person[] }) {
                         >
                           {intern.name}
                         </motion.h3>
-                      </motion.div>
-                      
-                      {/* Role Badge - Responsive sizing */}
-                      <motion.div 
-                        className="flex items-center justify-center"
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.4, delay: 0.3 }}
-                      >
-                        <motion.div 
-                          className={`px-2 sm:px-3 py-1 rounded-full text-xs font-medium ${roleStyles.badgeClass}`}
-                          whileHover={{ 
+                      </div>
+
+                      <div className="flex items-center justify-center">
+                        <motion.div
+                          className={`rounded-full px-2 py-1 text-xs font-medium sm:px-3 ${roleStyles.badgeClass}`}
+                          whileHover={{
                             scale: 1.05,
-                            boxShadow: isCodev(intern) 
-                              ? "0 4px 15px rgba(59, 130, 246, 0.3)" 
+                            boxShadow: isCodev(intern)
+                              ? "0 4px 15px rgba(59, 130, 246, 0.3)"
                               : "0 4px 15px rgba(34, 197, 94, 0.3)",
                           }}
                           transition={{ duration: 0.3 }}
                         >
                           {roleStyles.label}
                         </motion.div>
-                      </motion.div>
-                      
-                      {/* Position - Responsive text and spacing */}
-                      <motion.div 
-                        className="flex items-center justify-center"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.4 }}
-                      >
-                        <p className="text-xs sm:text-sm text-center opacity-70 line-clamp-2 leading-tight px-1 sm:px-2">
+                      </div>
+
+                      <div className="flex items-center justify-center">
+                        <p className="line-clamp-2 px-1 text-center text-xs leading-tight opacity-70 sm:px-2 sm:text-sm">
                           {intern.display_position || roleStyles.label}
                         </p>
-                      </motion.div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>

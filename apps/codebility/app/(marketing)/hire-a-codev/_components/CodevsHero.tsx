@@ -5,7 +5,6 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import pathsConfig from "@/config/paths.config";
 
-import SideNavMenu from "../../_components/MarketingSidenavMenu";
 import OrbitingCirclesBackground from "./CodevsOrbitingCirclesBg";
 
 const rowdies = Rowdies({
@@ -19,7 +18,6 @@ export default function Hero() {
       id="home"
       className="relative flex min-h-screen w-full flex-col items-center overflow-hidden bg-cover bg-no-repeat pt-24"
     >
-      <SideNavMenu />
       <div
         className="absolute left-1/2 top-1/2 h-[1100px] w-96 -translate-x-1/2 -translate-y-1/2 blur-3xl md:w-full xl:-left-10 xl:-top-96 xl:h-[1562.01px] xl:w-[1044.36px] xl:-translate-x-0 xl:-translate-y-0"
         style={{

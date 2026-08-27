@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import LandingImage from "./LandingImage";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -101,13 +101,12 @@ const WorkWithUsCard = ({
     <div className="relative flex h-full flex-col overflow-hidden rounded-3xl border border-white/10 bg-white/5 bg-gradient-to-br from-white/10 via-white/5 to-purple-950/20 p-6 shadow-xl backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-purple-300/60 hover:shadow-purple-500/20 md:p-8">
       <div className="relative overflow-hidden rounded-2xl">
         <div className="relative aspect-[16/9] w-full">
-          <Image
+          <LandingImage
             src={card.image.src}
             alt={card.image.alt}
             fill
             sizes="(max-width: 768px) 100vw, 70vw"
             className="object-cover transition-transform duration-500 group-hover:scale-105"
-            priority={index === 0}
           />
         </div>
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-purple-950/70 via-transparent to-transparent" />

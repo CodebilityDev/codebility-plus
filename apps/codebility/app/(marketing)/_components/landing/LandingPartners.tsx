@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import LandingImage from "./LandingImage";
 import { motion } from "framer-motion";
 
 import Section from "../MarketingSection";
@@ -90,7 +90,7 @@ export default function Partners() {
               className="group relative flex h-32 w-full items-center justify-center rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm transition-all duration-300"
             >
               <div className="relative z-10 h-full w-full">
-                <Image
+                <LandingImage
                   src={partner.logo}
                   alt={`${partner.name} logo`}
                   fill

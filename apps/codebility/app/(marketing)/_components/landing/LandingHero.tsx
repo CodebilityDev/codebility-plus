@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 
 import { MarketingCardData } from "@/constants/landing_data";
 import Container from "../MarketingContainer";
-import SideNavMenu from "../MarketingSidenavMenu";
 import HeroBackground from "./LandingHeroBg";
 import HeroCard from "./LandingHeroCard";
 import FloatingParticles from "./FloatingParticles";
@@ -20,94 +19,79 @@ const HIGHLIGHT_METRICS = [
 
 // Animation variants
 const containerVariants = {
-  hidden: { opacity: 0 },
+  hidden: {},
   visible: {
-    opacity: 1,
     transition: {
-      staggerChildren: 0.2,
-      delayChildren: 0.1,
+      staggerChildren: 0.08,
     },
   },
 };
 
 const itemVariants = {
-  hidden: { 
-    opacity: 0, 
-    y: 30,
-    scale: 0.95,
+  hidden: {
+    opacity: 0,
+    y: 16,
   },
   visible: {
     opacity: 1,
     y: 0,
-    scale: 1,
     transition: {
-      duration: 0.8,
-      ease: [0.25, 0.46, 0.45, 0.94], // Custom easing
+      duration: 0.45,
+      ease: [0.25, 0.46, 0.45, 0.94],
     },
   },
 };
 
 const titleVariants = {
-  hidden: { opacity: 0, y: 50 },
+  hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 1,
+      duration: 0.5,
       ease: [0.25, 0.46, 0.45, 0.94],
     },
   },
 };
 
 const subtitleVariants = {
-  hidden: { opacity: 0, y: 30 },
+  hidden: { opacity: 0, y: 12 },
   visible: {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.8,
-      delay: 0.3,
+      duration: 0.45,
       ease: [0.25, 0.46, 0.45, 0.94],
     },
   },
 };
 
 const buttonVariants = {
-  hidden: { opacity: 0, y: 20, scale: 0.9 },
+  hidden: { opacity: 0, y: 10 },
   visible: {
     opacity: 1,
     y: 0,
-    scale: 1,
     transition: {
-      duration: 0.6,
-      delay: 0.5,
+      duration: 0.4,
       ease: [0.25, 0.46, 0.45, 0.94],
     },
   },
 };
 
 const metricsVariants = {
-  hidden: { opacity: 0, y: 30 },
+  hidden: {},
   visible: {
-    opacity: 1,
-    y: 0,
     transition: {
-      duration: 0.8,
-      delay: 0.7,
-      staggerChildren: 0.1,
+      staggerChildren: 0.06,
     },
   },
 };
 
 const cardContainerVariants = {
-  hidden: { opacity: 0, x: 50 },
+  hidden: {},
   visible: {
-    opacity: 1,
-    x: 0,
     transition: {
-      duration: 1,
-      delay: 0.4,
-      staggerChildren: 0.15,
+      staggerChildren: 0.08,
     },
   },
 };
@@ -118,14 +102,7 @@ const Hero = () => {
       <HeroBackground />
       <FloatingParticles />
 
-      <motion.section
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-        className="relative flex w-full flex-col items-center justify-center text-white py-20"
-      >
-        <SideNavMenu />
-
+      <section className="relative flex w-full flex-col items-center justify-center py-20 text-white">
         <Container className="relative z-10 flex w-full max-w-[1400px] flex-col gap-20 px-8 py-20 md:px-12 md:py-24 lg:flex-row lg:items-start lg:gap-20 lg:px-16">
           <motion.div 
             className="flex w-full flex-col items-center gap-12 text-center lg:w-[58%] lg:items-start lg:text-left"
@@ -140,25 +117,14 @@ const Hero = () => {
               >
                 Strategic Digital Partner
               </motion.span>
-              <motion.h1 
+              <motion.h1
                 className="flex flex-col gap-2 text-4xl font-semibold leading-tight md:text-5xl lg:text-6xl"
                 variants={titleVariants}
               >
-                <motion.span
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.2 }}
-                >
-                  Turn your ideas into
-                </motion.span>
-                <motion.span 
-                  className="bg-gradient-to-r from-purple-200 via-white to-purple-300 bg-clip-text text-transparent"
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.4 }}
-                >
+                <span>Turn your ideas into</span>
+                <span className="bg-gradient-to-r from-purple-200 via-white to-purple-300 bg-clip-text text-transparent">
                   profitable digital products
-                </motion.span>
+                </span>
               </motion.h1>
               <motion.p 
                 className="max-w-2xl text-base leading-relaxed text-white/75 md:text-lg"
@@ -201,31 +167,22 @@ const Hero = () => {
               className="grid w-full grid-cols-1 items-stretch gap-6 sm:grid-cols-3"
               variants={metricsVariants}
             >
-              {HIGHLIGHT_METRICS.map((metric, index) => (
+              {HIGHLIGHT_METRICS.map((metric) => (
                 <motion.div
                   key={metric.label}
                   className="flex flex-col rounded-2xl border border-white/10 bg-white/5 p-4 text-center shadow-lg shadow-purple-500/10 backdrop-blur"
                   variants={itemVariants}
-                  whileHover={{ 
-                    scale: 1.05, 
+                  whileHover={{
+                    scale: 1.05,
                     y: -5,
-                    transition: { duration: 0.2 }
-                  }}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ 
-                    opacity: 1, 
-                    y: 0,
-                    transition: { 
-                      duration: 0.6, 
-                      delay: 0.8 + (index * 0.1) 
-                    }
+                    transition: { duration: 0.2 },
                   }}
                 >
                   <AnimatedMetrics
                     value={metric.value}
                     suffix={metric.suffix}
                     format={metric.format as "number" | "decimal"}
-                    delay={500 + (index * 300)}
+                    delay={0}
                   />
                   <p className="mt-1 text-xs font-medium uppercase tracking-[0.18em] text-white/60 md:text-sm">
                     {metric.label}
@@ -249,29 +206,12 @@ const Hero = () => {
                 <motion.div
                   key={index}
                   variants={itemVariants}
-                  whileHover={{ 
-                    scale: 1.02, 
+                  whileHover={{
+                    scale: 1.02,
                     y: -8,
-                    transition: { duration: 0.3, ease: "easeOut" }
+                    transition: { duration: 0.3, ease: "easeOut" },
                   }}
                   whileTap={{ scale: 0.98 }}
-                  initial={{ 
-                    opacity: 0, 
-                    y: 50, 
-                    rotateY: -15,
-                    scale: 0.9
-                  }}
-                  animate={{ 
-                    opacity: 1, 
-                    y: 0, 
-                    rotateY: 0,
-                    scale: 1,
-                    transition: { 
-                      duration: 0.8, 
-                      delay: 0.6 + (index * 0.15),
-                      ease: [0.25, 0.46, 0.45, 0.94]
-                    }
-                  }}
                 >
                   <HeroCard
                     title={data.title}
@@ -311,7 +251,7 @@ const Hero = () => {
         </motion.div>
 
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-80 bg-gradient-to-t from-black via-black/40 to-transparent" aria-hidden="true" />
-      </motion.section>
+      </section>
     </div>
   );
 };

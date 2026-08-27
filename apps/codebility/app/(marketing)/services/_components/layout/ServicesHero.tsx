@@ -1,11 +1,9 @@
 import Container from "../../../_components/MarketingContainer";
-import SideNavMenu from "../../../_components/MarketingSidenavMenu";
 
 export const Hero = () => {
   return (
     <div className="relative">
       <section id="services-hero" className="relative mt-2 flex min-h-[180px] w-full flex-col items-center justify-center overflow-hidden bg-cover bg-no-repeat lg:mt-16">
-        <SideNavMenu />
         <Container className="text-white">
           <div className="relative z-10 flex flex-col gap-2 pt-14 2xl:p-0 text-center lg:pt-0">
             <h1 className="flex flex-col gap-1 text-3xl font-semibold md:text-5xl">

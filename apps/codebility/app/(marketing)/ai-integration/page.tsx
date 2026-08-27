@@ -1,7 +1,5 @@
 import { Metadata } from "next";
 
-import Footer from "../_components/MarketingFooter";
-import SideNavMenu from "../_components/MarketingSidenavMenu";
 import DevelopmentProcessReactFLow from "./_components/AiIntegration-development-process-react-flow";
 import DevelopmentProcess from "./_components/AiIntegrationDevelopmentProcess";
 import HeroBackground from "./_components/AiIntegrationHeroBg";
@@ -38,7 +36,6 @@ const AiIntegration = () => {
     return (
         <div className="bg-black-400 relative mx-auto flex min-h-screen flex-col gap-10 text-white">
             <HeroBackground />
-            <SideNavMenu />
             <AISolutions />
             <UnparallelDigitalSuccess />
             <LatestTech />

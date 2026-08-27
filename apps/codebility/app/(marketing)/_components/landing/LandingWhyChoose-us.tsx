@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import LandingImage from "./LandingImage";
 import { motion } from "framer-motion";
 
 import Container from "../MarketingContainer";
@@ -91,7 +91,7 @@ const WhyChooseUs = () => {
             >
               <div className="relative z-10 flex h-full flex-col place-items-center justify-around gap-3 text-center">
                 <div>
-                  <Image
+                  <LandingImage
                     src="https://codebility-cdn.pages.dev/assets/images/index/choose-approach.png"
                     alt="innovative approach"
                     width={300}
@@ -123,7 +123,7 @@ const WhyChooseUs = () => {
             >
               <div className="relative z-10 flex h-full flex-col place-items-center justify-around gap-3">
                 <div>
-                  <Image
+                  <LandingImage
                     src="https://codebility-cdn.pages.dev/assets/images/index/choose-shield.png"
                     alt="shield"
                     width={400}
@@ -155,7 +155,7 @@ const WhyChooseUs = () => {
               variants={cardVariants}
             >
               <div>
-                <Image
+                <LandingImage
                   src="https://codebility-cdn.pages.dev/assets/images/index/choose-hands.jpg"
                   alt="codevs"
                   width={300}
@@ -180,7 +180,7 @@ const WhyChooseUs = () => {
                     ease: "easeInOut",
                   }}
                 >
-                  <Image
+                  <LandingImage
                     src="https://codebility-cdn.pages.dev/assets/images/index/choose-heart.png"
                     alt="tailored"
                     width={200}

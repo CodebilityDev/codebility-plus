@@ -1,4 +1,4 @@
-import Image from "next/image";
+import LandingImage from "./LandingImage";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -30,7 +30,7 @@ const WhyChoose = () => {
               </div>
               <div className="flex w-full flex-col gap-4 md:flex-row">
                 <div className=" h-[320px] w-full   rounded-lg  ">
-                  <Image
+                  <LandingImage
 
                     alt="A guy sitting"
                     src="/assets/images/campaign/guy-sitting.png"
@@ -68,7 +68,7 @@ const WhyChoose = () => {
                       ensure you get top notch results.
                     </p>
                   </div>
-                  <Image
+                  <LandingImage
                     src="/assets/images/campaign/laptop-browsing.png"
                     alt="Laptop Browsing"
 
@@ -89,12 +89,11 @@ const WhyChoose = () => {
           <div className="flex w-full flex-col gap-10  pt-10 md:flex-row md:pt-40">
             <div className=" flex w-full flex-col rounded-lg  p-4  md:h-[560px]">
               <div className="w-full rounded-lg md:h-[400px] ">
-                <Image
+                <LandingImage
                   src="/assets/images/campaign/inquire.png"
                   alt="projects"
                   width={100}
                   className="w-full rounded-lg object-cover"
-
                   height={100}
                 />
               </div>
@@ -123,13 +122,12 @@ const WhyChoose = () => {
             </div>
             <div className="bg-light-900/5 flex w-full flex-col rounded-lg p-4 md:h-[560px]">
               <div className="w-full rounded-lg md:h-[400px]">
-                <Image
+                <LandingImage
                   src="/assets/images/campaign/codevs.png"
                   alt="codevs"
                   width={100}
                   height={100}
                   className="w-full rounded-lg object-cover"
-
                 />
               </div>
               <div className="flex flex-col">
@@ -148,7 +146,7 @@ const WhyChoose = () => {
                   >
                     Hire a CoDev{" "}
                     <span className="text-black-400 flex size-7 flex-col items-center justify-center rounded-full bg-white">
-                      <Image
+                      <LandingImage
                         alt="arrow-right-icon"
                         src="/assets/svgs/icon-arrow-right.svg"
                         width={7}
