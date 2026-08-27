@@ -29,11 +29,9 @@ const containerVariants = {
 
 const itemVariants = {
   hidden: {
-    opacity: 0,
     y: 16,
   },
   visible: {
-    opacity: 1,
     y: 0,
     transition: {
       duration: 0.45,
@@ -43,9 +41,8 @@ const itemVariants = {
 };
 
 const titleVariants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { y: 20 },
   visible: {
-    opacity: 1,
     y: 0,
     transition: {
       duration: 0.5,
@@ -55,9 +52,8 @@ const titleVariants = {
 };
 
 const subtitleVariants = {
-  hidden: { opacity: 0, y: 12 },
+  hidden: { y: 12 },
   visible: {
-    opacity: 1,
     y: 0,
     transition: {
       duration: 0.45,
@@ -67,9 +63,8 @@ const subtitleVariants = {
 };
 
 const buttonVariants = {
-  hidden: { opacity: 0, y: 10 },
+  hidden: { y: 10 },
   visible: {
-    opacity: 1,
     y: 0,
     transition: {
       duration: 0.4,

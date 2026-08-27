@@ -154,15 +154,13 @@ const WhyChooseUs = () => {
               className="relative col-start-1 col-end-2 row-start-3 row-end-5 hidden overflow-hidden rounded-xl bg-customBlue-100 lg:block"
               variants={cardVariants}
             >
-              <div>
-                <LandingImage
-                  src="https://codebility-cdn.pages.dev/assets/images/index/choose-hands.jpg"
-                  alt="codevs"
-                  width={300}
-                  height={450}
-                  className="h-full w-full object-cover"
-                />
-              </div>
+              <LandingImage
+                src="https://codebility-cdn.pages.dev/assets/images/index/choose-hands.jpg"
+                alt="codevs"
+                fill
+                sizes="(max-width: 1024px) 0px, 25vw"
+                className="object-cover"
+              />
             </motion.div>
 
             <motion.div

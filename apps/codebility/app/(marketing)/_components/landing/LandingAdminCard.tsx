@@ -1,9 +1,9 @@
 "use client";
 
+import { useCallback, useState } from "react";
+import Image from "next/image";
 import { Codev } from "@/types/home/codev";
 import { motion } from "framer-motion";
-
-import LandingImage from "./LandingImage";
 
 const capitalizeWords = (text: string) => {
   return text
@@ -12,8 +12,32 @@ const capitalizeWords = (text: string) => {
     .join(" ");
 };
 
+const getInitials = (firstName?: string, lastName?: string) => {
+  const first = (firstName ?? "").trim().charAt(0);
+  const last = (lastName ?? "").trim().charAt(0);
+  const initials = `${first}${last}`.toUpperCase();
+  return initials || "?";
+};
+
 const AdminCard = ({ admin }: { admin: Codev }) => {
-  const defaultImage = "/assets/svgs/icon-codebility-black.svg";
+  const [loaded, setLoaded] = useState(false);
+  const [errored, setErrored] = useState(false);
+  const src = admin.image_url;
+  const showPhoto = Boolean(src) && !errored;
+  const initials = getInitials(admin.first_name, admin.last_name);
+
+  const markLoaded = useCallback(() => {
+    setLoaded(true);
+  }, []);
+
+  const handleImgRef = useCallback(
+    (node: HTMLImageElement | null) => {
+      if (node?.complete && node.naturalWidth > 0) {
+        markLoaded();
+      }
+    },
+    [markLoaded],
+  );
 
   return (
     <motion.div
@@ -25,16 +49,30 @@ const AdminCard = ({ admin }: { admin: Codev }) => {
       transition={{ duration: 0.2 }}
     >
       <div className="flex h-full w-full flex-col gap-4 rounded-lg">
-        <div className="relative h-[250px] w-full overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800">
-          <div className="relative h-full w-full">
-            <LandingImage
+        <div className="relative h-[250px] w-full overflow-hidden rounded-lg bg-gray-800">
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span
+              className="font-bold text-white/50"
+              style={{ fontSize: 64, lineHeight: 1 }}
+              aria-hidden
+            >
+              {initials}
+            </span>
+          </div>
+          {showPhoto ? (
+            <Image
               alt={`${admin.first_name} Avatar`}
-              src={admin.image_url || defaultImage}
+              src={src!}
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              className="rounded-lg object-cover"
+              className={`rounded-lg object-cover transition-opacity duration-200 ${
+                loaded ? "opacity-100" : "opacity-0"
+              }`}
+              onLoad={markLoaded}
+              onError={() => setErrored(true)}
+              ref={handleImgRef}
             />
-          </div>
+          ) : null}
         </div>
 
         <motion.div

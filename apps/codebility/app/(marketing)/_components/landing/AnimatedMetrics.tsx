@@ -17,8 +17,8 @@ const VIEWPORT = { once: true, amount: 0.2 } as const;
 const VARIANT_CONFIG = {
   hero: {
     countDuration: 2,
-    enterInitial: { scale: 0, opacity: 0 },
-    enterAnimate: { scale: 1, opacity: 1 },
+    enterInitial: { scale: 0.92 },
+    enterAnimate: { scale: 1 },
   },
   stat: {
     countDuration: 2.5,
