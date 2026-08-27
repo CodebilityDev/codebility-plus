@@ -8,7 +8,6 @@ import Partners from "./_components/landing/LandingPartners";
 import WhyChooseUs from "./_components/landing/LandingWhyChoose-us";
 import WorkWithUs from "./_components/landing/LandingWorkWithUs";
 import Calendly from "./_components/MarketingCalendly";
-import Testimonials from "./_components/testimonial/Testimonials";
 
 export const metadata: Metadata = {
   title: "Codebility — Hire Skilled Filipino Developers",
@@ -43,7 +42,6 @@ export default function Index() {
       <Admins />
       <InternSectionContainer />
       <Partners />
-      {/* <Testimonials /> */}
       <Calendly />
     </>
   );

@@ -3,9 +3,9 @@
 import LandingImage from "./LandingImage";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
 
-const VIEWPORT = { once: true, amount: 0.2 } as const;
+import ProgressiveMotion from "./ProgressiveMotion";
+import { LandingWorkWithUsSkeleton } from "./LandingSectionSkeletons";
 
 const WORK_WITH_US_CARDS = [
   {
@@ -66,29 +66,6 @@ const WORK_WITH_US_CARDS = [
   },
 ];
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.15,
-      delayChildren: 0.1,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 32 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.6,
-      ease: [0.25, 0.46, 0.45, 0.94],
-    },
-  },
-};
-
 const WorkWithUsCard = ({
   card,
   index,
@@ -96,7 +73,7 @@ const WorkWithUsCard = ({
   card: (typeof WORK_WITH_US_CARDS)[number];
   index: number;
 }) => (
-  <motion.div className="group relative w-full" variants={itemVariants}>
+  <div data-progressive-child className="group relative w-full">
     <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-purple-500/60 via-purple-400/40 to-purple-900/20 opacity-80 blur-2xl transition-all duration-500 group-hover:opacity-100" />
     <div className="relative flex h-full flex-col overflow-hidden rounded-3xl border border-white/10 bg-white/5 bg-gradient-to-br from-white/10 via-white/5 to-purple-950/20 p-6 shadow-xl backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-purple-300/60 hover:shadow-purple-500/20 md:p-8">
       <div className="relative overflow-hidden rounded-2xl">
@@ -134,7 +111,7 @@ const WorkWithUsCard = ({
         </div>
       </div>
     </div>
-  </motion.div>
+  </div>
 );
 
 const WorkWithUs = () => {
@@ -152,47 +129,52 @@ const WorkWithUs = () => {
         aria-hidden="true"
       />
 
-      <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col items-center px-4 text-white md:px-6 lg:px-8">
-        <motion.div
-          className="flex w-full max-w-4xl flex-col items-center gap-6 text-center md:gap-8"
-          initial="hidden"
-          whileInView="visible"
-          viewport={VIEWPORT}
-          variants={containerVariants}
-        >
-          <motion.span
-            variants={itemVariants}
+      <div data-landing-section className="relative z-10 w-full">
+        <div data-landing-skeleton>
+          <LandingWorkWithUsSkeleton />
+        </div>
+        <div data-landing-content>
+          <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col items-center px-4 text-white md:px-6 lg:px-8">
+            <ProgressiveMotion
+              className="flex w-full max-w-4xl flex-col items-center gap-6 text-center md:gap-8"
+              y={32}
+              duration={0.6}
+              staggerChildren={0.12}
+            >
+          <span
+            data-progressive-child
             className="inline-flex items-center gap-2 rounded-full border border-purple-400/40 bg-purple-500/10 px-4 py-1 text-xs font-medium uppercase tracking-[0.3em] text-purple-200"
           >
             Work With Us
-          </motion.span>
-          <motion.h2
-            variants={itemVariants}
+          </span>
+          <h2
+            data-progressive-child
             className="text-3xl font-semibold leading-tight md:text-4xl"
           >
             Build meaningful products with a partner that keeps momentum high.
-          </motion.h2>
-          <motion.p
-            variants={itemVariants}
+          </h2>
+          <p
+            data-progressive-child
             className="max-w-3xl text-sm leading-relaxed text-white/70 md:text-base"
           >
             Whether you need a seasoned project team, specialist talent, or a
             launchpad for your own journey, Codebility brings world-class
             execution, mentorship, and community to every collaboration.
-          </motion.p>
-        </motion.div>
+          </p>
+        </ProgressiveMotion>
 
-        <motion.div
-          className="mt-14 grid w-full grid-cols-1 gap-8 md:mt-20 md:grid-cols-2 md:gap-10 lg:gap-12"
-          initial="hidden"
-          whileInView="visible"
-          viewport={VIEWPORT}
-          variants={containerVariants}
-        >
-          {WORK_WITH_US_CARDS.map((card, index) => (
-            <WorkWithUsCard key={card.id} card={card} index={index} />
-          ))}
-        </motion.div>
+            <ProgressiveMotion
+              className="mt-14 grid w-full grid-cols-1 gap-8 md:mt-20 md:grid-cols-2 md:gap-10 lg:gap-12"
+              y={32}
+              duration={0.6}
+              staggerChildren={0.15}
+            >
+              {WORK_WITH_US_CARDS.map((card, index) => (
+                <WorkWithUsCard key={card.id} card={card} index={index} />
+              ))}
+            </ProgressiveMotion>
+          </div>
+        </div>
       </div>
     </section>
   );

@@ -125,9 +125,16 @@ async function LandingAdminsContent() {
 export default function Admins() {
   return (
     <Section id="admins" className="text-light-900 relative w-full pt-10">
-      <Suspense fallback={<LandingAdminsSkeleton />}>
-        <LandingAdminsContent />
-      </Suspense>
+      <div data-landing-section>
+        <div data-landing-skeleton>
+          <LandingAdminsSkeleton />
+        </div>
+        <div data-landing-content>
+          <Suspense fallback={<LandingAdminsSkeleton />}>
+            <LandingAdminsContent />
+          </Suspense>
+        </div>
+      </div>
     </Section>
   );
 }

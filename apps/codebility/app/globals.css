@@ -868,3 +868,34 @@ html body[data-scroll-locked] {
     transform: translateX(0);
   }
 }
+
+[data-landing-section] {
+  position: relative;
+  width: 100%;
+}
+
+[data-landing-content] {
+  width: 100%;
+}
+
+html:not([data-landing-motion="ready"]) [data-landing-skeleton] {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+html[data-landing-motion="ready"] [data-landing-skeleton] {
+  display: none !important;
+}
+
+html:not([data-landing-motion="ready"]) [data-landing-content] {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+html[data-landing-motion="ready"] [data-landing-content] {
+  visibility: visible;
+  pointer-events: auto;
+}
