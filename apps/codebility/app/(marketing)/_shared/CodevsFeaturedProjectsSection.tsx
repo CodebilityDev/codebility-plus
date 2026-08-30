@@ -2,8 +2,8 @@ import { EmblaOptionsType } from "embla-carousel";
 
 import { getCachedCodevsFeaturedProjects } from "@/lib/server/codevs-featured-projects-cached";
 
-import EmblaCarousel from "../../_shared/CodevsCarousel";
-import Section from "../../_shared/CodevsSection";
+import EmblaCarousel from "./CodevsCarousel";
+import Section from "./CodevsSection";
 
 const CAROUSEL_OPTIONS: EmblaOptionsType = {
   loop: true,
@@ -11,7 +11,7 @@ const CAROUSEL_OPTIONS: EmblaOptionsType = {
   containScroll: "trimSnaps",
 };
 
-export default async function ProjectSection() {
+export default async function CodevsFeaturedProjectsSection() {
   const data = await getCachedCodevsFeaturedProjects();
 
   if (!data) {

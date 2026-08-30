@@ -1,10 +1,10 @@
 import { Metadata } from "next";
 
-import Footer from "../_components/MarketingFooter";
-import Profiles from "../profiles/page";
 import FeaturedSection from "../_shared/CodevsFeaturedCection";
+import CodevsFeaturedProjectsSection from "../_shared/CodevsFeaturedProjectsSection";
+import CodevsProfiles from "../_shared/CodevsProfiles";
+import { CodevHireCodevModal } from "../profiles/_components/CodevHireCodevModal";
 import Hero from "./_components/CodevsHero";
-import Project from "./_components/CodevsProject";
 import HiringProcess from "./_components/HiringProcess";
 
 export const metadata: Metadata = {
@@ -25,18 +25,15 @@ export const metadata: Metadata = {
     },
 };
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
-
 export default function HireACodev() {
     return (
         <div className="bg-black-400 relative flex w-full flex-col">
             <Hero />
             <HiringProcess />
-            <Profiles />
+            <CodevsProfiles />
             <FeaturedSection />
-            <Project />
-            <Footer />
+            <CodevsFeaturedProjectsSection />
+            <CodevHireCodevModal />
         </div>
     );
 }

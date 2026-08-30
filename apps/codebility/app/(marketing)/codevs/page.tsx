@@ -1,13 +1,12 @@
 import { Metadata } from "next";
 
-import Footer from "../_components/MarketingFooter";
 import FeaturedSection from "../_shared/CodevsFeaturedCection";
+import CodevsFeaturedProjectsSection from "../_shared/CodevsFeaturedProjectsSection";
+import CodevsProfiles from "../_shared/CodevsProfiles";
+import CTA from "../_shared/CodevsCta";
 import Hero from "./_components/CodevsHero";
-import Project from "./_components/CodevsProject";
 import CodevsRoadmapStatic from "./_components/CodevsRoadmapStatic";
 import MissionVision from "./_components/CodevsMissionVision";
-import CTA from "../_shared/CodevsCta";
-import CodevsProfiles from "./_components/CodevsProfiles";
 
 export const metadata: Metadata = {
     title: "Our Developers — Meet the Codebility Team",
@@ -33,11 +32,10 @@ export default function Codevs() {
             <Hero />
             <CodevsProfiles />
             <FeaturedSection />
-            <Project />
+            <CodevsFeaturedProjectsSection />
             <CodevsRoadmapStatic />
             <MissionVision />
             <CTA />
-            <Footer />
         </div>
     );
 }

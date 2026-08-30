@@ -1,9 +1,9 @@
 import { pageSize } from "@/constants";
 import { getCachedCodevsProfilesPage } from "@/lib/server/codevs-profiles-cached";
 
-import Section from "../../_shared/CodevsSection";
 import CodevsProfilesContainer from "./CodevsProfilesContainer";
 import CodevsProfilesPagination from "./CodevsProfilesPagination";
+import Section from "./CodevsSection";
 
 const PAGE_SIZE = pageSize.codevsProfiles;
 

@@ -8,8 +8,8 @@ import { getStableColor } from "@/lib/getRandomColor";
 import type { CodevsProfilesPage } from "@/types/marketing/codevs-profiles";
 import { fetchApiJson } from "@/utils/api-fetch";
 
-import CodevCard from "../../profiles/_components/CodevCard";
-import CodevListFilter from "../../profiles/_components/CodevListFilter";
+import CodevCard from "../profiles/_components/CodevCard";
+import CodevListFilter from "../profiles/_components/CodevListFilter";
 import { CodevsProfilesSkeleton } from "./CodevsProfilesSkeleton";
 
 const pagePromises = new Map<string, Promise<CodevsProfilesPage>>();

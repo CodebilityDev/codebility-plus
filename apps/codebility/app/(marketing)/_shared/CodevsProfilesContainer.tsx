@@ -25,8 +25,8 @@ export default function CodevsProfilesContainer() {
       >
         <Heading3>See Who You'll Be Working With</Heading3>
         <IntroText>
-          Get inspired by our current CoDevs who started their journey just like you. 
-          These talented developers have grown their skills through real-world projects 
+          Get inspired by our current CoDevs who started their journey just like you.
+          These talented developers have grown their skills through real-world projects
           and are now contributing to amazing products worldwide.
         </IntroText>
       </motion.div>
