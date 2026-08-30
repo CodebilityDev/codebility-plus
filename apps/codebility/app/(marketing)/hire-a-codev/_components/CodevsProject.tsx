@@ -1,5 +1,3 @@
-"use server";
-
 import React from "react";
 import { createClientServerComponent } from "@/utils/supabase/server";
 import { EmblaOptionsType } from "embla-carousel";

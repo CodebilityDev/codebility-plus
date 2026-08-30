@@ -1,5 +1,3 @@
-"use server";
-
 import { ModalProviderMarketing } from "@/components/providers/modal-provider-marketing";
 import Footer from "./_components/MarketingFooter";
 import Navigation from "./_components/MarketingNavigation";
