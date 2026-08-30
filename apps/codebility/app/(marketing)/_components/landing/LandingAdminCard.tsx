@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Codev } from "@/types/home/codev";
 import { motion } from "framer-motion";
 
@@ -41,13 +42,15 @@ const AdminCard = ({ admin }: { admin: Codev }) => {
 
   return (
     <motion.div
-      className="h-full cursor-pointer"
-      onClick={() =>
-        (window.location.href = `https://www.codebility.tech/profiles/${admin.id}`)
-      }
+      className="h-full"
       whileHover={{ scale: 1.02 }}
       transition={{ duration: 0.2 }}
     >
+      <Link
+        href={`/profiles/${admin.id}`}
+        prefetch
+        className="block h-full cursor-pointer"
+      >
       <div className="flex h-full w-full flex-col gap-4 rounded-lg">
         <div className="relative h-[250px] w-full overflow-hidden rounded-lg bg-gray-800">
           <div className="absolute inset-0 flex items-center justify-center">
@@ -95,6 +98,7 @@ const AdminCard = ({ admin }: { admin: Codev }) => {
           </div>
         </motion.div>
       </div>
+      </Link>
     </motion.div>
   );
 };

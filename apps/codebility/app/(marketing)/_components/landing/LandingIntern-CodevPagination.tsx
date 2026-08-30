@@ -176,7 +176,7 @@ export default function LandingInternPagination({
   return (
     <div className="flex w-full flex-col items-center gap-6">
       <div
-        className={`w-full min-h-[300px] transition-opacity duration-200 ${
+        className={`relative z-10 w-full min-h-[300px] transition-opacity duration-200 ${
           isPending ? "opacity-60" : "opacity-100"
         }`}
       >

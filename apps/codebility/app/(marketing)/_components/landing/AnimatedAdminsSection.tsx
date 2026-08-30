@@ -47,7 +47,7 @@ const AnimatedAdminsSection = ({
             <BlueBg className="h-[300px] w-full max-w-[1200px] lg:top-[45%]" />
           </div>
 
-          <div className="grid grid-cols-2 gap-2 pb-5 pt-20 md:grid-cols-4">
+          <div className="relative z-10 grid grid-cols-2 gap-2 pb-5 pt-20 md:grid-cols-4">
             {members.map((member: Codev) => (
               <div
                 key={member.id}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -163,11 +164,9 @@ function InternCard({
       }}
       whileTap={{ scale: 0.95 }}
       style={{ perspective: "1000px" }}
-      onClick={() => {
-        window.location.href = `https://www.codebility.tech/profiles/${intern.id}`;
-      }}
       className="cursor-pointer"
     >
+      <Link href={`/profiles/${intern.id}`} prefetch className="block h-full">
       <motion.div
         className="relative h-full"
         whileHover={{
@@ -258,6 +257,7 @@ function InternCard({
           </CardContent>
         </Card>
       </motion.div>
+      </Link>
     </motion.div>
   );
 }
