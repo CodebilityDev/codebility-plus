@@ -1,7 +1,1 @@
-"use client";
-
-export function markLandingMotionReady() {
-  if (typeof document === "undefined") return;
-  if (document.documentElement.dataset.landingMotion === "ready") return;
-  document.documentElement.dataset.landingMotion = "ready";
-}
+export { markMarketingMotionReady as markLandingMotionReady } from "../../_shared/marketing-motion-ready";

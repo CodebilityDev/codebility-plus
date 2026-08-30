@@ -1,9 +1,7 @@
 "use client";
 
 import { Rowdies } from "next/font/google";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import pathsConfig from "@/config/paths.config";
+import ProgressiveMotion from "../../_shared/ProgressiveMotion";
 
 import OrbitingCirclesBackground from "./CodevsOrbitingCirclesBg";
 
@@ -24,11 +22,19 @@ export default function CodevHero() {
           background:
             "radial-gradient(50% 50% at 50% 50%, rgba(151, 71, 255, 0.3) 0%, rgba(3, 3, 3, 0.3) 100%)",
         }}
-      ></div>
+      />
       <OrbitingCirclesBackground />
-      <div className="z-10 flex w-full flex-col gap-3 p-4 text-center text-white">
-        <p className="text-sm lg:text-xl">Build Your Career With Us</p>
-        <div className="relative">
+      <ProgressiveMotion
+        className="z-10 flex w-full flex-col gap-3 p-4 pt-24 text-center text-white"
+        y={40}
+        duration={0.7}
+        staggerChildren={0.1}
+        playOnMount
+      >
+        <p data-progressive-child className="text-sm lg:text-xl">
+          Build Your Career With Us
+        </p>
+        <div data-progressive-child className="relative">
           <h1
             className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-5xl uppercase tracking-widest opacity-5 md:text-6xl lg:text-9xl ${rowdies.className}`}
           >
@@ -38,14 +44,17 @@ export default function CodevHero() {
             Advance Your Tech Career{" "}
           </h2>
         </div>
-        <p className="text-xs md:text-sm lg:text-2xl">
+        <p data-progressive-child className="text-xs md:text-sm lg:text-2xl">
           Where Innovation Meets Opportunity and Talent Thrives
         </p>
-        <div className="mx-auto mt-6 flex w-full flex-col justify-center gap-6 md:flex-row">
+        <div
+          data-progressive-child
+          className="mx-auto mt-6 flex w-full flex-col justify-center gap-6 md:flex-row"
+        >
           <button
             onClick={() => {
-              document.getElementById('open-positions')?.scrollIntoView({ 
-                behavior: 'smooth' 
+              document.getElementById("open-positions")?.scrollIntoView({
+                behavior: "smooth",
               });
             }}
             className="inline-flex h-11 items-center justify-center rounded-full bg-customViolet-100 px-8 py-2 text-sm font-medium text-white ring-offset-background transition-colors hover:bg-customViolet-100/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 md:w-40"
@@ -53,7 +62,7 @@ export default function CodevHero() {
             View Jobs
           </button>
         </div>
-      </div>
+      </ProgressiveMotion>
 
       <div className="hero-bubble">
         {Array.from({ length: 8 }, (_, index) => (
