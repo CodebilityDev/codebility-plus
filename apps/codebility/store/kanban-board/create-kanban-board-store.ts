@@ -25,6 +25,12 @@ export type KanbanBoardStore = {
   mergeTasksLocal: (tasks: Task[]) => void;
   appendColumnTasksLocal: (columnId: string, tasks: Task[]) => void;
   setColumnLoadMeta: (columnId: string, meta: ColumnLoadMeta) => void;
+  addColumnLocal: (column: KanbanColumnType) => void;
+  updateColumnLocal: (
+    columnId: string,
+    patch: Partial<Pick<KanbanColumnType, "name" | "position">>,
+  ) => void;
+  removeColumnLocal: (columnId: string) => void;
   reconcileBoard: (board: KanbanBoardWithColumns) => void;
 };
 
@@ -171,8 +177,28 @@ export function createKanbanBoardStore(
     },
 
     addTaskLocal: (columnId, task) => {
+      const columns = get().columns;
+      const existingColumnId = columns.reduce<string | null>((found, column) => {
+        if (found) {
+          return found;
+        }
+
+        return (column.tasks ?? []).some((entry) => entry.id === task.id)
+          ? column.id
+          : null;
+      }, null);
+
+      if (existingColumnId) {
+        if (existingColumnId === columnId) {
+          get().patchTaskLocal(task.id, task);
+        } else {
+          get().moveTaskLocal(task.id, columnId, task.position ?? 0);
+        }
+        return;
+      }
+
       const nextColumns = normalizePositions(
-        get().columns.map((column) =>
+        columns.map((column) =>
           column.id === columnId
             ? { ...column, tasks: [...(column.tasks ?? []), task] }
             : column,
@@ -267,6 +293,46 @@ export function createKanbanBoardStore(
           ...get().columnLoadMeta,
           [columnId]: meta,
         },
+      });
+    },
+
+    addColumnLocal: (column) => {
+      if (get().columns.some((entry) => entry.id === column.id)) {
+        return;
+      }
+
+      const nextColumns = [...get().columns, { ...column, tasks: column.tasks ?? [] }]
+        .sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
+
+      set({
+        columns: nextColumns,
+        board: { ...get().board, kanban_columns: nextColumns },
+        columnLoadMeta: syncColumnLoadCounts(get().columnLoadMeta, nextColumns),
+      });
+    },
+
+    updateColumnLocal: (columnId, patch) => {
+      const nextColumns = get()
+        .columns.map((column) =>
+          column.id === columnId ? { ...column, ...patch } : column,
+        )
+        .sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
+
+      set({
+        columns: nextColumns,
+        board: { ...get().board, kanban_columns: nextColumns },
+      });
+    },
+
+    removeColumnLocal: (columnId) => {
+      const nextColumns = get().columns.filter((column) => column.id !== columnId);
+      const nextMeta = { ...get().columnLoadMeta };
+      delete nextMeta[columnId];
+
+      set({
+        columns: nextColumns,
+        board: { ...get().board, kanban_columns: nextColumns },
+        columnLoadMeta: nextMeta,
       });
     },
 

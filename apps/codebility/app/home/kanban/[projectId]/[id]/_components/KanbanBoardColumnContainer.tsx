@@ -20,12 +20,15 @@ import {
 } from "@dnd-kit/sortable";
 import toast from "react-hot-toast";
 
+import { broadcastColumnsReorder } from "@/lib/kanban/board-broadcast";
 import {
   commitTaskMove,
   filterColumnsByMember,
 } from "@/lib/kanban/board-mutations";
+import { registerColumnReorderBlock } from "@/lib/kanban/own-writes";
 import {
   useKanbanBoardActions,
+  useKanbanBoardMeta,
   useKanbanColumns,
 } from "@/store/kanban-board/KanbanBoardProvider";
 
@@ -71,6 +74,7 @@ export default function KanbanBoardColumnContainer({
 }: Props) {
   const router = useRouter();
   const columns = useKanbanColumns();
+  const { boardId } = useKanbanBoardMeta();
   const { setColumns, removeTaskLocal } = useKanbanBoardActions();
 
   const boardData = useMemo(
@@ -100,7 +104,14 @@ export default function KanbanBoardColumnContainer({
         const newCols = arrayMove(orderedColumns, oldIndex, newIndex).map(
           (column, index) => ({ ...column, position: index }),
         );
+        registerColumnReorderBlock();
         setColumns(newCols);
+        broadcastColumnsReorder(boardId, {
+          columns: newCols.map((column) => ({
+            id: column.id,
+            position: column.position ?? 0,
+          })),
+        });
 
         try {
           await Promise.all(
@@ -160,7 +171,7 @@ export default function KanbanBoardColumnContainer({
         }
       }
     },
-    [boardData, columns, router, setColumns],
+    [boardData, boardId, columns, router, setColumns],
   );
 
   const { sensors } = useDragAndDrop({

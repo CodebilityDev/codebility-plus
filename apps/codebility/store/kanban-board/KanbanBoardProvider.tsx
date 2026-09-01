@@ -10,6 +10,8 @@ import {
 } from "react";
 import { useStore } from "zustand";
 
+import { useKanbanBoardSync } from "@/hooks/use-kanban-board-sync";
+import { useKanbanRealtime } from "@/hooks/use-kanban-realtime";
 import { getBoardFingerprint } from "@/lib/kanban/board-fingerprint";
 import { KanbanBoardWithColumns } from "@/lib/kanban/board-mappers";
 
@@ -54,6 +56,19 @@ function KanbanBoardRegistryHost({
   return <span ref={hostRef} hidden aria-hidden className="hidden" />;
 }
 
+function KanbanBoardRealtimeHost({ store }: { store: KanbanBoardStoreApi }) {
+  const { refreshBoard } = useKanbanBoardSync();
+  const boardId = useStore(store, (state) => state.boardId);
+
+  useKanbanRealtime({
+    boardId,
+    store,
+    onReconnect: refreshBoard,
+  });
+
+  return null;
+}
+
 export function KanbanBoardProvider({
   boardId,
   projectId,
@@ -86,6 +101,7 @@ export function KanbanBoardProvider({
   return (
     <KanbanBoardStoreContext.Provider value={store}>
       <KanbanBoardRegistryHost store={store} scopeKey={scopeKey} />
+      <KanbanBoardRealtimeHost store={store} />
       {children}
     </KanbanBoardStoreContext.Provider>
   );
@@ -115,6 +131,9 @@ export function useKanbanBoardActions() {
     mergeTasksLocal: state.mergeTasksLocal,
     appendColumnTasksLocal: state.appendColumnTasksLocal,
     setColumnLoadMeta: state.setColumnLoadMeta,
+    addColumnLocal: state.addColumnLocal,
+    updateColumnLocal: state.updateColumnLocal,
+    removeColumnLocal: state.removeColumnLocal,
     reconcileBoard: state.reconcileBoard,
   }));
 }

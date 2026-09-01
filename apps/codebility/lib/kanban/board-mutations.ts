@@ -1,4 +1,6 @@
 import { moveTask } from "@/app/home/kanban/[projectId]/[id]/actions";
+import { broadcastTaskMove } from "@/lib/kanban/board-broadcast";
+import { registerOwnTaskWrite } from "@/lib/kanban/own-writes";
 import { KanbanColumnType } from "@/types/home/codev";
 
 import { getKanbanBoardStore } from "@/store/kanban-board/registry";
@@ -10,8 +12,11 @@ export async function commitTaskMove(
 ): Promise<{ success: boolean; error?: string }> {
   const store = getKanbanBoardStore();
   const previousColumns = store.getState().columns;
+  const { boardId } = store.getState();
 
+  registerOwnTaskWrite(taskId);
   store.getState().moveTaskLocal(taskId, columnId, position);
+  broadcastTaskMove(boardId, { taskId, columnId, position });
 
   const result = await moveTask({
     taskId,
