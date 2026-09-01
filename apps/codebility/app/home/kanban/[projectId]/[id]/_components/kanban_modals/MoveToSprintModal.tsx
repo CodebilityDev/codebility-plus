@@ -20,7 +20,7 @@ import { Label } from "@codevs/ui/label";
 import { Loader2Icon, ArrowRightLeft } from "lucide-react";
 import toast from "react-hot-toast";
 import { createClientClientComponent } from "@/utils/supabase/client";
-import { getSprintsData } from "@/lib/kanban/sprints-query";
+import { getSprintsData } from "@/actions/kanban/sprints";
 import { transferTaskToSprint } from "@/actions/kanban/tasks";
 import { useKanbanBoardSync } from "@/hooks/kanban/use-kanban-board-sync";
 import { Task } from "@/types/home/codev";

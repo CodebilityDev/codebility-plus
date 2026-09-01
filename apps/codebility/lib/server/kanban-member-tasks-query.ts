@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-import { KANBAN_BOARD_TASK_SELECT } from "@/lib/kanban/board-task-select";
+import { KANBAN_BOARD_TASK_SELECT } from "@/constants/kanban/task-select";
 import { mapTaskSummary } from "@/lib/kanban/board-mappers";
 import { Task } from "@/types/home/codev";
 

@@ -5,7 +5,7 @@ import { defaultAvatar } from "@/public/assets/images";
 import { useUserStore } from "@/store/codev-store";
 import { useFeedsStore } from "@/store/feeds-store";
 import { createComment, searchUsers } from "@/actions/feeds/post";
-import { PostType } from "@/lib/feeds/query";
+import type { PostType } from "@/types/feeds";
 import { UserMention } from "@/types/feeds";
 
 interface CreateCommentProps {

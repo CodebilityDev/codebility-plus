@@ -11,7 +11,7 @@ import {
   hasUserUpvoted,
   removePostUpvote,
 } from "@/actions/feeds/post";
-import { PostType } from "@/lib/feeds/query";
+import type { PostType } from "@/types/feeds";
 
 interface PostUpvoteProps {
   post: PostType;

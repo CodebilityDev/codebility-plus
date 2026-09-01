@@ -1,10 +1,11 @@
-type TimelogData = {
+export type TimelogData = {
   task: string;
   points: number;
   renderedHours: string;
   durationHours: string;
   project: string;
 };
+
 export const logData: TimelogData[] = [
   {
     task: "BE-Add New Property",
@@ -91,19 +92,3 @@ export const logData: TimelogData[] = [
     project: "Tap Up",
   },
 ];
-const calculateTotalRenderedHours = (data: TimelogData[]) => {
-  return data.reduce(
-    (total, entry) => total + parseFloat(entry.renderedHours),
-    0,
-  );
-};
-export const totalRenderedHours = calculateTotalRenderedHours(logData);
-
-const calculateExcessHours = (data: TimelogData[]) => {
-  return data.reduce((totalExcess, entry) => {
-    const excess =
-      parseFloat(entry.renderedHours) - parseFloat(entry.durationHours);
-    return totalExcess + Math.max(excess, 0);
-  }, 0);
-};
-export const excessHours = calculateExcessHours(logData);

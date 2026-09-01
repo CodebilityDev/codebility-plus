@@ -4,7 +4,7 @@ import { useCallback, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
 import { fetchColumnTasksPage } from "@/actions/kanban/queries";
-import { KANBAN_COLUMN_TASK_PAGE_SIZE } from "@/lib/kanban/board-pagination";
+import { KANBAN_COLUMN_TASK_PAGE_SIZE } from "@/constants/kanban/pagination";
 import {
   useKanbanBoardActions,
   useKanbanBoardStore,

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 
 import { Checkbox } from "@codevs/ui/checkbox";
 
-import { getPostTagsLookup } from "@/lib/feeds/query";
+import { getPostTagsLookup } from "@/actions/feeds/queries";
 
 interface TagSelectorProps {
   selectedTags?: number[];

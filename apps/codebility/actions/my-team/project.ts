@@ -3,8 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClientServerComponent } from "@/utils/supabase/server";
 import { requireProjectMember, requireUser } from "@/lib/server/auth-guard";
-
-const ATTENDANCE_POINTS_PER_DAY = 2;
+import { ATTENDANCE_POINTS_PER_DAY } from "@/constants/my-team/attendance";
 
 // ─── INTERNAL: Core save logic only — no point recalc (trigger handles it) ───
 async function saveAttendanceRecord(

@@ -1,27 +1,13 @@
-// apps/codebility/app/home/applicants/_service/processTimeline.ts
-//
-// Pure, data-driven derivation of an applicant's recruitment pipeline timeline.
-// All stage states and timestamps are derived from the applicant record
-// (the `codev` row plus its nested `applicant` relation). No hardcoded states.
-
+import {
+  PIPELINE_STAGES,
+  TERMINAL_DENIED,
+  TERMINAL_PASSED,
+  type PipelineStageDefinition,
+  type PipelineStageKey,
+} from "@/constants/applicants/pipeline-stages";
 import { NewApplicantType } from "@/types/applicants";
 
 export type StageState = "completed" | "current" | "pending" | "denied";
-
-export type PipelineStageKey =
-  | "applying"
-  | "testing"
-  | "onboarding"
-  | "waitlist";
-
-export interface PipelineStageDefinition {
-  /** Stable key matching the relevant application_status values. */
-  key: PipelineStageKey;
-  /** Human-readable label rendered in the timeline. */
-  label: string;
-  /** Sequential order position (ascending). */
-  order: number;
-}
 
 export interface DerivedStage {
   key: PipelineStageKey;
@@ -36,20 +22,6 @@ export interface DerivedTimeline {
   /** True when the application_status could not be matched to a stage. */
   statusUnrecognized: boolean;
 }
-
-/**
- * The configured recruitment pipeline. Terminal outcomes (`passed`, `denied`)
- * are represented as stage *states*, not as additional sequential stages.
- */
-export const PIPELINE_STAGES: PipelineStageDefinition[] = [
-  { key: "applying", label: "Applying", order: 0 },
-  { key: "testing", label: "Testing", order: 1 },
-  { key: "onboarding", label: "Onboarding", order: 2 },
-  { key: "waitlist", label: "Waitlist", order: 3 },
-];
-
-const TERMINAL_PASSED = "passed";
-const TERMINAL_DENIED = "denied";
 
 /**
  * Resolve the configured stages into a single deterministic sequence.
@@ -126,13 +98,10 @@ export function deriveTimeline(
       timestamp: getStageTimestamp(stage.key, applicant),
     }));
 
-  // Terminal: passed -> every stage completed.
   if (status === TERMINAL_PASSED) {
     return { stages: withTimestamps(() => "completed"), statusUnrecognized: false };
   }
 
-  // Terminal: denied -> mark the furthest reached stage as denied,
-  // preceding stages completed, following stages pending.
   if (status === TERMINAL_DENIED) {
     const deniedAt = furthestReachedIndex(ordered, applicant);
     return {
@@ -143,11 +112,9 @@ export function deriveTimeline(
     };
   }
 
-  // Non-terminal: status maps to a pipeline stage.
   const currentIndex = ordered.findIndex((stage) => stage.key === status);
 
   if (currentIndex === -1) {
-    // Unrecognized status: render all stages as pending.
     return { stages: withTimestamps(() => "pending"), statusUnrecognized: true };
   }
 

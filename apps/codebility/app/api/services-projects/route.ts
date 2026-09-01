@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { parseServicesCategory } from "@/lib/services/services-categories";
+import { parseServicesCategory } from "@/utils/services/categories";
 import {
   getCachedServicesProjectById,
   getCachedServicesProjectsPage,

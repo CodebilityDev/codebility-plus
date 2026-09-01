@@ -1,4 +1,4 @@
-import { getSprintsData } from "@/lib/kanban/sprints-query";
+import { getSprintsData } from "@/actions/kanban/sprints";
 import { KanbanProjectWithSprintsData } from "@/app/home/kanban/[projectId]/page";
 import { create } from "zustand";
 

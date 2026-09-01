@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useFeedsStore } from "@/store/feeds-store";
 import { MessageSquare } from "lucide-react";
 
-import { PostType } from "@/lib/feeds/query";
+import type { PostType } from "@/types/feeds";
 
 interface PostCommentCountProps {
   post: PostType;

@@ -11,7 +11,6 @@ const theme = createTheme({
     fontFamily: outfit.style.fontFamily,
   },
   components: {
-    // Custom Stepper connector color
     MuiStepConnector: {
       styleOverrides: {
         alternativeLabel: {

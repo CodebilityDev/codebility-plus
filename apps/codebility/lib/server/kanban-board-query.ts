@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-import { KANBAN_COLUMN_TASK_PAGE_SIZE } from "@/lib/kanban/board-pagination";
+import { KANBAN_COLUMN_TASK_PAGE_SIZE } from "@/constants/kanban/pagination";
 import { mapBoardData, KanbanBoardWithColumns } from "@/lib/kanban/board-mappers";
 import type { ColumnLoadMeta } from "@/lib/kanban/column-load-meta";
 

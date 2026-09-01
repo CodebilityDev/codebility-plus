@@ -1,5 +1,6 @@
 import { create } from "zustand";
-import { getPosts, PostType } from "@/lib/feeds/query";
+import { getPosts } from "@/actions/feeds/queries";
+import type { PostType } from "@/types/feeds";
 
 interface FeedsState {
   posts: PostType[];

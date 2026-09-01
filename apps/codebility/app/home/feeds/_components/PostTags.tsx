@@ -1,6 +1,6 @@
 "use client";
 
-import type { PostType } from "@/lib/feeds/query";
+import type { PostType } from "@/types/feeds";
 
 interface PostTagsProps {
   post: PostType;

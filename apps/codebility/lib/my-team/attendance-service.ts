@@ -1,6 +1,7 @@
 import { createClientServerComponent } from "@/utils/supabase/server";
+import { ATTENDANCE_POINTS_PER_DAY } from "@/constants/my-team/attendance";
 
-export const ATTENDANCE_POINTS_PER_DAY = 2;
+export { ATTENDANCE_POINTS_PER_DAY };
 
 interface AttendanceRecord {
   id?: string;

@@ -13,7 +13,7 @@ import { format } from "date-fns";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-import type { PostType } from "@/lib/feeds/query";
+import type { PostType } from "@/types/feeds";
 import { SYSTEM_POST } from "@/constants/feeds/system-post";
 import PostUpvote from "../_components/PostUpvote";
 import { getUserRole } from "@/actions/feeds/post";

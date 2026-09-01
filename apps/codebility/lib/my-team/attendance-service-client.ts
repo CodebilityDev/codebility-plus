@@ -1,5 +1,7 @@
 // Client-side attendance service functions
-export const ATTENDANCE_POINTS_PER_DAY = 2;
+import { ATTENDANCE_POINTS_PER_DAY } from "@/constants/my-team/attendance";
+
+export { ATTENDANCE_POINTS_PER_DAY };
 
 // Client-side function to get attendance data
 export async function getAttendanceForMonth(

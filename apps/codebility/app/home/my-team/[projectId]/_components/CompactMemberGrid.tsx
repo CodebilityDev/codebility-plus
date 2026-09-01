@@ -6,7 +6,7 @@ import { SimpleMemberData } from "@/actions/projects/actions";
 import DefaultAvatar from "@/components/DefaultAvatar";
 import { Mail, Calendar, Trophy, RefreshCw, AlertCircle } from "lucide-react";
 import { multipleMoveApplicantToOnboardingAction } from "@/actions/applicants/applicant";
-const ATTENDANCE_POINTS_PER_DAY = 2;
+import { ATTENDANCE_POINTS_PER_DAY } from "@/constants/my-team/attendance";
 import { getTeamMonthlyAttendancePoints } from "@/actions/my-team/project";
 import MemberDetailModal from "../../_components/MemberDetailModal";
 

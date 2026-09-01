@@ -16,7 +16,7 @@ import {
   deriveTimeline,
   formatStageDate,
   StageState,
-} from "@/lib/applicants/process-timeline";
+} from "@/utils/applicants/process-timeline";
 
 const STATE_STYLES: Record<
   StageState,

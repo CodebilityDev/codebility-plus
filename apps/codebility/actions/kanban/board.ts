@@ -10,7 +10,7 @@ import {
 } from "@/lib/server/kanban-task-query";
 import { fetchMemberBoardTasks as fetchMemberBoardTasksQuery } from "@/lib/server/kanban-member-tasks-query";
 import { fetchColumnTasksPage as fetchColumnTasksPageQuery } from "@/lib/server/kanban-column-tasks-query";
-import { KANBAN_COLUMN_TASK_PAGE_SIZE } from "@/lib/kanban/board-pagination";
+import { KANBAN_COLUMN_TASK_PAGE_SIZE } from "@/constants/kanban/pagination";
 import type { BoardSnapshotInput } from "@/lib/kanban/board-snapshot-types";
 import { persistBoardSnapshot } from "@/lib/server/kanban-board-snapshot-sync";
 import { updateDeveloperLevels } from "@/lib/kanban/update-developer-levels";

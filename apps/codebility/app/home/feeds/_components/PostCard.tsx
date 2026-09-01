@@ -8,7 +8,7 @@ import { format } from "date-fns";
 import toast from "react-hot-toast";
 
 import { deletePost } from "@/actions/feeds/post";
-import { PostType } from "@/lib/feeds/query";
+import type { PostType } from "@/types/feeds";
 import { DeleteDialog } from "./DeleteDialog";
 import PostCommentCount from "./PostCommentCount";
 import PostTags from "./PostTags";

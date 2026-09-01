@@ -1,6 +1,5 @@
 "use server";
 
-import type { PostType } from "@/types/feeds";
 import { createClientServerComponent } from "@/utils/supabase/server";
 
 export const getPosts = async () => {
@@ -30,7 +29,6 @@ export const getPosts = async () => {
 
     if (error) throw error;
 
-    // compute counts + flatten tag structure
     const postsWithCounts = posts.map((post) => ({
       ...post,
       upvote_count: post.post_upvotes?.length ?? 0,
@@ -47,8 +45,6 @@ export const getPosts = async () => {
     throw error;
   }
 };
-
-export type { PostType } from "@/types/feeds";
 
 export const getPostTagsLookup = async () => {
   try {

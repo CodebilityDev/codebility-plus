@@ -7,9 +7,9 @@ import Section from "@/app/(marketing)/_components/MarketingSection";
 import DefaultPagination from "@/components/ui/pagination";
 import {
   SERVICES_CATEGORY_TABS,
-  categoryHref,
   type ServicesCategorySlug,
-} from "@/lib/services/services-categories";
+} from "@/constants/services/categories";
+import { categoryHref } from "@/utils/services/categories";
 import type { ServicesProjectsPage } from "@/lib/server/services-projects-cached";
 import { fetchApiJson } from "@/utils/api-fetch";
 

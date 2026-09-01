@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { mapTaskSummary } from "@/lib/kanban/board-mappers";
-import { KANBAN_BOARD_TASK_SELECT } from "@/lib/kanban/board-task-select";
+import { KANBAN_BOARD_TASK_SELECT } from "@/constants/kanban/task-select";
 import { Task } from "@/types/home/codev";
 
 const ACTIVE_TASKS_FILTER = "is_archive.is.null,is_archive.eq.false";

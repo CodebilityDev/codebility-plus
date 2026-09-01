@@ -1,4 +1,4 @@
-import getNewApplicants from "@/lib/applicants/query";
+import { getNewApplicants } from "@/actions/applicants/queries";
 import { NewApplicantType } from "@/types/applicants";
 import ApplicantLists from "./applicantLists";
 
