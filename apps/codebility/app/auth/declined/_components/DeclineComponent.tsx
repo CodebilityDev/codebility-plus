@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import Logo from "@/components/shared/Logo";
 
 import { getUserData } from "@/actions/auth/declined";
-import { getCanReApply } from "@/utils/applicant-waiting";
+import { getCanReApply } from "@/utils/auth/declined";
 import { DeclinedButtons } from "./DeclinedButtons";
 import { DeclinedCountdown } from "./DeclinedCountdown";
 

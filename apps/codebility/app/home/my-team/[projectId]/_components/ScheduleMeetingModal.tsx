@@ -147,7 +147,7 @@ const ScheduleMeetingModal = ({
           title: "📅 Meeting Schedule Removed",
           message: `The recurring meeting schedule for "${projectName}" has been removed by the team lead.`,
           type: "event",
-          priority: "medium",
+          priority: "normal",
           actionUrl: `/home/my-team/${projectId}`,
           metadata: {
             projectId,

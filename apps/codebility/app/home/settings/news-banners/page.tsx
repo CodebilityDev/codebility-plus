@@ -6,7 +6,7 @@ import { Button } from "@codevs/ui/button";
 import { H1 } from "@/components/shared/dashboard";
 import PageContainer from "../../_components/PageContainer";
 import NewsBannerForm from "./_components/NewsBannerForm";
-import { createClientClientComponent } from "@/utils/supabase/client";
+import { getClientSupabase } from "@/utils/supabase/client";
 import { toast } from "sonner";
 
 interface NewsBanner {
@@ -41,7 +41,7 @@ export default function NewsBannersPage() {
   }, []);
 
   const fetchBanners = async () => {
-    const supabase = createClientClientComponent();
+    const supabase = getClientSupabase();
     
     const { data, error } = await supabase
       .from("news_banners")
@@ -59,7 +59,7 @@ export default function NewsBannersPage() {
   };
 
   const toggleBannerStatus = async (banner: NewsBanner) => {
-    const supabase = createClientClientComponent();
+    const supabase = getClientSupabase();
     
     const { error } = await supabase
       .from("news_banners")
@@ -77,7 +77,7 @@ export default function NewsBannersPage() {
   const deleteBanner = async (bannerId: string) => {
     if (!confirm("Are you sure you want to delete this banner?")) return;
     
-    const supabase = createClientClientComponent();
+    const supabase = getClientSupabase();
     
     const { error } = await supabase
       .from("news_banners")

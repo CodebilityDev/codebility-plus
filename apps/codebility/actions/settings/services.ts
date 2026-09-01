@@ -106,7 +106,7 @@ export async function getCodevProfiles() {
       return isValidStatus;
     });
 
-    return { data: activeCodevs as Codev[], error: null };
+    return { data: activeCodevs as unknown as Codev[], error: null };
   } catch (error) {
     console.error('❌ Error fetching codev profiles:', error);
     return { data: [], error: 'Failed to fetch codev profiles' };

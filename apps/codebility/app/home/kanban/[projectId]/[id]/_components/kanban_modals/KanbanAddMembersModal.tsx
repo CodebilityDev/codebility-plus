@@ -139,7 +139,7 @@ export default function KanbanAddMembersModal() {
     try {
       const result = await updateProjectMembers(
         selectedProject,
-        updatedMembers,
+        updatedMembers as Codev[],
         teamLeaderId,
       );
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@codevs/ui/button";
@@ -75,12 +75,8 @@ export default function ServiceForm({ service, onSuccess }: ServiceFormProps) {
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "features",
-  });
-
   const isActive = watch("is_active");
+  const features = watch("features");
 
   const onSubmit = async (data: ServiceFormData) => {
     setLoading(true);
@@ -203,20 +199,25 @@ export default function ServiceForm({ service, onSuccess }: ServiceFormProps) {
       <div className="space-y-2">
         <Label className="text-foreground dark:text-gray-300">Features *</Label>
         <div className="space-y-3">
-          {fields.map((field, index) => (
-            <div key={field.id} className="flex gap-2">
+          {features.map((_, index) => (
+            <div key={index} className="flex gap-2">
               <Input
                 variant="lightgray"
                 {...register(`features.${index}`)}
                 placeholder="Enter a feature"
                 className="rounded flex-1"
               />
-              {fields.length > 1 && (
+              {features.length > 1 && (
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
-                  onClick={() => remove(index)}
+                  onClick={() =>
+                    setValue(
+                      "features",
+                      features.filter((_, featureIndex) => featureIndex !== index),
+                    )
+                  }
                   className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
                 >
                   <X className="h-4 w-4" />
@@ -233,7 +234,7 @@ export default function ServiceForm({ service, onSuccess }: ServiceFormProps) {
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => append("")}
+            onClick={() => setValue("features", [...features, ""])}
             className="border border-gray-300 bg-accent hover:bg-gray-300 dark:border-gray-700 dark:bg-gray-800 text-foreground dark:hover:bg-gray-700 rounded"
           >
             <Plus className="h-4 w-4 mr-2" />

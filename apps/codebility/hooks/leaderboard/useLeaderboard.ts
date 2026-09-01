@@ -30,6 +30,23 @@ interface UseLeaderboardReturn {
   setTimePeriod: (period: TimePeriod) => void;
 }
 
+interface LeaderboardApiError {
+  error?: string;
+  details?: string;
+}
+
+interface TechnicalLeaderboardResult {
+  leaders?: TechnicalLeader[];
+}
+
+interface SoftSkillsLeaderboardResult {
+  leaders?: SoftSkillsLeader[];
+}
+
+interface ProjectLeaderboardResult {
+  leaders?: ProjectLeader[];
+}
+
 export const useLeaderboard = (options: UseLeaderboardOptions): UseLeaderboardReturn => {
   const {
     type,
@@ -62,6 +79,14 @@ export const useLeaderboard = (options: UseLeaderboardOptions): UseLeaderboardRe
     
     try {
       const supabase = createClientClientComponent();
+      if (!supabase) {
+        setState(prev => ({
+          ...prev,
+          error: createError("Database client unavailable"),
+        }));
+        return;
+      }
+
       const { data: categoriesData, error } = await supabase
         .from("skill_category")
         .select("name")
@@ -86,11 +111,13 @@ export const useLeaderboard = (options: UseLeaderboardOptions): UseLeaderboardRe
       const frontendIndex = reorderedCategories.findIndex(cat => cat === "Frontend Developer");
       if (frontendIndex !== -1) {
         const [frontendDev] = reorderedCategories.splice(frontendIndex, 1);
-        reorderedCategories.unshift(frontendDev);
+        if (frontendDev) {
+          reorderedCategories.unshift(frontendDev);
+        }
       }
 
       setCategories(reorderedCategories);
-      if (!selectedCategory && reorderedCategories.length > 0) {
+      if (!selectedCategory && reorderedCategories[0]) {
         setSelectedCategory(reorderedCategories[0]);
       }
     } catch (error) {
@@ -113,7 +140,7 @@ export const useLeaderboard = (options: UseLeaderboardOptions): UseLeaderboardRe
     const response = await fetch(`/api/technical-leaderboard?category=${encodeURIComponent(selectedCategory)}&timeFilter=${selectedTimePeriod}&limit=${limit}`);
     
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
+      const errorData = (await response.json().catch(() => ({}))) as LeaderboardApiError;
       throw createError(
         errorData.error || "Failed to fetch technical leaderboard",
         errorData.details,
@@ -121,7 +148,7 @@ export const useLeaderboard = (options: UseLeaderboardOptions): UseLeaderboardRe
       );
     }
 
-    const result = await response.json();
+    const result = (await response.json()) as TechnicalLeaderboardResult;
     return result.leaders || [];
   }, [selectedCategory, selectedTimePeriod, limit, createError]);
 
@@ -129,7 +156,7 @@ export const useLeaderboard = (options: UseLeaderboardOptions): UseLeaderboardRe
     const response = await fetch(`/api/soft-skills-leaderboard?limit=${limit}`);
     
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
+      const errorData = (await response.json().catch(() => ({}))) as LeaderboardApiError;
       throw createError(
         errorData.error || "Failed to fetch soft skills leaderboard",
         errorData.details,
@@ -137,7 +164,7 @@ export const useLeaderboard = (options: UseLeaderboardOptions): UseLeaderboardRe
       );
     }
 
-    const result = await response.json();
+    const result = (await response.json()) as SoftSkillsLeaderboardResult;
     return result.leaders || [];
   }, [limit, createError]);
 
@@ -145,7 +172,7 @@ export const useLeaderboard = (options: UseLeaderboardOptions): UseLeaderboardRe
     const response = await fetch(`/api/project-leaderboard?timeFilter=${selectedTimePeriod}&limit=${limit}`);
     
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
+      const errorData = (await response.json().catch(() => ({}))) as LeaderboardApiError;
       throw createError(
         errorData.error || "Failed to fetch project leaderboard", 
         errorData.details,
@@ -153,7 +180,7 @@ export const useLeaderboard = (options: UseLeaderboardOptions): UseLeaderboardRe
       );
     }
 
-    const result = await response.json();
+    const result = (await response.json()) as ProjectLeaderboardResult;
     return result.leaders || [];
   }, [selectedTimePeriod, limit, createError]);
 

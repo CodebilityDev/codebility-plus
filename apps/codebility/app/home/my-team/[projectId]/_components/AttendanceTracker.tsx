@@ -38,7 +38,9 @@ interface AttendanceTrackerProps {
 
 const AttendanceTracker = ({ teamMembers, teamLead, projectId }: AttendanceTrackerProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [selectedDate, setSelectedDate] = useState(
+    () => new Date().toISOString().slice(0, 10),
+  );
   const [attendanceRecords, setAttendanceRecords] = useState<Record<string, AttendanceRecord>>({});
   const [isLoading, setIsLoading] = useState(false);
 

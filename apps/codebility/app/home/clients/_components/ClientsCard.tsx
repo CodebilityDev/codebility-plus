@@ -21,7 +21,7 @@ import { useUserStore } from "@/store/codev-store";
 import { Client } from "@/types/home/codev";
 import toast from "react-hot-toast";
 
-import { copyToClipboard, handleDownload } from "@/utils/dashboard/time-formats";
+import { copyToClipboard, handleDownload } from "@/utils/clients/utils";
 import { deleteClientAction, toggleClientStatusAction } from "@/actions/clients/actions";
 
 interface Props {

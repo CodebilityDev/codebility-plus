@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { ChevronDown, ChevronUp, Minimize2, Maximize2, NotebookTabs, CheckCircle2, Circle, TrendingUp, Award } from "lucide-react";
 import { Box } from "@/components/shared/dashboard";
-import { createClientClientComponent } from "@/utils/supabase/client";
+import { getClientSupabase } from "@/utils/supabase/client";
 
 // Types for profile points data
 interface ProfilePointsData {
@@ -226,7 +226,7 @@ export default function ProfileCompletionGuide() {
       setLoading(true);
       setError(null);
       
-      const supabase = createClientClientComponent();
+      const supabase = getClientSupabase();
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
@@ -240,7 +240,7 @@ export default function ProfileCompletionGuide() {
         throw new Error(`Failed to fetch profile points: ${response.statusText}`);
       }
       
-      const data = await response.json();
+      const data = (await response.json()) as ProfilePointsData;
       setProfileData(data);
     } catch (err) {
       console.error("Error fetching profile points:", err);

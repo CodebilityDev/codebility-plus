@@ -19,7 +19,7 @@ export default function HeroSection({ h1Ref }: HeroSectionProps) {
 
       <h1
         id="codebility-h1"
-        ref={h1Ref}
+        ref={h1Ref as RefObject<HTMLHeadingElement>}
         className="relative z-[999999] -mr-[140px] mt-16 hidden text-[120px] lg:flex 2xl:text-[140px]"
       >
         <span id="co" className="flex">

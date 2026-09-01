@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/utils/utils";
 import toast from "react-hot-toast";
 import { reApplyAction } from "@/actions/auth/declined";
-import { getCanReApply } from "@/utils/applicant-waiting";
+import { getCanReApply } from "@/utils/auth/declined";
 
 export const DeclinedButtons = ({ userData }: { userData: any }) => {
   const router = useRouter();

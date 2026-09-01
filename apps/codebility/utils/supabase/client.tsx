@@ -19,3 +19,11 @@ export const createClientClientComponent = () => {
   
   return browserClient;
 };
+
+export function getClientSupabase(): SupabaseClient {
+  const client = createClientClientComponent();
+  if (!client) {
+    throw new Error("Supabase client is not available");
+  }
+  return client;
+}

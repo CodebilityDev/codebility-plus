@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { createClientClientComponent } from "@/utils/supabase/client";
+import { getClientSupabase } from "@/utils/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@codevs/ui/input";
 import { ArrowLeft } from "lucide-react";
 import toast from "react-hot-toast";
 
 export default function TwoFactorForm() {
-  const [supabase] = useState(() => createClientClientComponent());
+  const [supabase] = useState(() => getClientSupabase());
   const [code, setCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [factorId, setFactorId] = useState<string | null>(null);

@@ -47,7 +47,7 @@ export async function submitSurveyResponse(
     return { data, success: true };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { error: error.errors[0].message };
+      return { error: error.errors[0]?.message ?? "Validation failed" };
     }
     return { error: "Failed to submit survey response" };
   }

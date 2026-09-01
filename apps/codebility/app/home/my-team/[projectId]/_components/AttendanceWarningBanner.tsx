@@ -29,7 +29,7 @@ export default function AttendanceWarningBanner({ projectId, isTeamLead }: Atten
         currentDate.getMonth()
       );
 
-      if (result.success && result.summary?.membersWithWarnings > 0) {
+      if (result.success && (result.summary?.membersWithWarnings ?? 0) > 0) {
         setWarningData(result);
       }
       setIsLoading(false);

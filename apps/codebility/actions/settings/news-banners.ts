@@ -62,7 +62,7 @@ export async function createNewsBanner(formData: z.infer<typeof bannerSchema>) {
     return { data, success: true };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { error: error.errors[0].message };
+      return { error: error.errors[0]?.message ?? "Validation failed" };
     }
     return { error: "Failed to create banner" };
   }
@@ -119,7 +119,7 @@ export async function updateNewsBanner(
     return { data, success: true };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { error: error.errors[0].message };
+      return { error: error.errors[0]?.message ?? "Validation failed" };
     }
     return { error: "Failed to update banner" };
   }
@@ -170,7 +170,7 @@ export async function deleteNewsBanner(bannerId: string) {
     // Clean up image from storage if it exists
     if (banner.image_url) {
       try {
-        const imagePath = getImagePath(banner.image_url);
+        const imagePath = await getImagePath(banner.image_url);
         if (imagePath) {
           await deleteImage(imagePath, "codebility");
         }

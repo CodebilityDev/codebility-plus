@@ -1,6 +1,7 @@
 "use server";
 
 import * as notificationService from "@/lib/server/notification.service";
+import type { Notification } from "@/types/notifications";
 
 export async function fetchNotificationsAction(limit: number = 50) {
   return notificationService.getNotifications(limit);
@@ -26,8 +27,8 @@ export async function createNotificationAction(data: {
   recipientId: string;
   title: string;
   message: string;
-  type: string;
-  priority?: string;
+  type: Notification["type"];
+  priority?: Notification["priority"];
   actionUrl?: string;
   metadata?: any;
   senderId?: string;

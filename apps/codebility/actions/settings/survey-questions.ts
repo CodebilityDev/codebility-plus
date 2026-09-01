@@ -73,7 +73,7 @@ export async function createQuestion(surveyId: string, formData: z.infer<typeof 
     return { data, success: true };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { error: error.errors[0].message };
+      return { error: error.errors[0]?.message ?? "Validation failed" };
     }
     return { error: "Failed to create question" };
   }
@@ -125,7 +125,7 @@ export async function updateQuestion(
     return { data, success: true };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { error: error.errors[0].message };
+      return { error: error.errors[0]?.message ?? "Validation failed" };
     }
     return { error: "Failed to update question" };
   }

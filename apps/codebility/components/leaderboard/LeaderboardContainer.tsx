@@ -32,7 +32,7 @@ const LeaderboardContainer = memo<LeaderboardContainerProps>(({
     state,
     refetch,
     setCategory,
-    setTimePeriod
+    setTimePeriod: setLeaderboardTimePeriod
   } = useLeaderboard({
     type: leaderboardType,
     timePeriod,
@@ -102,6 +102,7 @@ const LeaderboardContainer = memo<LeaderboardContainerProps>(({
 
   const handleTimePeriodChange = (newPeriod: TimePeriod) => {
     setTimePeriod(newPeriod);
+    setLeaderboardTimePeriod(newPeriod);
   };
 
   const handleCategoryChange = (category: string) => {
@@ -169,7 +170,7 @@ const LeaderboardContainer = memo<LeaderboardContainerProps>(({
           onTimePeriodChange={handleTimePeriodChange}
           showTimeFilter={shouldShowTimeFilter}
           categories={categories}
-          selectedCategory={categories.length > 0 ? categories[0] : ""}
+          selectedCategory={categories[0] ?? ""}
           onCategoryChange={handleCategoryChange}
           showCategoryFilter={shouldShowCategoryFilter}
         />

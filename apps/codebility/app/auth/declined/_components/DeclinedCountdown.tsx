@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-import { getReApplyDate } from "@/utils/applicant-waiting";
+import { getReApplyDate } from "@/utils/auth/declined";
 
 export const DeclinedCountdown = ({ userData }: { userData: any }) => {
 

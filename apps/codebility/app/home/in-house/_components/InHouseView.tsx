@@ -7,7 +7,7 @@ import { Codev } from "@/types/home/codev";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@codevs/ui/tabs";
 
-import { getMemberStats } from "@/utils/dashboard/time-formats";
+import { getMemberStats } from "@/utils/in-house/utils";
 import { InHouseTable } from "./table/InHouseTable";
 import { TableFilters } from "./table/table-filters";
 import { InHouseTableSkeleton } from "./skeletons/InHouseLoadingSkeleton";

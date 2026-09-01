@@ -124,7 +124,7 @@ export async function GET() {
         codev_points: row.codev_points || [],
         projects: projects,
         project_members: row.project_members || [],
-      } as Codev;
+      } as unknown as Codev;
     });
 
     // Apply prioritization using the prioritizeCodevs function

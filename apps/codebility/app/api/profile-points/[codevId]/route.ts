@@ -128,9 +128,12 @@ function isFieldFilled(value: any, fieldName?: string): boolean {
 }
 
 // Helper function to calculate points for array fields with limits
+type PointRule = (typeof POINT_RULES)[keyof typeof POINT_RULES];
+type ArrayPointRule = PointRule & { pointsPerItem?: number; maxItems?: number };
+
 function calculateArrayPoints(
-  items: any[] | null,
-  rule: typeof POINT_RULES[keyof typeof POINT_RULES]
+  items: unknown[] | null,
+  rule: ArrayPointRule
 ): number {
   if (!items || !Array.isArray(items) || items.length === 0) return 0;
   
@@ -255,7 +258,7 @@ export async function GET(
     // Process one-time fields from POINT_RULES
     for (const [field, rule] of Object.entries(POINT_RULES)) {
       if (rule.isOneTime && codevData.hasOwnProperty(field)) {
-        if (isFieldFilled(codevData[field], field)) {
+        if ("points" in rule && isFieldFilled(codevData[field], field)) {
           pointsToInsert.push({
             codev_id: validCodevId,
             category: field,

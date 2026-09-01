@@ -347,7 +347,7 @@ function PostSubmitted({
                   ? "Update your Figma File link"
                   : "Update your GitHub repository link"
               }
-              defaultValue={applicantData.fork_url}
+              defaultValue={applicantData.fork_url ?? ""}
               className="w-full rounded-md border border-gray-300 p-2 text-sm dark:bg-gray-800 dark:text-white"
             />
 

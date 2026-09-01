@@ -66,7 +66,7 @@ export async function createSurvey(formData: z.infer<typeof surveySchema>) {
     return { data, success: true };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { error: error.errors[0].message };
+      return { error: error.errors[0]?.message ?? "Validation failed" };
     }
     return { error: "Failed to create survey" };
   }
@@ -125,7 +125,7 @@ export async function updateSurvey(
     return { data, success: true };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { error: error.errors[0].message };
+      return { error: error.errors[0]?.message ?? "Validation failed" };
     }
     return { error: "Failed to update survey" };
   }
@@ -176,7 +176,7 @@ export async function deleteSurvey(surveyId: string) {
     // Clean up image from storage if it exists
     if (survey.image_url) {
       try {
-        const imagePath = getImagePath(survey.image_url);
+        const imagePath = await getImagePath(survey.image_url);
         if (imagePath) {
           await deleteImage(imagePath, "codebility");
         }

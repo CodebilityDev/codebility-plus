@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ContactFormData } from "../page";
+import { ContactFormData } from "./ContactPage";
 
 const meetingTypes = [
   { value: "zoom", label: "Zoom", sub: "Via Zoom meeting link" },

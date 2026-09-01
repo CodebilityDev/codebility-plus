@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClientClientComponent } from "@/utils/supabase/client";
+import { getClientSupabase } from "@/utils/supabase/client";
 import { ShieldCheck, ShieldAlert, CheckCircle2, Copy, QrCode, Key, Lock } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -25,7 +25,7 @@ interface Factor {
 }
 
 export default function AccountSettings2FA() {
-  const [supabase] = useState(() => createClientClientComponent());
+  const [supabase] = useState(() => getClientSupabase());
   const [loading, setLoading] = useState(true);
   const [factors, setFactors] = useState<Factor[]>([]);
   const [activeFactor, setActiveFactor] = useState<Factor | null>(null);
