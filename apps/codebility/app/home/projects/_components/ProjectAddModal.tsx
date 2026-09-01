@@ -21,7 +21,7 @@ import {
 import { MemberSelection } from "@/components/ui/MemberSelection";
 import { useModal as useGlobalModal } from "@/hooks/modals/use-modal";
 import { useModal } from "@/hooks/modals/use-modal-projects";
-import { useTechStackStore } from "@/hooks/use-techstack";
+import { useTechStackStore } from "@/hooks/data/use-techstack";
 import { Client, Codev, SkillCategory } from "@/types/home/codev";
 import { uploadImage } from "@/utils/uploadImage";
 import { useForm } from "react-hook-form";

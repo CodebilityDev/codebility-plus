@@ -38,7 +38,7 @@ import {
 } from "@codevs/ui/select";
 
 import { updateClientAction } from "../action";
-import { useCountries } from "@/hooks/useCountries"; // New centralized hook
+import { useCountries } from "@/hooks/data/useCountries"; // New centralized hook
 
 export default function ClientEditModal() {
   const { isOpen, onClose, type, data } = useModal();

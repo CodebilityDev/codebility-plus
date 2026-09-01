@@ -114,8 +114,20 @@ hooks/navigation/                # use-sidebar, useChangeBgNavigation, useHideSi
 hooks/leaderboard/useLeaderboard.ts
 ```
 
-Legacy re-exports under `app/home/**/actions.ts` and route `_service` shims remain for compatibility. Unused duplicate `CodevsNavbar` copies were removed (layout uses `MarketingNavigation`).
+## Migrated features (Phase 4)
+
+```
+hooks/data/                      # use-pagination, use-techstack, use-timeavail, useCountries, useLocalStorageValue
+hooks/ui/                        # useToast, useSlider, useFadeAnimation, usePageAnimationSettings, useImageCrop, use-media-query, useDragAndDrop
+hooks/query/                     # reactQuery, requestHandler, toastHandler
+
+actions/applicants/email/        # split email actions (barrel no longer re-exports email-action monolith)
+utils/codev-priority.ts          # canonical prioritizeCodevs (interns/_lib is a shim)
+constants/feeds/system-post.ts   # PostType from @/types/feeds
+```
+
+Applicant email dynamic imports now target `@/actions/applicants/applicant`. Route `_service` folders under applicant/auth/marketing/kanban/my-team remain as one-line shims only.
 
 ## Still to migrate
 
-Flat hooks at `hooks/` root (useToast, use-pagination, etc.), applicant onboarding `_service` shims, interns `_lib/codevpriority.ts` duplicate.
+Marketing route `_lib` dummy-data files, remaining dashboard/clients `_lib` shims if any callers remain, and optional removal of legacy route shims once all imports use canonical paths.

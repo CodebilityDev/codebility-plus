@@ -12,7 +12,7 @@ import { getValidImageUrl } from "@/utils/imageValidation";
 import { cn } from "@/utils/utils";
 
 import { OrgChartProps } from "../_types/org-chart";
-import { usePageAnimationSettings } from "@/hooks/usePageAnimationSettings";
+import { usePageAnimationSettings } from "@/hooks/ui/usePageAnimationSettings";
 
 import {
   Crown,

@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Box } from "@/components/shared/dashboard";
 import { Button } from "@/components/ui/button";
 import { useModal } from "@/hooks/modals/use-modal";
-import { useTechStackStore } from "@/hooks/use-techstack";
+import { useTechStackStore } from "@/hooks/data/use-techstack";
 import { IconEdit } from "@/public/assets/svgs";
 import toast from "react-hot-toast";
 

@@ -18,7 +18,7 @@ import {
   DialogTitle,
 } from "@codevs/ui/dialog";
 import { useModal } from "@/hooks/modals/use-modal-clients";
-import { useCountries } from "@/hooks/useCountries"; // Import new hook
+import { useCountries } from "@/hooks/data/useCountries"; // Import new hook
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";

@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { useModal as useModalTechkStack } from "@/hooks/modals/use-modal";
 import { useModal } from "@/hooks/modals/use-modal-applicants";
-import { useTechStackStore } from "@/hooks/use-techstack";
+import { useTechStackStore } from "@/hooks/data/use-techstack";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { useForm } from "react-hook-form";

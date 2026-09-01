@@ -10,7 +10,7 @@ import {
   DialogHeader,
 } from "@/components/ui/dialog";
 import { Slider } from "@/components/ui/sliders";
-import getCroppedImg from "@/hooks/useImageCrop";
+import getCroppedImg from "@/hooks/ui/useImageCrop";
 import { uploadImage } from "@/utils/uploadImage";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import Cropper, { Area, Point } from "react-easy-crop";

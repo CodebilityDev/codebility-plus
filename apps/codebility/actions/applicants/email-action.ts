@@ -1546,7 +1546,7 @@ export const sendDenyEmail = async ({ email, name }: { email: string, name: stri
 
 // New wrapper functions that handle both email sending and database updates
 export const sendTestReminderWithUpdate = async ({ email, name, applicantId }: { email: string, name: string, applicantId: string }) => {
-    const { updateReminderCountAction } = await import('./action');
+    const { updateReminderCountAction } = await import("@/actions/applicants/applicant");
     
     try {
         // Send the email first
@@ -1561,7 +1561,7 @@ export const sendTestReminderWithUpdate = async ({ email, name, applicantId }: {
 }
 
 export const sendOnboardingReminderWithUpdate = async ({ email, name, applicantId }: { email: string, name: string, applicantId: string }) => {
-    const { updateReminderCountAction } = await import('./action');
+    const { updateReminderCountAction } = await import("@/actions/applicants/applicant");
     
     try {
         // Send the email first
@@ -1580,7 +1580,7 @@ export const sendTestReminderForConfig = async (email: string) => {
     // This function will be called from useApplicantActions, but we need applicant data
     // We'll need to get the applicant data from the database first
     const { createClientServerComponent } = await import('@/utils/supabase/server');
-    const { updateReminderCountAction } = await import('./action');
+    const { updateReminderCountAction } = await import("@/actions/applicants/applicant");
     
     try {
         const supabase = await createClientServerComponent();
@@ -1620,7 +1620,7 @@ export const sendOnboardingReminderForConfig = async (email: string) => {
     // This function will be called from useApplicantActions, but we need applicant data
     // We'll need to get the applicant data from the database first
     const { createClientServerComponent } = await import('@/utils/supabase/server');
-    const { updateReminderCountAction } = await import('./action');
+    const { updateReminderCountAction } = await import("@/actions/applicants/applicant");
     
     try {
         const supabase = await createClientServerComponent();
@@ -1732,7 +1732,7 @@ export const sendDenyEmailForConfig = async (email: string) => {
 }
 
 export const sendMultipleTestReminderEmailWithUpdate = async (applicants: { email: string, applicantId: string }[]) => {
-    const { updateMultipleReminderCountAction } = await import('./action');
+    const { updateMultipleReminderCountAction } = await import("@/actions/applicants/applicant");
     
     try {
         // Send the emails first
@@ -1749,7 +1749,7 @@ export const sendMultipleTestReminderEmailWithUpdate = async (applicants: { emai
 }
 
 export const sendMultipleOnboardingReminderWithUpdate = async (applicants: { email: string, applicantId: string }[]) => {
-    const { updateMultipleReminderCountAction } = await import('./action');
+    const { updateMultipleReminderCountAction } = await import("@/actions/applicants/applicant");
 
     try {
         // Send the emails first

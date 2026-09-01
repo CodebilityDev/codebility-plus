@@ -24,7 +24,7 @@ import { SelectMemberModal } from "@/components/ui/SelectMemberModal";
 import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import { useModal as useGlobalModal } from "@/hooks/modals/use-modal";
 import { useModal } from "@/hooks/modals/use-modal-projects";
-import { useTechStackStore } from "@/hooks/use-techstack";
+import { useTechStackStore } from "@/hooks/data/use-techstack";
 import { Client, Codev, Project, SkillCategory } from "@/types/home/codev";
 import { uploadImage } from "@/utils/uploadImage";
 import { useQuery, useQueryClient } from "@tanstack/react-query";

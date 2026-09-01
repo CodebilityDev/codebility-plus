@@ -3,7 +3,7 @@ import AsyncErrorBoundary from "@/components/AsyncErrorBoundary";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { ModalProviderHome } from "@/components/providers/modal-provider-home";
 import { ThemeProvider } from "@/store/providers/ThemeProvider";
-import ReactQueryProvider from "@/hooks/reactQuery";
+import ReactQueryProvider from "@/hooks/query/reactQuery";
 import { UserProvider } from "@/store/UserProvider";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
 import { Toaster } from "sonner";

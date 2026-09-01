@@ -7,7 +7,7 @@ import Logo from "@/components/shared/home/Logo";
 import { CareersSignIn, MobileDrawer } from "./MarkitingNavigationSubComponents";
 import dynamic from "next/dynamic";
 import { signOut } from "@/actions/auth";
-import { removeLocalStorageValue } from "@/hooks/useLocalStorageValue";
+import { removeLocalStorageValue } from "@/hooks/data/useLocalStorageValue";
 
 
 const UserMenu = dynamic(

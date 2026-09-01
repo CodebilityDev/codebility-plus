@@ -33,7 +33,7 @@ import {
   SheetTrigger,
 } from "@codevs/ui";
 import { createClientClientComponent } from "@/utils/supabase/client";
-import { setLocalStorageValue, useLocalStorageValue } from "@/hooks/useLocalStorageValue";
+import { setLocalStorageValue, useLocalStorageValue } from "@/hooks/data/useLocalStorageValue";
 import { NavUserProfile } from "@/types/database";
 
 // Navigation items for top navbar and mobile drawer

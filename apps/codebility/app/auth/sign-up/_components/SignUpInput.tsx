@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useModal } from "@/hooks/modals/use-modal";
-import { useTechStackStore } from "@/hooks/use-techstack";
+import { useTechStackStore } from "@/hooks/data/use-techstack";
 import { IconEye, IconEyeClose } from "@/public/assets/svgs";
 import { ChevronDown } from "lucide-react";
 

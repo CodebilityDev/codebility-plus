@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { techstacks } from "@/constants/techstack";
 import { useModal } from "@/hooks/modals/use-modal";
-import { useTechStackStore } from "@/hooks/use-techstack";
+import { useTechStackStore } from "@/hooks/data/use-techstack";
 import { IconClose } from "@/public/assets/svgs";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@codevs/ui/tabs";

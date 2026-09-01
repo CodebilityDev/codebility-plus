@@ -18,7 +18,7 @@ import { Toaster } from "@/components/ui/toaster";
 
 import { signupUser } from "@/actions/auth";
 import { useModal } from "@/hooks/modals/use-modal";
-import { useTechStackStore } from "@/hooks/use-techstack";
+import { useTechStackStore } from "@/hooks/data/use-techstack";
 
 // Import modals
 import TechStackModal from "@/components/modals/TechStackModal";

@@ -1,4 +1,4 @@
-import { showErrorToast, showSuccessToast } from "@/hooks/toastHandler";
+import { showErrorToast, showSuccessToast } from "@/hooks/query/toastHandler";
 
 export const handleRequest = async (
   url: string,

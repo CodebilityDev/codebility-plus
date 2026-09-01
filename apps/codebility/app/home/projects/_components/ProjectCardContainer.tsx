@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import DefaultPagination from "@/components/ui/pagination";
 import { CATEGORIES, pageSize } from "@/constants";
 import { useModal } from "@/hooks/modals/use-modal-projects";
-import usePagination from "@/hooks/use-pagination";
+import usePagination from "@/hooks/data/use-pagination";
 import { Project } from "@/types/home/codev";
 
 import Container from "../../../(marketing)/_components/MarketingContainer";

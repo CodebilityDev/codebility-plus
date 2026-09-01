@@ -63,7 +63,7 @@ export const sendTestReminderWithUpdate = async ({
   name,
   applicantId,
 }: EmailRecipient & { applicantId: string }) => {
-  const { updateReminderCountAction } = await import("../../action");
+  const { updateReminderCountAction } = await import("@/actions/applicants/applicant");
 
   try {
     await sendTestReminder({ email, name });
@@ -77,7 +77,7 @@ export const sendTestReminderWithUpdate = async ({
 export const sendMultipleTestReminderEmailWithUpdate = async (
   applicants: { email: string; applicantId: string }[]
 ) => {
-  const { updateMultipleReminderCountAction } = await import("../../action");
+  const { updateMultipleReminderCountAction } = await import("@/actions/applicants/applicant");
 
   try {
     const emails = applicants.map((applicant) => applicant.email);
@@ -93,7 +93,7 @@ export const sendMultipleTestReminderEmailWithUpdate = async (
 
 export const sendTestReminderForConfig = async (email: string) => {
   const { createClientServerComponent } = await import("@/utils/supabase/server");
-  const { updateReminderCountAction } = await import("../../action");
+  const { updateReminderCountAction } = await import("@/actions/applicants/applicant");
 
   try {
     const supabase = await createClientServerComponent();

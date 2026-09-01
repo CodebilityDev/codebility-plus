@@ -76,7 +76,7 @@ export const sendOnboardingReminderWithUpdate = async ({
   name,
   applicantId,
 }: EmailRecipient & { applicantId: string }) => {
-  const { updateReminderCountAction } = await import("../../action");
+  const { updateReminderCountAction } = await import("@/actions/applicants/applicant");
 
   try {
     await sendOnboardingReminder({ email, name });
@@ -90,7 +90,7 @@ export const sendOnboardingReminderWithUpdate = async ({
 export const sendMultipleOnboardingReminderWithUpdate = async (
   applicants: { email: string; applicantId: string }[]
 ) => {
-  const { updateMultipleReminderCountAction } = await import("../../action");
+  const { updateMultipleReminderCountAction } = await import("@/actions/applicants/applicant");
 
   try {
     const emails = applicants.map((applicant) => applicant.email);
@@ -106,7 +106,7 @@ export const sendMultipleOnboardingReminderWithUpdate = async (
 
 export const sendOnboardingReminderForConfig = async (email: string) => {
   const { createClientServerComponent } = await import("@/utils/supabase/server");
-  const { updateReminderCountAction } = await import("../../action");
+  const { updateReminderCountAction } = await import("@/actions/applicants/applicant");
 
   try {
     const supabase = await createClientServerComponent();

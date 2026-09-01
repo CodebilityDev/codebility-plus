@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { H1 } from "@/components/shared/home";
-import usePagination from "@/hooks/use-pagination";
+import usePagination from "@/hooks/data/use-pagination";
 import { Codev } from "@/types/home/codev";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@codevs/ui/tabs";

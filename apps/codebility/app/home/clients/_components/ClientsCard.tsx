@@ -10,7 +10,7 @@ import DefaultPagination from "@/components/ui/pagination";
 import SwitchStatusButton from "@/components/ui/SwitchStatusButton";
 import { pageSize } from "@/constants";
 import { useModal } from "@/hooks/modals/use-modal-clients";
-import usePagination from "@/hooks/use-pagination";
+import usePagination from "@/hooks/data/use-pagination";
 import {
   IconCopy,
   IconMail,
