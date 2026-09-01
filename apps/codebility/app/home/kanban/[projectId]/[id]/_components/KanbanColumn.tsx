@@ -1,17 +1,15 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useKanbanModal } from "@/hooks/use-modal-kanban";
 import { useModal } from "@/hooks/use-modal";
+import { useKanbanBoardSync } from "@/hooks/use-kanban-board-sync";
 import { useUserStore } from "@/store/codev-store";
-import { useKanbanStore } from "@/store/kanban-store";
+import { useKanbanBoardStore } from "@/store/kanban-board/KanbanBoardProvider";
 import { ExtendedTask } from "@/types/home/codev";
 import { useDroppable } from "@dnd-kit/core";
-import {
-  SortableContext,
-  useSortable,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
+import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import {
   Check,
@@ -33,8 +31,7 @@ import { Input } from "@codevs/ui/input";
 
 import { deleteColumn, updateColumnName } from "../actions";
 import KanbanTaskAddModal from "./kanban_modals/KanbanTaskAddModal";
-/** IMPORTANT: This is where you import the sortable task component. */
-import KanbanTask from "./KanbanTask"; // (see #2 below)
+import KanbanColumnVirtualList from "./KanbanColumnVirtualList";
 
 interface Props {
   column: {
@@ -67,9 +64,13 @@ export default function KanbanColumn({
   const [isEditing, setIsEditing] = useState(false);
   const [newName, setNewName] = useState(column.name);
 
-  const { fetchBoardData } = useKanbanStore();
+  const { refreshBoard } = useKanbanBoardSync();
+  const columnLoadMeta = useKanbanBoardStore(
+    (state) => state.columnLoadMeta[column.id],
+  );
 
   const safeTasks = tasks ?? [];
+  const totalTaskCount = columnLoadMeta?.totalCount ?? safeTasks.length;
 
   // 1) Make the whole column "sortable" so we can reorder columns horizontally
   const {
@@ -103,30 +104,16 @@ export default function KanbanColumn({
     zIndex: isColumnDragging ? 40 : undefined,
   };
 
-  // Sorted tasks by updated_at (DESC) using safeTasks array
-  const sortedTasks = useMemo(() => {
-    return [...safeTasks].sort((a, b) => {
-      const dateA = a.updated_at ? new Date(a.updated_at).getTime() : 0;
-      const dateB = b.updated_at ? new Date(b.updated_at).getTime() : 0;
-      return dateB - dateA;
-    });
-  }, [safeTasks]);
-
-  // The array of task IDs for our SortableContext
-  const taskIds = useMemo(
-    () => sortedTasks.map((task) => task.id),
-    [sortedTasks],
-  );
-
   // Handle column deletion
-  const { onOpen } = useModal();
+  const { onOpen } = useKanbanModal();
+  const { onOpen: onOpenGlobal } = useModal();
 
   const confirmDelete = async () => {
     const response = await deleteColumn(column.id);
     if (response.success) {
       toast.success("Column deleted successfully");
       // Refetch the board data
-      await fetchBoardData();
+      await refreshBoard();
     } else {
       toast.error(response.error || "Failed to delete column");
     }
@@ -138,12 +125,12 @@ export default function KanbanColumn({
       return;
     }
 
-    if (safeTasks.length > 0) {
+    if (totalTaskCount > 0) {
       toast.error("Cannot delete column with tasks");
       return;
     }
 
-    onOpen("deleteWarningModal", {}, {}, () => confirmDelete());
+    onOpenGlobal("deleteWarningModal", {}, {}, () => confirmDelete());
   };
 
   // Handle column rename
@@ -163,7 +150,7 @@ export default function KanbanColumn({
       toast.success("Column name updated");
       setIsEditing(false);
       // Refetch the board data
-      await fetchBoardData();
+      await refreshBoard();
     } else {
       toast.error(response.error || "Failed to update column name");
     }
@@ -229,7 +216,7 @@ export default function KanbanColumn({
                   {column.name}
                 </span>
                 <div className="flex items-center justify-center rounded-full border border-gray-300 bg-gray-200 px-3 py-1 text-sm font-medium text-gray-700 backdrop-blur-sm dark:border-white/30 dark:bg-white/20 dark:text-gray-200">
-                  {safeTasks.length}
+                  {totalTaskCount}
                 </div>
               </>
             )}
@@ -253,7 +240,7 @@ export default function KanbanColumn({
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={handleDelete}
-                  disabled={safeTasks.length > 0}
+                  disabled={totalTaskCount > 0}
                   className="text-red-500 focus:text-red-500"
                 >
                   <Trash2 className="mr-2 h-3 w-3" />
@@ -276,26 +263,12 @@ export default function KanbanColumn({
               ${isOver ? "border-2 border-customBlue-300 bg-customBlue-50/30 backdrop-blur-sm dark:bg-customBlue-900/20" : ""}
             `}
           >
-            <SortableContext
-              items={taskIds}
-              strategy={verticalListSortingStrategy}
-            >
-              {sortedTasks.length === 0 ? (
-                <div className="py-4 text-center text-xs text-gray-400 dark:text-gray-400 md:text-sm">
-                  No tasks in this column
-                </div>
-              ) : (
-                sortedTasks.map((task) => (
-                  <KanbanTask
-                    key={task.id}
-                    task={task}
-                    columnId={column.id}
-                    onComplete={onTaskComplete}
-                    availableColumns={availableColumns}
-                  />
-                ))
-              )}
-            </SortableContext>
+            <KanbanColumnVirtualList
+              columnId={column.id}
+              tasks={safeTasks}
+              onTaskComplete={onTaskComplete}
+              availableColumns={availableColumns}
+            />
           </div>
 
           {canAddTask && (
@@ -304,7 +277,7 @@ export default function KanbanColumn({
                 listId={column.id}
                 listName={column.name}
                 projectId={projectId}
-                totalTask={safeTasks.length}
+                totalTask={totalTaskCount}
               />
             </div>
           )}

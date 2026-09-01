@@ -18,10 +18,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useModal } from "@/hooks/use-modal";
+import { useKanbanModal } from "@/hooks/use-modal-kanban";
+import { useKanbanBoardSync } from "@/hooks/use-kanban-board-sync";
 import { IconPlus } from "@/public/assets/svgs";
 import { useUserStore } from "@/store/codev-store";
-import { useKanbanStore } from "@/store/kanban-store";
 import { SkillCategory, Task } from "@/types/home/codev";
 import { createClientClientComponent } from "@/utils/supabase/client";
 import { Ellipsis, Loader2Icon } from "lucide-react";
@@ -291,9 +291,9 @@ const TaskViewModal = ({
   // ============================================================================
   // HOOKS AND STATE
   // ============================================================================
-  const { isOpen, onOpen, onClose, type, data } = useModal();
+  const { isOpen, onOpen, onClose, type, data } = useKanbanModal();
   const user = useUserStore((state) => state.user);
-  const { fetchBoardData } = useKanbanStore();
+  const { refreshBoard } = useKanbanBoardSync();
 
   // Loading states
   const [isLoading, setIsLoading] = useState(false);
@@ -501,7 +501,7 @@ const TaskViewModal = ({
         }
 
         onClose();
-        await fetchBoardData();
+        refreshBoard();
       } else {
         toast.error(result.error || "Failed to complete task");
       }
@@ -559,7 +559,7 @@ const TaskViewModal = ({
         setForceRefreshKey(Date.now().toString());
 
         // Refresh board data
-        await fetchBoardData();
+        refreshBoard();
       } else {
         toast.error("Failed to update assignee");
       }
@@ -592,13 +592,13 @@ const TaskViewModal = ({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-32">
                   <DropdownMenuItem
-                    onClick={() => onOpen("taskEditModal", task)}
+                    onClick={() => task && onOpen("taskEditModal", task)}
                   >
                     Edit
                   </DropdownMenuItem>
                   {user?.role_id !== 4 && (
                     <DropdownMenuItem
-                      onClick={() => onOpen("taskDeleteModal", task)}
+                      onClick={() => task && onOpen("taskDeleteModal", task)}
                       className="text-red-500 focus:text-red-500"
                     >
                       Delete

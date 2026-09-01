@@ -1,10 +1,19 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { Task, TaskDraft } from "@/types/home/codev";
 import { createClientServerComponent } from "@/utils/supabase/server";
 import { requireUser } from "@/lib/server/auth-guard";
 import { createNotificationAction } from "@/lib/actions/notification.actions";
+import {
+  fetchTaskDetail,
+  type KanbanTaskDetail,
+} from "@/lib/server/kanban-task-query";
+import { fetchMemberBoardTasks as fetchMemberBoardTasksQuery } from "@/lib/server/kanban-member-tasks-query";
+import {
+  fetchColumnTasksPage as fetchColumnTasksPageQuery,
+} from "@/lib/server/kanban-column-tasks-query";
+import { KANBAN_COLUMN_TASK_PAGE_SIZE } from "@/lib/kanban/board-pagination";
 
 interface CodevMember {
   id: string;
@@ -113,6 +122,181 @@ async function assertProjectMembership(
   }
 }
 
+function revalidateKanbanBoard(boardId: string, projectId?: string | null) {
+  revalidateTag(`board:${boardId}`);
+  revalidatePath("/home/kanban");
+  if (projectId) {
+    revalidatePath(`/home/kanban/${projectId}`);
+    revalidatePath(`/home/kanban/${projectId}/${boardId}`);
+  }
+}
+
+type TaskPositionRow = {
+  id: string;
+  kanban_column_id: string | null;
+  position: number;
+};
+
+async function fetchColumnTasks(
+  supabase: GuardSupabase,
+  columnId: string,
+): Promise<TaskPositionRow[]> {
+  const { data, error } = await supabase
+    .from("tasks")
+    .select("id, kanban_column_id, position")
+    .eq("kanban_column_id", columnId)
+    .or("is_archive.is.null,is_archive.eq.false")
+    .order("position", { ascending: true });
+
+  if (error) throw error;
+  return (data ?? []) as TaskPositionRow[];
+}
+
+function buildPositionUpdates(
+  sourceColumnId: string | null,
+  sourceTasks: TaskPositionRow[],
+  targetColumnId: string,
+  targetTasks: TaskPositionRow[],
+  taskId: string,
+  targetPosition: number,
+): Array<{ id: string; kanban_column_id: string; position: number }> {
+  const sourceList =
+    sourceColumnId === targetColumnId
+      ? targetTasks
+      : sourceTasks.filter((task) => task.id !== taskId);
+
+  const targetList =
+    sourceColumnId === targetColumnId
+      ? [...sourceList]
+      : [
+          ...targetTasks.filter((task) => task.id !== taskId),
+        ];
+
+  const insertAt = Math.max(0, Math.min(targetPosition, targetList.length));
+  targetList.splice(insertAt, 0, {
+    id: taskId,
+    kanban_column_id: targetColumnId,
+    position: insertAt,
+  });
+
+  const updates: Array<{ id: string; kanban_column_id: string; position: number }> =
+    targetList.map((task, index) => ({
+      id: task.id,
+      kanban_column_id: targetColumnId,
+      position: index,
+    }));
+
+  if (sourceColumnId && sourceColumnId !== targetColumnId) {
+    sourceList.forEach((task, index) => {
+      updates.push({
+        id: task.id,
+        kanban_column_id: sourceColumnId,
+        position: index,
+      });
+    });
+  }
+
+  return updates;
+}
+
+async function persistTaskPositions(
+  supabase: GuardSupabase,
+  updates: Array<{ id: string; kanban_column_id: string; position: number }>,
+) {
+  const results = await Promise.all(
+    updates.map((row) =>
+      supabase
+        .from("tasks")
+        .update({
+          kanban_column_id: row.kanban_column_id,
+          position: row.position,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", row.id),
+    ),
+  );
+
+  const failed = results.find((result) => result.error);
+  if (failed?.error) throw failed.error;
+}
+
+export async function moveTask({
+  taskId,
+  columnId,
+  position,
+  opId: _opId,
+}: {
+  taskId: string;
+  columnId: string;
+  position: number;
+  opId?: string;
+}): Promise<{ success: boolean; error?: string }> {
+  let supabase: GuardSupabase;
+  let user;
+  try {
+    ({ supabase, user } = await requireUser());
+  } catch {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  const projectResolution = await getProjectIdForTask(supabase, taskId);
+  try {
+    await assertProjectMembership(supabase, user.id, projectResolution);
+  } catch {
+    return { success: false, error: "Forbidden" };
+  }
+
+  try {
+    const { data: task, error: taskError } = await supabase
+      .from("tasks")
+      .select("id, kanban_column_id, position")
+      .eq("id", taskId)
+      .single();
+
+    if (taskError || !task) {
+      return { success: false, error: "Task not found" };
+    }
+
+    const sourceColumnId = task.kanban_column_id;
+    const [sourceTasks, targetTasks] = await Promise.all([
+      sourceColumnId ? fetchColumnTasks(supabase, sourceColumnId) : Promise.resolve([]),
+      fetchColumnTasks(supabase, columnId),
+    ]);
+
+    const updates = buildPositionUpdates(
+      sourceColumnId,
+      sourceTasks,
+      columnId,
+      targetTasks,
+      taskId,
+      position,
+    );
+
+    await persistTaskPositions(supabase, updates);
+
+    const columnResolution = await getProjectIdForColumn(supabase, columnId);
+    if (columnResolution.found && columnResolution.projectId) {
+      const { data: columnData } = await supabase
+        .from("kanban_columns")
+        .select("board_id")
+        .eq("id", columnId)
+        .single();
+
+      if (columnData?.board_id) {
+        revalidateKanbanBoard(columnData.board_id, columnResolution.projectId);
+      }
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("moveTask error:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to move task",
+    };
+  }
+}
+
 const updateDeveloperLevels = async (codevId?: string) => {
   if (!codevId) return;
 
@@ -178,22 +362,25 @@ export const updateTaskColumnId = async (
   const projectId = await getProjectIdForTask(supabase, taskId);
   await assertProjectMembership(supabase, user.id, projectId);
 
-  try {
-    const { data, error } = await supabase
-      .from("tasks")
-      .update({
-        kanban_column_id: newColumnId,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", taskId)
-      .select("*")
-      .single();
+  const targetTasks = await fetchColumnTasks(supabase, newColumnId);
+  const result = await moveTask({
+    taskId,
+    columnId: newColumnId,
+    position: targetTasks.length,
+  });
 
-    if (error) throw error;
-    return data as Task;
-  } catch (error) {
-    throw error;
+  if (!result.success) {
+    throw new Error(result.error ?? "Failed to move task");
   }
+
+  const { data, error } = await supabase
+    .from("tasks")
+    .select("*")
+    .eq("id", taskId)
+    .single();
+
+  if (error || !data) throw error ?? new Error("Task not found");
+  return data as Task;
 };
 
 export const fetchAvailableMembers = async (
@@ -299,6 +486,9 @@ export const createNewTask = async (
       return { success: false, error: "Forbidden" };
     }
 
+    const targetTasks = await fetchColumnTasks(supabase, kanban_column_id);
+    const nextPosition = targetTasks.length;
+
     const { data: newTask, error } = await supabase.from("tasks").insert([
       {
         title,
@@ -309,6 +499,7 @@ export const createNewTask = async (
         pr_link,
         points,
         kanban_column_id,
+        position: nextPosition,
         codev_id,
         sidekick_ids,
         skill_category_id,
@@ -336,7 +527,7 @@ export const createNewTask = async (
         .single();
 
       if (boardData?.project_id) {
-        revalidatePath(`/home/kanban/${boardData.project_id}/${columnData.board_id}`);
+        revalidateKanbanBoard(columnData.board_id, boardData.project_id);
 
         if (codev_id && newTask?.id) {
           // Reuse the already-authenticated caller (checked before the mutation).
@@ -937,65 +1128,17 @@ export const completeTask = async (
 
 export async function batchUpdateTasks(
   updates: Array<{ taskId: string; newColumnId: string }>,
-) {
-  let supabase: GuardSupabase;
-  let user;
-  try {
-    ({ supabase, user } = await requireUser());
-  } catch {
-    return { success: false, error: "Unauthorized" };
+): Promise<{ success: boolean; error?: string }> {
+  if (updates.length === 0) {
+    return { success: true };
   }
 
-  try {
-    // Verify membership for every distinct project touched by the batch.
-    const resolutions = await Promise.all(
-      updates.map((u) => getProjectIdForTask(supabase, u.taskId)),
-    );
-
-    // Fail-closed: if any target exists but has no resolvable project, deny.
-    for (const res of resolutions) {
-      if (res.found && !res.projectId) {
-        throw new Error("Forbidden");
-      }
-    }
-
-    const uniqueProjectIds = [
-      ...new Set(
-        resolutions
-          .filter((r): r is { found: true; projectId: string } => r.found && r.projectId !== null)
-          .map((r) => r.projectId),
-      ),
-    ];
-    for (const projectId of uniqueProjectIds) {
-      await assertProjectMembership(supabase, user.id, { found: true, projectId });
-    }
-  } catch {
-    return { success: false, error: "Forbidden" };
-  }
-
-  try {
-    const updatePromises = updates.map(async (update) => {
-      const { error } = await supabase
-        .from("tasks")
-        .update({
-          kanban_column_id: update.newColumnId,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", update.taskId);
-      return error;
-    });
-    const errors = await Promise.all(updatePromises);
-    return {
-      success: !errors.some((error) => error !== null),
-      error: errors.some((error) => error !== null) ? "Some updates failed" : undefined,
-    };
-  } catch (error) {
-    console.error("Batch update error:", error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Batch update failed",
-    };
-  }
+  const last = updates[updates.length - 1]!;
+  return moveTask({
+    taskId: last.taskId,
+    columnId: last.newColumnId,
+    position: 0,
+  });
 }
 
 export async function updateTaskPRLink(taskId: string, prLink: string) {
@@ -1483,7 +1626,7 @@ export const promoteDraft = async (
         .single();
 
       if (boardData?.project_id) {
-        revalidatePath(`/home/kanban/${boardData.project_id}/${columnData.board_id}`);
+        revalidateKanbanBoard(columnData.board_id, boardData.project_id);
       }
     }
 
@@ -1530,6 +1673,107 @@ export const getDraftCount = async (
     };
   }
 };
+
+export async function fetchColumnTasksPage(
+  columnId: string,
+  offset: number,
+  limit: number = KANBAN_COLUMN_TASK_PAGE_SIZE,
+): Promise<{ success: boolean; tasks?: Task[]; error?: string }> {
+  let supabase: GuardSupabase;
+  let user;
+  try {
+    ({ supabase, user } = await requireUser());
+  } catch {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  try {
+    const projectResolution = await getProjectIdForColumn(supabase, columnId);
+    await assertProjectMembership(supabase, user.id, projectResolution);
+
+    const tasks = await fetchColumnTasksPageQuery(
+      supabase,
+      columnId,
+      offset,
+      limit,
+    );
+    return { success: true, tasks };
+  } catch (error) {
+    if (error instanceof Error && error.message === "Forbidden") {
+      return { success: false, error: "Forbidden" };
+    }
+    console.error("Error fetching column tasks page:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Failed to fetch column tasks",
+    };
+  }
+}
+
+export async function fetchMemberBoardTasks(
+  boardId: string,
+  memberId: string,
+): Promise<{ success: boolean; tasks?: Task[]; error?: string }> {
+  let supabase: GuardSupabase;
+  let user;
+  try {
+    ({ supabase, user } = await requireUser());
+  } catch {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  try {
+    const projectResolution = await getProjectIdForBoard(supabase, boardId);
+    await assertProjectMembership(supabase, user.id, projectResolution);
+
+    const tasks = await fetchMemberBoardTasksQuery(supabase, boardId, memberId);
+    return { success: true, tasks };
+  } catch (error) {
+    if (error instanceof Error && error.message === "Forbidden") {
+      return { success: false, error: "Forbidden" };
+    }
+    console.error("Error fetching member board tasks:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Failed to fetch member tasks",
+    };
+  }
+}
+
+export async function getTaskDetail(
+  taskId: string,
+): Promise<{ success: boolean; data?: KanbanTaskDetail; error?: string }> {
+  let supabase: GuardSupabase;
+  let user;
+  try {
+    ({ supabase, user } = await requireUser());
+  } catch {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  try {
+    const projectResolution = await getProjectIdForTask(supabase, taskId);
+    await assertProjectMembership(supabase, user.id, projectResolution);
+
+    const data = await fetchTaskDetail(supabase, taskId);
+    if (!data) {
+      return { success: false, error: "Task not found" };
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    if (error instanceof Error && error.message === "Forbidden") {
+      return { success: false, error: "Forbidden" };
+    }
+    console.error("Error fetching task detail:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to fetch task",
+    };
+  }
+}
 
 export async function transferTaskToSprint(
   taskId: string,

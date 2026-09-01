@@ -6,7 +6,7 @@ import { createClientClientComponent } from "@/utils/supabase/client";
 import { Task } from "@/types/home/codev";
 import { IconArchive } from "@/public/assets/svgs";
 
-import { useModal } from "@/hooks/use-modal";
+import { useKanbanModal } from "@/hooks/use-modal-kanban";
 import toast from "react-hot-toast";
 import ArchiveTask from "./ArchiveTask";
 
@@ -19,7 +19,7 @@ export default function ArchiveColumn({ projectId, boardId }: ArchiveColumnProps
   const [archivedTasks, setArchivedTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [supabase, setSupabase] = useState<any>(null);
-  const { onOpen } = useModal();
+  const { onOpen } = useKanbanModal();
 
   const searchParams = useSearchParams();
   const highlightTaskId = searchParams.get("taskId");

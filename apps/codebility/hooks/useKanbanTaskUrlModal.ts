@@ -1,55 +1,138 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useModal } from "@/hooks/use-modal";
-import { KanbanBoardType, KanbanColumnType } from "@/types/home/codev";
+import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
+
+import { useKanbanModal } from "@/hooks/use-modal-kanban";
+import { KanbanBoardType, KanbanColumnType, Task } from "@/types/home/codev";
+
+function buildPathWithTaskId(
+  pathname: string,
+  currentSearch: string,
+  taskId: string | null,
+): string {
+  const params = new URLSearchParams(currentSearch);
+
+  if (taskId) {
+    params.set("taskId", taskId);
+  } else {
+    params.delete("taskId");
+    params.delete("commentId");
+  }
+
+  const query = params.toString();
+  return query ? `${pathname}?${query}` : pathname;
+}
+
+function readTaskIdFromWindow(): string | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  return new URLSearchParams(window.location.search).get("taskId");
+}
 
 /**
- * Syncs the Kanban task modal with the URL ?taskId param.
+ * Keeps ?taskId= in sync with the task view modal.
+ * Modal store leads for clicks. URL uses history.replaceState so Next.js
+ * searchParams (and the Suspense boundary) are not re-triggered per open.
  */
 export function useKanbanTaskUrlModal(
-  boardData: KanbanBoardType & { kanban_columns: KanbanColumnType[] }
+  boardData: KanbanBoardType & { kanban_columns: KanbanColumnType[] },
 ) {
-  const { isOpen, type, onOpen } = useModal();
-  const router = useRouter();
+  const { isOpen, type, data, onOpen, onClose } = useKanbanModal();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // Flatten all tasks once
   const tasks = useMemo(
     () => boardData.kanban_columns.flatMap((col) => col.tasks ?? []),
-    [boardData.kanban_columns]
+    [boardData.kanban_columns],
   );
 
-  // Track whether we've already opened the modal from the URL
-  const openedFromUrlRef = useRef(false);
+  const isArchiveView = searchParams.get("view") === "archive";
+  const modalTaskId =
+    isOpen && type === "taskViewModal" && data
+      ? (data as Task).id
+      : null;
 
+  const tasksRef = useRef(tasks);
+  tasksRef.current = tasks;
+
+  const modalRef = useRef({ isOpen, type, modalTaskId, onOpen, onClose });
+  modalRef.current = { isOpen, type, modalTaskId, onOpen, onClose };
+
+  const deepLinkedRef = useRef(false);
+
+  // Deep link on first paint (?taskId= in the loaded URL)
   useEffect(() => {
-    const taskId = searchParams.get("taskId");
+    if (deepLinkedRef.current || isArchiveView) {
+      return;
+    }
 
-    // Only process if we're actually looking at the task list, NOT the archive
-    const isArchiveView = searchParams.get("view") === "archive";
+    const taskId = readTaskIdFromWindow();
+    if (!taskId) {
+      return;
+    }
 
-    // Open modal only once from URL (for active tasks)
-    if (taskId && !openedFromUrlRef.current && !isArchiveView) {
-      const task = tasks.find((t) => t.id === taskId);
+    deepLinkedRef.current = true;
+
+    const task = tasksRef.current.find((t) => t.id === taskId);
+    if (task) {
+      onOpen("taskViewModal", task);
+    }
+  }, [isArchiveView, onOpen]);
+
+  // Modal → URL (sync; no router.replace)
+  useLayoutEffect(() => {
+    if (isArchiveView) {
+      return;
+    }
+
+    const currentSearch = window.location.search;
+    const urlTaskId = readTaskIdFromWindow();
+
+    if (type === "taskViewModal" && isOpen && modalTaskId) {
+      if (urlTaskId !== modalTaskId) {
+        const next = buildPathWithTaskId(pathname, currentSearch, modalTaskId);
+        window.history.replaceState(window.history.state, "", next);
+      }
+      return;
+    }
+
+    if (!isOpen && urlTaskId) {
+      const next = buildPathWithTaskId(pathname, currentSearch, null);
+      window.history.replaceState(window.history.state, "", next);
+    }
+  }, [isOpen, type, modalTaskId, isArchiveView, pathname]);
+
+  // Back/forward only (replaceState does not fire popstate)
+  useEffect(() => {
+    if (isArchiveView) {
+      return;
+    }
+
+    const onPopState = () => {
+      const taskId = readTaskIdFromWindow();
+      const { isOpen, type, modalTaskId, onOpen, onClose } = modalRef.current;
+
+      if (!taskId) {
+        if (isOpen && type === "taskViewModal") {
+          onClose();
+        }
+        return;
+      }
+
+      if (modalTaskId === taskId) {
+        return;
+      }
+
+      const task = tasksRef.current.find((t) => t.id === taskId);
       if (task) {
         onOpen("taskViewModal", task);
-        openedFromUrlRef.current = true;
       }
-    }
+    };
 
-    // Clear URL if modal closed
-    if (!isOpen && searchParams.has("taskId") && !isArchiveView) {
-      router.replace(pathname, { scroll: false });
-      openedFromUrlRef.current = false; // reset so next URL param works
-    }
-
-    // If modal type changes away from taskViewModal, remove param
-    if (isOpen && type !== "taskViewModal" && searchParams.has("taskId")) {
-      router.replace(pathname, { scroll: false });
-      openedFromUrlRef.current = false;
-    }
-  }, [isOpen, type, tasks, onOpen, pathname, searchParams, router]);
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, [isArchiveView]);
 }

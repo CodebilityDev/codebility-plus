@@ -1,12 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { useKanbanStore } from "@/store/kanban-store";
-import { KanbanColumnType, Task } from "@/types/home/codev";
-import { debounce } from "@/utils/debounce";
 import {
-  closestCenter,
   closestCorners,
   DndContext,
   DragEndEvent,
@@ -24,19 +20,25 @@ import {
 } from "@dnd-kit/sortable";
 import toast from "react-hot-toast";
 
-import { batchUpdateTasks, updateColumnPosition } from "../actions";
+import {
+  commitTaskMove,
+  filterColumnsByMember,
+} from "@/lib/kanban/board-mutations";
+import {
+  useKanbanBoardActions,
+  useKanbanColumns,
+} from "@/store/kanban-board/KanbanBoardProvider";
+
+import { updateColumnPosition } from "../actions";
 import KanbanColumn from "./KanbanColumn";
 
-// Styles
 const styles = {
   container: "overflow-x-auto overflow-y-hidden",
   columnList:
     "flex flex-wrap min-h-[calc(100vh-12rem)] w-full gap-4 p-2 md:p-4",
 } as const;
 
-// Types
 interface Props {
-  columns: KanbanColumnType[];
   projectId: string;
   activeFilter: string | null;
 }
@@ -46,131 +48,35 @@ interface DnDData {
   columnId?: string;
 }
 
-interface DragAndDropHandlers {
+function useDragAndDrop(handlers: {
   onDragEnd: (event: DragEndEvent) => void | Promise<void>;
   onDragStart: (event: DragStartEvent) => void;
   onDragOver: (event: DragOverEvent) => void;
-}
-
-// Custom Hook with proper types
-function useDragAndDrop(handlers: DragAndDropHandlers) {
+}) {
   const sensors = useSensors(
     useSensor(PointerSensor, {
-      activationConstraint: { distance: 3 }, // Very responsive
+      activationConstraint: { distance: 3 },
     }),
     useSensor(TouchSensor, {
-      activationConstraint: { distance: 3 }, // Very responsive
+      activationConstraint: { distance: 3 },
     }),
   );
 
-  return {
-    sensors,
-    handleDragEnd: handlers.onDragEnd,
-    handleDragStart: handlers.onDragStart,
-    handleDragOver: handlers.onDragOver,
-  };
+  return { sensors, ...handlers };
 }
 
 export default function KanbanBoardColumnContainer({
-  columns,
   projectId,
   activeFilter,
 }: Props) {
   const router = useRouter();
+  const columns = useKanbanColumns();
+  const { setColumns, removeTaskLocal } = useKanbanBoardActions();
 
-  // Sort columns by their "position" (lowest to highest)
-  const [orderedColumns, setOrderedColumns] = useState<KanbanColumnType[]>(() =>
-    [...columns].sort((a, b) => (a.position ?? 0) - (b.position ?? 0)),
+  const boardData = useMemo(
+    () => filterColumnsByMember(columns, activeFilter),
+    [columns, activeFilter],
   );
-
-  // Our board data: ensure every column has a tasks array.
-  const [boardData, setBoardData] = useState<KanbanColumnType[]>([]);
-  // For batching task updates (when a task moves between columns)
-  const [pendingUpdates, setPendingUpdates] = useState<
-    Array<{ taskId: string; newColumnId: string }>
-  >([]);
-
-  // Track dragging state for immediate feedback
-  const [isDragging, setIsDragging] = useState(false);
-
-  // Sort function for tasks (descending by updated_at)
-  const sortByUpdatedAtDesc = (a: Task, b: Task) => {
-    const dateA = a.updated_at ? new Date(a.updated_at).getTime() : 0;
-    const dateB = b.updated_at ? new Date(b.updated_at).getTime() : 0;
-    return dateB - dateA;
-  };
-
-  // Debounced batch update with improved error handling
-  const debouncedBatchUpdate = useMemo(
-    () =>
-      debounce(
-        async (updates: Array<{ taskId: string; newColumnId: string }>) => {
-          if (updates.length === 0) return;
-          try {
-            const result = await batchUpdateTasks(updates);
-            if (result.success) {
-              setPendingUpdates([]);
-              // Success - no refresh needed
-            } else {
-              console.error("Batch update failed:", result.error);
-              toast.error(result.error || "Failed to update tasks");
-            }
-          } catch (error) {
-            console.error("Batch update error:", error);
-            toast.error("Failed to update tasks. Changes may not be saved.");
-          }
-        },
-        500, // Faster than before but still debounced
-      ),
-    [],
-  );
-
-  useEffect(() => {
-    if (pendingUpdates.length > 0) {
-      debouncedBatchUpdate(pendingUpdates);
-    }
-  }, [pendingUpdates, debouncedBatchUpdate]);
-
-  // Filter and sort tasks
-  const filterAndSortTasks = useCallback(
-    (tasks: Task[] = []) => {
-      return tasks
-        .filter(
-          (task) =>
-            !activeFilter ||
-            task.codev?.id === activeFilter ||
-            task.sidekick_ids?.includes(activeFilter),
-        )
-        .sort(sortByUpdatedAtDesc);
-    },
-    [activeFilter],
-  );
-
-  // Update orderedColumns when columns change
-  useEffect(() => {
-    const sortedColumns = [...columns].sort(
-      (a, b) => (a.position ?? 0) - (b.position ?? 0),
-    );
-    setOrderedColumns(sortedColumns);
-  }, [columns]);
-
-  // Initialize board data from orderedColumns
-  useEffect(() => {
-    setBoardData(
-      orderedColumns.map((col) => ({
-        ...col,
-        tasks: filterAndSortTasks(col.tasks),
-      })),
-    );
-  }, [orderedColumns, activeFilter, filterAndSortTasks]);
-
-  const handleDragStart = useCallback((event: DragStartEvent) => {
-    // Optional: set active item state for custom drag overlays.
-  }, []);
-
-  const handleDragOver = useCallback((event: DragOverEvent) => {
-    // Optional: implement live feedback if needed.
-  }, []);
 
   const handleDragEnd = useCallback(
     async (event: DragEndEvent) => {
@@ -181,34 +87,36 @@ export default function KanbanBoardColumnContainer({
       const overData = over.data.current as DnDData | undefined;
       if (!activeData || !overData) return;
 
-      // Column Reordering
       if (activeData.type === "Column" && overData.type === "Column") {
-        const oldIndex = boardData.findIndex((col) => col.id === active.id);
-        const newIndex = boardData.findIndex((col) => col.id === over.id);
+        const orderedColumns = [...columns].sort(
+          (a, b) => (a.position ?? 0) - (b.position ?? 0),
+        );
+        const oldIndex = orderedColumns.findIndex((col) => col.id === active.id);
+        const newIndex = orderedColumns.findIndex((col) => col.id === over.id);
 
         if (oldIndex === -1 || newIndex === -1 || oldIndex === newIndex) return;
 
-        const newCols = arrayMove(boardData, oldIndex, newIndex);
+        const previousColumns = columns;
+        const newCols = arrayMove(orderedColumns, oldIndex, newIndex).map(
+          (column, index) => ({ ...column, position: index }),
+        );
+        setColumns(newCols);
 
-        // Optimistic update - update UI immediately
-        setBoardData(newCols);
-        setOrderedColumns(newCols);
-
-        // Save to database in background without blocking UI
-        Promise.all(
-          newCols.map((column, index) =>
-            updateColumnPosition(column.id, index),
-          ),
-        ).catch((error) => {
+        try {
+          await Promise.all(
+            newCols.map((column, index) =>
+              updateColumnPosition(column.id, index),
+            ),
+          );
+        } catch (error) {
           console.error("Column reorder error:", error);
+          setColumns(previousColumns);
           toast.error("Failed to reorder columns");
-          // Only refresh on error to revert changes
           router.refresh();
-        });
+        }
         return;
       }
 
-      // Task Drag
       if (
         activeData.type === "Task" &&
         (overData.type === "Column" || overData.type === "Task")
@@ -220,90 +128,64 @@ export default function KanbanBoardColumnContainer({
 
         if (!activeColId || !overColId) return;
 
-        const updatedBoard = structuredClone(boardData);
-        const oldColumnIndex = updatedBoard.findIndex(
-          (col) => col.id === activeColId,
-        );
-        const newColumnIndex = updatedBoard.findIndex(
-          (col) => col.id === overColId,
-        );
+        const sourceColumn = columns.find((col) => col.id === activeColId);
+        const targetColumn = columns.find((col) => col.id === overColId);
+        if (!sourceColumn || !targetColumn) return;
 
-        if (oldColumnIndex === -1 || newColumnIndex === -1) return;
+        const sourceTasks = sourceColumn.tasks ?? [];
+        const targetTasks =
+          activeColId === overColId
+            ? sourceTasks
+            : (targetColumn.tasks ?? []);
 
-        const oldColumn = updatedBoard[oldColumnIndex];
-        const newColumn = updatedBoard[newColumnIndex];
-
-        if (!oldColumn || !newColumn) return;
-
-        oldColumn.tasks = oldColumn.tasks ?? [];
-        newColumn.tasks = newColumn.tasks ?? [];
-
-        const activeTaskIndex = oldColumn.tasks.findIndex(
-          (t) => t.id === active.id,
-        );
+        const activeTaskIndex = sourceTasks.findIndex((t) => t.id === active.id);
         if (activeTaskIndex === -1) return;
 
-        const movedTask = oldColumn.tasks.splice(activeTaskIndex, 1)[0];
-        if (!movedTask) return;
-
-        movedTask.kanban_column_id = overColId;
-
-        // If dragging over another task, insert at that task's index
+        let targetPosition = targetTasks.length;
         if (overData.type === "Task") {
-          const overTaskIndex = newColumn.tasks.findIndex(
-            (t) => t.id === over.id,
-          );
-          newColumn.tasks.splice(overTaskIndex, 0, movedTask);
-        } else {
-          // If dragging to column, add to the end
-          newColumn.tasks.push(movedTask);
+          const overTaskIndex = targetTasks.findIndex((t) => t.id === over.id);
+          if (overTaskIndex !== -1) {
+            targetPosition = overTaskIndex;
+          }
         }
 
-        setBoardData(updatedBoard);
+        const result = await commitTaskMove(
+          String(active.id),
+          overColId,
+          targetPosition,
+        );
 
-        // Add to pending updates for debounced batch processing
-        setPendingUpdates((prev) => {
-          // Remove any existing update for this task to avoid duplicates
-          const filtered = prev.filter(
-            (update) => update.taskId !== movedTask.id,
-          );
-          return [
-            ...filtered,
-            { taskId: movedTask.id, newColumnId: overColId },
-          ];
-        });
+        if (!result.success) {
+          toast.error(result.error || "Failed to move task");
+        }
       }
     },
-    [boardData, router],
+    [boardData, columns, router, setColumns],
   );
 
   const { sensors } = useDragAndDrop({
     onDragEnd: handleDragEnd,
-    onDragStart: handleDragStart,
-    onDragOver: handleDragOver,
+    onDragStart: () => {},
+    onDragOver: () => {},
   });
 
-  // Handle task completion
-  const handleTaskComplete = useCallback((completedTaskId: string) => {
-    setBoardData((prevData) =>
-      prevData.map((column) => ({
-        ...column,
-        tasks:
-          column.tasks?.filter((task) => task.id !== completedTaskId) || [],
-      })),
-    );
-  }, []);
+  const handleTaskComplete = useCallback(
+    (completedTaskId: string) => {
+      removeTaskLocal(completedTaskId);
+    },
+    [removeTaskLocal],
+  );
 
-  // IDs for the SortableContext for columns
   const columnIds = boardData.map((col) => col.id);
 
   return (
     <div className={styles.container}>
       <DndContext
+        id={`kanban-board-${projectId}`}
         sensors={sensors}
         collisionDetection={closestCorners}
-        onDragStart={handleDragStart}
-        onDragOver={handleDragOver}
+        onDragStart={() => {}}
+        onDragOver={() => {}}
         onDragEnd={handleDragEnd}
       >
         <SortableContext
@@ -318,7 +200,10 @@ export default function KanbanBoardColumnContainer({
                 projectId={projectId}
                 tasks={column.tasks ?? []}
                 onTaskComplete={handleTaskComplete}
-                availableColumns={boardData.map(col => ({ id: col.id, name: col.name }))}
+                availableColumns={boardData.map((col) => ({
+                  id: col.id,
+                  name: col.name,
+                }))}
               />
             ))}
           </ol>

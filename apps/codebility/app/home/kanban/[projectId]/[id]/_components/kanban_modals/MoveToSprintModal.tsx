@@ -22,7 +22,7 @@ import toast from "react-hot-toast";
 import { createClientClientComponent } from "@/utils/supabase/client";
 import { getSprintsData } from "@/app/home/kanban/[projectId]/_services/query";
 import { transferTaskToSprint } from "@/app/home/kanban/[projectId]/[id]/actions";
-import { useKanbanStore } from "@/store/kanban-store";
+import { useKanbanBoardSync } from "@/hooks/use-kanban-board-sync";
 import { Task } from "@/types/home/codev";
 
 interface Sprint {
@@ -62,7 +62,7 @@ export default function MoveToSprintModal({
   task,
   projectId,
 }: Props) {
-  const { fetchBoardData, removeTaskOptimistic } = useKanbanStore();
+  const { refreshBoard, removeTask } = useKanbanBoardSync();
 
   const [sprints, setSprints] = useState<Sprint[]>([]);
   const [currentSprintId, setCurrentSprintId] = useState<string | null>(null);
@@ -194,7 +194,7 @@ export default function MoveToSprintModal({
 
     // Optimistically remove task from the current board view
     if (!task) return;
-    removeTaskOptimistic(task.id);
+    removeTask(task.id);
     onClose();
     toast.success("Transferring task to sprint...");
 
@@ -207,16 +207,16 @@ export default function MoveToSprintModal({
 
       if (result.success) {
         toast.success("Task successfully moved to the selected sprint!");
-        await fetchBoardData();
+        refreshBoard();
       } else {
         toast.error(result.error ?? "Failed to transfer task.");
         // Re-fetch to restore the task if optimistic removal was premature
-        await fetchBoardData();
+        refreshBoard();
       }
     } catch (err) {
       console.error("Transfer error:", err);
       toast.error("An unexpected error occurred.");
-      await fetchBoardData();
+      refreshBoard();
     } finally {
       setIsTransferring(false);
     }

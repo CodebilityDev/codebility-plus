@@ -1,5 +1,5 @@
 "use client";
-import { useModal } from "@/hooks/use-modal";
+import { useKanbanModal } from "@/hooks/use-modal-kanban";
 interface Props {
   listId: string;
   listName: string;
@@ -12,7 +12,7 @@ export default function KanbanTaskAddModal({
   projectId,
   totalTask,
 }: Props) {
-  const { onOpen } = useModal();
+  const { onOpen } = useKanbanModal();
   const data = {
     listId,
     listName,

@@ -1,9 +1,9 @@
 "use client";
 
 import { ReactNode, memo, useCallback } from "react";
-import { useModal } from "@/hooks/use-modal";
+
+import { useKanbanModal } from "@/hooks/use-modal-kanban";
 import { ExtendedTask } from "@/types/home/codev";
-import { usePathname, useRouter } from "next/navigation";
 
 interface Props {
   children: ReactNode;
@@ -16,20 +16,13 @@ function KanbanTaskViewEditModal({
   task,
   onComplete,
 }: Props) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { onOpen } = useModal();
+  const { onOpen } = useKanbanModal();
 
   const handleClick = useCallback(() => {
-    router.push(`${pathname}?taskId=${task.id}`, { scroll: false });
-    onOpen("taskViewModal", task, onComplete);
+    onOpen("taskViewModal", task, onComplete as (taskId?: string) => void);
   }, [onOpen, task, onComplete]);
 
-  return (
-    <div onClick={handleClick}>
-      {children}
-    </div>
-  );
+  return <div onClick={handleClick}>{children}</div>;
 }
 
 export default memo(KanbanTaskViewEditModal);

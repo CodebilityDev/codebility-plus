@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import DefaultAvatar from "@/components/DefaultAvatar";
+import { VisuallyHidden } from "@/components/ui/visuallyHidden";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -19,10 +20,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useModal } from "@/hooks/use-modal";
+import { useKanbanModal } from "@/hooks/use-modal-kanban";
+import { useKanbanBoardSync } from "@/hooks/use-kanban-board-sync";
+import {
+  getCachedTaskDetail,
+  invalidateTaskDetail,
+  setCachedTaskDetail,
+} from "@/lib/kanban/task-detail-cache";
+import type { KanbanTaskDetail } from "@/lib/server/kanban-task-query";
 import { IconPlus } from "@/public/assets/svgs";
 import { useUserStore } from "@/store/codev-store";
-import { useKanbanStore } from "@/store/kanban-store";
 import { SkillCategory, Task } from "@/types/home/codev";
 import { createClientClientComponent } from "@/utils/supabase/client";
 import {
@@ -48,7 +55,7 @@ import {
 import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
 
-import { completeTask, updateTaskPRLink } from "../../actions";
+import { completeTask, getTaskDetail, updateTaskPRLink } from "../../actions";
 import DifficultyPointsTooltip, {
   DIFFICULTY_LEVELS,
 } from "../DifficultyPointsTooltip";
@@ -314,9 +321,9 @@ const TaskViewModal = ({
 }: {
   onComplete?: (taskId: string) => void;
 }) => {
-  const { isOpen, onOpen, onClose, type, data } = useModal();
+  const { isOpen, onOpen, onClose, type, data } = useKanbanModal();
   const user = useUserStore((state) => state.user);
-  const { fetchBoardData, removeTaskOptimistic } = useKanbanStore();
+  const { refreshBoard, removeTask } = useKanbanBoardSync();
 
   const [isLoading, setIsLoading] = useState(false);
   const [updateLoading, setUpdateLoading] = useState(false);
@@ -352,7 +359,22 @@ const TaskViewModal = ({
   const [isMoveToSprintOpen, setIsMoveToSprintOpen] = useState(false);
 
   const isModalOpen = isOpen && type === "taskViewModal";
-  const task = data as Task | null;
+  const summaryTask = data as Task | null;
+  const activeTaskId =
+    isModalOpen && summaryTask?.id ? summaryTask.id : null;
+  const cachedDetail = activeTaskId
+    ? getCachedTaskDetail(activeTaskId)
+    : undefined;
+
+  const [fetchedForTaskId, setFetchedForTaskId] = useState<string | null>(null);
+  const [fetchedDetail, setFetchedDetail] = useState<KanbanTaskDetail | null>(
+    null,
+  );
+  const resolvedDetail =
+    cachedDetail ??
+    (fetchedForTaskId === activeTaskId ? fetchedDetail : undefined);
+  const detailLoading = Boolean(activeTaskId && !resolvedDetail);
+  const task = resolvedDetail?.task ?? summaryTask;
 
   const hasPrLinkChanges = prLink.trim() !== originalPrLink;
   const hasUnsavedChanges = manualSaveChanges || hasPrLinkChanges;
@@ -403,123 +425,64 @@ const TaskViewModal = ({
     setSupabase(supabaseClient);
   }, []);
 
-  useEffect(() => {
-    if (!supabase || !task?.kanban_column_id) {
-      setBoardId("");
-      setProjectId("");
+  useLayoutEffect(() => {
+    if (!resolvedDetail) {
       return;
     }
 
-    const fetchBoardId = async () => {
-      try {
-        const { data: columnData, error: columnError } = await supabase
-          .from("kanban_columns")
-          .select("board_id")
-          .eq("id", task.kanban_column_id)
-          .single();
+    const { task: detailTask, boardId: nextBoardId, projectId: nextProjectId } =
+      resolvedDetail;
 
-        if (columnError || !columnData?.board_id) {
-          setBoardId("");
-          setProjectId("");
-          return;
-        }
+    setBoardId(nextBoardId ?? "");
+    setProjectId(nextProjectId ?? "");
+    setPrimaryAssignee(resolvedDetail.primaryAssignee);
+    setSidekickDetails(resolvedDetail.sidekickDetails);
+    setCreatedBy(resolvedDetail.createdBy);
+    setSkillCategory(resolvedDetail.skillCategory);
 
-        setBoardId(columnData.board_id);
-
-        // NEW: also resolve project_id so MoveToSprintModal can use it
-        const { data: boardData, error: boardError } = await supabase
-          .from("kanban_boards")
-          .select("project_id")
-          .eq("id", columnData.board_id)
-          .single();
-
-        if (!boardError && boardData?.project_id) {
-          setProjectId(boardData.project_id);
-        }
-      } catch (err) {
-        console.error("Exception fetching board ID:", err);
-        setBoardId("");
-        setProjectId("");
-      }
-    };
-
-    fetchBoardId();
-  }, [task?.kanban_column_id, supabase]);
-
-  useEffect(() => {
-    if (!task?.id || !supabase) return;
-
-    const taskPrLink = task?.pr_link || "";
+    const taskPrLink = detailTask.pr_link || "";
     setPrLink(taskPrLink);
     setOriginalPrLink(taskPrLink);
     setManualSaveChanges(false);
     setPendingAssigneeId(undefined);
     setForceRefreshKey(Date.now().toString());
-
     setIsEditingPrLink(!taskPrLink);
+  }, [resolvedDetail]);
 
-    const assigneeId = task.codev_id || task?.codev?.id;
-    if (assigneeId) {
-      supabase
-        .from("codev")
-        .select("id, first_name, last_name, image_url")
-        .eq("id", assigneeId)
-        .single()
-        .then(({ data, error }: { data: any; error: any }) => {
-          setPrimaryAssignee(!error && data ? (data as CodevMember) : null);
-        });
-    } else {
-      setPrimaryAssignee(null);
+  useEffect(() => {
+    if (!activeTaskId) {
+      setFetchedDetail(null);
+      setFetchedForTaskId(null);
+      return;
     }
-  }, [task?.id, supabase]);
 
-  useEffect(() => {
-    if (!supabase || !task?.skill_category_id) return;
+    if (getCachedTaskDetail(activeTaskId)) {
+      setFetchedDetail(null);
+      setFetchedForTaskId(null);
+      return;
+    }
 
-    const fetchSkillCategory = async () => {
-      const { data, error } = await supabase
-        .from("skill_category")
-        .select("id, name")
-        .eq("id", task.skill_category_id)
-        .single();
-      if (!error && data) {
-        setSkillCategory(data as SkillCategory);
+    setFetchedDetail(null);
+    setFetchedForTaskId(null);
+
+    let cancelled = false;
+
+    getTaskDetail(activeTaskId).then((result) => {
+      if (cancelled) return;
+
+      if (result.success && result.data) {
+        setCachedTaskDetail(activeTaskId, result.data);
+        setFetchedForTaskId(activeTaskId);
+        setFetchedDetail(result.data);
+      } else {
+        toast.error(result.error || "Failed to load task");
       }
+    });
+
+    return () => {
+      cancelled = true;
     };
-    fetchSkillCategory();
-  }, [task?.skill_category_id, supabase]);
-
-  useEffect(() => {
-    if (!supabase || !task?.sidekick_ids?.length) return;
-
-    const fetchSidekickDetails = async () => {
-      const { data, error } = await supabase
-        .from("codev")
-        .select("id, first_name, last_name, image_url")
-        .in("id", task.sidekick_ids);
-      if (!error && data) {
-        setSidekickDetails(data as CodevMember[]);
-      }
-    };
-    fetchSidekickDetails();
-  }, [task?.sidekick_ids, supabase]);
-
-  useEffect(() => {
-    if (!supabase || !task?.created_by) return;
-
-    const fetchCreatedBy = async () => {
-      const { data, error } = await supabase
-        .from("codev")
-        .select("id, first_name, last_name, image_url")
-        .eq("id", task.created_by)
-        .single();
-
-      if (!error && data) {
-        setCreatedBy(data as CodevMember);
-      }
-    };
-    fetchCreatedBy();
-  }, [task?.created_by, supabase]);
+  }, [activeTaskId]);
 
   const handleUpdate = async () => {
     if (!task) return;
@@ -537,6 +500,7 @@ const TaskViewModal = ({
       toast.success("PR Link updated successfully");
       setOriginalPrLink(prLink);
       if (task) task.pr_link = prLink;
+      if (task?.id) invalidateTaskDetail(task.id);
       setIsEditingPrLink(false);
     } else {
       toast.error(response.error || "Failed to update PR Link");
@@ -560,7 +524,7 @@ const TaskViewModal = ({
 
     setIsLoading(true);
 
-    removeTaskOptimistic(task.id);
+    removeTask(task.id);
     onClose();
     toast.success("Completing task...");
 
@@ -575,20 +539,20 @@ const TaskViewModal = ({
         }
 
         setTimeout(() => {
-          fetchBoardData();
+          refreshBoard();
         }, 1000);
       } else {
         const errorMessage = result.error || "Failed to complete task";
         console.error("Task completion failed:", errorMessage, result);
         toast.error(errorMessage);
-        await fetchBoardData();
+        refreshBoard();
       }
     } catch (error) {
       console.error("Error completing task:", error);
       const errorMsg =
         error instanceof Error ? error.message : "Failed to complete task";
       toast.error(errorMsg);
-      await fetchBoardData();
+      refreshBoard();
     } finally {
       setIsLoading(false);
     }
@@ -688,7 +652,7 @@ const TaskViewModal = ({
         }
       }
 
-      await fetchBoardData();
+      refreshBoard();
       setManualSaveChanges(false);
       setPendingAssigneeId(undefined);
       setOriginalPrLink(prLink);
@@ -710,6 +674,22 @@ const TaskViewModal = ({
           viewport height on 1366x768 laptops (sm: fires at >=640px, 900px > ~650px usable).
           max-h-[90vh] now applies at all breakpoints, capping the modal within the viewport. */}
       <DialogContent className="h-auto max-h-[90vh] w-[95vw] max-w-3xl overflow-y-auto bg-white p-3 dark:bg-gray-900 sm:w-[90vw] sm:p-4">
+        {detailLoading ? (
+          <>
+            <DialogHeader>
+              <DialogTitle>
+                <VisuallyHidden>
+                  {summaryTask?.title
+                    ? `Loading ${summaryTask.title}`
+                    : "Loading task"}
+                </VisuallyHidden>
+              </DialogTitle>
+            </DialogHeader>
+            <div className="flex min-h-[240px] items-center justify-center">
+              <Loader2Icon className="h-8 w-8 animate-spin text-customBlue-500" />
+            </div>
+          </>
+        ) : (
         <div className="flex flex-col gap-6">
           <div className="h-4 md:h-0"></div>
 
@@ -738,7 +718,7 @@ const TaskViewModal = ({
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-44">
                     <DropdownMenuItem
-                      onClick={() => onOpen("taskEditModal", task)}
+                      onClick={() => task && onOpen("taskEditModal", task)}
                     >
                       Edit
                     </DropdownMenuItem>
@@ -760,7 +740,7 @@ const TaskViewModal = ({
 
                     {user?.role_id !== 4 && (
                       <DropdownMenuItem
-                        onClick={() => onOpen("taskDeleteModal", task)}
+                        onClick={() => task && onOpen("taskDeleteModal", task)}
                         className="text-red-500 focus:text-red-500"
                       >
                         Delete
@@ -1214,6 +1194,7 @@ const TaskViewModal = ({
               )}
             </DialogFooter>
           </div>
+        )}
         </DialogContent>
       </Dialog>
 
