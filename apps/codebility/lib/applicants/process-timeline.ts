@@ -4,7 +4,7 @@
 // All stage states and timestamps are derived from the applicant record
 // (the `codev` row plus its nested `applicant` relation). No hardcoded states.
 
-import { NewApplicantType } from "./types";
+import { NewApplicantType } from "@/types/applicants";
 
 export type StageState = "completed" | "current" | "pending" | "denied";
 

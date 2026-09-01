@@ -3,7 +3,7 @@
 import { ThemeProvider } from "@mui/material";
 import CssBaseline from "@mui/material/CssBaseline";
 
-import theme from "../_lib/theme";
+import theme from "@/lib/dashboard/theme";
 
 export function MuiStyleRoot({
   children,

@@ -11,12 +11,12 @@ import React, { Component, ReactNode, useEffect } from "react";
 import { cn } from "@/utils/utils";
 import { AlertCircle, Check, Circle, Dot, X } from "lucide-react";
 
-import { NewApplicantType } from "../_service/types";
+import { NewApplicantType } from "@/types/applicants";
 import {
   deriveTimeline,
   formatStageDate,
   StageState,
-} from "../_service/processTimeline";
+} from "@/lib/applicants/process-timeline";
 
 const STATE_STYLES: Record<
   StageState,

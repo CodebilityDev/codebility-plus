@@ -1,12 +1,1 @@
-
-export function getTestDate(dateApplied: Date): Date {
-    const testDate = new Date(dateApplied);
-    testDate.setDate(testDate.getDate() + 5);
-    return testDate;
-}
-
-/* export function getCanReApply(dateApplied: Date): boolean {
-    const reapplyDate = getReApplyDate(dateApplied);
-    const now = new Date();
-    return now >= reapplyDate;
-} */
+export * from "@/utils/applicant-waiting";

@@ -21,8 +21,8 @@ import KanbanColumnAddButton from "./kanban_modals/KanbanColumnAddButton";
 import KanbanColumnAddModal from "./kanban_modals/KanbanColumnAddModal";
 import UserTaskFilter from "./UserTaskFilter";
 import KanbanBoardSyncIndicator from "./KanbanBoardSyncIndicator";
-import { useKanbanTaskUrlModal } from "@/hooks/useKanbanTaskUrlModal";
-import { useMemberTaskFilter } from "@/hooks/use-member-task-filter";
+import { useKanbanTaskUrlModal } from "@/hooks/kanban/useKanbanTaskUrlModal";
+import { useMemberTaskFilter } from "@/hooks/kanban/use-member-task-filter";
 
 const KanbanBoardColumnContainer = dynamic(
   () => import("./KanbanBoardColumnContainer"),

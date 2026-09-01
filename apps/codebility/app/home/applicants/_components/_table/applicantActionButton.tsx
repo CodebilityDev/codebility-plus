@@ -40,15 +40,15 @@ import {
   moveApplicantToOnboardingAction,
   moveApplicantToTestingAction,
   passApplicantTestAction,
-} from "../../_service/action";
+} from "../@/actions/applicants/applicant";
 import {
   sendDenyEmail,
   sendFailedTestEmail,
   sendOnboardingReminderWithUpdate,
   sendPassedTestEmail,
   sendTestReminderWithUpdate,
-} from "../../_service/email";
-import { NewApplicantType } from "../../_service/types";
+} from "../@/actions/applicants/email";
+import { NewApplicantType } from "../@/types/applicants";
 
 export default function ApplicantActionButton({
   applicant,

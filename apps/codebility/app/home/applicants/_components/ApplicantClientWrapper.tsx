@@ -4,7 +4,7 @@
 
 import { ReactNode, useState, createContext, useContext } from "react";
 import ApplicantProfileModal from "./ApplicantProfileModal";
-import { NewApplicantType } from "../_service/types";
+import { NewApplicantType } from "@/types/applicants";
 
 interface ModalContextType {
   isModalOpen: boolean;

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { getPosts, PostType } from "../app/home/feeds/_services/query";
+import { getPosts, PostType } from "@/lib/feeds/query";
 
 interface FeedsState {
   posts: PostType[];

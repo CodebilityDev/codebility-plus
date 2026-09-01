@@ -8,12 +8,12 @@ import { Input } from "@codevs/ui/input";
 import { Textarea } from "@codevs/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { getCodev } from "../_service/actions";
+import { getCodev } from "@/actions/applicants/applicants";
 import { z } from "zod";
 import { toast } from "@/components/ui/use-toast";
 import { Codev } from "@/types/home/codev";
 import { useEffect, useState } from "react";
-import { sentHireCodevEmail } from "../_service/emailAction";
+import { sentHireCodevEmail } from "@/actions/applicants/emailAction";
 
 const formSchema = z.object({
 	name: z.string().min(1, { message: "Name is required" }),

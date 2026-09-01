@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useKanbanModal } from "@/hooks/use-modal-kanban";
+import { useKanbanModal } from "@/hooks/kanban/use-modal-kanban";
 import { useModal } from "@/hooks/use-modal";
-import { useKanbanBoardSync } from "@/hooks/use-kanban-board-sync";
+import { useKanbanBoardSync } from "@/hooks/kanban/use-kanban-board-sync";
 import { useUserStore } from "@/store/codev-store";
 import { useKanbanBoardStore } from "@/store/kanban-board/KanbanBoardProvider";
 import { ExtendedTask } from "@/types/home/codev";

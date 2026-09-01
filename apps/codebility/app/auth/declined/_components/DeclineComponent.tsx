@@ -3,8 +3,8 @@
 import { Suspense } from "react";
 import Logo from "@/components/shared/Logo";
 
-import { getUserData } from "../_service/actions";
-import { getCanReApply } from "../_service/util";
+import { getUserData } from "@/actions/applicants/applicants";
+import { getCanReApply } from "@/utils/applicant-waiting";
 import { DeclinedButtons } from "./DeclinedButtons";
 import { DeclinedCountdown } from "./DeclinedCountdown";
 

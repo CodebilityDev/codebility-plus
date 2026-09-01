@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/utils/utils";
 import toast from "react-hot-toast";
-import { reApplyAction } from "../_service/actions";
-import { getCanReApply } from "../_service/util";
+import { reApplyAction } from "@/actions/applicants/applicants";
+import { getCanReApply } from "@/utils/applicant-waiting";
 
 export const DeclinedButtons = ({ userData }: { userData: any }) => {
   const router = useRouter();

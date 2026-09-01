@@ -8,8 +8,8 @@ import toast from "react-hot-toast";
 
 import { Textarea } from "@codevs/ui/textarea";
 
-import { addPost, editPost } from "../_services/action";
-import { PostType } from "../_services/query";
+import { addPost, editPost } from "@/actions/feeds/post";
+import { PostType } from "@/lib/feeds/query";
 import MarkdownEditor from "./MarkdownEditor";
 import TagSelector from "./TagSelector";
 import ThumbnailUpload from "./ThumbnailUpload";

@@ -6,7 +6,7 @@ import { createClientClientComponent } from "@/utils/supabase/client";
 import { Task } from "@/types/home/codev";
 import { IconArchive } from "@/public/assets/svgs";
 
-import { useKanbanModal } from "@/hooks/use-modal-kanban";
+import { useKanbanModal } from "@/hooks/kanban/use-modal-kanban";
 import toast from "react-hot-toast";
 import ArchiveTask from "./ArchiveTask";
 

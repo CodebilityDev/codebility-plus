@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Task } from "@/types/home/codev";
-import { useKanbanBoardSync } from "@/hooks/use-kanban-board-sync";
+import { useKanbanBoardSync } from "@/hooks/kanban/use-kanban-board-sync";
 import { MoreHorizontal, ArrowRight, CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
 

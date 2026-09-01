@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import useUser from "@/app/home/_hooks/use-user";
+import useUser from "@/hooks/home/use-user";
 import Logo from "@/components/shared/Logo";
 import { Button } from "@/components/ui/button";
 import { navLinks } from "@/constants/navigation";

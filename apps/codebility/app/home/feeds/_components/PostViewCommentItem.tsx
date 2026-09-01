@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useFeedsStore } from "@/store/feeds-store";
 import { X } from "lucide-react";
-import { deletePostComment } from "../_services/action";
+import { deletePostComment } from "@/actions/feeds/post";
 
 interface PostViewCommentItemProps {
   postId: string;

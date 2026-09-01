@@ -1,5 +1,5 @@
 "use client";
-import { useKanbanModal } from "@/hooks/use-modal-kanban";
+import { useKanbanModal } from "@/hooks/kanban/use-modal-kanban";
 interface Props {
   listId: string;
   listName: string;

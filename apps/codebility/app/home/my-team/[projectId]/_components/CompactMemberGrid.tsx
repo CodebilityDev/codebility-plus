@@ -5,7 +5,7 @@ import Image from "next/image";
 import { SimpleMemberData } from "@/app/home/projects/actions";
 import DefaultAvatar from "@/components/DefaultAvatar";
 import { Mail, Calendar, Trophy, RefreshCw, AlertCircle } from "lucide-react";
-import { multipleMoveApplicantToOnboardingAction } from "@/app/home/applicants/_service/action";
+import { multipleMoveApplicantToOnboardingAction } from "@/actions/applicants/applicant";
 const ATTENDANCE_POINTS_PER_DAY = 2;
 import { getTeamMonthlyAttendancePoints } from "../actions";
 import MemberDetailModal from "../../_components/MemberDetailModal";

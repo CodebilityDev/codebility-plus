@@ -8,7 +8,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@codevs/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@codevs/ui/tabs";
 
-import { NewApplicantType } from "../_service/types";
+import { NewApplicantType } from "@/types/applicants";
 import { ApplicantDataTable } from "./_table/applicantDataTable";
 import { getApplicantColumns } from "./_table/applicantColumns";
 import ApplicantFilterHeaders from "./applicantHeaders";

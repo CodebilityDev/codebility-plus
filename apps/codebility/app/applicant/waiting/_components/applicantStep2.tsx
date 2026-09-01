@@ -10,8 +10,8 @@ import {
   applicantSubmitTest,
   applicantTakeTest,
   applicantUpdateTestSubmission,
-} from "../_service/action";
-import { ApplicantType } from "../_service/type";
+} from "@/actions/applicants/applicant";
+import { ApplicantType } from "@/types/applicant-waiting";
 import { TestCountdown } from "./testCountDown";
 import TestInstruction from "./testInstruction";
 import TestQAInstruction from "./testQAInstruction";

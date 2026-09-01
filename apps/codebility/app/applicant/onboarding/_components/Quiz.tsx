@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { quizQuestions, QuizQuestion } from "./quizData";
-import { saveQuizProgress } from "../_service/action";
+import { saveQuizProgress } from "@/actions/applicants/applicant";
 
 interface QuizProps {
   applicantId: string;

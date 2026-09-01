@@ -1,9 +1,9 @@
 "use server";
 import { createClientServerComponent } from "@/utils/supabase/server";
 import { deleteImage, getImagePath } from "@/utils/uploadImage";
-import { createPostSchema, editPostSchema } from "./validation";
+import { createPostSchema, editPostSchema } from "@/utils/validations/feeds";
 import { ZodError } from "zod";
-import { UserMention } from "./types";
+import type { UserMention } from "@/types/feeds";
 import { createNotificationAction } from "@/actions/notifications/notification.actions";
 
 

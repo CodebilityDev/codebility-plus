@@ -8,7 +8,7 @@ import toast from "react-hot-toast";
 
 import { Textarea } from "@codevs/ui/textarea";
 
-import { addPost } from "../../feeds/_services/action";
+import { addPost } from "@/actions/feeds/post";
 import { EditSprint } from "../[projectId]/actions";
 import { KanbanSprintData } from "../[projectId]/page";
 

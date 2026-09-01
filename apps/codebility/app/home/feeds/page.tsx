@@ -15,7 +15,7 @@ import {
   hasNotPostedYet,
   hasReachedDailyPostLimit,
   getSocialPoints,
-} from "./_services/action";
+} from "@/actions/feeds/post";
 import toast from "react-hot-toast";
 import {
   PlusCircle,

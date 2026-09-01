@@ -6,7 +6,7 @@ import {
   clientSchema,
   ClientWithStatusFormValues,
   getFormItemLabels,
-} from "@/app/home/clients/_lib/schema";
+} from "@/utils/validations/clients";
 import DefaultAvatar from "@/components/DefaultAvatar";
 import { Button } from "@codevs/ui/button";
 import {

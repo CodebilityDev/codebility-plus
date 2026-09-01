@@ -3,7 +3,7 @@
 
 import React, { useEffect, useState } from "react";
 import { cn } from "@/utils/utils";
-import { getTeamData } from "./actions";
+import { getTeamData } from "@/actions/auth/onboarding-team";
 
 // -------------------------
 // Types

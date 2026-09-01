@@ -1,5 +1,5 @@
-import getNewApplicants from "../_service/query";
-import { NewApplicantType } from "../_service/types";
+import getNewApplicants from "@/lib/applicants/query";
+import { NewApplicantType } from "@/types/applicants";
 import ApplicantLists from "./applicantLists";
 
 export default async function ApplicantDataWrapper() {

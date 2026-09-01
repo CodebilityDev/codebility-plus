@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useMemo } from "react";
-import { getTestDate } from "@/app/applicant/waiting/_service/util";
+import { getTestDate } from "@/utils/applicant-waiting";
 import { Box } from "@/components/shared/dashboard";
 import DefaultPagination from "@/components/ui/pagination";
 import {
@@ -25,7 +25,7 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 
-import { NewApplicantType } from "../../_service/types";
+import { NewApplicantType } from "../@/types/applicants";
 import ApplicantEmailAction from "../applicantEmailAction";
 import ApplicantMobileTable from "./applicantMobileTable";
 import ApplicantRowActionButton from "./applicantRowActionButton";

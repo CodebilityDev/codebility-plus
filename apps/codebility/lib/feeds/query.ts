@@ -1,5 +1,6 @@
 "use server";
 
+import type { PostType } from "@/types/feeds";
 import { createClientServerComponent } from "@/utils/supabase/server";
 
 export const getPosts = async () => {
@@ -47,28 +48,7 @@ export const getPosts = async () => {
   }
 };
 
-export type PostType = {
-  id: string;
-  created_at: string;
-  title: string;
-  content: string;
-  image_url?: string;
-
-  author_id?: {
-    id: string;
-    first_name: string;
-    last_name: string;
-    image_url?: string;
-  };
-
-  upvote_count?: number;
-  comment_count?: number;
-
-  tags: {
-    tag_id: string;
-    name: string | null;
-  }[];
-};
+export type { PostType } from "@/types/feeds";
 
 export const getPostTagsLookup = async () => {
   try {

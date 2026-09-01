@@ -18,8 +18,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useKanbanModal } from "@/hooks/use-modal-kanban";
-import { useKanbanBoardSync } from "@/hooks/use-kanban-board-sync";
+import { useKanbanModal } from "@/hooks/kanban/use-modal-kanban";
+import { useKanbanBoardSync } from "@/hooks/kanban/use-kanban-board-sync";
 import { IconPlus } from "@/public/assets/svgs";
 import { useUserStore } from "@/store/codev-store";
 import { SkillCategory, Task } from "@/types/home/codev";

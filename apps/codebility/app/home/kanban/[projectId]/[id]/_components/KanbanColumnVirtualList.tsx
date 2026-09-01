@@ -5,7 +5,7 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { Loader2 } from "lucide-react";
 
-import { useColumnTasksInfinite } from "@/hooks/use-column-tasks-infinite";
+import { useColumnTasksInfinite } from "@/hooks/kanban/use-column-tasks-infinite";
 import { ExtendedTask } from "@/types/home/codev";
 
 import KanbanTask from "./KanbanTask";

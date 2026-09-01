@@ -10,8 +10,8 @@ import {
   countUpvotes,
   hasUserUpvoted,
   removePostUpvote,
-} from "../_services/action";
-import { PostType } from "../_services/query";
+} from "@/actions/feeds/post";
+import { PostType } from "@/lib/feeds/query";
 
 interface PostUpvoteProps {
   post: PostType;

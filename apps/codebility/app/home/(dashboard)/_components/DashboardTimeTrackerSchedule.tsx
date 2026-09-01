@@ -7,7 +7,7 @@ import { useSchedule } from "@/hooks/use-timeavail";
 import { formatToLocaleTime } from "@/utils/format-date-time";
 import { IconEdit } from "@/public/assets/svgs";
 
-import { formatLocaleTime } from "../_lib/util";
+import { formatLocaleTime } from "@/utils/dashboard/time-format";
 import { updateUserSchedule } from "../actions";
 
 interface Props {

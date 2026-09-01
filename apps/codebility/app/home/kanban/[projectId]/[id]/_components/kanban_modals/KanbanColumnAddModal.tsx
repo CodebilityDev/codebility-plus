@@ -11,8 +11,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useKanbanModal } from "@/hooks/use-modal-kanban";
-import { useKanbanBoardSync } from "@/hooks/use-kanban-board-sync";
+import { useKanbanModal } from "@/hooks/kanban/use-modal-kanban";
+import { useKanbanBoardSync } from "@/hooks/kanban/use-kanban-board-sync";
 import toast from "react-hot-toast";
 
 import { Input } from "@codevs/ui/input";

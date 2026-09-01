@@ -13,10 +13,10 @@ import { format } from "date-fns";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-import type { PostType } from "../_services/query";
+import type { PostType } from "@/lib/feeds/query";
 import { SYSTEM_POST } from "../_constants/system-post";
 import PostUpvote from "../_components/PostUpvote";
-import { getUserRole } from "../_services/action";
+import { getUserRole } from "@/actions/feeds/post";
 import PostCommentCount from "./PostCommentCount";
 import PostTags from "./PostTags";
 import PostViewCommentList from "./PostViewCommentList";

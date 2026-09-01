@@ -38,15 +38,15 @@ import {
   moveApplicantToOnboardingAction,
   moveApplicantToTestingAction,
   passApplicantTestAction,
-} from "../../_service/action";
+} from "../@/actions/applicants/applicant";
 import {
   sendDenyEmail,
   sendFailedTestEmail,
   sendOnboardingReminder,
   sendPassedTestEmail,
   sendTestReminder,
-} from "../../_service/email";
-import { NewApplicantType } from "../../_service/types";
+} from "../@/actions/applicants/email";
+import { NewApplicantType } from "../@/types/applicants";
 import { useApplicantModal } from "../ApplicantClientWrapper";
 
 export default function ApplicantActionButton({

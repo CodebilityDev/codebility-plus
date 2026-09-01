@@ -1,4 +1,4 @@
-import type { PostType } from "../_services/query";
+import type { PostType } from "@/types/feeds";
 
 export const SYSTEM_POST: PostType = {
   id: "00000000-0000-0000-0000-000000000001",

@@ -3,7 +3,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
-import { useKanbanModal } from "@/hooks/use-modal-kanban";
+import { useKanbanModal } from "@/hooks/kanban/use-modal-kanban";
 import { KanbanBoardType, KanbanColumnType, Task } from "@/types/home/codev";
 
 function buildPathWithTaskId(

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useToast } from "@codevs/ui/use-toast";
 import { ActionType } from "./applicantActionTypes";
 import { ACTION_CONFIG } from "./applicantActionConfig";
-import { NewApplicantType } from "../../_service/types";
+import { NewApplicantType } from "../@/types/applicants";
 
 export function useApplicantActions(applicant: NewApplicantType) {
   const { toast } = useToast();
