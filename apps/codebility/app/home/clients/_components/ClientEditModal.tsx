@@ -16,7 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@codevs/ui/dialog";
-import { useModal } from "@/hooks/use-modal-clients";
+import { useModal } from "@/hooks/modals/use-modal-clients";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";

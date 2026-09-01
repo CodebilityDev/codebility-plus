@@ -6,7 +6,7 @@ import { useMemo } from "react";
 
 
 
-import type { SimpleMemberData } from "@/app/home/projects/actions";
+import type { SimpleMemberData } from "@/actions/projects/actions";
 
 import { filterBoardByQuery } from "@/lib/kanban/board-mappers";
 

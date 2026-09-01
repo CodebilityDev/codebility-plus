@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import KanbanBoardsSearch from "@/app/home/kanban/_components/KanbanBoardsSearch";
-import type { SimpleMemberData } from "@/app/home/projects/actions";
+import type { SimpleMemberData } from "@/actions/projects/actions";
 import pathsConfig from "@/types/zod/paths.config";
 import { ArrowRightIcon, IconArchive, IconSearch } from "@/public/assets/svgs";
 import { useUserStore } from "@/store/codev-store";

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Logo from "@/components/shared/Logo";
 import { aboutLinks, siteLinks } from "@/constants/links";
-import { useModal } from "@/hooks/use-modal";
+import { useModal } from "@/hooks/modals/use-modal";
 
 const Footer = () => {
   const { onOpen } = useModal();

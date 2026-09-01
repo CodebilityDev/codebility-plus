@@ -38,14 +38,14 @@ import {
   moveApplicantToOnboardingAction,
   moveApplicantToTestingAction,
   passApplicantTestAction,
-} from "../@/actions/applicants/applicant";
+} from "@/actions/applicants/applicant";
 import {
   sendDenyEmail,
   sendFailedTestEmail,
   sendOnboardingReminder,
   sendPassedTestEmail,
   sendTestReminder,
-} from "../@/actions/applicants/email";
+} from "@/actions/applicants/email";
 import { NewApplicantType } from "../@/types/applicants";
 import { useApplicantModal } from "../ApplicantClientWrapper";
 

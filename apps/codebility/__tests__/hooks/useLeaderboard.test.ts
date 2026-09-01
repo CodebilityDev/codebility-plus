@@ -1,5 +1,5 @@
 import { renderHook, waitFor } from "@testing-library/react";
-import { useLeaderboard } from "@/hooks/useLeaderboard";
+import { useLeaderboard } from "@/hooks/leaderboard/useLeaderboard";
 
 // Mock the API calls
 global.fetch = jest.fn();

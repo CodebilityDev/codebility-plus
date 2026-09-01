@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useModal } from "@/hooks/use-modal";
+import { useModal } from "@/hooks/modals/use-modal";
 import { useSchedule } from "@/hooks/use-timeavail";
 import { formatToLocaleTime } from "@/utils/format-date-time";
 import { IconEdit } from "@/public/assets/svgs";

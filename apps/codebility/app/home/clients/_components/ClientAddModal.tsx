@@ -7,7 +7,7 @@ import {
   clientSchema,
   getFormItemLabels,
 } from "@/utils/validations/clients";
-import { createClientAction } from "@/app/home/clients/action";
+import { createClientAction } from "@/actions/clients/actions";
 import DefaultAvatar from "@/components/DefaultAvatar";
 import { Button } from "@codevs/ui/button";
 import {
@@ -17,7 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@codevs/ui/dialog";
-import { useModal } from "@/hooks/use-modal-clients";
+import { useModal } from "@/hooks/modals/use-modal-clients";
 import { useCountries } from "@/hooks/useCountries"; // Import new hook
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";

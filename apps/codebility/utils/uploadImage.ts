@@ -1,6 +1,6 @@
 "use server";
 
-import { updateCodev } from "@/app/home/settings/profile/action";
+import { updateCodev } from "@/actions/settings/profile";
 import { createClientServerComponent } from "./supabase/server";
 
 

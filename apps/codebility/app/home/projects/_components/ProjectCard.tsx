@@ -3,11 +3,11 @@
 import React, { memo, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { SimpleMemberData } from "@/app/home/projects/actions";
+import { SimpleMemberData } from "@/actions/projects/actions";
 import DefaultAvatar from "@/components/DefaultAvatar";
 import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import SwitchStatusButton from "@/components/ui/SwitchStatusButton";
-import { ModalType } from "@/hooks/use-modal-projects";
+import { ModalType } from "@/hooks/modals/use-modal-projects";
 import { defaultAvatar } from "@/public/assets/images";
 import { IconGithub, IconLink } from "@/public/assets/svgs";
 import { IconFigma } from "@/public/assets/svgs/techstack";

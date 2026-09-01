@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useKanbanModal } from "@/hooks/kanban/use-modal-kanban";
-import { useModal } from "@/hooks/use-modal";
+import { useModal } from "@/hooks/modals/use-modal";
 import { useKanbanBoardSync } from "@/hooks/kanban/use-kanban-board-sync";
 import { useUserStore } from "@/store/codev-store";
 import { useKanbanBoardStore } from "@/store/kanban-board/KanbanBoardProvider";

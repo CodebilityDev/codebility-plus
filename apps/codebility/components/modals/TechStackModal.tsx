@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { techstacks } from "@/constants/techstack";
-import { useModal } from "@/hooks/use-modal";
+import { useModal } from "@/hooks/modals/use-modal";
 import { useTechStackStore } from "@/hooks/use-techstack";
 import { IconClose } from "@/public/assets/svgs";
 

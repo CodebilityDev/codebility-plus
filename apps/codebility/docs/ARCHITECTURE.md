@@ -80,6 +80,42 @@ store/providers/               # ThemeProvider, ToasterProvider (from context/)
 types/zod/                     # app.config, paths.config (from config/)
 ```
 
+## Migrated features (Phase 3)
+
+```
+actions/dashboard/actions.ts
+actions/account-settings/actions.ts
+actions/admin/                   # appointments, client-tracker, ticket-support
+actions/clients/actions.ts
+actions/hire/actions.ts
+actions/in-house/actions.ts
+actions/overflow/actions.ts
+actions/projects/actions.ts
+actions/promote-modal/actions.ts
+actions/settings/                # news-banners, profile, services, surveys, survey-questions, survey-responses
+actions/test-notifications/actions.ts
+actions/ticket-support/actions.ts
+actions/my-team/                 # actions, project, leaderboard, attendance-sync, attendance-warnings
+actions/marketing/               # profiles, profiles-email
+actions/kanban/ticket.ts
+
+lib/marketing/profile-detail-query.ts
+lib/marketing/hire-codev-template.ts
+lib/kanban/board-page-query.ts
+lib/my-team/attendance-service.ts
+lib/my-team/attendance-service-client.ts
+
+types/marketing/hire-codev-email.ts
+
+components/marketing/CodevsRoadmapCard.tsx
+
+hooks/modals/                    # use-modal, use-modal-* feature modals
+hooks/navigation/                # use-sidebar, useChangeBgNavigation, useHideSidebarOnResize
+hooks/leaderboard/useLeaderboard.ts
+```
+
+Legacy re-exports under `app/home/**/actions.ts` and route `_service` shims remain for compatibility. Unused duplicate `CodevsNavbar` copies were removed (layout uses `MarketingNavigation`).
+
 ## Still to migrate
 
-Route-level `actions.ts` under `app/home/*` (projects, hire, overflow, settings, etc.), marketing profile `_service`, kanban `[id]/_services/query.ts`, and deduping shared marketing components (CodevsRoadmap, CodevsNavbar).
+Flat hooks at `hooks/` root (useToast, use-pagination, etc.), applicant onboarding `_service` shims, interns `_lib/codevpriority.ts` duplicate.

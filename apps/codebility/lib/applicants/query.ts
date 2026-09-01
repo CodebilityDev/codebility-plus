@@ -1,6 +1,6 @@
 
 import { createClientServerComponent } from "@/utils/supabase/server";
-import { newApplicantsSchema, NewApplicantType } from "./types";
+import { newApplicantsSchema, NewApplicantType } from "@/types/applicants";
 
 export default async function getNewApplicants(): Promise<NewApplicantType[]> {
     try {

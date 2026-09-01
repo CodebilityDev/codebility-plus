@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Box from "@/components/shared/dashboard/Box";
 import { Paragraph } from "@/components/shared/home";
-import { useModal } from "@/hooks/use-modal";
+import { useModal } from "@/hooks/modals/use-modal";
 import { defaultAvatar } from "@/public/assets/images";
 import { deleteImage, getImagePath, uploadImage } from "@/utils/uploadImage";
 import toast from "react-hot-toast";

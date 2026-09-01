@@ -13,8 +13,8 @@ import {
   DialogFooter,
   DialogHeader,
 } from "@/components/ui/dialog";
-import { useModal as useModalTechkStack } from "@/hooks/use-modal";
-import { useModal } from "@/hooks/use-modal-applicants";
+import { useModal as useModalTechkStack } from "@/hooks/modals/use-modal";
+import { useModal } from "@/hooks/modals/use-modal-applicants";
 import { useTechStackStore } from "@/hooks/use-techstack";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DialogTitle } from "@radix-ui/react-dialog";

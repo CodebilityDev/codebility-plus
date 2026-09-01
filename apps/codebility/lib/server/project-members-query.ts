@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-import type { SimpleMemberData } from "@/app/home/projects/actions";
+import type { SimpleMemberData } from "@/actions/projects/actions";
 
 export async function fetchProjectMembers(
   supabase: SupabaseClient,

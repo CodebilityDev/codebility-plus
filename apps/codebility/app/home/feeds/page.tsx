@@ -9,7 +9,7 @@ import { AnimatePresence, motion } from "framer-motion";
 
 import Feed from "./_components/Feed";
 import SortMenu from "./_components/SortMenu";
-import { SEARCH_DEBOUNCE_MS } from "./_constants";
+import { SEARCH_DEBOUNCE_MS } from "@/constants/feeds";
 import {
   getUserRole,
   hasNotPostedYet,

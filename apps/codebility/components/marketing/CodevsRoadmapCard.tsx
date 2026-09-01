@@ -10,7 +10,7 @@ interface RoadmapCardProps {
   steps: Step[];
 }
 
-const RoadmapCard: React.FC<RoadmapCardProps> = ({
+const CodevsRoadmapCard: React.FC<RoadmapCardProps> = ({
   id,
   phase,
   title,
@@ -32,4 +32,4 @@ const RoadmapCard: React.FC<RoadmapCardProps> = ({
   );
 };
 
-export default RoadmapCard;
+export default CodevsRoadmapCard;

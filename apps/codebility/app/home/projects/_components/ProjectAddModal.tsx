@@ -7,7 +7,7 @@ import {
   getProjectCategories,
   getProjectClients,
   getProjectCodevs,
-} from "@/app/home/projects/actions";
+} from "@/actions/projects/actions";
 import ProjectAvatar from "@/components/ProjectAvatar";
 import { CustomSelect } from "@/components/ui/CustomSelect";
 import {
@@ -19,8 +19,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { MemberSelection } from "@/components/ui/MemberSelection";
-import { useModal as useGlobalModal } from "@/hooks/use-modal";
-import { useModal } from "@/hooks/use-modal-projects";
+import { useModal as useGlobalModal } from "@/hooks/modals/use-modal";
+import { useModal } from "@/hooks/modals/use-modal-projects";
 import { useTechStackStore } from "@/hooks/use-techstack";
 import { Client, Codev, SkillCategory } from "@/types/home/codev";
 import { uploadImage } from "@/utils/uploadImage";

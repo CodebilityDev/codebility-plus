@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { useTheme } from "next-themes";
-import { useNavStore } from "@/hooks/use-sidebar";
+import { useNavStore } from "@/hooks/navigation/use-sidebar";
 import { defaultAvatar } from "@/public/assets/images";
 import { getValidImageUrl } from "@/utils/imageValidation";
 import { cn } from "@/utils/utils";

@@ -40,14 +40,14 @@ import {
   moveApplicantToOnboardingAction,
   moveApplicantToTestingAction,
   passApplicantTestAction,
-} from "../@/actions/applicants/applicant";
+} from "@/actions/applicants/applicant";
 import {
   sendDenyEmail,
   sendFailedTestEmail,
   sendOnboardingReminderWithUpdate,
   sendPassedTestEmail,
   sendTestReminderWithUpdate,
-} from "../@/actions/applicants/email";
+} from "@/actions/applicants/email";
 import { NewApplicantType } from "../@/types/applicants";
 
 export default function ApplicantActionButton({

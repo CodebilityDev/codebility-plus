@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Codev } from "@/types/home/codev";
 import toast from "react-hot-toast";
 
-import { updateCodev } from "@/app/home/in-house/actions";
+import { updateCodev } from "@/actions/in-house/actions";
 
 export function useCodevForm(initialData: Codev) {
   const [data, setData] = useState<Codev>(initialData);

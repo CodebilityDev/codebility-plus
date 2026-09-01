@@ -17,7 +17,7 @@ import { Textarea } from "@codevs/ui/textarea";
 import { Toaster } from "@/components/ui/toaster";
 
 import { signupUser } from "@/actions/auth";
-import { useModal } from "@/hooks/use-modal";
+import { useModal } from "@/hooks/modals/use-modal";
 import { useTechStackStore } from "@/hooks/use-techstack";
 
 // Import modals

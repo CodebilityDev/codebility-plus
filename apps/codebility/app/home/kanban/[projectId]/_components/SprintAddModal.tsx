@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useModal } from "@/hooks/use-modal-sprints";
+import { useModal } from "@/hooks/modals/use-modal-sprints";
 import { objectToFormData } from "@/utils/form-data";
 import { useSprintStore } from "@/store/sprints-store";
 import { zodResolver } from "@hookform/resolvers/zod";

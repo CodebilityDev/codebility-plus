@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { SimpleMemberData } from "@/app/home/projects/actions";
+import { SimpleMemberData } from "@/actions/projects/actions";
 import DefaultAvatar from "@/components/DefaultAvatar";
 import { Mail, Calendar, Trophy, RefreshCw, AlertCircle } from "lucide-react";
 import { multipleMoveApplicantToOnboardingAction } from "@/actions/applicants/applicant";

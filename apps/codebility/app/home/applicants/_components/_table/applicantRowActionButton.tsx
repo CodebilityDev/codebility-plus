@@ -31,13 +31,13 @@ import {
   multipleMoveApplicantToOnboardingAction,
   multipleMoveApplicantToTestingAction,
   multiplePassApplicantTestAction,
-} from "../@/actions/applicants/applicant";
+} from "@/actions/applicants/applicant";
 import {
   sendMultipleDenyEmail,
   sendMultipleOnboardingReminderWithUpdate,
   sendMultiplePassedTestEmail,
   sendMultipleTestReminderEmailWithUpdate,
-} from "../@/actions/applicants/email";
+} from "@/actions/applicants/email";
 import { NewApplicantType } from "../@/types/applicants";
 
 export default function ApplicantRowActionButton({

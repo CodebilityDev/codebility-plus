@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@codevs/ui/select";
-import { SimpleMemberData } from "@/app/home/projects/actions";
+import { SimpleMemberData } from "@/actions/projects/actions";
 import { toast } from "react-hot-toast";
 
 type AttendanceStatus = "present" | "absent" | "late" | "break" | "off";

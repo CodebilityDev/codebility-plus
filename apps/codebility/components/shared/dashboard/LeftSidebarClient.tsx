@@ -4,7 +4,7 @@ import { memo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useNavStore } from "@/hooks/use-sidebar";
+import { useNavStore } from "@/hooks/navigation/use-sidebar";
 import { cn } from "@/utils/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import type { Sidebar, SidebarLink } from "@/constants/sidebar";

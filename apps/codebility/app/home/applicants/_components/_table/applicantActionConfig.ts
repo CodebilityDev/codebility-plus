@@ -7,7 +7,7 @@ import {
   moveApplicantToOnboardingAction,
   moveApplicantToTestingAction,
   passApplicantTestAction,
-} from "../@/actions/applicants/applicant";
+} from "@/actions/applicants/applicant";
 import {
   sendAcceptedEmailForConfig,
   sendDenyEmailForConfig,
@@ -15,7 +15,7 @@ import {
   sendOnboardingReminderForConfig,
   sendPassedTestEmailForConfig,
   sendTestReminderForConfig,
-} from "../@/actions/applicants/email";
+} from "@/actions/applicants/email";
 
 export const ACTION_CONFIG: Record<ActionType, ActionConfig> = {
   applying: {

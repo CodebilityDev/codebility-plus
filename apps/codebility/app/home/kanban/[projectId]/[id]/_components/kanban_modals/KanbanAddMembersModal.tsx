@@ -10,7 +10,7 @@ import {
   getTeamLead,
   SimpleMemberData,
   updateProjectMembers,
-} from "@/app/home/projects/actions";
+} from "@/actions/projects/actions";
 import DefaultAvatar from "@/components/DefaultAvatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/dialog";
 import { MemberSelection } from "@/components/ui/MemberSelection";
 import { Skeleton } from "@/components/ui/skeleton/skeleton";
-import { useModal } from "@/hooks/use-modal-projects";
+import { useModal } from "@/hooks/modals/use-modal-projects";
 import { Codev } from "@/types/home/codev";
 import toast from "react-hot-toast";
 

@@ -1,7 +1,7 @@
 "use client";
 
 import AddNewButton from "@/components/ui/AddNewButton";
-import { useModal } from "@/hooks/use-modal-clients";
+import { useModal } from "@/hooks/modals/use-modal-clients";
 import { useUserStore } from "@/store/codev-store";
 
 export default function ClientButtons() {

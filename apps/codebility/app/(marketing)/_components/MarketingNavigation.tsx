@@ -2,7 +2,7 @@
 
 import { Suspense, useState } from "react";
 
-import useChangeBgNavigation from "@/hooks/useChangeBgNavigation";
+import useChangeBgNavigation from "@/hooks/navigation/useChangeBgNavigation";
 import Logo from "@/components/shared/home/Logo";
 import { CareersSignIn, MobileDrawer } from "./MarkitingNavigationSubComponents";
 import dynamic from "next/dynamic";

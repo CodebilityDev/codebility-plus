@@ -4,7 +4,7 @@ import React, { useState, memo } from "react";
 import { Box } from "@/components/shared/dashboard";
 import { Trophy, Users, Star } from "lucide-react";
 import { LeaderboardType, TimePeriod } from "@/types/leaderboard";
-import { useLeaderboard } from "@/hooks/useLeaderboard";
+import { useLeaderboard } from "@/hooks/leaderboard/useLeaderboard";
 import LeaderboardFilters from "./LeaderboardFilters";
 import LeaderboardTable from "./LeaderboardTable";
 import LeaderboardError from "./LeaderboardError";

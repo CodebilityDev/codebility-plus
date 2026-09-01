@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useModal } from "@/hooks/use-modal";
+import { useModal } from "@/hooks/modals/use-modal";
 import { Button } from "@codevs/ui/button";
 import { MessageSquare, ChevronDown, ChevronUp } from "lucide-react";
 import {

@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavStore } from "@/hooks/use-sidebar";
+import { useNavStore } from "@/hooks/navigation/use-sidebar";
 import PageLoadingAnimation from "./PageLoadingAnimation";
 
 // Hook to detect if we're on desktop

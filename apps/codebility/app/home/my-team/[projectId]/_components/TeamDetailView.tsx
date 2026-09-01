@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   getMembers,
   SimpleMemberData,
-} from "@/app/home/projects/actions";
+} from "@/actions/projects/actions";
 import { Button } from "@/components/ui/button";
 import { Codev } from "@/types/home/codev";
 import {

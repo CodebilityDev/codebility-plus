@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, forwardRef, useImperativeHandle } from "react";
 import { ChevronLeft, ChevronRight, Circle, Save, Trophy, AlertTriangle, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SimpleMemberData } from "@/app/home/projects/actions";
+import { SimpleMemberData } from "@/actions/projects/actions";
 import {
   Select,
   SelectContent,

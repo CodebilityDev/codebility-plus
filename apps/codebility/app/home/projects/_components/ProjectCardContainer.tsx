@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import DefaultPagination from "@/components/ui/pagination";
 import { CATEGORIES, pageSize } from "@/constants";
-import { useModal } from "@/hooks/use-modal-projects";
+import { useModal } from "@/hooks/modals/use-modal-projects";
 import usePagination from "@/hooks/use-pagination";
 import { Project } from "@/types/home/codev";
 
