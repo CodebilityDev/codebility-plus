@@ -42,7 +42,7 @@ import {
   completeTask,
   fetchAvailableMembers,
   updateTaskPRLink,
-} from "../../actions";
+} from "@/actions/kanban";
 import DifficultyPointsTooltip, {
   DIFFICULTY_LEVELS,
 } from "../DifficultyPointsTooltip";

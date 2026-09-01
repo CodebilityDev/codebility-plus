@@ -10,11 +10,11 @@ import { toast } from "sonner";
 import { Button } from "@codevs/ui/button";
 
 import PageContainer from "../../../../_components/PageContainer";
-import { getSurveyQuestions } from "../../questions/actions";
+import { getSurveyQuestions } from "@/actions/settings/survey-questions";
 import {
   getSurveyResponses,
   getSurveyStatistics,
-} from "../../responses/actions";
+} from "@/actions/settings/survey-responses";
 
 interface Question {
   id: string;

@@ -24,7 +24,7 @@ import {
   getSurveyQuestions,
   reorderQuestions,
   updateQuestion,
-} from "../questions/actions";
+} from "@/actions/settings/survey-questions";
 import QuestionForm from "./_components/QuestionForm";
 import ShareSurveyModal from "../_components/ShareSurveyModal";
 

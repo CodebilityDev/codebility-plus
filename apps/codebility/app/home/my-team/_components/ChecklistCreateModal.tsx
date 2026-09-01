@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { SimpleMemberData } from "@/actions/projects/actions";
-import { createChecklistItem } from "../actions";
+import { createChecklistItem } from "@/actions/my-team/actions";
 import toast from "react-hot-toast";
 import Image from "next/image";
 import DefaultAvatar from "@/components/DefaultAvatar";

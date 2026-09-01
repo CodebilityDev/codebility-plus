@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 import { Textarea } from "@codevs/ui/textarea";
 
 import { addPost } from "@/actions/feeds/post";
-import { EditSprint } from "../[projectId]/actions";
+import { EditSprint } from "@/actions/kanban/sprints";
 import { KanbanSprintData } from "../[projectId]/page";
 
 const EditSprintForm = ({

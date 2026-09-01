@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { OnboardingProgressType } from "@/types/applicant-waiting";
+import { OnboardingProgressType } from "@/types/applicant-onboarding";
 
 interface OnboardingStepperProps {
   progress: OnboardingProgressType;

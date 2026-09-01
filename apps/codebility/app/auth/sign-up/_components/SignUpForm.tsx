@@ -14,7 +14,7 @@ import { z } from "zod";
 
 import { Checkbox } from "@codevs/ui/checkbox";
 
-import { signupUser } from "../../actions";
+import { signupUser } from "@/actions/auth";
 import { FORM_STEPS } from "./form-steps";
 import { ImageUpload } from "./ImageUpload";
 import SignUpInputs from "./SignUpInput";

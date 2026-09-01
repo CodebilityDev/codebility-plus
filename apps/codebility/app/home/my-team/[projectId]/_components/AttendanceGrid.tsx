@@ -12,8 +12,8 @@ import {
   SelectValue,
 } from "@codevs/ui/select";
 import { toast } from "react-hot-toast";
-import { saveAttendance, getMonthlyAttendance, bulkSaveAttendance } from "../actions";
-import { checkAttendanceWarnings } from "../actions/attendance-warnings";
+import { saveAttendance, getMonthlyAttendance, bulkSaveAttendance } from "@/actions/my-team/project";
+import { checkAttendanceWarnings } from "@/actions/my-team/attendance-warnings";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@codevs/ui/tooltip";
 
 const ATTENDANCE_POINTS_PER_DAY = 2;

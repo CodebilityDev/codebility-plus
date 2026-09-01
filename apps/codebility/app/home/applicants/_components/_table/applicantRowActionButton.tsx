@@ -38,7 +38,7 @@ import {
   sendMultiplePassedTestEmail,
   sendMultipleTestReminderEmailWithUpdate,
 } from "@/actions/applicants/email";
-import { NewApplicantType } from "../@/types/applicants";
+import { NewApplicantType } from "@/types/applicants";
 
 export default function ApplicantRowActionButton({
   applicants,

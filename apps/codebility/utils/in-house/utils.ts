@@ -1,5 +1,5 @@
 import { Codev } from "@/types/home/codev";
-import { MemberStats } from "../_types/in-house";
+import { MemberStats } from "@/app/home/in-house/_types/in-house";
 
 export const statusColors: Record<string, string> = {
   Available: "text-codeGreen",

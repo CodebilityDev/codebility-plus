@@ -13,7 +13,7 @@ import { Task } from "@/types/home/codev";
 import toast from "react-hot-toast";
 
 import { formatTime } from "@/utils/dashboard/time-format";
-import { startUserTimer, updateUserTaskOnHand } from "../actions";
+import { startUserTimer, updateUserTaskOnHand } from "@/actions/dashboard/actions";
 
 interface Props {
   tasks: Task[];

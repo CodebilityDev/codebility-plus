@@ -12,7 +12,7 @@ import toast from "react-hot-toast";
 
 import { Button } from "@codevs/ui/button";
 
-import { updateCodev } from "../action";
+import { updateCodev } from "@/actions/settings/profile";
 import UploadPhotoModal from "./UploadPhotoModal";
 
 type PhotoProps = {

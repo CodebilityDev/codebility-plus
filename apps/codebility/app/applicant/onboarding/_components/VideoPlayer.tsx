@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { updateVideoProgress } from "@/actions/applicants/applicant";
+import { updateVideoProgress } from "@/actions/applicant-onboarding/actions";
 
 interface VideoPlayerProps {
   videoNumber: number;

@@ -8,8 +8,8 @@ import OnboardingStepper from "./OnboardingStepper";
 import VideoPlayer from "./VideoPlayer";
 import Quiz from "./Quiz";
 import Commitment from "./Commitment";
-import { getOnboardingProgress, completeOnboarding, saveQuizAndCommitment } from "@/actions/applicants/applicant";
-import { OnboardingProgressType } from "@/types/applicant-waiting";
+import { getOnboardingProgress, completeOnboarding, saveQuizAndCommitment } from "@/actions/applicant-onboarding/actions";
+import { OnboardingProgressType } from "@/types/applicant-onboarding";
 
 interface OnboardingClientProps {
   user: any;

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { AlertTriangle, X } from "lucide-react";
 import { Button } from "@codevs/ui/button";
-import { getAttendanceWarningStatus } from "../actions/attendance-warnings";
+import { getAttendanceWarningStatus } from "@/actions/my-team/attendance-warnings";
 
 interface AttendanceWarningBannerProps {
   projectId: string;

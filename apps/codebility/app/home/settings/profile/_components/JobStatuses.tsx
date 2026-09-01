@@ -19,7 +19,7 @@ import toast from "react-hot-toast";
 
 import { Input } from "@codevs/ui/input";
 
-import { createJobStatus, deleteJobStatus, updateJobStatus } from "../action";
+import { createJobStatus, deleteJobStatus, updateJobStatus } from "@/actions/settings/profile";
 
 interface JobStatusProps {
   data: JobStatus[];

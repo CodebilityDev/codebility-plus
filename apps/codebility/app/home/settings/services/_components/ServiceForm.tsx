@@ -86,7 +86,7 @@ export default function ServiceForm({ service, onSuccess }: ServiceFormProps) {
     setLoading(true);
     
     try {
-      const { createService, updateService } = await import("../actions");
+      const { createService, updateService } = await import("@/actions/settings/services");
       
       if (service) {
         const result = await updateService(service.id, data);

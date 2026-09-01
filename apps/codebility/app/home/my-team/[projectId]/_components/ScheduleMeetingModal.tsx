@@ -24,7 +24,7 @@ import { toast } from "react-hot-toast";
 import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
 
-import { saveMeetingSchedule } from "../actions";
+import { saveMeetingSchedule } from "@/actions/my-team/project";
 
 interface ScheduleMeetingModalProps {
   isOpen: boolean;

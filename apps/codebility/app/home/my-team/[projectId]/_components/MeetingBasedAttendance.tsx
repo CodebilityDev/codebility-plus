@@ -12,9 +12,9 @@ import {
   SelectValue,
 } from "@codevs/ui/select";
 import { toast } from "react-hot-toast";
-import { saveAttendance, getMonthlyAttendance, bulkSaveAttendance } from "../actions";
+import { saveAttendance, getMonthlyAttendance, bulkSaveAttendance } from "@/actions/my-team/project";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@codevs/ui/tooltip";
-import { checkAttendanceWarnings } from "../actions/attendance-warnings";
+import { checkAttendanceWarnings } from "@/actions/my-team/attendance-warnings";
 
 const ATTENDANCE_POINTS_PER_MEETING = 2;
 

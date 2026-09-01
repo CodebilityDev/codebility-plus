@@ -7,7 +7,7 @@ import { H1 } from "@/components/shared/dashboard";
 import PageContainer from "../../_components/PageContainer";
 import { toast } from "sonner";
 import Image from "next/image";
-import { getRealProjects, RealProject, getCodevProfiles } from "./actions";
+import { getRealProjects, RealProject, getCodevProfiles } from "@/actions/settings/services";
 import { techstacks } from '@/constants/techstack';
 
 interface Service {

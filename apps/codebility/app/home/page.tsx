@@ -3,7 +3,7 @@ import H1 from "@/components/shared/dashboard/H1";
 import PageContainer from "./_components/PageContainer";
 import DashboardClient from "./_components/DashboardClient";
 import NewsBanner from "./_components/NewsBanner";
-import { fetchActiveModal } from "./promote-modal/actions";
+import { fetchActiveModal } from "@/actions/promote-modal/actions";
 import FeaturePromoModal from "./promote-modal/_components/FeaturePromoModal";
 
 // Loading component for better UX

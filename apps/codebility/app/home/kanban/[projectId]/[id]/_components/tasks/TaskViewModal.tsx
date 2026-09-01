@@ -55,7 +55,7 @@ import {
 import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
 
-import { completeTask, getTaskDetail, updateTaskPRLink } from "../../actions";
+import { completeTask, getTaskDetail, updateTaskPRLink } from "@/actions/kanban";
 import DifficultyPointsTooltip, {
   DIFFICULTY_LEVELS,
 } from "../DifficultyPointsTooltip";

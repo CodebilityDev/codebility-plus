@@ -8,8 +8,8 @@ import {
   getPendingSurveyForUser,
   getDismissedSurveys,
   undismissSurvey,
-} from "../settings/surveys/actions";
-import { getSurveyQuestions } from "../settings/surveys/questions/actions";
+} from "@/actions/settings/surveys";
+import { getSurveyQuestions } from "@/actions/settings/survey-questions";
 
 interface Survey {
   id: string;

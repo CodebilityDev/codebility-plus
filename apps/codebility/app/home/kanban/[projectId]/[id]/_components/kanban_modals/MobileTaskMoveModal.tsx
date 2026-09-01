@@ -15,7 +15,7 @@ import {
 } from "@codevs/ui/dropdown-menu";
 import { Button } from "@codevs/ui/button";
 
-import { updateTaskColumnId } from "../../actions";
+import { updateTaskColumnId } from "@/actions/kanban";
 
 interface Props {
   task: Task;

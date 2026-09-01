@@ -10,7 +10,7 @@ import { ArrowUpDown } from "lucide-react";
 
 import { Checkbox } from "@codevs/ui/checkbox";
 
-import { NewApplicantType } from "../@/types/applicants";
+import { NewApplicantType } from "@/types/applicants";
 import ApplicantReapplyTime from "../applicantReapplyTime";
 import ApplicantTechStack from "../applicantTechStack";
 import ApplicantTestTimeRemaining from "../applicantTestTimeRemaining";

@@ -25,7 +25,7 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 
-import { NewApplicantType } from "../@/types/applicants";
+import { NewApplicantType } from "@/types/applicants";
 import ApplicantEmailAction from "../applicantEmailAction";
 import ApplicantMobileTable from "./applicantMobileTable";
 import ApplicantRowActionButton from "./applicantRowActionButton";

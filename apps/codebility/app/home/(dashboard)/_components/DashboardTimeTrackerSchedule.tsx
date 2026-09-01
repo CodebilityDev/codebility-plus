@@ -8,7 +8,7 @@ import { formatToLocaleTime } from "@/utils/format-date-time";
 import { IconEdit } from "@/public/assets/svgs";
 
 import { formatLocaleTime } from "@/utils/dashboard/time-format";
-import { updateUserSchedule } from "../actions";
+import { updateUserSchedule } from "@/actions/dashboard/actions";
 
 interface Props {
   startTime: number;

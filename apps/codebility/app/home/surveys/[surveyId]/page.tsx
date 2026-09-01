@@ -11,8 +11,8 @@ import { Checkbox } from "@codevs/ui/checkbox";
 import PageContainer from "../../_components/PageContainer";
 import { createClientClientComponent } from "@/utils/supabase/client";
 import { toast } from "sonner";
-import { getSurveyQuestions } from "../../settings/surveys/questions/actions";
-import { submitSurveyResponse, hasUserResponded } from "../../settings/surveys/responses/actions";
+import { getSurveyQuestions } from "@/actions/settings/survey-questions";
+import { submitSurveyResponse, hasUserResponded } from "@/actions/settings/survey-responses";
 
 interface Question {
   id: string;

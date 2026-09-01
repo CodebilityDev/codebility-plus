@@ -11,7 +11,7 @@ import toast from "react-hot-toast";
 import { Label } from "@codevs/ui/label";
 import { Textarea } from "@codevs/ui/textarea";
 
-import { updateCodev } from "../action";
+import { updateCodev } from "@/actions/settings/profile";
 
 type AboutProps = {
   data: Codev;

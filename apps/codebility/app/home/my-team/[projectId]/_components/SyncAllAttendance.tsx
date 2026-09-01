@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 import { toast } from "react-hot-toast";
-import { syncAllTeamAttendancePoints } from "../actions/attendance-sync";
+import { syncAllTeamAttendancePoints } from "@/actions/my-team/attendance-sync";
 
 interface SyncAllAttendanceProps {
   projectId: string;

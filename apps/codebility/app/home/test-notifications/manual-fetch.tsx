@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@codevs/ui/button";
 import { Card } from "@codevs/ui/card";
-import { fetchNotifications } from "./actions";
+import { fetchNotifications } from "@/actions/test-notifications/actions";
 
 export function ManualFetchTest() {
   const [notifications, setNotifications] = useState<any[]>([]);

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { getRealProjects, RealProject, getCodevProfiles } from "../home/settings/services/actions";
+import { getRealProjects, RealProject, getCodevProfiles } from "@/actions/settings/services";
 import { techstacks } from '@/constants/techstack';
 
 interface Service {

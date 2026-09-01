@@ -9,7 +9,7 @@ import { useTechStackStore } from "@/hooks/data/use-techstack";
 import { IconEdit } from "@/public/assets/svgs";
 import toast from "react-hot-toast";
 
-import { updateCodev } from "../action";
+import { updateCodev } from "@/actions/settings/profile";
 
 type SkillsProps = {
   data: {

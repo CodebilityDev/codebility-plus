@@ -14,7 +14,7 @@ import { Task } from "@/types/home/codev";
 import { Loader2Icon } from "lucide-react";
 import toast from "react-hot-toast";
 
-import { deleteTask } from "../../actions";
+import { deleteTask } from "@/actions/kanban";
 
 const TaskDeleteModal = () => {
   const { isOpen, onClose, type, data } = useKanbanModal();

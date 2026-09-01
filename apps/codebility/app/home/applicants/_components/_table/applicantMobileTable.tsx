@@ -13,7 +13,7 @@ import {
 import { cn } from "@/utils/utils";
 import { flexRender, Table as ReactTable } from "@tanstack/react-table";
 
-import { NewApplicantType } from "../@/types/applicants";
+import { NewApplicantType } from "@/types/applicants";
 
 interface ApplicantMobileTableProps<TData extends NewApplicantType> {
   table: ReactTable<TData>;

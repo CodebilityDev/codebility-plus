@@ -10,7 +10,7 @@ import {
   applicantSubmitTest,
   applicantTakeTest,
   applicantUpdateTestSubmission,
-} from "@/actions/applicants/applicant";
+} from "@/actions/applicant-waiting/actions";
 import { ApplicantType } from "@/types/applicant-waiting";
 import { TestCountdown } from "./testCountDown";
 import TestInstruction from "./testInstruction";

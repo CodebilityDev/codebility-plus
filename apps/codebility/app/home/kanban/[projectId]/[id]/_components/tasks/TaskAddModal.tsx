@@ -47,7 +47,7 @@ import {
   getUserDrafts,
   loadDraft,
   deleteDraft,
-} from "../../actions";
+} from "@/actions/kanban";
 import DifficultyPointsTooltip, {
   DIFFICULTY_LEVELS,
   DIFFICULTY_POINTS,

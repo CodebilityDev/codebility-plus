@@ -17,7 +17,7 @@ import { Badge } from "@codevs/ui/badge";
 import {
   fetchUserAvailabilityStatus,
   updateUserAvailabilityStatus,
-} from "../actions";
+} from "@/actions/dashboard/actions";
 import DashboardCertificate from "./DashboardCertificate";
 
 export default function DashboardProfile() {

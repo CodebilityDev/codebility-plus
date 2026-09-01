@@ -23,7 +23,7 @@ import {
   HoverCardTrigger,
 } from "@codevs/ui/hover-card";
 
-import { NewApplicantType } from "../@/types/applicants";
+import { NewApplicantType } from "@/types/applicants";
 import ApplicantReapplyTime from "../applicantReapplyTime";
 import ApplicantTestTimeRemaining from "../applicantTestTimeRemaining";
 import ApplicantActionButton from "./applicantActionButton";

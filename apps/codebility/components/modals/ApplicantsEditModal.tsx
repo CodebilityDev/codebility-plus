@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 /* import {
   ApplicantsFormValues,
   applicantsSchema,
-} from "@/app/home/applicants/_lib/applicants-schema";
+} from "@/utils/validations/applicants";
 import { updateAction } from "@/app/home/applicants/action"; */
 import { Button } from "@/components/ui/button";
 import {

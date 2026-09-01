@@ -22,7 +22,7 @@ import { z } from "zod";
 import { Form, FormControl, FormField, FormMessage } from "@codevs/ui/form";
 import { Input } from "@codevs/ui/input";
 
-import { createNewSprint } from "../actions";
+import { createNewSprint } from "@/actions/kanban/sprints";
 
 const formSchema = z
   .object({

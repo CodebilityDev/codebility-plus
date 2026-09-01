@@ -29,7 +29,7 @@ import {
 } from "@codevs/ui/dropdown-menu";
 import { Input } from "@codevs/ui/input";
 
-import { deleteColumn, updateColumnName } from "../actions";
+import { deleteColumn, updateColumnName } from "@/actions/kanban";
 import KanbanTaskAddModal from "./kanban_modals/KanbanTaskAddModal";
 import KanbanColumnVirtualList from "./KanbanColumnVirtualList";
 

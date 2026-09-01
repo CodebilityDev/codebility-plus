@@ -37,7 +37,7 @@ import {
   SelectValue,
 } from "@codevs/ui/select";
 
-import { updateClientAction } from "../action";
+import { updateClientAction } from "@/actions/clients/actions";
 import { useCountries } from "@/hooks/data/useCountries"; // New centralized hook
 
 export default function ClientEditModal() {

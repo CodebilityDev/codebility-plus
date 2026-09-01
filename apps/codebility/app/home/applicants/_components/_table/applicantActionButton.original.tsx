@@ -46,7 +46,7 @@ import {
   sendPassedTestEmail,
   sendTestReminder,
 } from "@/actions/applicants/email";
-import { NewApplicantType } from "../@/types/applicants";
+import { NewApplicantType } from "@/types/applicants";
 import { useApplicantModal } from "../ApplicantClientWrapper";
 
 export default function ApplicantActionButton({

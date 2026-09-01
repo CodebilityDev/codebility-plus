@@ -15,7 +15,7 @@ import {
 import CommentSection from "./CommentSection";
 import QuestionImagePreview from "./QuestionImagePreview"
 import PostQuestionModal, { QuestionContentDisplay }  from "./PostQuestionModal";
-import { updateQuestion, deletePostAndImages, togglePostLike, checkPostLike } from "../actions";
+import { updateQuestion, deletePostAndImages, togglePostLike, checkPostLike } from "@/actions/overflow/actions";
 import { useToast } from "@/components/ui/use-toast";
 
 interface Question {
