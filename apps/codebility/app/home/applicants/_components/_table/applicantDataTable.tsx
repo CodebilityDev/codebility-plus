@@ -13,7 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { pageSize } from "@/constants";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/utils";
 import {
   ColumnDef,
   flexRender,

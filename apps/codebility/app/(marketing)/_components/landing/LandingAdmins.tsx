@@ -4,7 +4,7 @@ import { getCachedLandingAdminsData } from "@/lib/server/landing-admins-cached";
 import Section from "../MarketingSection";
 import AnimatedAdminsSection from "./AnimatedAdminsSection";
 import { LandingAdminsSkeleton } from "./LandingAdminsSkeleton";
-import { ADMINS_SECTION_COPY } from "../../_lib/constants";
+import { ADMINS_SECTION_COPY } from "@/constants/marketing/admins-section-copy";
 
 async function LandingAdminsContent() {
   const data = await getCachedLandingAdminsData();

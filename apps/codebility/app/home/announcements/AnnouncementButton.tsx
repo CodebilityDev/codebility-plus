@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Megaphone } from "lucide-react";
 import { AnnouncementModal } from "./AnnouncementModal";
 import { useNotificationStore } from "@/store/notification-store"; 
-import { cn } from "@/lib/utils"; 
+import { cn } from "@/utils/utils"; 
 
 export const AnnouncementButton: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);

@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import { createNewBoard } from "@/app/home/kanban/actions";
+import { createNewBoard } from "@/actions/kanban/boards-list";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

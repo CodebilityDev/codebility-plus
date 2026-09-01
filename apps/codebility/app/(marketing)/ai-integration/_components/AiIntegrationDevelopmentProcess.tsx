@@ -1,4 +1,4 @@
-import { developmentProcessData } from "../_lib/dummy-data";
+import { developmentProcessData } from "@/lib/ai-integration/dummy-data";
 import Section from "../../_components/MarketingSection";
 import ProcessCard from "./AiIntegrationProcessCard";
 

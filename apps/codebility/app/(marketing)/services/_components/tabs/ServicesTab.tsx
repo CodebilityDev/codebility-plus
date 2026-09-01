@@ -9,7 +9,7 @@ import {
   SERVICES_CATEGORY_TABS,
   categoryHref,
   type ServicesCategorySlug,
-} from "../../_lib/services-categories";
+} from "@/lib/services/services-categories";
 import type { ServicesProjectsPage } from "@/lib/server/services-projects-cached";
 import { fetchApiJson } from "@/utils/api-fetch";
 

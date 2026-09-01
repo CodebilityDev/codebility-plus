@@ -15,7 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import pathsConfig from "@/config/paths.config";
+import pathsConfig from "@/types/zod/paths.config";
 import { ArrowRightIcon, IconKanban } from "@/public/assets/svgs";
 import { useSprintStore } from "@/store/sprints-store";
 import { KanbanBoardType, KanbanSprintType } from "@/types/home/codev";

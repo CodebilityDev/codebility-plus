@@ -2,7 +2,7 @@
 
 import { Skeleton } from "@/components/ui/skeleton/skeleton";
 
-import { ADMINS_SECTION_COPY } from "../../_lib/constants";
+import { ADMINS_SECTION_COPY } from "@/constants/marketing/admins-section-copy";
 import BlueBg from "./LandingBlueBg";
 
 const ADMIN_CARD_COUNT = 9;

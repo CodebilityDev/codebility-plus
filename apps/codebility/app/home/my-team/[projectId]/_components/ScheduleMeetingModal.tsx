@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { createNotificationAction } from "@/lib/actions/notification.actions";
+import { createNotificationAction } from "@/actions/notifications/notification.actions";
 import {
   AlertCircle,
   Calendar,

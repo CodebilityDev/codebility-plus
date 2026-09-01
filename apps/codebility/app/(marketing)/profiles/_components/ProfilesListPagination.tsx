@@ -2,7 +2,7 @@
 
 import { Suspense, use, useState, useTransition } from "react";
 import DefaultPagination from "@/components/ui/pagination";
-import { getStableColor } from "@/lib/getRandomColor";
+import { getStableColor } from "@/utils/getRandomColor";
 import type { ProfilesListingPage } from "@/types/marketing/profiles-listing";
 import { fetchApiJson } from "@/utils/api-fetch";
 

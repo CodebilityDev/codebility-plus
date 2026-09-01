@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
-import { fetchMemberBoardTasks } from "@/app/home/kanban/[projectId]/[id]/actions";
+import { fetchMemberBoardTasks } from "@/actions/kanban/queries";
 import { isBoardFullyLoaded } from "@/lib/kanban/column-load-meta";
 import {
   useKanbanBoardActions,

@@ -2,7 +2,7 @@
 
 import ReactFlow, { Background, useEdgesState, useNodesState } from "reactflow";
 
-import { PartnerInitialEdges, PartnerInitialNodes } from "../_lib/dummy-data";
+import { PartnerInitialEdges, PartnerInitialNodes } from "@/lib/ai-integration/dummy-data";
 import { CustomEdge } from "./AiIntegrationEdgeTypes";
 import { PartnerCard, PartnerTitle } from "./AiIntegrationNodeTypes";
 

@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import pathsConfig from "@/config/paths.config";
-import { SignInValidation } from "@/lib/validations/auth";
+import pathsConfig from "@/types/zod/paths.config";
+import { SignInValidation } from "@/utils/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";

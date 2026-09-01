@@ -15,7 +15,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/utils";
 import {
   CheckCircle2Icon,
   Loader2Icon,

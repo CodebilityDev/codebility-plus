@@ -6,7 +6,7 @@ import PrivacyPolicyModal from "@/components/modals/PrivacyPolicyModal";
 import TechStackModal from "@/components/modals/TechStackModal";
 import { Button } from "@/components/ui/button";
 import { useModal } from "@/hooks/use-modal";
-import { SignUpValidation } from "@/lib/validations/auth";
+import { SignUpValidation } from "@/utils/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormProvider, useForm } from "react-hook-form";
 import toast from "react-hot-toast";

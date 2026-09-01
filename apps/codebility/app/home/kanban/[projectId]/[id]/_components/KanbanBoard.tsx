@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import KanbanBoardsSearch from "@/app/home/kanban/_components/KanbanBoardsSearch";
 import type { SimpleMemberData } from "@/app/home/projects/actions";
-import pathsConfig from "@/config/paths.config";
+import pathsConfig from "@/types/zod/paths.config";
 import { ArrowRightIcon, IconArchive, IconSearch } from "@/public/assets/svgs";
 import { useUserStore } from "@/store/codev-store";
 import { KanbanBoardType, KanbanColumnType } from "@/types/home/codev";

@@ -9,7 +9,7 @@ import { useTheme } from "next-themes";
 import { useNavStore } from "@/hooks/use-sidebar";
 import { defaultAvatar } from "@/public/assets/images";
 import { getValidImageUrl } from "@/utils/imageValidation";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/utils";
 
 import { OrgChartProps } from "../_types/org-chart";
 import { usePageAnimationSettings } from "@/hooks/usePageAnimationSettings";

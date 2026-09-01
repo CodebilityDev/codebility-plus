@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Logo from "@/components/shared/Logo";
 import { Toaster } from "@/components/ui/toaster";
-import pathsConfig from "@/config/paths.config";
+import pathsConfig from "@/types/zod/paths.config";
 
 import AuthForm from "./_components/SignInForm";
 

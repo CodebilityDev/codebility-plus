@@ -4,7 +4,7 @@ import { Suspense, use, useState, useTransition } from "react";
 import { motion } from "framer-motion";
 import { box } from "@/components/FramerAnimation/Framer";
 import DefaultPagination from "@/components/ui/pagination";
-import { getStableColor } from "@/lib/getRandomColor";
+import { getStableColor } from "@/utils/getRandomColor";
 import type { CodevsProfilesPage } from "@/types/marketing/codevs-profiles";
 import { fetchApiJson } from "@/utils/api-fetch";
 

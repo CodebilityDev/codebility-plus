@@ -104,6 +104,3 @@ export const SignInValidation = z.object({
     .email("Please enter a valid email"),
   password: z.string().min(1, "Password is required"),
 });
-
-export type SignUpInputs = z.infer<typeof SignUpValidation>;
-export type SignInInputs = z.infer<typeof SignInValidation>;

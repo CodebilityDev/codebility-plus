@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { SignInValidation } from "@/lib/validations/auth";
+import { SignInValidation } from "@/utils/validations/auth";
 import { IconEye, IconEyeClose } from "@/public/assets/svgs";
 import clsx from "clsx";
 import { EyeIcon, EyeOffIcon } from "lucide-react";

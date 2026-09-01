@@ -21,7 +21,7 @@ import { Loader2Icon, ArrowRightLeft } from "lucide-react";
 import toast from "react-hot-toast";
 import { createClientClientComponent } from "@/utils/supabase/client";
 import { getSprintsData } from "@/app/home/kanban/[projectId]/_services/query";
-import { transferTaskToSprint } from "@/app/home/kanban/[projectId]/[id]/actions";
+import { transferTaskToSprint } from "@/actions/kanban/tasks";
 import { useKanbanBoardSync } from "@/hooks/use-kanban-board-sync";
 import { Task } from "@/types/home/codev";
 

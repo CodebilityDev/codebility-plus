@@ -5,7 +5,7 @@ import Image from "next/image";
 import {
   fetchAvailableMembers,
   updateTask,
-} from "@/app/home/kanban/[projectId]/[id]/actions";
+} from "@/actions/kanban/tasks";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

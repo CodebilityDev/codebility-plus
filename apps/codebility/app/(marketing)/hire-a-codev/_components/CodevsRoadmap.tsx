@@ -1,6 +1,6 @@
 import { SectionWrapper } from "@/components/shared/home";
 
-import { roadmapData } from "../_lib/dummy-data";
+import { roadmapData } from "@/lib/hire-a-codev/roadmap-data";
 import RoadmapCard from "./CodevsRoadmapCard";
 
 // Define the type for the roadmap step

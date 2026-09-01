@@ -10,7 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/utils";
 import { set } from "date-fns";
 import { Loader2Icon, MailIcon, MoreHorizontalIcon } from "lucide-react";
 

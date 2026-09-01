@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { useUserStore } from "@/store/codev-store";
 import { Codev } from "@/types/home/codev";
 import { createClientServerComponent } from "@/utils/supabase/server";
-import { checkRateLimit, recordRateLimitAttempt, resetRateLimit } from "@/lib/rate-limiter";
+import { checkRateLimit, recordRateLimitAttempt, resetRateLimit } from "@/utils/rate-limiter";
 import { uploadNdaToStorage, updateCodevNdaUrls } from "@/utils/ndaStorageService";
 
 const uploadProfileImage = async (

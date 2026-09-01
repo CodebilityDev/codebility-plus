@@ -4,8 +4,8 @@ import React from "react";
 import { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import { Toaster } from "@/components/ui/toaster";
-import { ThemeProvider } from "@/context/ThemeProvider";
-import ToasterContext from "@/context/ToasterProvider";
+import { ThemeProvider } from "@/store/providers/ThemeProvider";
+import ToasterContext from "@/store/providers/ToasterProvider";
 import ReactQueryProvider from "@/hooks/reactQuery";
 import { TooltipProvider } from "@codevs/ui/tooltip";
 

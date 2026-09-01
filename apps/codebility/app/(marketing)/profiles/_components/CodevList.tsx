@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { box } from "@/components/FramerAnimation/Framer";
 import DefaultPagination from "@/components/ui/pagination";
 import usePagination from "@/hooks/use-pagination";
-import { getStableColor } from "@/lib/getRandomColor";
+import { getStableColor } from "@/utils/getRandomColor";
 import { Codev } from "@/types/home/codev";
 
 import CodevCard from "./CodevCard";

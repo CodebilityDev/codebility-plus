@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import {
   parseServicesCategory,
   servicesHref,
-} from "../../_lib/services-categories";
+} from "@/lib/services/services-categories";
 import type { ServicesProjectsPage } from "@/lib/server/services-projects-cached";
 
 import Calendly from "../../../_components/MarketingCalendly";

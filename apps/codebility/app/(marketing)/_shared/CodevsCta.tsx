@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { H2, Paragraph } from "@/components/shared/home";
 import { Button } from "@/components/ui/button";
-import pathsConfig from "@/config/paths.config";
+import pathsConfig from "@/types/zod/paths.config";
 
 import Section from "./CodevsSection";
 

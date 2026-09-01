@@ -8,7 +8,7 @@
 "use client";
 
 import React, { Component, ReactNode, useEffect } from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/utils";
 import { AlertCircle, Check, Circle, Dot, X } from "lucide-react";
 
 import { NewApplicantType } from "../_service/types";

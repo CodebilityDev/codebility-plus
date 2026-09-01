@@ -4,7 +4,7 @@ import { deleteImage, getImagePath } from "@/utils/uploadImage";
 import { createPostSchema, editPostSchema } from "./validation";
 import { ZodError } from "zod";
 import { UserMention } from "./types";
-import { createNotificationAction } from "@/lib/actions/notification.actions";
+import { createNotificationAction } from "@/actions/notifications/notification.actions";
 
 
 export const getUserRole = async (userId: Number | null): Promise<string | null> => {

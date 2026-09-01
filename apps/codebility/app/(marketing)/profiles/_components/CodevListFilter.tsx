@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/select";
 import { Codev } from "@/types/home/codev";
 
-import { removeArrayDuplicate } from "../../_lib/util";
+import { removeArrayDuplicate } from "@/utils/marketing/array";
 
 interface Props {
   selectedPosition: string;

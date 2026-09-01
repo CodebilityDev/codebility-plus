@@ -9,7 +9,7 @@ import {
   subWeeks,
   subMonths
 } from "date-fns";
-import { getWeekRange, getMonthRange } from "@/lib/leaderboard-utils";
+import { getWeekRange, getMonthRange } from "@/utils/leaderboard-utils";
 
 export type LeaderboardTimeRange = "this-week" | "last-week" | "this-month" | "last-month";
 
