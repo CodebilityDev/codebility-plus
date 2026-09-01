@@ -262,7 +262,13 @@ function InternCard({
   );
 }
 
-export default function InternCards({ interns }: { interns: Person[] }) {
+export default function InternCards({
+  interns,
+  playOnMount = false,
+}: {
+  interns: Person[];
+  playOnMount?: boolean;
+}) {
   const isCodev = (person: Person): boolean => person.role === ROLE_CONFIG.CODEV;
 
   return (
@@ -271,6 +277,7 @@ export default function InternCards({ interns }: { interns: Person[] }) {
       y={60}
       duration={0.8}
       staggerChildren={0.1}
+      playOnMount={playOnMount}
     >
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-4 md:grid-cols-3 md:gap-5 lg:grid-cols-4 xl:grid-cols-5">
         {interns.map((intern, idx) => {

@@ -9,6 +9,7 @@ import {
   SERVICES_CATEGORY_TABS,
   type ServicesCategorySlug,
 } from "@/constants/services/categories";
+import { useMarketingPageUrl } from "@/hooks/marketing/use-marketing-page-url";
 import { categoryHref } from "@/utils/services/categories";
 import type { ServicesProjectsPage } from "@/lib/server/services-projects-cached";
 import { fetchApiJson } from "@/utils/api-fetch";
@@ -17,6 +18,44 @@ import type { ServiceProject } from "../ui/ServicesServiceCard";
 import { ServicesServiceCard } from "../ui";
 
 const pagePromises = new Map<string, Promise<ServicesProjectsPage>>();
+const pageMetaCache = new Map<string, ServicesProjectsPage["pagination"]>();
+
+function pageCacheKey(
+  category: ServicesCategorySlug,
+  page: number,
+  pageSize: number,
+) {
+  return `${category}:${page}:${pageSize}`;
+}
+
+function filterCacheKey(category: ServicesCategorySlug, pageSize: number) {
+  return `${category}:${pageSize}`;
+}
+
+function rememberPagination(
+  category: ServicesCategorySlug,
+  page: number,
+  pageSize: number,
+  pagination: ServicesProjectsPage["pagination"],
+) {
+  pageMetaCache.set(pageCacheKey(category, page, pageSize), pagination);
+  pageMetaCache.set(filterCacheKey(category, pageSize), pagination);
+}
+
+function resolvePagination(
+  category: ServicesCategorySlug,
+  page: number,
+  pageSize: number,
+  initialData: ServicesProjectsPage,
+): ServicesProjectsPage["pagination"] {
+  return (
+    pageMetaCache.get(pageCacheKey(category, page, pageSize)) ??
+    pageMetaCache.get(filterCacheKey(category, pageSize)) ??
+    (category === initialData.category
+      ? initialData.pagination
+      : { page, limit: pageSize, total: 0, totalPages: 0 })
+  );
+}
 
 function loadPage(
   category: ServicesCategorySlug,
@@ -24,7 +63,7 @@ function loadPage(
   pageSize: number,
   initialData: ServicesProjectsPage,
 ): Promise<ServicesProjectsPage> {
-  const key = `${category}:${page}:${pageSize}`;
+  const key = pageCacheKey(category, page, pageSize);
   const cached = pagePromises.get(key);
   if (cached) return cached;
 
@@ -32,6 +71,7 @@ function loadPage(
     page === initialData.pagination.page &&
     category === initialData.category
   ) {
+    rememberPagination(category, page, pageSize, initialData.pagination);
     const resolved = Promise.resolve(initialData);
     pagePromises.set(key, resolved);
     return resolved;
@@ -43,7 +83,7 @@ function loadPage(
   ).then((result) => {
     if (!result.ok) {
       console.error("Error fetching services projects page:", result.error);
-      return {
+      const fallback = {
         projects: [],
         pagination: {
           page,
@@ -53,7 +93,11 @@ function loadPage(
         },
         category,
       };
+      rememberPagination(category, page, pageSize, fallback.pagination);
+      return fallback;
     }
+
+    rememberPagination(category, page, pageSize, result.data.pagination);
     return result.data;
   });
 
@@ -76,9 +120,11 @@ function ServicesGridSkeleton() {
 
 function ServicesProjectsGrid({
   projects,
+  page,
   onServiceSelect,
 }: {
   projects: ServiceProject[];
+  page: number;
   onServiceSelect?: (service: ServiceProject) => void;
 }) {
   if (projects.length === 0) {
@@ -90,7 +136,10 @@ function ServicesProjectsGrid({
   }
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+    <div
+      key={page}
+      className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
+    >
       {projects.map((project, index) => (
         <div
           key={project.id}
@@ -113,51 +162,90 @@ function ServicesTabRemote({
   pageSize,
   initialData,
   onServiceSelect,
-  onPageChange,
-  isPending,
 }: {
   category: ServicesCategorySlug;
   page: number;
   pageSize: number;
   initialData: ServicesProjectsPage;
   onServiceSelect?: (service: ServiceProject) => void;
-  onPageChange: (page: number) => void;
-  isPending: boolean;
 }) {
   const data = use(loadPage(category, page, pageSize, initialData));
-  const totalPages = Math.max(1, data.pagination.totalPages);
+
+  return (
+    <ServicesProjectsGrid
+      projects={data.projects}
+      page={page}
+      onServiceSelect={onServiceSelect}
+    />
+  );
+}
+
+function ServicesTabGrid({
+  category,
+  page,
+  pageSize,
+  initialData,
+  onServiceSelect,
+}: {
+  category: ServicesCategorySlug;
+  page: number;
+  pageSize: number;
+  initialData: ServicesProjectsPage;
+  onServiceSelect?: (service: ServiceProject) => void;
+}) {
+  if (
+    page === initialData.pagination.page &&
+    category === initialData.category
+  ) {
+    return (
+      <ServicesProjectsGrid
+        projects={initialData.projects}
+        page={page}
+        onServiceSelect={onServiceSelect}
+      />
+    );
+  }
+
+  return (
+    <ServicesTabRemote
+      category={category}
+      page={page}
+      pageSize={pageSize}
+      initialData={initialData}
+      onServiceSelect={onServiceSelect}
+    />
+  );
+}
+
+function ServicesPaginationSlot({
+  page,
+  totalPages,
+  onPageChange,
+}: {
+  page: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}) {
+  if (totalPages <= 1) {
+    return null;
+  }
+
   const currentPage = Math.min(page, totalPages);
 
   return (
-    <>
-      <div
-        id="services-grid"
-        className={`transition-opacity duration-200 ${
-          isPending ? "opacity-60" : "opacity-100"
-        }`}
-      >
-        <ServicesProjectsGrid
-          projects={data.projects}
-          onServiceSelect={onServiceSelect}
-        />
-      </div>
-
-      {totalPages > 1 && (
-        <div id="services-pagination" className="text-white">
-          <DefaultPagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            handleNextPage={() => {
-              onPageChange(Math.min(totalPages, currentPage + 1));
-            }}
-            handlePreviousPage={() => {
-              onPageChange(Math.max(1, currentPage - 1));
-            }}
-            setCurrentPage={onPageChange}
-          />
-        </div>
-      )}
-    </>
+    <div id="services-pagination" className="text-white">
+      <DefaultPagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        handleNextPage={() => {
+          onPageChange(Math.min(totalPages, currentPage + 1));
+        }}
+        handlePreviousPage={() => {
+          onPageChange(Math.max(1, currentPage - 1));
+        }}
+        setCurrentPage={onPageChange}
+      />
+    </div>
   );
 }
 
@@ -174,8 +262,29 @@ export const ServicesTab = ({
   pageSize,
   onServiceSelect,
 }: Props) => {
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(initialData.pagination.page);
   const [isPending, startTransition] = useTransition();
+
+  rememberPagination(
+    initialData.category as ServicesCategorySlug,
+    initialData.pagination.page,
+    pageSize,
+    initialData.pagination,
+  );
+
+  const activePagination = resolvePagination(
+    category,
+    page,
+    pageSize,
+    initialData,
+  );
+  const totalPages = Math.max(1, activePagination.totalPages);
+
+  useMarketingPageUrl(page, (nextPage) => {
+    startTransition(() => {
+      setPage(nextPage);
+    });
+  });
 
   const onPageChange = (nextPage: number) => {
     startTransition(() => {
@@ -210,17 +319,28 @@ export const ServicesTab = ({
             })}
           </div>
 
-          <Suspense fallback={<ServicesGridSkeleton />}>
-            <ServicesTabRemote
-              category={category}
-              page={page}
-              pageSize={pageSize}
-              initialData={initialData}
-              onServiceSelect={onServiceSelect}
-              onPageChange={onPageChange}
-              isPending={isPending}
-            />
-          </Suspense>
+          <div
+            id="services-grid"
+            className={`transition-opacity duration-200 ${
+              isPending ? "opacity-60" : "opacity-100"
+            }`}
+          >
+            <Suspense key={`${category}:${page}`} fallback={<ServicesGridSkeleton />}>
+              <ServicesTabGrid
+                category={category}
+                page={page}
+                pageSize={pageSize}
+                initialData={initialData}
+                onServiceSelect={onServiceSelect}
+              />
+            </Suspense>
+          </div>
+
+          <ServicesPaginationSlot
+            page={page}
+            totalPages={totalPages}
+            onPageChange={onPageChange}
+          />
         </div>
       </Container>
     </Section>

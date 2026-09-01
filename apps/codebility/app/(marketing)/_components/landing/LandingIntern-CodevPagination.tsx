@@ -2,10 +2,12 @@
 
 import { Suspense, use, useState, useTransition } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import InternCards from "./LandingIntern-CodevCard";
-import { LandingInternCardsSkeleton } from "./LandingInternSkeleton";
+import { useMarketingPageUrl } from "@/hooks/marketing/use-marketing-page-url";
 import type { LandingInternsPage } from "@/lib/server/landing-interns-cached";
 import { fetchApiJson } from "@/utils/api-fetch";
+
+import InternCards from "./LandingIntern-CodevCard";
+import { LandingInternCardsSkeleton } from "./LandingInternSkeleton";
 
 export type PersonRole = "Intern" | "Codev";
 
@@ -18,6 +20,32 @@ export type LandingInternMember = {
 };
 
 const pagePromises = new Map<string, Promise<LandingInternsPage>>();
+const pageMetaCache = new Map<string, LandingInternsPage["pagination"]>();
+
+function pageCacheKey(page: number, pageSize: number) {
+  return `rank:${page}:${pageSize}`;
+}
+
+function rememberPagination(
+  page: number,
+  pageSize: number,
+  pagination: LandingInternsPage["pagination"],
+) {
+  pageMetaCache.set(pageCacheKey(page, pageSize), pagination);
+  pageMetaCache.set(`rank:${pageSize}`, pagination);
+}
+
+function resolvePagination(
+  page: number,
+  pageSize: number,
+  initialData: LandingInternsPage,
+): LandingInternsPage["pagination"] {
+  return (
+    pageMetaCache.get(pageCacheKey(page, pageSize)) ??
+    pageMetaCache.get(`rank:${pageSize}`) ??
+    initialData.pagination
+  );
+}
 
 function toTeamMembers(
   members: LandingInternsPage["TEAM_MEMBERS"],
@@ -36,11 +64,12 @@ function loadPage(
   pageSize: number,
   initialData: LandingInternsPage,
 ): Promise<LandingInternsPage> {
-  const key = `rank:${page}:${pageSize}`;
+  const key = pageCacheKey(page, pageSize);
   const cached = pagePromises.get(key);
   if (cached) return cached;
 
   if (page === initialData.pagination.page) {
+    rememberPagination(page, pageSize, initialData.pagination);
     const resolved = Promise.resolve(initialData);
     pagePromises.set(key, resolved);
     return resolved;
@@ -52,7 +81,7 @@ function loadPage(
   ).then((result) => {
     if (!result.ok) {
       console.error("Error fetching landing interns page:", result.error);
-      return {
+      const fallback = {
         TEAM_MEMBERS: [],
         pagination: {
           page,
@@ -61,7 +90,11 @@ function loadPage(
           totalPages: Math.max(1, initialData.pagination.totalPages),
         },
       };
+      rememberPagination(page, pageSize, fallback.pagination);
+      return fallback;
     }
+
+    rememberPagination(page, pageSize, result.data.pagination);
     return result.data;
   });
 
@@ -83,7 +116,7 @@ function PaginationControls({
   }
 
   return (
-    <div className="flex items-center gap-3 relative z-[100] mt-8 min-h-9">
+    <div className="relative z-[100] mt-8 flex min-h-9 items-center gap-3">
       {page <= 1 ? (
         <span
           aria-disabled
@@ -95,13 +128,13 @@ function PaginationControls({
         <button
           type="button"
           onClick={() => onPageChange(page - 1)}
-          className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white relative z-[100] pointer-events-auto hover:bg-white/10"
+          className="pointer-events-auto relative z-[100] inline-flex h-9 w-9 items-center justify-center rounded-full border border-white hover:bg-white/10"
         >
           <ChevronLeft size={16} className="shrink-0" />
         </button>
       )}
 
-      <div className="text-sm text-gray-600 dark:text-gray-300 px-4 tabular-nums">
+      <div className="px-4 text-sm tabular-nums text-gray-600 dark:text-gray-300">
         Page {page} of {totalPages}
       </div>
 
@@ -116,7 +149,7 @@ function PaginationControls({
         <button
           type="button"
           onClick={() => onPageChange(page + 1)}
-          className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white relative z-[100] pointer-events-auto hover:bg-white/10"
+          className="pointer-events-auto relative z-[100] inline-flex h-9 w-9 items-center justify-center rounded-full border border-white hover:bg-white/10"
         >
           <ChevronRight size={16} className="shrink-0" />
         </button>
@@ -135,7 +168,13 @@ function LandingInternCardsRemote({
   initialData: LandingInternsPage;
 }) {
   const data = use(loadPage(page, pageSize, initialData));
-  return <InternCards interns={toTeamMembers(data.TEAM_MEMBERS)} />;
+  return (
+    <InternCards
+      key={page}
+      interns={toTeamMembers(data.TEAM_MEMBERS)}
+      playOnMount
+    />
+  );
 }
 
 function LandingInternCards({
@@ -149,7 +188,11 @@ function LandingInternCards({
 }) {
   if (page === initialData.pagination.page) {
     return (
-      <InternCards interns={toTeamMembers(initialData.TEAM_MEMBERS)} />
+      <InternCards
+        key={page}
+        interns={toTeamMembers(initialData.TEAM_MEMBERS)}
+        playOnMount={page > 1}
+      />
     );
   }
 
@@ -171,7 +214,27 @@ export default function LandingInternPagination({
 }) {
   const [page, setPage] = useState(initialData.pagination.page);
   const [isPending, startTransition] = useTransition();
-  const totalPages = Math.max(1, initialData.pagination.totalPages);
+
+  rememberPagination(
+    initialData.pagination.page,
+    pageSize,
+    initialData.pagination,
+  );
+
+  const activePagination = resolvePagination(page, pageSize, initialData);
+  const totalPages = Math.max(1, activePagination.totalPages);
+
+  useMarketingPageUrl(page, (nextPage) => {
+    startTransition(() => {
+      setPage(nextPage);
+    });
+  });
+
+  const onPageChange = (nextPage: number) => {
+    startTransition(() => {
+      setPage(nextPage);
+    });
+  };
 
   return (
     <div className="flex w-full flex-col items-center gap-6">
@@ -180,7 +243,7 @@ export default function LandingInternPagination({
           isPending ? "opacity-60" : "opacity-100"
         }`}
       >
-        <Suspense fallback={<LandingInternCardsSkeleton />}>
+        <Suspense key={page} fallback={<LandingInternCardsSkeleton />}>
           <LandingInternCards
             page={page}
             pageSize={pageSize}
@@ -188,14 +251,11 @@ export default function LandingInternPagination({
           />
         </Suspense>
       </div>
+
       <PaginationControls
         page={page}
         totalPages={totalPages}
-        onPageChange={(nextPage) => {
-          startTransition(() => {
-            setPage(nextPage);
-          });
-        }}
+        onPageChange={onPageChange}
       />
     </div>
   );

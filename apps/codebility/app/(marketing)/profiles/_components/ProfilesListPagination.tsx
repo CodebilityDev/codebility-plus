@@ -2,6 +2,7 @@
 
 import { Suspense, use, useState, useTransition } from "react";
 import DefaultPagination from "@/components/ui/pagination";
+import { useMarketingPageUrl } from "@/hooks/marketing/use-marketing-page-url";
 import { getStableColor } from "@/utils/getRandomColor";
 import type { ProfilesListingPage } from "@/types/marketing/profiles-listing";
 import { fetchApiJson } from "@/utils/api-fetch";
@@ -235,6 +236,12 @@ export default function ProfilesListPagination({
     pageSize,
     initialData,
   );
+
+  useMarketingPageUrl(page, (nextPage) => {
+    startTransition(() => {
+      setPage(nextPage);
+    });
+  });
 
   const onPageChange = (nextPage: number) => {
     startTransition(() => {

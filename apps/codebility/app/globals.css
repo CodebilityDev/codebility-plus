@@ -895,6 +895,13 @@ html:not([data-landing-motion="ready"]) [data-landing-content] {
   pointer-events: none;
 }
 
+html[data-landing-motion="ready"]
+  [data-progressive-root]:not([data-progressive-ready])
+  [data-progressive-child] {
+  opacity: 0;
+  transform: translateY(var(--progressive-y, 30px));
+}
+
 html[data-landing-motion="ready"] [data-landing-content] {
   visibility: visible;
   pointer-events: auto;

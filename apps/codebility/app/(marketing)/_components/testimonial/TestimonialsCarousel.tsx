@@ -10,92 +10,90 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel/carousel";
 import Autoplay from "embla-carousel-autoplay";
-import { motion } from "framer-motion";
 import { Quote } from "lucide-react";
 
+import MarketingProgressiveSection from "../../_shared/MarketingProgressiveSection";
+import ProgressiveMotion from "../../_shared/ProgressiveMotion";
 import BlueBg from "../landing/LandingBlueBg";
 import type { ClientTestimonyType } from "./Testimonials";
-
-const VIEWPORT = { once: true, amount: 0.2 } as const;
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.05,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 28 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.55,
-      ease: [0.25, 0.46, 0.45, 0.94],
-    },
-  },
-};
 
 export default function TestimonialsCarousel({
   testimonials,
 }: {
   testimonials: ClientTestimonyType[];
 }) {
-  return (
-    <motion.section
-      className="relative px-4 py-16"
-      initial="hidden"
-      whileInView="visible"
-      viewport={VIEWPORT}
-      variants={containerVariants}
-    >
-      <BlueBg className="absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 transform" />
-      <div className="relative z-10 mx-auto">
-        <motion.div className="mb-12 text-center" variants={itemVariants}>
-          <h2 className="mb-4 text-3xl font-bold text-white md:text-4xl">
-            What Our Partners Say
-          </h2>
-        </motion.div>
-
-        <motion.div className="container" variants={itemVariants}>
-          <Carousel
-            plugins={[
-              Autoplay({
-                delay: 4000,
-              }),
-            ]}
-            opts={{
-              loop: true,
-              slidesToScroll: 1,
-            }}
-            className="py-0 xl:px-20"
-          >
-            <CarouselContent className="md:px-2 xl:px-5">
-              {testimonials.map((testimonial) => (
-                <CarouselItem
-                  key={testimonial.id}
-                  className="ml-5 basis-full md:basis-1/2 lg:basis-1/3"
-                >
-                  <TestimonialCard client={testimonial} />
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-
-            {testimonials.length >= 3 && (
-              <>
-                <CarouselPrevious className="hidden h-full min-h-full xl:flex" />
-                <CarouselNext className="hidden h-full min-h-full xl:flex" />
-              </>
-            )}
-          </Carousel>
-        </motion.div>
+  const skeleton = (
+    <div className="relative z-10 mx-auto">
+      <div className="mb-12 text-center">
+        <h2 className="mb-4 text-3xl font-bold text-white md:text-4xl">
+          What Our Partners Say
+        </h2>
       </div>
-    </motion.section>
+      <div className="container">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {testimonials.slice(0, 3).map((testimonial) => (
+            <TestimonialCard key={testimonial.id} client={testimonial} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <section className="relative px-4 py-16">
+      <BlueBg className="absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 transform" />
+      <MarketingProgressiveSection skeleton={skeleton}>
+        <div className="relative z-10 mx-auto">
+          <ProgressiveMotion
+            className="mb-12 text-center"
+            y={28}
+            duration={0.55}
+          >
+            <h2
+              data-progressive-child
+              className="mb-4 text-3xl font-bold text-white md:text-4xl"
+            >
+              What Our Partners Say
+            </h2>
+          </ProgressiveMotion>
+
+          <ProgressiveMotion className="container" y={28} duration={0.55}>
+            <div data-progressive-child>
+              <Carousel
+                plugins={[
+                  Autoplay({
+                    delay: 4000,
+                  }),
+                ]}
+                opts={{
+                  loop: true,
+                  slidesToScroll: 1,
+                }}
+                className="py-0 xl:px-20"
+              >
+                <CarouselContent className="md:px-2 xl:px-5">
+                  {testimonials.map((testimonial) => (
+                    <CarouselItem
+                      key={testimonial.id}
+                      className="ml-5 basis-full md:basis-1/2 lg:basis-1/3"
+                    >
+                      <TestimonialCard client={testimonial} />
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+
+                {testimonials.length >= 3 && (
+                  <>
+                    <CarouselPrevious className="hidden h-full min-h-full xl:flex" />
+                    <CarouselNext className="hidden h-full min-h-full xl:flex" />
+                  </>
+                )}
+              </Carousel>
+            </div>
+          </ProgressiveMotion>
+        </div>
+      </MarketingProgressiveSection>
+    </section>
   );
 }
 

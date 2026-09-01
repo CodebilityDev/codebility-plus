@@ -2,6 +2,7 @@
 
 import type { CareersJobListingsInitial } from "@/types/marketing/careers-job-listings";
 
+import MarketingProgressiveSection from "../../_shared/MarketingProgressiveSection";
 import ProgressiveMotion from "../../_shared/ProgressiveMotion";
 import JobListingsPagination from "./JobListingsPagination";
 import { JobListingsSkeleton } from "./JobListingsSkeleton";
@@ -47,27 +48,40 @@ export default function JobListingsShell({
   pageSize,
   loading = false,
 }: JobListingsShellProps) {
+  const skeleton = (
+    <div className="mb-12 text-center">
+      <h2 className="mb-4 text-4xl font-light tracking-tight text-white">
+        Open Positions
+      </h2>
+      <p className="text-lg text-gray-400">
+        Join our team and help shape the future of technology
+      </p>
+    </div>
+  );
+
   return (
     <section id="open-positions" className="relative border-y border-gray-800 py-20">
       <div className="mx-auto max-w-7xl px-6">
-        <ProgressiveMotion y={30} duration={0.6} staggerChildren={0.1}>
-          <div data-progressive-child className="mb-12 text-center">
-            <h2 className="mb-4 text-4xl font-light tracking-tight text-white">
-              Open Positions
-            </h2>
-            <p className="text-lg text-gray-400">
-              Join our team and help shape the future of technology
-            </p>
-          </div>
+        <MarketingProgressiveSection skeleton={skeleton}>
+          <ProgressiveMotion y={30} duration={0.6} staggerChildren={0.1}>
+            <div data-progressive-child className="mb-12 text-center">
+              <h2 className="mb-4 text-4xl font-light tracking-tight text-white">
+                Open Positions
+              </h2>
+              <p className="text-lg text-gray-400">
+                Join our team and help shape the future of technology
+              </p>
+            </div>
 
-          <div data-progressive-child>
-            <JobListingsBody
-              initialData={initialData}
-              pageSize={pageSize}
-              loading={loading}
-            />
-          </div>
-        </ProgressiveMotion>
+            <div data-progressive-child>
+              <JobListingsBody
+                initialData={initialData}
+                pageSize={pageSize}
+                loading={loading}
+              />
+            </div>
+          </ProgressiveMotion>
+        </MarketingProgressiveSection>
       </div>
     </section>
   );

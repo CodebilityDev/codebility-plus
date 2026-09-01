@@ -29,6 +29,7 @@ import { CodevHireCodevButton } from "./CodevHireCodevButton";
 interface Props {
   codev: Codev;
   color: string;
+  animateEntrance?: boolean;
 }
 
 const STATUS_CONFIG: Record<InternalStatus, { label: string; className: string }> = {
@@ -64,7 +65,7 @@ const STATUS_CONFIG: Record<InternalStatus, { label: string; className: string }
   },
 };
 
-const CodevCard = ({ codev, color }: Props) => {
+const CodevCard = ({ codev, color, animateEntrance = true }: Props) => {
   const [hovered, setHovered] = useState(false);
   const springConfig = { stiffness: 100, damping: 5 };
   const x = useMotionValue(0);
@@ -115,14 +116,7 @@ const CodevCard = ({ codev, color }: Props) => {
       : {};
   }, [codev.level, codev.codev_points]);
 
-  return (
-    <motion.div
-      variants={item}
-      transition={{ duration: 0.4, ease: "easeOut" }}
-      className="h-80"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
+  const cardBody = (
       <Link
         href={`/profiles/${codev.id}`}
         prefetch
@@ -238,6 +232,29 @@ const CodevCard = ({ codev, color }: Props) => {
           <CodevHireCodevButton />
         </div>
       </Link>
+  );
+
+  if (!animateEntrance) {
+    return (
+      <div
+        className="h-80"
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      >
+        {cardBody}
+      </div>
+    );
+  }
+
+  return (
+    <motion.div
+      variants={item}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      className="h-80"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {cardBody}
     </motion.div>
   );
 };

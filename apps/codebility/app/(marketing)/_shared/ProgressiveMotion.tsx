@@ -1,13 +1,17 @@
 "use client";
 
 import {
-  useCallback,
+  useLayoutEffect,
   useRef,
   type CSSProperties,
   type ReactNode,
 } from "react";
-import { animate, inView, stagger } from "framer-motion/dom";
+import { animate, stagger } from "framer-motion/dom";
 
+import {
+  attachProgressiveInView,
+  isElementIntersecting,
+} from "../_components/landing/progressive-in-view";
 import { markMarketingMotionReady } from "./marketing-motion-ready";
 
 const VISIBLE_STYLE: CSSProperties = { opacity: 1, transform: "none" };
@@ -23,6 +27,7 @@ function prefersReducedMotion() {
 }
 
 function snapVisible(element: HTMLElement) {
+  element.setAttribute("data-progressive-ready", "");
   element.style.opacity = "1";
   element.style.transform = "none";
   element.querySelectorAll<HTMLElement>(CHILD_SELECTOR).forEach((child) => {
@@ -69,7 +74,7 @@ type ProgressiveMotionProps = {
   duration?: number;
   amount?: number | "some" | "all";
   staggerChildren?: number;
-  /** Play enter animation immediately on mount (hero sections). */
+  /** Play enter animation immediately on mount (paginated lists). */
   playOnMount?: boolean;
 };
 
@@ -82,99 +87,127 @@ export default function ProgressiveMotion({
   staggerChildren = 0,
   playOnMount = false,
 }: ProgressiveMotionProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
   const stopRef = useRef<(() => void) | undefined>(undefined);
 
-  const motionRef = useCallback(
-    (element: HTMLDivElement | null) => {
-      stopRef.current?.();
-      stopRef.current = undefined;
-      if (!element) return;
+  useLayoutEffect(() => {
+    const element = containerRef.current;
+    stopRef.current?.();
+    stopRef.current = undefined;
 
-      markMarketingMotionReady();
+    if (!element) {
+      return;
+    }
 
-      let cancelled = false;
-      let stopInView: (() => void) | undefined;
-      const effectiveStagger = resolveStagger(element, staggerChildren);
+    markMarketingMotionReady();
 
-      const playEnter = () => {
-        const childElements =
-          element.querySelectorAll<HTMLElement>(CHILD_SELECTOR);
+    let cancelled = false;
+    const effectiveStagger = resolveStagger(element, staggerChildren);
 
-        if (childElements.length > 0 && effectiveStagger > 0) {
-          element.style.opacity = "1";
-          element.style.transform = "none";
-          animate(
-            childElements,
-            { opacity: 1, transform: "translateY(0px)" },
-            {
-              duration,
-              ease: EASE,
-              delay: stagger(effectiveStagger),
-              onComplete: () => {
-                snapVisible(element);
-              },
-            },
-          );
-          return;
-        }
+    const playEnter = () => {
+      if (cancelled) {
+        return;
+      }
 
+      const childElements =
+        element.querySelectorAll<HTMLElement>(CHILD_SELECTOR);
+
+      if (childElements.length > 0 && effectiveStagger > 0) {
+        element.style.opacity = "1";
+        element.style.transform = "none";
         animate(
-          element,
+          childElements,
           { opacity: 1, transform: "translateY(0px)" },
           {
             duration,
             ease: EASE,
+            delay: stagger(effectiveStagger),
             onComplete: () => {
-              snapVisible(element);
+              if (!cancelled) {
+                snapVisible(element);
+              }
             },
           },
         );
+        return;
+      }
+
+      animate(
+        element,
+        { opacity: 1, transform: "translateY(0px)" },
+        {
+          duration,
+          ease: EASE,
+          onComplete: () => {
+            if (!cancelled) {
+              snapVisible(element);
+            }
+          },
+        },
+      );
+    };
+
+    if (prefersReducedMotion()) {
+      snapVisible(element);
+      return;
+    }
+
+    if (playOnMount) {
+      hideForEnter(element, y, effectiveStagger);
+      playEnter();
+      return () => {
+        cancelled = true;
       };
+    }
 
-      const attach = () => {
-        if (cancelled) return;
+    if (isElementIntersecting(element)) {
+      snapVisible(element);
+      return () => {
+        cancelled = true;
+      };
+    }
 
-        if (prefersReducedMotion()) {
+    hideForEnter(element, y, effectiveStagger);
+
+    const stopInView = attachProgressiveInView(
+      element,
+      (alreadyVisible) => {
+        if (cancelled) {
+          return;
+        }
+
+        if (alreadyVisible) {
           snapVisible(element);
           return;
         }
 
-        hideForEnter(element, y, effectiveStagger);
+        playEnter();
+      },
+      amount,
+    );
 
-        if (playOnMount) {
-          playEnter();
-          return;
-        }
+    stopRef.current = () => {
+      cancelled = true;
+      stopInView();
+    };
 
-        let hasEntered = false;
-
-        stopInView = inView(
-          element,
-          () => {
-            if (hasEntered) return;
-            hasEntered = true;
-            stopInView?.();
-            stopInView = undefined;
-            playEnter();
-          },
-          { amount },
-        );
-      };
-
-      requestAnimationFrame(() => {
-        requestAnimationFrame(attach);
-      });
-
-      stopRef.current = () => {
-        cancelled = true;
-        stopInView?.();
-      };
-    },
-    [amount, duration, playOnMount, staggerChildren, y],
-  );
+    return () => {
+      cancelled = true;
+      stopInView();
+      stopRef.current = undefined;
+    };
+  }, [amount, duration, playOnMount, staggerChildren, y]);
 
   return (
-    <div ref={motionRef} className={className} style={VISIBLE_STYLE}>
+    <div
+      ref={containerRef}
+      className={className}
+      style={{
+        ...VISIBLE_STYLE,
+        ["--progressive-y" as string]: `${y}px`,
+      }}
+      data-progressive-root=""
+    >
       {children}
     </div>
   );

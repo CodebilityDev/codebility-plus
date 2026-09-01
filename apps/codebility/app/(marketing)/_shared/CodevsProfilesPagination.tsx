@@ -2,8 +2,8 @@
 
 import { Suspense, use, useState, useTransition } from "react";
 import { motion } from "framer-motion";
-import { box } from "@/components/FramerAnimation/Framer";
 import DefaultPagination from "@/components/ui/pagination";
+import { useMarketingPageUrl } from "@/hooks/marketing/use-marketing-page-url";
 import { getStableColor } from "@/utils/getRandomColor";
 import type { CodevsProfilesPage } from "@/types/marketing/codevs-profiles";
 import { fetchApiJson } from "@/utils/api-fetch";
@@ -13,6 +13,40 @@ import CodevListFilter from "../profiles/_components/CodevListFilter";
 import { CodevsProfilesSkeleton } from "./CodevsProfilesSkeleton";
 
 const pagePromises = new Map<string, Promise<CodevsProfilesPage>>();
+const pageMetaCache = new Map<string, CodevsProfilesPage["pagination"]>();
+
+function pageCacheKey(position: string, page: number, pageSize: number) {
+  return `${position}:${page}:${pageSize}`;
+}
+
+function filterCacheKey(position: string, pageSize: number) {
+  return `${position}:${pageSize}`;
+}
+
+function rememberPagination(
+  position: string,
+  page: number,
+  pageSize: number,
+  pagination: CodevsProfilesPage["pagination"],
+) {
+  pageMetaCache.set(pageCacheKey(position, page, pageSize), pagination);
+  pageMetaCache.set(filterCacheKey(position, pageSize), pagination);
+}
+
+function resolvePagination(
+  position: string,
+  page: number,
+  pageSize: number,
+  initialData: CodevsProfilesPage,
+): CodevsProfilesPage["pagination"] {
+  return (
+    pageMetaCache.get(pageCacheKey(position, page, pageSize)) ??
+    pageMetaCache.get(filterCacheKey(position, pageSize)) ??
+    (position === initialData.position
+      ? initialData.pagination
+      : { page, limit: pageSize, total: 0, totalPages: 0 })
+  );
+}
 
 function loadPage(
   position: string,
@@ -20,7 +54,7 @@ function loadPage(
   pageSize: number,
   initialData: CodevsProfilesPage,
 ): Promise<CodevsProfilesPage> {
-  const key = `${position}:${page}:${pageSize}`;
+  const key = pageCacheKey(position, page, pageSize);
   const cached = pagePromises.get(key);
   if (cached) return cached;
 
@@ -28,6 +62,12 @@ function loadPage(
     page === initialData.pagination.page &&
     position === initialData.position
   ) {
+    rememberPagination(
+      position,
+      page,
+      pageSize,
+      initialData.pagination,
+    );
     const resolved = Promise.resolve(initialData);
     pagePromises.set(key, resolved);
     return resolved;
@@ -47,7 +87,7 @@ function loadPage(
   ).then((result) => {
     if (!result.ok) {
       console.error("Error fetching codevs profiles page:", result.error);
-      return {
+      const fallback = {
         codevs: [],
         pagination: {
           page,
@@ -58,7 +98,11 @@ function loadPage(
         positions: initialData.positions,
         position,
       };
+      rememberPagination(position, page, pageSize, fallback.pagination);
+      return fallback;
     }
+
+    rememberPagination(position, page, pageSize, result.data.pagination);
     return result.data;
   });
 
@@ -98,7 +142,13 @@ function CodevsPaginationSlot({
   );
 }
 
-function CodevsGrid({ codevs }: { codevs: CodevsProfilesPage["codevs"] }) {
+function CodevsGrid({
+  codevs,
+  page,
+}: {
+  codevs: CodevsProfilesPage["codevs"];
+  page: number;
+}) {
   if (codevs.length === 0) {
     return (
       <p className="text-center text-2xl text-gray-500 dark:text-gray-400">
@@ -108,21 +158,29 @@ function CodevsGrid({ codevs }: { codevs: CodevsProfilesPage["codevs"] }) {
   }
 
   return (
-    <motion.div
-      variants={box}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: false, amount: 0.2 }}
+    <div
+      key={page}
       className="grid h-full w-full grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
     >
-      {codevs.map((codev) => (
-        <CodevCard
-          color={getStableColor(codev.id)}
+      {codevs.map((codev, index) => (
+        <motion.div
           key={codev.id}
-          codev={codev}
-        />
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{
+            duration: 0.4,
+            ease: "easeOut",
+            delay: index * 0.08,
+          }}
+        >
+          <CodevCard
+            color={getStableColor(codev.id)}
+            codev={codev}
+            animateEntrance={false}
+          />
+        </motion.div>
       ))}
-    </motion.div>
+    </div>
   );
 }
 
@@ -131,58 +189,32 @@ function CodevsProfilesRemote({
   page,
   pageSize,
   initialData,
-  onPageChange,
 }: {
   position: string;
   page: number;
   pageSize: number;
   initialData: CodevsProfilesPage;
-  onPageChange: (page: number) => void;
 }) {
   const data = use(loadPage(position, page, pageSize, initialData));
-  const totalPages = Math.max(0, data.pagination.totalPages);
-
-  return (
-    <>
-      <CodevsGrid codevs={data.codevs} />
-      <CodevsPaginationSlot
-        page={page}
-        totalPages={totalPages}
-        onPageChange={onPageChange}
-      />
-    </>
-  );
+  return <CodevsGrid codevs={data.codevs} page={page} />;
 }
 
-function CodevsProfilesPageView({
+function CodevsProfilesGrid({
   position,
   page,
   pageSize,
   initialData,
-  onPageChange,
 }: {
   position: string;
   page: number;
   pageSize: number;
   initialData: CodevsProfilesPage;
-  onPageChange: (page: number) => void;
 }) {
   if (
     page === initialData.pagination.page &&
     position === initialData.position
   ) {
-    const totalPages = Math.max(0, initialData.pagination.totalPages);
-
-    return (
-      <>
-        <CodevsGrid codevs={initialData.codevs} />
-        <CodevsPaginationSlot
-          page={page}
-          totalPages={totalPages}
-          onPageChange={onPageChange}
-        />
-      </>
-    );
+    return <CodevsGrid codevs={initialData.codevs} page={page} />;
   }
 
   return (
@@ -191,7 +223,6 @@ function CodevsProfilesPageView({
       page={page}
       pageSize={pageSize}
       initialData={initialData}
-      onPageChange={onPageChange}
     />
   );
 }
@@ -208,6 +239,26 @@ export default function CodevsProfilesPagination({
   const [position, setPosition] = useState(initialData.position);
   const [page, setPage] = useState(initialData.pagination.page);
   const [isPending, startTransition] = useTransition();
+
+  rememberPagination(
+    initialData.position,
+    initialData.pagination.page,
+    pageSize,
+    initialData.pagination,
+  );
+
+  const activePagination = resolvePagination(
+    position,
+    page,
+    pageSize,
+    initialData,
+  );
+
+  useMarketingPageUrl(page, (nextPage) => {
+    startTransition(() => {
+      setPage(nextPage);
+    });
+  });
 
   const onPageChange = (nextPage: number) => {
     startTransition(() => {
@@ -238,22 +289,22 @@ export default function CodevsProfilesPagination({
       >
         <Suspense
           key={`${position}:${page}`}
-          fallback={
-            <>
-              <CodevsProfilesSkeleton count={pageSize} />
-              <div className="mt-6 min-h-[4.5rem]" aria-hidden="true" />
-            </>
-          }
+          fallback={<CodevsProfilesSkeleton count={pageSize} />}
         >
-          <CodevsProfilesPageView
+          <CodevsProfilesGrid
             position={position}
             page={page}
             pageSize={pageSize}
             initialData={initialData}
-            onPageChange={onPageChange}
           />
         </Suspense>
       </div>
+
+      <CodevsPaginationSlot
+        page={page}
+        totalPages={Math.max(0, activePagination.totalPages)}
+        onPageChange={onPageChange}
+      />
     </div>
   );
 }
