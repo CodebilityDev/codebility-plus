@@ -34,8 +34,23 @@ export type KanbanBoardStore = {
   reconcileBoard: (board: KanbanBoardWithColumns) => void;
 };
 
-function normalizePositions(columns: KanbanColumnType[]): KanbanColumnType[] {
+function dedupeTasksGlobally(columns: KanbanColumnType[]): KanbanColumnType[] {
+  const seen = new Set<string>();
+
   return columns.map((column) => ({
+    ...column,
+    tasks: (column.tasks ?? []).filter((task) => {
+      if (seen.has(task.id)) {
+        return false;
+      }
+      seen.add(task.id);
+      return true;
+    }),
+  }));
+}
+
+function normalizePositions(columns: KanbanColumnType[]): KanbanColumnType[] {
+  return dedupeTasksGlobally(columns).map((column) => ({
     ...column,
     tasks: [...(column.tasks ?? [])]
       .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
@@ -125,11 +140,34 @@ export function createKanbanBoardStore(
     },
 
     moveTaskLocal: (taskId, columnId, position) => {
-      const nextColumns = applyMove(get().columns, taskId, columnId, position);
+      const columns = get().columns;
+      const currentColumn = columns.find((column) =>
+        (column.tasks ?? []).some((task) => task.id === taskId),
+      );
+      const currentTask = currentColumn?.tasks?.find((task) => task.id === taskId);
+
+      if (
+        currentTask &&
+        currentColumn?.id === columnId &&
+        (currentTask.position ?? 0) === position
+      ) {
+        return columns;
+      }
+
+      const nextColumns = applyMove(columns, taskId, columnId, position);
+
+      let nextMeta = syncColumnLoadCounts(get().columnLoadMeta, nextColumns);
+      const sourceColumnId = currentColumn?.id;
+
+      if (sourceColumnId && sourceColumnId !== columnId) {
+        nextMeta = adjustColumnTotalCount(nextMeta, sourceColumnId, -1);
+        nextMeta = adjustColumnTotalCount(nextMeta, columnId, 1);
+      }
+
       set({
         columns: nextColumns,
         board: { ...get().board, kanban_columns: nextColumns },
-        columnLoadMeta: syncColumnLoadCounts(get().columnLoadMeta, nextColumns),
+        columnLoadMeta: nextMeta,
       });
       return nextColumns;
     },

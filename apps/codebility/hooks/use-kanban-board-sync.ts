@@ -1,22 +1,20 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-
 import {
   broadcastTaskPatch,
   broadcastTaskRemove,
 } from "@/lib/kanban/board-broadcast";
 import { clearTaskDetailCache } from "@/lib/kanban/task-detail-cache";
-import { registerOwnTaskWrite } from "@/lib/kanban/own-writes";
 import { Task } from "@/types/home/codev";
 import { tryGetKanbanBoardStore } from "@/store/kanban-board/registry";
 
+/**
+ * Board layout is client-authoritative during the session.
+ * DB snapshot sync is silent; server data loads on full page reload only.
+ */
 export function useKanbanBoardSync() {
-  const router = useRouter();
-
   const refreshBoard = () => {
     clearTaskDetailCache();
-    router.refresh();
   };
 
   const removeTask = (taskId: string) => {
@@ -25,7 +23,6 @@ export function useKanbanBoardSync() {
       return;
     }
 
-    registerOwnTaskWrite(taskId);
     store.getState().removeTaskLocal(taskId);
     broadcastTaskRemove(store.getState().boardId, taskId);
   };
@@ -36,7 +33,6 @@ export function useKanbanBoardSync() {
       return;
     }
 
-    registerOwnTaskWrite(taskId);
     store.getState().patchTaskLocal(taskId, patch);
     broadcastTaskPatch(store.getState().boardId, { taskId, patch });
   };

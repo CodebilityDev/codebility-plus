@@ -14,13 +14,14 @@ export function useColumnTasksInfinite(columnId: string) {
   const columnLoadMeta = useKanbanBoardStore(
     (state) => state.columnLoadMeta[columnId],
   );
-  const { appendColumnTasksLocal } = useKanbanBoardActions();
+  const { appendColumnTasksLocal, setColumnLoadMeta } = useKanbanBoardActions();
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const loadingRef = useRef(false);
 
   const loadedCount = columnLoadMeta?.loadedCount ?? 0;
   const totalCount = columnLoadMeta?.totalCount ?? 0;
-  const hasMore = loadedCount < totalCount;
+  const hasMore =
+    totalCount > KANBAN_COLUMN_TASK_PAGE_SIZE && loadedCount < totalCount;
 
   const loadMore = useCallback(async () => {
     if (loadingRef.current || !hasMore) {
@@ -44,14 +45,20 @@ export function useColumnTasksInfinite(columnId: string) {
 
       if (result.tasks?.length) {
         appendColumnTasksLocal(columnId, result.tasks);
+        return;
       }
+
+      setColumnLoadMeta(columnId, {
+        loadedCount,
+        totalCount: loadedCount,
+      });
     } catch {
       toast.error("Failed to load more tasks");
     } finally {
       loadingRef.current = false;
       setIsLoadingMore(false);
     }
-  }, [appendColumnTasksLocal, columnId, hasMore, loadedCount]);
+  }, [appendColumnTasksLocal, columnId, hasMore, loadedCount, setColumnLoadMeta]);
 
   return { hasMore, isLoadingMore, loadMore };
 }

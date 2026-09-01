@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidatePath } from "next/cache";
 import { Task, TaskDraft } from "@/types/home/codev";
 import { createClientServerComponent } from "@/utils/supabase/server";
 import { requireUser } from "@/lib/server/auth-guard";
@@ -14,6 +14,10 @@ import {
   fetchColumnTasksPage as fetchColumnTasksPageQuery,
 } from "@/lib/server/kanban-column-tasks-query";
 import { KANBAN_COLUMN_TASK_PAGE_SIZE } from "@/lib/kanban/board-pagination";
+import type { BoardSnapshotInput } from "@/lib/kanban/board-snapshot-types";
+import {
+  persistBoardSnapshot,
+} from "@/lib/server/kanban-board-snapshot-sync";
 
 interface CodevMember {
   id: string;
@@ -122,12 +126,11 @@ async function assertProjectMembership(
   }
 }
 
-function revalidateKanbanBoard(boardId: string, projectId?: string | null) {
-  revalidateTag(`board:${boardId}`);
+/** List routes only. Active board UI is client-authoritative during the session. */
+function revalidateKanbanBoardLists(projectId?: string | null) {
   revalidatePath("/home/kanban");
   if (projectId) {
     revalidatePath(`/home/kanban/${projectId}`);
-    revalidatePath(`/home/kanban/${projectId}/${boardId}`);
   }
 }
 
@@ -274,19 +277,6 @@ export async function moveTask({
 
     await persistTaskPositions(supabase, updates);
 
-    const columnResolution = await getProjectIdForColumn(supabase, columnId);
-    if (columnResolution.found && columnResolution.projectId) {
-      const { data: columnData } = await supabase
-        .from("kanban_columns")
-        .select("board_id")
-        .eq("id", columnId)
-        .single();
-
-      if (columnData?.board_id) {
-        revalidateKanbanBoard(columnData.board_id, columnResolution.projectId);
-      }
-    }
-
     return { success: true };
   } catch (error) {
     console.error("moveTask error:", error);
@@ -295,6 +285,14 @@ export async function moveTask({
       error: error instanceof Error ? error.message : "Failed to move task",
     };
   }
+}
+
+export type { BoardSnapshotInput } from "@/lib/kanban/board-snapshot-types";
+
+export async function syncBoardSnapshot(
+  snapshot: BoardSnapshotInput,
+): Promise<{ success: boolean; error?: string }> {
+  return persistBoardSnapshot(snapshot);
 }
 
 const updateDeveloperLevels = async (codevId?: string) => {
@@ -527,7 +525,7 @@ export const createNewTask = async (
         .single();
 
       if (boardData?.project_id) {
-        revalidateKanbanBoard(columnData.board_id, boardData.project_id);
+        revalidateKanbanBoardLists(boardData.project_id);
 
         if (codev_id && newTask?.id) {
           // Reuse the already-authenticated caller (checked before the mutation).
@@ -722,7 +720,7 @@ export const deleteTask = async (
           .single();
 
         if (boardData?.project_id) {
-          revalidatePath(`/home/kanban/${boardData.project_id}/${columnData.board_id}`);
+          revalidateKanbanBoardLists(boardData.project_id);
         }
       }
     }
@@ -1108,13 +1106,7 @@ export const completeTask = async (
     }
 
     // Single revalidation at the end
-    revalidatePath("/home/kanban");
-    if (projectId) {
-      revalidatePath(`/home/kanban/${projectId}`);
-    }
-    if (projectId && boardId) {
-      revalidatePath(`/home/kanban/${projectId}/${boardId}`);
-    }
+    revalidateKanbanBoardLists(projectId);
 
     return { success: true };
   } catch (error) {
@@ -1189,7 +1181,7 @@ export async function updateTaskPRLink(taskId: string, prLink: string) {
           .single();
 
         if (boardData?.project_id) {
-          revalidatePath(`/home/kanban/${boardData.project_id}/${columnData.board_id}`);
+          revalidateKanbanBoardLists(boardData.project_id);
         }
       }
     }
@@ -1255,7 +1247,7 @@ export async function unarchiveTask(taskId: string) {
           .single();
 
         if (boardData?.project_id) {
-          revalidatePath(`/home/kanban/${boardData.project_id}/${columnData.board_id}`);
+          revalidateKanbanBoardLists(boardData.project_id);
         }
       }
     }
@@ -1626,7 +1618,7 @@ export const promoteDraft = async (
         .single();
 
       if (boardData?.project_id) {
-        revalidateKanbanBoard(columnData.board_id, boardData.project_id);
+        revalidateKanbanBoardLists(boardData.project_id);
       }
     }
 
@@ -1923,9 +1915,7 @@ export async function transferTaskToSprint(
     // -------------------------------------------------------------------------
     // 6. Revalidate both boards so changes are visible immediately
     // -------------------------------------------------------------------------
-    revalidatePath(`/home/kanban/${projectId}/${sourceBoardId}`);
-    revalidatePath(`/home/kanban/${projectId}/${destinationBoardId}`);
-    revalidatePath(`/home/kanban/${projectId}`);
+    revalidateKanbanBoardLists(projectId);
  
     return { success: true };
   } catch (error) {

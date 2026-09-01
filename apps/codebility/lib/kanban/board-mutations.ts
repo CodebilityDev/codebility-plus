@@ -1,35 +1,37 @@
-import { moveTask } from "@/app/home/kanban/[projectId]/[id]/actions";
 import { broadcastTaskMove } from "@/lib/kanban/board-broadcast";
-import { registerOwnTaskWrite } from "@/lib/kanban/own-writes";
+import { queueOriginatorTaskMove } from "@/lib/kanban/board-snapshot-save";
 import { KanbanColumnType } from "@/types/home/codev";
 
 import { getKanbanBoardStore } from "@/store/kanban-board/registry";
 
-export async function commitTaskMove(
+export function commitTaskMove(
   taskId: string,
   columnId: string,
   position: number,
-): Promise<{ success: boolean; error?: string }> {
+): { success: boolean } {
   const store = getKanbanBoardStore();
-  const previousColumns = store.getState().columns;
-  const { boardId } = store.getState();
+  const { boardId, projectId } = store.getState();
 
-  registerOwnTaskWrite(taskId);
-  store.getState().moveTaskLocal(taskId, columnId, position);
-  broadcastTaskMove(boardId, { taskId, columnId, position });
+  const currentColumn = store
+    .getState()
+    .columns.find((column) =>
+      (column.tasks ?? []).some((task) => task.id === taskId),
+    );
+  const currentTask = currentColumn?.tasks?.find((task) => task.id === taskId);
 
-  const result = await moveTask({
-    taskId,
-    columnId,
-    position,
-    opId: crypto.randomUUID(),
-  });
-
-  if (!result.success) {
-    store.getState().setColumns(previousColumns);
+  if (
+    currentTask &&
+    currentColumn?.id === columnId &&
+    (currentTask.position ?? 0) === position
+  ) {
+    return { success: true };
   }
 
-  return result;
+  store.getState().moveTaskLocal(taskId, columnId, position);
+  broadcastTaskMove(boardId, { taskId, columnId, position });
+  queueOriginatorTaskMove(boardId, projectId, taskId, columnId, position);
+
+  return { success: true };
 }
 
 export function filterColumnsByMember(

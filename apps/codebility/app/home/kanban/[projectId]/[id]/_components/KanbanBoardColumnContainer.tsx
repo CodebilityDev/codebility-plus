@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import {
   closestCorners,
   DndContext,
@@ -25,14 +24,13 @@ import {
   commitTaskMove,
   filterColumnsByMember,
 } from "@/lib/kanban/board-mutations";
-import { registerColumnReorderBlock } from "@/lib/kanban/own-writes";
+import { queueOriginatorColumnsReorder } from "@/lib/kanban/board-snapshot-save";
 import {
   useKanbanBoardActions,
   useKanbanBoardMeta,
   useKanbanColumns,
 } from "@/store/kanban-board/KanbanBoardProvider";
 
-import { updateColumnPosition } from "../actions";
 import KanbanColumn from "./KanbanColumn";
 
 const styles = {
@@ -72,7 +70,6 @@ export default function KanbanBoardColumnContainer({
   projectId,
   activeFilter,
 }: Props) {
-  const router = useRouter();
   const columns = useKanbanColumns();
   const { boardId } = useKanbanBoardMeta();
   const { setColumns, removeTaskLocal } = useKanbanBoardActions();
@@ -83,7 +80,7 @@ export default function KanbanBoardColumnContainer({
   );
 
   const handleDragEnd = useCallback(
-    async (event: DragEndEvent) => {
+    (event: DragEndEvent) => {
       const { active, over } = event;
       if (!over) return;
 
@@ -100,11 +97,9 @@ export default function KanbanBoardColumnContainer({
 
         if (oldIndex === -1 || newIndex === -1 || oldIndex === newIndex) return;
 
-        const previousColumns = columns;
         const newCols = arrayMove(orderedColumns, oldIndex, newIndex).map(
           (column, index) => ({ ...column, position: index }),
         );
-        registerColumnReorderBlock();
         setColumns(newCols);
         broadcastColumnsReorder(boardId, {
           columns: newCols.map((column) => ({
@@ -112,19 +107,14 @@ export default function KanbanBoardColumnContainer({
             position: column.position ?? 0,
           })),
         });
-
-        try {
-          await Promise.all(
-            newCols.map((column, index) =>
-              updateColumnPosition(column.id, index),
-            ),
-          );
-        } catch (error) {
-          console.error("Column reorder error:", error);
-          setColumns(previousColumns);
-          toast.error("Failed to reorder columns");
-          router.refresh();
-        }
+        queueOriginatorColumnsReorder(
+          boardId,
+          projectId,
+          newCols.map((column) => ({
+            id: column.id,
+            position: column.position ?? 0,
+          })),
+        );
         return;
       }
 
@@ -160,18 +150,18 @@ export default function KanbanBoardColumnContainer({
           }
         }
 
-        const result = await commitTaskMove(
+        const result = commitTaskMove(
           String(active.id),
           overColId,
           targetPosition,
         );
 
         if (!result.success) {
-          toast.error(result.error || "Failed to move task");
+          toast.error("Failed to move task");
         }
       }
     },
-    [boardData, boardId, columns, router, setColumns],
+    [boardId, columns, setColumns],
   );
 
   const { sensors } = useDragAndDrop({

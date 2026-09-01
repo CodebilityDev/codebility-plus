@@ -20,6 +20,7 @@ import KanbanAddMembersButton from "./kanban_modals/KanbanAddMembersButton";
 import KanbanColumnAddButton from "./kanban_modals/KanbanColumnAddButton";
 import KanbanColumnAddModal from "./kanban_modals/KanbanColumnAddModal";
 import UserTaskFilter from "./UserTaskFilter";
+import KanbanBoardSyncIndicator from "./KanbanBoardSyncIndicator";
 import { useKanbanTaskUrlModal } from "@/hooks/useKanbanTaskUrlModal";
 import { useMemberTaskFilter } from "@/hooks/use-member-task-filter";
 
@@ -160,9 +161,12 @@ function KanbanBoard({
                 </span>
               </div>
               <div>
-                <h1 className="bg-gradient-to-r from-purple-600 to-customBlue-600 bg-clip-text text-2xl font-bold text-transparent drop-shadow-sm md:text-3xl">
-                  {boardData.name}
-                </h1>
+                <div className="flex flex-wrap items-center gap-2">
+                  <h1 className="bg-gradient-to-r from-purple-600 to-customBlue-600 bg-clip-text text-2xl font-bold text-transparent drop-shadow-sm md:text-3xl">
+                    {boardData.name}
+                  </h1>
+                  <KanbanBoardSyncIndicator />
+                </div>
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
                   Organize and track your project tasks efficiently
                 </p>

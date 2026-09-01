@@ -4,15 +4,12 @@ import {
   createContext,
   useCallback,
   useContext,
-  useLayoutEffect,
   useRef,
   type ReactNode,
 } from "react";
 import { useStore } from "zustand";
 
-import { useKanbanBoardSync } from "@/hooks/use-kanban-board-sync";
-import { useKanbanRealtime } from "@/hooks/use-kanban-realtime";
-import { getBoardFingerprint } from "@/lib/kanban/board-fingerprint";
+import { KanbanRealtimeHost } from "@/lib/kanban/kanban-realtime";
 import { KanbanBoardWithColumns } from "@/lib/kanban/board-mappers";
 
 import {
@@ -56,19 +53,6 @@ function KanbanBoardRegistryHost({
   return <span ref={hostRef} hidden aria-hidden className="hidden" />;
 }
 
-function KanbanBoardRealtimeHost({ store }: { store: KanbanBoardStoreApi }) {
-  const { refreshBoard } = useKanbanBoardSync();
-  const boardId = useStore(store, (state) => state.boardId);
-
-  useKanbanRealtime({
-    boardId,
-    store,
-    onReconnect: refreshBoard,
-  });
-
-  return null;
-}
-
 export function KanbanBoardProvider({
   boardId,
   projectId,
@@ -78,30 +62,18 @@ export function KanbanBoardProvider({
   const scopeKey = `${projectId}:${boardId}`;
   const storeRef = useRef<KanbanBoardStoreApi | null>(null);
   const scopeRef = useRef(scopeKey);
-  const reconciledFingerprintRef = useRef(getBoardFingerprint(initialBoard));
 
   if (!storeRef.current || scopeRef.current !== scopeKey) {
     storeRef.current = createKanbanBoardStore(initialBoard, boardId, projectId);
     scopeRef.current = scopeKey;
-    reconciledFingerprintRef.current = getBoardFingerprint(initialBoard);
   }
 
   const store = storeRef.current;
-  const boardFingerprint = getBoardFingerprint(initialBoard);
-
-  useLayoutEffect(() => {
-    if (reconciledFingerprintRef.current === boardFingerprint) {
-      return;
-    }
-
-    reconciledFingerprintRef.current = boardFingerprint;
-    store.getState().reconcileBoard(initialBoard);
-  }, [store, initialBoard, boardFingerprint]);
 
   return (
     <KanbanBoardStoreContext.Provider value={store}>
       <KanbanBoardRegistryHost store={store} scopeKey={scopeKey} />
-      <KanbanBoardRealtimeHost store={store} />
+      <KanbanRealtimeHost boardId={boardId} store={store} />
       {children}
     </KanbanBoardStoreContext.Provider>
   );
