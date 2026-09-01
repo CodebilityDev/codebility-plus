@@ -2,14 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { getClientSupabase } from "@/utils/supabase/client";
+import { createClientClientComponent } from "@/utils/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@codevs/ui/input";
 import { ArrowLeft } from "lucide-react";
 import toast from "react-hot-toast";
 
 export default function TwoFactorForm() {
-  const [supabase] = useState(() => getClientSupabase());
   const [code, setCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [factorId, setFactorId] = useState<string | null>(null);
@@ -18,6 +17,9 @@ export default function TwoFactorForm() {
 
   useEffect(() => {
     async function loadFactors() {
+      const supabase = createClientClientComponent();
+      if (!supabase) return;
+
       try {
         const { data, error } = await supabase.auth.mfa.listFactors();
         if (error) throw error;
@@ -35,7 +37,7 @@ export default function TwoFactorForm() {
       }
     }
     loadFactors();
-  }, [supabase, router]);
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,6 +52,13 @@ export default function TwoFactorForm() {
     }
 
     setIsLoading(true);
+
+    const supabase = createClientClientComponent();
+    if (!supabase) {
+      toast.error("Authentication service unavailable");
+      setIsLoading(false);
+      return;
+    }
 
     try {
       // Standard TOTP Challenge & Verify
@@ -74,6 +83,9 @@ export default function TwoFactorForm() {
   };
 
   const handleSignOut = async () => {
+    const supabase = createClientClientComponent();
+    if (!supabase) return;
+
     await supabase.auth.signOut();
     router.push("/auth/sign-in");
   };
