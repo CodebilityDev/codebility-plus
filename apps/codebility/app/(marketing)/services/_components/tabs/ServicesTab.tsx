@@ -15,7 +15,7 @@ import type { ServicesProjectsPage } from "@/lib/server/services-projects-cached
 import { fetchApiJson } from "@/utils/api-fetch";
 
 import type { ServiceProject } from "../ui/ServicesServiceCard";
-import { ServicesServiceCard } from "../ui";
+import { ServicesGridSkeleton, ServicesServiceCard, servicesProjectsGridClass } from "../ui";
 
 const pagePromises = new Map<string, Promise<ServicesProjectsPage>>();
 const pageMetaCache = new Map<string, ServicesProjectsPage["pagination"]>();
@@ -105,17 +105,17 @@ function loadPage(
   return promise;
 }
 
-function ServicesGridSkeleton() {
-  return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-      {Array.from({ length: 4 }).map((_, index) => (
-        <div
-          key={index}
-          className="aspect-square w-full animate-pulse rounded-xl bg-white/5"
-        />
-      ))}
-    </div>
-  );
+function resolveSkeletonCount(
+  page: number,
+  pageSize: number,
+  total: number,
+) {
+  if (total <= 0) {
+    return pageSize;
+  }
+
+  const remaining = total - (page - 1) * pageSize;
+  return Math.min(pageSize, Math.max(1, remaining));
 }
 
 function ServicesProjectsGrid({
@@ -136,10 +136,7 @@ function ServicesProjectsGrid({
   }
 
   return (
-    <div
-      key={page}
-      className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
-    >
+    <div key={page} className={servicesProjectsGridClass}>
       {projects.map((project, index) => (
         <div
           key={project.id}
@@ -227,13 +224,13 @@ function ServicesPaginationSlot({
   onPageChange: (page: number) => void;
 }) {
   if (totalPages <= 1) {
-    return null;
+    return <div className="mt-6 min-h-[4.5rem]" aria-hidden="true" />;
   }
 
   const currentPage = Math.min(page, totalPages);
 
   return (
-    <div id="services-pagination" className="text-white">
+    <div id="services-pagination" className="mt-6 min-h-[4.5rem] text-white">
       <DefaultPagination
         currentPage={currentPage}
         totalPages={totalPages}
@@ -263,7 +260,7 @@ export const ServicesTab = ({
   onServiceSelect,
 }: Props) => {
   const [page, setPage] = useState(initialData.pagination.page);
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
 
   rememberPagination(
     initialData.category as ServicesCategorySlug,
@@ -279,6 +276,11 @@ export const ServicesTab = ({
     initialData,
   );
   const totalPages = Math.max(1, activePagination.totalPages);
+  const skeletonCount = resolveSkeletonCount(
+    page,
+    pageSize,
+    activePagination.total,
+  );
 
   useMarketingPageUrl(page, (nextPage) => {
     startTransition(() => {
@@ -319,13 +321,11 @@ export const ServicesTab = ({
             })}
           </div>
 
-          <div
-            id="services-grid"
-            className={`transition-opacity duration-200 ${
-              isPending ? "opacity-60" : "opacity-100"
-            }`}
-          >
-            <Suspense key={`${category}:${page}`} fallback={<ServicesGridSkeleton />}>
+          <div id="services-grid">
+            <Suspense
+              key={`${category}:${page}`}
+              fallback={<ServicesGridSkeleton count={skeletonCount} />}
+            >
               <ServicesTabGrid
                 category={category}
                 page={page}
