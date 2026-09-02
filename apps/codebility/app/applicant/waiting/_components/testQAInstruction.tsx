@@ -16,7 +16,7 @@ import { ChevronRight } from "lucide-react";
 import { Separator } from "@codevs/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@codevs/ui/tabs";
 
-import { ApplicantType } from "../_service/type";
+import { ApplicantType } from "@/types/applicant-waiting";
 
 export default function TestQAInstruction({
   children,

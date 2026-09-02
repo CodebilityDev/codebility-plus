@@ -6,7 +6,7 @@ import { useFeedsStore } from "@/store/feeds-store";
 import { uploadImage } from "@/utils/uploadImage";
 import toast from "react-hot-toast";
 
-import { addPost } from "../_services/action";
+import { addPost } from "@/actions/feeds/post";
 import MarkdownEditor from "./MarkdownEditor";
 import TagSelector from "./TagSelector";
 import ThumbnailUpload from "./ThumbnailUpload";

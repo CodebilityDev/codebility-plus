@@ -81,7 +81,7 @@ const LeaderboardFilters = memo<LeaderboardFiltersProps>(({
       <div className="flex gap-4 mb-4">
         <Tabs
           value={currentType}
-          onValueChange={(value: LeaderboardType) => onTypeChange(value)}
+          onValueChange={(value) => onTypeChange(value as LeaderboardType)}
           className="w-fit"
           aria-label="Select leaderboard type"
         >

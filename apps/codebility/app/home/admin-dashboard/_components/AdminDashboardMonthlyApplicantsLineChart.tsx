@@ -14,7 +14,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/utils";
 import { TrendingDown, TrendingUp, Minus } from "lucide-react";
 import {
   Area,

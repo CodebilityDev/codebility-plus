@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useModal } from "@/hooks/use-modal";
-import { useSchedule } from "@/hooks/use-timeavail";
-import { formatToLocaleTime } from "@/lib/format-date-time";
+import { useModal } from "@/hooks/modals/use-modal";
+import { useSchedule } from "@/hooks/data/use-timeavail";
+import { formatToLocaleTime } from "@/utils/format-date-time";
 import { IconEdit } from "@/public/assets/svgs";
 
-import { formatLocaleTime } from "../_lib/util";
-import { updateUserSchedule } from "../actions";
+import { formatLocaleTime } from "@/utils/dashboard/time-format";
+import { updateUserSchedule } from "@/actions/dashboard/actions";
 
 interface Props {
   startTime: number;

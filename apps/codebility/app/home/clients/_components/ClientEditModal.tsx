@@ -6,7 +6,7 @@ import {
   clientSchema,
   ClientWithStatusFormValues,
   getFormItemLabels,
-} from "@/app/home/clients/_lib/schema";
+} from "@/utils/validations/clients";
 import DefaultAvatar from "@/components/DefaultAvatar";
 import { Button } from "@codevs/ui/button";
 import {
@@ -16,7 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@codevs/ui/dialog";
-import { useModal } from "@/hooks/use-modal-clients";
+import { useModal } from "@/hooks/modals/use-modal-clients";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -37,8 +37,8 @@ import {
   SelectValue,
 } from "@codevs/ui/select";
 
-import { updateClientAction } from "../action";
-import { useCountries } from "@/hooks/useCountries"; // New centralized hook
+import { updateClientAction } from "@/actions/clients/actions";
+import { useCountries } from "@/hooks/data/useCountries"; // New centralized hook
 
 export default function ClientEditModal() {
   const { isOpen, onClose, type, data } = useModal();

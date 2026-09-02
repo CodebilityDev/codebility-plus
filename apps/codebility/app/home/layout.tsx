@@ -2,14 +2,14 @@ import React, { Suspense } from "react";
 import AsyncErrorBoundary from "@/components/AsyncErrorBoundary";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { ModalProviderHome } from "@/components/providers/modal-provider-home";
-import { ThemeProvider } from "@/context/ThemeProvider";
-import ReactQueryProvider from "@/hooks/reactQuery";
+import { ThemeProvider } from "@/store/providers/ThemeProvider";
+import ReactQueryProvider from "@/hooks/query/reactQuery";
 import { UserProvider } from "@/store/UserProvider";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
 import { Toaster } from "sonner";
 
 import ToastNotification from "./_components/HomeToastNotification";
-import LeftSidebarServer from "./_components/LeftSidebarServer";
+import LeftSidebarServer from "@/components/shared/dashboard/LeftSidebarServer";
 import Navbar from "./_components/Navbar";
 import { NavigationOptimizer } from "./_components/NavigationOptimizer";
 import PageTransitionWrapper from "./_components/PageTransitionWrapper";
@@ -19,9 +19,6 @@ import ConditionalMainWrapper from "./_components/ConditionalMainWrapper";
 import DynamicMainContent from "./_components/DynamicMainContent";
 import { Toast } from "@codevs/ui/toast";
 import SurveyWidget from "./_components/SurveyWidget";
-
-// Force dynamic rendering for layout due to server-side Supabase usage
-export const dynamic = "force-dynamic";
 
 // Optimize provider structure - move heavy providers to client
 export default async function HomeLayout({

@@ -27,7 +27,7 @@ import {
   deleteTicket,
   archiveTicket,
   unarchiveTicket,
-} from "../actions";
+} from "@/actions/admin/ticket-support";
 import { Archive, ArchiveRestore } from "lucide-react";
 
 interface TicketPreviewSidebarProps {

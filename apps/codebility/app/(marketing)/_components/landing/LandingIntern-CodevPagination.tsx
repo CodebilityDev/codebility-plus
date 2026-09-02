@@ -1,230 +1,262 @@
-// components/landing/LandingIntern-CodevPagination.tsx
-// 
-// This component displays a paginated list of team members (Interns and Codevs) 
-// with prioritization applied using the prioritizeCodevs utility function.
-// Team members are automatically sorted by:
-// 1. Total codev points (highest first)
-// 2. Level 2+ badges (prioritized)
-// 3. Number of valid badges
-// 4. Has profile image
-// 5. Has work experience
-// 6. Years of experience
-
 "use client";
 
-import { useState, useEffect } from "react";
+import { Suspense, use, useState, useTransition } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { useMarketingPageUrl } from "@/hooks/marketing/use-marketing-page-url";
+import type { LandingInternsPage } from "@/lib/server/landing-interns-cached";
+import { fetchApiJson } from "@/utils/api-fetch";
+
 import InternCards from "./LandingIntern-CodevCard";
-import { prioritizeCodevs } from "@/utils/codev-priority";
+import { LandingInternCardsSkeleton } from "./LandingInternSkeleton";
 
-// Type definitions for the two roles from database
-type PersonRole = 'Intern' | 'Codev';
+export type PersonRole = "Intern" | "Codev";
 
-type TeamMember = {
+export type LandingInternMember = {
   id: string;
   name: string;
-  role: PersonRole; // Either Intern or Codev from roles table
+  role: PersonRole;
   image?: string;
   display_position?: string;
-  years_of_experience?: number;
-  internal_status?: string;
-  level?: Record<string, any>;
-  codev_points?: Array<{
-    id: string;
-    codev_id?: string;
-    skill_category_id?: string;
-    points: number;
-  }>;
-  work_experience?: Array<any>;
 };
 
-interface TeamMembersApiResponse {
-  TEAM_MEMBERS: { // Changed from INTERNS to TEAM_MEMBERS to match new API
-    id: string;
-    name: string; 
-    role: string; 
-    image?: string; 
-    display_position?: string;
-    years_of_experience?: number;
-    internal_status?: string;
-    level?: Record<string, any>;
-    codev_points?: Array<{
-      id: string;
-      codev_id?: string;
-      skill_category_id?: string;
-      points: number;
-    }>;
-    work_experience?: Array<any>;
-  }[];
-  error?: string;
+const pagePromises = new Map<string, Promise<LandingInternsPage>>();
+const pageMetaCache = new Map<string, LandingInternsPage["pagination"]>();
+
+function pageCacheKey(page: number, pageSize: number) {
+  return `rank:${page}:${pageSize}`;
 }
 
-// Role constants for better code maintainability
-const TEAM_ROLES = {
-  INTERN: 'Intern' as const,
-  CODEV: 'Codev' as const,
-} as const;
+function rememberPagination(
+  page: number,
+  pageSize: number,
+  pagination: LandingInternsPage["pagination"],
+) {
+  pageMetaCache.set(pageCacheKey(page, pageSize), pagination);
+  pageMetaCache.set(`rank:${pageSize}`, pagination);
+}
 
-export default function TeamMembersPagination() {
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [allTeamMembers, setAllTeamMembers] = useState<TeamMember[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [fetchError, setFetchError] = useState<string | null>(null);
-
-  const ITEMS_PER_PAGE = 10;
-
-  // Helper functions for role identification
-  const isInternRole = (role: string): boolean => role === TEAM_ROLES.INTERN;
-  const isCodevRole = (role: string): boolean => role === TEAM_ROLES.CODEV;
-  const validateTeamRole = (role: string): PersonRole => {
-    return isCodevRole(role) ? TEAM_ROLES.CODEV : TEAM_ROLES.INTERN;
-  };
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const fetchAllTeamMembers = async () => {
-      setIsLoading(true);
-      setFetchError(null);
-
-      try {
-        const response = await fetch("/api/all-active-interns-codev-prioritized");
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`Failed to fetch team members: ${response.status} ${errorText}`);
-        }
-
-        const apiData = (await response.json()) as TeamMembersApiResponse;
-
-        if (!apiData || !Array.isArray(apiData.TEAM_MEMBERS)) {
-          console.warn("Unexpected API response shape for /api/all-active-interns-codev-prioritized:", apiData);
-          if (!isMounted) return;
-          setAllTeamMembers([]);
-        } else {
-          // Map API response to TeamMember objects with proper role validation
-          const mappedTeamMembers = apiData.TEAM_MEMBERS.map((member) => ({
-            id: member.id,
-            name: member.name,
-            role: validateTeamRole(member.role), // Ensures only Intern or Codev roles
-            image: member.image,
-            display_position: member.display_position,
-            years_of_experience: member.years_of_experience,
-            internal_status: member.internal_status,
-            level: member.level,
-            codev_points: member.codev_points,
-            work_experience: member.work_experience,
-          }));
-          
-          if (!isMounted) return;
-          setAllTeamMembers(mappedTeamMembers);
-          setCurrentPage(1); // Reset to first page when new data loads
-        }
-      } catch (fetchErr: any) {
-        console.error("Error fetching team members:", fetchErr);
-        if (!isMounted) return;
-        setFetchError(fetchErr?.message ?? "Unknown error occurred");
-        setAllTeamMembers([]);
-      } finally {
-        if (!isMounted) return;
-        setIsLoading(false);
-      }
-    };
-
-    fetchAllTeamMembers();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  const totalPages = Math.max(1, Math.ceil(allTeamMembers.length / ITEMS_PER_PAGE));
-
-  // Ensure current page stays within valid range
-  useEffect(() => {
-    if (currentPage > totalPages) setCurrentPage(totalPages);
-    if (currentPage < 1) setCurrentPage(1);
-  }, [currentPage, totalPages]);
-
-  // Get current page team members (both Interns and Codevs)
-  const currentPageTeamMembers = allTeamMembers.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE, 
-    currentPage * ITEMS_PER_PAGE
+function resolvePagination(
+  page: number,
+  pageSize: number,
+  initialData: LandingInternsPage,
+): LandingInternsPage["pagination"] {
+  return (
+    pageMetaCache.get(pageCacheKey(page, pageSize)) ??
+    pageMetaCache.get(`rank:${pageSize}`) ??
+    initialData.pagination
   );
+}
 
-  // Navigation functions
-  const goToPreviousPage = () => {
-    setCurrentPage((prevPage) => Math.max(1, prevPage - 1));
-  };
+function toTeamMembers(
+  members: LandingInternsPage["TEAM_MEMBERS"],
+): LandingInternMember[] {
+  return members.map((member) => ({
+    id: member.id,
+    name: member.name,
+    role: member.role === "Codev" ? "Codev" : "Intern",
+    image: member.image,
+    display_position: member.display_position,
+  }));
+}
 
-  const goToNextPage = () => {
-    setCurrentPage((prevPage) => Math.min(totalPages, prevPage + 1));
-  };
+function loadPage(
+  page: number,
+  pageSize: number,
+  initialData: LandingInternsPage,
+): Promise<LandingInternsPage> {
+  const key = pageCacheKey(page, pageSize);
+  const cached = pagePromises.get(key);
+  if (cached) return cached;
 
-  const handlePreviousPageClick = () => {
-    goToPreviousPage();
-  };
+  if (page === initialData.pagination.page) {
+    rememberPagination(page, pageSize, initialData.pagination);
+    const resolved = Promise.resolve(initialData);
+    pagePromises.set(key, resolved);
+    return resolved;
+  }
 
-  const handleNextPageClick = () => {
-    goToNextPage();
-  };
+  const promise = fetchApiJson<LandingInternsPage>(
+    `/api/landing-interns?page=${page}&limit=${pageSize}`,
+    { cache: "force-cache" },
+  ).then((result) => {
+    if (!result.ok) {
+      console.error("Error fetching landing interns page:", result.error);
+      const fallback = {
+        TEAM_MEMBERS: [],
+        pagination: {
+          page,
+          limit: pageSize,
+          total: 0,
+          totalPages: Math.max(1, initialData.pagination.totalPages),
+        },
+      };
+      rememberPagination(page, pageSize, fallback.pagination);
+      return fallback;
+    }
 
-  // Button disabled states
-  const isPreviousPageDisabled = currentPage <= 1 || isLoading;
-  const isNextPageDisabled = currentPage >= totalPages || isLoading;
+    rememberPagination(page, pageSize, result.data.pagination);
+    return result.data;
+  });
+
+  pagePromises.set(key, promise);
+  return promise;
+}
+
+function PaginationControls({
+  page,
+  totalPages,
+  onPageChange,
+}: {
+  page: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}) {
+  if (totalPages <= 1) {
+    return <div className="mt-8 min-h-9" aria-hidden="true" />;
+  }
 
   return (
-    <div className="w-full flex flex-col items-center gap-6">
-      {/* Team Members Cards Container (Both Interns and Codevs) */}
-      <div className="w-full min-h-[300px]">
-        {isLoading ? (
-          <div className="py-12 text-sm text-gray-500 flex items-center justify-center">
-            Loading team members…
-          </div>
-        ) : fetchError ? (
-          <div className="py-12 text-sm text-red-500 flex items-center justify-center">
-            Error: {fetchError}
-          </div>
-        ) : currentPageTeamMembers.length > 0 ? (
-          <InternCards interns={currentPageTeamMembers} />
-        ) : (
-          <div className="py-12 text-sm text-gray-400 flex items-center justify-center">
-            No team members available (Interns or Codevs)
-          </div>
-        )}
-      </div>
-
-      {/* Pagination Controls for Team Members */}
-      <div className="flex items-center gap-3 relative z-[100] mt-8">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={handlePreviousPageClick}
-          disabled={isPreviousPageDisabled}
-          className="rounded-full w-9 h-9 p-0 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed relative z-[100] pointer-events-auto"
-          style={{ position: 'relative', zIndex: 100 }}
+    <div className="relative z-[100] mt-8 flex min-h-9 items-center gap-3">
+      {page <= 1 ? (
+        <span
+          aria-disabled
+          className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white opacity-50"
         >
           <ChevronLeft size={16} className="shrink-0" />
-        </Button>
-
-        <div className="text-sm text-gray-600 dark:text-gray-300 px-4">
-          Page {currentPage} of {totalPages}
-        </div>
-
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={handleNextPageClick}
-          disabled={isNextPageDisabled}
-          className="rounded-full w-9 h-9 p-0 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed relative z-[100] pointer-events-auto"
-          style={{ position: 'relative', zIndex: 100 }}
+        </span>
+      ) : (
+        <button
+          type="button"
+          onClick={() => onPageChange(page - 1)}
+          className="pointer-events-auto relative z-[100] inline-flex h-9 w-9 items-center justify-center rounded-full border border-white hover:bg-white/10"
         >
-          <ChevronRight size={16} className="shrink-0" />
-        </Button>
+          <ChevronLeft size={16} className="shrink-0" />
+        </button>
+      )}
+
+      <div className="px-4 text-sm tabular-nums text-gray-600 dark:text-gray-300">
+        Page {page} of {totalPages}
       </div>
 
-      
+      {page >= totalPages ? (
+        <span
+          aria-disabled
+          className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white opacity-50"
+        >
+          <ChevronRight size={16} className="shrink-0" />
+        </span>
+      ) : (
+        <button
+          type="button"
+          onClick={() => onPageChange(page + 1)}
+          className="pointer-events-auto relative z-[100] inline-flex h-9 w-9 items-center justify-center rounded-full border border-white hover:bg-white/10"
+        >
+          <ChevronRight size={16} className="shrink-0" />
+        </button>
+      )}
+    </div>
+  );
+}
+
+function LandingInternCardsRemote({
+  page,
+  pageSize,
+  initialData,
+}: {
+  page: number;
+  pageSize: number;
+  initialData: LandingInternsPage;
+}) {
+  const data = use(loadPage(page, pageSize, initialData));
+  return (
+    <InternCards
+      key={page}
+      interns={toTeamMembers(data.TEAM_MEMBERS)}
+      playOnMount
+    />
+  );
+}
+
+function LandingInternCards({
+  page,
+  pageSize,
+  initialData,
+}: {
+  page: number;
+  pageSize: number;
+  initialData: LandingInternsPage;
+}) {
+  if (page === initialData.pagination.page) {
+    return (
+      <InternCards
+        key={page}
+        interns={toTeamMembers(initialData.TEAM_MEMBERS)}
+        playOnMount={page > 1}
+      />
+    );
+  }
+
+  return (
+    <LandingInternCardsRemote
+      page={page}
+      pageSize={pageSize}
+      initialData={initialData}
+    />
+  );
+}
+
+export default function LandingInternPagination({
+  initialData,
+  pageSize = 10,
+}: {
+  initialData: LandingInternsPage;
+  pageSize?: number;
+}) {
+  const [page, setPage] = useState(initialData.pagination.page);
+  const [isPending, startTransition] = useTransition();
+
+  rememberPagination(
+    initialData.pagination.page,
+    pageSize,
+    initialData.pagination,
+  );
+
+  const activePagination = resolvePagination(page, pageSize, initialData);
+  const totalPages = Math.max(1, activePagination.totalPages);
+
+  useMarketingPageUrl(page, (nextPage) => {
+    startTransition(() => {
+      setPage(nextPage);
+    });
+  });
+
+  const onPageChange = (nextPage: number) => {
+    startTransition(() => {
+      setPage(nextPage);
+    });
+  };
+
+  return (
+    <div className="flex w-full flex-col items-center gap-6">
+      <div
+        className={`relative z-10 w-full min-h-[300px] transition-opacity duration-200 ${
+          isPending ? "opacity-60" : "opacity-100"
+        }`}
+      >
+        <Suspense key={page} fallback={<LandingInternCardsSkeleton />}>
+          <LandingInternCards
+            page={page}
+            pageSize={pageSize}
+            initialData={initialData}
+          />
+        </Suspense>
+      </div>
+
+      <PaginationControls
+        page={page}
+        totalPages={totalPages}
+        onPageChange={onPageChange}
+      />
     </div>
   );
 }

@@ -9,10 +9,10 @@ import { Label } from "@codevs/ui/label";
 import { RadioGroup, RadioGroupItem } from "@codevs/ui/radio-group";
 import { Checkbox } from "@codevs/ui/checkbox";
 import PageContainer from "../../_components/PageContainer";
-import { createClientClientComponent } from "@/utils/supabase/client";
+import { getClientSupabase } from "@/utils/supabase/client";
 import { toast } from "sonner";
-import { getSurveyQuestions } from "../../settings/surveys/questions/actions";
-import { submitSurveyResponse, hasUserResponded } from "../../settings/surveys/responses/actions";
+import { getSurveyQuestions } from "@/actions/settings/survey-questions";
+import { submitSurveyResponse, hasUserResponded } from "@/actions/settings/survey-responses";
 
 interface Question {
   id: string;
@@ -55,7 +55,7 @@ export default function SurveyResponsePage() {
     setLoading(true);
 
     // Fetch survey
-    const supabase = createClientClientComponent();
+    const supabase = getClientSupabase();
     const { data: surveyData, error: surveyError } = await supabase
       .from("surveys")
       .select("id, title, description, is_active")

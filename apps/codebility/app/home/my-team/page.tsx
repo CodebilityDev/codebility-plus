@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import AsyncErrorBoundary from "@/components/AsyncErrorBoundary";
-import { getMembers, getTeamLead, getUserProjects } from "../projects/actions";
+import { getMembers, getTeamLead, getUserProjects } from "@/actions/projects/actions";
 import MyTeamView from "./_components/MyTeamView";
 import { Users } from "lucide-react";
 

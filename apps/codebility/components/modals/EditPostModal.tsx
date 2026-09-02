@@ -1,7 +1,7 @@
 "use client";
 
 import EditPostForm from "@/app/home/feeds/_components/EditPostForm";
-import { PostType } from "@/app/home/feeds/_services/query";
+import type { PostType } from "@/types/feeds";
 import {
   Dialog,
   DialogContent,

@@ -7,8 +7,8 @@ import { useUserStore } from "@/store/codev-store";
 import { format } from "date-fns";
 import toast from "react-hot-toast";
 
-import { deletePost } from "../_services/action";
-import { PostType } from "../_services/query";
+import { deletePost } from "@/actions/feeds/post";
+import type { PostType } from "@/types/feeds";
 import { DeleteDialog } from "./DeleteDialog";
 import PostCommentCount from "./PostCommentCount";
 import PostTags from "./PostTags";

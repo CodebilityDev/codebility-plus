@@ -20,7 +20,7 @@ import toast from "react-hot-toast";
 import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
 
-import { getPositions, updateCodev } from "../action";
+import { getPositions, updateCodev } from "@/actions/settings/profile";
 
 type PersonalInfoProps = {
   data: Codev;

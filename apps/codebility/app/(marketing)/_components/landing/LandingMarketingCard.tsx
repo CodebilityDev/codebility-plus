@@ -1,5 +1,5 @@
 import React from "react";
-import Image from "next/image";
+import LandingImage from "./LandingImage";
 import Link from "next/link";
 
 import { cn } from "@codevs/ui";
@@ -27,12 +27,11 @@ const MarketingCard: React.FC<MarketingCardProps> = ({
           <div className="flex w-full flex-row items-center justify-between">
             <h1 className="font-bold">{title}</h1>
             <span className="flex size-10 flex-col items-center justify-center rounded-full border-2 border-white/5 bg-white/5 hover:bg-[#9747FF]">
-              <Image
+              <LandingImage
                 src="/assets/svgs/icon-arrow-up-right.svg"
                 width={15}
                 height={15}
                 alt="arrow up"
-                
               />
             </span>
           </div>

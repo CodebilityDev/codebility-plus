@@ -30,7 +30,7 @@ import {
   deleteClientOutreach,
   type AdminOutreachStats,
   type ClientOutreach,
-} from "../actions";
+} from "@/actions/admin/client-tracker";
 import { getCurrentWeekStart } from "../utils";
 import { Skeleton } from "@/components/ui/skeleton/skeleton";
 

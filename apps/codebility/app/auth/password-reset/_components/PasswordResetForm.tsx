@@ -10,7 +10,7 @@ import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
 
-import { resetUserPassword } from "../action";
+import { resetUserPassword } from "@/actions/auth/password-reset";
 /* import { createClientClientComponent } from "@/utils/supabase/client"; */
 
 // Define the schema for email validation

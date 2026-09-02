@@ -1,15 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useModal } from "@/hooks/use-modal";
+import { useModal } from "@/hooks/modals/use-modal";
 import { Button } from "@codevs/ui/button";
 import { MessageSquare, ChevronDown, ChevronUp } from "lucide-react";
 import {
   getPendingSurveyForUser,
   getDismissedSurveys,
   undismissSurvey,
-} from "../settings/surveys/actions";
-import { getSurveyQuestions } from "../settings/surveys/questions/actions";
+} from "@/actions/settings/surveys";
+import { getSurveyQuestions } from "@/actions/settings/survey-questions";
 
 interface Survey {
   id: string;

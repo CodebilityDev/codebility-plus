@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import { mobileAppServicesData } from "../_lib/dummy-data";
+import { mobileAppServicesData } from "@/constants/ai-integration/dummy-data";
 
 const MobileAppServices = () => {
   return (

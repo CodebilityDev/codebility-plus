@@ -46,7 +46,7 @@ import {
 } from "@codevs/ui/select";
 
 import ApplicationDetailsModal from "../../_components/ApplicationDetailsModal";
-import { deleteJobApplication, updateApplicationStatus } from "../../actions";
+import { deleteJobApplication, updateApplicationStatus } from "@/actions/hire/actions";
 
 interface JobApplication {
   id: string;

@@ -3,7 +3,7 @@
 import { useMemo, useState, useEffect } from "react";
 import DefaultPagination from "@/components/ui/pagination";
 import { pageSize } from "@/constants";
-import usePagination from "@/hooks/use-pagination";
+import usePagination from "@/hooks/data/use-pagination";
 import { Codev } from "@/types/home/codev";
 import { getPrioritizedAndFilteredCodevs } from "@/utils/codev-priority"; // Import the utility
 

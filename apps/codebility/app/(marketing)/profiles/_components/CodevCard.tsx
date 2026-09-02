@@ -17,7 +17,6 @@ import {
 import { BookOpenIcon } from "lucide-react";
 
 import { cn } from "@codevs/ui";
-import { Button } from "@codevs/ui/button";
 import {
   Tooltip,
   TooltipContent,
@@ -30,6 +29,7 @@ import { CodevHireCodevButton } from "./CodevHireCodevButton";
 interface Props {
   codev: Codev;
   color: string;
+  animateEntrance?: boolean;
 }
 
 const STATUS_CONFIG: Record<InternalStatus, { label: string; className: string }> = {
@@ -65,7 +65,7 @@ const STATUS_CONFIG: Record<InternalStatus, { label: string; className: string }
   },
 };
 
-const CodevCard = ({ codev, color }: Props) => {
+const CodevCard = ({ codev, color, animateEntrance = true }: Props) => {
   const [hovered, setHovered] = useState(false);
   const springConfig = { stiffness: 100, damping: 5 };
   const x = useMotionValue(0);
@@ -116,16 +116,10 @@ const CodevCard = ({ codev, color }: Props) => {
       : {};
   }, [codev.level, codev.codev_points]);
 
-  return (
-    <motion.div
-      variants={item}
-      transition={{ duration: 0.4, ease: "easeOut" }}
-      className="h-80"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      <div
-        onClick={() => window.location.href = `https://www.codebility.tech/profiles/${codev.id}`}
+  const cardBody = (
+      <Link
+        href={`/profiles/${codev.id}`}
+        prefetch
         className="group relative flex h-full w-full flex-col items-center justify-between rounded-lg border border-white/20 bg-white/10 p-6 shadow-2xl backdrop-blur-md transition-all duration-300 ease-out cursor-pointer hover:bg-white/20 hover:scale-[1.02] dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10"
       >
         {/* Background decoration */}
@@ -201,15 +195,9 @@ const CodevCard = ({ codev, color }: Props) => {
             <TooltipProvider>
               <Tooltip delayDuration={100}>
                 <TooltipTrigger asChild>
-                  <Link href={`/profiles/${codev.id}`} target="_blank" onClick={(e) => e.stopPropagation()}>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="relative z-10 h-9 w-9 rounded-full border-white/30 bg-white/20 backdrop-blur-sm transition-all duration-300 hover:bg-white/30 active:scale-95 dark:border-white/20 dark:bg-white/10 dark:hover:bg-white/20"
-                    >
-                      <BookOpenIcon className="h-4 w-4" />
-                    </Button>
-                  </Link>
+                  <span className="relative z-10 inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/30 bg-white/20 backdrop-blur-sm dark:border-white/20 dark:bg-white/10">
+                    <BookOpenIcon className="h-4 w-4" />
+                  </span>
                 </TooltipTrigger>
                 <TooltipContent className="border border-white/20 bg-white/10 px-2 py-1 text-xs text-white backdrop-blur-md dark:border-white/10 dark:bg-white/5">
                   Read Bio
@@ -241,9 +229,32 @@ const CodevCard = ({ codev, color }: Props) => {
           ) : null}
         </div>
         <div className="relative z-10">
-          <CodevHireCodevButton codevId={codev.id} />
+          <CodevHireCodevButton />
         </div>
+      </Link>
+  );
+
+  if (!animateEntrance) {
+    return (
+      <div
+        className="h-80"
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      >
+        {cardBody}
       </div>
+    );
+  }
+
+  return (
+    <motion.div
+      variants={item}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      className="h-80"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {cardBody}
     </motion.div>
   );
 };

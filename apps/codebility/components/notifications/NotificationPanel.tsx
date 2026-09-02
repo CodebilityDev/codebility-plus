@@ -17,7 +17,7 @@ import {
   Briefcase,
   Megaphone
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/utils";
 import { Button } from "@codevs/ui/button";
 import { ScrollArea } from "@codevs/ui/scroll-area";
 

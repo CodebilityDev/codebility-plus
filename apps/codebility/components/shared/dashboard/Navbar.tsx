@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { signOut } from "@/app/auth/actions";
+import { signOut } from "@/actions/auth";
 import MobileNav from "@/components/shared/dashboard/MobileNav";
 import Theme from "@/components/shared/dashboard/Theme";
 import { defaultAvatar } from "@/public/assets/images";

@@ -9,7 +9,7 @@ import "../_styles/index.css";
 import {
   DevProcessInitialEdges,
   DevProcessInitialNodes,
-} from "../_lib/dummy-data";
+} from "@/constants/ai-integration/dummy-data";
 import Section from "../../_components/MarketingSection";
 import { CustomEdge } from "./AiIntegrationEdgeTypes";
 import GradientBackgroundWhite from "./AiIntegrationGradientBgWhite";

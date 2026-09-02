@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { createNotificationAction } from "@/lib/actions/notification.actions";
+import { createNotificationAction } from "@/actions/notifications/notification.actions";
 import {
   AlertCircle,
   Calendar,
@@ -24,7 +24,7 @@ import { toast } from "react-hot-toast";
 import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
 
-import { saveMeetingSchedule } from "../actions";
+import { saveMeetingSchedule } from "@/actions/my-team/project";
 
 interface ScheduleMeetingModalProps {
   isOpen: boolean;
@@ -147,7 +147,7 @@ const ScheduleMeetingModal = ({
           title: "📅 Meeting Schedule Removed",
           message: `The recurring meeting schedule for "${projectName}" has been removed by the team lead.`,
           type: "event",
-          priority: "medium",
+          priority: "normal",
           actionUrl: `/home/my-team/${projectId}`,
           metadata: {
             projectId,

@@ -25,7 +25,7 @@ import {
   DropdownMenuTrigger,
 } from "@codevs/ui/dropdown-menu";
 
-import { signOut } from "../../auth/actions";
+import { signOut } from "@/actions/auth";
 import MobileNav from "./MobileNav";
 
 export const defaultMenuItems = [

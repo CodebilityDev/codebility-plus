@@ -3,10 +3,10 @@
 import { useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/utils";
 import toast from "react-hot-toast";
-import { reApplyAction } from "../_service/actions";
-import { getCanReApply } from "../_service/util";
+import { reApplyAction } from "@/actions/auth/declined";
+import { getCanReApply } from "@/utils/auth/declined";
 
 export const DeclinedButtons = ({ userData }: { userData: any }) => {
   const router = useRouter();

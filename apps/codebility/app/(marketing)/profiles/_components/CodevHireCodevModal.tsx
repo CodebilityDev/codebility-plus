@@ -2,27 +2,23 @@
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogHeader, DialogContent, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { useModal } from "@/hooks/use-modal";
+import { useModal } from "@/hooks/modals/use-modal";
 // Removed form imports to fix version conflict
 import { Input } from "@codevs/ui/input";
 import { Textarea } from "@codevs/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { getCodev } from "../_service/actions";
-import { z } from "zod";
+import { getCodev } from "@/actions/marketing/profiles";
 import { toast } from "@/components/ui/use-toast";
 import { Codev } from "@/types/home/codev";
 import { useEffect, useState } from "react";
-import { sentHireCodevEmail } from "../_service/emailAction";
+import { sentHireCodevEmail } from "@/actions/marketing/profiles-email";
+import {
+  hireCodevEmailSchema,
+  type HireCodevEmail,
+} from "@/types/marketing/hire-codev-email";
 
-const formSchema = z.object({
-	name: z.string().min(1, { message: "Name is required" }),
-	email: z.string().email({ message: "Invalid email" }),
-	message: z.string().min(1, { message: "Message is required" }),
-});
-
-type FormValues = z.infer<typeof formSchema>;
-export type HireCodevEmail = FormValues;
+export type { HireCodevEmail } from "@/types/marketing/hire-codev-email";
 
 export function CodevHireCodevModal() {
 	const { isOpen, onClose, type, data: codevId } = useModal();
@@ -35,8 +31,8 @@ export function CodevHireCodevModal() {
 		});
 	}, [codevId]);
 
-	const form = useForm<FormValues>({
-		resolver: zodResolver(formSchema),
+	const form = useForm<HireCodevEmail>({
+		resolver: zodResolver(hireCodevEmailSchema),
 		defaultValues: {
 			name: "",
 			email: "",
@@ -44,7 +40,7 @@ export function CodevHireCodevModal() {
 		},
 	});
 
-	const onSubmit = async (values: FormValues) => {
+	const onSubmit = async (values: HireCodevEmail) => {
 		try {
 			// Prepare template parameters
 			const templateParams = {

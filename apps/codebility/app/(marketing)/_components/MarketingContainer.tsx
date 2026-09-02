@@ -7,7 +7,7 @@ const Container = ({
   children: ReactNode;
   className?: string;
 }) => {
-  return <div className={`max-w-screen-xl p-3 ${className}`}>{children}</div>;
+  return <div className={`mx-auto w-full max-w-screen-xl p-3 ${className}`}>{children}</div>;
 };
 
 export default Container;

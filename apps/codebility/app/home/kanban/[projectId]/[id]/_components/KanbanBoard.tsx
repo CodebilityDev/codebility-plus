@@ -1,15 +1,15 @@
 "use client";
 
-import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
+import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import KanbanBoardsSearch from "@/app/home/kanban/_components/KanbanBoardsSearch";
-import { getMembers } from "@/app/home/projects/actions";
-import pathsConfig from "@/config/paths.config";
+import type { SimpleMemberData } from "@/actions/projects/actions";
+import pathsConfig from "@/types/zod/paths.config";
 import { ArrowRightIcon, IconArchive, IconSearch } from "@/public/assets/svgs";
 import { useUserStore } from "@/store/codev-store";
 import { KanbanBoardType, KanbanColumnType } from "@/types/home/codev";
-import { useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { Archive } from "lucide-react";
 
@@ -19,20 +19,61 @@ import ArchiveColumn from "./ArchiveColumn";
 import KanbanAddMembersButton from "./kanban_modals/KanbanAddMembersButton";
 import KanbanColumnAddButton from "./kanban_modals/KanbanColumnAddButton";
 import KanbanColumnAddModal from "./kanban_modals/KanbanColumnAddModal";
-import KanbanBoardColumnContainer from "./KanbanBoardColumnContainer";
 import UserTaskFilter from "./UserTaskFilter";
-import { useKanbanTaskUrlModal } from "@/hooks/useKanbanTaskUrlModal";
-import { getDraftCount } from "../actions";
+import KanbanBoardSyncIndicator from "./KanbanBoardSyncIndicator";
+import { useKanbanTaskUrlModal } from "@/hooks/kanban/useKanbanTaskUrlModal";
+import { useMemberTaskFilter } from "@/hooks/kanban/use-member-task-filter";
+
+const KanbanBoardColumnContainer = dynamic(
+  () => import("./KanbanBoardColumnContainer"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="overflow-x-auto overflow-y-hidden">
+        <ol className="flex min-h-[calc(100vh-12rem)] w-full flex-wrap gap-4 p-2 md:p-4">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <li
+              key={index}
+              className="relative flex h-full w-[calc(100vw-2rem)] min-w-[280px] flex-col overflow-hidden rounded-xl border border-gray-200 bg-gray-50 shadow-sm dark:border-white/10 dark:bg-white/5 md:w-[350px] md:min-w-[350px] lg:w-[400px] lg:min-w-[400px]"
+            >
+              <div className="border-b border-gray-200 bg-gradient-to-r from-gray-100 to-gray-50 p-4 dark:border-white/20 dark:from-white/10 dark:to-white/15">
+                <div className="h-6 w-32 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
+              </div>
+              <div className="flex flex-col gap-3 p-3">
+                {Array.from({ length: 2 }).map((__, taskIndex) => (
+                  <div
+                    key={taskIndex}
+                    className="h-24 animate-pulse rounded-xl bg-gray-100 dark:bg-white/10"
+                  />
+                ))}
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+    ),
+  },
+);
 
 interface KanbanBoardProps {
   boardData: KanbanBoardType & { kanban_columns: KanbanColumnType[] };
   projectId: string;
+  members: SimpleMemberData[];
+  draftCount: number;
 }
 
-function KanbanBoard({ boardData, projectId }: KanbanBoardProps) {
+function KanbanBoard({
+  boardData,
+  projectId,
+  members: allMembers,
+  draftCount,
+}: KanbanBoardProps) {
   const user = useUserStore((state) => state.user);
 
   useKanbanTaskUrlModal(boardData);
+
+  const { activeFilter, handleFilterClick, loadingMemberId } =
+    useMemberTaskFilter();
 
   const canAddColumn = user?.role_id === 1 || user?.role_id === 5;
   const canAddMember = canAddColumn;
@@ -40,55 +81,25 @@ function KanbanBoard({ boardData, projectId }: KanbanBoardProps) {
   const searchParams = useSearchParams();
   const viewParam = searchParams.get("view");
 
-  const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [showArchive, setShowArchive] = useState(viewParam === "archive");
-  const [draftCount, setDraftCount] = useState<number>(0);
-
-  const { data: allMembers = [], isLoading: isMembersLoading } = useQuery({
-    queryKey: ["members", projectId],
-    queryFn: async () => {
-      const result = await getMembers(projectId);
-      return result.data || [];
-    },
-    enabled: !!projectId,
-    staleTime: 5 * 60 * 1000,
-    refetchOnWindowFocus: false,
-  });
 
   const members = useMemo(
     () =>
-      allMembers.map((user) => ({
-        userId: user.id,
-        userName: `${user.first_name} ${user.last_name}`,
-        imageUrl: user.image_url,
-        isActive: activeFilter === user.id,
+      allMembers.map((member) => ({
+        userId: member.id,
+        userName: `${member.first_name} ${member.last_name}`,
+        imageUrl: member.image_url,
+        isActive: activeFilter === member.id,
+        isLoading: loadingMemberId === member.id,
       })),
-    [allMembers, activeFilter],
+    [allMembers, activeFilter, loadingMemberId],
   );
-
-  useEffect(() => {
-    if (user?.id && projectId) {
-      loadDraftCount();
-    }
-  }, [user?.id, projectId]);
-
-  const loadDraftCount = async () => {
-    if (!user?.id || !projectId) return;
-    const result = await getDraftCount(projectId, user.id);
-    if (result.success && result.count !== undefined) {
-      setDraftCount(result.count);
-    }
-  };
 
   useEffect(() => {
     if (viewParam === "archive") {
       setShowArchive(true);
     }
   }, [viewParam]);
-
-  const handleFilterClick = useCallback((userId: string) => {
-    setActiveFilter((prev) => (prev === userId ? null : userId));
-  }, []);
 
   if (!boardData) {
     return (
@@ -150,9 +161,12 @@ function KanbanBoard({ boardData, projectId }: KanbanBoardProps) {
                 </span>
               </div>
               <div>
-                <h1 className="bg-gradient-to-r from-purple-600 to-customBlue-600 bg-clip-text text-2xl font-bold text-transparent drop-shadow-sm md:text-3xl">
-                  {boardData.name}
-                </h1>
+                <div className="flex flex-wrap items-center gap-2">
+                  <h1 className="bg-gradient-to-r from-purple-600 to-customBlue-600 bg-clip-text text-2xl font-bold text-transparent drop-shadow-sm md:text-3xl">
+                    {boardData.name}
+                  </h1>
+                  <KanbanBoardSyncIndicator />
+                </div>
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
                   Organize and track your project tasks efficiently
                 </p>
@@ -277,7 +291,6 @@ function KanbanBoard({ boardData, projectId }: KanbanBoardProps) {
                 {!showArchive ? (
                   <KanbanBoardColumnContainer
                     projectId={projectId}
-                    columns={boardData.kanban_columns || []}
                     activeFilter={activeFilter}
                   />
                 ) : (

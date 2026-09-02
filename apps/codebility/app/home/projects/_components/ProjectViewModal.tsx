@@ -8,7 +8,7 @@ import {
   getSubLead,   // ── CBP-116
   getTeamLead,
   SimpleMemberData,
-} from "@/app/home/projects/actions";
+} from "@/actions/projects/actions";
 import DefaultAvatar from "@/components/DefaultAvatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,7 +18,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton/skeleton";
-import { useModal } from "@/hooks/use-modal-projects";
+import { useModal } from "@/hooks/modals/use-modal-projects";
 import { IconGithub, IconLink } from "@/public/assets/svgs";
 import { IconFigma } from "@/public/assets/svgs/techstack";
 import { useQuery } from "@tanstack/react-query";

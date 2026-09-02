@@ -14,7 +14,7 @@ import {
   createEducation,
   deleteEducation,
   updateEducation,
-} from "../action";
+} from "@/actions/settings/profile";
 
 interface EducationProps {
   data: Education[];

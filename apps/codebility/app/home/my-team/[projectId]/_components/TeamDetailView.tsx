@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   getMembers,
   SimpleMemberData,
-} from "@/app/home/projects/actions";
+} from "@/actions/projects/actions";
 import { Button } from "@/components/ui/button";
 import { Codev } from "@/types/home/codev";
 import {
@@ -25,7 +25,7 @@ import { toast } from "react-hot-toast";
 
 import ChecklistManageModal from "../../_components/ChecklistManageModal";
 import AddMembersModal from "../../AddMembersModal";
-import { getMeetingSchedule, getTeamMonthlyAttendancePoints } from "../actions";
+import { getMeetingSchedule, getTeamMonthlyAttendancePoints } from "@/actions/my-team/project";
 import AttendanceGrid from "./AttendanceGrid";
 import AttendanceWarningBanner from "./AttendanceWarningBanner";
 import ChecklistStatusBanner from "./ChecklistStatusBanner";

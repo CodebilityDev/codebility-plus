@@ -10,9 +10,9 @@ import {
   getTeamLead, 
   updateProjectMembers,
   SimpleMemberData 
-} from "@/app/home/projects/actions";
+} from "@/actions/projects/actions";
 import { Codev, InternalStatus } from "@/types/home/codev";
-import { useModal } from "@/hooks/use-modal-users";
+import { useModal } from "@/hooks/modals/use-modal-users";
 import { createClientClientComponent } from "@/utils/supabase/client";
 import AddMembersModal from "./AddMembersModal";
 

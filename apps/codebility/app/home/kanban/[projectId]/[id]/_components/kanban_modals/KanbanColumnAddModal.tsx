@@ -2,7 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createNewColumn } from "@/app/home/kanban/[projectId]/[id]/actions";
+import { createNewColumn } from "@/actions/kanban/columns";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,19 +11,19 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useModal } from "@/hooks/use-modal";
-import { useKanbanStore } from "@/store/kanban-store";
+import { useKanbanModal } from "@/hooks/kanban/use-modal-kanban";
+import { useKanbanBoardSync } from "@/hooks/kanban/use-kanban-board-sync";
 import toast from "react-hot-toast";
 
 import { Input } from "@codevs/ui/input";
 
 export default function KanbanColumnAddModal() {
-  const { isOpen, onClose, type, data: boardId } = useModal();
+  const { isOpen, onClose, type, data: boardId } = useKanbanModal();
   const [columnName, setColumnName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const isModalOpen = isOpen && type === "ColumnAddModal";
-  const { fetchBoardData } = useKanbanStore();
+  const { refreshBoard } = useKanbanBoardSync();
 
   const validateColumnName = (name: string): boolean => {
     // Add validation rules based on your database constraints
@@ -45,11 +45,12 @@ export default function KanbanColumnAddModal() {
     setIsLoading(true);
 
     try {
-      const response = await createNewColumn(columnName, boardId);
+      const resolvedBoardId = typeof boardId === "string" ? boardId : "";
+      const response = await createNewColumn(columnName, resolvedBoardId);
       if (response.success) {
         toast.success("Column created successfully!");
         // Refetch the board data
-        await fetchBoardData();
+        await refreshBoard();
         // window.location.reload();
         onClose();
         setColumnName("");

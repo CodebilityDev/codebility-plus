@@ -1,5 +1,5 @@
 import React from "react";
-import Image from "next/image";
+import LandingImage from "./LandingImage";
 
 import { cn } from "@codevs/ui";
 
@@ -26,12 +26,11 @@ const ServicesCard: React.FC<ServicesCardProps> = ({
       )}
     >
       <div className="">
-        <Image
+        <LandingImage
           src={imageUrl}
           width={90}
           alt={imageAlt}
           height={100}
-
           className="h-[210px] w-full bg-[#9747FF]"
         />
       </div>

@@ -40,7 +40,7 @@ export default function CertificatePreview() {
     
     // For Codev role, check level
     if (currentUser.role_id === 10) {
-      return currentLevel >= 2 ? "codev" : "intern";
+      return (currentLevel ?? 0) >= 2 ? "codev" : "intern";
     }
     
     return "intern";
@@ -62,7 +62,9 @@ export default function CertificatePreview() {
     const fetchUsers = async () => {
       if (!isAdmin) return;
       
-      const supabase = await import('@/utils/supabase/client').then(m => m.createClientClientComponent());
+      const supabase = await import("@/utils/supabase/client").then((m) =>
+        m.getClientSupabase(),
+      );
       
       try {
         const { data: users } = await supabase
@@ -87,7 +89,9 @@ export default function CertificatePreview() {
       if (!currentUser) return;
       
       setLoading(true);
-      const supabase = await import('@/utils/supabase/client').then(m => m.createClientClientComponent());
+      const supabase = await import("@/utils/supabase/client").then((m) =>
+        m.getClientSupabase(),
+      );
       
       try {
         // Fetch skill points

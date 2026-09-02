@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import { createNewBoard } from "@/app/home/kanban/actions";
+import { createNewBoard } from "@/actions/kanban/boards-list";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useModal } from "@/hooks/use-modal";
+import { useModal } from "@/hooks/modals/use-modal";
 import { Project } from "@/types/home/codev";
 import { createClientClientComponent } from "@/utils/supabase/client";
 import toast from "react-hot-toast";

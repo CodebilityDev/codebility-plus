@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-import { uploadPostContentImage } from "../_services/action";
+import { uploadPostContentImage } from "@/actions/feeds/post";
 
 export default function MarkdownEditor({
   initialValue = "",

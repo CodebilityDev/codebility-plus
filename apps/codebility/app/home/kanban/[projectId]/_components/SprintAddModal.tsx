@@ -10,8 +10,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useModal } from "@/hooks/use-modal-sprints";
-import { objectToFormData } from "@/lib/form-data";
+import { useModal } from "@/hooks/modals/use-modal-sprints";
+import { objectToFormData } from "@/utils/form-data";
 import { useSprintStore } from "@/store/sprints-store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isBefore, isEqual } from "date-fns";
@@ -22,7 +22,7 @@ import { z } from "zod";
 import { Form, FormControl, FormField, FormMessage } from "@codevs/ui/form";
 import { Input } from "@codevs/ui/input";
 
-import { createNewSprint } from "../actions";
+import { createNewSprint } from "@/actions/kanban/sprints";
 
 const formSchema = z
   .object({

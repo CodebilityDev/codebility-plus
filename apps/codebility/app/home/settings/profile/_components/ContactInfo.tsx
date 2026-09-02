@@ -10,7 +10,7 @@ import toast from "react-hot-toast";
 
 import { Input } from "@codevs/ui/input";
 
-import { updateSocialLinks } from "../action";
+import { updateSocialLinks } from "@/actions/settings/profile";
 
 type ContactInfoProps = {
   data: {

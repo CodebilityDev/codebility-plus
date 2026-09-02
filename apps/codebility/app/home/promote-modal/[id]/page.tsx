@@ -1,4 +1,4 @@
-import { fetchModalById } from "../actions";
+import { fetchModalById } from "@/actions/promote-modal/actions";
 import EditPromoModal from "../_components/EditPromoModal";
 import PageContainer from "../../_components/PageContainer";
 import { H1 } from "@/components/shared/dashboard";

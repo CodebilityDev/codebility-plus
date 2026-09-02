@@ -1,0 +1,1 @@
+export const ATTENDANCE_POINTS_PER_DAY = 2;

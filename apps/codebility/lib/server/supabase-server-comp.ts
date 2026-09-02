@@ -2,7 +2,7 @@
 
 import { use } from "react";
 import { cookies } from "next/headers";
-import { signOut } from "@/app/auth/actions";
+import { signOut } from "@/actions/auth";
 import { User } from "lucide-react";
 import z from "zod";
 

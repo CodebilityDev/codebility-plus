@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { updateAppointmentStatus } from "../actions";
+import { updateAppointmentStatus } from "@/actions/admin/appointments";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";

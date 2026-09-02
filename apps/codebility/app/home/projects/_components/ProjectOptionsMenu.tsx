@@ -14,7 +14,7 @@ import {
   updateKanbanDisplaySwitch,
   updatePublicDisplaySwitch,
   updateStatus,
-} from "../actions";
+} from "@/actions/projects/actions";
 import { ProjectCardProps } from "./ProjectCard";
 
 export default function ProjectOptionsMenu({

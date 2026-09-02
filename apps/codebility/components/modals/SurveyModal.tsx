@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useModal } from "@/hooks/use-modal";
+import { useModal } from "@/hooks/modals/use-modal";
 import { Button } from "@codevs/ui/button";
 import { Input } from "@codevs/ui/input";
 import { Textarea } from "@codevs/ui/textarea";
@@ -15,8 +15,8 @@ import {
   DialogTitle,
 } from "@codevs/ui/dialog";
 import { toast } from "sonner";
-import { submitSurveyResponse } from "@/app/home/settings/surveys/responses/actions";
-import { dismissSurvey } from "@/app/home/settings/surveys/actions";
+import { submitSurveyResponse } from "@/actions/settings/survey-responses";
+import { dismissSurvey } from "@/actions/settings/surveys";
 
 interface Question {
   id: string;

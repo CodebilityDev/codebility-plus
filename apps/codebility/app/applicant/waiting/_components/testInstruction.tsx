@@ -15,8 +15,8 @@ import { ChevronRight } from "lucide-react";
 import { Separator } from "@codevs/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@codevs/ui/tabs";
 
-import { applicantTakeTest } from "../_service/action";
-import { ApplicantType } from "../_service/type";
+import { applicantTakeTest } from "@/actions/applicant-waiting/actions";
+import { ApplicantType } from "@/types/applicant-waiting";
 import { useRouter } from 'next/navigation'
 
 export default function TestInstruction({

@@ -1,5 +1,5 @@
 import React from "react";
-import { useModal } from "@/hooks/use-modal";
+import { useModal } from "@/hooks/modals/use-modal";
 
 import { Dialog, DialogContent, DialogTitle } from "@codevs/ui/dialog";
 

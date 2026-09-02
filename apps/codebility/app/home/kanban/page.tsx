@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import pathsConfig from "@/config/paths.config";
+import pathsConfig from "@/types/zod/paths.config";
 import { IconKanban } from "@/public/assets/svgs";
 import { createClientServerComponent } from "@/utils/supabase/server";
 import PageContainer from "../_components/PageContainer";
