@@ -10,6 +10,7 @@ import { fetchApiJson } from "@/utils/api-fetch";
 import CodevCard from "./CodevCard";
 import CodevListFilter from "./CodevListFilter";
 import { ProfilesListSkeleton } from "./ProfilesListSkeleton";
+import ProgressiveMotion from "../../_shared/ProgressiveMotion";
 
 const pagePromises = new Map<string, Promise<ProfilesListingPage>>();
 const pageMetaCache = new Map<string, ProfilesListingPage["pagination"]>();
@@ -112,7 +113,13 @@ function resolvePagination(
   );
 }
 
-function ProfilesGrid({ codevs }: { codevs: ProfilesListingPage["codevs"] }) {
+function AnimatedProfilesGrid({
+  codevs,
+  animationKey,
+}: {
+  codevs: ProfilesListingPage["codevs"];
+  animationKey: string;
+}) {
   if (codevs.length === 0) {
     return (
       <p className="text-center text-2xl text-gray-500 dark:text-gray-400">
@@ -122,16 +129,35 @@ function ProfilesGrid({ codevs }: { codevs: ProfilesListingPage["codevs"] }) {
   }
 
   return (
-    <div className="grid h-full w-full grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+    <ProgressiveMotion
+      key={animationKey}
+      className="grid h-full w-full grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+      y={20}
+      duration={0.5}
+      staggerChildren={0.05}
+      playOnMount
+    >
       {codevs.map((codev) => (
-        <CodevCard
-          color={getStableColor(codev.id)}
-          key={codev.id}
-          codev={codev}
-        />
+        <div key={codev.id} data-progressive-child>
+          <CodevCard
+            color={getStableColor(codev.id)}
+            codev={codev}
+            animateEntrance={false}
+          />
+        </div>
       ))}
-    </div>
+    </ProgressiveMotion>
   );
+}
+
+function ProfilesGrid({
+  codevs,
+  animationKey,
+}: {
+  codevs: ProfilesListingPage["codevs"];
+  animationKey: string;
+}) {
+  return <AnimatedProfilesGrid codevs={codevs} animationKey={animationKey} />;
 }
 
 function ProfilesPaginationSlot({
@@ -179,7 +205,12 @@ function ProfilesListRemote({
 }) {
   const data = use(loadPage(position, page, pageSize, initialData));
 
-  return <ProfilesGrid codevs={data.codevs} />;
+  return (
+    <ProfilesGrid
+      codevs={data.codevs}
+      animationKey={`${position}:${page}`}
+    />
+  );
 }
 
 function ProfilesListGrid({
@@ -193,11 +224,18 @@ function ProfilesListGrid({
   pageSize: number;
   initialData: ProfilesListingPage;
 }) {
+  const animationKey = `${position}:${page}`;
+
   if (
     page === initialData.pagination.page &&
     position === initialData.position
   ) {
-    return <ProfilesGrid codevs={initialData.codevs} />;
+    return (
+      <ProfilesGrid
+        codevs={initialData.codevs}
+        animationKey={animationKey}
+      />
+    );
   }
 
   return (

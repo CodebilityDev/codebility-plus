@@ -1,10 +1,10 @@
-"use client";
-
 import { Rowdies } from "next/font/google";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import pathsConfig from "@/types/zod/paths.config";
 
+import MarketingProgressiveSection from "../../_shared/MarketingProgressiveSection";
+import ProgressiveMotion from "../../_shared/ProgressiveMotion";
 import OrbitingCirclesBackground from "./CodevsOrbitingCirclesBg";
 
 const rowdies = Rowdies({
@@ -13,6 +13,34 @@ const rowdies = Rowdies({
 });
 
 export default function Hero() {
+  const skeleton = (
+    <div className="z-10 flex w-full flex-1 flex-col items-center justify-center gap-3 p-4 text-center text-white">
+      <p className="text-sm lg:text-xl">Find Your Next Developer</p>
+      <div className="relative">
+        <h1
+          className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-5xl uppercase tracking-widest opacity-5 md:text-6xl lg:text-9xl ${rowdies.className}`}
+        >
+          Codebility
+        </h1>
+        <h2 className="text-xl font-semibold lg:text-5xl">
+          Hire Talented Codevs
+        </h2>
+      </div>
+      <p className="text-xs md:text-sm lg:text-2xl">
+        Connect with skilled developers ready to bring your projects to life
+      </p>
+      <div className="mx-auto mt-6 flex w-full justify-center">
+        <Link href="#codevs">
+          <Button className="from-customTeal to-customViolet-100 h-12 rounded-full bg-gradient-to-r via-customBlue-100 p-0.5 hover:bg-gradient-to-br md:w-40">
+            <span className="bg-black-500 flex h-full w-full items-center justify-center rounded-full text-sm text-white lg:text-lg">
+              Hire Codevs
+            </span>
+          </Button>
+        </Link>
+      </div>
+    </div>
+  );
+
   return (
     <section
       id="home"
@@ -24,33 +52,49 @@ export default function Hero() {
           background:
             "radial-gradient(50% 50% at 50% 50%, rgba(151, 71, 255, 0.3) 0%, rgba(3, 3, 3, 0.3) 100%)",
         }}
-      ></div>
+      />
       <OrbitingCirclesBackground />
-      <div className="z-10 flex w-full flex-1 flex-col items-center justify-center gap-3 p-4 text-center text-white">
-        <p className="text-sm lg:text-xl">Find Your Next Developer</p>
-        <div className="relative">
-          <h1
-            className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-5xl uppercase tracking-widest opacity-5 md:text-6xl lg:text-9xl ${rowdies.className}`}
+      <MarketingProgressiveSection skeleton={skeleton}>
+        <ProgressiveMotion
+          className="z-10 flex w-full flex-1 flex-col items-center justify-center gap-3 p-4 text-center text-white"
+          y={30}
+          duration={0.6}
+          staggerChildren={0.12}
+          playOnMount
+        >
+          <p data-progressive-child className="text-sm lg:text-xl">
+            Find Your Next Developer
+          </p>
+          <div data-progressive-child className="relative">
+            <h1
+              className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-5xl uppercase tracking-widest opacity-5 md:text-6xl lg:text-9xl ${rowdies.className}`}
+            >
+              Codebility
+            </h1>
+            <h2 className="text-xl font-semibold lg:text-5xl">
+              Hire Talented Codevs
+            </h2>
+          </div>
+          <p
+            data-progressive-child
+            className="text-xs md:text-sm lg:text-2xl"
           >
-            Codebility
-          </h1>
-          <h2 className="text-xl font-semibold lg:text-5xl">
-            Hire Talented Codevs
-          </h2>
-        </div>
-        <p className="text-xs md:text-sm lg:text-2xl">
-          Connect with skilled developers ready to bring your projects to life
-        </p>
-        <div className="mx-auto mt-6 flex w-full justify-center">
-          <Link href="#codevs">
-            <Button className="from-customTeal to-customViolet-100 h-12 rounded-full bg-gradient-to-r via-customBlue-100 p-0.5 hover:bg-gradient-to-br md:w-40">
-              <span className="bg-black-500 flex h-full w-full items-center justify-center rounded-full text-sm text-white lg:text-lg">
-                Hire Codevs
-              </span>
-            </Button>
-          </Link>
-        </div>
-      </div>
+            Connect with skilled developers ready to bring your projects to life
+          </p>
+          <div
+            data-progressive-child
+            className="mx-auto mt-6 flex w-full justify-center"
+          >
+            <Link href="#codevs">
+              <Button className="from-customTeal to-customViolet-100 h-12 rounded-full bg-gradient-to-r via-customBlue-100 p-0.5 hover:bg-gradient-to-br md:w-40">
+                <span className="bg-black-500 flex h-full w-full items-center justify-center rounded-full text-sm text-white lg:text-lg">
+                  Hire Codevs
+                </span>
+              </Button>
+            </Link>
+          </div>
+        </ProgressiveMotion>
+      </MarketingProgressiveSection>
 
       <div className="hero-bubble">
         {Array.from({ length: 8 }, (_, index) => (

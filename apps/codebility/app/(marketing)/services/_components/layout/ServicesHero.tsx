@@ -1,18 +1,45 @@
 import Container from "../../../_components/MarketingContainer";
+import MarketingProgressiveSection from "../../../_shared/MarketingProgressiveSection";
+import ProgressiveMotion from "../../../_shared/ProgressiveMotion";
 
 export const Hero = () => {
+  const skeleton = (
+    <div className="relative z-10 flex flex-col gap-2 pt-14 text-center 2xl:p-0 lg:pt-0">
+      <h1 className="flex flex-col gap-1 text-3xl font-semibold md:text-5xl">
+        Our Services
+      </h1>
+      <h2 className="text-lg md:text-xl">
+        Partner with Us to Bring Your Vision to Life
+      </h2>
+    </div>
+  );
+
   return (
     <div className="relative">
-      <section id="services-hero" className="relative mt-2 flex min-h-[180px] w-full flex-col items-center justify-center overflow-hidden bg-cover bg-no-repeat lg:mt-16">
+      <section
+        id="services-hero"
+        className="relative mt-2 flex min-h-[180px] w-full flex-col items-center justify-center overflow-hidden bg-cover bg-no-repeat lg:mt-16"
+      >
         <Container className="text-white">
-          <div className="relative z-10 flex flex-col gap-2 pt-14 2xl:p-0 text-center lg:pt-0">
-            <h1 className="flex flex-col gap-1 text-3xl font-semibold md:text-5xl">
-              Our Services
-            </h1>
-            <h2 className="text-lg md:text-xl">
-              Partner with Us to Bring Your Vision to Life
-            </h2>
-          </div>
+          <MarketingProgressiveSection skeleton={skeleton}>
+            <ProgressiveMotion
+              className="relative z-10 flex flex-col gap-2 pt-14 text-center 2xl:p-0 lg:pt-0"
+              y={30}
+              duration={0.6}
+              staggerChildren={0.1}
+              playOnMount
+            >
+              <h1
+                data-progressive-child
+                className="flex flex-col gap-1 text-3xl font-semibold md:text-5xl"
+              >
+                Our Services
+              </h1>
+              <h2 data-progressive-child className="text-lg md:text-xl">
+                Partner with Us to Bring Your Vision to Life
+              </h2>
+            </ProgressiveMotion>
+          </MarketingProgressiveSection>
         </Container>
       </section>
       <div

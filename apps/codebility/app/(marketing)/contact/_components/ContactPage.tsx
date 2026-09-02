@@ -10,6 +10,8 @@ import {
 import InquiryForm from "./ContactInquiryInform";
 import ShortSurvey from "./ContactShortSurvey";
 import Appointment from "./ContactAppointment";
+import MarketingProgressiveSection from "../../_shared/MarketingProgressiveSection";
+import ProgressiveMotion from "../../_shared/ProgressiveMotion";
 
 const steps = [
     { label: "Inquiry Form", icon: <IconHuman /> },
@@ -51,12 +53,40 @@ const ContactPage = () => {
 
     const progressWidth = `${(currentStep / (steps.length - 1)) * 100}%`;
 
+    const skeleton = (
+        <div className="mx-auto flex max-w-xl flex-col items-center gap-8 px-5 py-10">
+            <div className="relative w-full opacity-80">
+                <div className="relative flex items-start">
+                    {steps.map((step, i) => (
+                        <div key={i} className="relative z-10 flex flex-1 flex-col items-center gap-2">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/5 bg-white/5 text-sm font-medium text-white/30">
+                                {step.icon}
+                            </div>
+                            <p className="text-center text-xs font-medium text-white/30">
+                                {step.label}
+                            </p>
+                        </div>
+                    ))}
+                </div>
+            </div>
+            <div className="h-[2px] w-full rounded-full bg-white/5" />
+            <div className="h-64 w-full rounded-xl bg-white/5" />
+        </div>
+    );
+
     return (
         <div className="min-h-screen w-full bg-[#030303] text-white">
-            <div className="mx-auto flex max-w-xl flex-col items-center gap-8 px-5 py-10">
+            <MarketingProgressiveSection skeleton={skeleton}>
+            <ProgressiveMotion
+                className="mx-auto flex max-w-xl flex-col items-center gap-8 px-5 py-10"
+                y={24}
+                duration={0.55}
+                staggerChildren={0.08}
+                playOnMount
+            >
 
                 {/* Stepper */}
-                <div className="relative w-full">
+                <div data-progressive-child className="relative w-full">
                     {/* Connector: circle 1 → circle 2 */}
                     <div
                         className={`absolute top-5 h-[2px] transition-all duration-500 ${currentStep > 0 ? "bg-violet-600" : "bg-white/5"
@@ -110,7 +140,7 @@ const ContactPage = () => {
                 </div>
 
                 {/* Progress Bar */}
-                <div className="h-[2px] w-full rounded-full bg-white/5">
+                <div data-progressive-child className="h-[2px] w-full rounded-full bg-white/5">
                     <div
                         className="h-full rounded-full bg-violet-600 transition-all duration-500"
                         style={{ width: progressWidth }}
@@ -118,6 +148,7 @@ const ContactPage = () => {
                 </div>
 
                 {/* Step Panels */}
+                <div data-progressive-child className="w-full">
                 {currentStep === 0 && (
                     <InquiryForm
                         defaultValues={formData}
@@ -137,9 +168,10 @@ const ContactPage = () => {
                         onBack={goBack}
                     />
                 )}
+                </div>
 
                 {/* Security note */}
-                <div className="flex w-full items-center gap-2 rounded-lg border border-white/5 bg-white/5 px-4 py-3">
+                <div data-progressive-child className="flex w-full items-center gap-2 rounded-lg border border-white/5 bg-white/5 px-4 py-3">
                     <svg className="h-4 w-4 shrink-0 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                             d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -149,7 +181,8 @@ const ContactPage = () => {
                     </p>
                 </div>
 
-            </div>
+            </ProgressiveMotion>
+            </MarketingProgressiveSection>
         </div>
     );
 };

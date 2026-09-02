@@ -1,7 +1,7 @@
-"use client";
-
 import { Rowdies } from "next/font/google";
-
+import Link from "next/link";
+import MarketingProgressiveSection from "../../_shared/MarketingProgressiveSection";
+import ProgressiveMotion from "../../_shared/ProgressiveMotion";
 import OrbitingCirclesBackground from "./CodevsOrbitingCirclesBg";
 
 const rowdies = Rowdies({
@@ -10,6 +10,33 @@ const rowdies = Rowdies({
 });
 
 export default function CodevHero() {
+  const skeleton = (
+    <div className="z-10 flex w-full flex-col gap-3 p-4 pt-24 text-center text-white">
+      <p className="text-sm lg:text-xl">Build Your Career With Us</p>
+      <div className="relative">
+        <h1
+          className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-5xl uppercase tracking-widest opacity-5 md:text-6xl lg:text-9xl ${rowdies.className}`}
+        >
+          Codebility
+        </h1>
+        <h2 className="text-xl font-semibold lg:text-5xl">
+          Advance Your Tech Career
+        </h2>
+      </div>
+      <p className="text-xs md:text-sm lg:text-2xl">
+        Where Innovation Meets Opportunity and Talent Thrives
+      </p>
+      <div className="mx-auto mt-6 flex w-full flex-col justify-center gap-6 md:flex-row">
+        <Link
+          href="#open-positions"
+          className="inline-flex h-11 items-center justify-center rounded-full bg-customViolet-100 px-8 py-2 text-sm font-medium text-white md:w-40"
+        >
+          View Jobs
+        </Link>
+      </div>
+    </div>
+  );
+
   return (
     <section
       id="home"
@@ -23,35 +50,46 @@ export default function CodevHero() {
         }}
       />
       <OrbitingCirclesBackground />
-      <div className="z-10 flex w-full flex-col gap-3 p-4 pt-24 text-center text-white">
-        <p className="text-sm lg:text-xl">Build Your Career With Us</p>
-        <div className="relative">
-          <h1
-            className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-5xl uppercase tracking-widest opacity-5 md:text-6xl lg:text-9xl ${rowdies.className}`}
+      <MarketingProgressiveSection skeleton={skeleton}>
+        <ProgressiveMotion
+          className="z-10 flex w-full flex-col gap-3 p-4 pt-24 text-center text-white"
+          y={30}
+          duration={0.6}
+          staggerChildren={0.12}
+          playOnMount
+        >
+          <p data-progressive-child className="text-sm lg:text-xl">
+            Build Your Career With Us
+          </p>
+          <div data-progressive-child className="relative">
+            <h1
+              className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-5xl uppercase tracking-widest opacity-5 md:text-6xl lg:text-9xl ${rowdies.className}`}
+            >
+              Codebility
+            </h1>
+            <h2 className="text-xl font-semibold lg:text-5xl">
+              Advance Your Tech Career
+            </h2>
+          </div>
+          <p
+            data-progressive-child
+            className="text-xs md:text-sm lg:text-2xl"
           >
-            Codebility
-          </h1>
-          <h2 className="text-xl font-semibold lg:text-5xl">
-            Advance Your Tech Career
-          </h2>
-        </div>
-        <p className="text-xs md:text-sm lg:text-2xl">
-          Where Innovation Meets Opportunity and Talent Thrives
-        </p>
-        <div className="mx-auto mt-6 flex w-full flex-col justify-center gap-6 md:flex-row">
-          <button
-            type="button"
-            onClick={() => {
-              document.getElementById("open-positions")?.scrollIntoView({
-                behavior: "smooth",
-              });
-            }}
-            className="inline-flex h-11 items-center justify-center rounded-full bg-customViolet-100 px-8 py-2 text-sm font-medium text-white ring-offset-background transition-colors hover:bg-customViolet-100/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 md:w-40"
+            Where Innovation Meets Opportunity and Talent Thrives
+          </p>
+          <div
+            data-progressive-child
+            className="mx-auto mt-6 flex w-full flex-col justify-center gap-6 md:flex-row"
           >
-            View Jobs
-          </button>
-        </div>
-      </div>
+            <Link
+              href="#open-positions"
+              className="inline-flex h-11 items-center justify-center rounded-full bg-customViolet-100 px-8 py-2 text-sm font-medium text-white ring-offset-background transition-colors hover:bg-customViolet-100/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 md:w-40"
+            >
+              View Jobs
+            </Link>
+          </div>
+        </ProgressiveMotion>
+      </MarketingProgressiveSection>
 
       <div className="hero-bubble">
         {Array.from({ length: 8 }, (_, index) => (
