@@ -24,7 +24,6 @@ export default function PrivacyPolicyContent() {
             y={24}
             duration={0.55}
             staggerChildren={0.06}
-            playOnMount
           >
             <h1
               data-progressive-child

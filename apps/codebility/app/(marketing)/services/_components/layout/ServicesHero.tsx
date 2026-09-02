@@ -1,6 +1,5 @@
 import Container from "../../../_components/MarketingContainer";
 import MarketingProgressiveSection from "../../../_shared/MarketingProgressiveSection";
-import ProgressiveMotion from "../../../_shared/ProgressiveMotion";
 
 export const Hero = () => {
   const skeleton = (
@@ -22,23 +21,14 @@ export const Hero = () => {
       >
         <Container className="text-white">
           <MarketingProgressiveSection skeleton={skeleton}>
-            <ProgressiveMotion
-              className="relative z-10 flex flex-col gap-2 pt-14 text-center 2xl:p-0 lg:pt-0"
-              y={30}
-              duration={0.6}
-              staggerChildren={0.1}
-              playOnMount
-            >
-              <h1
-                data-progressive-child
-                className="flex flex-col gap-1 text-3xl font-semibold md:text-5xl"
-              >
+            <div className="relative z-10 flex flex-col gap-2 pt-14 text-center 2xl:p-0 lg:pt-0">
+              <h1 className="flex flex-col gap-1 text-3xl font-semibold md:text-5xl">
                 Our Services
               </h1>
-              <h2 data-progressive-child className="text-lg md:text-xl">
+              <h2 className="text-lg md:text-xl">
                 Partner with Us to Bring Your Vision to Life
               </h2>
-            </ProgressiveMotion>
+            </div>
           </MarketingProgressiveSection>
         </Container>
       </section>

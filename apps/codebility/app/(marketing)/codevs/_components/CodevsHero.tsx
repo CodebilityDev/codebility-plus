@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import pathsConfig from "@/types/zod/paths.config";
 
 import MarketingProgressiveSection from "../../_shared/MarketingProgressiveSection";
-import ProgressiveMotion from "../../_shared/ProgressiveMotion";
 import OrbitingCirclesBackground from "./CodevsOrbitingCirclesBg";
 
 const rowdies = Rowdies({
@@ -12,9 +11,12 @@ const rowdies = Rowdies({
   subsets: ["latin"],
 });
 
+const heroContentClassName =
+  "absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 p-4 text-center text-white";
+
 export default function Hero() {
   const skeleton = (
-    <div className="z-10 flex w-full flex-1 flex-col items-center justify-center gap-3 p-4 text-center text-white">
+    <div className={heroContentClassName}>
       <p className="text-sm lg:text-xl">Join Our Community</p>
       <div className="relative">
         <h1
@@ -52,37 +54,21 @@ export default function Hero() {
         }}
       />
       <OrbitingCirclesBackground />
-      <MarketingProgressiveSection skeleton={skeleton}>
-        <ProgressiveMotion
-          className="z-10 flex w-full flex-1 flex-col items-center justify-center gap-3 p-4 text-center text-white"
-          y={30}
-          duration={0.6}
-          staggerChildren={0.12}
-          playOnMount
-        >
-          <p data-progressive-child className="text-sm lg:text-xl">
-            Join Our Community
-          </p>
-          <div data-progressive-child className="relative">
+      <MarketingProgressiveSection className="z-10 w-full flex-1" skeleton={skeleton}>
+        <div className={heroContentClassName}>
+          <p className="text-sm lg:text-xl">Join Our Community</p>
+          <div className="relative">
             <h1
               className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-5xl uppercase tracking-widest opacity-5 md:text-6xl lg:text-9xl ${rowdies.className}`}
             >
               Codebility
             </h1>
-            <h2 className="text-xl font-semibold lg:text-5xl">
-              Become a CoDevs
-            </h2>
+            <h2 className="text-xl font-semibold lg:text-5xl">Become a CoDevs</h2>
           </div>
-          <p
-            data-progressive-child
-            className="text-xs md:text-sm lg:text-2xl"
-          >
+          <p className="text-xs md:text-sm lg:text-2xl">
             Start your journey as a developer and grow with real-world projects
           </p>
-          <div
-            data-progressive-child
-            className="mx-auto mt-6 flex w-full justify-center"
-          >
+          <div className="mx-auto mt-6 flex w-full justify-center">
             <Link href={pathsConfig.auth.onboarding}>
               <Button className="from-customTeal to-customViolet-100 h-12 rounded-full bg-gradient-to-r via-customBlue-100 p-0.5 hover:bg-gradient-to-br md:w-40">
                 <span className="bg-black-500 flex h-full w-full items-center justify-center rounded-full text-sm text-white lg:text-lg">
@@ -91,7 +77,7 @@ export default function Hero() {
               </Button>
             </Link>
           </div>
-        </ProgressiveMotion>
+        </div>
       </MarketingProgressiveSection>
 
       <div className="hero-bubble">

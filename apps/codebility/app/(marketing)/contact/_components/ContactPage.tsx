@@ -82,7 +82,6 @@ const ContactPage = () => {
                 y={24}
                 duration={0.55}
                 staggerChildren={0.08}
-                playOnMount
             >
 
                 {/* Stepper */}

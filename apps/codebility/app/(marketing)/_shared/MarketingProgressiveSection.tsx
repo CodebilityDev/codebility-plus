@@ -1,15 +1,13 @@
 import type { ReactNode } from "react";
 
+import MarketingMotionReadyMarker from "./MarketingMotionReadyMarker";
+
 type MarketingProgressiveSectionProps = {
   children: ReactNode;
   skeleton: ReactNode;
   className?: string;
 };
 
-/**
- * SSR-friendly section shell: shows static skeleton until motion JS is ready,
- * then reveals animated content without hiding parts already in the viewport.
- */
 export default function MarketingProgressiveSection({
   children,
   skeleton,
@@ -17,6 +15,7 @@ export default function MarketingProgressiveSection({
 }: MarketingProgressiveSectionProps) {
   return (
     <div data-landing-section className={className}>
+      <MarketingMotionReadyMarker />
       <div data-landing-skeleton aria-hidden="true">
         {skeleton}
       </div>

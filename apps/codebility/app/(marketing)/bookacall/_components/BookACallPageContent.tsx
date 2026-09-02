@@ -1,4 +1,5 @@
-import Container from "../../_components/MarketingContainer";import MarketingProgressiveSection from "../../_shared/MarketingProgressiveSection";
+import Container from "../../_components/MarketingContainer";
+import MarketingProgressiveSection from "../../_shared/MarketingProgressiveSection";
 import ProgressiveMotion from "../../_shared/ProgressiveMotion";
 import BookACallCalendlyWidgetContainer from "./BookACallCalendlyWidgetContainer";
 
@@ -23,24 +24,15 @@ export default function BookACallPageContent() {
       <Container>
         <MarketingProgressiveSection skeleton={skeleton}>
           <div className="relative z-10 flex w-full max-w-screen-sm flex-col gap-6 pt-10 text-white lg:mx-60 lg:max-w-screen-lg lg:flex-row lg:justify-between lg:gap-10 lg:pt-32">
-            <ProgressiveMotion
-              className="flex w-full flex-col gap-2 text-center lg:pt-64 lg:text-left"
-              y={30}
-              duration={0.6}
-              staggerChildren={0.12}
-              playOnMount
-            >
-              <h2
-                data-progressive-child
-                className="text-3xl font-bold uppercase md:text-5xl"
-              >
+            <div className="flex w-full flex-col gap-2 text-center lg:pt-64 lg:text-left">
+              <h2 className="text-3xl font-bold uppercase md:text-5xl">
                 Book a meeting!
               </h2>
-              <p data-progressive-child className="text-md lg:text-lg">
+              <p className="text-md lg:text-lg">
                 Schedule a meeting with our experts to discuss your needs and
                 find tailored solutions.
               </p>
-            </ProgressiveMotion>
+            </div>
 
             <ProgressiveMotion y={32} duration={0.55}>
               <div data-progressive-child>
