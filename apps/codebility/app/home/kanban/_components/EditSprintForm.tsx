@@ -1,8 +1,8 @@
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Input } from "@/components/shared/dashboard/input";
 import { Button } from "@/components/ui/button";
 import { useUserStore } from "@/store/codev-store";
-import { useSprintStore } from "@/store/sprints-store";
 import { uploadImage } from "@/utils/uploadImage";
 import toast from "react-hot-toast";
 
@@ -10,7 +10,7 @@ import { Textarea } from "@codevs/ui/textarea";
 
 import { addPost } from "@/actions/feeds/post";
 import { EditSprint } from "@/actions/kanban/sprints";
-import { KanbanSprintData } from "../[projectId]/page";
+import { KanbanSprintData } from "../_types/sprint";
 
 const EditSprintForm = ({
   className,
@@ -23,7 +23,7 @@ const EditSprintForm = ({
 }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user } = useUserStore();
-  const { fetchSprintsData } = useSprintStore();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -38,8 +38,8 @@ const EditSprintForm = ({
 
       if (!isSuccess) throw error;
 
-      // Revalidate sprint store
-      fetchSprintsData();
+      // re-render the server component tree with fresh sprint data
+      router.refresh();
 
       // Notify
       toast.success("Sprint edited successfully!");

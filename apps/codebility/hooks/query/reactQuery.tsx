@@ -1,26 +1,30 @@
 "use client";
 
-import React from "react";
-import {
-  keepPreviousData,
-  QueryClient,
-  QueryClientProvider,
-} from "@tanstack/react-query";
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      placeholderData: keepPreviousData, // to use the previous data as placeholder while new data is being fetched
-      refetchOnWindowFocus: true, // set to "true" to ensure the data is up to date
-      refetchOnMount: true,
-      refetchOnReconnect: true,
-      retry: false, // to control the failed retries
-      staleTime: 5 * 60 * 1000, // to improved performance and to reduce any unnecessary network request. This is set to 5 minutes
-    },
-  },
-});
+import React, { useState } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 function ReactQueryProvider({ children }: React.PropsWithChildren) {
+  // Created per provider instance rather than at module scope. A module-level
+  // client is shared across requests in the server process, which would leak
+  // one user's cached data to another as soon as any query is prefetched
+  // during SSR.
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            refetchOnWindowFocus: true,
+            refetchOnMount: true,
+            refetchOnReconnect: true,
+            retry: false,
+            // Components asking for the same queryKey within this window share
+            // a single response instead of each issuing its own request.
+            staleTime: 5 * 60 * 1000,
+          },
+        },
+      }),
+  );
+
   return (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );

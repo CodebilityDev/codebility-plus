@@ -294,6 +294,26 @@ export async function getAllSurveys() {
   }
 }
 
+export async function getSurveyById(surveyId: string) {
+  try {
+    const supabase = await createClientServerComponent();
+
+    const { data, error } = await supabase
+      .from("surveys")
+      .select("*")
+      .eq("id", surveyId)
+      .single();
+
+    if (error) {
+      return { error: error.message };
+    }
+
+    return { data, success: true };
+  } catch (error) {
+    return { error: "Failed to fetch survey" };
+  }
+}
+
 export async function dismissSurvey(surveyId: string) {
   try {
     const supabase = await createClientServerComponent();

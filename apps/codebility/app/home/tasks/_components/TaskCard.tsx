@@ -1,20 +1,20 @@
 import Image from "next/image";
 import { Paragraph } from "@/components/shared/home";
-import {
-  KanbanBoardType,
-  KanbanColumnType,
-  Project,
-  Task,
-} from "@/types/home/codev";
+import { Task } from "@/types/home/codev";
 
 interface Props {
   task: TaskWithRelations; // Updated type to include relations
 }
 
-interface TaskWithRelations extends Task {
-  kanban_column?: KanbanColumnType & {
-    board?: KanbanBoardType & {
-      project?: Project;
+// Only the columns the tasks page selects for the nested relations.
+export interface TaskWithRelations extends Task {
+  kanban_column?: {
+    id: string;
+    name: string;
+    board?: {
+      id: string;
+      name: string;
+      project?: { id: string; name: string };
     };
   };
 }

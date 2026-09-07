@@ -1,9 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Box from "@/components/shared/dashboard/Box";
 import InputField from "@/components/shared/dashboard/InputPhone";
 import { Button } from "@/components/ui/button";
+import {
+  useInvalidateProfilePoints,
+  useProfilePoints,
+} from "@/hooks/query/use-profile-points";
 import { IconEdit } from "@/public/assets/svgs";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";

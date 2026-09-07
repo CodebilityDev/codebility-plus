@@ -3,6 +3,10 @@
 import { useState, useEffect } from "react";
 import Box from "@/components/shared/dashboard/Box";
 import { Button } from "@/components/ui/button";
+import {
+  useInvalidateProfilePoints,
+  useProfilePoints,
+} from "@/hooks/query/use-profile-points";
 import { IconEdit } from "@/public/assets/svgs";
 import { Codev } from "@/types/home/codev";
 import { useForm } from "react-hook-form";
@@ -21,12 +25,21 @@ type FormValues = {
   about: string;
 };
 
+type ProfilePointEntry = { category: string; points: number };
+
 const About = ({ data }: AboutProps) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [hasAboutPoints, setHasAboutPoints] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
+  const { data: profilePoints } = useProfilePoints(data.id);
+  const invalidateProfilePoints = useInvalidateProfilePoints();
+
+  // Has the user earned points for the 'about' field?
+  const aboutPoint = (
+    (profilePoints?.points ?? []) as ProfilePointEntry[]
+  ).find((point) => point.category === "about");
+  const hasAboutPoints = !!aboutPoint && aboutPoint.points > 0;
 
   const {
     register,
@@ -47,28 +60,6 @@ const About = ({ data }: AboutProps) => {
     else setIsExpanded(false);
   }, [isEditMode]);
 
-  // Check if user has earned points for the 'about' field
-  useEffect(() => {
-    async function checkAboutPoints() {
-      if (!data.id) return;
-
-      try {
-        const res = await fetch(`/api/profile-points/${data.id}`);
-        if (res.ok) {
-            const pointsData: { points?: { category: string; points: number }[] } = await res.json() as { points?: { category: string; points: number }[] };
-            const aboutPoint = pointsData?.points?.find(
-              (point) => point.category === 'about'
-            );
-            setHasAboutPoints(!!aboutPoint && aboutPoint.points > 0);
-          }
-      } catch (error) {
-        console.error("Failed to check about points:", error);
-      }
-    }
-
-    checkAboutPoints();
-  }, [data.id, data.about]); // Re-check when about field changes
-
   const onSubmit = async (formData: FormValues) => {
     const toastId = toast.loading("Your info is being updated");
     try {
@@ -76,16 +67,9 @@ const About = ({ data }: AboutProps) => {
       await updateCodev(formData);
       toast.success("Your about was successfully updated!", { id: toastId });
       setIsEditMode(false);
-      
+
       // Re-check points after update
-            const res = await fetch(`/api/profile-points/${data.id}`);
-            if (res.ok) {
-              const pointsData: { points?: { category: string; points: number }[] } = await res.json() as { points?: { category: string; points: number }[] };
-              const aboutPoint = pointsData?.points?.find(
-                (point) => point.category === 'about'
-              );
-              setHasAboutPoints(!!aboutPoint && aboutPoint.points > 0);
-            }
+      await invalidateProfilePoints(data.id);
     } catch (error) {
       console.error(error);
       toast.error("Something went wrong, please try again later!");
