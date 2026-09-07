@@ -1,223 +1,73 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClientServerComponent } from "@/utils/supabase/server";
+import {
+  getCachedAllTimeTechnicalLeaderboard,
+  getTechnicalLeaderboard,
+} from "@/lib/server/technical-leaderboard";
 import { z } from "zod";
-import { getWeekRange, getMonthRange } from "@/utils/leaderboard-utils";
 
-interface TechnicalLeader {
-  codev_id: string;
-  first_name: string;
-  total_points: number;
-  latest_update: string;
-}
-
-// Validation schema for query parameters
 const querySchema = z.object({
   category: z.string().min(1, "Category is required"),
   timeFilter: z.enum(["all", "weekly", "monthly"]).default("all"),
-  limit: z.string().optional().default("10").transform(Number).refine(n => n > 0 && n <= 50, "Limit must be between 1 and 50")
+  limit: z
+    .string()
+    .optional()
+    .default("10")
+    .transform(Number)
+    .refine((n) => n > 0 && n <= 50, "Limit must be between 1 and 50"),
 });
 
 export async function GET(request: NextRequest) {
   try {
-    // Validate query parameters
     const url = new URL(request.url);
     const params = Object.fromEntries(url.searchParams);
     const { category, timeFilter, limit } = querySchema.parse(params);
 
     const supabase = await createClientServerComponent();
-    
-    // Verify user authentication
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
+
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
     if (authError || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    let processedLeaders: TechnicalLeader[] = [];
-
-    // All-time totals come from the codev_points ledger, NOT from the tasks table.
-    //
-    // codev_points is append-only: points are added when a task is approved and are
-    // never removed. The tasks table is mutable, so recomputing all-time totals from it
-    // silently drops every point whose originating task was later deleted, un-archived,
-    // or had its skill_category cleared — which is what caused the all-time leaderboard
-    // to under-report. Time-ranged views below still derive from tasks, where the
-    // approval date is the whole point of the query.
-    if (timeFilter === "all") {
-      const { data: rawPoints, error: pointsError } = await supabase
-        .from("codev_points")
-        .select(`
-          codev_id,
-          points,
-          created_at,
-          codev:codev_id!inner(first_name),
-          skill_category:skill_category_id!inner(name)
-        `)
-        .eq("skill_category.name", category)
-        .not("codev.first_name", "is", null);
-
-      if (pointsError) {
-        console.error("Error fetching all-time technical leaderboard:", pointsError);
-        return NextResponse.json(
-          { error: "Failed to fetch leaderboard data", details: pointsError.message },
-          { status: 500 }
-        );
-      }
-
-      // codev_points holds one row per (codev, skill category), but aggregate defensively
-      // in case duplicate rows exist for a pair.
-      const allTimeMap = new Map<string, TechnicalLeader>();
-
-      rawPoints?.forEach((entry: any) => {
-        const userId = entry.codev_id;
-        if (!userId) return;
-
-        const points = entry.points || 0;
-        const existing = allTimeMap.get(userId);
-
-        if (existing) {
-          existing.total_points += points;
-          if (entry.created_at && entry.created_at > existing.latest_update) {
-            existing.latest_update = entry.created_at;
-          }
-        } else {
-          allTimeMap.set(userId, {
-            codev_id: userId,
-            first_name: entry.codev?.first_name || "Unknown",
-            total_points: points,
-            latest_update: entry.created_at || new Date(0).toISOString()
+    // All-time boards are identical for every viewer, so they come from the
+    // shared cache — switching between FE/BE/FS tabs is a cache hit after the
+    // first look. Weekly/monthly read the project-scoped tasks table and are
+    // window-dependent, so they stay uncached.
+    const leaders =
+      timeFilter === "all"
+        ? await getCachedAllTimeTechnicalLeaderboard(category, limit)
+        : await getTechnicalLeaderboard(supabase, {
+            category,
+            timeFilter,
+            limit,
           });
-        }
-      });
 
-      processedLeaders = Array.from(allTimeMap.values())
-        .filter(leader => leader.total_points > 0)
-        .sort((a, b) => b.total_points - a.total_points)
-        .slice(0, limit);
-
-      return NextResponse.json({
-        leaders: processedLeaders,
-        totalCount: processedLeaders.length
-      });
-    }
-
-    // Weekly/monthly are derived from approved tasks within the requested window.
-    let query = supabase
-      .from("tasks")
-      .select(`
-        points,
-        approved_at,
-        codev_id,
-        sidekick_ids,
-        codev:codev_id(first_name),
-        skill_category:skill_category_id!inner(name)
-      `)
-      .eq("skill_category.name", category)
-      .eq("is_archive", true);
-
-    if (timeFilter === "weekly") {
-      const { startDate, endDate } = getWeekRange();
-      query = query.gte("approved_at", startDate.toISOString()).lte("approved_at", endDate.toISOString());
-    } else {
-      const { startDate, endDate } = getMonthRange();
-      query = query.gte("approved_at", startDate.toISOString()).lte("approved_at", endDate.toISOString());
-    }
-
-    const { data: rawTasks, error: tasksError } = await query;
-
-    if (tasksError) {
-      console.error(`Error fetching ${timeFilter} technical leaderboard tasks:`, tasksError);
+    if (!leaders) {
       return NextResponse.json(
-        { error: "Failed to fetch tasks data", details: tasksError.message },
-        { status: 500 }
+        { error: "Failed to fetch leaderboard data" },
+        { status: 500 },
       );
     }
 
-    const userPointsMap = new Map<string, { total_points: number; latest_update: string; first_name?: string }>();
-    const involvedUserIds = new Set<string>();
-
-    rawTasks?.forEach((task: any) => {
-      const points = task.points || 0;
-      const sidekickPoints = Math.floor(points * 0.5);
-
-      // Add points to primary assignee
-      if (task.codev_id) {
-        involvedUserIds.add(task.codev_id);
-        const existing = userPointsMap.get(task.codev_id);
-        if (existing) {
-          existing.total_points += points;
-          // Use approved_at instead of updated_at
-          if (task.approved_at && task.approved_at > existing.latest_update) existing.latest_update = task.approved_at;
-        } else {
-          userPointsMap.set(task.codev_id, {
-            total_points: points,
-            latest_update: task.approved_at || new Date(0).toISOString(),
-            first_name: task.codev?.first_name
-          });
-        }
-      }
-
-      // Add points to sidekicks
-      if (task.sidekick_ids && Array.isArray(task.sidekick_ids)) {
-        task.sidekick_ids.forEach((sidekickId: string) => {
-          involvedUserIds.add(sidekickId);
-          const existing = userPointsMap.get(sidekickId);
-          if (existing) {
-            existing.total_points += sidekickPoints;
-            if (task.approved_at && task.approved_at > existing.latest_update) existing.latest_update = task.approved_at;
-          } else {
-            userPointsMap.set(sidekickId, {
-              total_points: sidekickPoints,
-              latest_update: task.approved_at || new Date(0).toISOString()
-            });
-          }
-        });
-      }
-    });
-
-    // Fetch missing first names (for sidekicks)
-    const missingNameIds = Array.from(involvedUserIds).filter(id => !userPointsMap.get(id)?.first_name);
-    
-    if (missingNameIds.length > 0) {
-      const { data: namesData } = await supabase
-        .from("codev")
-        .select("id, first_name")
-        .in("id", missingNameIds);
-      
-      namesData?.forEach(n => {
-        const user = userPointsMap.get(n.id);
-        if (user) user.first_name = n.first_name;
-      });
-    }
-
-    processedLeaders = Array.from(userPointsMap.entries())
-      .map(([id, data]) => ({
-        codev_id: id,
-        first_name: data.first_name || "Unknown",
-        total_points: data.total_points,
-        latest_update: data.latest_update
-      }))
-      .filter(leader => leader.total_points > 0)
-      .sort((a, b) => b.total_points - a.total_points)
-      .slice(0, limit);
-
-    return NextResponse.json({ 
-      leaders: processedLeaders,
-      totalCount: processedLeaders.length 
-    });
-
+    return NextResponse.json({ leaders, totalCount: leaders.length });
   } catch (error) {
     console.error("API error:", error);
-    
-    // Provide more specific error information in development
-    const isDev = process.env.NODE_ENV === 'development';
-    
+
+    const isDev = process.env.NODE_ENV === "development";
+
     return NextResponse.json(
-      { 
+      {
         error: "Internal server error",
-        ...(isDev && { details: error instanceof Error ? error.message : 'Unknown error' })
+        ...(isDev && {
+          details: error instanceof Error ? error.message : "Unknown error",
+        }),
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

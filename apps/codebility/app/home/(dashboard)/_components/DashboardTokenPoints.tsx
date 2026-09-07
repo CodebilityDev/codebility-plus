@@ -1,14 +1,4 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import PromoteToCodevModal from "@/components/modals/PromoteToCodevModal";
-import PromoteToMentorModal from "@/components/modals/PromoteToMentorModal";
 import { Box } from "@/components/shared/dashboard";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton/skeleton";
-import { useUserStore } from "@/store/codev-store";
-import { CodevPoints, Level, SkillCategory } from "@/types/home/codev";
-import { createClientClientComponent } from "@/utils/supabase/client";
 import {
   ArrowUp,
   Award,
@@ -21,333 +11,72 @@ import {
   Zap,
 } from "lucide-react";
 
-export default function TokenPoints() {
-  const { user } = useUserStore();
-  const [points, setPoints] = useState<Record<string, number>>({});
-  const [levels, setLevels] = useState<Record<string, number>>({});
-  const [attendancePoints, setAttendancePoints] = useState(0);
-  // Social points default to 0 — RPC was dropped (20260219_drop_obsolete_social_points_rpc.sql)
-  // TODO: Re-implement when feeds/social table is built
-  const [socialPoints] = useState(0);
-  const [profilePoints, setProfilePoints] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [roleToBePromoted, setRoleToBePromoted] = useState<string | null>(null);
-  const [promotionAccepted, setPromotionAccepted] = useState(false);
-  const setUserLevel = useUserStore((state) => state.setUserLevel);
+import DashboardPromotionPrompt, {
+  type PromotionRole,
+} from "./DashboardPromotionPrompt";
 
-  useEffect(() => {
-    let isMounted = true;
-    const supabase = createClientClientComponent();
-    if (!supabase) {
-      setError("Failed to initialize Supabase client.");
-      setLoading(false);
-      return;
-    }
+// Social points default to 0 — the RPC was dropped
+// (20260219_drop_obsolete_social_points_rpc.sql).
+// TODO: Re-implement when feeds/social table is built
+const SOCIAL_POINTS = 0;
 
-    const fetchPointsAndCategories = async () => {
-      setLoading(true);
-      setError(null);
+const CATEGORY_ICONS: Record<string, React.ReactNode> = {
+  "Frontend Developer": <Star className="h-6 w-6" />,
+  "Backend Developer": <Zap className="h-6 w-6" />,
+  "UI/UX Designer": <Target className="h-6 w-6" />,
+  "Mobile Developer": <TrendingUp className="h-6 w-6" />,
+  "QA Engineer": <Award className="h-6 w-6" />,
+};
 
-      // Use getUser() instead of getSession() for secure auth check
-      const {
-        data: { user: authUser },
-        error: authError,
-      } = await supabase.auth.getUser();
+const CATEGORY_COLORS: Record<string, string> = {
+  "Frontend Developer": "from-customBlue-500 to-cyan-500",
+  "Backend Developer": "from-green-500 to-emerald-500",
+  "UI/UX Designer": "from-purple-500 to-pink-500",
+  "Mobile Developer": "from-orange-500 to-red-500",
+  "QA Engineer": "from-indigo-500 to-customBlue-500",
+};
 
-      if (!isMounted) return;
+const getCategoryColor = (category: string) =>
+  CATEGORY_COLORS[category] ?? "from-gray-500 to-gray-600";
 
-      if (authError || !authUser) {
-        if (isMounted) {
-          setError("No authenticated user found.");
-          setLoading(false);
-        }
-        return;
-      }
+/** Interns unlock Codev at level 2; Codevs unlock Mentor at level 3. */
+function getPromotionRole(
+  roleId: number | null,
+  levels: Record<string, number>,
+): PromotionRole | null {
+  const reached = (level: number) =>
+    Object.values(levels).some((value) => value >= level);
 
-      try {
-        // Fetch all skill categories
-        const { data: categories, error: categoriesError } = await supabase
-          .from("skill_category")
-          .select("id, name");
+  if (roleId === 4 && reached(2)) return "Codev";
+  if (roleId === 10 && reached(3)) return "Mentor";
+  return null;
+}
 
-        if (!isMounted) return;
-
-        if (categoriesError) throw categoriesError;
-
-        // Exclude PM from points overview
-        const skillCategories = (categories as SkillCategory[]).filter(
-          (category) => category.name !== "Project Manager",
-        );
-
-        // Fetch user's skill points
-        const { data: pointsData, error: pointsError } = await supabase
-          .from("codev_points")
-          .select("id, codev_id, skill_category_id, points")
-          .eq("codev_id", authUser.id);
-
-        if (!isMounted) return;
-
-        if (pointsError) throw pointsError;
-
-        const userPoints = pointsData as CodevPoints[];
-
-        // Map points to skill categories
-        const pointsByCategory = skillCategories.reduce(
-          (acc, category) => {
-            const matchingPoint = userPoints?.find(
-              (point) => point.skill_category_id === category.id,
-            );
-            acc[category.name] = matchingPoint ? matchingPoint.points : 0;
-            return acc;
-          },
-          {} as Record<string, number>,
-        );
-
-        if (isMounted) {
-          setPoints(pointsByCategory);
-        }
-
-        // Fetch attendance points — separate table from skill points
-        const { data: attendanceData, error: attendanceError } = await supabase
-          .from("attendance_points")
-          .select("points")
-          .eq("codev_id", authUser.id)
-          .single();
-
-        // PGRST116 = no rows found — create the record if missing
-        if (attendanceError && attendanceError.code === "PGRST116") {
-          const {
-            count,
-          } = await supabase
-            .from("attendance")
-            .select("*", { count: "exact", head: true })
-            .eq("codev_id", authUser.id)
-            .in("status", ["present", "late"]);
-
-          const totalPoints = (count || 0) * 2;
-
-          if (totalPoints > 0) {
-            const { data: newAttendancePoints } = await supabase
-              .from("attendance_points")
-              .insert({
-                codev_id: authUser.id,
-                points: totalPoints,
-                last_updated: new Date().toISOString().split("T")[0],
-              })
-              .select()
-              .single();
-
-            if (isMounted) {
-              setAttendancePoints(newAttendancePoints?.points || 0);
-            }
-          } else {
-            if (isMounted) {
-              setAttendancePoints(0);
-            }
-          }
-        } else if (!attendanceError) {
-          if (isMounted) {
-            setAttendancePoints(attendanceData?.points || 0);
-          }
-        } else {
-          console.error("Error fetching attendance points:", attendanceError);
-          if (isMounted) {
-            setAttendancePoints(0);
-          }
-        }
-
-        // Fetch profile completion points via API route
-        if (user?.id) {
-          try {
-            const res = await fetch(`/api/profile-points/${user.id}`);
-            if (res.ok) {
-              const data = (await res.json()) as
-                | { success?: boolean; totalPoints?: number }
-                | undefined;
-              if (data?.success && isMounted) {
-                setProfilePoints(data.totalPoints ?? 0);
-              }
-            }
-          } catch (error) {
-            console.error("Failed to fetch profile points:", error);
-            if (isMounted) {
-              setProfilePoints(0);
-            }
-          }
-        }
-
-        // Fetch levels for all skill categories
-        const { data: levelsData, error: levelsError } = await supabase
-          .from("levels")
-          .select("id, skill_category_id, level, min_points, max_points")
-          .order("level", { ascending: true });
-
-        if (!isMounted) return;
-
-        if (levelsError) throw levelsError;
-
-        const skillLevels = levelsData as Level[];
-
-        // Map current level to each category based on point thresholds
-        const levelsByCategory = skillCategories.reduce(
-          (acc, category) => {
-            const categoryPoints = pointsByCategory[category.name] || 0;
-            const categoryLevels = skillLevels?.filter(
-              (l) => l.skill_category_id === category.id,
-            );
-
-            const currentLevel =
-              categoryLevels?.find(
-                (l) =>
-                  categoryPoints >= l.min_points &&
-                  (l.max_points === undefined ||
-                    categoryPoints <= l.max_points),
-              )?.level || 1;
-
-            acc[category.name] = currentLevel;
-            return acc;
-          },
-          {} as Record<string, number>,
-        );
-
-        if (isMounted) {
-          setLevels(levelsByCategory);
-        }
-
-        // Check if user qualifies for promotion
-        if (isMounted) {
-          if (
-            user?.role_id == 4 &&
-            Object.values(levelsByCategory).some((value) => value >= 2) &&
-            !promotionAccepted
-          ) {
-            setRoleToBePromoted("Codev");
-            if (!user?.promote_declined) setIsModalOpen(true);
-          } else if (
-            user?.role_id == 10 &&
-            Object.values(levelsByCategory).some((value) => value >= 3) &&
-            !promotionAccepted
-          ) {
-            setUserLevel(2);
-            setRoleToBePromoted("Mentor");
-            if (!user?.promote_declined) setIsModalOpen(true);
-          }
-        }
-      } catch (err) {
-        if (isMounted) {
-          console.error("Error fetching data:", err);
-          setError("Failed to fetch data. Please try again.");
-        }
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchPointsAndCategories();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [user, promotionAccepted]);
-
-  const handlePromotionAccepted = () => {
-    setPromotionAccepted(true);
-    setRoleToBePromoted(null);
-    setIsModalOpen(false);
-  };
-
-  if (loading) {
-    return (
-      <Box className="!before:absolute !before:inset-0 !before:bg-gradient-to-br !before:from-white/10 !before:to-transparent !before:pointer-events-none relative flex w-full flex-1 flex-col gap-6 overflow-hidden !border-white/10 !bg-white/5 !shadow-2xl !backdrop-blur-2xl dark:!border-slate-400/10 dark:!bg-slate-900/5">
-        <div className="from-customBlue-50/30 dark:from-customBlue-950/10 absolute inset-0 bg-gradient-to-br to-purple-50/30 dark:to-purple-950/10" />
-        <div className="absolute -right-4 -top-4 h-32 w-32 rounded-full bg-gradient-to-br from-yellow-400/10 to-orange-400/10 blur-2xl" />
-
-        <div className="relative">
-          <div className="mb-4 flex items-center gap-3">
-            <Skeleton className="h-10 w-10 rounded-full" />
-            <div className="space-y-2">
-              <Skeleton className="h-7 w-48" />
-              <Skeleton className="h-4 w-64" />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div
-                key={i}
-                className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900"
-              >
-                <div className="mb-3 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Skeleton className="h-12 w-12 rounded-lg" />
-                    <div className="space-y-2">
-                      <Skeleton className="h-4 w-32" />
-                      <Skeleton className="h-3 w-20" />
-                    </div>
-                  </div>
-                  <div className="space-y-1 text-right">
-                    <Skeleton className="ml-auto h-8 w-16" />
-                    <Skeleton className="ml-auto h-3 w-12" />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Skeleton className="h-3 w-full" />
-                  <Skeleton className="h-3 w-3/4" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </Box>
-    );
-  }
-
-  if (error) {
-    return <p className="text-red-500">{error}</p>;
-  }
-
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
-
-  const getCategoryIcon = (category: string) => {
-    const iconMap: Record<string, any> = {
-      "Frontend Developer": <Star className="h-6 w-6" />,
-      "Backend Developer": <Zap className="h-6 w-6" />,
-      "UI/UX Designer": <Target className="h-6 w-6" />,
-      "Mobile Developer": <TrendingUp className="h-6 w-6" />,
-      "QA Engineer": <Award className="h-6 w-6" />,
-    };
-    return iconMap[category] || <Star className="h-6 w-6" />;
-  };
-
-  const getCategoryColor = (category: string) => {
-    const colorMap: Record<string, string> = {
-      "Frontend Developer": "from-customBlue-500 to-cyan-500",
-      "Backend Developer": "from-green-500 to-emerald-500",
-      "UI/UX Designer": "from-purple-500 to-pink-500",
-      "Mobile Developer": "from-orange-500 to-red-500",
-      "QA Engineer": "from-indigo-500 to-customBlue-500",
-    };
-    return colorMap[category] || "from-gray-500 to-gray-600";
-  };
-
-  // Calculate progress percentage toward the next level (100 points per level)
-  const getProgressToNextLevel = (category: string, currentPoints: number) => {
-    const nextLevelThreshold = (levels[category] ?? 1) * 100;
-    const progress = ((currentPoints % 100) / 100) * 100;
-    return Math.min(progress, 100);
-  };
-
+export default function TokenPoints({
+  userId,
+  roleId,
+  promoteDeclined,
+  points,
+  levels,
+  attendancePoints,
+  profilePoints,
+}: {
+  userId: string;
+  roleId: number | null;
+  promoteDeclined: boolean | null;
+  points: Record<string, number>;
+  levels: Record<string, number>;
+  attendancePoints: number;
+  profilePoints: number;
+}) {
   const totalSkillPoints = Object.values(points).reduce(
     (sum, point) => sum + point,
     0,
   );
   const totalPoints =
-    totalSkillPoints + attendancePoints + profilePoints + socialPoints;
+    totalSkillPoints + attendancePoints + profilePoints + SOCIAL_POINTS;
+
+  const promotionRole = getPromotionRole(roleId, levels);
 
   return (
     <Box className="!before:absolute !before:inset-0 !before:bg-gradient-to-br !before:from-white/10 !before:to-transparent !before:pointer-events-none relative flex w-full flex-1 flex-col gap-6 overflow-hidden !border-white/10 !bg-white/5 !shadow-2xl !backdrop-blur-2xl dark:!border-slate-400/10 dark:!bg-slate-900/5">
@@ -366,7 +95,7 @@ export default function TokenPoints() {
             <p className="text-sm text-gray-500 dark:text-gray-400">
               Total: {totalPoints} points (Skills: {totalSkillPoints} +
               Attendance: {attendancePoints} + Profile: {profilePoints} +
-              Social: {socialPoints})
+              Social: {SOCIAL_POINTS})
             </p>
           </div>
         </div>
@@ -458,7 +187,7 @@ export default function TokenPoints() {
                 </div>
                 <div className="text-right">
                   <p className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-2xl font-bold text-transparent">
-                    {socialPoints}
+                    {SOCIAL_POINTS}
                   </p>
                   <p className="text-xs text-gray-500">points</p>
                 </div>
@@ -477,7 +206,8 @@ export default function TokenPoints() {
           {/* Skill Points Cards — one per category */}
           {Object.entries(points).map(([category, point]) => {
             const currentLevel = levels[category] || 1;
-            const progress = getProgressToNextLevel(category, point);
+            // 100 points per level.
+            const progress = Math.min(((point % 100) / 100) * 100, 100);
 
             return (
               <div
@@ -494,7 +224,9 @@ export default function TokenPoints() {
                       <div
                         className={`rounded-lg bg-gradient-to-br p-2 ${getCategoryColor(category)} text-white`}
                       >
-                        {getCategoryIcon(category)}
+                        {CATEGORY_ICONS[category] ?? (
+                          <Star className="h-6 w-6" />
+                        )}
                       </div>
                       <div>
                         <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
@@ -545,42 +277,12 @@ export default function TokenPoints() {
         </div>
       </div>
 
-      {roleToBePromoted == "Codev" && !promotionAccepted && (
-        <div className="relative">
-          <div className="to-customBlue-500 absolute inset-0 rounded-lg bg-gradient-to-r from-green-400 opacity-75 blur-sm"></div>
-          <Button
-            className="to-customBlue-500 hover:to-customBlue-600 relative mb-4 mt-4 w-auto transform animate-pulse bg-gradient-to-r from-green-500 px-6 py-3 font-bold text-white shadow-lg transition-all duration-200 hover:scale-105 hover:from-green-600"
-            onClick={openModal}
-          >
-            <Award className="mr-2 h-5 w-5" />
-            Become a Codev!
-          </Button>
-          <PromoteToCodevModal
-            isOpen={isModalOpen}
-            onClose={closeModal}
-            userId={user?.id}
-            onPromotionAccepted={handlePromotionAccepted}
-          />
-        </div>
-      )}
-
-      {roleToBePromoted == "Mentor" && !promotionAccepted && (
-        <div className="relative">
-          <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-purple-400 to-pink-500 opacity-75 blur-sm"></div>
-          <Button
-            className="relative mb-4 mt-4 w-auto transform animate-pulse bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-3 font-bold text-white shadow-lg transition-all duration-200 hover:scale-105 hover:from-purple-600 hover:to-pink-600"
-            onClick={openModal}
-          >
-            <Star className="mr-2 h-5 w-5" />
-            Become a Mentor!
-          </Button>
-          <PromoteToMentorModal
-            isOpen={isModalOpen}
-            onClose={closeModal}
-            userId={user?.id}
-            onPromotionAccepted={handlePromotionAccepted}
-          />
-        </div>
+      {promotionRole && (
+        <DashboardPromotionPrompt
+          userId={userId}
+          role={promotionRole}
+          promoteDeclined={promoteDeclined ?? false}
+        />
       )}
     </Box>
   );

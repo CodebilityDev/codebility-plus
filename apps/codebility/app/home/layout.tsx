@@ -5,6 +5,7 @@ import { ModalProviderHome } from "@/components/providers/modal-provider-home";
 import { ThemeProvider } from "@/store/providers/ThemeProvider";
 import ReactQueryProvider from "@/hooks/query/reactQuery";
 import { UserProvider } from "@/store/UserProvider";
+import { getCurrentCodev } from "@/lib/server/current-codev";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
 import { Toaster } from "sonner";
 
@@ -26,10 +27,13 @@ export default async function HomeLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // Read once here so the sidebar and the client store share one query.
+  const currentUser = await getCurrentCodev();
+
   return (
     <ErrorBoundary>
       <ReactQueryProvider>
-        <UserProvider>
+        <UserProvider initialUser={currentUser}>
           <ThemeProvider>
             <ModalProviderHome />
             <ToastNotification />
