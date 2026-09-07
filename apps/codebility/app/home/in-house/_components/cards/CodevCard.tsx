@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Codev, InternalStatus } from "@/types/home/codev";
 import { Edit2, Eye, Trash2 } from "lucide-react";
 
@@ -187,10 +188,12 @@ export function CodevCard({ data, onEdit, onDelete, roles }: CodevCardProps) {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => window.location.href = `https://www.codebility.tech/profiles/${data.id}`}
+          asChild
           className="dark:text-light-900 hover:bg-light-800 dark:hover:bg-dark-200 p-1 text-black"
         >
-          <Eye className="h-4 w-4" />
+          <Link href={`/profiles/${data.id}`} prefetch aria-label="View profile">
+            <Eye className="h-4 w-4" />
+          </Link>
         </Button>
         <Button
           variant="ghost"

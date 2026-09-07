@@ -8,18 +8,18 @@ export default function ProfileCloseButton() {
   const router = useRouter();
 
   const handleClose = () => {
-    // If they came from somewhere within the app, go back. 
-    // In rare cases where they opened directly, they might need to go home, but router.back() handles history.
     router.back();
   };
 
   return (
-    <button
+    <Button
       onClick={handleClose}
       aria-label="Go back"
-      className="text-white hover:text-gray-300 transition-colors"
+      className="text-white hover:text-gray-300 transition-colors p-2"
+      variant={"ghost"}
+      size={"icon"}
     >
-      <X className="h-6 w-6" />
-    </button>
+      <X />
+    </Button>
   );
 }

@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { Search, X, Filter, ChevronDown, Flame, CheckCircle2 } from "lucide-react";
-import { fetchTopSolvers, type TopSolver } from "../actions";
+import { fetchTopSolvers, type TopSolver } from "@/actions/overflow/actions";
 import DefaultAvatar from "@/components/DefaultAvatar";
 
 interface SearchFilterProps {

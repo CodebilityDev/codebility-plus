@@ -44,7 +44,14 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    const body = (await request.json()) as {
+      codev_id: string;
+      project_id: string;
+      date: string;
+      status: string;
+      check_in?: string;
+      check_out?: string;
+    };
     const { codev_id, project_id, date, status, check_in, check_out } = body;
 
     if (!codev_id || !project_id || !date || !status) {

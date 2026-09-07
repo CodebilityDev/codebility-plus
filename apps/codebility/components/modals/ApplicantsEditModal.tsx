@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 /* import {
   ApplicantsFormValues,
   applicantsSchema,
-} from "@/app/home/applicants/_lib/applicants-schema";
+} from "@/utils/validations/applicants";
 import { updateAction } from "@/app/home/applicants/action"; */
 import { Button } from "@/components/ui/button";
 import {
@@ -13,9 +13,9 @@ import {
   DialogFooter,
   DialogHeader,
 } from "@/components/ui/dialog";
-import { useModal as useModalTechkStack } from "@/hooks/use-modal";
-import { useModal } from "@/hooks/use-modal-applicants";
-import { useTechStackStore } from "@/hooks/use-techstack";
+import { useModal as useModalTechkStack } from "@/hooks/modals/use-modal";
+import { useModal } from "@/hooks/modals/use-modal-applicants";
+import { useTechStackStore } from "@/hooks/data/use-techstack";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { useForm } from "react-hook-form";

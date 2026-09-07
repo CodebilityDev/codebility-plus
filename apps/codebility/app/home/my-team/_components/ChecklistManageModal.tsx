@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import Input from "@/components/ui/forms/input";
 import toast from "react-hot-toast";
 import { createClientClientComponent } from "@/utils/supabase/client";
-import { SimpleMemberData, getMembers, getTeamLead } from "@/app/home/projects/actions";
+import { SimpleMemberData, getMembers, getTeamLead } from "@/actions/projects/actions";
 
 /**
  * ChecklistManageModal - PRODUCTION-READY VERSION
@@ -71,7 +71,7 @@ const ChecklistManageModal = ({
   const parseTargetRole = (description: string | null): string | null => {
     if (!description) return null;
     try {
-      const parsed = JSON.parse(description);
+      const parsed = JSON.parse(description) as { target_role?: string | null };
       return parsed?.target_role ?? null;
     } catch {
       return null;

@@ -6,7 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import { useUserStore } from "@/store/codev-store";
 import { Step, StepLabel, Stepper } from "@mui/material";
 
-import { fetchUserInternalStatus } from "../actions";
+import { fetchUserInternalStatus } from "@/actions/dashboard/actions";
 
 export default function DashboardRoadmap() {
   const { user } = useUserStore();

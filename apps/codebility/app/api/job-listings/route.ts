@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    const body = (await request.json()) as Record<string, unknown>;
     const supabase = await createClientServerComponent();
     
     // Get current user

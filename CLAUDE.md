@@ -200,3 +200,17 @@ All database migrations are located in `apps/codebility/supabase/migrations/`
 **Legacy Migrations:**
 The `migration-scripts/` folder in the root contains deprecated migration tools and scripts.
 Do not add new migrations there. See `migration-scripts/DEPRECATION_NOTICE.md` for details.
+
+## Agent skills
+
+### Issue tracker
+
+Issues and specs live in GitHub Issues for `CodebilityDev/codebility-plus`. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Five canonical triage roles mapped to GitHub label strings. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context layout: root `CONTEXT.md` and `docs/adr/`. See `docs/agents/domain.md`.

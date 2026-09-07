@@ -2,12 +2,12 @@ import Image from "next/image";
 import { Trophy, Medal, ArrowLeft, Crown, User } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { getMembers, getUserProjects } from "../../../projects/actions";
+import { getMembers, getUserProjects } from "@/actions/projects/actions";
 import { createClientServerComponent } from "@/utils/supabase/server";
 import { notFound } from "next/navigation";
 import CustomBreadcrumb from "@/components/shared/dashboard/CustomBreadcrumb";
 import LeaderboardSort from "./_components/LeaderboardSort";
-import { getLeaderboardData, LeaderboardTimeRange } from "./actions";
+import { getLeaderboardData, LeaderboardTimeRange } from "@/actions/my-team/leaderboard";
 
 export const dynamic = "force-dynamic";
 

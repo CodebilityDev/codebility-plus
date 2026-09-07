@@ -1,35 +1,82 @@
 "use client";
 
-import { useServiceContext } from "../../_context";
+import { Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import {
+  parseServicesCategory,
+  servicesHref,
+} from "@/utils/services/categories";
+import type { ServicesProjectsPage } from "@/lib/server/services-projects-cached";
+
 import Calendly from "../../../_components/MarketingCalendly";
-import Footer from "../../../_components/MarketingFooter";
-import { ServicesHero, ServicesTab } from "../layout";
+import { ServicesTab } from "../tabs";
+import { Hero as ServicesHero } from "./ServicesHero";
 import { ServiceDetailModal } from "./ServiceDetailModal";
 
 interface Props {
-  servicesData: any[];
+  initialData: ServicesProjectsPage;
+  pageSize: number;
 }
 
-export const ServicesPageContent = ({ servicesData }: Props) => {
-  const { activeService, clearActiveService, setActiveService } =
-    useServiceContext();
+function ServicesPageBody({ initialData, pageSize }: Props) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const category = parseServicesCategory(searchParams.get("category"));
+  const projectId = searchParams.get("project");
+
+  const replaceServicesUrl = (next: {
+    category?: typeof category;
+    project?: string | null;
+  }) => {
+    router.replace(
+      servicesHref({
+        category: next.category ?? category,
+        project: next.project === undefined ? projectId : next.project,
+      }),
+      { scroll: false },
+    );
+  };
 
   return (
     <>
       <ServicesHero />
       <ServicesTab
-        servicesData={servicesData}
-        onServiceSelect={setActiveService}
+        key={category}
+        initialData={initialData}
+        category={category}
+        pageSize={pageSize}
+        onServiceSelect={(service) => {
+          replaceServicesUrl({ project: service.id });
+        }}
       />
       <Calendly />
-      <Footer />
-      
-      {/* Service Detail Modal */}
       <ServiceDetailModal
-        service={activeService}
-        isOpen={!!activeService}
-        onClose={clearActiveService}
+        projectId={projectId}
+        isOpen={!!projectId}
+        onClose={() => {
+          replaceServicesUrl({ project: null });
+        }}
       />
     </>
+  );
+}
+
+export const ServicesPageContent = ({ initialData, pageSize }: Props) => {
+  return (
+    <Suspense
+      fallback={
+        <>
+          <ServicesHero />
+          <ServicesTab
+            initialData={initialData}
+            category="all"
+            pageSize={pageSize}
+          />
+          <Calendly />
+        </>
+      }
+    >
+      <ServicesPageBody initialData={initialData} pageSize={pageSize} />
+    </Suspense>
   );
 };

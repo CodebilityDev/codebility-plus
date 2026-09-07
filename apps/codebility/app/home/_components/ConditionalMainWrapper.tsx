@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
-import { useNavStore } from "@/hooks/use-sidebar";
+import { useNavStore } from "@/hooks/navigation/use-sidebar";
 
 interface ConditionalMainWrapperProps {
   children: ReactNode;

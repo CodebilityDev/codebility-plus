@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { useModal } from "@/hooks/use-modal";
+import { useModal } from "@/hooks/modals/use-modal";
 import { XIcon } from "lucide-react";
 
 import { Button } from "@codevs/ui/button";

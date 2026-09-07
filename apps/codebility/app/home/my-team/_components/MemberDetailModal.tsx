@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { SimpleMemberData } from "@/app/home/projects/actions";
+import { SimpleMemberData } from "@/actions/projects/actions";
 import {
   Mail,
   Calendar,

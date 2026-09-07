@@ -75,46 +75,30 @@ const HeroCard: React.FC<HeroCardProps> = ({ title, description, url = "#", cate
           }}
         />
         
-        <motion.div 
-          className="flex w-full flex-col relative z-10"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
+        <div
+          className="relative z-10 flex w-full flex-col"
           style={{
             transform: "translateZ(20px)",
           }}
         >
           {category && (
-            <motion.p 
-              className="text-[10px] uppercase tracking-[0.3em] text-white/60 sm:text-xs"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-            >
+            <p className="text-[10px] uppercase tracking-[0.3em] text-white/60 sm:text-xs">
               {category}
-            </motion.p>
+            </p>
           )}
-          <motion.h3 
-            className="text-lg font-semibold leading-tight sm:text-xl"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-          >
+          <h3 className="text-lg font-semibold leading-tight sm:text-xl">
             {title}
-          </motion.h3>
-        </motion.div>
-        
-        <motion.p 
-          className="text-xs leading-relaxed text-white/80 sm:text-sm relative z-10 w-full"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
+          </h3>
+        </div>
+
+        <p
+          className="relative z-10 w-full text-xs leading-relaxed text-white/80 sm:text-sm"
           style={{
             transform: "translateZ(15px)",
           }}
         >
           {description}
-        </motion.p>
+        </p>
       </motion.div>
     </Link>
   );

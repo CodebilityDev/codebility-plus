@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import LandingImage from "./LandingImage";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { MouseEvent, useState } from "react";
 
@@ -88,12 +88,11 @@ const FeaturesCard: React.FC<FeaturesCardProps> = ({
             whileHover={{ scale: 1.1 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
           >
-            <Image
+            <LandingImage
               src={imageName}
               alt={imageAlt}
               width={450}
               height={300}
-              priority
               className="h-[250px] w-[370px] object-cover transition-transform duration-300"
             />
           </motion.div>

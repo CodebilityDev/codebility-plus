@@ -23,7 +23,7 @@ import {
 } from "@codevs/ui/select";
 import { Textarea } from "@codevs/ui/textarea";
 
-import { createMeeting } from "../actions";
+import { createMeeting } from "@/actions/my-team/project";
 
 interface MeetingSchedulerProps {
   projectId: string;

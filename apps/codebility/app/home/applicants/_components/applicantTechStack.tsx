@@ -2,7 +2,7 @@ import React from "react";
 import Image from "next/image";
 
 import { getTechStackIconName } from "@/constants/techstack";
-import { NewApplicantType } from "../_service/types";
+import { NewApplicantType } from "@/types/applicants";
 
 export default function ApplicantTechStack({
   applicant,

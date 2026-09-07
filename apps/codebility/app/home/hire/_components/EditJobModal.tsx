@@ -18,7 +18,7 @@ import {
 } from "@codevs/ui/select";
 import { Switch } from "@codevs/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
-import { updateJobListing } from "../actions";
+import { updateJobListing } from "@/actions/hire/actions";
 import {
   Dialog,
   DialogContent,

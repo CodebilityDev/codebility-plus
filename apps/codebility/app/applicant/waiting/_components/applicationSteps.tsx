@@ -2,7 +2,7 @@
 
 import React from "react";
 
-import { ApplicantType } from "../_service/type";
+import { ApplicantType } from "@/types/applicant-waiting";
 import ApplicantStep1 from "./applicantStep1";
 import ApplicantStep2 from "./applicantStep2";
 import ApplicantStep3 from "./applicantStep3";

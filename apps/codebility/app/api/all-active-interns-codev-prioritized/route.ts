@@ -1,3 +1,4 @@
+// @deprecated Prefer lib/server/landing-interns-cached (+ /api/landing-interns) for the marketing intern section.
 // app/api/all-active-interns-codev-prioritized/route.ts
 import { NextResponse } from "next/server";
 import { createClientServerComponent } from "@/utils/supabase/server";
@@ -123,7 +124,7 @@ export async function GET() {
         codev_points: row.codev_points || [],
         projects: projects,
         project_members: row.project_members || [],
-      } as Codev;
+      } as unknown as Codev;
     });
 
     // Apply prioritization using the prioritizeCodevs function

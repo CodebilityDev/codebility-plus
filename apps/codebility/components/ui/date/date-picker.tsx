@@ -1,7 +1,7 @@
 import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/utils/utils"
 import { Label } from "@codevs/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@codevs/ui/popover"
 import { Button } from "../button"

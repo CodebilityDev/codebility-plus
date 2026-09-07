@@ -13,6 +13,7 @@ interface Member {
   userName: string;
   imageUrl?: string | null;
   isActive: boolean;
+  isLoading?: boolean;
 }
 
 interface Props {
@@ -47,7 +48,7 @@ export default function UserTaskFilter({ members, onFilterClick }: Props) {
                 : shouldUseGrid
                   ? "hover:scale-105"
                   : `hover:scale-105 ${index > 0 ? "sm:-ml-2" : ""}`
-            }`}
+            } ${member.isLoading ? "pointer-events-none opacity-60" : ""}`}
             style={{ zIndex: shouldUseGrid ? 1 : visibleMembers.length - index }}
             title={member.userName}
           >
@@ -89,7 +90,7 @@ export default function UserTaskFilter({ members, onFilterClick }: Props) {
                   onClick={() => onFilterClick(member.userId)}
                   className={`flex cursor-pointer items-center gap-2 rounded-md px-2 py-1 hover:bg-white/20 dark:hover:bg-white/10 transition-colors ${
                     member.isActive ? "bg-white/30 dark:bg-white/20" : ""
-                  }`}
+                  } ${member.isLoading ? "pointer-events-none opacity-60" : ""}`}
                 >
                   <div className="bg-white/20 dark:bg-white/10 backdrop-blur-sm relative h-6 w-6 overflow-hidden rounded-full border-2 border-white dark:text-white">
                     {member.imageUrl ? (

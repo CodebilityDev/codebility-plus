@@ -343,6 +343,7 @@ export interface Task {
   created_at: string; // CHANGE: Make this required (remove ?)
   updated_at?: string;
   skill_category_id?: string;
+  position?: number;
   codev?: {
     id: string;
     first_name: string;

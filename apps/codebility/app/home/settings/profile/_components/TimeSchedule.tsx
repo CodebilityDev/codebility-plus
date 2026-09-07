@@ -19,7 +19,7 @@ import toast from "react-hot-toast";
 import { Checkbox } from "@codevs/ui/checkbox";
 import { Label } from "@codevs/ui/label";
 
-import { updateWorkSchedule } from "../action";
+import { updateWorkSchedule } from "@/actions/settings/profile";
 import { cn } from "@codevs/ui";
 
 interface TimeScheduleProps {

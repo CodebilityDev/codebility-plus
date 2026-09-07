@@ -1,5 +1,5 @@
 // app/api/cron/meeting-reminders/route.ts
-import { createNotificationAction } from "@/lib/actions/notification.actions";
+import { createNotificationAction } from "@/actions/notifications/notification.actions";
 import { createClientServerComponent } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
 

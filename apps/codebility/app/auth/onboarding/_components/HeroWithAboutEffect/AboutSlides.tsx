@@ -1,5 +1,3 @@
-// AboutSlides.tsx
-
 "use client";
 
 import { RefObject } from "react";
@@ -16,7 +14,7 @@ interface AboutSlidesProps {
 export default function AboutSlides({ slidesRef }: AboutSlidesProps) {
   return (
     <div
-      ref={slidesRef}
+      ref={slidesRef as RefObject<HTMLDivElement>}
       className="flex h-auto transform-gpu flex-col will-change-transform lg:h-full lg:w-[400vw] lg:flex-row"
     >
       <div className="w-full flex-shrink-0 pb-20 lg:min-h-screen lg:w-screen lg:pb-0">

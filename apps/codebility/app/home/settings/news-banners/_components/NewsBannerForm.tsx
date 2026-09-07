@@ -10,7 +10,7 @@ import { Textarea } from "@codevs/ui/textarea";
 import { Label } from "@codevs/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@codevs/ui/select";
 import { Switch } from "@codevs/ui/switch";
-import { createClientClientComponent } from "@/utils/supabase/client";
+import { getClientSupabase } from "@/utils/supabase/client";
 import { toast } from "sonner";
 import BannerImageUpload from "./BannerImageUpload";
 
@@ -72,7 +72,7 @@ export default function NewsBannerForm({ banner, onSuccess }: NewsBannerFormProp
 
   const onSubmit = async (data: BannerFormData) => {
     setLoading(true);
-    const supabase = createClientClientComponent();
+    const supabase = getClientSupabase();
 
     try {
       const bannerData = {

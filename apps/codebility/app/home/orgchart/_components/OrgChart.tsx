@@ -6,13 +6,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { useTheme } from "next-themes";
-import { useNavStore } from "@/hooks/use-sidebar";
+import { useNavStore } from "@/hooks/navigation/use-sidebar";
 import { defaultAvatar } from "@/public/assets/images";
 import { getValidImageUrl } from "@/utils/imageValidation";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/utils";
 
 import { OrgChartProps } from "../_types/org-chart";
-import { usePageAnimationSettings } from "@/hooks/usePageAnimationSettings";
+import { usePageAnimationSettings } from "@/hooks/ui/usePageAnimationSettings";
 
 import {
   Crown,

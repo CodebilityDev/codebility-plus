@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import * as Icons from "lucide-react";
 import { FeatureModal } from "../type";
-import { createModal, deleteModal, toggleModalActive } from "../actions";
+import { createModal, deleteModal, toggleModalActive } from "@/actions/promote-modal/actions";
 import {
   AlertDialog,
   AlertDialogAction,

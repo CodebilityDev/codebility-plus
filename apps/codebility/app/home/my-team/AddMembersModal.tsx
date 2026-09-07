@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
-import { SimpleMemberData, updateProjectMembers } from "@/app/home/projects/actions";
+import { SimpleMemberData, updateProjectMembers } from "@/actions/projects/actions";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -13,7 +13,7 @@ import {
 import { Codev, InternalStatus } from "@/types/home/codev";
 import { Search, Users, X } from "lucide-react";
 import toast from "react-hot-toast";
-import { useModal } from "@/hooks/use-modal-users";
+import { useModal } from "@/hooks/modals/use-modal-users";
 import { createClientClientComponent } from "@/utils/supabase/client";
 
 interface AddMembersModalProps {

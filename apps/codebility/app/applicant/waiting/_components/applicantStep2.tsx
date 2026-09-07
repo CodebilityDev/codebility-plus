@@ -10,8 +10,8 @@ import {
   applicantSubmitTest,
   applicantTakeTest,
   applicantUpdateTestSubmission,
-} from "../_service/action";
-import { ApplicantType } from "../_service/type";
+} from "@/actions/applicant-waiting/actions";
+import { ApplicantType } from "@/types/applicant-waiting";
 import { TestCountdown } from "./testCountDown";
 import TestInstruction from "./testInstruction";
 import TestQAInstruction from "./testQAInstruction";
@@ -347,7 +347,7 @@ function PostSubmitted({
                   ? "Update your Figma File link"
                   : "Update your GitHub repository link"
               }
-              defaultValue={applicantData.fork_url}
+              defaultValue={applicantData.fork_url ?? ""}
               className="w-full rounded-md border border-gray-300 p-2 text-sm dark:bg-gray-800 dark:text-white"
             />
 

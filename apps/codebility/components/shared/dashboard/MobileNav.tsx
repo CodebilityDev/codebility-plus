@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { getSidebarData, Sidebar, SidebarLink } from "@/constants/sidebar";
-import useHideSidebarOnResize from "@/hooks/useHideSidebarOnResize";
+import useHideSidebarOnResize from "@/hooks/navigation/useHideSidebarOnResize";
 import { Roles } from "@/types/home/codev";
 import { createClientClientComponent } from "@/utils/supabase/client";
 

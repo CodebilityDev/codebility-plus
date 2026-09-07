@@ -1,4 +1,4 @@
-import { fetchAllModals } from "./actions";
+import { fetchAllModals } from "@/actions/promote-modal/actions";
 import PageContainer from "../_components/PageContainer";
 import { H1 } from "@/components/shared/dashboard";
 import ModalListClient from "./_components/ModalList";

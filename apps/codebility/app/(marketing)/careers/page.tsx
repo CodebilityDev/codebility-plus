@@ -1,12 +1,10 @@
 import { Metadata } from "next";
 
-import Footer from "../_components/MarketingFooter";
-import Navigation from "../_components/MarketingNavigation";
-import WorkplaceCulture from "./_components/WorkplaceCulture";
-import CodevHero from "./_components/CodevsHero";
-import JobListings from "./_components/JobListings";
-import TechStack from "./_components/TechStack";
 import CareerGrowthPath from "./_components/CareerGrowthPath";
+import { JobListingsBlock } from "./_components/JobListingsBlock";
+import CodevHero from "./_components/CodevsHero";
+import TechStack from "./_components/TechStack";
+import WorkplaceCulture from "./_components/WorkplaceCulture";
 
 export const metadata: Metadata = {
     title: "Careers — Join Codebility as a Developer",
@@ -26,19 +24,14 @@ export const metadata: Metadata = {
     },
 };
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
-
 export default function Careers() {
     return (
         <div className="bg-black-400 relative flex w-full flex-col">
-            <Navigation />
             <CodevHero />
-            <JobListings />
+            <JobListingsBlock />
             <WorkplaceCulture />
             <TechStack />
             <CareerGrowthPath />
-            <Footer />
         </div>
     );
 }

@@ -37,7 +37,7 @@ import EditJobModal from "./EditJobModal";
 import { createClientClientComponent } from "@/utils/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import { useUserStore } from "@/store/codev-store";
-import { deleteJobListing, updateJobListingStatus } from "../actions";
+import { deleteJobListing, updateJobListingStatus } from "@/actions/hire/actions";
 
 import {
   Accordion,

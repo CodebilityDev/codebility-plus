@@ -7,7 +7,7 @@ import {
   markAllNotificationsAsReadAction,
   archiveNotificationAction,
   clearAllNotificationsAction
-} from "@/lib/actions/notification.actions";
+} from "@/actions/notifications/notification.actions";
 
 interface NotificationStore {
   notifications: Notification[];

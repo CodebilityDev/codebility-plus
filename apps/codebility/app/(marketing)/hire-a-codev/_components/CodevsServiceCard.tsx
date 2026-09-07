@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { fadeInOutLeftToRight } from "@/components/FramerAnimation/Framer";
-import { useModal } from "@/hooks/use-modal-services";
+import { useModal } from "@/hooks/modals/use-modal-services";
 import { IconArrowRight } from "@/public/assets/svgs";
 import { motion } from "framer-motion";
 

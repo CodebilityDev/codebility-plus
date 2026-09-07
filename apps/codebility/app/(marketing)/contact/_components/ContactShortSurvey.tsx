@@ -10,7 +10,7 @@ import {
 } from "@radix-ui/react-select";
 import { Label } from "@codevs/ui/label";
 import { Textarea } from "@codevs/ui/textarea";
-import { ContactFormData } from "../page";
+import { ContactFormData } from "./ContactPage";
 
 const referralSources = [
   "Search engine", "Social media", "Referral / Word of mouth",

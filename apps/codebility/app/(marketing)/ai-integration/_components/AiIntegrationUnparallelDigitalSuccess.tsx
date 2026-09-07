@@ -1,4 +1,4 @@
-import { unparalleledDigitalSuccessData } from "../_lib/dummy-data";
+import { unparalleledDigitalSuccessData } from "@/constants/ai-integration/dummy-data";
 import Section from "../../_components/MarketingSection";
 import UnparallelCard from "./AiIntegrationUnparallelCard";
 

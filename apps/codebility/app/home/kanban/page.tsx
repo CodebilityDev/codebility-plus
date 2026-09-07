@@ -5,7 +5,6 @@ import AsyncErrorBoundary from "@/components/AsyncErrorBoundary";
 import { Box } from "@/components/shared/dashboard";
 import H1 from "@/components/shared/dashboard/H1";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import {
   Table,
   TableBody,
@@ -14,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import pathsConfig from "@/config/paths.config";
+import pathsConfig from "@/types/zod/paths.config";
 import { IconKanban } from "@/public/assets/svgs";
 import { createClientServerComponent } from "@/utils/supabase/server";
 import PageContainer from "../_components/PageContainer";
@@ -117,35 +116,6 @@ export default async function KanbanPage(props: PageProps) {
           </TableCell>
         </TableRow>
       );
-    }
-
-    // Loading state
-    if (!typedProjects) {
-      return Array.from({ length: 5 }).map((_, index) => (
-        <TableRow key={`loading-${index}`} className="grid grid-cols-1 md:table-row">
-          {/* Project Name Column */}
-          <TableCell className="md:table-cell">
-            <div className="flex items-center gap-3">
-              <Skeleton className="h-5 w-24 md:w-32" />
-            </div>
-          </TableCell>
-          
-          {/* Team Lead Column */}
-          <TableCell className="md:table-cell">
-            <div className="flex items-center gap-2">
-              <Skeleton className="h-8 w-8 rounded-full" />
-              <Skeleton className="h-4 w-28 md:w-36" />
-            </div>
-          </TableCell>
-          
-          {/* Actions Column */}
-          <TableCell className="text-center md:table-cell">
-            <div className="flex justify-center">
-              <Skeleton className="h-9 w-24 md:w-28 rounded-md" />
-            </div>
-          </TableCell>
-        </TableRow>
-      ));
     }
 
     // Empty state

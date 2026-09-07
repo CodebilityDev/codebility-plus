@@ -180,28 +180,28 @@ export const MarketingCardData: MarketingCardData[] = [
     title: "Web App Development",
     description:
       "Discover the best in the industry and turn your ideas into powerful digital solutions.",
-    url: "/services#web-application",
+    url: "/services?category=web-application",
     category: "Engineering",
   },
   {
     title: "Mobile App Development",
     description:
       "Experience top-notch mobile app development with our expert team.",
-    url: "/services#mobile-application",
+    url: "/services?category=mobile-application",
     category: "Engineering",
   },
   {
     title: "Product Design",
     description:
       "Encounter excellence in development with our skilled team, masters of UI/UX design.",
-    url: "/services#product-design",
+    url: "/services?category=product-design",
     category: "Product",
   },
   {
     title: "CMS",
     description:
       "Create and manage your content effortlessly with our custom CMS solutions tailored to your needs.",
-    url: "/services#cms",
+    url: "/services?category=cms",
     category: "Technology",
   },
 ];

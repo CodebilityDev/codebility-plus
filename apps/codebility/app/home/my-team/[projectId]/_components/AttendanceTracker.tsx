@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@codevs/ui/select";
-import { SimpleMemberData } from "@/app/home/projects/actions";
+import { SimpleMemberData } from "@/actions/projects/actions";
 import { toast } from "react-hot-toast";
 
 type AttendanceStatus = "present" | "absent" | "late" | "break" | "off";
@@ -38,7 +38,9 @@ interface AttendanceTrackerProps {
 
 const AttendanceTracker = ({ teamMembers, teamLead, projectId }: AttendanceTrackerProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [selectedDate, setSelectedDate] = useState(
+    () => new Date().toISOString().slice(0, 10),
+  );
   const [attendanceRecords, setAttendanceRecords] = useState<Record<string, AttendanceRecord>>({});
   const [isLoading, setIsLoading] = useState(false);
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { getReApplyDate } from "@/app/auth/declined/_service/util";
+import { getReApplyDate } from "@/utils/auth/declined";
 
-import { NewApplicantType } from "../_service/types";
+import { NewApplicantType } from "@/types/applicants";
 
 export default function ApplicantReapplyTime({
   applicant,

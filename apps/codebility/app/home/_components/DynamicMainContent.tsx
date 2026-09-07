@@ -2,7 +2,7 @@
 
 import { ReactNode } from "react";
 import { usePathname } from "next/navigation";
-import { useNavStore } from "@/hooks/use-sidebar";
+import { useNavStore } from "@/hooks/navigation/use-sidebar";
 
 interface DynamicMainContentProps {
   children: ReactNode;

@@ -10,25 +10,28 @@ import {
 } from "@/components/ui/select";
 import { Codev } from "@/types/home/codev";
 
-import { removeArrayDuplicate } from "../../_lib/util";
+import { removeArrayDuplicate } from "@/utils/marketing/array";
 
 interface Props {
   selectedPosition: string;
   setSelectedPosition: (position: string) => void;
-  users: Codev[]; // Ensure the users array uses the correct type
+  users: Codev[];
+  positions?: string[];
 }
 
 const CodevListFilter: React.FC<Props> = ({
   selectedPosition,
   setSelectedPosition,
   users,
+  positions: positionsProp,
 }) => {
   const selectGroupRef = useRef<HTMLDivElement>(null);
 
-  // Extract unique display_position values
-  const positions = removeArrayDuplicate(
-    users.map((user) => user.display_position).filter(Boolean), // Safely access display_position
-  );
+  const positions =
+    positionsProp ??
+    removeArrayDuplicate(
+      users.map((user) => user.display_position).filter(Boolean),
+    );
 
   const handleSelectPosition = () => {
     if (selectGroupRef.current) {

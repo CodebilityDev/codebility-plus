@@ -3,10 +3,10 @@
 import { useState } from "react";
 import * as Icons from "lucide-react";
 import { FeatureModal, ModalFeature } from "../type";
-import { upsertActiveModal } from "../actions";
+import { upsertActiveModal } from "@/actions/promote-modal/actions";
 import IconPicker from "./IconPicker";
 import { Upload, X } from "lucide-react";
-import { uploadModalImage } from "../actions";
+import { uploadModalImage } from "@/actions/promote-modal/actions";
 
 interface EditPromoModalProps {
   data: FeatureModal | null;

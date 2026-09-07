@@ -1,4 +1,4 @@
-import Image from "next/image";
+import LandingImage from "./LandingImage";
 
 const HeroBackground = () => {
   return (
@@ -15,13 +15,12 @@ const HeroBackground = () => {
           className="relative aspect-[855/678] w-[40rem] bg-gradient-to-r from-[#00738B] via-[#0C3FDB] to-[#9707DD] opacity-30 sm:w-[72.1875rem]"
         />
       </div>
-      <Image
-        src={`https://codebility-cdn.pages.dev/assets/images/index/hero-image.png`}
+      <LandingImage
+        src="https://codebility-cdn.pages.dev/assets/images/index/hero-image.png"
         alt="Hero Background"
         width={910}
         height={420}
         className="absolute -right-[650px] top-[400px] hidden h-[420px] w-[910px] lg:block"
-        
       />
     </>
   );

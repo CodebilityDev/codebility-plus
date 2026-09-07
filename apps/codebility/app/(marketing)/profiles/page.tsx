@@ -1,15 +1,8 @@
 import { Metadata } from "next";
-import { Suspense } from "react";
-import { UsersSkeleton } from "@/components/ui/skeleton/UsersSkeleton";
-import { getCodevs } from "@/lib/server/codev.service";
-import { Codev } from "@/types/home/codev";
-import { prioritizeCodevs } from "@/utils/codev-priority";
-import { getQualifiedCodevs } from "@/utils/codev-qualification";
 
 import Section from "../_shared/CodevsSection";
-import CodevContainer from "./_components/CodevContainer";
 import { CodevHireCodevModal } from "./_components/CodevHireCodevModal";
-import CodevList from "./_components/CodevList";
+import { ProfilesListBlock } from "./_components/ProfilesListBlock";
 
 export const metadata: Metadata = {
     title: "Developer Profiles — Browse Our Talent Pool | Codebility",
@@ -29,22 +22,7 @@ export const metadata: Metadata = {
     },
 };
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
-
-export default async function Profiles() {
-    const [{ data: allCodevs, error }] = await Promise.all([
-        getCodevs({ filters: { application_status: "passed" } }),
-    ]);
-
-    if (error) {
-        throw new Error("Failed to fetch profiles data");
-    }
-
-    const codevsArray: Codev[] = Array.isArray(allCodevs) ? allCodevs : [];
-    const qualifiedCodevs = getQualifiedCodevs(codevsArray);
-    const sortedCodevs = prioritizeCodevs(qualifiedCodevs);
-
+export default function Profiles() {
     return (
         <>
             <Section
@@ -55,12 +33,7 @@ export default async function Profiles() {
                 <div className="absolute inset-0 bg-gradient-to-br from-customBlue-950/20 to-purple-950/20" />
                 <div className="absolute -top-4 -right-4 h-96 w-96 rounded-full bg-gradient-to-br from-yellow-400/10 to-orange-400/10 blur-3xl" />
                 <div className="absolute -bottom-4 -left-4 h-96 w-96 rounded-full bg-gradient-to-br from-purple-400/10 to-pink-400/10 blur-3xl" />
-                <div className="relative flex flex-col gap-8 z-10">
-                    <CodevContainer />
-                    <Suspense fallback={<UsersSkeleton />}>
-                        <CodevList codevs={sortedCodevs} />
-                    </Suspense>
-                </div>
+                <ProfilesListBlock />
             </Section>
             <CodevHireCodevModal />
         </>

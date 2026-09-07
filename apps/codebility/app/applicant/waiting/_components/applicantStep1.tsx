@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2Icon } from "lucide-react";
 
-import { applicantMoveToOnboard } from "../_service/action";
+import { applicantMoveToOnboard } from "@/actions/applicant-waiting/actions";
 
 export default function ApplicantStep1({
   setActiveStep,

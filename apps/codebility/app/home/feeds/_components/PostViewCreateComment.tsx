@@ -4,9 +4,9 @@ import Image from "next/image";
 import { defaultAvatar } from "@/public/assets/images";
 import { useUserStore } from "@/store/codev-store";
 import { useFeedsStore } from "@/store/feeds-store";
-import { createComment, searchUsers } from "../_services/action";
-import { PostType } from "../_services/query";
-import { UserMention } from "../_services/types";
+import { createComment, searchUsers } from "@/actions/feeds/post";
+import type { PostType } from "@/types/feeds";
+import { UserMention } from "@/types/feeds";
 
 interface CreateCommentProps {
   post: PostType;

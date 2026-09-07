@@ -2,12 +2,12 @@
 
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { SimpleMemberData } from "@/app/home/projects/actions";
+import { SimpleMemberData } from "@/actions/projects/actions";
 import DefaultAvatar from "@/components/DefaultAvatar";
 import { Mail, Calendar, Trophy, RefreshCw, AlertCircle } from "lucide-react";
-import { multipleMoveApplicantToOnboardingAction } from "@/app/home/applicants/_service/action";
-const ATTENDANCE_POINTS_PER_DAY = 2;
-import { getTeamMonthlyAttendancePoints } from "../actions";
+import { multipleMoveApplicantToOnboardingAction } from "@/actions/applicants/applicant";
+import { ATTENDANCE_POINTS_PER_DAY } from "@/constants/my-team/attendance";
+import { getTeamMonthlyAttendancePoints } from "@/actions/my-team/project";
 import MemberDetailModal from "../../_components/MemberDetailModal";
 
 interface CompactMemberGridProps {

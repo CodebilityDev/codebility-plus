@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation";
 import Logo from "@/components/shared/Logo";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@codevs/ui/checkbox";
-import { ApplicantType } from "../_service/type";
-import { applicantUpdateJoinedStatus } from "../_service/action";
+import { ApplicantType } from "@/types/applicant-waiting";
+import { applicantUpdateJoinedStatus } from "@/actions/applicant-waiting/actions";
 
 export default function ApplicantStep3({
   setActiveStep,

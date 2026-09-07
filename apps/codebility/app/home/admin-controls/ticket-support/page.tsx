@@ -3,7 +3,7 @@ import { Ticket } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import H1 from "@/components/shared/dashboard/H1";
 import PageContainer from "../../_components/PageContainer";
-import { getTickets, getCodevList } from "./actions";
+import { getTickets, getCodevList } from "@/actions/admin/ticket-support";
 import TicketManagementView from "./_components/TicketManagementView";
 
 export const dynamic = "force-dynamic";

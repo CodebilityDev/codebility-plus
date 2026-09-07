@@ -4,40 +4,10 @@ import { memo, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { IconLink } from "@/public/assets/svgs";
+import type { ServicesProjectCard } from "@/lib/server/services-projects-cached";
 import { Eye } from "lucide-react";
 
-import { useServiceContext } from "../../_context";
-
-interface TeamMember {
-  id: string;
-  first_name: string;
-  last_name: string;
-  image_url?: string | null;
-  role?: string;
-  joined_at?: string;
-}
-
-export interface ServiceProject {
-  id: string;
-  name: string;
-  description?: string;
-  main_image?: string;
-  github_link?: string;
-  figma_link?: string;
-  start_date?: string;
-  end_date?: string;
-  members?: TeamMember[];
-  categories?: Array<{
-    id: number;
-    name: string;
-    description?: string;
-  }>;
-  client_id?: string;
-  created_at?: string;
-  updated_at?: string;
-  website_url?: string;
-  tech_stack?: string[];
-}
+export type ServiceProject = ServicesProjectCard;
 
 interface Props {
   service: ServiceProject;
@@ -45,16 +15,12 @@ interface Props {
 }
 
 export const ServicesServiceCard = memo(({ service, onSelect }: Props) => {
-  const { setActiveService } = useServiceContext();
-
   const {
     name,
     main_image,
     description,
-    members = [],
     website_url,
     categories = [],
-    tech_stack = [],
   } = service;
 
   const imageUrl = useMemo(
@@ -69,16 +35,13 @@ export const ServicesServiceCard = memo(({ service, onSelect }: Props) => {
 
   const hasValidWebsite = useMemo(
     () =>
-      website_url &&
-      website_url !== "" &&
-      website_url.toLowerCase() !== "n/a" &&
-      website_url !== ".",
+      Boolean(
+        website_url &&
+          website_url !== "" &&
+          website_url.toLowerCase() !== "n/a" &&
+          website_url !== ".",
+      ),
     [website_url],
-  );
-
-  const teamLeader = useMemo(
-    () => members.find((member) => member.role === "team_leader") || null,
-    [members],
   );
 
   const [isHovered, setIsHovered] = useState(false);
@@ -93,7 +56,6 @@ export const ServicesServiceCard = memo(({ service, onSelect }: Props) => {
       return;
     }
 
-    // After 2s on hover, switch to description
     timerRef.current = setTimeout(() => {
       setShowDescription(true);
     }, 2000);
@@ -104,16 +66,11 @@ export const ServicesServiceCard = memo(({ service, onSelect }: Props) => {
   }, [isHovered]);
 
   const handleClick = () => {
-    if (onSelect) {
-      onSelect(service);
-    } else {
-      setActiveService(service);
-    }
+    onSelect?.(service);
   };
 
   return (
     <div className="group flex h-full cursor-pointer flex-col overflow-hidden rounded-xl bg-white/[0.04] ring-1 ring-white/[0.08] transition-all duration-300 hover:bg-white/[0.07] hover:ring-white/[0.16] hover:shadow-[0_8px_30px_rgba(0,0,0,0.3)]">
-      {/* Image — consistent 4:3 aspect ratio */}
       <div
         className="relative w-full flex-1 overflow-hidden"
         onClick={handleClick}
@@ -129,7 +86,6 @@ export const ServicesServiceCard = memo(({ service, onSelect }: Props) => {
           quality={75}
         />
 
-        {/* Category badges — dark glass pill */}
         {categories.length > 0 && (
           <div className="absolute left-3 top-3 flex max-w-[calc(100%-1.5rem)] flex-wrap gap-1.5">
             {categories.map((category) => (
@@ -143,13 +99,13 @@ export const ServicesServiceCard = memo(({ service, onSelect }: Props) => {
           </div>
         )}
 
-        {/* Bottom glass band — grows from single-line to 40% max on description */}
         <div
           className="pointer-events-none absolute inset-x-0 bottom-0 border-t border-white/10 bg-gray-950/75 px-4 py-3"
           style={{
             opacity: isHovered ? 1 : 0,
             maxHeight: showDescription ? "40%" : "auto",
-            transition: "opacity 300ms cubic-bezier(0.4,0,0.2,1), max-height 300ms cubic-bezier(0.4,0,0.2,1)",
+            transition:
+              "opacity 300ms cubic-bezier(0.4,0,0.2,1), max-height 300ms cubic-bezier(0.4,0,0.2,1)",
           }}
         >
           {!showDescription && (
@@ -178,7 +134,6 @@ export const ServicesServiceCard = memo(({ service, onSelect }: Props) => {
           )}
         </div>
 
-        {/* Website link — top right */}
         {hasValidWebsite && (
           <Link
             href={website_url!}
@@ -191,16 +146,10 @@ export const ServicesServiceCard = memo(({ service, onSelect }: Props) => {
         )}
       </div>
 
-      {/* Footer — single line: name + author */}
       <div className="flex items-center gap-2 px-3 py-2.5" onClick={handleClick}>
         <h3 className="min-w-0 flex-1 truncate text-sm font-medium text-white/80 transition-colors group-hover:text-white">
           {name}
         </h3>
-        {teamLeader && (
-          <span className="flex-shrink-0 truncate text-xs text-white/35">
-            {teamLeader.first_name} {teamLeader.last_name}
-          </span>
-        )}
       </div>
     </div>
   );

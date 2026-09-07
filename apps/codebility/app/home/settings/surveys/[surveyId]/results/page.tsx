@@ -1,201 +1,80 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { Suspense } from "react";
+import Link from "next/link";
 import { H1 } from "@/components/shared/dashboard";
-import { createClientClientComponent } from "@/utils/supabase/client";
-import { ArrowLeft, CheckCircle, Download, Users } from "lucide-react";
-import { toast } from "sonner";
+import { ArrowLeft, CheckCircle, Users } from "lucide-react";
 
 import { Button } from "@codevs/ui/button";
 
 import PageContainer from "../../../../_components/PageContainer";
-import { getSurveyQuestions } from "../../questions/actions";
+import { getSurveyQuestions } from "@/actions/settings/survey-questions";
 import {
   getSurveyResponses,
   getSurveyStatistics,
-} from "../../responses/actions";
+} from "@/actions/settings/survey-responses";
+import { getSurveyById } from "@/actions/settings/surveys";
+import ExportResultsButton from "./_components/ExportResultsButton";
+import type { Question, Statistics, SurveyResponse } from "./_components/types";
 
-interface Question {
-  id: string;
-  question_text: string;
-  question_type: string;
-  options: string[];
+function ResultsSkeleton() {
+  return (
+    <div className="flex h-64 items-center justify-center">
+      <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-violet-500"></div>
+    </div>
+  );
 }
 
-interface Response {
-  id: string;
-  answers: Record<string, any>;
-  submitted_at: string;
-  respondent: {
-    first_name: string;
-    last_name: string;
-    email_address: string;
-  } | null;
-  respondent_email: string | null;
-}
+function getAnswerSummary(question: Question, responses: SurveyResponse[]) {
+  const questionResponses = responses
+    .map((r) => r.answers[question.id])
+    .filter(Boolean);
 
-interface Statistics {
-  total_responses: number;
-  completed_responses: number;
-  unique_respondents: number;
-  last_response_at: string;
-}
-
-export default function SurveyResultsPage() {
-  const params = useParams();
-  const router = useRouter();
-  const surveyId = params.surveyId as string;
-
-  const [survey, setSurvey] = useState<any>(null);
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [responses, setResponses] = useState<Response[]>([]);
-  const [statistics, setStatistics] = useState<Statistics | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchData();
-  }, [surveyId]);
-
-  const fetchData = async () => {
-    setLoading(true);
-
-    // Fetch survey
-    const supabase = createClientClientComponent();
-    if (!supabase) {
-      toast.error("Failed to initialize database client");
-      setLoading(false);
-      return;
-    }
-
-    const { data: surveyData } = await supabase
-      .from("surveys")
-      .select("id, title, description")
-      .eq("id", surveyId)
-      .single();
-
-    setSurvey(surveyData);
-
-    // Fetch questions
-    const questionsResult = await getSurveyQuestions(surveyId);
-    if (questionsResult.data) {
-      setQuestions(questionsResult.data);
-    }
-
-    // Fetch responses
-    const responsesResult = await getSurveyResponses(surveyId);
-    if (responsesResult.data) {
-      setResponses(responsesResult.data);
-    }
-
-    // Fetch statistics
-    const statsResult = await getSurveyStatistics(surveyId);
-    if (statsResult.data) {
-      setStatistics(statsResult.data as Statistics);
-    }
-
-    setLoading(false);
-  };
-
-  const getAnswerSummary = (question: Question) => {
-    const questionResponses = responses
-      .map((r) => r.answers[question.id])
-      .filter(Boolean);
-
-    if (question.question_type === "multiple_choice") {
-      const counts: Record<string, number> = {};
-      questionResponses.forEach((answer) => {
-        counts[answer] = (counts[answer] || 0) + 1;
-      });
-      return counts;
-    }
-
-    if (question.question_type === "checkbox") {
-      const counts: Record<string, number> = {};
-      questionResponses.forEach((answer) => {
-        if (Array.isArray(answer)) {
-          answer.forEach((item) => {
-            counts[String(item)] = (counts[String(item)] || 0) + 1;
-          });
-        }
-      });
-      return counts;
-    }
-
-    if (question.question_type === "rating") {
-      const ratings = questionResponses as number[];
-      const average = ratings.length
-        ? (ratings.reduce((sum, r) => sum + r, 0) / ratings.length).toFixed(1)
-        : "N/A";
-      return { average, count: ratings.length };
-    }
-
-    return questionResponses;
-  };
-
-  const exportToCSV = () => {
-    if (responses.length === 0) {
-      toast.error("No responses to export");
-      return;
-    }
-
-    const headers = [
-      "Submitted At",
-      "Respondent",
-      ...questions.map((q) => q.question_text),
-    ];
-
-    const rows = responses.map((response) => {
-      const respondentName = response.respondent
-        ? `${response.respondent.first_name} ${response.respondent.last_name}`
-        : response.respondent_email || "Anonymous";
-
-      return [
-        new Date(response.submitted_at).toLocaleString(),
-        respondentName,
-        ...questions.map((q) => {
-          const answer = response.answers[q.id];
-          if (Array.isArray(answer)) return answer.join(", ");
-          return answer || "";
-        }),
-      ];
+  if (question.question_type === "multiple_choice") {
+    const counts: Record<string, number> = {};
+    questionResponses.forEach((answer) => {
+      counts[answer] = (counts[answer] || 0) + 1;
     });
-
-    const csv = [headers, ...rows].map((row) => row.join(",")).join("\n");
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `survey-${surveyId}-results.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast.success("Results exported successfully");
-  };
-
-  if (loading) {
-    return (
-      <PageContainer>
-        <div className="flex h-64 items-center justify-center">
-          <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-violet-500"></div>
-        </div>
-      </PageContainer>
-    );
+    return counts;
   }
 
-  return (
-    <PageContainer maxWidth="7xl">
-      {/* Header */}
-      <div className="mb-6 flex items-center gap-4">
-        <Button
-          variant="ghost"
-          onClick={() => router.push(`/home/settings/surveys/${surveyId}`)}
-          className="text-gray-600 dark:text-gray-400"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Builder
-        </Button>
-      </div>
+  if (question.question_type === "checkbox") {
+    const counts: Record<string, number> = {};
+    questionResponses.forEach((answer) => {
+      if (Array.isArray(answer)) {
+        answer.forEach((item) => {
+          counts[String(item)] = (counts[String(item)] || 0) + 1;
+        });
+      }
+    });
+    return counts;
+  }
 
+  if (question.question_type === "rating") {
+    const ratings = questionResponses as number[];
+    const average = ratings.length
+      ? (ratings.reduce((sum, r) => sum + r, 0) / ratings.length).toFixed(1)
+      : "N/A";
+    return { average, count: ratings.length };
+  }
+
+  return questionResponses;
+}
+
+async function SurveyResultsData({ surveyId }: { surveyId: string }) {
+  const [surveyResult, questionsResult, responsesResult, statsResult] =
+    await Promise.all([
+      getSurveyById(surveyId),
+      getSurveyQuestions(surveyId),
+      getSurveyResponses(surveyId),
+      getSurveyStatistics(surveyId),
+    ]);
+
+  const survey = surveyResult.data ?? null;
+  const questions: Question[] = questionsResult.data ?? [];
+  const responses: SurveyResponse[] = responsesResult.data ?? [];
+  const statistics = (statsResult.data ?? null) as Statistics | null;
+
+  return (
+    <>
       <div className="mb-6 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <H1 className="bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
@@ -205,14 +84,11 @@ export default function SurveyResultsPage() {
             Survey responses and analytics
           </p>
         </div>
-        <Button
-          onClick={exportToCSV}
-          disabled={responses.length === 0}
-          className="flex items-center gap-2 bg-gradient-to-r from-violet-500 to-purple-500 text-white hover:from-violet-600 hover:to-purple-600"
-        >
-          <Download className="h-4 w-4" />
-          Export CSV
-        </Button>
+        <ExportResultsButton
+          surveyId={surveyId}
+          questions={questions}
+          responses={responses}
+        />
       </div>
 
       {/* Statistics Cards */}
@@ -276,7 +152,7 @@ export default function SurveyResultsPage() {
       {/* Question Results */}
       <div className="space-y-6">
         {questions.map((question, index) => {
-          const summary = getAnswerSummary(question);
+          const summary = getAnswerSummary(question, responses);
 
           return (
             <div
@@ -351,6 +227,36 @@ export default function SurveyResultsPage() {
           );
         })}
       </div>
+    </>
+  );
+}
+
+export default async function SurveyResultsPage({
+  params,
+}: {
+  params: Promise<{ surveyId: string }>;
+}) {
+  const { surveyId } = await params;
+
+  return (
+    <PageContainer maxWidth="7xl">
+      {/* Header */}
+      <div className="mb-6 flex items-center gap-4">
+        <Button
+          asChild
+          variant="ghost"
+          className="text-gray-600 dark:text-gray-400"
+        >
+          <Link href={`/home/settings/surveys/${surveyId}`}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Builder
+          </Link>
+        </Button>
+      </div>
+
+      <Suspense fallback={<ResultsSkeleton />}>
+        <SurveyResultsData surveyId={surveyId} />
+      </Suspense>
     </PageContainer>
   );
 }

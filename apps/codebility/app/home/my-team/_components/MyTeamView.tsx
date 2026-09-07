@@ -7,7 +7,7 @@ import {
   getTeamLead, 
   updateProjectMembers,
   SimpleMemberData 
-} from "@/app/home/projects/actions";
+} from "@/actions/projects/actions";
 import { Codev } from "@/types/home/codev";
 import { Button } from "@/components/ui/button";
 import TeamProjectCard from "./TeamProjectCard";

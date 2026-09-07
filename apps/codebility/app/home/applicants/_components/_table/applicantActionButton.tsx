@@ -15,7 +15,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/utils";
 import {
   CheckCircle2Icon,
   Loader2Icon,
@@ -40,15 +40,15 @@ import {
   moveApplicantToOnboardingAction,
   moveApplicantToTestingAction,
   passApplicantTestAction,
-} from "../../_service/action";
+} from "@/actions/applicants/applicant";
 import {
   sendDenyEmail,
   sendFailedTestEmail,
   sendOnboardingReminderWithUpdate,
   sendPassedTestEmail,
   sendTestReminderWithUpdate,
-} from "../../_service/email";
-import { NewApplicantType } from "../../_service/types";
+} from "@/actions/applicants/email";
+import { NewApplicantType } from "@/types/applicants";
 
 export default function ApplicantActionButton({
   applicant,

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, memo } from "react";
+import React, { useMemo, memo } from "react";
 import DefaultAvatar from "@/components/DefaultAvatar";
 import {
   IconPriority1,
@@ -8,23 +8,14 @@ import {
   IconPriority5,
 } from "@/public/assets/svgs";
 import { Task } from "@/types/home/codev";
-import { createClientClientComponent } from "@/utils/supabase/client";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
 import KanbanTaskViewEditModal from "./kanban_modals/KanbanTaskViewEditModal";
 import MobileTaskMoveModal from "./kanban_modals/MobileTaskMoveModal";
 
-// Local interface for fetched sidekick data
-interface SidekickMember {
-  id: string;
-  first_name: string;
-  last_name: string;
-  image_url?: string | null;
-}
-
 interface Props {
-  task: Task; // Use the global Task type, not ExtendedTask
+  task: Task;
   columnId?: string;
   onComplete?: (taskId: string) => void;
   availableColumns?: Array<{
@@ -57,8 +48,7 @@ function KanbanTask({ task, columnId, onComplete, availableColumns = [] }: Props
 
   const primaryImage = task.codev?.image_url;
   const primaryName = task.codev?.first_name || "Assignee";
-
-  const sidekicks = task.sidekick_ids ?? [];
+  const sidekickCount = task.sidekick_ids?.length ?? 0;
 
   const PriorityIconMap: { [key: string]: React.FC<React.SVGProps<SVGSVGElement>> } = useMemo(() => ({
     critical: IconPriority1,
@@ -73,10 +63,6 @@ function KanbanTask({ task, columnId, onComplete, availableColumns = [] }: Props
       : IconPriority5
   , [task.priority, PriorityIconMap]);
 
-  const [sidekickDetails, setSidekickDetails] = useState<SidekickMember[]>([]);
-  const [supabase, setSupabase] = useState<any>(null);
-
-  // Calculate deadline urgency
   const getDeadlineStatus = useMemo(() => {
     if (!task.deadline) return null;
     
@@ -103,7 +89,6 @@ function KanbanTask({ task, columnId, onComplete, availableColumns = [] }: Props
     }
   }, [task.deadline]);
 
-  // Get priority-based styles
   const priorityStyles = useMemo(() => {
     const baseClasses = "absolute top-0 left-0 w-1 h-full rounded-l-lg";
     switch (task.priority?.toLowerCase()) {
@@ -120,7 +105,6 @@ function KanbanTask({ task, columnId, onComplete, availableColumns = [] }: Props
     }
   }, [task.priority]);
 
-  // Get skill category color
   const getSkillCategoryColor = useMemo(() => (category: string): string => {
     const colorMap: Record<string, string> = {
       "UI/UX Designer":
@@ -141,7 +125,6 @@ function KanbanTask({ task, columnId, onComplete, availableColumns = [] }: Props
     );
   }, []);
 
-  // Get task type color
   const getTaskTypeColor = useMemo(() => (type: string): string => {
     const typeColorMap: Record<string, string> = {
       BUG: "bg-red-200 text-red-900 border-red-300 dark:bg-red-900/60 dark:text-red-200 dark:border-red-800",
@@ -155,30 +138,6 @@ function KanbanTask({ task, columnId, onComplete, availableColumns = [] }: Props
       "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
     );
   }, []);
-
-  useEffect(() => {
-    const supabaseClient = createClientClientComponent();
-    setSupabase(supabaseClient);
-  }, []);
-
-  useEffect(() => {
-    if (!supabase) return;
-
-    async function fetchSidekickDetails() {
-      if (sidekicks.length === 0) return;
-
-      const { data, error } = await supabase
-        .from("codev")
-        .select("id, first_name, last_name, image_url")
-        .in("id", sidekicks);
-      if (error) {
-        console.error("Error fetching sidekick details:", error.message);
-      } else if (data) {
-        setSidekickDetails(data as SidekickMember[]);
-      }
-    }
-    fetchSidekickDetails();
-  }, [sidekicks, supabase]);
 
   return (
     <KanbanTaskViewEditModal task={task} onComplete={onComplete}>
@@ -198,10 +157,8 @@ function KanbanTask({ task, columnId, onComplete, availableColumns = [] }: Props
           transform transition-all duration-200 ease-out`}
         data-type="Task"
       >
-        {/* Priority Indicator Bar */}
         <div className={`${priorityStyles} transition-all duration-300`} />
 
-        {/* Task Header */}
         <div className="flex items-center justify-between">
           <h3
             className="mr-2 line-clamp-2 flex-1 text-sm font-semibold 
@@ -211,7 +168,6 @@ function KanbanTask({ task, columnId, onComplete, availableColumns = [] }: Props
             {task.title}
           </h3>
           <div className="flex flex-shrink-0 items-center gap-1 md:gap-2">
-            {/* Mobile Move Button */}
             {columnId && availableColumns.length > 0 && (
               <MobileTaskMoveModal
                 task={task}
@@ -236,7 +192,6 @@ function KanbanTask({ task, columnId, onComplete, availableColumns = [] }: Props
               <span className="capitalize">{task.priority ?? "Low"}</span>
               <PriorityIcon className="h-3 w-3 md:h-4 md:w-4" />
             </div>
-            {/* PRIMARY AVATAR */}
             <div
               className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-full border-2 border-white shadow-sm transition-all duration-200 
               group-hover:border-customBlue-300 group-hover:scale-110 dark:border-gray-700 md:h-8 md:w-8"
@@ -254,7 +209,6 @@ function KanbanTask({ task, columnId, onComplete, availableColumns = [] }: Props
           </div>
         </div>
 
-        {/* Skill Category Badge */}
         {task.skill_category && (
           <div>
             <span
@@ -267,7 +221,6 @@ function KanbanTask({ task, columnId, onComplete, availableColumns = [] }: Props
           </div>
         )}
 
-        {/* Task Details */}
         <div className="flex flex-wrap gap-1 text-xs text-gray-600 dark:text-gray-400 md:gap-2 md:text-sm">
           {task.difficulty && (
             <span
@@ -296,7 +249,6 @@ function KanbanTask({ task, columnId, onComplete, availableColumns = [] }: Props
               {task.type}
             </span>
           )}
-          {/* Deadline Badge */}
           {getDeadlineStatus && (
             <span
               className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium shadow-sm border md:px-2.5 md:py-1 ${getDeadlineStatus.color} transition-all duration-200`}
@@ -305,45 +257,14 @@ function KanbanTask({ task, columnId, onComplete, availableColumns = [] }: Props
               📅 {getDeadlineStatus.text}
             </span>
           )}
+          {sidekickCount > 0 && (
+            <span
+              className="inline-flex items-center rounded-md bg-gray-100/80 px-2 py-0.5 text-xs font-medium text-gray-700 border border-gray-200 dark:bg-gray-800/40 dark:text-gray-300 dark:border-gray-600 md:px-2.5 md:py-1"
+            >
+              +{sidekickCount} sidekick{sidekickCount === 1 ? "" : "s"}
+            </span>
+          )}
         </div>
-
-        {/* Sidekicks */}
-        {sidekicks.length > 0 && (
-          <div className="flex -space-x-1.5 pt-1 md:-space-x-2 md:pt-2">
-            {sidekicks.slice(0, 3).map((sidekickId) => {
-              const member = sidekickDetails.find((m) => m.id === sidekickId);
-              return (
-                <div
-                  key={sidekickId}
-                  className="flex h-6 w-6 items-center justify-center overflow-hidden rounded-full border-2 border-white 
-                    shadow-sm transition-all duration-200 hover:scale-110 hover:border-customBlue-300 dark:border-gray-700 
-                    md:h-7 md:w-7"
-                >
-                  {member && member.image_url ? (
-                    <img
-                      src={member.image_url}
-                      alt={member.first_name}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <>
-                      <DefaultAvatar size={20} className="md:hidden" />
-                      <DefaultAvatar size={28} className="hidden md:block" />
-                    </>
-                  )}
-                </div>
-              );
-            })}
-            {sidekicks.length > 3 && (
-              <div
-                className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm border border-white/30
-                text-[10px] font-medium text-gray-700 dark:bg-white/10 dark:border-white/20 dark:text-gray-300 shadow-sm md:h-7 md:w-7 md:text-xs"
-              >
-                +{sidekicks.length - 3}
-              </div>
-            )}
-          </div>
-        )}
       </div>
     </KanbanTaskViewEditModal>
   );

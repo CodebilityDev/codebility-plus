@@ -9,7 +9,7 @@ import { createClientClientComponent } from "@/utils/supabase/client";
 
 import { Checkbox } from "@codevs/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@codevs/ui/tabs";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/utils";
 
 interface Filters {
   positions: string[];

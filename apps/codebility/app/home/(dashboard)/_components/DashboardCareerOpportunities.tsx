@@ -1,17 +1,13 @@
-"use client";
-
 import { ArrowRight, Briefcase, TrendingUp, Star } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@codevs/ui/button";
 import Box from "@/components/shared/dashboard/Box";
-import { useUserStore } from "@/store/codev-store";
 
-export default function DashboardCareerOpportunities() {
-  const { user } = useUserStore();
-  
-  // Check if user is a Codev (role_id = 10)
-  const isCodev = user?.role_id === 10;
-
+export default function DashboardCareerOpportunities({
+  isCodev,
+}: {
+  isCodev: boolean;
+}) {
   return (
     <Box className="relative overflow-hidden !bg-white/5 !backdrop-blur-2xl !border-white/10 !shadow-2xl dark:!bg-slate-900/5 dark:!border-slate-400/10 !before:absolute !before:inset-0 !before:bg-gradient-to-br !before:from-white/10 !before:to-transparent !before:pointer-events-none">
       {/* Main background gradient */}

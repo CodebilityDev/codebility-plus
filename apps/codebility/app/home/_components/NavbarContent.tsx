@@ -1,7 +1,6 @@
 // Server Component for static navbar content
 import Image from "next/image";
 import Link from "next/link";
-import { getServerSession } from "next-auth/server";
 
 export default async function NavbarContent() {
   // For now, we'll just return the logo part as a server component

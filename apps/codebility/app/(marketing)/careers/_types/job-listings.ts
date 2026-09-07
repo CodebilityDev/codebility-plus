@@ -20,18 +20,21 @@ export interface JobListing {
 export interface JobApplication {
   id: string;
   job_id: string;
-  job_title: string;
+  job_title?: string;
   first_name: string;
   last_name: string;
   email: string;
   phone: string;
   linkedin?: string;
   portfolio?: string;
-  cover_letter: string;
-  experience: string;
+  cover_letter?: string;
+  experience?: string;
   resume_url?: string;
   applied_at: string;
   status: "pending" | "reviewing" | "shortlisted" | "rejected" | "hired";
+  years_of_experience?: number;
+  github?: string;
+  notes?: string;
 }
 
 export interface JobListingsProps {
