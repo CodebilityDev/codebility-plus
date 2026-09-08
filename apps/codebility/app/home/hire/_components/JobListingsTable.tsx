@@ -68,8 +68,8 @@ export default function JobListingsTable() {
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'closed' | 'draft'>('all');
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
-  // Check if user is admin (role_id 1 or 4)
-  const isAdmin = user?.role_id === 1 || user?.role_id === 4;
+  // Check if user is admin (role_id 1)
+  const isAdmin = user?.role_id === 1;
 
   // Filter jobs based on status
   const filteredJobs = jobs.filter(job => {
