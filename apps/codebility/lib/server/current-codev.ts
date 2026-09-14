@@ -8,10 +8,6 @@ import { createClientServerComponent } from "@/utils/supabase/server";
  * The /home layout renders both the sidebar and the client user store from
  * this, so a page load no longer pays for a server read plus a duplicate
  * client-side `auth.getUser()` + `codev` fetch during store hydration.
- *
- * The row is plain-ified before it is returned: PostgREST hands back `Date`
- * instances for `timestamptz` columns, and React cannot serialize those across
- * the Server -> Client boundary ("Only plain objects ... can be passed").
  */
 export const getCurrentCodev = cache(async (): Promise<Codev | null> => {
   const supabase = await createClientServerComponent();

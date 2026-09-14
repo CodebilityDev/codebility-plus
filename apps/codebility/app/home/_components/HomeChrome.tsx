@@ -1,34 +1,18 @@
 "use client";
 
 import { Suspense, ReactNode } from "react";
-import AsyncErrorBoundary from "@/components/AsyncErrorBoundary";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { ModalProviderHome } from "@/components/providers/modal-provider-home";
-import { Toaster } from "sonner";
 
 import ToastNotification from "./HomeToastNotification";
 import Navbar from "./Navbar";
 import { NavigationOptimizer } from "./NavigationOptimizer";
-import PageTransitionWrapper from "./PageTransitionWrapper";
-import { PageTransitionSettings } from "./PageTransitionSettings";
 import ConditionalMainWrapper from "./ConditionalMainWrapper";
 import DynamicMainContent from "./DynamicMainContent";
 import SurveyWidget from "./SurveyWidget";
 
-/**
- * Client shell for the home routes.
- *
- * `children` and `sidebar` arrive as props from the server layout. React keeps
- * the same element references across renders of this component, so anything
- * that re-renders here (a sidebar toggle, a notification arriving, a toast)
- * updates the chrome while the page and sidebar subtrees pass through
- * untouched.
- *
- * NEVER import an async Server Component into this file. This module is
- * `"use client"`, so an async component here throws at runtime with
- * "<X> is an async Client Component". Render it in `layout.tsx` and pass it
- * down as a prop instead.
- */
+// Never import an async Server Component here: this module is "use client", so
+// it throws "<X> is an async Client Component". Render it in layout.tsx instead.
 export default function HomeChrome({
   children,
   sidebar,
@@ -40,15 +24,7 @@ export default function HomeChrome({
     <div className="background-light850_dark100 flex min-h-screen flex-col overflow-hidden">
       <ModalProviderHome />
       <ToastNotification />
-      <PageTransitionSettings />
       <NavigationOptimizer />
-      <Toaster
-        richColors
-        position="top-right"
-        toastOptions={{
-          className: "dark:bg-gray-800 dark:text-white",
-        }}
-      />
 
       <ErrorBoundary
         fallback={<div className="p-4 text-center">Navigation failed to load</div>}
@@ -67,11 +43,7 @@ export default function HomeChrome({
 
         <DynamicMainContent>
           <ConditionalMainWrapper>
-            <PageTransitionWrapper>
-              <Suspense fallback={<PageSpinner />}>
-                <AsyncErrorBoundary>{children}</AsyncErrorBoundary>
-              </Suspense>
-            </PageTransitionWrapper>
+            <Suspense fallback={<PageSpinner />}>{children}</Suspense>
           </ConditionalMainWrapper>
         </DynamicMainContent>
       </div>
