@@ -32,13 +32,11 @@ export const getCurrentCodev = cache(async (): Promise<Codev | null> => {
   return toPlainCodev(data);
 });
 
-/**
- * Structured-clone-safe clone. `JSON.parse(JSON.stringify(...))` is deliberate:
- * Date -> ISO string (matching the `string` fields in the Codev type) and
- * bigint -> number, with nested arrays/objects (education, projects, level)
- * recursed in one pass. Swap for a hand-written mapper only if a column is ever
- * added that JSON cannot represent losslessly.
- */
+// PostgREST returns real Dates for timestamptz columns, which React refuses to
+// serialize across the Server -> Client boundary. JSON round-trip makes them
+// ISO strings to match the Codev type.
+// ponytail: JSON cannot carry a column that is genuinely non-JSON; hand-write a
+// mapper if one is ever added.
 function toPlainCodev(row: unknown): Codev {
   return JSON.parse(JSON.stringify(row)) as Codev;
 }

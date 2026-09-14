@@ -12,8 +12,6 @@ export function NotificationContainer() {
   const supabase = createClientClientComponent();
   const userId = useUserStore((state) => state.user?.id);
 
-  // Subscribe to single fields so this component only re-renders when the
-  // value it actually renders changes, not on every store write.
   const notifications = useNotificationStore((state) => state.notifications);
   const isOpen = useNotificationStore((state) => state.isOpen);
   const togglePanel = useNotificationStore((state) => state.togglePanel);
@@ -24,9 +22,6 @@ export function NotificationContainer() {
     (state) => state.archiveNotification,
   );
   const clearAll = useNotificationStore((state) => state.clearAll);
-
-  // Store actions are stable references, so the polling effect below does not
-  // restart every time notifications change.
   const fetchNotifications = useNotificationStore(
     (state) => state.fetchNotifications,
   );
@@ -35,6 +30,7 @@ export function NotificationContainer() {
 
   useNotificationPolling({ userId, isOpen, fetchNotifications });
   useNotificationRealtime({ userId, supabase });
+
   // Close panel when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -83,10 +79,6 @@ export function NotificationContainer() {
   );
 }
 
-/**
- * Fetches on mount and while the panel is open. Lives outside the component so
- * the polling timer is not recreated by unrelated re-renders.
- */
 function useNotificationPolling({
   userId,
   isOpen,
