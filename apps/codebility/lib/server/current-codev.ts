@@ -8,6 +8,10 @@ import { createClientServerComponent } from "@/utils/supabase/server";
  * The /home layout renders both the sidebar and the client user store from
  * this, so a page load no longer pays for a server read plus a duplicate
  * client-side `auth.getUser()` + `codev` fetch during store hydration.
+ *
+ * The row is plain-ified before it is returned: PostgREST hands back `Date`
+ * instances for `timestamptz` columns, and React cannot serialize those across
+ * the Server -> Client boundary ("Only plain objects ... can be passed").
  */
 export const getCurrentCodev = cache(async (): Promise<Codev | null> => {
   const supabase = await createClientServerComponent();
@@ -29,5 +33,16 @@ export const getCurrentCodev = cache(async (): Promise<Codev | null> => {
     return null;
   }
 
-  return data as unknown as Codev;
+  return toPlainCodev(data);
 });
+
+/**
+ * Structured-clone-safe clone. `JSON.parse(JSON.stringify(...))` is deliberate:
+ * Date -> ISO string (matching the `string` fields in the Codev type) and
+ * bigint -> number, with nested arrays/objects (education, projects, level)
+ * recursed in one pass. Swap for a hand-written mapper only if a column is ever
+ * added that JSON cannot represent losslessly.
+ */
+function toPlainCodev(row: unknown): Codev {
+  return JSON.parse(JSON.stringify(row)) as Codev;
+}

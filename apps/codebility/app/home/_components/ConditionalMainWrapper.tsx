@@ -2,7 +2,6 @@
 
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
-import { useNavStore } from "@/hooks/navigation/use-sidebar";
 
 interface ConditionalMainWrapperProps {
   children: ReactNode;
@@ -10,8 +9,7 @@ interface ConditionalMainWrapperProps {
 
 export default function ConditionalMainWrapper({ children }: ConditionalMainWrapperProps) {
   const pathname = usePathname();
-  const { isToggleOpen } = useNavStore();
-  
+
   // Check if current route is kanban
   const isKanbanRoute = pathname.includes("/kanban");
   

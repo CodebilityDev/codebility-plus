@@ -9,11 +9,10 @@ interface DynamicMainContentProps {
 }
 
 export default function DynamicMainContent({ children }: DynamicMainContentProps) {
-  const { isToggleOpen } = useNavStore();
+  const isToggleOpen = useNavStore((state) => state.isToggleOpen);
   const pathname = usePathname();
 
   const isOrgChart = pathname === "/home/orgchart";
-
 
   const marginClass = isToggleOpen ? "lg:ml-64" : "lg:ml-20";
 

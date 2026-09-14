@@ -29,7 +29,7 @@ interface PageTransitionWrapperProps {
 
 export default function PageTransitionWrapper({ children }: PageTransitionWrapperProps) {
   const pathname = usePathname();
-  const { isToggleOpen } = useNavStore();
+  const isToggleOpen = useNavStore((state) => state.isToggleOpen);
   const isDesktop = useIsDesktop();
   const [isLoading, setIsLoading] = useState(true);
   const [displayedPathname, setDisplayedPathname] = useState(pathname);

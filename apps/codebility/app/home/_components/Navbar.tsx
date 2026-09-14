@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import Theme from "@/components/shared/dashboard/Theme";
 import { MobileTheme } from "@/components/shared/dashboard/theme-mobile";
 import { defaultAvatar } from "@/public/assets/images";
+import type { Codev } from "@/types/home/codev";
 import {
   IconCog,
   IconDropdown,
@@ -38,8 +38,7 @@ export const adminMenus = [
 ];
 
 const Navbar = () => {
-  const { user } = useUserStore(); // Get user data from Zustand store
-  const router = useRouter();
+  const user = useUserStore((state) => state.user);
 
   // // Redirect to sign-in page if no user is found
   // useEffect(() => {
@@ -48,12 +47,8 @@ const Navbar = () => {
   //   }
   // }, [user, router]);
 
-  // // Return null while redirecting to prevent rendering
+  // Return null while redirecting to prevent rendering
   if (!user) return null;
-
-  const { first_name, last_name, email_address, image_url, role_id } = user;
-
-  const menuItems = role_id === 1 ? adminMenus : defaultMenuItems;
 
   return (
     <>
@@ -87,9 +82,9 @@ const Navbar = () => {
         >
           {/* Announcement Button - NEW */}
           <AnnouncementButton />
-          
+
           <NotificationContainer />
-          
+
           <div>
             <div className="md:hidden">
               <MobileTheme />
@@ -99,85 +94,7 @@ const Navbar = () => {
             </div>
           </div>
 
-          <DropdownMenu modal={false}>
-            <DropdownMenuTrigger
-              className="focus:ring-customBlue-500 flex items-center gap-4 rounded-lg p-1 focus:outline-none focus:ring-2 focus:ring-offset-2"
-              aria-haspopup="menu"
-              aria-expanded="false"
-              aria-label={`User menu for ${first_name} ${last_name}`}
-            >
-              <div
-                className="hidden flex-col items-end md:flex"
-                aria-hidden="true"
-              >
-                <p className="capitalize text-gray-900 dark:text-gray-100">
-                  {first_name} {last_name}
-                </p>
-                <p className="text-gray-600 dark:text-gray-400 text-sm">{email_address}</p>
-              </div>
-              <div className="from-customViolet-300 to-customBlue-500 relative size-[44px] rounded-full bg-gradient-to-b p-[1.5px]">
-                <Image
-                  alt={`${first_name} ${last_name}'s profile picture`}
-                  src={image_url || defaultAvatar}
-                  fill
-                  sizes="44px"
-                  className="h-auto w-full rounded-full object-cover"
-                  title={`${first_name}'s Avatar`}
-                />
-              </div>
-              <IconDropdown
-                className="hidden text-gray-600 dark:text-gray-400 md:block"
-                aria-hidden="true"
-              />
-              <span className="sr-only">
-                Open user menu for {first_name} {last_name} ({email_address})
-              </span>
-            </DropdownMenuTrigger>
-
-            <DropdownMenuContent
-              className="bg-white dark:bg-gray-800 absolute -left-24 top-3 border-gray-200 dark:border-gray-700 md:w-[200px] shadow-lg"
-              role="menu"
-              aria-label="User account options"
-            >
-              {menuItems.map((item) => (
-                <Link href={item.href} key={item.label}>
-                  <DropdownMenuItem
-                    className="flex cursor-pointer items-center gap-6 p-3 px-5"
-                    role="menuitem"
-                    aria-label={`Go to ${item.label} page`}
-                  >
-                    <item.icon
-                      className="invert dark:invert-0"
-                      aria-hidden="true"
-                    />
-                    {item.label}
-                  </DropdownMenuItem>
-                </Link>
-              ))}
-
-              <DropdownMenuSeparator role="separator" />
-
-              <DropdownMenuItem
-                onClick={async (e) => {
-                  e.stopPropagation();
-                  await signOut();
-                }}
-                className="flex cursor-pointer items-center gap-6 p-3 px-5"
-                role="menuitem"
-                aria-label="Sign out of your account"
-              >
-                <IconLogout
-                  className="invert dark:invert-0"
-                  aria-hidden="true"
-                />
-                Logout
-                <span className="sr-only">
-                  {" "}
-                  - This will sign you out of your account
-                </span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <UserMenu user={user} />
           <MobileNav />
         </div>
       </div>
@@ -185,5 +102,97 @@ const Navbar = () => {
     </>
   );
 };
+
+/**
+ * Isolated so that nothing else in the navbar re-renders when the dropdown's
+ * internal open/close state changes.
+ */
+function UserMenu({ user }: { user: Codev }) {
+  const { first_name, last_name, email_address, image_url, role_id } = user;
+
+  const menuItems = role_id === 1 ? adminMenus : defaultMenuItems;
+
+  return (
+    <DropdownMenu modal={false}>
+      <DropdownMenuTrigger
+        className="focus:ring-customBlue-500 flex items-center gap-4 rounded-lg p-1 focus:outline-none focus:ring-2 focus:ring-offset-2"
+        aria-haspopup="menu"
+        aria-expanded="false"
+        aria-label={`User menu for ${first_name} ${last_name}`}
+      >
+        <div
+          className="hidden flex-col items-end md:flex"
+          aria-hidden="true"
+        >
+          <p className="capitalize text-gray-900 dark:text-gray-100">
+            {first_name} {last_name}
+          </p>
+          <p className="text-gray-600 dark:text-gray-400 text-sm">{email_address}</p>
+        </div>
+        <div className="from-customViolet-300 to-customBlue-500 relative size-[44px] rounded-full bg-gradient-to-b p-[1.5px]">
+          <Image
+            alt={`${first_name} ${last_name}'s profile picture`}
+            src={image_url || defaultAvatar}
+            fill
+            sizes="44px"
+            className="h-auto w-full rounded-full object-cover"
+            title={`${first_name}'s Avatar`}
+          />
+        </div>
+        <IconDropdown
+          className="hidden text-gray-600 dark:text-gray-400 md:block"
+          aria-hidden="true"
+        />
+        <span className="sr-only">
+          Open user menu for {first_name} {last_name} ({email_address})
+        </span>
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent
+        className="bg-white dark:bg-gray-800 absolute -left-24 top-3 border-gray-200 dark:border-gray-700 md:w-[200px] shadow-lg"
+        role="menu"
+        aria-label="User account options"
+      >
+        {menuItems.map((item) => (
+          <Link href={item.href} key={item.label}>
+            <DropdownMenuItem
+              className="flex cursor-pointer items-center gap-6 p-3 px-5"
+              role="menuitem"
+              aria-label={`Go to ${item.label} page`}
+            >
+              <item.icon
+                className="invert dark:invert-0"
+                aria-hidden="true"
+              />
+              {item.label}
+            </DropdownMenuItem>
+          </Link>
+        ))}
+
+        <DropdownMenuSeparator role="separator" />
+
+        <DropdownMenuItem
+          onClick={async (e) => {
+            e.stopPropagation();
+            await signOut();
+          }}
+          className="flex cursor-pointer items-center gap-6 p-3 px-5"
+          role="menuitem"
+          aria-label="Sign out of your account"
+        >
+          <IconLogout
+            className="invert dark:invert-0"
+            aria-hidden="true"
+          />
+          Logout
+          <span className="sr-only">
+            {" "}
+            - This will sign you out of your account
+          </span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
 
 export default Navbar;

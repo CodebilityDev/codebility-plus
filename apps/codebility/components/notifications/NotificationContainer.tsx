@@ -10,83 +10,31 @@ import { toast } from "sonner";
 export function NotificationContainer() {
   const containerRef = useRef<HTMLDivElement>(null);
   const supabase = createClientClientComponent();
-  const { user } = useUserStore();
+  const userId = useUserStore((state) => state.user?.id);
 
-  const {
-    notifications,
-    isOpen,
-    togglePanel,
-    setOpen,
-    markAsRead,
-    markAllAsRead,
-    archiveNotification,
-    clearAll,
-    getUnreadCount,
-    fetchNotifications,
-    addNotification,
-  } = useNotificationStore();
+  // Subscribe to single fields so this component only re-renders when the
+  // value it actually renders changes, not on every store write.
+  const notifications = useNotificationStore((state) => state.notifications);
+  const isOpen = useNotificationStore((state) => state.isOpen);
+  const togglePanel = useNotificationStore((state) => state.togglePanel);
+  const setOpen = useNotificationStore((state) => state.setOpen);
+  const markAsRead = useNotificationStore((state) => state.markAsRead);
+  const markAllAsRead = useNotificationStore((state) => state.markAllAsRead);
+  const archiveNotification = useNotificationStore(
+    (state) => state.archiveNotification,
+  );
+  const clearAll = useNotificationStore((state) => state.clearAll);
 
-  const unreadCount = getUnreadCount();
+  // Store actions are stable references, so the polling effect below does not
+  // restart every time notifications change.
+  const fetchNotifications = useNotificationStore(
+    (state) => state.fetchNotifications,
+  );
 
-  // Fetch notifications on mount and when user changes
-  useEffect(() => {
-    if (user?.id) {
-      fetchNotifications();
-    }
-  }, [user?.id, fetchNotifications]);
+  const unreadCount = notifications.reduce((n, item) => (item.read ? n : n + 1), 0);
 
-  // Fetch when panel opens and poll while open
-  useEffect(() => {
-    if (isOpen && user?.id) {
-      fetchNotifications();
-
-      const pollInterval = setInterval(() => {
-        fetchNotifications();
-      }, 5000);
-
-      return () => clearInterval(pollInterval);
-    }
-  }, [isOpen, user?.id, fetchNotifications]);
-
-  // Set up real-time subscription
-  useEffect(() => {
-    if (!user?.id || !supabase) return;
-
-    const channel = supabase
-      .channel(`notifications:${user.id}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "notifications",
-          filter: `recipient_id=eq.${user.id}`,
-        },
-        (payload) => {
-          const newNotification = {
-            ...payload.new,
-            createdAt: new Date(payload.new.created_at),
-          };
-
-          addNotification(newNotification as any);
-
-          if (payload.new.sender_id && payload.new.sender_id !== user.id) {
-            toast.info(payload.new.title, {
-              description: payload.new.message,
-              duration: 5000,
-            });
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      if (channel) {
-        supabase.removeChannel(channel);
-      }
-    };
-  }, [user?.id, addNotification, supabase]);
-
+  useNotificationPolling({ userId, isOpen, fetchNotifications });
+  useNotificationRealtime({ userId, supabase });
   // Close panel when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -133,4 +81,79 @@ export function NotificationContainer() {
       )}
     </div>
   );
+}
+
+/**
+ * Fetches on mount and while the panel is open. Lives outside the component so
+ * the polling timer is not recreated by unrelated re-renders.
+ */
+function useNotificationPolling({
+  userId,
+  isOpen,
+  fetchNotifications,
+}: {
+  userId: string | undefined;
+  isOpen: boolean;
+  fetchNotifications: () => Promise<void>;
+}) {
+  useEffect(() => {
+    if (!userId) return;
+    fetchNotifications();
+  }, [userId, fetchNotifications]);
+
+  useEffect(() => {
+    if (!isOpen || !userId) return;
+
+    fetchNotifications();
+    const pollInterval = setInterval(fetchNotifications, 5000);
+    return () => clearInterval(pollInterval);
+  }, [isOpen, userId, fetchNotifications]);
+}
+
+function useNotificationRealtime({
+  userId,
+  supabase,
+}: {
+  userId: string | undefined;
+  supabase: ReturnType<typeof createClientClientComponent>;
+}) {
+  const addNotification = useNotificationStore((state) => state.addNotification);
+
+  useEffect(() => {
+    if (!userId || !supabase) return;
+
+    const channel = supabase
+      .channel(`notifications:${userId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "notifications",
+          filter: `recipient_id=eq.${userId}`,
+        },
+        (payload) => {
+          const newNotification = {
+            ...payload.new,
+            createdAt: new Date(payload.new.created_at),
+          };
+
+          addNotification(newNotification as any);
+
+          if (payload.new.sender_id && payload.new.sender_id !== userId) {
+            toast.info(payload.new.title, {
+              description: payload.new.message,
+              duration: 5000,
+            });
+          }
+        },
+      )
+      .subscribe();
+
+    return () => {
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
+    };
+  }, [userId, addNotification, supabase]);
 }

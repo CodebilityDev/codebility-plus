@@ -14,7 +14,8 @@ interface LeftSidebarClientProps {
 }
 
 const LeftSidebarClient = ({ initialSidebarData }: LeftSidebarClientProps) => {
-  const { isToggleOpen, toggleNav } = useNavStore();
+  const isToggleOpen = useNavStore((state) => state.isToggleOpen);
+  const toggleNav = useNavStore((state) => state.toggleNav);
   const pathname = usePathname();
   
   // Check if we're in staging environment
