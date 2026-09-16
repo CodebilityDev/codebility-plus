@@ -15,6 +15,7 @@ import {
   deleteWorkExperience,
   updateWorkExperience,
 } from "@/actions/settings/profile";
+import { fetchProfilePoints } from "@/lib/client/profile-points";
 
 interface ExperienceProps {
   data: WorkExperience[];
@@ -52,11 +53,8 @@ const Experience = ({ data, codevId }: ExperienceProps) => {
       if (!codevId) return;
 
       try {
-        const res = await fetch(`/api/profile-points/${codevId}`);
-        if (res.ok) {
-          const pointsData: { points?: { category: string; points: number }[] } = 
-            await res.json() as { points?: { category: string; points: number }[] };
-          
+        const pointsData = await fetchProfilePoints(codevId);
+        if (pointsData) {
           const workExpPoint = pointsData?.points?.find(
             (point) => point.category === 'work_experience'
           );

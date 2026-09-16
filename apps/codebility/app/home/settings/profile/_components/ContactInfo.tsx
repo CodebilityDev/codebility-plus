@@ -15,6 +15,10 @@ import toast from "react-hot-toast";
 import { Input } from "@codevs/ui/input";
 
 import { updateSocialLinks } from "@/actions/settings/profile";
+import {
+  fetchProfilePoints,
+  invalidateProfilePoints,
+} from "@/lib/client/profile-points";
 
 type ContactInfoProps = {
   data: {
@@ -69,11 +73,8 @@ const ContactInfo = ({ data }: ContactInfoProps) => {
       if (!data.id) return;
 
       try {
-        const res = await fetch(`/api/profile-points/${data.id}`);
-        if (res.ok) {
-          const pointsData: { points?: { category: string; points: number }[] } = 
-            await res.json() as { points?: { category: string; points: number }[] };
-          
+        const pointsData = await fetchProfilePoints(data.id);
+        if (pointsData) {
           // Check if any contact-related categories have points
           const contactCategories = ['phone_number', 'github', 'facebook', 'linkedin', 'discord', 'portfolio_website'];
           const hasAnyContactPoints = pointsData?.points?.some(
@@ -100,13 +101,11 @@ const ContactInfo = ({ data }: ContactInfoProps) => {
       });
       setIsEditMode(false);
 
-      // Re-check points after update
+      // Re-check points after update; invalidate first so this reads fresh data.
       if (data.id) {
-        const res = await fetch(`/api/profile-points/${data.id}`);
-        if (res.ok) {
-          const pointsData: { points?: { category: string; points: number }[] } = 
-            await res.json() as { points?: { category: string; points: number }[] };
-          
+        invalidateProfilePoints(data.id);
+        const pointsData = await fetchProfilePoints(data.id);
+        if (pointsData) {
           const contactCategories = ['phone_number', 'github', 'facebook', 'linkedin', 'discord', 'portfolio_website'];
           const hasAnyContactPoints = pointsData?.points?.some(
             (point) => contactCategories.includes(point.category) && point.points > 0

@@ -14,6 +14,7 @@ import { Button } from "@codevs/ui/button";
 
 import { updateCodev } from "@/actions/settings/profile";
 import UploadPhotoModal from "./UploadPhotoModal";
+import { fetchProfilePoints } from "@/lib/client/profile-points";
 
 type PhotoProps = {
   data: {
@@ -43,11 +44,8 @@ const Photo = ({ data }: PhotoProps) => {
       if (!data.id) return;
 
       try {
-        const res = await fetch(`/api/profile-points/${data.id}`);
-        if (res.ok) {
-          const pointsData: { points?: { category: string; points: number }[] } = 
-            await res.json() as { points?: { category: string; points: number }[] };
-          
+        const pointsData = await fetchProfilePoints(data.id);
+        if (pointsData) {
           const imagePoint = pointsData?.points?.find(
             (point) => point.category === 'image_url'
           );

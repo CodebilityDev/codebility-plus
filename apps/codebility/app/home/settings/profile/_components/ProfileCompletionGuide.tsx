@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { ChevronDown, ChevronUp, Minimize2, Maximize2, NotebookTabs, CheckCircle2, Circle, TrendingUp, Award } from "lucide-react";
 import { Box } from "@/components/shared/dashboard";
 import { getClientSupabase } from "@/utils/supabase/client";
+import { fetchProfilePoints } from "@/lib/client/profile-points";
 
 // Types for profile points data
 interface ProfilePointsData {
@@ -218,10 +219,10 @@ export default function ProfileCompletionGuide() {
   ];
 
   useEffect(() => {
-    fetchProfilePoints();
+    loadProfilePoints();
   }, []);
 
-  const fetchProfilePoints = async () => {
+  const loadProfilePoints = async () => {
     try {
       setLoading(true);
       setError(null);
@@ -234,13 +235,12 @@ export default function ProfileCompletionGuide() {
         return;
       }
 
-      const response = await fetch(`/api/profile-points/${user.id}`);
+      const data = await fetchProfilePoints<ProfilePointsData>(user.id);
       
-      if (!response.ok) {
-        throw new Error(`Failed to fetch profile points: ${response.statusText}`);
+      if (!data) {
+        throw new Error("Failed to fetch profile points");
       }
       
-      const data = (await response.json()) as ProfilePointsData;
       setProfileData(data);
     } catch (err) {
       console.error("Error fetching profile points:", err);
@@ -279,7 +279,7 @@ export default function ProfileCompletionGuide() {
           <p className="text-red-400 mb-2">Failed to load profile completion data</p>
           <p className="text-gray-400 text-sm">{error}</p>
           <button 
-            onClick={fetchProfilePoints}
+            onClick={loadProfilePoints}
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             Retry

@@ -15,6 +15,7 @@ import {
   deleteEducation,
   updateEducation,
 } from "@/actions/settings/profile";
+import { fetchProfilePoints } from "@/lib/client/profile-points";
 
 interface EducationProps {
   data: Education[];
@@ -52,11 +53,8 @@ const EducationalBackground = ({ data, codevId }: EducationProps) => {
       if (!codevId) return;
 
       try {
-        const res = await fetch(`/api/profile-points/${codevId}`);
-        if (res.ok) {
-          const pointsData: { points?: { category: string; points: number }[] } = 
-            await res.json() as { points?: { category: string; points: number }[] };
-          
+        const pointsData = await fetchProfilePoints(codevId);
+        if (pointsData) {
           const educationPoint = pointsData?.points?.find(
             (point) => point.category === 'education'
           );

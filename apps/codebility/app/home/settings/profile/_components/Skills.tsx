@@ -10,6 +10,7 @@ import { IconEdit } from "@/public/assets/svgs";
 import toast from "react-hot-toast";
 
 import { updateCodev } from "@/actions/settings/profile";
+import { fetchProfilePoints } from "@/lib/client/profile-points";
 
 type SkillsProps = {
   data: {
@@ -89,11 +90,8 @@ const Skills = ({ data }: SkillsProps) => {
       if (!data.id) return;
 
       try {
-        const res = await fetch(`/api/profile-points/${data.id}`);
-        if (res.ok) {
-          const pointsData: { points?: { category: string; points: number }[] } = 
-            await res.json() as { points?: { category: string; points: number }[] };
-          
+        const pointsData = await fetchProfilePoints(data.id);
+        if (pointsData) {
           const techStackPoint = pointsData?.points?.find(
             (point) => point.category === 'tech_stacks'
           );
