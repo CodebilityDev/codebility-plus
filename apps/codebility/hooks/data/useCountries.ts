@@ -1,25 +1,9 @@
-// hooks/useCountries.ts
-import { useState, useEffect } from 'react';
-
 // Types for our formatted country options
 interface CountryOption {
   value: string;
   label: string;
 }
 
-// Type for the API response
-interface ApiCountry {
-  cca2: string;
-  name: { common: string };
-}
-
-// ✅ Type for cached data
-interface CachedData {
-  data: CountryOption[];
-  timestamp: number;
-}
-
-// ✅ COMPREHENSIVE fallback countries (all major countries)
 const FALLBACK_COUNTRIES: CountryOption[] = [
   { value: 'af', label: 'Afghanistan' },
   { value: 'al', label: 'Albania' },
@@ -125,141 +109,21 @@ const FALLBACK_COUNTRIES: CountryOption[] = [
   { value: 'zw', label: 'Zimbabwe' },
 ];
 
-// ✅ Cache key for localStorage
-const CACHE_KEY = 'countries_cache';
-const CACHE_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
-
-// ✅ Get cached countries from localStorage
-const getCachedCountries = (): CountryOption[] | null => {
-  if (typeof window === 'undefined') return null;
-  
-  try {
-    const cached = localStorage.getItem(CACHE_KEY);
-    if (!cached) return null;
-    
-    const parsed = JSON.parse(cached) as CachedData;
-    const isExpired = Date.now() - parsed.timestamp > CACHE_DURATION;
-    
-    if (isExpired) {
-      localStorage.removeItem(CACHE_KEY);
-      return null;
-    }
-    
-    return parsed.data;
-  } catch (error) {
-    console.warn('Failed to read cached countries:', error);
-    return null;
-  }
-};
-
-// ✅ Save countries to localStorage
-const setCachedCountries = (countries: CountryOption[]): void => {
-  if (typeof window === 'undefined') return;
-  
-  try {
-    const cacheData: CachedData = {
-      data: countries,
-      timestamp: Date.now(),
-    };
-    localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
-  } catch (error) {
-    console.warn('Failed to cache countries:', error);
-  }
-};
-
-// ✅ Fetch countries with timeout
-const fetchCountries = async (): Promise<ApiCountry[]> => {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
-  
-  try {
-    const response = await fetch('https://restcountries.com/v3.1/all', {
-      signal: controller.signal,
-      cache: 'force-cache',
-    });
-    
-    clearTimeout(timeoutId);
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
-    const data = await response.json();
-    return data as ApiCountry[];
-  } catch (error) {
-    clearTimeout(timeoutId);
-    
-    if (error instanceof Error) {
-      if (error.name === 'AbortError') {
-        throw new Error('Request timeout - using cached data');
-      }
-      throw error;
-    }
-    throw new Error('Unknown error fetching countries');
-  }
-};
-
-export const useCountries = () => {
-  const [countries, setCountries] = useState<CountryOption[]>(() => {
-    // ✅ Try to load from cache on initial render
-    const cached = getCachedCountries();
-    return cached || FALLBACK_COUNTRIES;
-  });
-  
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let isMounted = true;
-    
-    const loadCountries = async () => {
-      // ✅ Check cache first
-      const cached = getCachedCountries();
-      if (cached) {
-        setCountries(cached);
-        return; // Don't fetch if we have valid cache
-      }
-      
-      // ✅ No cache, fetch from API
-      setIsLoading(true);
-      setError(null);
-      
-      try {
-        const countryData = await fetchCountries();
-        
-        if (!isMounted) return;
-        
-        const formattedCountries = countryData
-          .map((country) => ({
-            value: country.cca2.toLowerCase(),
-            label: country.name.common,
-          }))
-          .sort((a, b) => a.label.localeCompare(b.label));
-        
-        setCountries(formattedCountries);
-        setCachedCountries(formattedCountries); // ✅ Cache the results
-      } catch (err) {
-        if (!isMounted) return;
-        
-        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-        console.warn('⚠️ Failed to load countries from API, using fallback list:', errorMessage);
-        setError('Using offline country list');
-        
-        // ✅ Keep fallback countries - don't reset to empty array
-        setCountries(FALLBACK_COUNTRIES);
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }
-    };
-    
-    loadCountries();
-    
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  return { countries, isLoading, error };
-};
+/**
+ * Static country list.
+ *
+ * This previously fetched restcountries.com. That API's v1-v4 endpoints were
+ * retired (they now return HTTP 200 with `{success:false}`), and v5 needs an
+ * account and API key, so the fetch only ever failed: a CORS error in the
+ * browser, then a silent fall back to this same list. Removed rather than
+ * migrated because the list is static data that never changes.
+ *
+ * ponytail: 102 countries, not all ~250. Add a row here if a client is from a
+ * country that is missing; reach for an API again only if the list must be
+ * exhaustive and current.
+ */
+export const useCountries = () => ({
+  countries: FALLBACK_COUNTRIES,
+  isLoading: false,
+  error: null,
+});

@@ -88,15 +88,14 @@ function useNotificationPolling({
   isOpen: boolean;
   fetchNotifications: () => Promise<void>;
 }) {
+  // One effect: fetch on mount, then poll only while the panel is open. These
+  // were two effects that both fired a fetch on the open transition.
   useEffect(() => {
     if (!userId) return;
-    fetchNotifications();
-  }, [userId, fetchNotifications]);
-
-  useEffect(() => {
-    if (!isOpen || !userId) return;
 
     fetchNotifications();
+    if (!isOpen) return;
+
     const pollInterval = setInterval(fetchNotifications, 5000);
     return () => clearInterval(pollInterval);
   }, [isOpen, userId, fetchNotifications]);

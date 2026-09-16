@@ -2,6 +2,8 @@ import { ThemeProvider } from "@/store/providers/ThemeProvider";
 import ReactQueryProvider from "@/hooks/query/reactQuery";
 import { UserProvider } from "@/store/UserProvider";
 import { getCurrentCodev } from "@/lib/server/current-codev";
+import { getSidebarData } from "@/constants/sidebar";
+import { getSidebarRoleId } from "@/components/shared/dashboard/LeftSidebarServer";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
 import { Toaster } from "sonner";
 
@@ -15,6 +17,9 @@ export default async function HomeLayout({
   children: React.ReactNode;
 }) {
   const currentUser = await getCurrentCodev();
+  // Fetched once here and passed to both the sidebar and the mobile nav, which
+  // previously each ran their own query for the same role-filtered links.
+  const sidebarData = await getSidebarData(getSidebarRoleId(currentUser));
 
   return (
     <AppRouterCacheProvider>
@@ -22,7 +27,10 @@ export default async function HomeLayout({
         <ThemeProvider>
           <ReactQueryProvider>
             <UserProvider initialUser={currentUser}>
-              <HomeChrome sidebar={<LeftSidebarServer />}>
+              <HomeChrome
+                sidebar={<LeftSidebarServer />}
+                sidebarData={sidebarData}
+              >
                 {children}
               </HomeChrome>
               <Toaster

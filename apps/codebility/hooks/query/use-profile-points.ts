@@ -49,7 +49,7 @@ async function fetchProfilePoints(
     throw new Error(`Failed to fetch profile points (${response.status})`);
   }
 
-  return response.json();
+  return (await response.json()) as ProfilePointsResponse;
 }
 
 /**

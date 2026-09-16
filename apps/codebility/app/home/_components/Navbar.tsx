@@ -26,6 +26,7 @@ import {
 } from "@codevs/ui/dropdown-menu";
 
 import { signOut } from "@/actions/auth";
+import type { Sidebar } from "@/constants/sidebar";
 import MobileNav from "./MobileNav";
 
 export const defaultMenuItems = [
@@ -37,7 +38,7 @@ export const adminMenus = [
   { href: "/home/account-settings", icon: IconCog, label: "Settings" },
 ];
 
-const Navbar = () => {
+const Navbar = ({ sidebarData }: { sidebarData: Sidebar[] }) => {
   const user = useUserStore((state) => state.user);
 
   // // Redirect to sign-in page if no user is found
@@ -95,7 +96,7 @@ const Navbar = () => {
           </div>
 
           <UserMenu user={user} />
-          <MobileNav />
+          <MobileNav sidebarData={sidebarData} />
         </div>
       </div>
     </nav>

@@ -9,28 +9,33 @@ import { shallow } from "zustand/shallow";
 import { getSocialPoints } from "@/actions/feeds/post";
 
 export default function SocialPointsCard() {
-  const posts = useFeedsStore((state) => state.posts, shallow);
-  const { user } = useUserStore();
+  const userId = useUserStore((state) => state.user?.id);
   const [points, setPoints] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // `posts` used to be a dependency here, so every feed write re-fired this
+  // server action. Points do not change when the rendered post list changes.
   useEffect(() => {
-    const fetchSocialPoints = async () => {
-      if (!user) {
-        setLoading(false);
-        return;
-      }
-      setLoading(true);
-      try {
-        const fetchedPoints = await getSocialPoints(user.id);
-        setPoints(fetchedPoints || 0);
-      } finally {
-        setLoading(false);
-      }
-    };
+    if (!userId) {
+      setLoading(false);
+      return;
+    }
 
-    if (user) fetchSocialPoints();
-  }, [user, posts]);
+    let cancelled = false;
+    setLoading(true);
+
+    getSocialPoints(userId)
+      .then((fetchedPoints) => {
+        if (!cancelled) setPoints(fetchedPoints || 0);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
 
   return (
     <div className="dark:bg-white/3 relative mt-4 mb-4 w-full rounded-xl border border-white/10 bg-gray-800 p-4 text-white shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/10 hover:shadow-lg dark:border-white/5 xl:fixed xl:right-6 xl:top-20 xl:z-50 xl:mt-0 xl:w-64">

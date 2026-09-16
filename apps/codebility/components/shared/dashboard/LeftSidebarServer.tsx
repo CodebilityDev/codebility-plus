@@ -3,7 +3,7 @@ import { getCurrentCodev } from "@/lib/server/current-codev";
 
 import LeftSidebarClient from "./LeftSidebarClient";
 
-function getSidebarRoleId(
+export function getSidebarRoleId(
   user: Awaited<ReturnType<typeof getCurrentCodev>>,
 ): number | null {
   if (!user) return null;

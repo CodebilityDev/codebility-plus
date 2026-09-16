@@ -1,12 +1,11 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { getSidebarData } from "@/constants/sidebar";
 import useHideSidebarOnResize from "@/hooks/navigation/useHideSidebarOnResize";
-import { useUserStore } from "@/store/codev-store";
+import type { Sidebar } from "@/constants/sidebar";
 
 import {
   Sheet,
@@ -24,35 +23,14 @@ interface SidebarLink {
   imgURL: string;
 }
 
-interface SidebarSection {
-  id: string;
-  title: string;
-  links: SidebarLink[];
-}
-
-const NavContent = () => {
-  const { user } = useUserStore();
+/**
+ * `sidebarData` is fetched once by `LeftSidebarServer` and passed down, so this
+ * no longer re-fetches the same role-filtered links on the client. Previously
+ * it called the `getSidebarData` server action from a mount effect, duplicating
+ * a query the layout had already made.
+ */
+const NavContent = ({ sidebarData }: { sidebarData: Sidebar[] }) => {
   const pathname = usePathname();
-  const [sidebarData, setSidebarData] = useState<SidebarSection[]>([]);
-
-  // Fetch sidebar data based on user role
-  useEffect(() => {
-    const fetchSidebarData = async () => {
-      if (user?.role_id) {
-        const roleId =
-          user.internal_status == "INACTIVE" ||
-          user.availability_status == false
-            ? -1
-            : user.role_id;
-        const data = await getSidebarData(roleId);
-        setSidebarData(data);
-      }
-    };
-
-    fetchSidebarData();
-  }, [user?.role_id]);
-
-  if (user?.application_status !== "passed") return null;
 
   return (
     <nav
@@ -114,7 +92,7 @@ const NavContent = () => {
   );
 };
 
-const MobileNav = () => {
+const MobileNav = ({ sidebarData }: { sidebarData: Sidebar[] }) => {
   const { isSheetOpen, setIsSheetOpen } = useHideSidebarOnResize();
 
   return (
@@ -164,7 +142,7 @@ const MobileNav = () => {
           </Link>
         </div>
         <div>
-          <NavContent />
+          <NavContent sidebarData={sidebarData} />
         </div>
       </SheetContent>
     </Sheet>

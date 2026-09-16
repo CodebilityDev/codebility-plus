@@ -25,11 +25,11 @@ function DashboardLoading() {
 }
 
 export default async function DashboardPage() {
-  // const modal = await fetchActiveModal();
+  const modal = await fetchActiveModal();
 
   return (
     <div className="w-full">
-      {/* {modal && <FeaturePromoModal data={modal} />} */}
+      {modal && <FeaturePromoModal data={modal} />}
 
       <div className="relative mb-8 flex flex-col gap-4 pt-4">
         {/* Background decorations - contained within content area */}
@@ -40,9 +40,9 @@ export default async function DashboardPage() {
         </div>
 
         <div className="relative z-10 flex flex-col gap-6">
-          {/* <Suspense fallback={null}>
+          <Suspense fallback={null}>
             <NewsBanner />
-          </Suspense> */}
+          </Suspense>
 
           {/* Enhanced Header */}
           <div className="mb-6 mt-3">
@@ -81,9 +81,9 @@ export default async function DashboardPage() {
             */}
           </div>
 
-          {/* <Suspense fallback={<DashboardLoading />}>
+          <Suspense fallback={<DashboardLoading />}>
             <DashboardContent />
-          </Suspense> */}
+          </Suspense>
         </div>
       </div>
     </div>

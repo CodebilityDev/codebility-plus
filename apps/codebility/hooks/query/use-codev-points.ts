@@ -18,7 +18,7 @@ async function fetchCodevPoints(
     throw new Error(`Failed to fetch codev points (${response.status})`);
   }
 
-  return response.json();
+  return (await response.json()) as CodevPointsResponse;
 }
 
 /**

@@ -18,24 +18,25 @@ interface PostUpvoteProps {
 }
 
 export default function PostUpvote({ post }: PostUpvoteProps) {
-  const { user } = useUserStore();
+  const userId = useUserStore((state) => state.user?.id);
 
   const [isUpvoted, setIsUpvoted] = useState(false);
   const [upvotes, setUpvotes] = useState(0);
-  const { posts, fetchPosts } = useFeedsStore((state) => ({
-    posts: state.posts,
-    fetchPosts: state.fetchPosts,
-  }));
 
+  // `posts` was in this dependency list, so every feed write (and every unrelated
+  // store update) re-ran both server actions for every visible card. Depend on
+  // the post's own id only; the counts are refetched by handleUpvote.
   useEffect(() => {
+    let cancelled = false;
+
     const checkUpvote = async () => {
-      if (user?.id && post?.id) {
+      if (userId && post?.id) {
         try {
-          const result = await hasUserUpvoted(post.id, user.id);
-          setIsUpvoted(result);
+          const result = await hasUserUpvoted(post.id, userId);
+          if (!cancelled) setIsUpvoted(result);
         } catch (error) {
           console.error("Error checking upvote status:", error);
-          setIsUpvoted(false);
+          if (!cancelled) setIsUpvoted(false);
         }
       } else {
         setIsUpvoted(false);
@@ -44,17 +45,22 @@ export default function PostUpvote({ post }: PostUpvoteProps) {
       if (post?.id) {
         try {
           const upvotesCount = await countUpvotes(post.id);
-          setUpvotes(upvotesCount);
+          if (!cancelled) setUpvotes(upvotesCount);
         } catch (error) {
           console.error("Error counting upvotes:", error);
         }
       }
     };
+
     checkUpvote();
-  }, [user?.id, post?.id, posts]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [userId, post?.id]);
 
   const handleUpvote = async (e: React.MouseEvent) => {
-    if (user) {
+    if (userId) {
       e.stopPropagation();
       e.preventDefault();
 
@@ -62,13 +68,13 @@ export default function PostUpvote({ post }: PostUpvoteProps) {
       setUpvotes((prev) => prev + (isUpvoted ? -1 : 1));
 
       if (!isUpvoted) {
-        const postUpvote = await AddPostUpvote(post.id, user.id);
+        await AddPostUpvote(post.id, userId);
 
         useFeedsStore.getState().updatePost(post.id, {
           upvote_count: post.comment_count! + 1,
         });
       } else {
-        await removePostUpvote(post.id, user.id);
+        await removePostUpvote(post.id, userId);
 
         useFeedsStore.getState().updatePost(post.id, {
           upvote_count: post.comment_count! - 1,

@@ -1,90 +1,109 @@
-// File: @/Components/providers/modal-provider-home.tsx
 "use client";
 
-import { useEffect, useState, ReactNode } from "react";
-import DashboardCurrentProjectModal from "@/app/home/(dashboard)/_components/DashboardCurrentProjectModal";
-import ClientAddModal from "@/app/home/clients/_components/ClientAddModal";
-import ClientEditModal from "@/app/home/clients/_components/ClientEditModal";
-import ProfileModal from "@/app/home/interns/_components/ProfileModal";
-import BoardAddModal from "@/app/home/kanban/_components/BoardAddModal";
-import ColumnAddModal from "@/app/home/kanban/[projectId]/[id]/_components/kanban_modals/KanbanColumnAddModal";
-import TaskAddModal from "@/app/home/kanban/[projectId]/[id]/_components/tasks/TaskAddModal";
-import TaskViewModal from "@/app/home/kanban/[projectId]/[id]/_components/tasks/TaskViewModal";
-import ProjectAddModal from "@/app/home/projects/_components/ProjectAddModal";
-import ProjectDeleteModal from "@/app/home/projects/_components/ProjectDeleteModal";
-import ProjectEditModal from "@/app/home/projects/_components/ProjectEditModal";
-import ProjectViewModal from "@/app/home/projects/_components/ProjectViewModal";
-import ApplicantsEditModal from "@/components/modals/ApplicantsEditModal";
-import PrivacyPolicyModal from "@/components/modals/PrivacyPolicyModal";
-import TermsOfServiceModal from "@/components/modals/TermsOfServiceModal";
-import TimeTrackerModal from "@/components/modals/TimeTrackerModal";
+import { lazy, Suspense, type ComponentType } from "react";
 
-import TaskDeleteModal from "@/app/home/kanban/[projectId]/[id]/_components/tasks/TaskDeleteModal";
-import TaskEditModal from "@/app/home/kanban/[projectId]/[id]/_components/tasks/TaskEditModal";
-import DeleteWarningModal from "@/components/modals/DeleteWarningModal";
-import TechStackModal from "@/components/modals/TechStackModal";
-import SprintAddModal from "@/app/home/kanban/[projectId]/_components/SprintAddModal";
-import KanbanAddMembersModal from "@/app/home/kanban/[projectId]/[id]/_components/kanban_modals/KanbanAddMembersModal";
-import SurveyModal from "@/components/modals/SurveyModal";
+import { useModal as useModalRoot } from "@/hooks/modals/use-modal";
+import { useModal as useModalApplicants } from "@/hooks/modals/use-modal-applicants";
+import { useModal as useModalClients } from "@/hooks/modals/use-modal-clients";
+import { useModal as useModalProjects } from "@/hooks/modals/use-modal-projects";
+import { useModal as useModalSprints } from "@/hooks/modals/use-modal-sprints";
+import { useModal as useModalUsers } from "@/hooks/modals/use-modal-users";
 
-// Add interface for props to support children
-interface ModalProviderHomeProps {
-  children?: ReactNode;
+/**
+ * Renders only the single modal that is currently open, lazy-loading its chunk
+ * on first use. Previously all 23 dialogs were mounted on every authenticated
+ * page, which cost thousands of renders at startup; nothing is mounted now until
+ * `onOpen("<type>")` fires.
+ *
+ * Modals are spread across seven independent Zustand stores, so this reads each
+ * store's `type` and picks the first non-null one. Only one modal can be open at
+ * a time by design: opening a second type on a different store while the first
+ * is open would need a coordinator, which nothing currently does.
+ */
+const MODALS: Record<string, ComponentType<any>> = {
+  // dashboard
+  dashboardCurrentProjectModal: lazy(
+    () => import("@/app/home/(dashboard)/_components/DashboardCurrentProjectModal"),
+  ),
+
+  // kanban
+  boardAddModal: lazy(() => import("@/app/home/kanban/_components/BoardAddModal")),
+  ColumnAddModal: lazy(
+    () =>
+      import("@/app/home/kanban/[projectId]/[id]/_components/kanban_modals/KanbanColumnAddModal"),
+  ),
+  taskAddModal: lazy(
+    () => import("@/app/home/kanban/[projectId]/[id]/_components/tasks/TaskAddModal"),
+  ),
+  taskViewModal: lazy(
+    () => import("@/app/home/kanban/[projectId]/[id]/_components/tasks/TaskViewModal"),
+  ),
+  taskEditModal: lazy(
+    () => import("@/app/home/kanban/[projectId]/[id]/_components/tasks/TaskEditModal"),
+  ),
+  taskDeleteModal: lazy(
+    () => import("@/app/home/kanban/[projectId]/[id]/_components/tasks/TaskDeleteModal"),
+  ),
+
+  // shared / root store
+  techStackModal: lazy(() => import("@/components/modals/TechStackModal")),
+  privacyPolicyModal: lazy(() => import("@/components/modals/PrivacyPolicyModal")),
+  termsOfServiceModal: lazy(() => import("@/components/modals/TermsOfServiceModal")),
+  timeTrackerTicketModal: lazy(() => import("@/components/modals/TimeTrackerModal")),
+  scheduleModal: lazy(() => import("@/components/modals/AvailableTimeModal")),
+  deleteWarningModal: lazy(() => import("@/components/modals/DeleteWarningModal")),
+  surveyModal: lazy(() => import("@/components/modals/SurveyModal")),
+
+  // projects store
+  projectAddModal: lazy(() => import("@/app/home/projects/_components/ProjectAddModal")),
+  projectEditModal: lazy(() => import("@/app/home/projects/_components/ProjectEditModal")),
+  projectViewModal: lazy(() => import("@/app/home/projects/_components/ProjectViewModal")),
+  projectDeleteModal: lazy(
+    () => import("@/app/home/projects/_components/ProjectDeleteModal"),
+  ),
+  KanbanAddMembersModal: lazy(
+    () =>
+      import("@/app/home/kanban/[projectId]/[id]/_components/kanban_modals/KanbanAddMembersModal"),
+  ),
+
+  // clients store
+  clientAddModal: lazy(() => import("@/app/home/clients/_components/ClientAddModal")),
+  clientEditModal: lazy(() => import("@/app/home/clients/_components/ClientEditModal")),
+
+  // users store
+  profileModal: lazy(() => import("@/app/home/interns/_components/ProfileModal")),
+
+  // sprints store
+  sprintAddModal: lazy(
+    () => import("@/app/home/kanban/[projectId]/_components/SprintAddModal"),
+  ),
+
+  // applicants store
+  applicantsEditModal: lazy(() => import("@/components/modals/ApplicantsEditModal")),
+};
+
+function useOpenModalType(): string | null {
+  const root = useModalRoot((s) => (s.isOpen ? s.type : null));
+  const applicants = useModalApplicants((s) => (s.isOpen ? s.type : null));
+  const clients = useModalClients((s) => (s.isOpen ? s.type : null));
+  const projects = useModalProjects((s) => (s.isOpen ? s.type : null));
+  const sprints = useModalSprints((s) => (s.isOpen ? s.type : null));
+  const users = useModalUsers((s) => (s.isOpen ? s.type : null));
+
+  return root ?? applicants ?? clients ?? projects ?? sprints ?? users ?? null;
 }
 
-export const ModalProviderHome = ({ children }: ModalProviderHomeProps = {}) => {
-  const [isMounted, setIsMounted] = useState(false);
+export const ModalProviderHome = () => {
+  const type = useOpenModalType();
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  if (!type) return null;
 
-  if (!isMounted) {
-    return null;
-  }
+  const Modal = MODALS[type];
+  if (!Modal) return null;
 
   return (
-    <>
-      {/* Render children if provided */}
-      {children}
-      
-      {/* All modal components - ENSURE TechStackModal IS INCLUDED */}
-      <TaskAddModal />
-      <TaskViewModal />
-      <TaskEditModal />
-      <TaskDeleteModal />
-
-      <BoardAddModal />
-      <ColumnAddModal />
-
-      <KanbanAddMembersModal />
-
-      <ProjectAddModal />
-      <ProjectEditModal />
-      <ProjectViewModal />
-      <ProjectDeleteModal />
-
-      <ClientAddModal />
-      <ClientEditModal />
-
-      <ApplicantsEditModal />
-      <PrivacyPolicyModal />
-      <TermsOfServiceModal />
-
-      <ProfileModal />
-
-      <TimeTrackerModal />
-
-      <SprintAddModal />
-
-      <DeleteWarningModal />
-
-      {/* CRITICAL: TechStackModal must be rendered here */}
-      <TechStackModal />
-
-      <DashboardCurrentProjectModal />
-
-      <SurveyModal />
-    </>
+    <Suspense fallback={null}>
+      <Modal />
+    </Suspense>
   );
 };

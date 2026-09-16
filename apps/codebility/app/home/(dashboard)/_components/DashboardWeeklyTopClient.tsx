@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Box from "@/components/shared/dashboard/Box";
 import {
   Table,
@@ -53,13 +54,23 @@ interface ProjectLeader {
   skill_breakdown: Record<string, number>;
 }
 
-/** categoryData is keyed by period as well as category: the same category has a
- *  different board for all-time, weekly and monthly. */
+/** One query key per board, so TanStack caches each tab instead of the manual
+ *  `loadedBoards` ref this used to keep. The string form is also the lookup key
+ *  into `categoryData`. */
 const boardKey = (period: TimePeriod, category: string) =>
+  ["leaderboard", "technical", period, category] as const;
+
+const boardDataKey = (period: TimePeriod, category: string) =>
   `${period}:${category}`;
 
-interface CategoryData {
-  [key: string]: TopCodev[];
+const softSkillsKey = ["leaderboard", "soft-skills"] as const;
+const projectsKey = (period: TimePeriod) =>
+  ["leaderboard", "projects", period] as const;
+
+async function fetchJson<T>(url: string): Promise<T> {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`Request failed (${response.status}): ${url}`);
+  return (await response.json()) as T;
 }
 
 const LoadingTable = () => {
@@ -98,170 +109,75 @@ export default function WeeklyTop({
   initialCategory: string;
   initialLeaders: TopCodev[];
 }) {
-  const [categoryData, setCategoryData] = useState<CategoryData>(
-    initialCategory ? { [boardKey("all", initialCategory)]: initialLeaders } : {},
-  );
   const [selectedCategory, setSelectedCategory] =
     useState<string>(initialCategory);
   const [timePeriod, setTimePeriod] = useState<TimePeriod>("all");
-  const [leaderboardType, setLeaderboardType] = useState<LeaderboardType>("technical");
-  const [softSkillsLeaders, setSoftSkillsLeaders] = useState<SoftSkillsLeader[]>([]);
-  const [projectLeaders, setProjectLeaders] = useState<ProjectLeader[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [leaderboardType, setLeaderboardType] =
+    useState<LeaderboardType>("technical");
+
+  const queryClient = useQueryClient();
 
   const allCategories = categories;
-  // Boards already fetched this session, so flipping between the FE/BE/FS tabs
-  // (or back to a tab) does not re-request one we are already holding. The
-  // default all-time board arrives server-rendered, so it starts in here.
-  const loadedBoards = useRef<Set<string>>(
-    new Set(initialCategory ? [boardKey("all", initialCategory)] : []),
-  );
-  // The subscription is mounted once, so it reaches the current view through a ref.
-  const refreshRef = useRef<(() => void) | null>(null);
 
-  // Fetch soft skills leaderboard
-  useEffect(() => {
-    if (leaderboardType !== "soft-skills") return;
+  const technicalQuery = useQuery({
+    queryKey: boardKey(timePeriod, selectedCategory),
+    queryFn: async () => {
+      const data = await fetchJson<{
+        leaders?: { codev_id: string; first_name: string; total_points: number }[];
+      }>(
+        `/api/technical-leaderboard?category=${encodeURIComponent(selectedCategory)}&timeFilter=${timePeriod}&limit=10`,
+      );
 
-    let isMounted = true;
+      // Ranking is by points alone. Activity is deliberately not part of the
+      // ordering: a leaderboard ranks scores.
+      return (data.leaders || []).map<TopCodev>((leader) => ({
+        points: leader.total_points,
+        codev: { first_name: leader.first_name },
+        skill_category: { name: selectedCategory },
+      }));
+    },
+    // The all-time board arrives server-rendered, so seed the cache with it and
+    // the first paint issues no request.
+    initialData:
+      timePeriod === "all" && selectedCategory === initialCategory
+        ? initialLeaders
+        : undefined,
+    enabled: leaderboardType === "technical" && Boolean(selectedCategory),
+  });
 
-    const fetchSoftSkillsLeaderboard = async () => {
-      setIsLoading(true);
-      
-      try {
-        const response = await fetch('/api/soft-skills-leaderboard');
-        if (!response.ok) {
-          throw new Error('Failed to fetch soft skills leaderboard');
-        }
-        
-        const data = await response.json() as { leaders?: SoftSkillsLeader[] };
-        if (isMounted) {
-          setSoftSkillsLeaders(data.leaders || []);
-        }
-      } catch (error) {
-        if (isMounted) {
-          console.error("Error fetching soft skills leaderboard:", error);
-          setSoftSkillsLeaders([]);
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }
-    };
+  const softSkillsQuery = useQuery({
+    queryKey: softSkillsKey,
+    queryFn: async () =>
+      (
+        await fetchJson<{ leaders?: SoftSkillsLeader[] }>(
+          "/api/soft-skills-leaderboard",
+        )
+      ).leaders || [],
+    enabled: leaderboardType === "soft-skills",
+  });
 
-    fetchSoftSkillsLeaderboard();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [leaderboardType]);
-
-  // Fetch projects leaderboard
-  useEffect(() => {
-    if (leaderboardType !== "projects") return;
-
-    let isMounted = true;
-
-    const fetchProjectsLeaderboard = async () => {
-      setIsLoading(true);
-
-      try {
-        const response = await fetch(
+  const projectsQuery = useQuery({
+    queryKey: projectsKey(timePeriod),
+    queryFn: async () =>
+      (
+        await fetchJson<{ leaders?: ProjectLeader[] }>(
           `/api/project-leaderboard?timeFilter=${timePeriod}&limit=10`,
-        );
+        )
+      ).leaders || [],
+    enabled: leaderboardType === "projects",
+  });
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch project leaderboard");
-        }
+  const isLoading =
+    (leaderboardType === "technical" && technicalQuery.isFetching) ||
+    (leaderboardType === "soft-skills" && softSkillsQuery.isFetching) ||
+    (leaderboardType === "projects" && projectsQuery.isFetching);
 
-        const data = (await response.json()) as { leaders?: ProjectLeader[] };
+  const softSkillsLeaders = softSkillsQuery.data ?? [];
+  const projectLeaders = projectsQuery.data ?? [];
+  const categoryData: Record<string, TopCodev[]> = technicalQuery.data
+    ? { [boardDataKey(timePeriod, selectedCategory)]: technicalQuery.data }
+    : {};
 
-        if (isMounted) {
-          setProjectLeaders(data.leaders || []);
-        }
-      } catch (error) {
-        if (isMounted) {
-          console.error("Error fetching projects leaderboard:", error);
-          setProjectLeaders([]);
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    fetchProjectsLeaderboard();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [leaderboardType, timePeriod]);
-
-  useEffect(() => {
-    if (leaderboardType !== "technical" || !selectedCategory) {
-      refreshRef.current = null;
-      return;
-    }
-
-    let isMounted = true;
-    const key = boardKey(timePeriod, selectedCategory);
-
-    const fetchTopCodevs = async () => {
-      setIsLoading(true);
-      try {
-        const response = await fetch(
-          `/api/technical-leaderboard?category=${encodeURIComponent(selectedCategory)}&timeFilter=${timePeriod}&limit=10`,
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch technical leaderboard");
-        }
-
-        const data = (await response.json()) as {
-          leaders?: { codev_id: string; first_name: string; total_points: number }[];
-        };
-
-        if (!isMounted) return;
-
-        // Ranking is by points alone. All-time totals come from the codev_points ledger;
-        // weekly/monthly are summed from tasks approved inside the window. Activity is
-        // deliberately not part of the ordering — a leaderboard ranks scores.
-        const leaders: TopCodev[] = (data.leaders || []).map((leader) => ({
-          points: leader.total_points,
-          codev: { first_name: leader.first_name },
-          skill_category: { name: selectedCategory },
-        }));
-
-        loadedBoards.current.add(key);
-        setCategoryData((prev) => ({ ...prev, [key]: leaders }));
-      } catch (error) {
-        if (isMounted) {
-          console.error("Error in fetchTopCodevs:", error);
-          // Left out of loadedBoards so returning to this tab retries.
-          setCategoryData((prev) => ({ ...prev, [key]: [] }));
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    refreshRef.current = () => {
-      if (isMounted) void fetchTopCodevs();
-    };
-
-    if (!loadedBoards.current.has(key)) {
-      void fetchTopCodevs();
-    }
-
-    return () => {
-      isMounted = false;
-      refreshRef.current = null;
-    };
-  }, [timePeriod, selectedCategory, leaderboardType]);
 
   // Postgres realtime keeps the board fresh: subscribe once for the lifetime of
   // the component rather than tearing the channel down on every tab switch.
@@ -282,12 +198,11 @@ export default function WeeklyTop({
           if (pending) clearTimeout(pending);
           pending = setTimeout(async () => {
             pending = null;
-            // Every board is now out of date, not just the visible one.
-            loadedBoards.current.clear();
-            // Drop the cached board before refetching, otherwise the refetch
-            // reads the stale cache entry and marks it loaded again.
+            // Drop the server cache first, otherwise the refetch reads the
+            // stale unstable_cache entry.
             await revalidateTechnicalLeaderboard().catch(() => {});
-            refreshRef.current?.();
+            // Every board is stale, not just the visible one.
+            await queryClient.invalidateQueries({ queryKey: ["leaderboard"] });
           }, 1000);
         },
       )
@@ -297,7 +212,7 @@ export default function WeeklyTop({
       if (pending) clearTimeout(pending);
       void supabase.removeChannel(channel);
     };
-  }, []);
+  }, [queryClient]);
 
   const getRankIcon = (rank: number, isTraditional: boolean = true) => {
     if (!isTraditional) {
@@ -365,7 +280,7 @@ export default function WeeklyTop({
 
   const generateTableRows = (category: string) => {
     const rows: React.ReactNode[] = [];
-    const categoryPoints = categoryData[boardKey(timePeriod, category)] || [];
+    const categoryPoints = categoryData[boardDataKey(timePeriod, category)] || [];
     const maxPoints = categoryPoints.length > 0 ? Math.max(...categoryPoints.map(d => d.points)) : 0;
     
     for (let i = 0; i < 10; i++) {
@@ -487,7 +402,7 @@ export default function WeeklyTop({
           <TableCell className="font-medium">
             {hasData ? (
               <div className="flex items-center gap-2">
-                <span>📂 {project.project_name}</span>
+                <span>ðŸ“‚ {project.project_name}</span>
                 {getRankLightningIcon(i + 1)}
               </div>
             ) : (
@@ -565,7 +480,7 @@ export default function WeeklyTop({
                   ? "from-purple-600 to-blue-600"
                   : "from-emerald-600 to-teal-600"
               } bg-clip-text text-transparent`}>
-                🏆 Leaderboard
+                ðŸ† Leaderboard
               </h2>
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 {leaderboardType === "technical" ? "Technical skills & expertise" : "Consistency & collaboration"}

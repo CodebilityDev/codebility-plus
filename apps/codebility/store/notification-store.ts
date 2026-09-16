@@ -32,6 +32,10 @@ export const useNotificationStore = create<NotificationStore>((set, get) => ({
   error: null,
 
   fetchNotifications: async () => {
+    // Collapse concurrent callers (mount effect plus panel-open effect, and
+    // Strict Mode's double invoke in dev) into one in-flight request.
+    if (get().isLoading) return;
+
     set({ isLoading: true, error: null });
     try {
       const { data, error } = await fetchNotificationsAction();
