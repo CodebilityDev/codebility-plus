@@ -48,7 +48,10 @@ const CompactMemberGrid = ({ members, teamLead, projectId }: CompactMemberGridPr
     const errorsData: MemberErrors = {};
 
     try {
-      const batchSize = 3;
+      // Batched to bound concurrent requests, not to serialise the work: each
+      // round awaits one batch, so a small batch multiplies wall-clock. 6 is
+      // enough for a normal team size in a single round.
+      const batchSize = 6;
       for (let i = 0; i < allMembers.length; i += batchSize) {
         const batch = allMembers.slice(i, i + batchSize);
         const pointsPromises = batch.map(async (member) => {
