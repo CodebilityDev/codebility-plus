@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react";
-import { useFeedsStore } from "@/store/feeds-store";
 import { MessageSquare } from "lucide-react";
 
 import type { PostType } from "@/types/feeds";
@@ -9,17 +7,12 @@ interface PostCommentCountProps {
 }
 
 export default function PostCommentCount({ post }: PostCommentCountProps) {
-  const [count, setCount] = useState(post.comment_count ?? 0);
-
-  // Update local state whenever the post prop changes
-  useEffect(() => {
-    setCount(post.comment_count ?? 0);
-  }, [post]);
-
+  // Rendered straight from the prop: the previous version mirrored it into
+  // state via an effect keyed on `post`, which re-ran on every store write.
   return (
     <div className="flex items-center space-x-1">
       <MessageSquare size={20} className="text-gray-600 dark:text-gray-400" />
-      <span>{count}</span>
+      <span>{post.comment_count ?? 0}</span>
     </div>
   );
 }

@@ -1,47 +1,79 @@
+import { Suspense } from "react";
 import { ThemeProvider } from "@/store/providers/ThemeProvider";
 import ReactQueryProvider from "@/hooks/query/reactQuery";
 import { UserProvider } from "@/store/UserProvider";
 import { getCurrentCodev } from "@/lib/server/current-codev";
 import { getSidebarData } from "@/constants/sidebar";
-import { getSidebarRoleId } from "@/components/shared/dashboard/LeftSidebarServer";
-import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
 import { Toaster } from "sonner";
 
-import { MuiStyleRoot } from "./(dashboard)/_components/DashboardRoadmapStyleRoot";
 import HomeChrome from "./_components/HomeChrome";
-import LeftSidebarServer from "@/components/shared/dashboard/LeftSidebarServer";
+import MobileNav from "./_components/MobileNav";
+import LeftSidebarServer, {
+  getSidebarRoleId,
+} from "@/components/shared/dashboard/LeftSidebarServer";
+import { SidebarSkeleton } from "@/components/shared/dashboard/SidebarSkeleton";
 
 export default async function HomeLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // Only the user blocks the shell.
   const currentUser = await getCurrentCodev();
-  // Fetched once here and passed to both the sidebar and the mobile nav, which
-  // previously each ran their own query for the same role-filtered links.
-  const sidebarData = await getSidebarData(getSidebarRoleId(currentUser));
+
+  // Kick the sidebar query off but do NOT await it here: awaiting would hold
+  // back the whole shell. The single promise is shared by both Suspense
+  // boundaries, so the query still runs once (getSidebarData is a "use server"
+  // action and is not cache()-deduped).
+  const sidebarPromise = getSidebarData(getSidebarRoleId(currentUser));
 
   return (
-    <AppRouterCacheProvider>
-      <MuiStyleRoot>
-        <ThemeProvider>
-          <ReactQueryProvider>
-            <UserProvider initialUser={currentUser}>
-              <HomeChrome
-                sidebar={<LeftSidebarServer />}
-                sidebarData={sidebarData}
-              >
-                {children}
-              </HomeChrome>
-              <Toaster
-                richColors
-                position="top-right"
-                toastOptions={{ className: "dark:bg-gray-800 dark:text-white" }}
-              />
-            </UserProvider>
-          </ReactQueryProvider>
-        </ThemeProvider>
-      </MuiStyleRoot>
-    </AppRouterCacheProvider>
+    <ThemeProvider>
+      <ReactQueryProvider>
+        <UserProvider initialUser={currentUser}>
+          <HomeChrome
+            sidebar={
+              <Suspense fallback={<SidebarSkeleton />}>
+                <SidebarSlot sidebarPromise={sidebarPromise} />
+              </Suspense>
+            }
+            mobileNav={
+              <Suspense fallback={null}>
+                <MobileNavSlot sidebarPromise={sidebarPromise} />
+              </Suspense>
+            }
+          >
+            {children}
+          </HomeChrome>
+          <Toaster
+            richColors
+            position="top-right"
+            toastOptions={{ className: "dark:bg-gray-800 dark:text-white" }}
+          />
+        </UserProvider>
+      </ReactQueryProvider>
+    </ThemeProvider>
   );
+}
+
+type SidebarPromise = ReturnType<typeof getSidebarData>;
+
+async function SidebarSlot({
+  sidebarPromise,
+}: {
+  sidebarPromise: SidebarPromise;
+}) {
+  return <LeftSidebarServer sidebarData={await sidebarPromise} />;
+}
+
+/**
+ * MobileNav is a client component needing resolved links. This server wrapper
+ * awaits the shared promise so the layout itself never blocks on it.
+ */
+async function MobileNavSlot({
+  sidebarPromise,
+}: {
+  sidebarPromise: SidebarPromise;
+}) {
+  return <MobileNav sidebarData={await sidebarPromise} />;
 }

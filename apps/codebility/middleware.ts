@@ -143,13 +143,11 @@ export async function middleware(req: NextRequest) {
       return NextResponse.next();
     }
 
-    // Check if email is verified
-    const {
-      data: { user: authUser },
-    } = await supabase.auth.getUser();
-
+    // Check if email is verified. Reuses `user` from the getUser() call above:
+    // this used to re-issue an identical auth.getUser(), which is a network
+    // round trip to the Supabase auth server on every single navigation.
     if (
-      !authUser?.email_confirmed_at &&
+      !user.email_confirmed_at &&
       pathname !== EMAIL_VERIFICATION_ROUTE
     ) {
       // If email not verified, redirect to verification page

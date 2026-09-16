@@ -1,7 +1,6 @@
 import type { Config } from "tailwindcss";
 
 import baseConfig from "@codevs/tailwind-config/web";
-import { green } from "@mui/material/colors";
 import { custom } from "zod";
 import typography from "@tailwindcss/typography";
 

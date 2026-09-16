@@ -1,4 +1,4 @@
-import { getSidebarData } from "@/constants/sidebar";
+import { getSidebarData, type Sidebar } from "@/constants/sidebar";
 import { getCurrentCodev } from "@/lib/server/current-codev";
 
 import LeftSidebarClient from "./LeftSidebarClient";
@@ -16,9 +16,20 @@ export function getSidebarRoleId(
   return user.role_id ?? null;
 }
 
-export default async function LeftSidebarServer() {
-  const user = await getCurrentCodev();
-  const sidebarData = await getSidebarData(getSidebarRoleId(user));
+/**
+ * `sidebarData` is computed once in the /home layout and passed in. This used to
+ * call `getSidebarData` itself, which is not request-deduped, so every render
+ * issued a second identical `roles` query alongside the layout's.
+ */
+export default async function LeftSidebarServer({
+  sidebarData,
+}: {
+  sidebarData?: Sidebar[];
+}) {
+  if (sidebarData) return <LeftSidebarClient initialSidebarData={sidebarData} />;
 
-  return <LeftSidebarClient initialSidebarData={sidebarData} />;
+  const user = await getCurrentCodev();
+  const resolved = await getSidebarData(getSidebarRoleId(user));
+
+  return <LeftSidebarClient initialSidebarData={resolved} />;
 }

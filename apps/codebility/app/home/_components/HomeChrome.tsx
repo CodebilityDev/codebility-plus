@@ -3,7 +3,6 @@
 import { Suspense, ReactNode } from "react";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { ModalProviderHome } from "@/components/providers/modal-provider-home";
-import type { Sidebar } from "@/constants/sidebar";
 
 import ToastNotification from "./HomeToastNotification";
 import Navbar from "./Navbar";
@@ -17,11 +16,11 @@ import SurveyWidget from "./SurveyWidget";
 export default function HomeChrome({
   children,
   sidebar,
-  sidebarData,
+  mobileNav,
 }: {
   children: ReactNode;
   sidebar: ReactNode;
-  sidebarData: Sidebar[];
+  mobileNav: ReactNode;
 }) {
   return (
     <div className="background-light850_dark100 flex min-h-screen flex-col overflow-hidden">
@@ -32,7 +31,7 @@ export default function HomeChrome({
       <ErrorBoundary
         fallback={<div className="p-4 text-center">Navigation failed to load</div>}
       >
-        <Navbar sidebarData={sidebarData} />
+        <Navbar mobileNav={mobileNav} />
       </ErrorBoundary>
 
       <div className="flex flex-1 overflow-hidden">

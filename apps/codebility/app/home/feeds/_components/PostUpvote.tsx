@@ -2,12 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useUserStore } from "@/store/codev-store";
-import { useFeedsStore } from "@/store/feeds-store";
 import { ArrowBigUp } from "lucide-react";
 
 import {
   AddPostUpvote,
-  countUpvotes,
   hasUserUpvoted,
   removePostUpvote,
 } from "@/actions/feeds/post";
@@ -21,11 +19,12 @@ export default function PostUpvote({ post }: PostUpvoteProps) {
   const userId = useUserStore((state) => state.user?.id);
 
   const [isUpvoted, setIsUpvoted] = useState(false);
-  const [upvotes, setUpvotes] = useState(0);
+  // Seeded from the server payload (`getPosts` computes upvote_count), so no
+  // per-card countUpvotes round trip is needed on mount.
+  const [upvotes, setUpvotes] = useState(post.upvote_count ?? 0);
 
-  // `posts` was in this dependency list, so every feed write (and every unrelated
-  // store update) re-ran both server actions for every visible card. Depend on
-  // the post's own id only; the counts are refetched by handleUpvote.
+  // Only the viewer's own upvote state is per-user and absent from the payload,
+  // so it is the one thing still fetched. Depends on primitives only.
   useEffect(() => {
     let cancelled = false;
 
@@ -40,15 +39,6 @@ export default function PostUpvote({ post }: PostUpvoteProps) {
         }
       } else {
         setIsUpvoted(false);
-      }
-
-      if (post?.id) {
-        try {
-          const upvotesCount = await countUpvotes(post.id);
-          if (!cancelled) setUpvotes(upvotesCount);
-        } catch (error) {
-          console.error("Error counting upvotes:", error);
-        }
       }
     };
 
@@ -69,16 +59,8 @@ export default function PostUpvote({ post }: PostUpvoteProps) {
 
       if (!isUpvoted) {
         await AddPostUpvote(post.id, userId);
-
-        useFeedsStore.getState().updatePost(post.id, {
-          upvote_count: post.comment_count! + 1,
-        });
       } else {
         await removePostUpvote(post.id, userId);
-
-        useFeedsStore.getState().updatePost(post.id, {
-          upvote_count: post.comment_count! - 1,
-        });
       }
     }
   };

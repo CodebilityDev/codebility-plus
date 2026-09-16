@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useFeedsStore } from "@/store/feeds-store";
+import type { PostType } from "@/types/feeds";
 
 import { POSTS_PER_PAGE, SYSTEM_POST } from "@/constants/feeds";
 import Post from "./PostCard";
@@ -12,6 +13,7 @@ interface FeedProp {
   searchQuery?: string;
   sortField: "title" | "date" | "upvotes" | "comments";
   sortOrder: "asc" | "desc";
+  initialPosts: PostType[];
 }
 
 export default function Feed({
@@ -19,17 +21,25 @@ export default function Feed({
   searchQuery,
   sortField,
   sortOrder,
+  initialPosts,
 }: FeedProp) {
   const posts = useFeedsStore((state) => state.posts);
-  const fetchPosts = useFeedsStore((state) => state.fetchPosts);
   const isFetchingPosts = useFeedsStore((state) => state.isFetchingPosts);
 
   const [visibleCount, setVisibleCount] = useState(POSTS_PER_PAGE);
   const loaderRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    fetchPosts();
-  }, []);
+  // Seed from the server render instead of fetching on mount. Written during
+  // render (same deliberate pattern as store/UserProvider.ts) so the first paint
+  // already has posts. Comparing against the last-seeded value keeps it
+  // idempotent across Strict Mode's double render while still picking up a new
+  // server payload on a later navigation. Post mutations still call
+  // `fetchPosts()` to refresh.
+  const seededFrom = useRef<PostType[] | null>(null);
+  if (seededFrom.current !== initialPosts) {
+    seededFrom.current = initialPosts;
+    useFeedsStore.setState({ posts: initialPosts, isFetchingPosts: false });
+  }
 
   // Always prepend system post to regular posts
   const allPosts = useMemo(() => {
@@ -92,11 +102,6 @@ export default function Feed({
   }, [filteredPosts, sortField, sortOrder]);
 
   const visiblePosts = sortedPosts.slice(0, visibleCount);
-
-  // Reset visible count when search changes
-  useEffect(() => {
-    setVisibleCount(POSTS_PER_PAGE);
-  }, [searchQuery]);
 
   // Infinite scroll
   useEffect(() => {

@@ -26,8 +26,6 @@ import {
 } from "@codevs/ui/dropdown-menu";
 
 import { signOut } from "@/actions/auth";
-import type { Sidebar } from "@/constants/sidebar";
-import MobileNav from "./MobileNav";
 
 export const defaultMenuItems = [
   { href: "/home/settings/profile", icon: IconProfile, label: "Profile" },
@@ -38,7 +36,12 @@ export const adminMenus = [
   { href: "/home/account-settings", icon: IconCog, label: "Settings" },
 ];
 
-const Navbar = ({ sidebarData }: { sidebarData: Sidebar[] }) => {
+/**
+ * `mobileNav` arrives as an element prop so the server layout can stream it
+ * inside its own Suspense. Passing resolved sidebar data here would force the
+ * layout to await `getSidebarData` before any markup could render.
+ */
+const Navbar = ({ mobileNav }: { mobileNav: React.ReactNode }) => {
   const user = useUserStore((state) => state.user);
 
   // // Redirect to sign-in page if no user is found
@@ -96,7 +99,7 @@ const Navbar = ({ sidebarData }: { sidebarData: Sidebar[] }) => {
           </div>
 
           <UserMenu user={user} />
-          <MobileNav sidebarData={sidebarData} />
+          {mobileNav}
         </div>
       </div>
     </nav>
