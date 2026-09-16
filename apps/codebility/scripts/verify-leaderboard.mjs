@@ -1,4 +1,4 @@
-// Verifies the dashboard leaderboard still renders, switches tabs, and that the
+﻿// Verifies the dashboard leaderboard still renders, switches tabs, and that the
 // realtime channel is subscribed after the TanStack Query conversion.
 import path from "node:path";
 import os from "node:os";
@@ -12,6 +12,7 @@ const url = process.argv[2] ?? "http://localhost:3000/home";
 
 const browser = await chromium.launchPersistentContext(PROFILE, {
   headless: false,
+  chromiumSandbox: true,
   channel: "chrome",
   viewport: null,
 });

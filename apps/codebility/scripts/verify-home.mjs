@@ -1,4 +1,4 @@
-// Post-change verification for /home: server-action count, dashboard cards,
+﻿// Post-change verification for /home: server-action count, dashboard cards,
 // leaderboard rows, sidebar, and console errors.
 import path from "node:path";
 import os from "node:os";
@@ -12,6 +12,7 @@ const url = process.argv[2] ?? "http://localhost:3000/home";
 
 const browser = await chromium.launchPersistentContext(PROFILE, {
   headless: false,
+  chromiumSandbox: true,
   channel: "chrome",
   viewport: null,
 });

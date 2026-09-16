@@ -1,4 +1,4 @@
-// Answers "what is rendering, and why" instead of guessing.
+﻿// Answers "what is rendering, and why" instead of guessing.
 //
 // Usage:
 //   node scripts/render-diagnose.mjs <url> [--seconds=10]
@@ -64,6 +64,7 @@ window.__REACT_DEVTOOLS_GLOBAL_HOOK__ = window.__REACT_DEVTOOLS_GLOBAL_HOOK__ ||
 
 const browser = await chromium.launchPersistentContext(PROFILE, {
   headless: false,
+  chromiumSandbox: true,
   channel: "chrome",
   viewport: null,
 });

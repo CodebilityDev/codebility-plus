@@ -1,4 +1,4 @@
-// Verifies modals still open after the lazy-registry change: no dialog should be
+﻿// Verifies modals still open after the lazy-registry change: no dialog should be
 // mounted at idle, and clicking a real trigger should mount exactly one.
 import path from "node:path";
 import os from "node:os";
@@ -14,6 +14,7 @@ const route = process.argv[2] ?? "http://localhost:3000/home/kanban";
 
 const browser = await chromium.launchPersistentContext(PROFILE, {
   headless: false,
+  chromiumSandbox: true,
   channel: "chrome",
   viewport: null,
 });

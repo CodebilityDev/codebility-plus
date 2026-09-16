@@ -1,4 +1,4 @@
-// Measures render behavior of an authenticated page under a real interaction.
+﻿// Measures render behavior of an authenticated page under a real interaction.
 //
 // Usage:
 //   node scripts/render-probe.mjs <url> [--seconds=8] [--click=<selector>]
@@ -71,6 +71,7 @@ window.__REACT_DEVTOOLS_GLOBAL_HOOK__ = window.__REACT_DEVTOOLS_GLOBAL_HOOK__ ||
 
 const browser = await chromium.launchPersistentContext(PROFILE, {
   headless: false,
+  chromiumSandbox: true,
   channel: "chrome",
   args: ["--profile-directory=Default"],
   viewport: null,

@@ -1,4 +1,4 @@
-// Measures client-side navigation latency: the thing the user reports as slow
+﻿// Measures client-side navigation latency: the thing the user reports as slow
 // when clicking a sidebar link, versus a full page load of the same URL.
 //
 // Usage: node scripts/nav-probe.mjs [--click="Services"] [--seconds=20]
@@ -18,6 +18,7 @@ const budget = Number(arg("seconds", 20));
 
 const browser = await chromium.launchPersistentContext(PROFILE, {
   headless: false,
+  chromiumSandbox: true,
   channel: "chrome",
   viewport: null,
 });
