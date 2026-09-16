@@ -1,12 +1,14 @@
-import { H1 } from "@/components/shared/dashboard";
-
 import OverflowView from "./_components/OverflowView";
 import { createClientServerComponent } from "@/utils/supabase/server";
+import {
+  fetchQuestions,
+  fetchTrendingTopics,
+  getSocialPoints,
+  getUserLikedPosts,
+} from "@/actions/overflow/actions";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
-
-
 
 export default async function OverflowPage() {
   const supabase = await createClientServerComponent();
@@ -26,6 +28,21 @@ export default async function OverflowPage() {
     ...user
   };
 
+  // First page of questions, trending topics and social points were three
+  // mount-time effects in OverflowView; resolving them here removes the
+  // post-hydration round trips. Pagination and post-question refresh still
+  // re-fetch on the client. Liked post ids are fetched once here so each
+  // QuestionCard does not issue its own `checkPostLike` call.
+  const [questionsResult, trendingTopics, socialPoints, liked] =
+    await Promise.all([
+      fetchQuestions(1, 5),
+      fetchTrendingTopics(),
+      user?.id ? getSocialPoints(user.id) : Promise.resolve(0),
+      user?.id
+        ? getUserLikedPosts(user.id)
+        : Promise.resolve({ success: true, likedPostIds: [] as string[] }),
+    ]);
+
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950">
       <div className="mx-auto max-w-6xl px-6 py-12">
@@ -42,7 +59,13 @@ export default async function OverflowPage() {
         </div>
 
         <div className="relative">
-          <OverflowView author={codevData} />
+          <OverflowView
+            author={codevData}
+            initialQuestions={questionsResult}
+            initialTrendingTopics={trendingTopics}
+            initialSocialPoints={socialPoints ?? 0}
+            initialLikedPostIds={liked.likedPostIds}
+          />
         </div>
       </div>
     </div>

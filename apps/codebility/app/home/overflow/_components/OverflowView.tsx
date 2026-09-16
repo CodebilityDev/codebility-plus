@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import {
@@ -41,6 +41,15 @@ type Author = {
 
 interface OverflowViewProps {
   author: Author;
+  initialQuestions: {
+    questions: Question[];
+    currentPage: number;
+    totalPages: number;
+    totalCount: number;
+  };
+  initialTrendingTopics: TrendingTopic[];
+  initialSocialPoints: number;
+  initialLikedPostIds: string[];
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -578,17 +587,26 @@ function SocialPointsBadge({
 
 // ── OverflowView ──────────────────────────────────────────────────────────────
 
-export default function OverflowView({ author }: OverflowViewProps) {
+export default function OverflowView({
+  author,
+  initialQuestions,
+  initialTrendingTopics,
+  initialSocialPoints,
+  initialLikedPostIds,
+}: OverflowViewProps) {
   const { toast } = useToast();
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
-  const [questions, setQuestions] = useState<Question[]>([]);
+  const [questions, setQuestions] = useState<Question[]>(
+    initialQuestions.questions,
+  );
   const [sortBy, setSortBy] = useState<
     "newest" | "oldest" | "popular" | "myPosts"
   >("newest");
   const [isPosting, setIsPosting] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [socPoints, setSocPoints] = useState(0);
-  const [trendingTopics, setTrendingTopics] = useState<TrendingTopic[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [socPoints, setSocPoints] = useState(initialSocialPoints);
+  const [trendingTopics, setTrendingTopics] =
+    useState<TrendingTopic[]>(initialTrendingTopics);
   const [solverRefreshKey, setSolverRefreshKey] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
@@ -597,9 +615,9 @@ export default function OverflowView({ author }: OverflowViewProps) {
     dateFrom: undefined,
     dateTo: undefined,
   });
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
-  const [totalCount, setTotalCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(initialQuestions.currentPage);
+  const [totalPages, setTotalPages] = useState(initialQuestions.totalPages);
+  const [totalCount, setTotalCount] = useState(initialQuestions.totalCount);
   const [isPending, startTransition] = useTransition();
 
   // ── Data Fetching ───────────────────────────────────────────────────────────
@@ -642,15 +660,13 @@ export default function OverflowView({ author }: OverflowViewProps) {
     }
   };
 
-  useEffect(() => {
-    loadQuestions(1);
-  }, []);
-  useEffect(() => {
-    refreshSocialPoints();
-  }, [author.id]);
-  useEffect(() => {
-    loadTrendingTopics();
-  }, []);
+  // No mount effects: the first page of questions, trending topics and social
+  // points arrive as props from the server render. The loaders below are kept
+  // for pagination and the post-question refresh.
+  const likedPostIds = useMemo(
+    () => new Set(initialLikedPostIds),
+    [initialLikedPostIds],
+  );
 
   // ── Handlers ────────────────────────────────────────────────────────────────
 
@@ -854,6 +870,7 @@ export default function OverflowView({ author }: OverflowViewProps) {
                   setQuestions={setQuestions}
                   refreshSocialPoints={refreshSocialPoints}
                   onSolutionMarked={() => setSolverRefreshKey((k) => k + 1)}
+                  likedPostIds={likedPostIds}
                 />
               </div>
             ))

@@ -15,7 +15,7 @@ import {
 import CommentSection from "./CommentSection";
 import QuestionImagePreview from "./QuestionImagePreview"
 import PostQuestionModal, { QuestionContentDisplay }  from "./PostQuestionModal";
-import { updateQuestion, deletePostAndImages, togglePostLike, checkPostLike } from "@/actions/overflow/actions";
+import { updateQuestion, deletePostAndImages, togglePostLike } from "@/actions/overflow/actions";
 import { useToast } from "@/components/ui/use-toast";
 
 interface Question {
@@ -46,6 +46,8 @@ interface QuestionCardProps {
   setQuestions : React.Dispatch<React.SetStateAction<Question[]>>;
   refreshSocialPoints: () => Promise<void>;
   onSolutionMarked?: () => void; // ← add
+  /** Ids the viewer has already liked, fetched once by the server render. */
+  likedPostIds: Set<string>;
 }
 
 // Memoized TimeAgo component
@@ -429,9 +431,9 @@ const QuestionActions = memo(function QuestionActions({
   );
 });
 
-export default function QuestionCard({ question, onLike, loggedIn, setQuestions, onSolutionMarked }: QuestionCardProps) {
+export default function QuestionCard({ question, onLike, loggedIn, setQuestions, onSolutionMarked, likedPostIds }: QuestionCardProps) {
   const [showComments, setShowComments] = useState(false);
-  const [isLiked, setIsLiked] = useState(false);
+  const [isLiked, setIsLiked] = useState(() => likedPostIds.has(question.id));
   const [showMenu, setShowMenu] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
@@ -446,16 +448,8 @@ export default function QuestionCard({ question, onLike, loggedIn, setQuestions,
   const isEdited = question.created_at !== question.updated_at;
   const displayDate = isEdited ? question.updated_at : question.created_at;
   
-  // Check if user has already liked this post on mount
-  useEffect(() => {
-    const checkLikeStatus = async () => {
-      const result = await checkPostLike(question.id, loggedIn.id);
-      if (result.success) {
-        setIsLiked(result.liked);
-      }
-    };
-    checkLikeStatus();
-  }, [question.id, loggedIn.id]);
+  // Like state is seeded from `likedPostIds` (one server query for the whole
+  // page) instead of a `checkPostLike` round trip per card.
 
   // Memoize handleLike
   const handleLike = useCallback(async () => {
