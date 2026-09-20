@@ -13,7 +13,7 @@
 
 CREATE OR REPLACE VIEW public.admin_users AS
 SELECT id FROM public.codev
-WHERE role_id IN (1, 4);  -- Admin and Super Admin role IDs
+WHERE role_id IN (1, 4);  -- Historical: Admin (1). Note: role 4 is Intern, not Super Admin; see migration 20260816_fix_admin_users_view_role4.sql
 
 
 -- =============================================================================

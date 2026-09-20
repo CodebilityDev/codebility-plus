@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { NewApplicantType } from "./types";
 import { createAdminClient } from "@/utils/supabase/admin";
 import { createClientServerComponent } from "@/utils/supabase/server";
+import { requireRole } from "@/lib/server/auth-guard";
 import { invalidateCache } from "@/lib/server/redis-cache";
 import { cacheKeys } from "@/lib/server/redis-cache-keys";
 
@@ -268,7 +269,7 @@ export async function multipleDenyApplicantAction(applicantIds: string[]) {
 
 export async function acceptApplicantAction(applicantId: string) {
     try {
-        const supabase = await createClientServerComponent();
+        const { supabase } = await requireRole("applicants");
 
         // update codev table
         const { error } = await supabase
@@ -298,7 +299,7 @@ export async function acceptApplicantAction(applicantId: string) {
 
 export async function multipleAcceptApplicantAction(applicantIds: string[]) {
     try {
-        const supabase = await createClientServerComponent();
+        const { supabase } = await requireRole("applicants");
 
         // update codev table
         const { error } = await supabase

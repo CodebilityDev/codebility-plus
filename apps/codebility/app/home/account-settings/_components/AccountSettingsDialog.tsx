@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
@@ -28,7 +27,6 @@ import {
 import { Input } from "@codevs/ui/input";
 
 import AccountSettingsBackdrop from "./AccountSettingsBackDrop";
-import { updateEmail } from "../action";
 import { createClientClientComponent } from "@/utils/supabase/client";
 
 const emailChangeSchema = z.object({
@@ -38,13 +36,12 @@ const emailChangeSchema = z.object({
 export default function AccountSettingsDialog() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(false);
-   const [supabase, setSupabase] = useState<any>(null);
+  const [supabase, setSupabase] = useState<any>(null);
 
   useEffect(() => {
     const supabaseClient = createClientClientComponent();
     setSupabase(supabaseClient);
   }, []);
-
 
   const form = useForm<z.infer<typeof emailChangeSchema>>({
     resolver: zodResolver(emailChangeSchema),
@@ -103,72 +100,71 @@ export default function AccountSettingsDialog() {
     <>
       <AccountSettingsBackdrop isOpen={isOpen} />
       
-        <Dialog
-          open={isOpen}
-          onOpenChange={(open) => {
-            setIsOpen(open);
-            if (!open) {
-              form.reset();
-            }
-          }}
-        >
-          <DialogTrigger asChild>
-            <Button className="h-11 bg-customBlue-200 text-white duration-300 hover:bg-customBlue-300">
-              Change email
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="text-dark100_light900 background-box w-[90%] sm:w-full">
-            <DialogHeader>
-              <DialogTitle>Change Email Address</DialogTitle>
-              <DialogDescription>
-                Enter your new email address below. You&apos;ll need to verify
-                this email before the change takes effect.
-              </DialogDescription>
-            </DialogHeader>
-            <Form {...form}>
-              <form
-                className="space-y-4 py-4"
-                noValidate
-                onSubmit={form.handleSubmit(onSubmit)}
-              >
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Input
-                          variant="lightgray"
-                          label="New Email Address"
-                          parentClassName="flex flex-col gap-2"
-                          {...field}
-                          placeholder="Enter new email address"
-                          disabled={isLoading}
-                        />
-                      </FormControl>
-                      <FormMessage className="text-red-600" />
-                    </FormItem>
-                  )}
-                />
-                <DialogFooter className="gap-2">
-                  <DialogClose asChild>
-                    <Button variant="outline" disabled={isLoading}>
-                      Cancel
-                    </Button>
-                  </DialogClose>
-                  <Button
-                    type="submit"
-                    className="text-dark100_light900 bg-customBlue-200 duration-300 hover:bg-customBlue-300"
-                    disabled={!form.formState.isValid || isLoading}
-                  >
-                    {isLoading ? "Updating..." : "Change Email"}
+      <Dialog
+        open={isOpen}
+        onOpenChange={(open) => {
+          setIsOpen(open);
+          if (!open) {
+            form.reset();
+          }
+        }}
+      >
+        <DialogTrigger asChild>
+          <Button className="h-11 bg-customBlue-200 text-white duration-300 hover:bg-customBlue-300">
+            Change email
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="text-dark100_light900 background-box w-[90%] sm:w-full">
+          <DialogHeader>
+            <DialogTitle>Change Email Address</DialogTitle>
+            <DialogDescription>
+              Enter your new email address below. You&apos;ll need to verify
+              this email before the change takes effect.
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...form}>
+            <form
+              className="space-y-4 py-4"
+              noValidate
+              onSubmit={form.handleSubmit(onSubmit)}
+            >
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input
+                        variant="lightgray"
+                        label="New Email Address"
+                        parentClassName="flex flex-col gap-2"
+                        {...field}
+                        placeholder="Enter new email address"
+                        disabled={isLoading}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-600" />
+                  </FormItem>
+                )}
+              />
+              <DialogFooter className="gap-2">
+                <DialogClose asChild>
+                  <Button variant="outline" disabled={isLoading}>
+                    Cancel
                   </Button>
-                </DialogFooter>
-              </form>
-            </Form>
-          </DialogContent>
-        </Dialog>
-      
+                </DialogClose>
+                <Button
+                  type="submit"
+                  className="text-dark100_light900 bg-customBlue-200 duration-300 hover:bg-customBlue-300"
+                  disabled={!form.formState.isValid || isLoading}
+                >
+                  {isLoading ? "Updating..." : "Change Email"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

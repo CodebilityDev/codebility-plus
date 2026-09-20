@@ -1,6 +1,6 @@
 "use server";
 
-import { createClientServerComponent } from "@/utils/supabase/server";
+import { requireRole } from "@/lib/server/auth-guard";
 import { createClient } from "@supabase/supabase-js";
 
 // Helper function to create service role client for admin operations
@@ -35,27 +35,8 @@ export async function updateJobListing(
   }
 ) {
   try {
-    const supabase = await createClientServerComponent();
-
-    // Get the current user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return { success: false, error: "Unauthorized - Please log in again" };
-    }
-
-    // Get user details to check role
-    const { data: userData, error: userError } = await supabase
-      .from('codev')
-      .select('id, role_id')
-      .eq('id', user.id)
-      .single();
-
-    if (userError || !userData) {
-      return { success: false, error: "User not found" };
-    }
-
-    // Check if user is admin (role_id 1 or 4)
-    const isAdmin = userData.role_id === 1 || userData.role_id === 4;
+    const { user, supabase, roleId } = await requireRole("clients");
+    const isAdmin = roleId === 1;
 
     // Get the job to check ownership
     const { data: job, error: jobError } = await supabase
@@ -69,7 +50,7 @@ export async function updateJobListing(
     }
 
     // Check permissions
-    if (!isAdmin && job.created_by !== userData.id) {
+    if (!isAdmin && job.created_by !== user.id) {
       return { success: false, error: "You don't have permission to edit this job" };
     }
 
@@ -116,28 +97,8 @@ export async function updateJobListing(
 
 export async function deleteJobListing(jobId: string) {
   try {
-    
-    const supabase = await createClientServerComponent();
-
-    // Get the current user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return { success: false, error: "Unauthorized - Please log in again" };
-    }
-
-    // Get user details to check role
-    const { data: userData, error: userError } = await supabase
-      .from('codev')
-      .select('id, role_id')
-      .eq('id', user.id)
-      .single();
-
-    if (userError || !userData) {
-      return { success: false, error: "User not found" };
-    }
-
-    // Check if user is admin (role_id 1 or 4)
-    const isAdmin = userData.role_id === 1 || userData.role_id === 4;
+    const { user, supabase, roleId } = await requireRole("clients");
+    const isAdmin = roleId === 1;
 
     // Use service role client for admin operations to bypass RLS
     let queryClient;
@@ -177,7 +138,7 @@ export async function deleteJobListing(jobId: string) {
     const job = jobs[0];
 
     // Check permissions - only for non-admin users
-    if (!isAdmin && job.created_by !== userData.id) {
+    if (!isAdmin && job.created_by !== user.id) {
       return { success: false, error: "You don't have permission to delete this job" };
     }
 
@@ -211,27 +172,8 @@ export async function updateApplicationStatus(
   status: "pending" | "reviewing" | "shortlisted" | "rejected" | "hired"
 ) {
   try {
-    const supabase = await createClientServerComponent();
-
-    // Get the current user
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      return { success: false, error: "Unauthorized" };
-    }
-
-    // Get user details to check role
-    const { data: userData } = await supabase
-      .from('codev')
-      .select('id, role_id')
-      .eq('id', user.id)
-      .single();
-
-    if (!userData) {
-      return { success: false, error: "User not found" };
-    }
-
-    // Check if user is admin (role_id 1 or 4)
-    const isAdmin = userData.role_id === 1 || userData.role_id === 4;
+    const { user, supabase, roleId } = await requireRole("clients");
+    const isAdmin = roleId === 1;
 
     // Get the application to check job ownership
     const { data: application } = await supabase
@@ -256,7 +198,7 @@ export async function updateApplicationStatus(
     }
 
     // Check permissions
-    if (!isAdmin && job.created_by !== userData.id) {
+    if (!isAdmin && job.created_by !== user.id) {
       return { success: false, error: "You don't have permission to update this application" };
     }
 
@@ -280,33 +222,17 @@ export async function updateApplicationStatus(
 
     return { success: true, data: updatedApplication };
   } catch (error) {
-    return { success: false, error: "An unexpected error occurred" };
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : "An unexpected error occurred" 
+    };
   }
 }
 
 export async function deleteJobApplication(applicationId: string, jobId: string) {
   try {
-    const supabase = await createClientServerComponent();
-
-    // Get the current user
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      return { success: false, error: "Unauthorized" };
-    }
-
-    // Get user details to check role
-    const { data: userData } = await supabase
-      .from('codev')
-      .select('id, role_id')
-      .eq('id', user.id)
-      .single();
-
-    if (!userData) {
-      return { success: false, error: "User not found" };
-    }
-
-    // Check if user is admin (role_id 1 or 4)
-    const isAdmin = userData.role_id === 1 || userData.role_id === 4;
+    const { user, supabase, roleId } = await requireRole("clients");
+    const isAdmin = roleId === 1;
 
     // Get the job to check ownership
     const { data: job } = await supabase
@@ -320,7 +246,7 @@ export async function deleteJobApplication(applicationId: string, jobId: string)
     }
 
     // Check permissions
-    if (!isAdmin && job.created_by !== userData.id) {
+    if (!isAdmin && job.created_by !== user.id) {
       return { success: false, error: "You don't have permission to delete this application" };
     }
 
@@ -339,7 +265,10 @@ export async function deleteJobApplication(applicationId: string, jobId: string)
 
     return { success: true };
   } catch (error) {
-    return { success: false, error: "An unexpected error occurred" };
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : "An unexpected error occurred" 
+    };
   }
 }
 
@@ -348,27 +277,8 @@ export async function updateJobListingStatus(
   status: "active" | "closed" | "draft"
 ) {
   try {
-    const supabase = await createClientServerComponent();
-
-    // Get the current user
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      return { success: false, error: "Unauthorized" };
-    }
-
-    // Get user details to check role
-    const { data: userData } = await supabase
-      .from('codev')
-      .select('id, role_id')
-      .eq('id', user.id)
-      .single();
-
-    if (!userData) {
-      return { success: false, error: "User not found" };
-    }
-
-    // Check if user is admin (role_id 1 or 4)
-    const isAdmin = userData.role_id === 1 || userData.role_id === 4;
+    const { user, supabase, roleId } = await requireRole("clients");
+    const isAdmin = roleId === 1;
 
     // Get the job to check ownership
     const { data: job } = await supabase
@@ -382,7 +292,7 @@ export async function updateJobListingStatus(
     }
 
     // Check permissions
-    if (!isAdmin && job.created_by !== userData.id) {
+    if (!isAdmin && job.created_by !== user.id) {
       return { success: false, error: "You don't have permission to update this job" };
     }
 
@@ -406,6 +316,9 @@ export async function updateJobListingStatus(
 
     return { success: true, data: updatedJob };
   } catch (error) {
-    return { success: false, error: "An unexpected error occurred" };
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : "An unexpected error occurred" 
+    };
   }
 }

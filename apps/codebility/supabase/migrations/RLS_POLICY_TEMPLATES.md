@@ -365,7 +365,7 @@ Instead of hard-coding `role_id = 1`, use a view:
 ```sql
 CREATE OR REPLACE VIEW admin_users AS
 SELECT id FROM codev
-WHERE role_id IN (1, 4);  -- Admin and Super Admin
+WHERE role_id = 1;  -- Admin
 ```
 
 Then policies become:

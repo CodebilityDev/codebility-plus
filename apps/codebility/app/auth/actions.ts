@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { useUserStore } from "@/store/codev-store";
 import { Codev } from "@/types/home/codev";
 import { createClientServerComponent } from "@/utils/supabase/server";
@@ -291,13 +292,41 @@ export const signupUser = async (formData: FormData) => {
 };
 
 export const signinUser = async (email: string, password: string) => {
-  const supabase = await createClientServerComponent();
-  const setUser = useUserStore.getState().setUser;
-
   // Standardize the email for comparison (assuming emails are stored in lowercase)
-  const normalizedEmail = email.toLowerCase();
+  const normalizedEmail = email.toLowerCase().trim();
+
+  // Extract client IP for dual-key rate limiting
+  const headersList = await headers();
+  const ip =
+    headersList.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    headersList.get("x-real-ip") ||
+    "unknown-ip";
+
+  const emailKey = `signin:email:${normalizedEmail}`;
+  const ipKey = `signin:ip:${ip}`;
+
+  // Check rate limit on email (5 attempts / 5 mins)
+  const emailLimit = await checkRateLimit(emailKey, 5, 5 * 60 * 1000);
+  if (!emailLimit.allowed) {
+    return {
+      success: false,
+      error: `Too many failed login attempts. Please try again in ${emailLimit.retryAfterSeconds} seconds.`,
+    };
+  }
+
+  // Check rate limit on IP (20 attempts / 5 mins)
+  const ipLimit = await checkRateLimit(ipKey, 20, 5 * 60 * 1000);
+  if (!ipLimit.allowed) {
+    return {
+      success: false,
+      error: `Too many requests from this network. Please try again in ${ipLimit.retryAfterSeconds} seconds.`,
+    };
+  }
 
   try {
+    const supabase = await createClientServerComponent();
+    const setUser = useUserStore.getState().setUser;
+
     // Sign in with email and password
     const { data: signInData, error: signInError } =
       await supabase.auth.signInWithPassword({
@@ -305,8 +334,21 @@ export const signinUser = async (email: string, password: string) => {
         password,
       });
 
-    if (signInError) throw signInError;
-    if (!signInData.user) throw new Error("Failed to sign in");
+    if (signInError) {
+      await recordRateLimitAttempt(emailKey, 5 * 60 * 1000);
+      await recordRateLimitAttempt(ipKey, 5 * 60 * 1000);
+      throw signInError;
+    }
+
+    if (!signInData.user) {
+      await recordRateLimitAttempt(emailKey, 5 * 60 * 1000);
+      await recordRateLimitAttempt(ipKey, 5 * 60 * 1000);
+      throw new Error("Failed to sign in");
+    }
+
+    // Reset rate limit counters on success
+    await resetRateLimit(emailKey);
+    await resetRateLimit(ipKey);
 
     const { data: userProfile, error: profileError } = await supabase
       .from("codev")
