@@ -117,6 +117,7 @@ export const saveDraft = async (
       result = data;
     }
 
+    revalidateKanbanBoardLists(project_id);
     return { success: true, draftId: result.id };
   } catch (error) {
     console.error("Error saving draft:", error);
@@ -240,6 +241,7 @@ export const deleteDraft = async (
       return { success: false, error: error.message };
     }
 
+    if (draftRow?.project_id) revalidateKanbanBoardLists(draftRow.project_id);
     return { success: true };
   } catch (error) {
     console.error("Error deleting draft:", error);

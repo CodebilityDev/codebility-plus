@@ -75,6 +75,7 @@ export const createNewColumn = async (
       return { success: false, error: insertError.message };
     }
 
+    revalidateKanbanBoardLists(projectId.found ? projectId.projectId : null);
     return { success: true };
   } catch (error) {
     console.error("Unexpected error:", error);
@@ -117,6 +118,7 @@ export const updateColumnPosition = async (
       throw error;
     }
 
+    revalidateKanbanBoardLists(projectId.found ? projectId.projectId : null);
     return { success: true };
   } catch (error) {
     console.error("Error updating column position:", error);
@@ -155,6 +157,7 @@ export const deleteColumn = async (
       return { success: false, error: error.message };
     }
 
+    revalidateKanbanBoardLists(projectId.found ? projectId.projectId : null);
     return { success: true };
   } catch (error) {
     return {
@@ -196,6 +199,7 @@ export const updateColumnName = async (
       return { success: false, error: error.message };
     }
 
+    revalidateKanbanBoardLists(projectId.found ? projectId.projectId : null);
     return { success: true };
   } catch (error) {
     return {

@@ -308,6 +308,8 @@ export const updateTask = async (
       return { success: false, error: updateError.message };
     }
 
+    revalidateKanbanBoardLists(projectId.found ? projectId.projectId : null);
+
     // 3. NOTIFICATION LOGIC: Trigger if assignee changed and isn't null
     if (codev_id && codev_id !== existingTask.codev_id) {
       // Reuse the already-authenticated caller (checked before the mutation).
