@@ -14,7 +14,7 @@ import { Button } from "@codevs/ui/button";
 
 import { updateCodev } from "@/actions/settings/profile";
 import UploadPhotoModal from "./UploadPhotoModal";
-import { fetchProfilePoints } from "@/lib/client/profile-points";
+import { useProfilePoints } from "@/hooks/query/use-profile-points";
 
 type PhotoProps = {
   data: {
@@ -26,7 +26,6 @@ type PhotoProps = {
 const Photo = ({ data }: PhotoProps) => {
   const [avatar, setAvatar] = useState<string | StaticImageData>(defaultAvatar);
   const [isUploading, setIsUploading] = useState(false);
-  const [hasImagePoints, setHasImagePoints] = useState(false);
   const { onOpen } = useModal();
 
   const [croppedAvatar, setCroppedAvatar] = useState<string | null>(null);
@@ -38,27 +37,8 @@ const Photo = ({ data }: PhotoProps) => {
     }
   }, [data?.image_url]);
 
-  // Check if user has earned points for uploading a photo
-  useEffect(() => {
-    async function checkImagePoints() {
-      if (!data.id) return;
-
-      try {
-        const pointsData = await fetchProfilePoints(data.id);
-        if (pointsData) {
-          const imagePoint = pointsData?.points?.find(
-            (point) => point.category === 'image_url'
-          );
-          
-          setHasImagePoints(!!imagePoint && imagePoint.points > 0);
-        }
-      } catch (error) {
-        console.error("Failed to check image points:", error);
-      }
-    }
-
-    checkImagePoints();
-  }, [data.id, data.image_url]);
+  const { data: points } = useProfilePoints(data.id);
+  const hasImagePoints = points?.completionDetails?.image_url?.completed ?? false;
 
   const handleUploadAvatar = async (
     event: React.ChangeEvent<HTMLInputElement>,

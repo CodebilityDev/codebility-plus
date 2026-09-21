@@ -44,7 +44,6 @@ type FormValues = {
 const ContactInfo = ({ data }: ContactInfoProps) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [hasContactPoints, setHasContactPoints] = useState(false);
 
   const {
     register,
@@ -67,29 +66,16 @@ const ContactInfo = ({ data }: ContactInfoProps) => {
   // Watch all contact fields
   const watchedFields = watch();
 
-  // Check if user has earned points for any contact field
-  useEffect(() => {
-    async function checkContactPoints() {
-      if (!data.id) return;
-
-      try {
-        const pointsData = await fetchProfilePoints(data.id);
-        if (pointsData) {
-          // Check if any contact-related categories have points
-          const contactCategories = ['phone_number', 'github', 'facebook', 'linkedin', 'discord', 'portfolio_website'];
-          const hasAnyContactPoints = pointsData?.points?.some(
-            (point) => contactCategories.includes(point.category) && point.points > 0
-          );
-          
-          setHasContactPoints(!!hasAnyContactPoints);
-        }
-      } catch (error) {
-        console.error("Failed to check contact points:", error);
-      }
-    }
-
-    checkContactPoints();
-  }, [data.id, data.phone_number, data.github, data.facebook, data.linkedin, data.discord, data.portfolio_website]);
+  const { data: points } = useProfilePoints(data.id);
+  const invalidatePoints = useInvalidateProfilePoints();
+  const hasContactPoints = [
+    "phone_number",
+    "github",
+    "facebook",
+    "linkedin",
+    "discord",
+    "portfolio_website",
+  ].some((key) => points?.completionDetails?.[key]?.completed);
 
   const onSubmit = async (formData: FormValues) => {
     const toastId = toast.loading("Your contact info is being updated");
@@ -101,18 +87,10 @@ const ContactInfo = ({ data }: ContactInfoProps) => {
       });
       setIsEditMode(false);
 
-      // Re-check points after update; invalidate first so this reads fresh data.
+      // Re-check points after update; invalidation refetches the shared query.
       if (data.id) {
         invalidateProfilePoints(data.id);
-        const pointsData = await fetchProfilePoints(data.id);
-        if (pointsData) {
-          const contactCategories = ['phone_number', 'github', 'facebook', 'linkedin', 'discord', 'portfolio_website'];
-          const hasAnyContactPoints = pointsData?.points?.some(
-            (point) => contactCategories.includes(point.category) && point.points > 0
-          );
-          
-          setHasContactPoints(!!hasAnyContactPoints);
-        }
+        await invalidatePoints(data.id);
       }
     } catch (error) {
       console.error(error);

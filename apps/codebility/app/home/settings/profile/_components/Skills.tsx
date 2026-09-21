@@ -10,7 +10,7 @@ import { IconEdit } from "@/public/assets/svgs";
 import toast from "react-hot-toast";
 
 import { updateCodev } from "@/actions/settings/profile";
-import { fetchProfilePoints } from "@/lib/client/profile-points";
+import { useProfilePoints } from "@/hooks/query/use-profile-points";
 
 type SkillsProps = {
   data: {
@@ -72,7 +72,6 @@ const TECH_STACK_MAPPING: Record<string, string> = {
 const Skills = ({ data }: SkillsProps) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [hasTechStackPoints, setHasTechStackPoints] = useState(false);
   const { onOpen } = useModal();
   const { stack, setStack } = useTechStackStore() as TechStackStore;
 
@@ -84,27 +83,9 @@ const Skills = ({ data }: SkillsProps) => {
     }
   }, [data?.tech_stacks, setStack]);
 
-  // Check if user has earned points for tech stacks
-  useEffect(() => {
-    async function checkTechStackPoints() {
-      if (!data.id) return;
-
-      try {
-        const pointsData = await fetchProfilePoints(data.id);
-        if (pointsData) {
-          const techStackPoint = pointsData?.points?.find(
-            (point) => point.category === 'tech_stacks'
-          );
-          
-          setHasTechStackPoints(!!techStackPoint && techStackPoint.points > 0);
-        }
-      } catch (error) {
-        console.error("Failed to check tech stack points:", error);
-      }
-    }
-
-    checkTechStackPoints();
-  }, [data.id, data.tech_stacks]);
+  const { data: points } = useProfilePoints(data.id);
+  const hasTechStackPoints =
+    points?.completionDetails?.tech_stacks?.completed ?? false;
 
   const handleEditMode = () => {
     setIsEditMode(true);

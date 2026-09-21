@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   getMembers,
   SimpleMemberData,
@@ -60,6 +61,7 @@ interface TeamDetailViewProps {
 
 const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [project, setProject] = useState(projectData);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showChecklistModal, setShowChecklistModal] = useState(false);
@@ -68,52 +70,43 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
   const [hasAttendanceChanges, setHasAttendanceChanges] = useState(false);
   const [useMeetingBasedAttendance, setUseMeetingBasedAttendance] = useState(true);
   const [showScheduleMeetingModal, setShowScheduleMeetingModal] = useState(false);
-  const [currentSchedule, setCurrentSchedule] = useState<{
-    selectedDays: string[];
-    time: string;
-  } | null>(null);
-  const [monthlyAttendancePoints, setMonthlyAttendancePoints] = useState<{
-    totalPoints: number;
-    presentDays: number;
-  }>({ totalPoints: 0, presentDays: 0 });
   const attendanceGridRef = useRef<any>(null);
 
   const { project: projectInfo, teamLead, members, subLead, currentUserId } = project;
   const totalMembers = (members?.data?.length || 0) + (teamLead?.data ? 1 : 0);
 
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth();
+
   const isCurrentUserTeamLead = teamLead?.data?.id
     ? currentUserId === teamLead.data.id
     : false;
 
-  useEffect(() => {
-    const loadSchedule = async () => {
+  const { data: currentSchedule = null } = useQuery({
+    queryKey: ["myTeam", "meetingSchedule", projectInfo.id],
+    staleTime: 60_000,
+    queryFn: async () => {
       const result = await getMeetingSchedule(projectInfo.id);
-      if (result.success && result.schedule) {
-        setCurrentSchedule(result.schedule);
-      }
-    };
-    loadSchedule();
-  }, [projectInfo.id]);
+      return result.success ? (result.schedule ?? null) : null;
+    },
+  });
 
-  useEffect(() => {
-    const loadAttendancePoints = async () => {
-      const currentDate = new Date();
+  const { data: monthlyAttendancePoints = { totalPoints: 0, presentDays: 0 } } = useQuery({
+    queryKey: ["myTeam", "monthlyPoints", projectInfo.id, currentYear, currentMonth],
+    enabled: viewMode === "team",
+    staleTime: 60_000,
+    queryFn: async () => {
       const result = await getTeamMonthlyAttendancePoints(
         projectInfo.id,
-        currentDate.getFullYear(),
-        currentDate.getMonth(),
+        currentYear,
+        currentMonth,
       );
-      if (result.success) {
-        setMonthlyAttendancePoints({
-          totalPoints: result.totalPoints,
-          presentDays: result.presentDays,
-        });
-      }
-    };
-    if (viewMode === "team") {
-      loadAttendancePoints();
-    }
-  }, [projectInfo.id, viewMode]);
+      return result.success
+        ? { totalPoints: result.totalPoints, presentDays: result.presentDays }
+        : { totalPoints: 0, presentDays: 0 };
+    },
+  });
 
   const formatSchedule = () => {
     if (!currentSchedule || !currentSchedule.selectedDays || currentSchedule.selectedDays.length === 0) {
@@ -155,20 +148,9 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
   const handleSaveAttendance = useCallback(async () => {
     if (attendanceGridRef.current?.saveAllAttendance) {
       await attendanceGridRef.current.saveAllAttendance();
-      const currentDate = new Date();
-      const result = await getTeamMonthlyAttendancePoints(
-        projectInfo.id,
-        currentDate.getFullYear(),
-        currentDate.getMonth(),
-      );
-      if (result.success) {
-        setMonthlyAttendancePoints({
-          totalPoints: result.totalPoints,
-          presentDays: result.presentDays,
-        });
-      }
+      await queryClient.invalidateQueries({ queryKey: ["myTeam", "monthlyPoints"] });
     }
-  }, [projectInfo.id]);
+  }, [queryClient]);
 
   const handleUpdateMembers = async (selectedMembers: Codev[]) => {
     // AddMembersModal already saved to DB, we just need to refetch and update UI
@@ -192,11 +174,8 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
 
   const handleScheduleUpdate = async () => {
     setShowScheduleMeetingModal(false);
-    setTimeout(async () => {
-      const result = await getMeetingSchedule(projectInfo.id);
-      if (result.success && result.schedule) {
-        setCurrentSchedule(result.schedule);
-      }
+    setTimeout(() => {
+      queryClient.invalidateQueries({ queryKey: ["myTeam", "meetingSchedule"] });
     }, 500);
   };
 

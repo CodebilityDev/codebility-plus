@@ -1,8 +1,8 @@
 // apps/codebility/app/home/my-team/_components/MemberDetailModal.tsx
 "use client";
 
-import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useQuery } from "@tanstack/react-query";
 import DefaultAvatar from "@/components/DefaultAvatar";
 import {
   Dialog,
@@ -40,35 +40,23 @@ const MemberDetailModal = ({
   projectId,
   onClose 
 }: MemberDetailModalProps) => {
-  const [memberPoints, setMemberPoints] = useState<MemberPoints | null>(null);
-  const [isLoadingPoints, setIsLoadingPoints] = useState(false);
-
-  // Load member points for the header display
-  useEffect(() => {
-    if (isOpen && member) {
-      loadMemberPoints();
-    }
-  }, [isOpen, member]);
-
-  const loadMemberPoints = async () => {
-    if (!member) return;
-    
-    setIsLoadingPoints(true);
-    try {
-      const response = await fetch(`/api/codev/${member.id}/points`);
-      if (response.ok) {
-        const data = await response.json() as { totalPoints?: number; attendancePoints?: number };
-        setMemberPoints({
-          totalPoints: data.totalPoints || 0,
-          attendancePoints: data.attendancePoints || 0
-        });
-      }
-    } catch (error) {
-      console.error("Error loading member points:", error);
-    } finally {
-      setIsLoadingPoints(false);
-    }
-  };
+  const { data: memberPoints = null } = useQuery({
+    queryKey: ["myTeam", "memberPoints", member?.id],
+    enabled: Boolean(isOpen && member),
+    staleTime: 60_000,
+    queryFn: async (): Promise<MemberPoints | null> => {
+      const response = await fetch(`/api/codev/${member!.id}/points`);
+      if (!response.ok) return null;
+      const data = (await response.json()) as {
+        totalPoints?: number;
+        attendancePoints?: number;
+      };
+      return {
+        totalPoints: data.totalPoints || 0,
+        attendancePoints: data.attendancePoints || 0,
+      };
+    },
+  });
 
   if (!isOpen || !member) return null;
 
