@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import type { TicketSupport } from "../types";
 import TicketDataTable from "./TicketDataTable";
@@ -36,7 +36,7 @@ export default function TicketManagementView({
 }: TicketManagementViewProps) {
   const router = useRouter();
   const { } = useNavStore(); 
-  const [selectedTicket, setSelectedTicket] = useState<TicketSupport | null>(null);
+  const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortField, setSortField] = useState<SortField>("created_at");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
@@ -45,19 +45,12 @@ export default function TicketManagementView({
   const [filterAssignedTo, setFilterAssignedTo] = useState<string>("ALL");
   const [showArchived, setShowArchived] = useState(false);
 
-  
-  useEffect(() => {
-    if (selectedTicket) {
-      const updated = initialTickets.find((t) => t.id === selectedTicket.id);
-      if (updated) {
-       
-        setSelectedTicket(updated);
-      } else {
-        
-        handleCloseSidebar();
-      }
-    }
-  }, [initialTickets]);
+  // Resolved from the latest server props, so a refresh updates the open
+  // sidebar and a deleted ticket closes it without a sync effect.
+  const selectedTicket = useMemo(
+    () => initialTickets.find((t) => t.id === selectedTicketId) ?? null,
+    [initialTickets, selectedTicketId],
+  );
 
   const filteredAndSortedTickets = useMemo(() => {
     let result = [...initialTickets];
@@ -127,11 +120,11 @@ export default function TicketManagementView({
   }, [initialTickets, searchQuery, sortField, sortDirection, filterStatus, filterPriority, filterAssignedTo, showArchived]);
 
   const handleTicketSelect = (ticket: TicketSupport) => {
-    setSelectedTicket(ticket);
+    setSelectedTicketId(ticket.id);
   };
 
   const handleCloseSidebar = () => {
-    setSelectedTicket(null);
+    setSelectedTicketId(null);
   };
 
   const handleTicketUpdated = () => {

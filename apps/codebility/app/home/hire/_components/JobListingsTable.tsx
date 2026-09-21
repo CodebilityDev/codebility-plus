@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   MoreVertical,
   Edit,
@@ -57,12 +58,13 @@ interface JobWithApplicationCount extends JobListing {
   };
 }
 
+const jobListingsKey = ["job-listings", "list"] as const;
+
 export default function JobListingsTable() {
   const router = useRouter();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const { user } = useUserStore();
-  const [jobs, setJobs] = useState<JobWithApplicationCount[]>([]);
-  const [loading, setLoading] = useState(true);
   const [editingJob, setEditingJob] = useState<JobListing | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'closed' | 'draft'>('all');
@@ -71,26 +73,15 @@ export default function JobListingsTable() {
   // Check if user is admin (role_id 1 or 4)
   const isAdmin = user?.role_id === 1 || user?.role_id === 4;
 
-  // Filter jobs based on status
-  const filteredJobs = jobs.filter(job => {
-    if (statusFilter === 'all') return true;
-    return (job.status || 'active') === statusFilter;
-  });
-
-  useEffect(() => {
-    fetchJobListings();
-  }, []);
-
-  const fetchJobListings = async () => {
-    try {
-      setLoading(true);
+  const { data: jobs = [], isLoading: loading } = useQuery({
+    queryKey: jobListingsKey,
+    queryFn: async () => {
       const supabase = createClientClientComponent();
 
       if (!supabase) {
         throw new Error("Failed to initialize Supabase client");
       }
 
-      // Fetch job listings with creator details
       const { data: jobsData, error: jobsError } = await supabase
         .from('job_listings')
         .select(`
@@ -105,16 +96,10 @@ export default function JobListingsTable() {
         .order('posted_date', { ascending: false });
 
       if (jobsError) {
-        toast({
-          title: "Failed to load job listings",
-          description: "Please refresh the page to try again.",
-          variant: "destructive",
-        });
-        return;
+        throw jobsError;
       }
 
-      // Fetch application counts for each job
-      const jobsWithCounts = await Promise.all(
+      return Promise.all(
         (jobsData || []).map(async (job) => {
           const { count } = await supabase
             .from('job_applications')
@@ -129,21 +114,17 @@ export default function JobListingsTable() {
               name: `${job.created_by_details.first_name} ${job.created_by_details.last_name}`,
               email: job.created_by_details.email_address
             } : undefined
-          };
+          } as JobWithApplicationCount;
         })
       );
+    },
+  });
 
-      setJobs(jobsWithCounts);
-    } catch (error) {
-      toast({
-        title: "An error occurred",
-        description: "Failed to load job listings.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Filter jobs based on status
+  const filteredJobs = jobs.filter(job => {
+    if (statusFilter === 'all') return true;
+    return (job.status || 'active') === statusFilter;
+  });
 
   const handleDelete = async (jobId: string) => {
     
@@ -155,8 +136,10 @@ export default function JobListingsTable() {
           throw new Error(result.error || "Failed to delete job");
         }
 
-        // Remove from local state
-        setJobs(prevJobs => prevJobs.filter(job => job.id !== jobId));
+        queryClient.setQueryData<JobWithApplicationCount[]>(
+          jobListingsKey,
+          (prevJobs) => (prevJobs ?? []).filter(job => job.id !== jobId),
+        );
 
         toast({
           title: "Job Deleted",
@@ -185,8 +168,7 @@ export default function JobListingsTable() {
   };
 
   const handleJobUpdated = () => {
-    // Refetch the jobs from the database
-    fetchJobListings();
+    queryClient.invalidateQueries({ queryKey: jobListingsKey });
 
     toast({
       title: "Job Updated",
@@ -209,13 +191,14 @@ export default function JobListingsTable() {
         throw new Error(result.error || "Failed to update job status");
       }
 
-      // Update local state
-      setJobs(prevJobs => 
-        prevJobs.map(job => 
-          job.id === jobId 
-            ? { ...job, status: newStatus }
-            : job
-        )
+      queryClient.setQueryData<JobWithApplicationCount[]>(
+        jobListingsKey,
+        (prevJobs) =>
+          (prevJobs ?? []).map(job =>
+            job.id === jobId
+              ? { ...job, status: newStatus }
+              : job
+          ),
       );
 
       const statusText = newStatus === 'closed' ? 'closed' : newStatus === 'active' ? 'reopened' : 'updated';

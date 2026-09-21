@@ -11,13 +11,20 @@ export interface ProfilePointsSection {
   maxPoints: number;
 }
 
+export interface ProfilePointsRow {
+  id: string;
+  codev_id: string;
+  category: string;
+  points: number;
+}
+
 export interface ProfilePointsResponse {
   success: boolean;
   totalPoints: number;
   maxPossiblePoints: number;
   completionPercentage: number;
   pointsCount: number;
-  points: unknown[] | null;
+  points: ProfilePointsRow[] | null;
   breakdown: unknown;
   completionDetails: Record<string, ProfilePointsCompletionDetail>;
   summary: {

@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus, TrendingUp, Users, Calendar, Eye, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -34,9 +35,10 @@ import {
 import { getCurrentWeekStart } from "../utils";
 import { Skeleton } from "@/components/ui/skeleton/skeleton";
 
+const outreachStatsKey = ["client-tracker", "stats"] as const;
+
 export default function ClientTrackerContent() {
-  const [stats, setStats] = useState<AdminOutreachStats[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
   const [selectedAdmin, setSelectedAdmin] = useState<AdminOutreachStats | null>(null);
@@ -59,20 +61,18 @@ export default function ClientTrackerContent() {
   const weekEnd = new Date(weekStart);
   weekEnd.setDate(weekStart.getDate() + 6);
 
-  const fetchStats = async () => {
-    setLoading(true);
-    const result = await getAdminOutreachStats();
-    if (result.success && result.data) {
-      setStats(result.data);
-    } else {
-      toast.error(result.error || "Failed to load stats");
-    }
-    setLoading(false);
-  };
+  const { data: stats = [], isLoading: loading } = useQuery({
+    queryKey: outreachStatsKey,
+    queryFn: async () => {
+      const result = await getAdminOutreachStats();
 
-  useEffect(() => {
-    fetchStats();
-  }, []);
+      if (!result.success || !result.data) {
+        throw new Error(result.error || "Failed to load stats");
+      }
+
+      return result.data;
+    },
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,7 +92,7 @@ export default function ClientTrackerContent() {
       });
       setImagePreview("");
       setAddDialogOpen(false);
-      fetchStats(); // Refresh stats
+      queryClient.invalidateQueries({ queryKey: outreachStatsKey }); // Refresh stats
     } else {
       toast.error(result.error || "Failed to add outreach");
     }
@@ -166,7 +166,7 @@ export default function ClientTrackerContent() {
     if (result.success) {
       toast.success("Outreach deleted");
       setHistory(prev => prev.filter(h => h.id !== outreachId));
-      fetchStats(); // Refresh stats
+      queryClient.invalidateQueries({ queryKey: outreachStatsKey }); // Refresh stats
     } else {
       toast.error(result.error || "Failed to delete");
     }

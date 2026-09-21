@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useDebounce } from "use-debounce";
 import { Button } from "@codevs/ui/button";
 import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
@@ -20,76 +22,55 @@ interface AccountSettingsUsernameProps {
 
 export default function AccountSettingsUsername({ userId }: AccountSettingsUsernameProps) {
   const [username, setUsername] = useState("");
-  const [currentUsername, setCurrentUsername] = useState("");
-  const [copied, setCopied] = useState(false);
-  const [checking, setChecking] = useState(false);
-  const [updating, setUpdating] = useState(false);
-  const [availabilityStatus, setAvailabilityStatus] = useState<{
-    available: boolean | null;
-    message: string;
-  }>({ available: null, message: "" });
-  const [cooldownDays, setCooldownDays] = useState<number | null>(null);
-  
+    const [copied, setCopied] = useState(false);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [debouncedUsername] = useDebounce(username, 500);
+  const [updating, setUpdating] = useState(false);
 
-  // Fetch current username data on mount
-  useEffect(() => {
-    const fetchUserData = async () => {
-      const result = await getUsernameData(userId);
-      if (result.success && result.data) {
-        setCurrentUsername(result.data.username || "");
-        
-        // Calculate cooldown
-        if (result.data.username_updated_at) {
-          const lastUpdate = new Date(result.data.username_updated_at);
-          const now = new Date();
-          const daysSinceUpdate = Math.floor((now.getTime() - lastUpdate.getTime()) / (1000 * 60 * 60 * 24));
-          const remaining = Math.max(0, 30 - daysSinceUpdate);
-          setCooldownDays(remaining);
-        } else {
-          setCooldownDays(0);
-        }
-      }
-    };
-    fetchUserData();
-  }, [userId]);
+  const { data: usernameData } = useQuery({
+    queryKey: ["accountSettings", "username", userId],
+    enabled: Boolean(userId),
+    staleTime: 60_000,
+    queryFn: () => getUsernameData(userId),
+  });
 
-  // Debounced username availability check
-  useEffect(() => {
-    if (!username || username.length < 8) {
-      setAvailabilityStatus({ available: null, message: "" });
-      return;
-    }
+  const currentUsername = usernameData?.success ? (usernameData.data?.username ?? "") : "";
+  const cooldownDays = (() => {
+    const updatedAt = usernameData?.success ? usernameData.data?.username_updated_at : null;
+    if (!updatedAt) return usernameData ? 0 : null;
+    const daysSince = Math.floor(
+      (Date.now() - new Date(updatedAt).getTime()) / (1000 * 60 * 60 * 24),
+    );
+    return Math.max(0, 30 - daysSince);
+  })();
 
-    // Don't check if it's the same as current username
-    if (username.toLowerCase() === currentUsername.toLowerCase()) {
-      setAvailabilityStatus({ 
-        available: null, 
-        message: "This is your current username" 
-      });
-      return;
-    }
+  // Typeahead check: per-interaction, so it is a query keyed on the debounced
+  // value rather than a timer-managed effect.
+  const shouldCheck =
+    debouncedUsername.length >= 8 &&
+    debouncedUsername.toLowerCase() !== currentUsername.toLowerCase();
 
-    const timeoutId = setTimeout(async () => {
-      setChecking(true);
-      const result = await checkUsernameAvailability(username, userId);
-      setChecking(false);
+  const { data: availability, isFetching: checking } = useQuery({
+    queryKey: ["accountSettings", "usernameAvailability", debouncedUsername, userId],
+    enabled: shouldCheck,
+    staleTime: 30_000,
+    queryFn: () => checkUsernameAvailability(debouncedUsername, userId),
+  });
 
-      if (result.available) {
-        setAvailabilityStatus({
-          available: true,
-          message: "Username is available",
-        });
-      } else {
-        setAvailabilityStatus({
-          available: false,
-          message: result.error || "Username is not available",
-        });
-      }
-    }, 500); // 500ms debounce
-
-    return () => clearTimeout(timeoutId);
-  }, [username, userId, currentUsername]);
+  const availabilityStatus =
+    debouncedUsername.length < 8
+      ? { available: null as boolean | null, message: "" }
+      : !shouldCheck
+        ? { available: null as boolean | null, message: "This is your current username" }
+        : availability
+          ? {
+              available: availability.available,
+              message: availability.available
+                ? "Username is available"
+                : availability.error || "Username is not available",
+            }
+          : { available: null as boolean | null, message: "" };
 
   const handleChangeUsername = async () => {
     if (!username || username.length < 8) return;
@@ -112,9 +93,10 @@ export default function AccountSettingsUsername({ userId }: AccountSettingsUsern
         title: "Success",
         description: "Username updated successfully",
       });
-      setCurrentUsername(username);
       setUsername("");
-      setCooldownDays(30);
+      await queryClient.invalidateQueries({
+        queryKey: ["accountSettings", "username", userId],
+      });
     } else {
       toast({
         title: "Error",
@@ -167,7 +149,7 @@ export default function AccountSettingsUsername({ userId }: AccountSettingsUsern
         {cooldownDays !== null && cooldownDays > 0 && (
           <div className="p-3 bg-yellow-900/20 border border-yellow-700/50 rounded-md">
             <p className="text-sm text-yellow-200">
-              ⏳ You can change your username again in {cooldownDays} day{cooldownDays !== 1 ? 's' : ''}
+              â³ You can change your username again in {cooldownDays} day{cooldownDays !== 1 ? 's' : ''}
             </p>
           </div>
         )}

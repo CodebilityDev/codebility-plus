@@ -15,7 +15,7 @@ import {
   deleteWorkExperience,
   updateWorkExperience,
 } from "@/actions/settings/profile";
-import { fetchProfilePoints } from "@/lib/client/profile-points";
+import { useProfilePoints } from "@/hooks/query/use-profile-points";
 
 interface ExperienceProps {
   data: WorkExperience[];
@@ -44,30 +44,16 @@ interface ExperienceFormProps {
 const Experience = ({ data, codevId }: ExperienceProps) => {
   const [experienceData, setExperienceData] = useState<WorkExperience[]>(data);
   const [isLoadingMain, setIsLoadingMain] = useState(false);
-  const [hasWorkExperiencePoints, setHasWorkExperiencePoints] = useState(false);
   const editModePerItem = useRef<EditModePerItem>({});
 
-  // Check if user has earned points for work experience
-  useEffect(() => {
-    async function checkWorkExperiencePoints() {
-      if (!codevId) return;
+  const { data: pointsData } = useProfilePoints(codevId);
 
-      try {
-        const pointsData = await fetchProfilePoints(codevId);
-        if (pointsData) {
-          const workExpPoint = pointsData?.points?.find(
-            (point) => point.category === 'work_experience'
-          );
-          
-          setHasWorkExperiencePoints(!!workExpPoint && workExpPoint.points > 0);
-        }
-      } catch (error) {
-        console.error("Failed to check work experience points:", error);
-      }
-    }
-
-    checkWorkExperiencePoints();
-  }, [codevId, experienceData.length]);
+  const hasWorkExperiencePoints = Boolean(
+    pointsData?.points?.some((point) => {
+      const p = point as { category?: string; points?: number };
+      return p.category === "work_experience" && (p.points ?? 0) > 0;
+    }),
+  );
 
   const handleUpdateExperience = (
     itemNo: number,

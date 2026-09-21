@@ -15,7 +15,7 @@ import {
   deleteEducation,
   updateEducation,
 } from "@/actions/settings/profile";
-import { fetchProfilePoints } from "@/lib/client/profile-points";
+import { useProfilePoints } from "@/hooks/query/use-profile-points";
 
 interface EducationProps {
   data: Education[];
@@ -44,30 +44,16 @@ interface EducationFormProps {
 const EducationalBackground = ({ data, codevId }: EducationProps) => {
   const [educationData, setEducationData] = useState<Education[]>(data);
   const [isLoadingMain, setIsLoadingMain] = useState(false);
-  const [hasEducationPoints, setHasEducationPoints] = useState(false);
   const editModePerItem = useRef<EditModePerItem>({});
 
-  // Check if user has earned points for education
-  useEffect(() => {
-    async function checkEducationPoints() {
-      if (!codevId) return;
+  const { data: pointsData } = useProfilePoints(codevId);
 
-      try {
-        const pointsData = await fetchProfilePoints(codevId);
-        if (pointsData) {
-          const educationPoint = pointsData?.points?.find(
-            (point) => point.category === 'education'
-          );
-          
-          setHasEducationPoints(!!educationPoint && educationPoint.points > 0);
-        }
-      } catch (error) {
-        console.error("Failed to check education points:", error);
-      }
-    }
-
-    checkEducationPoints();
-  }, [codevId, educationData.length]);
+  const hasEducationPoints = Boolean(
+    pointsData?.points?.some((point) => {
+      const p = point as { category?: string; points?: number };
+      return p.category === "education" && (p.points ?? 0) > 0;
+    }),
+  );
 
   const handleUpdateEducation = (
     itemNo: number,

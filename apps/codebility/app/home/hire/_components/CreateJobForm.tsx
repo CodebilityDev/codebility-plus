@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useQuery } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Loader2, Plus, X } from "lucide-react";
@@ -47,7 +48,6 @@ export default function CreateJobForm({ onJobCreated }: CreateJobFormProps) {
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [positions, setPositions] = useState<string[]>([]);
   const [titleType, setTitleType] = useState<"existing" | "custom">("existing");
 
   const {
@@ -70,31 +70,29 @@ export default function CreateJobForm({ onJobCreated }: CreateJobFormProps) {
   const watchRemote = watch("remote");
   const watchTitleType = watch("titleType");
 
-  useEffect(() => {
-    const fetchPositions = async () => {
+  const { data: positions = [] } = useQuery({
+    queryKey: ["job-listings", "display-positions"],
+    queryFn: async () => {
       const supabase = getClientSupabase();
 
+      const { data } = await supabase
+        .from("codev")
+        .select("display_position")
+        .not("display_position", "is", null)
+        .order("display_position");
 
-      // Fetch distinct display_positions from codev table
-      const { data, error } = await supabase
-        .from('codev')
-        .select('display_position')
-        .not('display_position', 'is', null)
-        .order('display_position');
-
-      if (data) {
-        // Get unique positions and filter out CEO/Founder
-        const uniquePositions = [...new Set(data.map(item => item.display_position))]
-          .filter(Boolean)
-          .filter(position => !position.toLowerCase().includes('ceo') && !position.toLowerCase().includes('founder'));
-        setPositions(uniquePositions);
-      }
-    };
-
-    if (isOpen) {
-      fetchPositions();
-    }
-  }, [isOpen]);
+      return [
+        ...new Set((data ?? []).map((item) => item.display_position)),
+      ]
+        .filter(Boolean)
+        .filter(
+          (position) =>
+            !position.toLowerCase().includes("ceo") &&
+            !position.toLowerCase().includes("founder"),
+        );
+    },
+    enabled: isOpen,
+  });
 
   const onSubmit = async (data: JobFormData) => {
     setIsSubmitting(true);

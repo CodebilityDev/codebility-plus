@@ -1,16 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { ChevronDown, ChevronUp, Minimize2, Maximize2, NotebookTabs, CheckCircle2, Circle, TrendingUp, Award } from "lucide-react";
 import { Box } from "@/components/shared/dashboard";
-import { getClientSupabase } from "@/utils/supabase/client";
-import { fetchProfilePoints } from "@/lib/client/profile-points";
+import { useUserStore } from "@/store/codev-store";
+import {
+  useProfilePoints,
+  type ProfilePointsResponse,
+} from "@/hooks/query/use-profile-points";
 
-// Types for profile points data
-interface ProfilePointsData {
-  totalPoints: number;
-  maxPossiblePoints: number;
-  completionPercentage: number;
+// The endpoint returns more per-category detail than the shared response type
+// models, so narrow it here rather than widening the type every caller shares.
+interface ProfilePointsData extends ProfilePointsResponse {
   completionDetails: Record<string, {
     completed: boolean;
     points: number;
@@ -19,19 +20,6 @@ interface ProfilePointsData {
     itemCount?: number;
     maxItems?: number;
   }>;
-  summary: {
-    profileSections: {
-      basicInfo: { points: number; maxPoints: number; completed: boolean };
-      socialLinks: { points: number; maxPoints: number; completed: boolean };
-      professionalInfo: { points: number; maxPoints: number; completed: boolean };
-    };
-    datacounts: {
-      workExperiences: number;
-      educationEntries: number;
-      techSkills: number;
-      positions: number;
-    };
-  };
 }
 
 const Badge = ({
@@ -129,10 +117,15 @@ const SectionProgress = ({
 
 export default function ProfileCompletionGuide() {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [profileData, setProfileData] = useState<ProfilePointsData | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [openDropdowns, setOpenDropdowns] = useState<Record<string, boolean>>({});
+  const codevId = useUserStore((s) => s.user?.id ?? null);
+
+  const {
+    data: profileData,
+    isLoading: loading,
+    error,
+    refetch: loadProfilePoints,
+  } = useProfilePoints(codevId ?? undefined);
 
   // Enhanced task definitions that map to actual profile points categories
   const getTasksFromProfileData = (data: ProfilePointsData) => [
@@ -218,38 +211,6 @@ export default function ProfileCompletionGuide() {
     },
   ];
 
-  useEffect(() => {
-    loadProfilePoints();
-  }, []);
-
-  const loadProfilePoints = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const supabase = getClientSupabase();
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        setError("Please log in to view profile completion");
-        return;
-      }
-
-      const data = await fetchProfilePoints<ProfilePointsData>(user.id);
-      
-      if (!data) {
-        throw new Error("Failed to fetch profile points");
-      }
-      
-      setProfileData(data);
-    } catch (err) {
-      console.error("Error fetching profile points:", err);
-      setError(err instanceof Error ? err.message : "Failed to load profile completion data");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const toggleDropdown = (taskId: string) => {
     setOpenDropdowns((prev) => ({
       ...prev,
@@ -277,9 +238,9 @@ export default function ProfileCompletionGuide() {
       <Box className="flex w-full flex-1 flex-col relative overflow-hidden">
         <div className="text-center py-8">
           <p className="text-red-400 mb-2">Failed to load profile completion data</p>
-          <p className="text-gray-400 text-sm">{error}</p>
+          <p className="text-gray-400 text-sm">{error.message}</p>
           <button 
-            onClick={loadProfilePoints}
+            onClick={() => loadProfilePoints()}
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             Retry
@@ -291,7 +252,7 @@ export default function ProfileCompletionGuide() {
 
   if (!profileData) return null;
 
-  const tasks = getTasksFromProfileData(profileData);
+  const tasks = getTasksFromProfileData(profileData as ProfilePointsData);
   const completedTasks = tasks.filter(task => task.completed).length;
 
   return (
