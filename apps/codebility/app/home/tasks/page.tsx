@@ -3,38 +3,11 @@ import AsyncErrorBoundary from "@/components/AsyncErrorBoundary";
 import H1 from "@/components/shared/dashboard/H1";
 import { Task } from "@/types/home/codev";
 import { createClientServerComponent } from "@/utils/supabase/server";
+import { getTasksPage } from "@/lib/server/task.service";
 
 import { TaskWithRelations } from "./_components/TaskCard";
 import TasksContainer from "./_components/TasksContainer";
 import TasksLoading from "./loading";
-
-const TASKS_SELECT = `
-    id,
-    title,
-    description,
-    priority,
-    difficulty,
-    type,
-    due_date,
-    deadline,
-    points,
-    codev_id,
-    kanban_column:kanban_columns (
-      id,
-      name,
-      board:kanban_boards (
-        id,
-        name,
-        project:projects (
-          id,
-          name
-        )
-      )
-    ),
-    created_by,
-    created_at,
-    updated_at
-  `;
 
 type MaybeArray<T> = T | T[] | null;
 
@@ -61,7 +34,7 @@ interface RawTask extends Task {
 
 // Supabase returns nested relations as either an object or a single-element
 // array depending on how it resolves the join, so flatten them to objects.
-function normalizeTask(task: RawTask): TaskWithRelations {
+export function normalizeTask(task: RawTask): TaskWithRelations {
   const column = Array.isArray(task.kanban_column)
     ? task.kanban_column[0]
     : task.kanban_column;
@@ -116,39 +89,11 @@ async function TasksData() {
     );
   }
 
-  const { data: codev, error: codevError } = await supabase
-    .from("codev")
-    .select("id")
-    .eq("id", user.id)
-    .single();
-
-  if (codevError || !codev) {
-    return (
-      <TasksShell>
-        <p>Please log in to view your tasks.</p>
-      </TasksShell>
-    );
-  }
-
-  const { data, error } = await supabase
-    .from("tasks")
-    .select(TASKS_SELECT)
-    .eq("codev_id", codev.id);
-
-  if (error) {
-    console.error("Error fetching tasks:", error);
-    return (
-      <TasksShell>
-        <p>Unable to load tasks. Please try again later.</p>
-      </TasksShell>
-    );
-  }
-
-  const tasks = (data ?? []).map((task) => normalizeTask(task as RawTask));
+  const initialData = await getTasksPage({ codevId: user.id, page: 1 });
 
   return (
     <TasksShell>
-      <TasksContainer tasks={tasks} />
+      <TasksContainer initialData={initialData} codevId={user.id} />
     </TasksShell>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Pagination,
   PaginationContent,
@@ -9,48 +9,63 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination/pagination";
+import { usePaginatedQuery } from "@/hooks/query/use-paginated-query";
+import { qk } from "@/lib/shared/query-keys";
+import type { Page } from "@/lib/server/paginate";
 
 import TaskCard, { TaskWithRelations } from "./TaskCard";
+import { fetchTasksPageAction } from "@/actions/tasks/actions";
 
-interface Props {
-  tasks: TaskWithRelations[];
+const PAGE_SIZE = 9;
+
+// Flattens the nested kanban relation, which Supabase returns as either an
+// object or a single-element array depending on how it resolves the join.
+function normalize(task: any): TaskWithRelations {
+  const column = Array.isArray(task.kanban_column) ? task.kanban_column[0] : task.kanban_column;
+  if (!column) return { ...task, kanban_column: undefined };
+
+  const board = Array.isArray(column.board) ? column.board[0] : column.board;
+  if (!board) return { ...task, kanban_column: { ...column, board: undefined } };
+
+  const project = Array.isArray(board.project) ? board.project[0] : board.project;
+  return {
+    ...task,
+    kanban_column: { ...column, board: { ...board, project: project || undefined } },
+  };
 }
 
-export default function TasksContainer({ tasks }: Props) {
-  const PAGE_SIZE = 9;
+interface Props {
+  initialData: Page<any>;
+  codevId: string;
+}
 
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [totalPages, setTotalPages] = useState<number>(1);
+export default function TasksContainer({ initialData, codevId }: Props) {
+  const [page, setPage] = useState(1);
 
-  useEffect(() => {
-    // Dynamically calculate the total number of pages
-    const pages = Math.ceil((tasks?.length ?? 0) / PAGE_SIZE);
-    setTotalPages(pages || 1);
-  }, [tasks]);
+  const { data, isPending } = usePaginatedQuery<any>(
+    qk.tasks.list({ codevId, page }),
+    () => fetchTasksPageAction({ codevId, page, pageSize: PAGE_SIZE }),
+    {
+      initialData,
+      initialDataKey: qk.tasks.list({ codevId, page: 1 }),
+    },
+  );
 
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage((prevPage) => prevPage + 1);
-    }
-  };
-
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage((prevPage) => prevPage - 1);
-    }
-  };
-
-  const paginatedTasks = tasks
-    ? tasks.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
-    : [];
+  const tasks = (data?.rows ?? []).map(normalize);
+  const totalPages = Math.max(Math.ceil((data?.total ?? 0) / (data?.pageSize ?? 1)), 1);
 
   return (
     <div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {paginatedTasks.length > 0 ? (
-          paginatedTasks.map((task: TaskWithRelations) => (
-            <TaskCard key={task.id} task={task} />
+        {isPending ? (
+          Array.from({ length: PAGE_SIZE }).map((_, i) => (
+            <div
+              key={i}
+              className="h-44 animate-pulse rounded-lg bg-zinc-200 dark:bg-zinc-800"
+            />
           ))
+        ) : tasks.length > 0 ? (
+          tasks.map((task) => <TaskCard key={task.id} task={task} />)
         ) : (
           <div>
             <h1 className="dark:text-white">No assigned task</h1>
@@ -58,13 +73,13 @@ export default function TasksContainer({ tasks }: Props) {
         )}
       </div>
 
-      {tasks && tasks.length > PAGE_SIZE && (
+      {totalPages > 1 && (
         <Pagination>
           <PaginationContent className="dark:text-white">
             <PaginationItem>
               <PaginationPrevious
                 className="cursor-pointer"
-                onClick={handlePreviousPage}
+                onClick={() => setPage((p) => Math.max(p - 1, 1))}
               />
             </PaginationItem>
 
@@ -72,8 +87,8 @@ export default function TasksContainer({ tasks }: Props) {
               <PaginationItem key={index + 1}>
                 <PaginationLink
                   className="cursor-pointer"
-                  onClick={() => setCurrentPage(index + 1)}
-                  isActive={currentPage === index + 1}
+                  onClick={() => setPage(index + 1)}
+                  isActive={page === index + 1}
                 >
                   {index + 1}
                 </PaginationLink>
@@ -83,7 +98,7 @@ export default function TasksContainer({ tasks }: Props) {
             <PaginationItem>
               <PaginationNext
                 className="cursor-pointer"
-                onClick={handleNextPage}
+                onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
               />
             </PaginationItem>
           </PaginationContent>
