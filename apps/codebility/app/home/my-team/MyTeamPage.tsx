@@ -13,7 +13,7 @@ import {
 } from "@/actions/projects/actions";
 import { Codev, InternalStatus } from "@/types/home/codev";
 import { useModal } from "@/hooks/modals/use-modal-users";
-import { createClientClientComponent } from "@/utils/supabase/client";
+import { getClientSupabase } from "@/utils/supabase/client";
 import AddMembersModal from "./AddMembersModal";
 
 interface ProjectData {
@@ -197,12 +197,7 @@ const MyTeamPage = ({ projectData }: MyTeamPageProps) => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [isLoadingMembers, setIsLoadingMembers] = useState(false);
 
-  const [supabase, setSupabase] = useState<any>(null);
-
-  useEffect(() => {
-    const supabaseClient = createClientClientComponent();
-    setSupabase(supabaseClient);
-  }, []);
+  const supabase = getClientSupabase();
 
   // Modal hook for profile integration
   const { onOpen: openProfileModal } = useModal();

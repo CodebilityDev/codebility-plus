@@ -1,9 +1,11 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@codevs/ui/button";
 import { Card } from "@codevs/ui/card";
 import { useUserStore } from "@/store/codev-store";
+import { getClientSupabase } from "@/utils/supabase/client";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Certificate, { CertificateProps } from "../(dashboard)/_components/DashboardDownloadCertificate";
@@ -13,13 +15,6 @@ export default function CertificatePreview() {
   const router = useRouter();
   const certRef = useRef<HTMLDivElement>(null);
   const { user, userLevel } = useUserStore();
-  const [loading, setLoading] = useState(true);
-  const [totalPoints, setTotalPoints] = useState(0);
-  const [skillPoints, setSkillPoints] = useState<Record<string, number>>({});
-  const [attendancePoints, setAttendancePoints] = useState(0);
-  
-  // Admin-only state
-  const [allUsers, setAllUsers] = useState<any[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string>("");
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [selectedUserLevel, setSelectedUserLevel] = useState(0);
@@ -46,86 +41,68 @@ export default function CertificatePreview() {
   };
   
   const [certificateType, setCertificateType] = useState<"intern" | "codev" | "mentor">(getInitialCertType());
-  const [name, setName] = useState("");
-  
-  useEffect(() => {
-    const currentUser = isAdmin && selectedUser ? selectedUser : user;
-    if (currentUser) {
-      setName(`${currentUser.first_name} ${currentUser.last_name}`);
-      setCertificateType(getInitialCertType());
-    }
-  }, [user, userLevel, selectedUser, selectedUserLevel, isAdmin]);
 
-  // Load all users for admin selection
-  useEffect(() => {
-    const fetchUsers = async () => {
-      if (!isAdmin) return;
-      
-      const supabase = await import("@/utils/supabase/client").then((m) =>
-        m.getClientSupabase(),
-      );
-      
-      try {
-        const { data: users } = await supabase
-          .from('codev')
-          .select('id, first_name, last_name, role_id, level')
-          .in('application_status', ['passed'])
-          .order('first_name');
-          
-        setAllUsers(users || []);
-      } catch (error) {
-        console.error('Error fetching users:', error);
-      }
-    };
-    
-    fetchUsers();
-  }, [isAdmin]);
-  
-  // Fetch user points
-  useEffect(() => {
-    const fetchPoints = async () => {
-      const currentUser = isAdmin && selectedUser ? selectedUser : user;
-      if (!currentUser) return;
-      
-      setLoading(true);
-      const supabase = await import("@/utils/supabase/client").then((m) =>
-        m.getClientSupabase(),
-      );
-      
-      try {
-        // Fetch skill points
-        const { data: codevPoints } = await supabase
-          .from('codev_points')
-          .select('points, skill_category_id')
-          .eq('codev_id', currentUser.id);
-          
-        // Fetch attendance points
-        const { data: attendanceData } = await supabase
-          .from('attendance_points')
-          .select('points')
-          .eq('codev_id', currentUser.id)
-          .single();
-          
-        const points = codevPoints?.reduce((acc, cp) => {
-          acc[cp.skill_category_id] = cp.points;
-          return acc;
-        }, {} as Record<string, number>) || {};
-        
-        setSkillPoints(points);
-        setAttendancePoints(attendanceData?.points || 0);
-        
-        const totalSkillPoints = Object.values(points).reduce((sum, point) => sum + point, 0);
-        setTotalPoints(totalSkillPoints + (attendanceData?.points || 0));
-      } catch (error) {
-        console.error('Error fetching points:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchPoints();
-  }, [user, selectedUser, isAdmin]);
+  const activeUser = isAdmin && selectedUser ? selectedUser : user;
+  const activeLevel = isAdmin && selectedUser ? selectedUserLevel : userLevel;
 
+  // Derived during render rather than synced in an effect; the field is
+  // editable, so a draft holds user overrides and the derived value is the
+  // fallback until one is made.
+  const derivedName = activeUser
+    ? `${activeUser.first_name} ${activeUser.last_name}`
+    : "";
+  const [nameDraft, setNameDraft] = useState<string | null>(null);
+  const name = nameDraft ?? derivedName;
+  const setName = (value: string) => setNameDraft(value);
+
+  const { data: allUsers = [] } = useQuery({
+    queryKey: ["certificate", "users"],
+    enabled: Boolean(isAdmin),
+    staleTime: 5 * 60_000,
+    queryFn: async () => {
+      const { data } = await getClientSupabase()
+        .from("codev")
+        .select("id, first_name, last_name, role_id, level")
+        .in("application_status", ["passed"])
+        .order("first_name");
+      return data ?? [];
+    },
+  });
+
+  const { data: pointsData, isPending: loading } = useQuery({
+    queryKey: ["certificate", "points", activeUser?.id],
+    enabled: Boolean(activeUser?.id),
+    staleTime: 60_000,
+    queryFn: async () => {
+      const supabase = getClientSupabase();
+
+      const { data: codevPoints } = await supabase
+        .from("codev_points")
+        .select("points, skill_category_id")
+        .eq("codev_id", activeUser!.id);
+
+      const { data: attendanceData } = await supabase
+        .from("attendance_points")
+        .select("points")
+        .eq("codev_id", activeUser!.id)
+        .single();
+
+      const skillPoints: Record<string, number> = {};
+      codevPoints?.forEach((cp) => {
+        skillPoints[cp.skill_category_id] = cp.points;
+      });
+
+      const attendance = attendanceData?.points ?? 0;
+      const skillTotal = codevPoints?.reduce((acc, cp) => acc + (cp.points || 0), 0) ?? 0;
+
+      return { skillPoints, attendancePoints: attendance, totalPoints: skillTotal + attendance };
+    },
+  });
+
+  const skillPoints = pointsData?.skillPoints ?? {};
+  const attendancePoints = pointsData?.attendancePoints ?? 0;
+  const totalPoints = pointsData?.totalPoints ?? 0;
+  
   // Handle user selection for admin
   const handleUserSelect = (userId: string) => {
     const selected = allUsers.find(u => u.id === userId);

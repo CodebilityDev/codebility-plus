@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { createClientClientComponent } from "@/utils/supabase/client";
+import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { getClientSupabase } from "@/utils/supabase/client";
 import { ShieldCheck, ShieldAlert, CheckCircle2, Copy, QrCode, Key, Lock } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -25,9 +26,7 @@ interface Factor {
 }
 
 export default function AccountSettings2FA() {
-  const [loading, setLoading] = useState(true);
-  const [factors, setFactors] = useState<Factor[]>([]);
-  const [activeFactor, setActiveFactor] = useState<Factor | null>(null);
+  const queryClient = useQueryClient();
 
   // Dialog States
   const [isEnrollOpen, setIsEnrollOpen] = useState(false);
@@ -41,36 +40,26 @@ export default function AccountSettings2FA() {
   const [verificationCode, setVerificationCode] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
 
-  const fetchMfaFactors = async () => {
-    const supabase = createClientClientComponent();
-    if (!supabase) {
-      setLoading(false);
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const { data, error } = await supabase.auth.mfa.listFactors();
+  // MFA factors live in auth state, so they are read through a query that the
+  // enrolment and verification paths invalidate.
+  const { data: factorsData, isPending: loading } = useQuery({
+    queryKey: ["accountSettings", "mfaFactors"],
+    staleTime: 60_000,
+    queryFn: async () => {
+      const { data, error } = await getClientSupabase().auth.mfa.listFactors();
       if (error) throw error;
+      return (data?.totp || []) as Factor[];
+    },
+  });
 
-      const totpFactors = (data?.totp || []) as Factor[];
-      setFactors(totpFactors);
+  const factors = factorsData ?? [];
+  const activeFactor = factors.find((f) => f.status === "verified") ?? null;
 
-      const verified = totpFactors.find((f) => f.status === "verified");
-      setActiveFactor(verified || null);
-    } catch (err) {
-      console.error("Error fetching 2FA factors:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchMfaFactors();
-  }, []);
+  const fetchMfaFactors = () =>
+    queryClient.invalidateQueries({ queryKey: ["accountSettings", "mfaFactors"] });
 
   const handleStartEnrollment = async () => {
-    const supabase = createClientClientComponent();
+    const supabase = getClientSupabase();
     if (!supabase) {
       toast.error("Authentication service unavailable");
       return;
@@ -107,7 +96,7 @@ export default function AccountSettings2FA() {
       return;
     }
 
-    const supabase = createClientClientComponent();
+    const supabase = getClientSupabase();
     if (!supabase) {
       toast.error("Authentication service unavailable");
       return;
@@ -142,7 +131,7 @@ export default function AccountSettings2FA() {
   const handleDisable2FA = async () => {
     if (!activeFactor) return;
 
-    const supabase = createClientClientComponent();
+    const supabase = getClientSupabase();
     if (!supabase) {
       toast.error("Authentication service unavailable");
       return;

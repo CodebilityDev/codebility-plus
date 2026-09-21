@@ -1,6 +1,7 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useCallback, forwardRef, useImperativeHandle } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { ChevronLeft, ChevronRight, Circle, Calendar, Clock, Info, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SimpleMemberData } from "@/actions/projects/actions";
@@ -38,6 +39,29 @@ interface MeetingBasedAttendanceProps {
   onHasChangesUpdate?: (hasChanges: boolean) => void;
 }
 
+const buildMeetingAttendanceData = (
+  rows: any[] | null | undefined,
+  allMembers: SimpleMemberData[],
+  year: number,
+  month: number,
+): AttendanceData => {
+  const data: AttendanceData = {};
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  allMembers.forEach((member) => {
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dateKey = `${member.id}-${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+      data[dateKey] = "not_scheduled";
+    }
+  });
+
+  rows?.forEach((record: any) => {
+    data[`${record.codev_id}-${record.date}`] = record.status;
+  });
+
+  return data;
+};
+
 const MeetingBasedAttendance = forwardRef<any, MeetingBasedAttendanceProps>(({ 
   teamMembers, 
   teamLead, 
@@ -49,14 +73,57 @@ const MeetingBasedAttendance = forwardRef<any, MeetingBasedAttendanceProps>(({
   const currentDate = new Date();
   const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth());
   const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
-  const [attendanceData, setAttendanceData] = useState<AttendanceData>({});
-  const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   // Safely combine team lead and members
   const safeTeamMembers = teamMembers || [];
   const allMembers = teamLead ? [teamLead, ...safeTeamMembers] : safeTeamMembers;
+
+  const { data: attendanceRows, isPending: isLoadingAttendance } = useQuery({
+    queryKey: [
+      "myTeam",
+      "meetingAttendance",
+      projectId,
+      selectedYear,
+      selectedMonth,
+      allMembers.map((m) => m.id).join(","),
+    ],
+    enabled: allMembers.length > 0,
+    staleTime: 60_000,
+    queryFn: async () => {
+      const result = await getMonthlyAttendance(projectId, selectedYear, selectedMonth);
+      return result.success ? (result.data ?? []) : [];
+    },
+  });
+
+  // The fetched rows seed an editable draft. The month travels with the draft
+  // so a month change re-derives during render instead of in an effect, and
+  // unsaved edits survive re-renders in between.
+  const draftKey = `${selectedYear}-${selectedMonth}-${allMembers.length}`;
+  const [draft, setDraft] = useState<{ key: string; data: AttendanceData }>({
+    key: "",
+    data: {},
+  });
+
+  const attendanceData =
+    draft.key === draftKey
+      ? draft.data
+      : buildMeetingAttendanceData(
+          attendanceRows,
+          allMembers,
+          selectedYear,
+          selectedMonth,
+        );
+
+  const setAttendanceData = (
+    update: AttendanceData | ((prev: AttendanceData) => AttendanceData),
+  ) => {
+    const next = typeof update === "function" ? update(attendanceData) : update;
+    setDraft({ key: draftKey, data: next });
+  };
+
+  const isLoading = isLoadingAttendance && allMembers.length === 0;
 
   // Get days in selected month
   const getDaysInMonth = (year: number, month: number) => {
@@ -94,55 +161,6 @@ const MeetingBasedAttendance = forwardRef<any, MeetingBasedAttendanceProps>(({
       schedule.day.toLowerCase() === dayName
     ) || null;
   };
-
-  // Load attendance data from database
-  useEffect(() => {
-    const loadAttendance = async () => {
-      setIsLoading(true);
-      try {
-        const result = await getMonthlyAttendance(projectId, selectedYear, selectedMonth);
-        
-        if (result.success && result.data) {
-          const dbData: AttendanceData = {};
-          
-          // First, set all dates as not_scheduled
-          allMembers.forEach(member => {
-            monthDays.forEach(day => {
-              const dateKey = `${member.id}-${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-              dbData[dateKey] = "not_scheduled";
-            });
-          });
-          
-          // Then apply saved attendance data for scheduled meetings
-          result.data.forEach((record: any) => {
-            const dateKey = `${record.codev_id}-${record.date}`;
-            dbData[dateKey] = record.status;
-          });
-          
-          setAttendanceData(dbData);
-        } else {
-          // Generate default data if no records exist
-          const defaultData: AttendanceData = {};
-          allMembers.forEach(member => {
-            monthDays.forEach(day => {
-              const dateKey = `${member.id}-${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-              defaultData[dateKey] = "not_scheduled";
-            });
-          });
-          setAttendanceData(defaultData);
-        }
-      } catch (error) {
-        console.error("Error loading attendance:", error);
-        toast.error("Failed to load attendance data");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (allMembers.length > 0) {
-      loadAttendance();
-    }
-  }, [selectedMonth, selectedYear, allMembers.length, projectId]);
 
   // Toggle attendance status
   const toggleAttendance = (memberId: string, day: number) => {
@@ -221,7 +239,7 @@ const MeetingBasedAttendance = forwardRef<any, MeetingBasedAttendanceProps>(({
         if (warningResult.success && warningResult.warnings && warningResult.warnings.length > 0) {
           const warningCount = warningResult.warnings.filter(w => w.notificationSent).length;
           if (warningCount > 0) {
-            toast.error(`⚠️ ${warningCount} member${warningCount > 1 ? 's' : ''} received attendance warnings`);
+            toast.error(`âš ï¸ ${warningCount} member${warningCount > 1 ? 's' : ''} received attendance warnings`);
           }
         }
       } else {
@@ -465,7 +483,7 @@ const MeetingBasedAttendance = forwardRef<any, MeetingBasedAttendanceProps>(({
                     <span className="hidden sm:inline">Team Member</span>
                     <span className="sm:hidden">Member</span>
                   </th>
-                  {/* ✅ FIXED: Tooltip is now INSIDE <th>, not wrapping it */}
+                  {/* âœ… FIXED: Tooltip is now INSIDE <th>, not wrapping it */}
                   {monthDays.map(day => {
                     const scheduledMeeting = hasScheduledMeeting(day);
                     const dayOfWeek = getDayOfWeek(selectedYear, selectedMonth, day);
