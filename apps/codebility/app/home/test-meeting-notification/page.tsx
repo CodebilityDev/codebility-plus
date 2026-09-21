@@ -1,6 +1,7 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,8 +30,6 @@ export default function TestMeetingNotificationPage() {
   const [isLoading, setIsLoading] = useState<'8am' | '30min' | 'start' | null>(null);
   const [results, setResults] = useState<NotificationTestResult | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [todaysProjects, setTodaysProjects] = useState<Project[]>([]);
-  const [projectsLoading, setProjectsLoading] = useState(false);
   const [showNotificationPreview, setShowNotificationPreview] = useState<'8am' | '30min' | 'start' | null>(null);
 
   const getCurrentManilaTime = () => {
@@ -73,33 +72,30 @@ export default function TestMeetingNotificationPage() {
     return `${hour12}:${minutes} ${ampm}`;
   };
 
-  const fetchTodaysProjects = async () => {
-    setProjectsLoading(true);
-    try {
-      const currentDay = getCurrentManilaTime().day;
-      const response = await fetch('/api/projects/today', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ currentDay }),
-      });
-      
-      if (response.ok) {
-        const data = (await response.json()) as { projects?: Project[] };
-        setTodaysProjects(data.projects || []);
-      }
-    } catch (error) {
-      console.error('Error fetching today\'s projects:', error);
-      setTodaysProjects([]);
-    } finally {
-      setProjectsLoading(false);
-    }
+  const fetchTodaysProjects = async (): Promise<Project[]> => {
+    const currentDay = getCurrentManilaTime().day;
+    const response = await fetch('/api/projects/today', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ currentDay }),
+    });
+
+    if (!response.ok) return [];
+    const data = (await response.json()) as { projects?: Project[] };
+    return data.projects || [];
   };
 
+  const { data: todaysProjects = [], isPending: projectsLoading } = useQuery({
+    queryKey: ["testMeetingNotification", "todaysProjects"],
+    staleTime: 60_000,
+    queryFn: fetchTodaysProjects,
+  });
+
+  // A live clock is a real timer, which is what effects are for.
   useEffect(() => {
     updateCurrentTime();
-    fetchTodaysProjects();
     const interval = setInterval(updateCurrentTime, 1000);
     return () => clearInterval(interval);
   }, []);
@@ -145,7 +141,7 @@ export default function TestMeetingNotificationPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              🕐 Current Manila Time
+              ðŸ• Current Manila Time
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -176,7 +172,7 @@ export default function TestMeetingNotificationPage() {
                 variant="outline" 
                 size="sm"
               >
-                🔄 Refresh Time
+                ðŸ”„ Refresh Time
               </Button>
               <Button 
                 onClick={fetchTodaysProjects} 
@@ -184,7 +180,7 @@ export default function TestMeetingNotificationPage() {
                 size="sm"
                 disabled={projectsLoading}
               >
-                {projectsLoading ? '⏳' : '📂'} Refresh Projects
+                {projectsLoading ? 'â³' : 'ðŸ“‚'} Refresh Projects
               </Button>
             </div>
           </CardContent>
@@ -195,7 +191,7 @@ export default function TestMeetingNotificationPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                📅 Projects with Meetings Today
+                ðŸ“… Projects with Meetings Today
               </CardTitle>
               <CardDescription>
                 These projects have meetings scheduled for {currentTime?.day}
@@ -225,10 +221,10 @@ export default function TestMeetingNotificationPage() {
           <Card className="border-2 border-blue-200 bg-blue-50">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                🔔 Notification Preview - 
-                {showNotificationPreview === '8am' && '📅 8 AM Morning'}
-                {showNotificationPreview === '30min' && '⏰ 30 Minutes Before'}
-                {showNotificationPreview === 'start' && '🔴 Meeting Start'}
+                ðŸ”” Notification Preview - 
+                {showNotificationPreview === '8am' && 'ðŸ“… 8 AM Morning'}
+                {showNotificationPreview === '30min' && 'â° 30 Minutes Before'}
+                {showNotificationPreview === 'start' && 'ðŸ”´ Meeting Start'}
               </CardTitle>
               <CardDescription>
                 This is how the notification would appear to team members
@@ -239,9 +235,9 @@ export default function TestMeetingNotificationPage() {
                 <div key={project.id} className="p-4 bg-white border rounded-lg shadow-sm">
                   <div className="flex items-start gap-3">
                     <div className="text-2xl">
-                      {showNotificationPreview === '8am' && '📅'}
-                      {showNotificationPreview === '30min' && '⏰'}
-                      {showNotificationPreview === 'start' && '🔴'}
+                      {showNotificationPreview === '8am' && 'ðŸ“…'}
+                      {showNotificationPreview === '30min' && 'â°'}
+                      {showNotificationPreview === 'start' && 'ðŸ”´'}
                     </div>
                     <div className="flex-1">
                       <h4 className="font-semibold text-gray-900 mb-1">
@@ -281,7 +277,7 @@ export default function TestMeetingNotificationPage() {
                 variant="outline"
                 className="w-full"
               >
-                👁️ Preview Notification UI (Example)
+                ðŸ‘ï¸ Preview Notification UI (Example)
               </Button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -294,12 +290,12 @@ export default function TestMeetingNotificationPage() {
                 >
                   {isLoading === '8am' ? (
                     <>
-                      <div className="animate-spin">⏳</div>
+                      <div className="animate-spin">â³</div>
                       <span>Testing...</span>
                     </>
                   ) : (
                     <>
-                      <div>📅</div>
+                      <div>ðŸ“…</div>
                       <span>Test 8 AM Morning Reminders</span>
                     </>
                   )}
@@ -310,7 +306,7 @@ export default function TestMeetingNotificationPage() {
                   size="sm"
                   className="w-full"
                 >
-                  👁️ Preview UI
+                  ðŸ‘ï¸ Preview UI
                 </Button>
               </div>
 
@@ -323,12 +319,12 @@ export default function TestMeetingNotificationPage() {
                 >
                   {isLoading === '30min' ? (
                     <>
-                      <div className="animate-spin">⏳</div>
+                      <div className="animate-spin">â³</div>
                       <span>Testing...</span>
                     </>
                   ) : (
                     <>
-                      <div>⏰</div>
+                      <div>â°</div>
                       <span>Test 30-Minute Before</span>
                     </>
                   )}
@@ -339,7 +335,7 @@ export default function TestMeetingNotificationPage() {
                   size="sm"
                   className="w-full"
                 >
-                  👁️ Preview UI
+                  ðŸ‘ï¸ Preview UI
                 </Button>
                 {todaysProjects.length > 0 && (
                   <div className="text-xs text-gray-600">
@@ -351,7 +347,7 @@ export default function TestMeetingNotificationPage() {
                           href={`/home/my-team/${project.id}`}
                           className="block hover:text-blue-600 truncate"
                         >
-                          • {project.name}
+                          â€¢ {project.name}
                         </Link>
                       ))}
                       {todaysProjects.length > 2 && (
@@ -371,12 +367,12 @@ export default function TestMeetingNotificationPage() {
                 >
                   {isLoading === 'start' ? (
                     <>
-                      <div className="animate-spin">⏳</div>
+                      <div className="animate-spin">â³</div>
                       <span>Testing...</span>
                     </>
                   ) : (
                     <>
-                      <div>🔴</div>
+                      <div>ðŸ”´</div>
                       <span>Test Meeting Start</span>
                     </>
                   )}
@@ -387,7 +383,7 @@ export default function TestMeetingNotificationPage() {
                   size="sm"
                   className="w-full"
                 >
-                  👁️ Preview UI
+                  ðŸ‘ï¸ Preview UI
                 </Button>
                 {todaysProjects.length > 0 && (
                   <div className="text-xs text-gray-600">
@@ -399,7 +395,7 @@ export default function TestMeetingNotificationPage() {
                           href={`/home/my-team/${project.id}`}
                           className="block hover:text-blue-600 truncate"
                         >
-                          • {project.name}
+                          â€¢ {project.name}
                         </Link>
                       ))}
                       {todaysProjects.length > 2 && (
@@ -417,7 +413,7 @@ export default function TestMeetingNotificationPage() {
         {error && (
           <div className="border border-red-200 bg-red-50 text-red-800 px-4 py-3 rounded-md">
             <div className="flex items-center gap-2">
-              <span>⚠️</span>
+              <span>âš ï¸</span>
               <strong>Error:</strong> {error}
             </div>
           </div>
@@ -479,19 +475,19 @@ export default function TestMeetingNotificationPage() {
                 {results.success ? (
                   results.notificationsSent > 0 ? (
                     <span>
-                      ✅ Successfully sent <strong>{results.notificationsSent}</strong> notifications! 
+                      âœ… Successfully sent <strong>{results.notificationsSent}</strong> notifications! 
                       Check your notification panel to see them.
                     </span>
                   ) : (
                     <span>
-                      ℹ️ Test ran successfully but no notifications were sent. 
+                      â„¹ï¸ Test ran successfully but no notifications were sent. 
                       This might be because no meetings are scheduled for the current time/day, 
                       or duplicate prevention is active.
                     </span>
                   )
                 ) : (
                   <span>
-                    ❌ Test failed to execute. Check the error details above.
+                    âŒ Test failed to execute. Check the error details above.
                   </span>
                 )}
               </div>
@@ -518,9 +514,9 @@ export default function TestMeetingNotificationPage() {
             <div className="space-y-2">
               <h4 className="font-medium">Notification Types:</h4>
               <ul className="text-sm space-y-1 ml-4 list-disc text-gray-600">
-                <li><strong>📅 8 AM Morning:</strong> Daily summary sent to all teams with meetings scheduled for today</li>
-                <li><strong>⏰ 30 Minutes Before:</strong> Urgent reminder sent exactly 30 minutes before each meeting</li>
-                <li><strong>🔴 Meeting Start:</strong> "Starting now" notification sent exactly when the meeting begins</li>
+                <li><strong>ðŸ“… 8 AM Morning:</strong> Daily summary sent to all teams with meetings scheduled for today</li>
+                <li><strong>â° 30 Minutes Before:</strong> Urgent reminder sent exactly 30 minutes before each meeting</li>
+                <li><strong>ðŸ”´ Meeting Start:</strong> "Starting now" notification sent exactly when the meeting begins</li>
               </ul>
             </div>
             <div className="space-y-2">

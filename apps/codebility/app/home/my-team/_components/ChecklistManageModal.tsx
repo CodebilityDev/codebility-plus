@@ -1,4 +1,4 @@
-import { useState, useEffect, FormEvent, useMemo } from "react";
+﻿import { useState, useEffect, FormEvent, useMemo } from "react";
 import { X, Plus, Edit2, Trash2, Check, Lock, RefreshCw, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
@@ -13,12 +13,12 @@ import { SimpleMemberData, getMembers, getTeamLead } from "@/actions/projects/ac
  * ChecklistManageModal - PRODUCTION-READY VERSION
  * 
  * FEATURES:
- * 1. ✅ Self-fetching fresh member data (fixes stale data issue)
- * 2. ✅ Auto-sync function - backfills missing checklist records for all members
- * 3. ✅ Role-based assignment - items assigned to specific roles via explicit input
- * 4. ✅ Preserves existing data - no deletion required
- * 5. ✅ Runs automatically on modal open
- * 6. ✅ Clean toast messages (no emoji, no double quotes)
+ * 1. Ã¢Å“â€¦ Self-fetching fresh member data (fixes stale data issue)
+ * 2. Ã¢Å“â€¦ Auto-sync function - backfills missing checklist records for all members
+ * 3. Ã¢Å“â€¦ Role-based assignment - items assigned to specific roles via explicit input
+ * 4. Ã¢Å“â€¦ Preserves existing data - no deletion required
+ * 5. Ã¢Å“â€¦ Runs automatically on modal open
+ * 6. Ã¢Å“â€¦ Clean toast messages (no emoji, no double quotes)
  * 
  * PERMISSION RULES:
  * - ALL members can VIEW checklist items
@@ -39,14 +39,13 @@ const ChecklistManageModal = ({
   onClose
 }: ChecklistManageModalProps) => {
   // State
-  const [items, setItems] = useState<{ title: string; target_role: string | null }[]>([]);
+  const [itemsDraft, setItemsDraft] = useState<{ title: string; target_role: string | null }[] | null>(null);
   const [newItemTitle, setNewItemTitle] = useState("");
   const [roleInput, setRoleInput] = useState("");
   const [editingTitle, setEditingTitle] = useState<string | null>(null);
   const [editingNewTitle, setEditingNewTitle] = useState("");
   const [editingNewRole, setEditingNewRole] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isFetching, setIsFetching] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
 
   // Self-contained auth
@@ -224,50 +223,48 @@ const ChecklistManageModal = ({
     }
   };
 
-  // Load checklist items when modal opens
-  useEffect(() => {
-    if (isOpen && supabase && projectId && allMemberIds.length > 0 && !isFetchingMembers) {
-      loadChecklistItems();
-      setTimeout(() => {
-        autoSyncChecklistItems();
-      }, 500);
-    }
-  }, [isOpen, supabase, projectId, allMemberIds.length, isFetchingMembers]);
-
-  // Load checklist items from database
-  const loadChecklistItems = async () => {
-    if (!supabase || !projectId) return;
-
-    setIsFetching(true);
-    try {
-      const { data, error } = await supabase
+  // Loaded when the modal opens, then owned locally because the list is edited
+  // in place by the add/rename/sync paths below.
+  const { data: fetchedItems, isPending: isFetching } = useQuery({
+    queryKey: ["myTeam", "checklistTemplates", projectId],
+    enabled: Boolean(isOpen && projectId),
+    staleTime: 60_000,
+    queryFn: async () => {
+      const { data, error } = await getClientSupabase()
         .from("member_checklists")
         .select("title, description, created_at")
         .eq("project_id", projectId)
         .order("created_at", { ascending: true });
 
-      if (error) {
-        toast.error("Failed to load checklist items");
-        setItems([]);
-      } else {
-        const seen = new Set<string>();
-        const uniqueItems: { title: string; target_role: string | null }[] = [];
-        for (const item of data) {
-          const titleStr = String(item.title);
-          if (!seen.has(titleStr)) {
-            seen.add(titleStr);
-            uniqueItems.push({ title: titleStr, target_role: parseTargetRole(item.description) });
-          }
+      if (error) throw error;
+
+      const seen = new Set<string>();
+      const uniqueItems: { title: string; target_role: string | null }[] = [];
+      for (const item of data) {
+        const titleStr = String(item.title);
+        if (!seen.has(titleStr)) {
+          seen.add(titleStr);
+          uniqueItems.push({
+            title: titleStr,
+            target_role: parseTargetRole(item.description),
+          });
         }
-        setItems(uniqueItems);
       }
-    } catch (error) {
-      toast.error("Failed to load checklist items");
-      setItems([]);
-    } finally {
-      setIsFetching(false);
-    }
-  };
+      return uniqueItems;
+    },
+  });
+
+  const items = itemsDraft ?? fetchedItems ?? [];
+  const setItems = (
+    update:
+      | { title: string; target_role: string | null }[]
+      | ((prev: { title: string; target_role: string | null }[]) => { title: string; target_role: string | null }[]),
+  ) =>
+    setItemsDraft((prev) =>
+      typeof update === "function"
+        ? update(prev ?? fetchedItems ?? [])
+        : update,
+    );
 
   // Handle adding new checklist item
   const handleAddItem = async (e: FormEvent<HTMLFormElement>) => {
@@ -611,7 +608,7 @@ const ChecklistManageModal = ({
                 </div>
               ) : items.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-8 text-center">
-                  <div className="text-4xl mb-2">📝</div>
+                  <div className="text-4xl mb-2">Ã°Å¸â€œÂ</div>
                   <p className="text-gray-600 dark:text-gray-400">No checklist items yet</p>
                   {isTeamLead && (
                     <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">Add your first item above</p>

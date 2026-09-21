@@ -1,6 +1,7 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { SimpleMemberData, updateProjectMembers } from "@/actions/projects/actions";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,7 +28,7 @@ interface AddMembersModalProps {
   onUpdate: (selectedMembers: Codev[]) => void;
 }
 
-// ✅ Calculate years from work experience
+// âœ… Calculate years from work experience
 const calculateYearsFromExperience = (workExperience: any[]): number => {
   if (!workExperience || workExperience.length === 0) return 0;
   
@@ -44,7 +45,7 @@ const calculateYearsFromExperience = (workExperience: any[]): number => {
   return Math.round(totalYears);
 };
 
-// ✅ Responsive Avatar Component — X button visible only on hover
+// âœ… Responsive Avatar Component â€” X button visible only on hover
 const TeamMemberAvatar = ({ 
   imageUrl, 
   name, 
@@ -63,7 +64,7 @@ const TeamMemberAvatar = ({
   onRemove?: (member: Codev) => void;
 }) => (
   <div className="flex flex-col items-center space-y-1 w-full">
-    {/* ✅ Extra padding so the X button (positioned outside the circle) is never clipped */}
+    {/* âœ… Extra padding so the X button (positioned outside the circle) is never clipped */}
     <div className="group relative" style={{ width: size + 8, height: size + 8, padding: 4 }}>
       <div 
         className={`relative rounded-full overflow-hidden ring-1 sm:ring-2 ring-customBlue-400 w-full h-full ${
@@ -91,7 +92,7 @@ const TeamMemberAvatar = ({
         />
       </div>
 
-      {/* ✅ X Remove Button — only visible on hover via group-hover */}
+      {/* âœ… X Remove Button â€” only visible on hover via group-hover */}
       {member && onRemove && (
         <button
           onClick={(e) => {
@@ -120,7 +121,7 @@ const TeamMemberAvatar = ({
   </div>
 );
 
-// ✅ Team Leader Display
+// âœ… Team Leader Display
 const TeamLeaderDisplay = ({ 
   teamLead,
   onProfileClick
@@ -201,7 +202,7 @@ const TeamLeaderDisplay = ({
   </div>
 );
 
-// ✅ Team Members Grid — flex-based scroll, hover-reveal scrollbar, no cut-offs
+// âœ… Team Members Grid â€” flex-based scroll, hover-reveal scrollbar, no cut-offs
 const TeamMembersGrid = ({ 
   members,
   currentMemberIds,
@@ -231,8 +232,8 @@ const TeamMembersGrid = ({
 
       {/*
         - flex-1 + min-h-0 lets the scroll container grow to fill whatever space
-          the parent left panel gives it — no hardcoded heights, no excess space
-        - overflowY:'scroll' always reserves the scrollbar gutter → zero layout shift on hover
+          the parent left panel gives it â€” no hardcoded heights, no excess space
+        - overflowY:'scroll' always reserves the scrollbar gutter â†’ zero layout shift on hover
         - scrollbar track/thumb are transparent by default, visible only on hover via CSS
         - inner grid overflow:visible so X buttons and avatar rings never clip
       */}
@@ -282,7 +283,7 @@ const TeamMembersGrid = ({
   );
 };
 
-// ✅ Project Preview
+// âœ… Project Preview
 const ProjectPreview = ({ 
   projectName, 
   teamLead, 
@@ -342,7 +343,7 @@ const ProjectPreview = ({
   </div>
 );
 
-// ✅ Main Modal Component
+// âœ… Main Modal Component
 const AddMembersModal = ({ 
   isOpen, 
   onClose, 
@@ -367,16 +368,14 @@ const AddMembersModal = ({
   const [selectedMembers, setSelectedMembers] = useState<Codev[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
-  const [availableMembers, setAvailableMembers] = useState<Codev[]>([]);
+  const [availableMembersDraft, setAvailableMembersDraft] = useState<Codev[] | null>(null);
   const [recentMembers, setRecentMembers] = useState<Codev[]>([]);
-  const [isLoadingMembers, setIsLoadingMembers] = useState(false);
-  const [loadError, setLoadError] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState<'smart' | 'all' | 'mentor' | 'graduated' | 'admin' | 'training'>('smart');
   const [filterCounts, setFilterCounts] = useState({ mentor: 0, graduated: 0, admin: 0, training: 0, all: 0 });
   const [isSearching, setIsSearching] = useState(false);
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // ✅ Fetch codevs based on filter with smart defaults
+  // âœ… Fetch codevs based on filter with smart defaults
   const fetchCodevsByFilter = useCallback(async (filter: 'smart' | 'all' | 'mentor' | 'graduated' | 'admin' | 'training'): Promise<Codev[]> => {
     if (!supabase) {
       console.error('Supabase client not available');
@@ -441,7 +440,7 @@ const AddMembersModal = ({
     }
   }, [supabase]);
 
-  // ✅ Fetch recently added members (last 7 days)
+  // âœ… Fetch recently added members (last 7 days)
   const fetchRecentMembers = useCallback(async (): Promise<Codev[]> => {
     if (!supabase) return [];
 
@@ -465,7 +464,7 @@ const AddMembersModal = ({
     }
   }, [supabase]);
 
-  // ✅ Fetch filter counts
+  // âœ… Fetch filter counts
   const fetchFilterCounts = useCallback(async () => {
     if (!supabase) return;
 
@@ -490,7 +489,7 @@ const AddMembersModal = ({
     }
   }, [supabase]);
 
-  // ✅ Server-side search with debouncing
+  // âœ… Server-side search with debouncing
   const searchMembers = useCallback(async (query: string): Promise<Codev[]> => {
     if (!supabase || !query.trim()) return [];
 
@@ -516,7 +515,7 @@ const AddMembersModal = ({
     }
   }, [supabase]);
 
-  // ✅ Debounced search handler
+  // âœ… Debounced search handler
   const handleSearchChange = useCallback((query: string) => {
     setSearchQuery(query);
 
@@ -541,7 +540,7 @@ const AddMembersModal = ({
     }, 300);
   }, [activeFilter, fetchCodevsByFilter, searchMembers]);
 
-  // ✅ Enhanced profile fetching with timeout protection
+  // âœ… Enhanced profile fetching with timeout protection
   const getCompleteCodevProfileSafe = useCallback(async (codevId: string): Promise<Codev | null> => {
     try {
       if (!supabase) {
@@ -601,7 +600,7 @@ const AddMembersModal = ({
     }
   }, [supabase]);
 
-  // ✅ Profile click handler
+  // âœ… Profile click handler
   const handleProfileClick = useCallback(async (member: Codev) => {
     try {
       const completeProfile = await getCompleteCodevProfileSafe(member.id);
@@ -629,76 +628,31 @@ const AddMembersModal = ({
     }
   }, [getCompleteCodevProfileSafe, openProfileModal]);
 
-  // ✅ Load available members based on active filter
-  useEffect(() => {
-    let isMounted = true;
-    let timeoutId: NodeJS.Timeout;
+  // Loads the roster for the active filter. The query replaces the manual
+  // isMounted guard and 30s timeout the effect used to keep.
+  const { data: membersData, isPending: isLoadingMembers, error: membersError, refetch: refetchMembers } = useQuery({
+    queryKey: ["myTeam", "addMembers", activeFilter],
+    enabled: Boolean(isOpen),
+    staleTime: 60_000,
+    queryFn: async () => {
+      const users = await fetchCodevsByFilter(activeFilter);
+      return users || [];
+    },
+  });
 
-    const loadMembers = async () => {
-      if (!isOpen || !supabase) return;
+  const availableMembers = availableMembersDraft ?? membersData ?? [];
+  const setAvailableMembers = (members: Codev[]) =>
+    setAvailableMembersDraft(members);
+  const loadError = membersError
+    ? membersError instanceof Error
+      ? membersError.message
+      : "Failed to load members"
+    : null;
 
-      setIsLoadingMembers(true);
-      setLoadError(null);
-
-      try {
-        timeoutId = setTimeout(() => {
-          if (isMounted) {
-            throw new Error('Loading timeout');
-          }
-        }, 30000);
-
-        // Load members based on active filter
-        const users = await fetchCodevsByFilter(activeFilter);
-
-        // Load recent members separately
-        const recent = await fetchRecentMembers();
-
-        // Fetch filter counts (non-blocking)
-        fetchFilterCounts();
-
-        clearTimeout(timeoutId);
-
-        if (isMounted) {
-          setAvailableMembers(users || []);
-          setRecentMembers(recent || []);
-          setLoadError(null);
-        }
-      } catch (error: any) {
-        console.error('Failed to fetch members:', error);
-
-        if (isMounted) {
-          const errorMessage = error?.message || 'Failed to load members';
-          setLoadError(errorMessage);
-
-          if (errorMessage.includes('timeout')) {
-            toast.error('Loading members is taking longer than expected. Please try again.');
-          } else {
-            toast.error('Failed to load members. Please try again.');
-          }
-
-          setAvailableMembers([]);
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoadingMembers(false);
-        }
-      }
-    };
-
-    loadMembers();
-
-    return () => {
-      isMounted = false;
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-    };
-  }, [isOpen, supabase, activeFilter, fetchCodevsByFilter, fetchRecentMembers, fetchFilterCounts]);
-
-  // ✅ Initialize selected members - only on modal open, not when availableMembers changes
+  // âœ… Initialize selected members - only on modal open, not when availableMembers changes
   const membersInitialized = useRef(false);
 
-  // ✅ Initialize selected members - ONLY when modal opens
+  // âœ… Initialize selected members - ONLY when modal opens
   useEffect(() => {
     if (!isOpen) {
       membersInitialized.current = false;
@@ -735,7 +689,7 @@ const AddMembersModal = ({
     }
   }, [isOpen, currentMembers]);
 
-  // ✅ Member selection logic
+  // âœ… Member selection logic
   const toggleMember = useCallback((member: Codev) => {
     setSelectedMembers(prev => {
       const isSelected = prev.some(m => m.id === member.id);
@@ -745,7 +699,7 @@ const AddMembersModal = ({
     });
   }, []);
 
-  // ✅ Remove member via X button on avatar
+  // âœ… Remove member via X button on avatar
   const handleRemoveMember = useCallback((member: Codev) => {
     toggleMember(member);
   }, [toggleMember]);
@@ -760,7 +714,7 @@ const AddMembersModal = ({
     [currentMembers]
   );
 
-  // ✅ Filter available members (client-side filtering when not searching server-side)
+  // âœ… Filter available members (client-side filtering when not searching server-side)
   const filteredUsers = useMemo(() => {
     if (!availableMembers.length) return [];
 
@@ -786,30 +740,17 @@ const AddMembersModal = ({
     return baseFiltered;
   }, [availableMembers, teamLeadData, searchQuery, selectedMembers]);
 
-  // ✅ Reset state on close
-  useEffect(() => {
-    if (!isOpen) {
-      setSearchQuery("");
-      setSelectedMembers([]);
-      setLoadError(null);
-      setIsSearching(false);
+  // The parent mounts this modal only while it is open, so the reset-on-close
+  // effect that used to live here was unreachable: closing unmounts the state.
 
-      // Clear any pending search timeouts
-      if (searchTimeoutRef.current) {
-        clearTimeout(searchTimeoutRef.current);
-        searchTimeoutRef.current = null;
-      }
-    }
-  }, [isOpen]);
-
-  // ✅ Submit handler
+  // âœ… Submit handler
   const handleSubmit = async () => {
     if (!teamLeadData) {
       toast.error('Team leader not found');
       return;
     }
 
-    console.log('🚀 [AddMembersModal] Starting member update');
+    console.log('ðŸš€ [AddMembersModal] Starting member update');
     console.log('   Selected members count:', selectedMembers.length);
     console.log('   Selected member names:', selectedMembers.map(m => `${m.first_name} ${m.last_name}`));
     console.log('   Team leader:', `${teamLeadData.first_name} ${teamLeadData.last_name}`);
@@ -835,7 +776,7 @@ const AddMembersModal = ({
           })),
       ];
 
-      console.log('📤 [AddMembersModal] Sending to database');
+      console.log('ðŸ“¤ [AddMembersModal] Sending to database');
       console.log('   Total members (including team leader):', updatedMembers.length);
       console.log('   Project ID:', project.id);
 
@@ -846,13 +787,13 @@ const AddMembersModal = ({
       );
 
       if (result.success) {
-        console.log('✅ [AddMembersModal] Update successful!');
+        console.log('âœ… [AddMembersModal] Update successful!');
         console.log('   Members added:', selectedMembers.length);
         toast.success("Team members updated successfully!", { id: loadingToast });
         await onUpdate(selectedMembers);
         onClose();
       } else {
-        console.error('❌ [AddMembersModal] Update failed:', result.error);
+        console.error('âŒ [AddMembersModal] Update failed:', result.error);
         toast.error(result.error || "Failed to update members", { id: loadingToast });
       }
     } catch (error) {
@@ -864,26 +805,20 @@ const AddMembersModal = ({
     }
   };
 
-  // ✅ Retry loading members
+  // Retry reloads the roster query and refreshes the recent list.
   const handleRetryLoad = async () => {
-    setLoadError(null);
-    setIsLoadingMembers(true);
-
     try {
-      const users = await fetchCodevsByFilter(activeFilter);
-      const recent = await fetchRecentMembers();
+      const [result, recent] = await Promise.all([
+        refetchMembers(),
+        fetchRecentMembers(),
+      ]);
       fetchFilterCounts();
-
-      setAvailableMembers(users || []);
+      setAvailableMembers(result.data ?? []);
       setRecentMembers(recent || []);
-      setLoadError(null);
     } catch (error) {
       console.error('Retry failed:', error);
-      setLoadError('Failed to load members');
       toast.error('Failed to load members. Please try again.');
       setAvailableMembers([]);
-    } finally {
-      setIsLoadingMembers(false);
     }
   };
 
