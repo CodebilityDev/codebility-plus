@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { CheckCircle2, Circle, Lock, Loader2 } from "lucide-react";
-import { createClientClientComponent } from "@/utils/supabase/client";
+import { getClientSupabase } from "@/utils/supabase/client";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useUserStore } from "@/store/codev-store";
 import toast from "react-hot-toast";
 
 /**
@@ -60,212 +62,210 @@ const parseTargetRole = (description: string | null): string | null => {
   }
 };
 
-const MemberChecklist = ({
-  memberId,
-  projectId, 
-  isTeamLead: _unusedProp,
-  viewMode = 'profile'
-}: MemberChecklistProps) => {
-  const [memberStatuses, setMemberStatuses] = useState<MemberChecklistStatus[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [supabase, setSupabase] = useState<any>(null);
-  const [currentCodevId, setCurrentCodevId] = useState<string | null>(null);
-  const [isCurrentUserTeamLead, setIsCurrentUserTeamLead] = useState(false);
 
-  useEffect(() => {
-    const client = createClientClientComponent();
-    setSupabase(client);
+const loadChecklistItems = async ({
+  projectId,
+  memberId,
+  viewMode,
+  currentCodevId,
+  isCurrentUserTeamLead,
+}: {
+  projectId: string;
+  memberId: string;
+  viewMode: "profile" | "team";
+  currentCodevId: string;
+  isCurrentUserTeamLead: boolean;
+}): Promise<MemberChecklistStatus[]> => {
+  const supabase = getClientSupabase();
+
+  try {
+    let membersToShow: string[] = [];
     
-    if (client) {
-      client.auth.getSession().then(async ({ data: { session } }) => {
-        if (session?.user?.email) {
-          const { data: codevData } = await client
-            .from("codev")
-            .select("id")
-            .eq("email_address", session.user.email)
-            .single();
-          
-          if (codevData) {
-            setCurrentCodevId(codevData.id);
-          }
+    if (viewMode === 'profile') {
+      membersToShow = [memberId];
+    } else if (viewMode === 'team') {
+      if (isCurrentUserTeamLead) {
+        const { data: projectMembers, error: membersError } = await supabase
+          .from("project_members")
+          .select("codev_id")
+          .eq("project_id", projectId);
+
+        if (membersError) throw membersError;
+        
+        membersToShow = projectMembers
+          ?.map((pm: any) => pm.codev_id)
+          .filter((id: string) => id != null && id !== undefined && id !== '') || [];
+      } else {
+        membersToShow = [currentCodevId];
+      }
+    }
+
+    if (membersToShow.length === 0) {
+      return [];
+    }
+
+    const { data: allChecklistItems, error: checklistError } = await supabase
+      .from("member_checklists")
+      .select("*")
+      .eq("project_id", projectId)
+      .order("created_at", { ascending: true });
+
+    if (checklistError) throw checklistError;
+
+    const uniqueTitlesMap = new Map();
+    allChecklistItems?.forEach((item: ChecklistItem) => {
+      const existing = uniqueTitlesMap.get(item.title);
+      
+      if (!existing) {
+        uniqueTitlesMap.set(item.title, {
+          title: item.title,
+          description: item.description,
+          target_role: parseTargetRole(item.description),
+          priority: item.priority,
+          due_date: item.due_date,
+          created_by: item.created_by,
+          created_at: item.created_at
+        });
+      } else {
+        const updatedItem = { ...existing };
+        
+        if (item.description && !existing.description) {
+          updatedItem.description = item.description;
+          updatedItem.target_role = parseTargetRole(item.description);
         }
+        
+        if (new Date(item.created_at) < new Date(existing.created_at)) {
+          updatedItem.created_at = item.created_at;
+          updatedItem.created_by = item.created_by;
+        }
+        
+        uniqueTitlesMap.set(item.title, updatedItem);
+      }
+    });
+    
+    const uniqueTitles = Array.from(uniqueTitlesMap.values());
+
+    const { data: memberDetails, error: memberDetailsError } = await supabase
+      .from("codev")
+      .select("id, first_name, last_name, email_address, image_url, display_position")
+      .in("id", membersToShow);
+
+    if (memberDetailsError) throw memberDetailsError;
+
+    const statuses: MemberChecklistStatus[] = [];
+    
+    for (const member of (memberDetails || [])) {
+      const memberItems = allChecklistItems?.filter(
+        (item: ChecklistItem) => item.member_id === member.id
+      ) || [];
+
+      const memberChecklistItems: ChecklistItem[] = [];
+      
+      for (const templateItem of uniqueTitles) {
+        // Skip items targeted to a different role than this member's
+        if (templateItem.target_role && member.display_position !== templateItem.target_role) {
+          continue;
+        }
+
+        const existingItem = memberItems.find(
+          (item: ChecklistItem) => item.title === templateItem.title
+        );
+
+        if (existingItem) {
+          memberChecklistItems.push(existingItem);
+        } else {
+          memberChecklistItems.push({
+            id: `placeholder-${member.id}-${templateItem.title}`,
+            member_id: member.id,
+            project_id: projectId,
+            title: templateItem.title,
+            description: templateItem.description,
+            priority: templateItem.priority,
+            completed: false,
+            created_by: templateItem.created_by,
+            due_date: templateItem.due_date,
+            created_at: templateItem.created_at,
+            updated_at: templateItem.created_at,
+            isPlaceholder: true
+          });
+        }
+      }
+
+      const completedCount = memberChecklistItems.filter(item => item.completed).length;
+      const memberTotalCount = memberChecklistItems.length;
+
+      statuses.push({
+        member,
+        completedCount,
+        totalCount: memberTotalCount,
+        allComplete: completedCount === memberTotalCount && memberTotalCount > 0,
+        checklistItems: memberChecklistItems
       });
     }
-  }, []);
 
-  useEffect(() => {
-    const checkTeamLeadStatus = async () => {
-      if (!supabase || !currentCodevId || !projectId) return;
+    statuses.sort((a, b) => {
+      if (a.allComplete !== b.allComplete) {
+        return a.allComplete ? 1 : -1;
+      }
+      return `${a.member.first_name} ${a.member.last_name}`.localeCompare(
+        `${b.member.first_name} ${b.member.last_name}`
+      );
+    });
 
-      const { data: projectMember } = await supabase
+    return statuses;
+
+  } catch (error) {
+    console.error("âŒ Error loading checklist:", error);
+    toast.error("Failed to load checklist items");
+    return [];
+  }
+};
+
+const MemberChecklist = ({
+  memberId,
+  projectId,
+  isTeamLead: _unusedProp,
+  viewMode = "profile",
+}: MemberChecklistProps) => {
+  const currentCodevId = useUserStore((s) => s.user?.id ?? null);
+  const queryClient = useQueryClient();
+  const supabase = getClientSupabase();
+
+  const { data: isCurrentUserTeamLead = false } = useQuery({
+    queryKey: ["myTeam", "teamLead", projectId, currentCodevId],
+    enabled: Boolean(currentCodevId && projectId),
+    staleTime: 5 * 60_000,
+    queryFn: async () => {
+      const { data } = await getClientSupabase()
         .from("project_members")
         .select("role")
         .eq("project_id", projectId)
         .eq("codev_id", currentCodevId)
         .single();
+      return data?.role === "team_leader";
+    },
+  });
 
-      setIsCurrentUserTeamLead(projectMember?.role === "team_leader");
-    };
-
-    checkTeamLeadStatus();
-  }, [supabase, currentCodevId, projectId]);
-
-  useEffect(() => {
-    if (supabase && currentCodevId && projectId) {
-      loadChecklistItems();
-    }
-  }, [supabase, currentCodevId, projectId, isCurrentUserTeamLead, memberId, viewMode]);
-
-  const loadChecklistItems = async () => {
-    if (!supabase || !projectId || !currentCodevId) return;
-    
-    setIsLoading(true);
-    try {
-      let membersToShow: string[] = [];
-      
-      if (viewMode === 'profile') {
-        membersToShow = [memberId];
-      } else if (viewMode === 'team') {
-        if (isCurrentUserTeamLead) {
-          const { data: projectMembers, error: membersError } = await supabase
-            .from("project_members")
-            .select("codev_id")
-            .eq("project_id", projectId);
-
-          if (membersError) throw membersError;
-          
-          membersToShow = projectMembers
-            ?.map((pm: any) => pm.codev_id)
-            .filter((id: string) => id != null && id !== undefined && id !== '') || [];
-        } else {
-          membersToShow = [currentCodevId];
-        }
-      }
-
-      if (membersToShow.length === 0) {
-        setMemberStatuses([]);
-        setIsLoading(false);
-        return;
-      }
-
-      const { data: allChecklistItems, error: checklistError } = await supabase
-        .from("member_checklists")
-        .select("*")
-        .eq("project_id", projectId)
-        .order("created_at", { ascending: true });
-
-      if (checklistError) throw checklistError;
-
-      const uniqueTitlesMap = new Map();
-      allChecklistItems?.forEach((item: ChecklistItem) => {
-        const existing = uniqueTitlesMap.get(item.title);
-        
-        if (!existing) {
-          uniqueTitlesMap.set(item.title, {
-            title: item.title,
-            description: item.description,
-            target_role: parseTargetRole(item.description),
-            priority: item.priority,
-            due_date: item.due_date,
-            created_by: item.created_by,
-            created_at: item.created_at
-          });
-        } else {
-          const updatedItem = { ...existing };
-          
-          if (item.description && !existing.description) {
-            updatedItem.description = item.description;
-            updatedItem.target_role = parseTargetRole(item.description);
-          }
-          
-          if (new Date(item.created_at) < new Date(existing.created_at)) {
-            updatedItem.created_at = item.created_at;
-            updatedItem.created_by = item.created_by;
-          }
-          
-          uniqueTitlesMap.set(item.title, updatedItem);
-        }
-      });
-      
-      const uniqueTitles = Array.from(uniqueTitlesMap.values());
-
-      const { data: memberDetails, error: memberDetailsError } = await supabase
-        .from("codev")
-        .select("id, first_name, last_name, email_address, image_url, display_position")
-        .in("id", membersToShow);
-
-      if (memberDetailsError) throw memberDetailsError;
-
-      const statuses: MemberChecklistStatus[] = [];
-      
-      for (const member of (memberDetails || [])) {
-        const memberItems = allChecklistItems?.filter(
-          (item: ChecklistItem) => item.member_id === member.id
-        ) || [];
-
-        const memberChecklistItems: ChecklistItem[] = [];
-        
-        for (const templateItem of uniqueTitles) {
-          // Skip items targeted to a different role than this member's
-          if (templateItem.target_role && member.display_position !== templateItem.target_role) {
-            continue;
-          }
-
-          const existingItem = memberItems.find(
-            (item: ChecklistItem) => item.title === templateItem.title
-          );
-
-          if (existingItem) {
-            memberChecklistItems.push(existingItem);
-          } else {
-            memberChecklistItems.push({
-              id: `placeholder-${member.id}-${templateItem.title}`,
-              member_id: member.id,
-              project_id: projectId,
-              title: templateItem.title,
-              description: templateItem.description,
-              priority: templateItem.priority,
-              completed: false,
-              created_by: templateItem.created_by,
-              due_date: templateItem.due_date,
-              created_at: templateItem.created_at,
-              updated_at: templateItem.created_at,
-              isPlaceholder: true
-            });
-          }
-        }
-
-        const completedCount = memberChecklistItems.filter(item => item.completed).length;
-        const memberTotalCount = memberChecklistItems.length;
-
-        statuses.push({
-          member,
-          completedCount,
-          totalCount: memberTotalCount,
-          allComplete: completedCount === memberTotalCount && memberTotalCount > 0,
-          checklistItems: memberChecklistItems
-        });
-      }
-
-      statuses.sort((a, b) => {
-        if (a.allComplete !== b.allComplete) {
-          return a.allComplete ? 1 : -1;
-        }
-        return `${a.member.first_name} ${a.member.last_name}`.localeCompare(
-          `${b.member.first_name} ${b.member.last_name}`
-        );
-      });
-
-      setMemberStatuses(statuses);
-
-    } catch (error) {
-      console.error("❌ Error loading checklist:", error);
-      toast.error("Failed to load checklist items");
-      setMemberStatuses([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { data: memberStatuses = [], isPending: isLoading } = useQuery({
+    queryKey: [
+      "myTeam",
+      "checklist",
+      projectId,
+      memberId,
+      viewMode,
+      currentCodevId,
+      isCurrentUserTeamLead,
+    ],
+    enabled: Boolean(currentCodevId && projectId),
+    queryFn: () =>
+      loadChecklistItems({
+        projectId,
+        memberId,
+        viewMode,
+        currentCodevId: currentCodevId as string,
+        isCurrentUserTeamLead,
+      }),
+  });
 
   const toggleComplete = async (
     memberStatus: MemberChecklistStatus,
@@ -317,26 +317,7 @@ const MemberChecklist = ({
           return;
         }
 
-        setMemberStatuses(prev =>
-          prev.map(ms => {
-            if (ms.member.id === targetMemberId) {
-              const updatedItems = ms.checklistItems.map(i =>
-                i.title === itemTitle 
-                  ? { ...newItem, isPlaceholder: false } 
-                  : i
-              );
-              const completedCount = updatedItems.filter(i => i.completed).length;
-              return {
-                ...ms,
-                checklistItems: updatedItems,
-                completedCount,
-                allComplete: completedCount === ms.totalCount && ms.totalCount > 0
-              };
-            }
-            return ms;
-          })
-        );
-
+        await queryClient.invalidateQueries({ queryKey: ["myTeam", "checklist"] });
         toast.success(`${itemTitle} marked as ${newStatus ? 'completed' : 'incomplete'}`);
         return;
       }
@@ -355,26 +336,8 @@ const MemberChecklist = ({
         toast.error("Failed to update checklist");
         return;
       }
-      
-      setMemberStatuses(prev =>
-        prev.map(ms => {
-          if (ms.member.id === targetMemberId) {
-            const updatedItems = ms.checklistItems.map(item =>
-              item.id === itemId 
-                ? { ...item, completed: newStatus } 
-                : item
-            );
-            const completedCount = updatedItems.filter(i => i.completed).length;
-            return {
-              ...ms,
-              checklistItems: updatedItems,
-              completedCount,
-              allComplete: completedCount === ms.totalCount && ms.totalCount > 0
-            };
-          }
-          return ms;
-        })
-      );
+
+      await queryClient.invalidateQueries({ queryKey: ["myTeam", "checklist"] });
 
       toast.success(`${itemTitle} marked as ${newStatus ? 'completed' : 'incomplete'}`);
 

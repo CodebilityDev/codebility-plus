@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { ChevronDown, ChevronUp, AlertCircle, CheckCircle, User } from "lucide-react";
 import { SimpleMemberData } from "@/actions/projects/actions";
-import { createClientClientComponent } from "@/utils/supabase/client";
+import { getClientSupabase } from "@/utils/supabase/client";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 /**
  * ChecklistStatusBanner - COMPLETE FIX FOR MISSING MEMBERS
@@ -35,92 +36,69 @@ interface MemberChecklistStatus {
   pendingItems: number;
 }
 
+const loadChecklistStatuses = async (
+  projectId: string,
+  allMembers: { id: string; first_name: string; last_name: string }[],
+): Promise<MemberChecklistStatus[]> => {
+  const supabase = getClientSupabase();
+
+  const { data: checklistData, error } = await supabase
+    .from("member_checklists")
+    .select("member_id, title, completed")
+    .eq("project_id", projectId);
+
+  if (error) {
+    if (process.env.NODE_ENV === "development") {
+      console.error("Banner - Error loading checklist data:", error);
+    }
+    return [];
+  }
+
+  const statusMap: { [key: string]: MemberChecklistStatus } = {};
+
+  allMembers.forEach((member) => {
+    const memberItems =
+      checklistData?.filter((item) => item.member_id === member.id) || [];
+    const completedCount = memberItems.filter((item) => item.completed).length;
+
+    statusMap[member.id] = {
+      memberId: member.id,
+      memberName: `${member.first_name} ${member.last_name}`,
+      totalItems: memberItems.length,
+      completedItems: completedCount,
+      pendingItems: memberItems.length - completedCount,
+    };
+  });
+
+  return Object.values(statusMap).sort((a, b) => {
+    if (a.pendingItems !== b.pendingItems) {
+      return b.pendingItems - a.pendingItems;
+    }
+    return a.memberName.localeCompare(b.memberName);
+  });
+};
+
 const ChecklistStatusBanner = ({
   projectId,
   teamMembers = [],
   teamLead = null,
 }: ChecklistStatusBannerProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [memberStatuses, setMemberStatuses] = useState<MemberChecklistStatus[]>([]);
-
-  useEffect(() => {
-    if (projectId) {
-      loadChecklistStatuses();
-    }
-  }, [projectId, teamMembers.length, teamLead?.id]);
+  const queryClient = useQueryClient();
 
   const allMembers = teamLead ? [teamLead, ...teamMembers] : teamMembers;
 
-  const loadChecklistStatuses = async () => {
-    setIsLoading(true);
-    const supabase = createClientClientComponent();
-
-    if (!supabase) {
-      // Only log in development
-      if (process.env.NODE_ENV === 'development') {
-        console.error("Failed to initialize Supabase client");
-      }
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-
-      // Get all checklist items for this project
-      const { data: checklistData, error } = await supabase
-        .from("member_checklists")
-        .select("member_id, title, completed")
-        .eq("project_id", projectId);
-
-      if (error) {
-        // Only log errors in development
-        if (process.env.NODE_ENV === 'development') {
-          console.error("❌ Banner - Error loading checklist data:", error);
-        }
-        return;
-      }
-
-      // 🔧 CRITICAL FIX: Create status for ALL members, not just those with items
-      const statusMap: { [key: string]: MemberChecklistStatus } = {};
-
-      allMembers.forEach(member => {
-        const memberItems = checklistData?.filter(item => item.member_id === member.id) || [];
-        const completedCount = memberItems.filter(item => item.completed).length;
-
-        // Create status entry for EVERY member, even if they have 0 items
-        statusMap[member.id] = {
-          memberId: member.id,
-          memberName: `${member.first_name} ${member.last_name}`,
-          totalItems: memberItems.length,
-          completedItems: completedCount,
-          pendingItems: memberItems.length - completedCount
-        };
-
-      });
-
-      // 🔧 CRITICAL FIX: Don't filter out members with 0 items
-      // Show ALL members so the count is accurate (10/10 instead of 7/9)
-      const statusArray = Object.values(statusMap)
-        .sort((a, b) => {
-          // Sort by: pending items (desc), then by name
-          if (a.pendingItems !== b.pendingItems) {
-            return b.pendingItems - a.pendingItems;
-          }
-          return a.memberName.localeCompare(b.memberName);
-        });
-
-      setMemberStatuses(statusArray);
-      
-    } catch (error) {
-      // Only log errors in development
-      if (process.env.NODE_ENV === 'development') {
-        console.error("❌ Banner - Error loading checklist statuses:", error);
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { data: memberStatuses = [], isPending: isLoading } = useQuery({
+    queryKey: [
+      "myTeam",
+      "checklistStatuses",
+      projectId,
+      allMembers.map((m) => m.id).join(","),
+    ],
+    enabled: Boolean(projectId),
+    staleTime: 60_000,
+    queryFn: () => loadChecklistStatuses(projectId, allMembers),
+  });
 
   // Calculate summary stats
   const membersWithPending = memberStatuses.filter(s => s.pendingItems > 0).length;
@@ -263,7 +241,9 @@ const ChecklistStatusBanner = ({
           }`}>
             <button
               onClick={() => {
-                loadChecklistStatuses();
+                queryClient.invalidateQueries({
+                  queryKey: ["myTeam", "checklistStatuses"],
+                });
               }}
               className={`text-xs font-medium ${
                 membersWithPending > 0

@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { AlertTriangle, X } from "lucide-react";
 import { Button } from "@codevs/ui/button";
+import { useQuery } from "@tanstack/react-query";
 import { getAttendanceWarningStatus } from "@/actions/my-team/attendance-warnings";
 
 interface AttendanceWarningBannerProps {
@@ -11,38 +12,32 @@ interface AttendanceWarningBannerProps {
 }
 
 export default function AttendanceWarningBanner({ projectId, isTeamLead }: AttendanceWarningBannerProps) {
-  const [warningData, setWarningData] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [isVisible, setIsVisible] = useState(true);
 
-  useEffect(() => {
-    const loadWarnings = async () => {
-      if (!isTeamLead) {
-        setIsLoading(false);
-        return;
+  // The month is part of the key: it changes which absences are counted, so a
+  // key without it would serve last month's warnings.
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+
+  const { data: warningData } = useQuery({
+    queryKey: ["myTeam", "attendanceWarnings", projectId, year, month],
+    enabled: isTeamLead,
+    staleTime: 60_000,
+    queryFn: async () => {
+      const result = await getAttendanceWarningStatus(projectId, year, month);
+      if (!result.success || (result.summary?.membersWithWarnings ?? 0) === 0) {
+        return null;
       }
+      return result;
+    },
+  });
 
-      const currentDate = new Date();
-      const result = await getAttendanceWarningStatus(
-        projectId,
-        currentDate.getFullYear(),
-        currentDate.getMonth()
-      );
-
-      if (result.success && (result.summary?.membersWithWarnings ?? 0) > 0) {
-        setWarningData(result);
-      }
-      setIsLoading(false);
-    };
-
-    loadWarnings();
-  }, [projectId, isTeamLead]);
-
-  if (!isTeamLead || isLoading || !warningData || !isVisible) {
+  if (!isTeamLead || !warningData || !isVisible) {
     return null;
   }
 
-  const { summary, data } = warningData;
+  const { summary, data } = warningData as { summary: any; data: any[] };
   const membersWithWarnings = data.filter((m: any) => m.hasWarning);
 
   return (

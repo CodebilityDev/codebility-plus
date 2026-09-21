@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import Input from "@/components/ui/forms/input";
 import toast from "react-hot-toast";
-import { createClientClientComponent } from "@/utils/supabase/client";
+import { createClientClientComponent, getClientSupabase } from "@/utils/supabase/client";
+import { useQuery } from "@tanstack/react-query";
+import { useUserStore } from "@/store/codev-store";
 import { SimpleMemberData, getMembers, getTeamLead } from "@/actions/projects/actions";
 
 /**
@@ -46,18 +48,10 @@ const ChecklistManageModal = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
-  const [supabase, setSupabase] = useState<any>(null);
-  
-  // Fresh member data (fetched internally)
-  const [freshTeamLead, setFreshTeamLead] = useState<SimpleMemberData | null>(null);
-  const [freshTeamMembers, setFreshTeamMembers] = useState<SimpleMemberData[]>([]);
-  const [freshTeamLeadId, setFreshTeamLeadId] = useState<string>("");
-  const [isFetchingMembers, setIsFetchingMembers] = useState(false);
-  
+
   // Self-contained auth
-  const [currentCodevId, setCurrentCodevId] = useState<string | null>(null);
-  const [isTeamLead, setIsTeamLead] = useState(false);
-  const [authChecked, setAuthChecked] = useState(false);
+  const currentCodevId = useUserStore((s) => s.user?.id ?? null);
+  const supabase = getClientSupabase();
 
   // Delete confirmation dialog state
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -82,61 +76,29 @@ const ChecklistManageModal = ({
   const makeDescription = (role: string): string | null =>
     role.trim() ? JSON.stringify({ target_role: role.trim() }) : null;
 
-  // Initialize Supabase
-  useEffect(() => {
-    const client = createClientClientComponent();
-    setSupabase(client);
-  }, []);
+  // Fresh member data when the modal opens (C3): the roster is only needed
+  // once a manager opens this dialog, so it is not fetched on page load.
+  const { data: freshData, isPending: isFetchingMembers } = useQuery({
+    queryKey: ["myTeam", "checklistManageMembers", projectId],
+    enabled: Boolean(isOpen && projectId),
+    staleTime: 60_000,
+    queryFn: async () => {
+      const [teamLeadResult, membersResult] = await Promise.all([
+        getTeamLead(projectId),
+        getMembers(projectId),
+      ]);
+      return {
+        teamLead: teamLeadResult.data ?? null,
+        members: membersResult.data ?? [],
+      };
+    },
+  });
 
-  // Fetch fresh member data when modal opens
-  useEffect(() => {
-    if (isOpen && projectId) {
-      fetchFreshMemberData();
-    }
-  }, [isOpen, projectId]);
-
-  // Fetch fresh member data from database
-  const fetchFreshMemberData = async () => {
-    setIsFetchingMembers(true);
-    
-    try {
-      const teamLeadResult = await getTeamLead(projectId);
-      if (teamLeadResult.data) {
-        setFreshTeamLead(teamLeadResult.data);
-        setFreshTeamLeadId(teamLeadResult.data.id);
-      }
-
-      const membersResult = await getMembers(projectId);
-      if (membersResult.data) {
-        setFreshTeamMembers(membersResult.data);
-      }
-    } catch (error) {
-      toast.error("Failed to load team members");
-    } finally {
-      setIsFetchingMembers(false);
-    }
-  };
-
-  // Get current user and check auth
-  useEffect(() => {
-    if (!supabase || !freshTeamLeadId) return;
-
-    supabase.auth.getSession().then(async ({ data: { session } }: any) => {
-      if (session?.user?.email) {
-        const { data: codevData } = await supabase
-          .from("codev")
-          .select("id")
-          .eq("email_address", session.user.email)
-          .single();
-        
-        if (codevData) {
-          setCurrentCodevId(codevData.id);
-          setIsTeamLead(codevData.id === freshTeamLeadId);
-        }
-      }
-      setAuthChecked(true);
-    });
-  }, [supabase, freshTeamLeadId]);
+  const freshTeamLead = freshData?.teamLead ?? null;
+  const freshTeamLeadId = freshTeamLead?.id ?? "";
+  const freshTeamMembers = freshData?.members ?? [];
+  const isTeamLead = Boolean(currentCodevId && currentCodevId === freshTeamLeadId);
+  const authChecked = currentCodevId !== null;
 
   // All team members including lead (deduped)
   const allMembersWithData = useMemo((): SimpleMemberData[] => {

@@ -4,7 +4,9 @@
 import { useState, useEffect } from "react";
 import { Star, Loader2, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { createClientClientComponent } from "@/utils/supabase/client";
+import { createClientClientComponent, getClientSupabase } from "@/utils/supabase/client";
+import { useQuery } from "@tanstack/react-query";
+import { useUserStore } from "@/store/codev-store";
 import toast from "react-hot-toast";
 
 // Define the 5 performance criteria with icons
@@ -40,11 +42,8 @@ interface MemberRatingProps {
 }
  
 const MemberRating = ({ memberId, projectId }: MemberRatingProps) => {
-  // Supabase client and user state
-  const [supabase, setSupabase] = useState<any>(null);
-  const [currentCodevId, setCurrentCodevId] = useState<string | null>(null); // Changed from currentUserId
-  const [isTeamLead, setIsTeamLead] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const currentCodevId = useUserStore((s) => s.user?.id ?? null);
+  const supabase = getClientSupabase();
   const [isSaving, setIsSaving] = useState(false);
   
   // Rating state - default to 0 for all criteria
@@ -59,88 +58,51 @@ const MemberRating = ({ memberId, projectId }: MemberRatingProps) => {
   const [feedback, setFeedback] = useState("");
   const [existingRatingId, setExistingRatingId] = useState<string | null>(null);
 
-  // Initialize Supabase client and get current user's codev_id
+  // One query replaces the session lookup, the permission check and the rating
+  // load; its key carries every input that changes the result.
+  const { data, isPending: isLoading } = useQuery({
+    queryKey: ["myTeam", "rating", projectId, memberId, currentCodevId],
+    enabled: Boolean(currentCodevId && projectId),
+    staleTime: 60_000,
+    queryFn: async () => {
+      const { data: projectMember } = await supabase
+        .from("project_members")
+        .select("role")
+        .eq("project_id", projectId)
+        .eq("codev_id", currentCodevId)
+        .single();
+
+      const { data: existingRatings } = await supabase
+        .from("member_ratings")
+        .select("*")
+        .eq("member_id", memberId)
+        .eq("project_id", projectId)
+        .order("updated_at", { ascending: false })
+        .limit(1);
+
+      return {
+        isTeamLead: projectMember?.role === "team_leader",
+        rating: existingRatings?.[0] ?? null,
+      };
+    },
+  });
+
+  const isTeamLead = data?.isTeamLead ?? false;
+
+  // The fetched rating seeds the editable form; the form then owns it locally.
+  const rating = data?.rating ?? null;
   useEffect(() => {
-    const client = createClientClientComponent();
-    setSupabase(client);
-    
-    if (client) {
-      // Get current user session and map to codev_id
-      client.auth.getSession().then(async ({ data: { session } }) => {
-        
-        if (session?.user?.email) {
-          // Map auth user email to codev_id
-          const { data: codevData, error } = await client
-            .from("codev")
-            .select("id")
-            .eq("email_address", session.user.email)
-            .single();
-          
-          if (codevData) {
-            setCurrentCodevId(codevData.id);
-          }
-        }
-      });
-    }
-  }, []);
-
-  // Check if current user is team lead and load existing ratings
-  useEffect(() => {
-    if (!supabase || !currentCodevId || !projectId) {
-      return;
-    }
-
-    const checkPermissionsAndLoadRatings = async () => {
-      setIsLoading(true);
-      
-      try {
-        
-        // Check if current user is team lead for this project
-        const { data: projectMember, error: roleError } = await supabase
-          .from("project_members")
-          .select("role")
-          .eq("project_id", projectId)
-          .eq("codev_id", currentCodevId) // Now using correct codev_id
-          .single();
-
-        const isLead = projectMember?.role === "team_leader";
-        setIsTeamLead(isLead);
-        
-        const { data: existingRatings, error: ratingError } = await supabase
-          .from("member_ratings")
-          .select("*")
-          .eq("member_id", memberId)
-          .eq("project_id", projectId)
-          .order("updated_at", { ascending: false })
-          .limit(1);
-
-        if (existingRatings && existingRatings.length > 0) {
-          const rating = existingRatings[0];
-          
-          // Load existing ratings into state
-          setRatings({
-            punctuality: rating.punctuality || 0,
-            accountability: rating.accountability || 0,
-            responsiveness: rating.responsiveness || 0,
-            initiative: rating.initiative || 0,
-            reliability: rating.reliability || 0,
-          });
-          setFeedback(rating.feedback || "");
-          
-          // Only set existingRatingId if current user is the one who rated
-          if (rating.rated_by === currentCodevId) {
-            setExistingRatingId(rating.id);
-          }
-        }
-      } catch (error) {
-        // Error checking permissions
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkPermissionsAndLoadRatings();
-  }, [supabase, currentCodevId, projectId, memberId]);
+    if (!rating) return;
+    setRatings({
+      punctuality: rating.punctuality || 0,
+      accountability: rating.accountability || 0,
+      responsiveness: rating.responsiveness || 0,
+      initiative: rating.initiative || 0,
+      reliability: rating.reliability || 0,
+    });
+    setFeedback(rating.feedback || "");
+    setExistingRatingId(rating.rated_by === currentCodevId ? rating.id : null);
+  }, [rating, currentCodevId]);
 
   // Calculate overall performance (average of all criteria)
   const calculateOverall = (): number => {
