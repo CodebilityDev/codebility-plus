@@ -111,6 +111,11 @@ async function ProfileComponent() {
             <About data={codevData} />
             <ContactInfo
               data={{
+                // Without id these components' points lookups short-circuit on
+                // `if (!data.id) return`, so their "earn points" badges never
+                // reflected reality. The shared points cache means passing it
+                // adds no extra request.
+                id: user.id,
                 facebook: user.facebook,
                 linkedin: user.linkedin,
                 github: user.github,
@@ -123,9 +128,10 @@ async function ProfileComponent() {
             <Experience data={workExperience || []} codevId={user.id} />
           </div>
           <div className="flex w-full basis-[30%] flex-col gap-8 2xl:basis-[40%]">
-            <Photo data={{ image_url: user.image_url || null }} />
+            <Photo data={{ id: user.id, image_url: user.image_url || null }} />
             <Skills
               data={{
+                id: user.id,
                 tech_stacks: user.tech_stacks,
                 level: user.level,
               }}
