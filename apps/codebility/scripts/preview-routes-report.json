@@ -1,0 +1,767 @@
+{
+  "base": "https://codebility-plus-codebility-portal-22ly08bdz-zeff01s-projects.vercel.app",
+  "report": [
+    {
+      "route": "/home",
+      "finalUrl": "/home",
+      "redirected": false,
+      "ms": 47381,
+      "firstContentMs": 5116,
+      "sawSkeleton": true,
+      "actions": 1,
+      "duplicatePage1Fetches": 0,
+      "duplicateBodies": [],
+      "prefetches": 11,
+      "state": {
+        "len": 2736,
+        "skeletons": 3,
+        "rows": 10,
+        "cards": 0,
+        "errText": null,
+        "head": "7 David Tribugenia david.estrelloso.tribugenia@gmail.com Open user men"
+      },
+      "pageErrors": [],
+      "consoleErrors": []
+    },
+    {
+      "route": "/home/account-settings",
+      "finalUrl": "/home/account-settings",
+      "redirected": false,
+      "ms": 45575,
+      "firstContentMs": 3429,
+      "sawSkeleton": false,
+      "actions": 2,
+      "duplicatePage1Fetches": 0,
+      "duplicateBodies": [],
+      "prefetches": 17,
+      "state": {
+        "len": 1047,
+        "skeletons": 0,
+        "rows": 0,
+        "cards": 0,
+        "errText": null,
+        "head": "7 David Tribugenia david.estrelloso.tribugenia@gmail.com Open user men"
+      },
+      "pageErrors": [],
+      "consoleErrors": []
+    },
+    {
+      "route": "/home/admin-controls",
+      "finalUrl": "/home/admin-controls",
+      "redirected": false,
+      "ms": 46431,
+      "firstContentMs": 4282,
+      "sawSkeleton": false,
+      "actions": 1,
+      "duplicatePage1Fetches": 0,
+      "duplicateBodies": [],
+      "prefetches": 19,
+      "state": {
+        "len": 817,
+        "skeletons": 0,
+        "rows": 0,
+        "cards": 0,
+        "errText": null,
+        "head": "7 David Tribugenia david.estrelloso.tribugenia@gmail.com Open user men"
+      },
+      "pageErrors": [],
+      "consoleErrors": []
+    },
+    {
+      "route": "/home/admin-controls/appointments",
+      "finalUrl": "/home/admin-controls/appointments",
+      "redirected": false,
+      "ms": 52535,
+      "firstContentMs": 10337,
+      "sawSkeleton": false,
+      "actions": 1,
+      "duplicatePage1Fetches": 0,
+      "duplicateBodies": [],
+      "prefetches": 17,
+      "state": {
+        "len": 1030,
+        "skeletons": 0,
+        "rows": 5,
+        "cards": 0,
+        "errText": null,
+        "head": "7 David Tribugenia david.estrelloso.tribugenia@gmail.com Open user men"
+      },
+      "pageErrors": [],
+      "consoleErrors": []
+    },
+    {
+      "route": "/home/admin-controls/client-tracker",
+      "finalUrl": "/home/admin-controls/client-tracker",
+      "redirected": false,
+      "ms": 48527,
+      "firstContentMs": 9970,
+      "sawSkeleton": true,
+      "actions": 2,
+      "duplicatePage1Fetches": 0,
+      "duplicateBodies": [],
+      "prefetches": 12,
+      "state": {
+        "len": 1436,
+        "skeletons": 0,
+        "rows": 17,
+        "cards": 0,
+        "errText": null,
+        "head": "7 David Tribugenia david.estrelloso.tribugenia@gmail.com Open user men"
+      },
+      "pageErrors": [],
+      "consoleErrors": []
+    },
+    {
+      "route": "/home/admin-controls/ticket-support",
+      "finalUrl": "/home/admin-controls/ticket-support",
+      "redirected": false,
+      "ms": 47010,
+      "firstContentMs": 4780,
+      "sawSkeleton": false,
+      "actions": 1,
+      "duplicatePage1Fetches": 0,
+      "duplicateBodies": [],
+      "prefetches": 17,
+      "state": {
+        "len": 576,
+        "skeletons": 0,
+        "rows": 1,
+        "cards": 0,
+        "errText": null,
+        "head": "7 David Tribugenia david.estrelloso.tribugenia@gmail.com Open user men"
+      },
+      "pageErrors": [],
+      "consoleErrors": []
+    },
+    {
+      "route": "/home/admin-dashboard",
+      "finalUrl": "/home/admin-dashboard",
+      "redirected": false,
+      "ms": 45113,
+      "firstContentMs": 2957,
+      "sawSkeleton": false,
+      "actions": 1,
+      "duplicatePage1Fetches": 0,
+      "duplicateBodies": [],
+      "prefetches": 16,
+      "state": {
+        "len": 1358,
+        "skeletons": 0,
+        "rows": 0,
+        "cards": 0,
+        "errText": null,
+        "head": "7 David Tribugenia david.estrelloso.tribugenia@gmail.com Open user men"
+      },
+      "pageErrors": [],
+      "consoleErrors": []
+    },
+    {
+      "route": "/home/applicants",
+      "finalUrl": "/home/applicants",
+      "redirected": false,
+      "ms": 47495,
+      "firstContentMs": 5029,
+      "sawSkeleton": false,
+      "actions": 2,
+      "duplicatePage1Fetches": 1,
+      "duplicateBodies": [
+        "[{\"status\":\"applying\",\"page\":1,\"search\":\"$undefined\"}]"
+      ],
+      "prefetches": 16,
+      "state": {
+        "len": 663,
+        "skeletons": 0,
+        "rows": 4,
+        "cards": 0,
+        "errText": null,
+        "head": "7 David Tribugenia david.estrelloso.tribugenia@gmail.com Open user men"
+      },
+      "pageErrors": [],
+      "consoleErrors": []
+    },
+    {
+      "route": "/home/certificate-preview",
+      "finalUrl": "/home/certificate-preview",
+      "redirected": false,
+      "ms": 46209,
+      "firstContentMs": 3874,
+      "sawSkeleton": false,
+      "actions": 1,
+      "duplicatePage1Fetches": 0,
+      "duplicateBodies": [],
+      "prefetches": 17,
+      "state": {
+        "len": 11572,
+        "skeletons": 0,
+        "rows": 0,
+        "cards": 0,
+        "errText": null,
+        "head": "7 David Tribugenia david.estrelloso.tribugenia@gmail.com Open user men"
+      },
+      "pageErrors": [],
+      "consoleErrors": []
+    },
+    {
+      "route": "/home/clients",
+      "finalUrl": "/home/clients",
+      "redirected": false,
+      "ms": 46227,
+      "firstContentMs": 4031,
+      "sawSkeleton": false,
+      "actions": 2,
+      "duplicatePage1Fetches": 1,
+      "duplicateBodies": [
+        "[{\"page\":1,\"pageSize\":12}]"
+      ],
+      "prefetches": 11,
+      "state": {
+        "len": 1045,
+        "skeletons": 0,
+        "rows": 0,
+        "cards": 1,
+        "errText": null,
+        "head": "7 David Tribugenia david.estrelloso.tribugenia@gmail.com Open user men"
+      },
+      "pageErrors": [],
+      "consoleErrors": []
+    },
+    {
+      "route": "/home/feeds",
+      "finalUrl": "/home/feeds",
+      "redirected": false,
+      "ms": 46403,
+      "firstContentMs": 4182,
+      "sawSkeleton": true,
+      "actions": 1,
+      "duplicatePage1Fetches": 0,
+      "duplicateBodies": [],
+      "prefetches": 11,
+      "state": {
+        "len": 875,
+        "skeletons": 0,
+        "rows": 0,
+        "cards": 0,
+        "errText": null,
+        "head": "7 David Tribugenia david.estrelloso.tribugenia@gmail.com Open user men"
+      },
+      "pageErrors": [],
+      "consoleErrors": []
+    },
+    {
+      "route": "/home/hire",
+      "finalUrl": "/home/hire",
+      "redirected": false,
+      "ms": 46652,
+      "firstContentMs": 4540,
+      "sawSkeleton": true,
+      "actions": 1,
+      "duplicatePage1Fetches": 0,
+      "duplicateBodies": [],
+      "prefetches": 12,
+      "state": {
+        "len": 1650,
+        "skeletons": 0,
+        "rows": 8,
+        "cards": 0,
+        "errText": null,
+        "head": "7 David Tribugenia david.estrelloso.tribugenia@gmail.com Open user men"
+      },
+      "pageErrors": [],
+      "consoleErrors": []
+    },
+    {
+      "route": "/home/in-house",
+      "finalUrl": "/home/in-house",
+      "redirected": false,
+      "ms": 46060,
+      "firstContentMs": 3782,
+      "sawSkeleton": false,
+      "actions": 2,
+      "duplicatePage1Fetches": 1,
+      "duplicateBodies": [
+        "[{\"page\":1,\"pageSize\":10,\"filters\":{\"application_status\":\"passed\",\"internal_status\":\"$unde"
+      ],
+      "prefetches": 16,
+      "state": {
+        "len": 1424,
+        "skeletons": 0,
+        "rows": 10,
+        "cards": 0,
+        "errText": null,
+        "head": "7 David Tribugenia david.estrelloso.tribugenia@gmail.com Open user men"
+      },
+      "pageErrors": [],
+      "consoleErrors": []
+    },
+    {
+      "route": "/home/interns",
+      "finalUrl": "/home/interns",
+      "redirected": false,
+      "ms": 46046,
+      "firstContentMs": 3816,
+      "sawSkeleton": false,
+      "actions": 2,
+      "duplicatePage1Fetches": 1,
+      "duplicateBodies": [
+        "[{\"page\":1,\"pageSize\":30,\"filters\":{\"application_status\":\"passed\",\"availability_status\":tr"
+      ],
+      "prefetches": 16,
+      "state": {
+        "len": 4195,
+        "skeletons": 0,
+        "rows": 0,
+        "cards": 0,
+        "errText": null,
+        "head": "7 David Tribugenia david.estrelloso.tribugenia@gmail.com Open user men"
+      },
+      "pageErrors": [],
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 ()",
+        "Failed to load resource: the server responded with a status of 404 ()",
+        "Failed to load resource: the server responded with a status of 404 ()"
+      ]
+    },
+    {
+      "route": "/home/kanban",
+      "finalUrl": "/home/kanban",
+      "redirected": false,
+      "ms": 44964,
+      "firstContentMs": 2733,
+      "sawSkeleton": false,
+      "actions": 1,
+      "duplicatePage1Fetches": 0,
+      "duplicateBodies": [],
+      "prefetches": 18,
+      "state": {
+        "len": 956,
+        "skeletons": 0,
+        "rows": 38,
+        "cards": 0,
+        "errText": null,
+        "head": "7 David Tribugenia david.estrelloso.tribugenia@gmail.com Open user men"
+      },
+      "pageErrors": [],
+      "consoleErrors": []
+    },
+    {
+      "route": "/home/my-team",
+      "finalUrl": "/home/my-team",
+      "redirected": false,
+      "ms": 47458,
+      "firstContentMs": 5146,
+      "sawSkeleton": false,
+      "actions": 1,
+      "duplicatePage1Fetches": 0,
+      "duplicateBodies": [],
+      "prefetches": 17,
+      "state": {
+        "len": 9505,
+        "skeletons": 0,
+        "rows": 0,
+        "cards": 0,
+        "errText": null,
+        "head": "7 David Tribugenia david.estrelloso.tribugenia@gmail.com Open user men"
+      },
+      "pageErrors": [],
+      "consoleErrors": []
+    },
+    {
+      "route": "/home/orgchart",
+      "finalUrl": "/home/orgchart",
+      "redirected": false,
+      "ms": 45646,
+      "firstContentMs": 3347,
+      "sawSkeleton": false,
+      "actions": 1,
+      "duplicatePage1Fetches": 0,
+      "duplicateBodies": [],
+      "prefetches": 17,
+      "state": {
+        "len": 635,
+        "skeletons": 0,
+        "rows": 0,
+        "cards": 0,
+        "errText": null,
+        "head": "7 David Tribugenia david.estrelloso.tribugenia@gmail.com Open user men"
+      },
+      "pageErrors": [],
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 ()"
+      ]
+    },
+    {
+      "route": "/home/overflow",
+      "finalUrl": "/home/overflow",
+      "redirected": false,
+      "ms": 47010,
+      "firstContentMs": 4880,
+      "sawSkeleton": true,
+      "actions": 2,
+      "duplicatePage1Fetches": 0,
+      "duplicateBodies": [],
+      "prefetches": 11,
+      "state": {
+        "len": 1936,
+        "skeletons": 0,
+        "rows": 0,
+        "cards": 0,
+        "errText": null,
+        "head": "7 David Tribugenia david.estrelloso.tribugenia@gmail.com Open user men"
+      },
+      "pageErrors": [],
+      "consoleErrors": []
+    },
+    {
+      "route": "/home/projects",
+      "finalUrl": "/home/projects",
+      "redirected": false,
+      "ms": 46448,
+      "firstContentMs": 4289,
+      "sawSkeleton": false,
+      "actions": 2,
+      "duplicatePage1Fetches": 1,
+      "duplicateBodies": [
+        "[{\"page\":1,\"pageSize\":12,\"categoryId\":\"$undefined\"}]"
+      ],
+      "prefetches": 16,
+      "state": {
+        "len": 6489,
+        "skeletons": 0,
+        "rows": 0,
+        "cards": 0,
+        "errText": null,
+        "head": "7 David Tribugenia david.estrelloso.tribugenia@gmail.com Open user men"
+      },
+      "pageErrors": [],
+      "consoleErrors": []
+    },
+    {
+      "route": "/home/promote-modal",
+      "finalUrl": "/home/promote-modal",
+      "redirected": false,
+      "ms": 45225,
+      "firstContentMs": 2822,
+      "sawSkeleton": false,
+      "actions": 1,
+      "duplicatePage1Fetches": 0,
+      "duplicateBodies": [],
+      "prefetches": 17,
+      "state": {
+        "len": 933,
+        "skeletons": 0,
+        "rows": 0,
+        "cards": 0,
+        "errText": null,
+        "head": "7 David Tribugenia david.estrelloso.tribugenia@gmail.com Open user men"
+      },
+      "pageErrors": [],
+      "consoleErrors": []
+    },
+    {
+      "route": "/home/settings",
+      "finalUrl": "/home/settings",
+      "redirected": false,
+      "ms": 46544,
+      "firstContentMs": null,
+      "sawSkeleton": false,
+      "actions": 1,
+      "duplicatePage1Fetches": 0,
+      "duplicateBodies": [],
+      "prefetches": 13,
+      "state": {
+        "len": 396,
+        "skeletons": 0,
+        "rows": 0,
+        "cards": 0,
+        "errText": null,
+        "head": "7 David Tribugenia david.estrelloso.tribugenia@gmail.com Open user men"
+      },
+      "pageErrors": [],
+      "consoleErrors": []
+    },
+    {
+      "route": "/home/settings/account-settings",
+      "finalUrl": "/home/settings/account-settings",
+      "redirected": false,
+      "ms": 45649,
+      "firstContentMs": 3448,
+      "sawSkeleton": false,
+      "actions": 2,
+      "duplicatePage1Fetches": 0,
+      "duplicateBodies": [],
+      "prefetches": 17,
+      "state": {
+        "len": 1047,
+        "skeletons": 0,
+        "rows": 0,
+        "cards": 0,
+        "errText": null,
+        "head": "7 David Tribugenia david.estrelloso.tribugenia@gmail.com Open user men"
+      },
+      "pageErrors": [],
+      "consoleErrors": []
+    },
+    {
+      "route": "/home/settings/news-banners",
+      "finalUrl": "/home/settings/news-banners",
+      "redirected": false,
+      "ms": 45775,
+      "firstContentMs": 3612,
+      "sawSkeleton": false,
+      "actions": 1,
+      "duplicatePage1Fetches": 0,
+      "duplicateBodies": [],
+      "prefetches": 17,
+      "state": {
+        "len": 1137,
+        "skeletons": 0,
+        "rows": 0,
+        "cards": 0,
+        "errText": null,
+        "head": "7 David Tribugenia david.estrelloso.tribugenia@gmail.com Open user men"
+      },
+      "pageErrors": [],
+      "consoleErrors": []
+    },
+    {
+      "route": "/home/settings/profile",
+      "finalUrl": "/home/settings/profile",
+      "redirected": false,
+      "ms": 48142,
+      "firstContentMs": 5830,
+      "sawSkeleton": true,
+      "actions": 1,
+      "duplicatePage1Fetches": 0,
+      "duplicateBodies": [],
+      "prefetches": 17,
+      "state": {
+        "len": 6507,
+        "skeletons": 0,
+        "rows": 0,
+        "cards": 0,
+        "errText": null,
+        "head": "7 David Tribugenia david.estrelloso.tribugenia@gmail.com Open user men"
+      },
+      "pageErrors": [],
+      "consoleErrors": []
+    },
+    {
+      "route": "/home/settings/services",
+      "finalUrl": "/home/settings/services",
+      "redirected": false,
+      "ms": 45745,
+      "firstContentMs": 3616,
+      "sawSkeleton": false,
+      "actions": 1,
+      "duplicatePage1Fetches": 0,
+      "duplicateBodies": [],
+      "prefetches": 17,
+      "state": {
+        "len": 2734,
+        "skeletons": 0,
+        "rows": 0,
+        "cards": 0,
+        "errText": null,
+        "head": "7 David Tribugenia david.estrelloso.tribugenia@gmail.com Open user men"
+      },
+      "pageErrors": [],
+      "consoleErrors": []
+    },
+    {
+      "route": "/home/settings/services/cms-diagnostic",
+      "finalUrl": "/home/settings/services/cms-diagnostic",
+      "redirected": false,
+      "ms": 46250,
+      "firstContentMs": 3790,
+      "sawSkeleton": false,
+      "actions": 1,
+      "duplicatePage1Fetches": 0,
+      "duplicateBodies": [],
+      "prefetches": 17,
+      "state": {
+        "len": 999,
+        "skeletons": 0,
+        "rows": 0,
+        "cards": 0,
+        "errText": null,
+        "head": "7 David Tribugenia david.estrelloso.tribugenia@gmail.com Open user men"
+      },
+      "pageErrors": [],
+      "consoleErrors": []
+    },
+    {
+      "route": "/home/settings/services/diagnostic",
+      "finalUrl": "/home/settings/services/diagnostic",
+      "redirected": false,
+      "ms": 45389,
+      "firstContentMs": 3139,
+      "sawSkeleton": false,
+      "actions": 1,
+      "duplicatePage1Fetches": 0,
+      "duplicateBodies": [],
+      "prefetches": 17,
+      "state": {
+        "len": 2251,
+        "skeletons": 0,
+        "rows": 0,
+        "cards": 0,
+        "errText": null,
+        "head": "7 David Tribugenia david.estrelloso.tribugenia@gmail.com Open user men"
+      },
+      "pageErrors": [],
+      "consoleErrors": []
+    },
+    {
+      "route": "/home/settings/surveys",
+      "finalUrl": "/home/settings/surveys",
+      "redirected": false,
+      "ms": 45551,
+      "firstContentMs": 3048,
+      "sawSkeleton": false,
+      "actions": 1,
+      "duplicatePage1Fetches": 0,
+      "duplicateBodies": [],
+      "prefetches": 17,
+      "state": {
+        "len": 587,
+        "skeletons": 0,
+        "rows": 0,
+        "cards": 0,
+        "errText": null,
+        "head": "7 David Tribugenia david.estrelloso.tribugenia@gmail.com Open user men"
+      },
+      "pageErrors": [],
+      "consoleErrors": []
+    },
+    {
+      "route": "/home/tasks",
+      "finalUrl": "/home/applicants",
+      "redirected": true,
+      "ms": 46868,
+      "firstContentMs": 4687,
+      "sawSkeleton": true,
+      "actions": 7,
+      "duplicatePage1Fetches": 5,
+      "duplicateBodies": [
+        "[{\"codevId\":\"70de3ce2-f686-4282-a917-b0bce29efcf8\",\"page\":1,\"pageSize\":9}]",
+        "[{\"page\":1,\"pageSize\":30,\"filters\":{\"application_status\":\"passed\",\"availability_status\":tr",
+        "[{\"status\":\"applying\",\"page\":1,\"search\":\"$undefined\"}]",
+        "[{\"page\":1,\"pageSize\":12}]",
+        "[{\"page\":1,\"pageSize\":12,\"categoryId\":\"$undefined\"}]"
+      ],
+      "prefetches": 86,
+      "state": {
+        "len": 667,
+        "skeletons": 0,
+        "rows": 4,
+        "cards": 0,
+        "errText": null,
+        "head": "7 David Tribugenia david.estrelloso.tribugenia@gmail.com Open user men"
+      },
+      "pageErrors": [
+        "Error: Minified React error #418; visit https://react.dev/errors/418?args[]=text&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings."
+      ],
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 ()",
+        "Failed to load resource: the server responded with a status of 404 ()",
+        "Failed to load resource: the server responded with a status of 404 ()"
+      ]
+    },
+    {
+      "route": "/home/test-meeting-notification",
+      "finalUrl": "/home",
+      "redirected": true,
+      "ms": 45890,
+      "firstContentMs": 3726,
+      "sawSkeleton": true,
+      "actions": 1,
+      "duplicatePage1Fetches": 0,
+      "duplicateBodies": [],
+      "prefetches": 39,
+      "state": {
+        "len": 2736,
+        "skeletons": 3,
+        "rows": 10,
+        "cards": 0,
+        "errText": null,
+        "head": "7 David Tribugenia david.estrelloso.tribugenia@gmail.com Open user men"
+      },
+      "pageErrors": [],
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 ()",
+        "Failed to load resource: the server responded with a status of 404 ()",
+        "Failed to load resource: the server responded with a status of 404 ()"
+      ]
+    },
+    {
+      "route": "/home/test-notifications",
+      "finalUrl": "/home/test-notifications",
+      "redirected": false,
+      "ms": 46785,
+      "firstContentMs": 4569,
+      "sawSkeleton": false,
+      "actions": 1,
+      "duplicatePage1Fetches": 0,
+      "duplicateBodies": [],
+      "prefetches": 17,
+      "state": {
+        "len": 2010,
+        "skeletons": 0,
+        "rows": 0,
+        "cards": 0,
+        "errText": null,
+        "head": "7 David Tribugenia david.estrelloso.tribugenia@gmail.com Open user men"
+      },
+      "pageErrors": [],
+      "consoleErrors": []
+    },
+    {
+      "route": "/home/ticket-support",
+      "finalUrl": "/home/ticket-support",
+      "redirected": false,
+      "ms": 46645,
+      "firstContentMs": 4395,
+      "sawSkeleton": false,
+      "actions": 1,
+      "duplicatePage1Fetches": 0,
+      "duplicateBodies": [],
+      "prefetches": 12,
+      "state": {
+        "len": 1386,
+        "skeletons": 0,
+        "rows": 0,
+        "cards": 0,
+        "errText": null,
+        "head": "7 David Tribugenia david.estrelloso.tribugenia@gmail.com Open user men"
+      },
+      "pageErrors": [],
+      "consoleErrors": []
+    },
+    {
+      "route": "/home/time-tracker",
+      "finalUrl": "/home/time-tracker",
+      "redirected": false,
+      "ms": 20266,
+      "firstContentMs": 17753,
+      "sawSkeleton": true,
+      "actions": 1,
+      "duplicatePage1Fetches": 0,
+      "duplicateBodies": [],
+      "prefetches": 17,
+      "state": {
+        "len": 455,
+        "skeletons": 0,
+        "rows": 0,
+        "cards": 0,
+        "errText": "rojects Hire Admin Controls Settings HELP Ticket Support ⏱️ Unable to load time logs We couldn't retrieve your time tracking data. Please check ",
+        "head": "7 David Tribugenia david.estrelloso.tribugenia@gmail.com Open user men"
+      },
+      "pageErrors": [],
+      "consoleErrors": [
+        "Error: An error occurred in the Server Components render. The specific message is omitted in production builds to avoid leaking sensitive details. A digest property is included on this error instance ",
+        "ErrorBoundary caught an error: Error: An error occurred in the Server Components render. The specific message is omitted in production builds to avoid leaking sensitive details. A digest property is i",
+        "Async Error: Error: An error occurred in the Server Components render. The specific message is omitted in production builds to avoid leaking sensitive details. A digest property is included on this er"
+      ]
+    }
+  ]
+}

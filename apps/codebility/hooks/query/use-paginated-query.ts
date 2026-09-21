@@ -27,13 +27,26 @@ export function usePaginatedQuery<T>(
   // and the table renders the unfiltered seed forever. Both sides must match.
   const seeded = initialDataKey !== undefined && hashKey(queryKey) === hashKey(initialDataKey);
 
-  return useQuery<Page<T>>({
+  // The seed's own server timestamp, not 0. `0` marks it instantly stale, which
+  // refetches page 1 on every load even though the server just rendered it. The
+  // filter case needs no special handling: a changed filter is a different key,
+  // gets no seed, and fetches because it has no data at all.
+  const seededAt = initialData?.fetchedAt ?? Date.now();
+
+  const query = useQuery<Page<T>>({
     queryKey,
     queryFn,
     placeholderData: keepPreviousData,
     staleTime: 60_000,
     gcTime: 5 * 60_000,
     ...rest,
-    ...(seeded ? { initialData, initialDataUpdatedAt: 0 } : {}),
+    ...(seeded ? { initialData, initialDataUpdatedAt: seededAt } : {}),
   });
+
+  // The rows on screen do not belong to the current key yet, so they are the
+  // wrong rows for what the user just asked for. `isPlaceholderData` covers that
+  // and `isPending` covers a cold key. `isFetching` is deliberately excluded: it
+  // is also true for a same-key background refetch, where the visible rows are
+  // correct and a skeleton would flash over good data.
+  return { ...query, showSkeleton: query.isPending || query.isPlaceholderData };
 }

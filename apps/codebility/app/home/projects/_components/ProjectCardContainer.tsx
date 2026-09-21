@@ -33,7 +33,7 @@ const ProjectCardContainer = ({ initialData }: ProjectCardContainerProps) => {
 
   const queryKey = qk.projects.list({ category: currentCategory, page });
 
-  const { data, isPending } = usePaginatedQuery<Project>(
+  const { data, showSkeleton } = usePaginatedQuery<Project>(
     queryKey,
     () =>
       getProjectsPageAction({
@@ -90,7 +90,7 @@ const ProjectCardContainer = ({ initialData }: ProjectCardContainerProps) => {
 
           {/* Projects Grid */}
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {isPending ? (
+            {showSkeleton ? (
               Array.from({ length: pageSize.projects }).map((_, i) => (
                 <div
                   key={i}

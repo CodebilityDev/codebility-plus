@@ -1,12 +1,13 @@
 "use client";
 
+import { MEMBER_LIST_COLUMNS, type MemberListRow } from "@/lib/shared/member-list";
 import { useState, useCallback } from "react";
 import { toast } from "react-hot-toast";
 import { 
   getMembers, 
   getTeamLead, 
   updateProjectMembers,
-  SimpleMemberData 
+  SimpleMemberData,
 } from "@/actions/projects/actions";
 import { Codev } from "@/types/home/codev";
 import { Button } from "@/components/ui/button";
@@ -49,7 +50,7 @@ const MyTeamView = ({ projectData }: MyTeamViewProps) => {
     setSelectedProject(null);
   }, []);
 
-  const handleUpdateMembers = async (selectedMembers: Codev[]) => {
+  const handleUpdateMembers = async (selectedMembers: MemberListRow[]) => {
     if (!selectedProject) {
       toast.error("No project selected");
       return;

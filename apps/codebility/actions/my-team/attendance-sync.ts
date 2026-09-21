@@ -1,4 +1,4 @@
-﻿"use server";
+"use server";
 
 import { revalidatePath } from "next/cache";
 
@@ -8,10 +8,11 @@ export async function syncAttendancePoints(codevId: string) {
   const supabase = await createClientServerComponent();
   
   try {
-    // Count all present/late days for this codev
-    const { data: attendanceRecords, error: attendanceError } = await supabase
+    // Count all present/late days for this codev. Only the count is used, so
+    // ask Postgres for the count and transfer no rows.
+    const { count: attendanceCount, error: attendanceError } = await supabase
       .from("attendance")
-      .select("*")
+      .select("id", { count: "exact", head: true })
       .eq("codev_id", codevId)
       .in("status", ["present", "late"]);
 
@@ -21,12 +22,12 @@ export async function syncAttendancePoints(codevId: string) {
     }
 
     // Calculate total points (2 points per day)
-    const totalPoints = (attendanceRecords?.length || 0) * 2;
+    const totalPoints = (attendanceCount || 0) * 2;
 
     // Update or insert attendance points
     const { data: existing } = await supabase
       .from("attendance_points")
-      .select("*")
+      .select("id")
       .eq("codev_id", codevId)
       .single();
 
@@ -66,7 +67,7 @@ export async function syncAttendancePoints(codevId: string) {
     return { 
       success: true, 
       data: result.data,
-      attendanceCount: attendanceRecords?.length || 0,
+      attendanceCount: attendanceCount || 0,
       totalPoints 
     };
   } catch (error) {

@@ -20,7 +20,7 @@ export const updateDeveloperLevels = async (codevId?: string) => {
   const levelPromises = pointsData.map(async (pointRecord) => {
     const { data: levelData, error: levelError } = await supabase
       .from("levels")
-      .select("*")
+      .select("level")
       .eq("skill_category_id", pointRecord.skill_category_id)
       .lte("min_points", pointRecord.points)
       .order("level", { ascending: false })

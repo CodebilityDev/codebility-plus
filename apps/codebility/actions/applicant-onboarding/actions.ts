@@ -9,7 +9,7 @@ export async function getOnboardingProgress(applicantId: string) {
 
     const { data, error } = await supabase
       .from("onboarding_videos")
-      .select("*")
+      .select("id, applicant_id, video_number, completed, completed_at")
       .eq("applicant_id", applicantId)
       .order("video_number", { ascending: true });
 
@@ -59,7 +59,7 @@ export async function updateVideoProgress({
     // Check if record exists
     const { data: existingRecord } = await supabase
       .from("onboarding_videos")
-      .select("*")
+      .select("id")
       .eq("applicant_id", applicantId)
       .eq("video_number", videoNumber)
       .single();

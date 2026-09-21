@@ -239,7 +239,7 @@ export async function getActiveBanners() {
     
     const { data, error } = await supabase
       .from("news_banners")
-      .select("*")
+      .select("id, title, message, type, image_url, is_active, priority, start_date, end_date, created_at")
       .eq("is_active", true)
       .or(`end_date.is.null,end_date.gte.${now}`)
       .lte("start_date", now)
@@ -279,7 +279,7 @@ export async function getAllBanners() {
     
     const { data, error } = await supabase
       .from("news_banners")
-      .select("*")
+      .select("id, title, message, type, image_url, is_active, priority, start_date, end_date, created_at")
       .order("priority", { ascending: false })
       .order("created_at", { ascending: false });
 

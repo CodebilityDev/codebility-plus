@@ -241,7 +241,7 @@ export async function getActiveSurveys() {
 
     const { data, error } = await supabase
       .from("surveys")
-      .select("*")
+      .select("id, title, description, type, image_url, target_audience, is_active, priority, start_date, end_date, created_at")
       .eq("is_active", true)
       .or(`end_date.is.null,end_date.gte.${now}`)
       .lte("start_date", now)
@@ -281,7 +281,7 @@ export async function getAllSurveys() {
 
     const { data, error } = await supabase
       .from("surveys")
-      .select("*")
+      .select("id, title, description, type, image_url, target_audience, is_active, priority, start_date, end_date, created_at")
       .order("priority", { ascending: false })
       .order("created_at", { ascending: false });
 
@@ -301,7 +301,7 @@ export async function getSurveyById(surveyId: string) {
 
     const { data, error } = await supabase
       .from("surveys")
-      .select("*")
+      .select("id, title, description, type, image_url, target_audience, is_active, priority, start_date, end_date, created_at")
       .eq("id", surveyId)
       .single();
 
@@ -455,7 +455,7 @@ export async function getPendingSurveyForUser() {
     // Get questions for this survey
     const { data: questions, error: questionsError } = await supabase
       .from("survey_questions")
-      .select("*")
+      .select("id, survey_id, question_text, description, question_type, options, settings, order_index")
       .eq("survey_id", pendingSurvey.id)
       .order("order_index", { ascending: true });
 

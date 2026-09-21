@@ -74,16 +74,28 @@ async function ProfileComponent() {
   ] = await Promise.all([
     supabase
       .from("education")
-      .select("*")
+      .select(
+        "id, codev_id, institution, degree, major_subject, achievements, description, start_date, end_date, created_at, updated_at",
+      )
       .eq("codev_id", user.id)
       .order("start_date", { ascending: false }),
     supabase
       .from("work_experience")
-      .select("*")
+      .select(
+        "id, codev_id, company_name, position, location, date_from, date_to, is_present, description",
+      )
       .eq("codev_id", user.id)
       .order("date_from", { ascending: false }),
-    supabase.from("work_schedules").select("*").eq("codev_id", user.id),
-    supabase.from("job_status").select("*").eq("codev_id", user.id),
+    supabase
+      .from("work_schedules")
+      .select("id, codev_id, days_of_week, start_time, end_time")
+      .eq("codev_id", user.id),
+    supabase
+      .from("job_status")
+      .select(
+        "id, job_title, company_name, employment_type, description, status, salary_range, work_setup, shift, codev_id, hours_per_week",
+      )
+      .eq("codev_id", user.id),
     getPositions(),
   ]);
 

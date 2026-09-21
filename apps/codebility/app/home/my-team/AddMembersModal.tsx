@@ -1,8 +1,12 @@
-﻿"use client";
+"use client";
 
+import { MEMBER_LIST_COLUMNS, type MemberListRow } from "@/lib/shared/member-list";
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { SimpleMemberData, updateProjectMembers } from "@/actions/projects/actions";
+import {
+  SimpleMemberData,
+  updateProjectMembers,
+} from "@/actions/projects/actions";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -25,7 +29,7 @@ interface AddMembersModalProps {
     teamLead: { data: SimpleMemberData | null };
     members: { data: SimpleMemberData[] | null };
   };
-  onUpdate: (selectedMembers: Codev[]) => void;
+  onUpdate: (selectedMembers: MemberListRow[]) => void;
 }
 
 // âœ… Calculate years from work experience
@@ -59,9 +63,9 @@ const TeamMemberAvatar = ({
   name: string; 
   position?: string;
   size?: number;
-  member?: Codev;
-  onClick?: (member: Codev) => void;
-  onRemove?: (member: Codev) => void;
+  member?: MemberListRow;
+  onClick?: (member: MemberListRow) => void;
+  onRemove?: (member: MemberListRow) => void;
 }) => (
   <div className="flex flex-col items-center space-y-1 w-full">
     {/* âœ… Extra padding so the X button (positioned outside the circle) is never clipped */}
@@ -127,7 +131,7 @@ const TeamLeaderDisplay = ({
   onProfileClick
 }: { 
   teamLead: SimpleMemberData | null;
-  onProfileClick?: (member: Codev) => void;
+  onProfileClick?: (member: { id: string }) => void;
 }) => (
   <div>
     <h4 className="text-base sm:text-lg font-semibold text-white mb-3">Team Leader</h4>
@@ -140,36 +144,10 @@ const TeamLeaderDisplay = ({
           style={{ width: 40, height: 40 }}
           onClick={(e) => {
             e.stopPropagation();
+            // The handler resolves the full profile by id, so a fabricated Codev
+            // with two dozen undefined fields was never needed.
             if (onProfileClick && teamLead) {
-              const basicCodev: Codev = {
-                id: teamLead.id,
-                first_name: teamLead.first_name,
-                last_name: teamLead.last_name,
-                email_address: teamLead.email_address,
-                display_position: teamLead.display_position ?? undefined,
-                image_url: teamLead.image_url ?? undefined,
-                username: (teamLead as any).username ?? null,
-                username_updated_at: (teamLead as any).username_updated_at ?? null,
-                availability_status: undefined,
-                internal_status: undefined,
-                years_of_experience: undefined,
-                about: undefined,
-                education: [],
-                work_experience: [],
-                projects: [],
-                tech_stacks: [],
-                codev_points: [],
-                positions: [],
-                github: undefined,
-                linkedin: undefined,
-                facebook: undefined,
-                discord: undefined,
-                phone_number: undefined,
-                address: undefined,
-                role_id: undefined
-              };
-              
-              onProfileClick(basicCodev);
+              onProfileClick({ id: teamLead.id });
             }
           }}
           title={onProfileClick ? "Click to view profile" : undefined}
@@ -209,10 +187,10 @@ const TeamMembersGrid = ({
   onProfileClick,
   onRemoveMember,
 }: { 
-  members: Codev[];
+  members: MemberListRow[];
   currentMemberIds: string[];
-  onProfileClick?: (member: Codev) => void;
-  onRemoveMember?: (member: Codev) => void;
+  onProfileClick?: (member: { id: string }) => void;
+  onRemoveMember?: (member: MemberListRow) => void;
 }) => {
   const getAvatarSize = () => {
     if (typeof window !== 'undefined') {
@@ -268,7 +246,7 @@ const TeamMembersGrid = ({
                 <TeamMemberAvatar
                   imageUrl={member.image_url}
                   name={member.first_name}
-                  position={member.display_position}
+                  position={member.display_position ?? undefined}
                   size={getAvatarSize()}
                   member={member}
                   onClick={onProfileClick}
@@ -294,10 +272,10 @@ const ProjectPreview = ({
 }: { 
   projectName: string; 
   teamLead: SimpleMemberData | null;
-  selectedMembers: Codev[];
+  selectedMembers: MemberListRow[];
   currentMemberIds: string[];
-  onProfileClick?: (member: Codev) => void;
-  onRemoveMember?: (member: Codev) => void;
+  onProfileClick?: (member: { id: string }) => void;
+  onRemoveMember?: (member: MemberListRow) => void;
 }) => (
   <div className="h-full flex flex-col p-1 sm:p-2 gap-y-4 overflow-hidden">
     <div className="flex-shrink-0">
@@ -326,10 +304,7 @@ const ProjectPreview = ({
     </div>
     
     <div className="flex-shrink-0">
-      <TeamLeaderDisplay 
-        teamLead={teamLead} 
-        onProfileClick={onProfileClick}
-      />
+      <TeamLeaderDisplay teamLead={teamLead} onProfileClick={onProfileClick} />
     </div>
     
     <div className="flex-1 min-h-0 mr-8 flex flex-col">
@@ -365,18 +340,18 @@ const AddMembersModal = ({
 
   const { onOpen: openProfileModal } = useModal();
 
-  const [selectedMembers, setSelectedMembers] = useState<Codev[]>([]);
+  const [selectedMembers, setSelectedMembers] = useState<MemberListRow[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
-  const [availableMembersDraft, setAvailableMembersDraft] = useState<Codev[] | null>(null);
-  const [recentMembers, setRecentMembers] = useState<Codev[]>([]);
+  const [availableMembersDraft, setAvailableMembersDraft] = useState<MemberListRow[] | null>(null);
+  const [recentMembers, setRecentMembers] = useState<MemberListRow[]>([]);
   const [activeFilter, setActiveFilter] = useState<'smart' | 'all' | 'mentor' | 'graduated' | 'admin' | 'training'>('smart');
   const [filterCounts, setFilterCounts] = useState({ mentor: 0, graduated: 0, admin: 0, training: 0, all: 0 });
   const [isSearching, setIsSearching] = useState(false);
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // âœ… Fetch codevs based on filter with smart defaults
-  const fetchCodevsByFilter = useCallback(async (filter: 'smart' | 'all' | 'mentor' | 'graduated' | 'admin' | 'training'): Promise<Codev[]> => {
+  const fetchCodevsByFilter = useCallback(async (filter: 'smart' | 'all' | 'mentor' | 'graduated' | 'admin' | 'training'): Promise<MemberListRow[]> => {
     if (!supabase) {
       console.error('Supabase client not available');
       return [];
@@ -384,11 +359,11 @@ const AddMembersModal = ({
 
     try {
       const PAGE_SIZE = 1000;
-      let allData: Codev[] = [];
+      let allData: MemberListRow[] = [];
       let from = 0;
 
       while (true) {
-        let query = supabase.from('codev').select('*');
+        let query = supabase.from('codev').select(MEMBER_LIST_COLUMNS);
 
         // Apply filters based on type
         switch (filter) {
@@ -441,7 +416,7 @@ const AddMembersModal = ({
   }, [supabase]);
 
   // âœ… Fetch recently added members (last 7 days)
-  const fetchRecentMembers = useCallback(async (): Promise<Codev[]> => {
+  const fetchRecentMembers = useCallback(async (): Promise<MemberListRow[]> => {
     if (!supabase) return [];
 
     try {
@@ -450,7 +425,7 @@ const AddMembersModal = ({
 
       const { data, error } = await supabase
         .from('codev')
-        .select('*')
+        .select(MEMBER_LIST_COLUMNS)
         .or('role_id.eq.5,role_id.eq.1,internal_status.eq.GRADUATED,internal_status.eq.TRAINING')
         .gte('created_at', sevenDaysAgo.toISOString())
         .order('created_at', { ascending: false })
@@ -490,7 +465,7 @@ const AddMembersModal = ({
   }, [supabase]);
 
   // âœ… Server-side search with debouncing
-  const searchMembers = useCallback(async (query: string): Promise<Codev[]> => {
+  const searchMembers = useCallback(async (query: string): Promise<MemberListRow[]> => {
     if (!supabase || !query.trim()) return [];
 
     try {
@@ -500,7 +475,7 @@ const AddMembersModal = ({
       // Search all users without status filtering - let user find anyone
       const { data, error } = await supabase
         .from('codev')
-        .select('*')
+        .select(MEMBER_LIST_COLUMNS)
         .or(`first_name.ilike.%${searchLower}%,last_name.ilike.%${searchLower}%,display_position.ilike.%${searchLower}%`)
         .order('first_name', { ascending: true })
         .limit(50);
@@ -601,30 +576,15 @@ const AddMembersModal = ({
   }, [supabase]);
 
   // âœ… Profile click handler
-  const handleProfileClick = useCallback(async (member: Codev) => {
+  const handleProfileClick = useCallback(async (member: { id: string }) => {
     try {
       const completeProfile = await getCompleteCodevProfileSafe(member.id);
-      
+
       if (completeProfile) {
         openProfileModal("profileModal", completeProfile);
-      } else {
-        const fallbackProfile: Codev = {
-          ...member,
-          years_of_experience: 0,
-          availability_status: member.availability_status ?? true,
-          internal_status: (member.internal_status as InternalStatus) ?? 'GRADUATED'
-        };
-        openProfileModal("profileModal", fallbackProfile);
       }
     } catch (error) {
       console.error('Error in profile click handler:', error);
-      const safeFallback: Codev = {
-        ...member,
-        years_of_experience: 0,
-        availability_status: true,
-        internal_status: 'GRADUATED' as InternalStatus
-      };
-      openProfileModal("profileModal", safeFallback);
     }
   }, [getCompleteCodevProfileSafe, openProfileModal]);
 
@@ -641,7 +601,7 @@ const AddMembersModal = ({
   });
 
   const availableMembers = availableMembersDraft ?? membersData ?? [];
-  const setAvailableMembers = (members: Codev[]) =>
+  const setAvailableMembers = (members: MemberListRow[]) =>
     setAvailableMembersDraft(members);
   const loadError = membersError
     ? membersError instanceof Error
@@ -666,21 +626,23 @@ const AddMembersModal = ({
     // Initialize directly from currentMembers (already fetched from DB by server)
     // Don't filter from availableMembers because current members might not match the smart filter
     if (currentMembers && currentMembers.length > 0) {
-      // Convert SimpleMemberData to Codev format for selectedMembers
-      const membersAsCodev = currentMembers.map(m => ({
+      // SimpleMemberData carries the same fields the picker lists. This used to
+      // fabricate a Codev via `as unknown as Codev`, inventing username/positions
+      // values that do not exist on the row.
+      const membersAsRows: MemberListRow[] = currentMembers.map((m) => ({
         id: m.id,
         first_name: m.first_name,
         last_name: m.last_name,
         email_address: m.email_address,
         display_position: m.display_position,
         image_url: m.image_url,
-        username: null,
-        username_updated_at: null,
-        positions: [],
-        tech_stacks: [],
-      } as unknown as Codev));
+        role_id: null,
+        internal_status: null,
+        tech_stacks: null,
+        level: null,
+      }));
 
-      setSelectedMembers(membersAsCodev);
+      setSelectedMembers(membersAsRows);
       membersInitialized.current = true;
     }
     // Mark as initialized even with no current members (new project)
@@ -690,7 +652,7 @@ const AddMembersModal = ({
   }, [isOpen, currentMembers]);
 
   // âœ… Member selection logic
-  const toggleMember = useCallback((member: Codev) => {
+  const toggleMember = useCallback((member: MemberListRow) => {
     setSelectedMembers(prev => {
       const isSelected = prev.some(m => m.id === member.id);
       return isSelected 
@@ -700,7 +662,7 @@ const AddMembersModal = ({
   }, []);
 
   // âœ… Remove member via X button on avatar
-  const handleRemoveMember = useCallback((member: Codev) => {
+  const handleRemoveMember = useCallback((member: MemberListRow) => {
     toggleMember(member);
   }, [toggleMember]);
 

@@ -273,7 +273,9 @@ export const promoteDraft = async (
     // Step 1: Fetch the draft
     const { data: draft, error: fetchError } = await supabase
       .from("task_drafts")
-      .select("*")
+      .select(
+        "id, project_id, created_by, codev_id, title, description, type, priority, difficulty, points, deadline, intended_column_id, skill_category_id, sidekick_ids, pr_link, created_at",
+      )
       .eq("id", draftId)
       .single();
 

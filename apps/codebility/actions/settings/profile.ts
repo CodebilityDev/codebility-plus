@@ -307,7 +307,7 @@ export async function getWorkSchedule(codevId: string) {
 
     const { data, error } = await supabase
       .from("work_schedules")
-      .select("*")
+      .select("id, codev_id, days_of_week, start_time, end_time")
       .eq("codev_id", codevId)
       .single();
 
@@ -334,7 +334,9 @@ export async function createJobStatus(jobStatus: Omit<JobStatus, "id">) {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
-      .select("*")
+      .select(
+        "id, job_title, company_name, employment_type, description, status, salary_range, work_setup, shift, codev_id, hours_per_week",
+      )
       .single();
 
     if (error) throw error;
@@ -362,7 +364,9 @@ export async function updateJobStatus(
         updated_at: new Date().toISOString(),
       })
       .eq("id", id)
-      .select("*")
+      .select(
+        "id, job_title, company_name, employment_type, description, status, salary_range, work_setup, shift, codev_id, hours_per_week",
+      )
       .single();
 
     if (error) throw error;

@@ -19,6 +19,15 @@ export interface TaskWithRelations extends Task {
   };
 }
 
+// Only these priority icons exist on disk. 80 tasks carry priority "critical",
+// which has no icon, so building the path from the raw value 404s on every card.
+// Anything unmapped falls back to medium.
+const PRIORITY_ICONS: Record<string, string> = {
+  low: "low",
+  medium: "medium",
+  high: "high",
+};
+
 export default function TaskCard({ task }: Props) {
   const {
     id,
@@ -44,7 +53,7 @@ export default function TaskCard({ task }: Props) {
             width={20}
             height={20}
             src={`/assets/svgs/icon-priority-${
-              priority?.toLowerCase() || "medium"
+              PRIORITY_ICONS[priority?.toLowerCase() ?? ""] ?? "medium"
             }.svg`}
             className="absolute right-0 top-0"
             alt="Priority level"

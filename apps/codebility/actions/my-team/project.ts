@@ -282,7 +282,7 @@ export async function getMonthlyAttendance(
 
     const { data, error } = await supabase
       .from("attendance")
-      .select("*")
+      .select("id, codev_id, project_id, date, status, check_in, check_out")
       .eq("project_id", projectId)
       .gte("date", startDate)
       .lte("date", endDate);
@@ -299,7 +299,7 @@ export async function getCodevAttendancePoints(codevId: string) {
   try {
     const { data, error } = await supabase
       .from("attendance_points")
-      .select("*")
+      .select("points, last_updated")
       .eq("codev_id", codevId)
       .maybeSingle();
 

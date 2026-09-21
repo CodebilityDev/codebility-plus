@@ -28,7 +28,7 @@ export default function ApplicantLists({
   const [search, setSearch] = React.useState("");
   const debouncedSearch = useDebouncedValue(search);
 
-  const { data, isPending } = usePaginatedQuery<NewApplicantType>(
+  const { data, showSkeleton } = usePaginatedQuery<NewApplicantType>(
     qk.applicants.list({ status: currentTab, page, search: debouncedSearch }),
     () =>
       getApplicantsPageAction({
@@ -81,7 +81,7 @@ export default function ApplicantLists({
         </div>
 
         <div className="mt-6">
-          {isPending ? (
+          {showSkeleton ? (
             <div className="space-y-2">
               {Array.from({ length: 10 }).map((_, i) => (
                 <div

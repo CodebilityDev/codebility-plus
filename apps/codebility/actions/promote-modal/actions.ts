@@ -5,13 +5,17 @@ import { createClientServerComponent } from "@/utils/supabase/server";
 import { requireRole } from "@/lib/server/auth-guard";
 import { FeatureModal } from "@/app/home/promote-modal/type";
 
+// Every column FeatureModal declares, and no others.
+const FEATURE_MODAL_COLUMNS =
+  "id, badge, headline, subheadline, cta_label, cta_href, dismiss_label, features, is_active, image_url, created_at, updated_at";
+
 export async function fetchActiveModal(): Promise<FeatureModal | null> {
   try {
     const supabase = await createClientServerComponent();
 
     const { data, error } = await supabase
       .from("feature_modals")
-      .select("*")
+      .select(FEATURE_MODAL_COLUMNS)
       .eq("is_active", true);
 
     if (error) throw error;
@@ -29,7 +33,7 @@ export async function fetchAllModals(): Promise<FeatureModal[]> {
     const supabase = await createClientServerComponent();
     const { data, error } = await supabase
       .from("feature_modals")
-      .select("*")
+      .select(FEATURE_MODAL_COLUMNS)
       .order("created_at", { ascending: false });
     if (error) throw error;
     return (data as FeatureModal[]) ?? [];
@@ -43,7 +47,7 @@ export async function fetchModalById(id: string): Promise<FeatureModal | null> {
     const supabase = await createClientServerComponent();
     const { data, error } = await supabase
       .from("feature_modals")
-      .select("*")
+      .select(FEATURE_MODAL_COLUMNS)
       .eq("id", id)
       .single();
     if (error) throw error;

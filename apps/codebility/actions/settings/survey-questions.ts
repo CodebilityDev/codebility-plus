@@ -179,7 +179,7 @@ export async function getSurveyQuestions(surveyId: string) {
 
     const { data, error } = await supabase
       .from("survey_questions")
-      .select("*")
+      .select("id, survey_id, question_text, description, question_type, options, settings, order_index")
       .eq("survey_id", surveyId)
       .order("order_index", { ascending: true });
 

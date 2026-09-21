@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClientServerComponent } from "@/utils/supabase/server";
 
+const ATTENDANCE_COLUMNS =
+  "id, codev_id, project_id, date, status, check_in, check_out, notes, created_at, updated_at";
+
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
@@ -19,7 +22,7 @@ export async function GET(request: NextRequest) {
     
     const { data, error } = await supabase
       .from("attendance")
-      .select("*")
+      .select(ATTENDANCE_COLUMNS)
       .eq("project_id", projectId)
       .gte("date", startDate)
       .lte("date", endDate);
@@ -66,7 +69,7 @@ export async function POST(request: NextRequest) {
     // Check if attendance record exists
     const { data: existing } = await supabase
       .from("attendance")
-      .select("*")
+      .select("id")
       .eq("codev_id", codev_id)
       .eq("project_id", project_id)
       .eq("date", date)
@@ -84,7 +87,7 @@ export async function POST(request: NextRequest) {
           updated_at: new Date().toISOString()
         })
         .eq("id", existing.id)
-        .select()
+        .select(ATTENDANCE_COLUMNS)
         .single();
     } else {
       // Create new record
@@ -98,7 +101,7 @@ export async function POST(request: NextRequest) {
           check_in,
           check_out
         })
-        .select()
+        .select(ATTENDANCE_COLUMNS)
         .single();
     }
 

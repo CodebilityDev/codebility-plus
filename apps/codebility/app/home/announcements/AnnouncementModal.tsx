@@ -59,7 +59,7 @@ export const AnnouncementModal: React.FC<AnnouncementModalProps> = ({
     queryFn: async () => {
       const { data, error: fetchError } = await getClientSupabase()
         .from("announcements")
-        .select("*")
+        .select("id, category, title, banner_image, content, updated_at, created_at")
         .order("created_at");
 
       if (fetchError) throw fetchError;

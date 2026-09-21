@@ -1,6 +1,7 @@
 // my-team/MyTeamPage.tsx - Proper Client-Side Implementation
 "use client";
 
+import { MEMBER_LIST_COLUMNS, type MemberListRow } from "@/lib/shared/member-list";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { toast } from "react-hot-toast";
@@ -9,7 +10,7 @@ import {
   getProjectCodevs, 
   getTeamLead, 
   updateProjectMembers,
-  SimpleMemberData 
+  SimpleMemberData,
 } from "@/actions/projects/actions";
 import { Codev, InternalStatus } from "@/types/home/codev";
 import { useModal } from "@/hooks/modals/use-modal-users";
@@ -299,7 +300,7 @@ const MyTeamPage = ({ projectData }: MyTeamPageProps) => {
     setSelectedProject(null);
   };
 
-  const handleUpdateMembers = async (selectedMembers: Codev[]) => {
+  const handleUpdateMembers = async (selectedMembers: MemberListRow[]) => {
     if (!selectedProject) return;
 
     try {

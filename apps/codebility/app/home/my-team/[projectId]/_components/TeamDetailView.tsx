@@ -1,5 +1,6 @@
 "use client";
 
+import { MEMBER_LIST_COLUMNS, type MemberListRow } from "@/lib/shared/member-list";
 import { useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -152,7 +153,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
     }
   }, [queryClient]);
 
-  const handleUpdateMembers = async (selectedMembers: Codev[]) => {
+  const handleUpdateMembers = async (selectedMembers: MemberListRow[]) => {
     // AddMembersModal already saved to DB, we just need to refetch and update UI
     try {
       setIsLoadingMembers(true);

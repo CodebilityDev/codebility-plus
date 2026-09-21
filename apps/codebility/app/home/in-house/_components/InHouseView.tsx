@@ -84,7 +84,7 @@ export default function InHouseView({
 
   const queryKey = qk.codevs.list({ ...queryFilters, page });
 
-  const { data, isPending } = usePaginatedQuery(
+  const { data, showSkeleton } = usePaginatedQuery(
     queryKey,
     () =>
       fetchCodevsAction({
@@ -163,7 +163,7 @@ export default function InHouseView({
         </div>
       </div>
 
-      {isPending ? (
+      {showSkeleton ? (
         <InHouseTableSkeleton rows={pageSize.applicants} />
       ) : rows.length === 0 ? (
         <div className="flex min-h-[400px] flex-col items-center justify-center p-8 text-center">
@@ -179,11 +179,13 @@ export default function InHouseView({
           roles={roles}
           positions={positions}
           projects={projects}
-          isFetching={isPending}
+          isFetching={showSkeleton}
           onDataChange={() => invalidate()}
           onDelete={() => invalidate()}
           pagination={{
-            currentPage: data?.page ?? page,
+            // Local state, so the marker moves on click. `data.page` lags a full
+            // round trip behind, which made the click look dead.
+            currentPage: page,
             totalPages: Math.max(Math.ceil((data?.total ?? 0) / (data?.pageSize ?? 1)), 1),
             onNextPage: () => setPage((p) => p + 1),
             onPreviousPage: () => setPage((p) => Math.max(p - 1, 1)),

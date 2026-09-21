@@ -1,4 +1,4 @@
-﻿"use server";
+"use server";
 
 import { revalidatePath } from "next/cache";
 import { createNotification } from "@/lib/server/notification.service";
@@ -66,7 +66,7 @@ export async function checkAttendanceWarnings(
     // Verify user is team lead for this project
     const { data: teamLead } = await supabase
       .from("project_members")
-      .select("*")
+      .select("codev_id")
       .eq("project_id", projectId)
       .eq("role", "team_leader")
       .single();
@@ -103,7 +103,7 @@ export async function checkAttendanceWarnings(
 
     const { data: attendance } = await supabase
       .from("attendance")
-      .select("*")
+      .select("id, codev_id, date, status")
       .eq("project_id", projectId)
       .gte("date", startDate)
       .lte("date", endDate);
@@ -152,10 +152,11 @@ export async function checkAttendanceWarnings(
       const absences = absenceCounts.get(member.codev_id) || 0;
 
       if (absences >= ABSENCE_WARNING_THRESHOLD) {
-        // Check if warning already sent this month
-        const { data: existingWarning } = await supabase
+        // Check if warning already sent this month. Only existence matters, so
+        // ask for the count and transfer no rows.
+        const { count: existingWarningCount } = await supabase
           .from("notifications")
-          .select("*")
+          .select("id", { count: "exact", head: true })
           .eq("recipient_id", member.codev_id)
           .eq("project_id", projectId)
           .eq("type", "attendance")
@@ -163,7 +164,7 @@ export async function checkAttendanceWarnings(
           .lte("created_at", endDate)
           .like("metadata->month", `${year}-${month + 1}`);
 
-        if (!existingWarning || existingWarning.length === 0) {
+        if (!existingWarningCount) {
           // Send warning notification
           const notification = {
             recipient_id: member.codev_id,
@@ -263,7 +264,7 @@ export async function getAttendanceWarningStatus(
 
     const { data: attendance } = await supabase
       .from("attendance")
-      .select("*")
+      .select("id, codev_id, date, status")
       .eq("project_id", projectId)
       .gte("date", startDate)
       .lte("date", endDate);

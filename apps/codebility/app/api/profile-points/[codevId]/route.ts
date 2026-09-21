@@ -88,7 +88,7 @@ export async function GET(
 
     const { data: savedPoints, error: fetchError } = await supabase
       .from("profile_points")
-      .select("*")
+      .select("id, codev_id, category, points")
       .eq("codev_id", validCodevId)
       .order("created_at", { ascending: false });
 

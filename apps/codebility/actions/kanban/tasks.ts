@@ -506,7 +506,7 @@ export const completeTask = async (
     const pointsPromises = allMemberIds.map(memberId =>
       supabase
         .from("codev_points")
-        .select("*")
+        .select("id, points")
         .eq("codev_id", memberId)
         .eq("skill_category_id", skillCategoryId)
         .maybeSingle()

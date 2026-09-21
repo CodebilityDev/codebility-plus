@@ -206,8 +206,7 @@ export async function getAdminOutreachHistory(
 
     let query = supabase
       .from('client_outreach')
-      .select('*')
-      .eq('admin_id', adminId)
+      .select('id, admin_id, client_name, client_email, client_company, job_link, outreach_date, notes, conversation_image, week_start, created_at')
       .order('outreach_date', { ascending: false });
 
     if (weekStart) {

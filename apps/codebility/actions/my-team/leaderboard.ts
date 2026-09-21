@@ -128,7 +128,7 @@ export async function getLeaderboardData(
     // 2. Fetch Attendance for the period
     const { data: attendanceData, error: attendanceError } = await supabase
       .from("attendance")
-      .select("*")
+      .select("id, codev_id, date, status")
       .eq("project_id", projectId)
       .in("codev_id", codevIds)
       .gte("date", startDate.toISOString().split("T")[0])

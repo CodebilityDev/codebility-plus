@@ -3,6 +3,13 @@ export type Page<T> = {
   total: number;
   page: number;
   pageSize: number;
+  /**
+   * When the server produced this page, as epoch ms. The client seeds its query
+   * cache with `rows` and must know how old that seed is: without this it either
+   * treats the seed as fresh forever (stale filters) or as instantly stale (a
+   * pointless refetch of data already on screen).
+   */
+  fetchedAt: number;
 };
 
 export type PageArgs = {
@@ -28,4 +35,5 @@ export const toPage = <T>(
   total: total ?? 0,
   page,
   pageSize,
+  fetchedAt: Date.now(),
 });

@@ -1197,7 +1197,7 @@ export default function TaskCommentsSection({
         // Fetch comments without codev join to avoid RLS filtering
         const { data, error } = await supabase
           .from("tasks_comments")
-          .select('*')
+          .select('id, task_id, author_id, content, created_at, updated_at, parent_comment_id')
           .eq("task_id", taskId)
           .order("created_at", { ascending: true });
 
@@ -1239,7 +1239,7 @@ export default function TaskCommentsSection({
             // Fetch comment without codev join to avoid RLS filtering
             const { data, error } = await supabase
               .from("tasks_comments")
-              .select('*')
+              .select('id, task_id, author_id, content, created_at, updated_at, parent_comment_id')
               .eq("id", payload.new.id)
               .single();
 

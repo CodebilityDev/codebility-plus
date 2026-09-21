@@ -29,7 +29,7 @@ export default function CodevList({ data, isFetching, pagination }: CodevListPro
 
   return (
     <div className="space-y-8">
-      {isFetching && data.length === 0 ? (
+      {isFetching ? (
         <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4">
           {Array.from({ length: 8 }).map((_, index) => (
             <AnimatedCodevCardSkeleton key={index} delay={index * 100} />

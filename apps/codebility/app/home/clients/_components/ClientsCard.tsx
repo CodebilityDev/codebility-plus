@@ -46,7 +46,7 @@ export default function ClientCards({ initialData }: Props) {
     user?.role_id === 3 ||
     user?.role_id === 5;
 
-  const { data, isPending } = usePaginatedQuery<Client>(
+  const { data, showSkeleton } = usePaginatedQuery<Client>(
     qk.clients.list({ page }),
     () => fetchClientsPageAction({ page, pageSize: pageSize.clients }),
     {
@@ -111,7 +111,7 @@ export default function ClientCards({ initialData }: Props) {
   return (
     <>
       <article className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-        {isPending ? (
+        {showSkeleton ? (
           Array.from({ length: pageSize.clients }).map((_, i) => (
             <div
               key={i}

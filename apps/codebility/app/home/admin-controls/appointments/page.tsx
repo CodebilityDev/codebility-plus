@@ -39,7 +39,9 @@ export default async function AppointmentsAdminPage() {
   // 4. Authorized query execution matching the validated database columns
   const { data: appointmentsData, error } = await supabase
     .from("appointments")
-    .select("*")
+    .select(
+      "id, first_name, last_name, email, phone_number, company_name, industry, service_interest, project_type, features_needed, referral_source, interest_level, other_requirements, appointment_date, appointment_time, meeting_type, meeting_tool_other, status, created_at",
+    )
     .order("created_at", { ascending: false });
 
   if (error) {

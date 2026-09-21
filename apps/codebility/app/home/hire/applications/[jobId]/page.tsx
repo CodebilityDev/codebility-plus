@@ -20,7 +20,7 @@ export default async function JobApplicationsPage({ params }: { params: { jobId:
   // Fetch applications for this job
   const { data: applications, error: applicationsError } = await supabase
     .from('job_applications')
-    .select('*')
+    .select('id, job_id, first_name, last_name, email, phone, linkedin, github, portfolio, years_of_experience, cover_letter, experience, resume_url, applied_at, status, notes')
     .eq('job_id', jobId)
     .order('applied_at', { ascending: false });
 

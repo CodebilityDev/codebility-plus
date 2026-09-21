@@ -710,7 +710,9 @@ export const getMembers = async (
 
 export const updateProjectMembers = async (
   projectId: string,
-  members: Codev[],
+  // Only the id is read (below), so callers that page a narrow column list can
+  // pass their rows without widening them back to a full Codev.
+  members: { id: string }[],
   teamLeaderId: string,
 ): Promise<{ success: boolean; error?: string }> => {
   console.log('🔧 [updateProjectMembers] Server-side update starting');

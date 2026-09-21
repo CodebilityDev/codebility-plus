@@ -22,7 +22,7 @@ export async function saveAttendanceRecord(record: AttendanceRecord) {
     // Check if attendance record exists for this date
     const { data: existing } = await supabase
       .from("attendance")
-      .select("*")
+      .select("id")
       .eq("codev_id", record.codev_id)
       .eq("project_id", record.project_id)
       .eq("date", record.date)
@@ -78,7 +78,7 @@ export async function getAttendanceForMonth(
 
   const { data, error } = await supabase
     .from("attendance")
-    .select("*")
+    .select("id, codev_id, project_id, date, status, check_in, check_out, notes")
     .eq("project_id", projectId)
     .gte("date", startDate)
     .lte("date", endDate);
@@ -96,7 +96,7 @@ export async function getCodevAttendancePoints(codevId: string) {
   
   const { data, error } = await supabase
     .from("attendance_points")
-    .select("*")
+    .select("points, last_updated")
     .eq("codev_id", codevId)
     .single();
 
@@ -128,7 +128,7 @@ export async function getAllCodevPoints(codevId: string) {
   // Get attendance points
   const { data: attendanceData, error: attendanceError } = await supabase
     .from("attendance_points")
-    .select("*")
+    .select("points, last_updated")
     .eq("codev_id", codevId)
     .single();
 

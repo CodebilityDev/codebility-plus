@@ -42,7 +42,7 @@ interface Props {
 export default function TasksContainer({ initialData, codevId }: Props) {
   const [page, setPage] = useState(1);
 
-  const { data, isPending } = usePaginatedQuery<any>(
+  const { data, showSkeleton } = usePaginatedQuery<any>(
     qk.tasks.list({ codevId, page }),
     () => fetchTasksPageAction({ codevId, page, pageSize: PAGE_SIZE }),
     {
@@ -57,7 +57,7 @@ export default function TasksContainer({ initialData, codevId }: Props) {
   return (
     <div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {isPending ? (
+        {showSkeleton ? (
           Array.from({ length: PAGE_SIZE }).map((_, i) => (
             <div
               key={i}

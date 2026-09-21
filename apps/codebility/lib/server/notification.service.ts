@@ -47,7 +47,9 @@ export async function getNotifications(limit: number = 50) {
 
   const { data, error } = await supabase
     .from("notifications")
-    .select("*")
+    .select(
+      "id, recipient_id, title, message, type, priority, read, archived, action_url, metadata, sender_id, project_id, job_id, created_at, read_at, archived_at, expires_at",
+    )
     .eq("recipient_id", codevUserId)
     .eq("archived", false)
     .order("created_at", { ascending: false })

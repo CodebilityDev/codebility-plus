@@ -65,9 +65,7 @@ export async function getNewApplicants(): Promise<NewApplicantType[]> {
 
     const { data: newApplicants, error } = await supabase
       .from("codev")
-      .select(`*,
-                applicant (*)
-                `)
+      .select(APPLICANT_LIST_COLUMNS)
       .not("application_status", "eq", "passed")
       .order("date_applied", { ascending: false });
 

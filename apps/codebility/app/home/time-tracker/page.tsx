@@ -31,7 +31,7 @@ export default async function TimeTracker() {
     )  
   `,
     )
-    .eq("user_id", user?.id)
+    .eq("id", user?.id)
     .single();
 
   const HoursSpent = {
@@ -88,7 +88,7 @@ export default async function TimeTracker() {
         </div>
 
         <div className="w-full">
-          <TimeTrackerTable timeLog={data?.time_log as TimeLog[]} />
+          <TimeTrackerTable timeLog={(data?.time_log as TimeLog[]) ?? []} />
         </div>
       </div>
     </AsyncErrorBoundary>

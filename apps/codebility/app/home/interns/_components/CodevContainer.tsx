@@ -66,7 +66,7 @@ export default function CodevContainer({
     [membersSubTab, filters, search],
   );
 
-  const { data, isPending } = usePaginatedQuery(
+  const { data, showSkeleton } = usePaginatedQuery(
     qk.codevs.list({ ...queryFilters, page }),
     () =>
       fetchInternsAction({
@@ -180,9 +180,10 @@ export default function CodevContainer({
       ) : (
         <CodevList
           data={rows}
-          isFetching={isPending}
+          isFetching={showSkeleton}
           pagination={{
-            currentPage: data?.page ?? page,
+            // Local state so the marker moves on click.
+            currentPage: page,
             totalPages,
             onNextPage: () => setPage((p) => p + 1),
             onPreviousPage: () => setPage((p) => Math.max(p - 1, 1)),

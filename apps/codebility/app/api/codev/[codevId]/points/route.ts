@@ -30,7 +30,7 @@ export async function GET(
     // Fetch attendance points from separate table
     const { data: attendanceData, error: attendanceError } = await supabase
       .from("attendance_points")
-      .select("*")
+      .select("points, last_updated")
       .eq("codev_id", codevId)
       .single();
 
@@ -55,7 +55,7 @@ export async function GET(
             points: attendancePoints,
             last_updated: new Date().toISOString().split('T')[0]
           })
-          .select()
+          .select("points, last_updated")
           .single();
 
         if (newRecord) {
