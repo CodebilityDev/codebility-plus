@@ -5,7 +5,8 @@ import CodevBadge from "@/components/CodevBadge";
 import DefaultAvatar from "@/components/DefaultAvatar";
 import Box from "@/components/shared/dashboard/Box";
 import { useModal } from "@/hooks/modals/use-modal-users";
-import { ApplicantStatus, Codev, CodevPoints } from "@/types/home/codev";
+import type { CodevCardRow } from "@/lib/server/codev.service";
+import { ApplicantStatus, CodevPoints } from "@/types/home/codev";
 import {
   AnimatePresence,
   motion,
@@ -23,7 +24,7 @@ import TechStacks from "./TechStacks";
 const MAX_VISIBLE_PROJECTS = 2;
 
 interface CodevCardProps {
-  codev: Codev;
+  codev: CodevCardRow;
 }
 
 const STATUS_CONFIG: Record<
@@ -87,6 +88,14 @@ export default function CodevCard({ codev }: CodevCardProps) {
     STATUS_CONFIG[applicationStatus as ApplicantStatus] ||
     STATUS_CONFIG.applying;
 
+  // The card row carries only what the card renders; the modal needs the full
+  // record, so fetch it on open (C3). Cached by id, so reopening is free.
+  const handleOpen = async () => {
+    const { fetchCodevDetailAction } = await import("@/actions/in-house/actions");
+    const detail = await fetchCodevDetailAction(codev.id);
+    onOpen("profileModal", (detail ?? codev) as never);
+  };
+
   return (
     <div
       onMouseEnter={() => setHovered(true)}
@@ -99,7 +108,7 @@ export default function CodevCard({ codev }: CodevCardProps) {
         <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-gradient-to-br from-yellow-400/10 to-orange-400/10 opacity-0 blur-xl transition-opacity duration-500 group-hover:opacity-100" />
         <div
           className="flex h-full cursor-pointer flex-col justify-start gap-4"
-          onClick={() => onOpen("profileModal", codev)}
+          onClick={handleOpen}
         >
           {/* Header Section */}
           <div className="relative flex items-start justify-start gap-4">

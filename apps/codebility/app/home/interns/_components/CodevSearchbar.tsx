@@ -1,37 +1,20 @@
-import React, { useCallback } from "react";
-import { Codev } from "@/types/home/codev";
+"use client";
+
+import React from "react";
 import { SearchIcon } from "lucide-react";
-import { useDebounce, useDebouncedCallback } from "use-debounce";
+import { useDebouncedCallback } from "use-debounce";
 
 export default function CodevSearchbar({
-  allCodevs,
-  codevs,
-  setCodevs,
-  setIsSearching,
+  value,
+  onSearch,
 }: {
-  allCodevs: Codev[];
-  codevs: Codev[];
-  setCodevs: React.Dispatch<React.SetStateAction<Codev[]>>;
-  setIsSearching?: React.Dispatch<React.SetStateAction<boolean>>;
+  value: string;
+  onSearch: (value: string) => void;
 }) {
-  const [searchValue, setSearchValue] = React.useState("");
+  const [searchValue, setSearchValue] = React.useState(value);
 
-  const handleSearch = useDebouncedCallback((value: string) => {
-    setIsSearching?.(true);
-    
-    if (value === "") {
-      setCodevs(allCodevs);
-      setIsSearching?.(false);
-      return;
-    }
-
-    const filteredCodevs = allCodevs.filter((codev) => {
-      const fullName = `${codev.first_name} ${codev.last_name}`;
-      return fullName.toLowerCase().includes(value.toLowerCase());
-    });
-
-    setCodevs(filteredCodevs);
-    setIsSearching?.(false);
+  const handleSearch = useDebouncedCallback((next: string) => {
+    onSearch(next);
   }, 300);
 
   return (

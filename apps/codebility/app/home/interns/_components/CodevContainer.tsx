@@ -1,30 +1,84 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import H1 from "@/components/shared/dashboard/H1";
-import { Codev } from "@/types/home/codev";
+import { pageSize } from "@/constants";
+import type { CodevCardRow } from "@/lib/server/codev.service";
+import type { PositionOption, ProjectOption } from "@/lib/server/reference-data";
+import type { Page } from "@/lib/server/paginate";
+import { qk } from "@/lib/shared/query-keys";
+import { usePaginatedQuery } from "@/hooks/query/use-paginated-query";
 
 import CodevList from "./CodevList";
 import CodevSearchbar from "./CodevSearchbar";
 import FilterCodevs from "./FilterCodevs";
 import InternalProjects from "./InternalProjects";
 import { Tabs, TabsList, TabsTrigger } from "@codevs/ui/tabs";
+import { fetchInternsAction } from "@/actions/in-house/actions";
 
-export default function CodevContainer({ data }: { data: Codev[] }) {
-  const [filters, setFilters] = useState({
-    positions: [] as string[],
-    projects: [] as string[],
-    availability: [] as string[],
+export type InternsFilters = {
+  positions: string[];
+  projects: string[];
+  availability: string[];
+};
+
+export default function CodevContainer({
+  initialData,
+  counts,
+  positions,
+  projects,
+}: {
+  initialData: Page<CodevCardRow>;
+  counts: { total: number; active: number; inactive: number };
+  positions: PositionOption[];
+  projects: ProjectOption[];
+}) {
+  const [filters, setFilters] = useState<InternsFilters>({
+    positions: [],
+    projects: [],
+    availability: [],
   });
-
-  const [codevs, setCodevs] = useState<Codev[]>(data);
+  const [page, setPage] = useState(1);
   const [activeTab, setActiveTab] = useState<"members" | "projects">("members");
   const [membersSubTab, setMembersSubTab] = useState<"active" | "inactive" | "all">("active");
-  const [isSearching, setIsSearching] = useState(false);
+  const [search, setSearch] = useState("");
 
-  // Calculate counts based on availability_status (same as in-house page)
-  const activeCount = data.filter(codev => codev.availability_status === true).length;
-  const inactiveCount = data.filter(codev => codev.availability_status !== true).length;
+  const queryFilters = useMemo(
+    () => ({
+      application_status: "passed",
+      availability_status:
+        membersSubTab === "all" ? undefined : membersSubTab === "active",
+      display_position: filters.positions[0],
+      internal_status: filters.availability[0]?.toUpperCase(),
+      search: search || undefined,
+    }),
+    [membersSubTab, filters, search],
+  );
+
+  const { data, isFetching } = usePaginatedQuery(
+    qk.codevs.list({ ...queryFilters, page }),
+    () =>
+      fetchInternsAction({
+        page,
+        pageSize: pageSize.codevsList,
+        filters: queryFilters,
+      }),
+    { initialData: page === 1 ? initialData : undefined },
+  );
+
+  const rows = data?.rows ?? [];
+  const total = data?.total ?? 0;
+  const totalPages = Math.max(Math.ceil(total / pageSize.codevsList), 1);
+
+  const handleFilterChange = (next: InternsFilters) => {
+    setFilters(next);
+    setPage(1);
+  };
+
+  const handleSearch = (value: string) => {
+    setSearch(value);
+    setPage(1);
+  };
 
   return (
     <div className="flex flex-col gap-12 px-4 sm:px-6 lg:px-8">
@@ -48,7 +102,7 @@ export default function CodevContainer({ data }: { data: Codev[] }) {
             <TabsTrigger value="members" className="flex items-center gap-2">
               Members
                 <span className="rounded-full bg-blue-600/20 px-2 py-0.5 text-xs font-semibold text-blue-800 dark:bg-blue-700/30 dark:text-blue-100">
-                  {data.length}
+                  {counts.total}
                 </span>
             </TabsTrigger>
             <TabsTrigger value="projects">
@@ -61,24 +115,24 @@ export default function CodevContainer({ data }: { data: Codev[] }) {
       {/* Sub-tabs for Members (Active/Inactive/All) */}
       {activeTab === "members" && (
         <div className="flex justify-center">
-          <Tabs value={membersSubTab} onValueChange={(value) => setMembersSubTab(value as "active" | "inactive" | "all")} className="w-full max-w-xl">
+          <Tabs value={membersSubTab} onValueChange={(value) => { setMembersSubTab(value as "active" | "inactive" | "all"); setPage(1); }} className="w-full max-w-xl">
             <TabsList className="grid w-full grid-cols-3 bg-white/10 backdrop-blur-sm dark:bg-white/5 border border-white/20 dark:border-white/10">
               <TabsTrigger value="active" className="flex items-center gap-2">
                 Active
                 <span className="rounded-full bg-emerald-600/20 px-2 py-0.5 text-xs font-semibold text-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-100">
-                  {activeCount}
+                  {counts.active}
                 </span>
               </TabsTrigger>
                 <TabsTrigger value="inactive" className="flex items-center gap-2">
                 Inactive
                 <span className="rounded-full bg-red-600/20 px-2 py-0.5 text-xs font-semibold text-red-700 dark:bg-red-700/40 dark:text-red-200">
-                  {inactiveCount}
+                  {counts.inactive}
                 </span>
                 </TabsTrigger>
                 <TabsTrigger value="all" className="flex items-center gap-2">
                 All
                 <span className="rounded-full bg-gray-600/20 px-2 py-0.5 text-xs font-semibold text-gray-800 dark:bg-gray-700/40 dark:text-white">
-                  {data.length}
+                  {counts.total}
                 </span>
                 </TabsTrigger>
             </TabsList>
@@ -91,15 +145,15 @@ export default function CodevContainer({ data }: { data: Codev[] }) {
         <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 dark:border-white/10 shadow-lg">
           <div className="flex flex-col items-stretch gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex-1 max-w-md mx-auto lg:mx-0">
-              <CodevSearchbar
-                allCodevs={data}
-                codevs={codevs}
-                setCodevs={setCodevs}
-                setIsSearching={setIsSearching}
-              />
+              <CodevSearchbar value={search} onSearch={handleSearch} />
             </div>
             <div className="flex justify-center lg:justify-end">
-              <FilterCodevs filters={filters} setFilters={setFilters} />
+              <FilterCodevs
+                filters={filters}
+                setFilters={handleFilterChange}
+                positions={positions}
+                projects={projects}
+              />
             </div>
           </div>
         </div>
@@ -109,11 +163,16 @@ export default function CodevContainer({ data }: { data: Codev[] }) {
       {activeTab === "projects" ? (
         <InternalProjects />
       ) : (
-        <CodevList 
-          filters={filters} 
-          data={codevs} 
-          activeTab={membersSubTab}
-          isSearching={isSearching}
+        <CodevList
+          data={rows}
+          isFetching={isFetching}
+          pagination={{
+            currentPage: data?.page ?? page,
+            totalPages,
+            onNextPage: () => setPage((p) => p + 1),
+            onPreviousPage: () => setPage((p) => Math.max(p - 1, 1)),
+            onGoToPage: (target: number) => setPage(target),
+          }}
         />
       )}
     </div>

@@ -1,76 +1,43 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
 import DefaultPagination from "@/components/ui/pagination";
-import { pageSize } from "@/constants";
-import usePagination from "@/hooks/data/use-pagination";
-import { Codev } from "@/types/home/codev";
-import { getPrioritizedAndFilteredCodevs } from "@/utils/codev-priority"; // Import the utility
+import type { CodevCardRow } from "@/lib/server/codev.service";
 
 import CodevCard from "./CodevCard";
 import AnimatedCodevCardSkeleton from "./AnimatedCodevCardSkeleton";
 
 interface CodevListProps {
-  data: Codev[];
-  filters: {
-    positions: string[];
-    projects: string[];
-    availability: string[];
+  data: CodevCardRow[];
+  isFetching?: boolean;
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    onNextPage: () => void;
+    onPreviousPage: () => void;
+    onGoToPage: (page: number) => void;
   };
-  activeTab?: "all" | "active" | "inactive";
-  isSearching?: boolean;
 }
 
-export default function CodevList({ data, filters, activeTab = "active", isSearching = false }: CodevListProps) {
-  const [isFiltering, setIsFiltering] = useState(false);
-
-  // Add a small delay to show loading when filters change
-  useEffect(() => {
-    if (Object.values(filters).some(arr => arr.length > 0) || isSearching) {
-      setIsFiltering(true);
-      const timer = setTimeout(() => {
-        setIsFiltering(false);
-      }, 300);
-      return () => clearTimeout(timer);
-    }
-  }, [filters, isSearching]);
-  // Use the new utility function to get prioritized and filtered codevs
-  const filteredCodevs = useMemo(() => {
-    // First filter by tab selection based on availability_status (same as in-house)
-    let tabFilteredData = data;
-    if (activeTab === "active") {
-      tabFilteredData = data.filter(codev => codev.availability_status === true);
-    } else if (activeTab === "inactive") {
-      tabFilteredData = data.filter(codev => codev.availability_status !== true);
-    }
-    // activeTab === "all" shows everyone
-    
-    const result = getPrioritizedAndFilteredCodevs(tabFilteredData, filters, true);
-
-    return result;
-  }, [data, filters, activeTab]);
-
-  const {
-    currentPage,
-    totalPages,
-    paginatedData,
-    handleNextPage,
-    handlePreviousPage,
-    setCurrentPage,
-  } = usePagination<Codev>(filteredCodevs, pageSize.codevsList);
+export default function CodevList({ data, isFetching, pagination }: CodevListProps) {
+  const setCurrentPage = (pageOrFunction: number | ((page: number) => number)) => {
+    const page =
+      typeof pageOrFunction === "function"
+        ? pageOrFunction(pagination.currentPage)
+        : pageOrFunction;
+    pagination.onGoToPage(Math.max(1, Math.min(page, pagination.totalPages)));
+  };
 
   return (
     <div className="space-y-8">
-      {isFiltering ? (
-        // Show skeleton while filtering
+      {isFetching && data.length === 0 ? (
         <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4">
           {Array.from({ length: 8 }).map((_, index) => (
             <AnimatedCodevCardSkeleton key={index} delay={index * 100} />
           ))}
         </div>
-      ) : paginatedData.length > 0 ? (
+      ) : data.length > 0 ? (
         <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4">
-          {paginatedData.map((codev) => (
+          {data.map((codev) => (
             <CodevCard key={codev.id} codev={codev} />
           ))}
         </div>
@@ -87,14 +54,14 @@ export default function CodevList({ data, filters, activeTab = "active", isSearc
         </div>
       )}
 
-      {!isFiltering && filteredCodevs.length > pageSize.codevsList && (
+      {pagination.totalPages > 1 && (
         <div className="flex justify-center">
           <DefaultPagination
-            currentPage={currentPage}
-            handleNextPage={handleNextPage}
-            handlePreviousPage={handlePreviousPage}
+            currentPage={pagination.currentPage}
+            handleNextPage={pagination.onNextPage}
+            handlePreviousPage={pagination.onPreviousPage}
             setCurrentPage={setCurrentPage}
-            totalPages={totalPages}
+            totalPages={pagination.totalPages}
           />
         </div>
       )}

@@ -5,9 +5,10 @@ import { Client, Codev, Project, WorkExperience } from "@/types/home/codev";
 import { createClientServerComponent } from "@/utils/supabase/server";
 import { resolvePageArgs, toPage, type Page, type PageArgs } from "./paginate";
 
-// Exactly the fields the in-house and interns tables render plus the two the
-// filter bar matches on. Adding a column here costs every row on every page
-// load; the heavy relations live in getCodevDetail instead.
+// Exactly the fields the in-house table renders plus the two the filter bar
+// matches on. Adding a column here costs every row on every page load; the
+// heavy relations live in getCodevDetail instead. The interns card grid needs
+// more than this and uses CODEV_CARD_COLUMNS below.
 export const CODEV_LIST_COLUMNS =
   "id, first_name, last_name, email_address, image_url, role_id, display_position, internal_status, availability_status, positions, nda_status, date_joined";
 
@@ -80,6 +81,91 @@ export const getCodevsPage = async ({
   }
 
   return toPage((data ?? []) as CodevListRow[], count, current, size);
+};
+
+// The interns card grid renders avatars, badges (level), skill points
+// (codev_points), tech stacks and project names, so it needs these relations.
+// Ordering comes from the database's landing_rank_score column, which is kept
+// current by triggers (supabase/migrations/20260825_landing_interns_rank_score.sql),
+// so the multi-key priority sort no longer has to run in the client.
+export const CODEV_CARD_COLUMNS = `
+  id,
+  first_name,
+  last_name,
+  display_position,
+  image_url,
+  role_id,
+  level,
+  tech_stacks,
+  years_of_experience,
+  application_status,
+  availability_status,
+  codev_points ( id, skill_category_id, points ),
+  project_members ( project: projects ( id, name ) )
+`;
+
+export type CodevCardRow = Pick<
+  Codev,
+  | "id"
+  | "first_name"
+  | "last_name"
+  | "display_position"
+  | "image_url"
+  | "role_id"
+  | "level"
+  | "tech_stacks"
+  | "years_of_experience"
+  | "application_status"
+  | "availability_status"
+  | "codev_points"
+  | "projects"
+>;
+
+export const getInternsPage = async ({
+  page,
+  pageSize,
+  filters = {},
+}: PageArgs & { filters?: CodevListFilters } = {}): Promise<Page<CodevCardRow>> => {
+  const supabase = await createClientServerComponent();
+  const { page: current, pageSize: size, from, to } = resolvePageArgs({ page, pageSize });
+
+  let query = supabase
+    .from("codev")
+    .select(CODEV_CARD_COLUMNS, { count: "exact" })
+    .eq("application_status", "passed");
+
+  if (filters.display_position)
+    query = query.eq("display_position", filters.display_position);
+  if (filters.internal_status)
+    query = query.eq("internal_status", filters.internal_status);
+  if (filters.availability_status !== undefined)
+    query = query.eq("availability_status", filters.availability_status);
+  if (filters.search) {
+    const term = `%${filters.search}%`;
+    query = query.or(
+      `first_name.ilike.${term},last_name.ilike.${term},display_position.ilike.${term}`,
+    );
+  }
+
+  const { data, error, count } = await query
+    .order("landing_rank_score", { ascending: false })
+    .order("id", { ascending: true })
+    .range(from, to);
+
+  if (error) {
+    console.error("Error fetching interns page:", error);
+    return toPage<CodevCardRow>(null, 0, current, size);
+  }
+
+  const rows = ((data ?? []) as any[]).map((row) => ({
+    ...row,
+    codev_points: row.codev_points ?? [],
+    projects: (row.project_members ?? [])
+      .map((member: any) => member.project)
+      .filter(Boolean),
+  })) as CodevCardRow[];
+
+  return toPage(rows, count, current, size);
 };
 
 export const getCodevStatusCounts = async (

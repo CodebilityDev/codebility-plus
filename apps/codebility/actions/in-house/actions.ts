@@ -8,6 +8,8 @@ import { revalidatePath } from "next/cache";
 import {
   getCodevDetail,
   getCodevsPage,
+  getInternsPage,
+  type CodevCardRow,
   type CodevListFilters,
   type CodevListRow,
 } from "@/lib/server/codev.service";
@@ -18,6 +20,13 @@ export const fetchCodevsAction = async (
 ): Promise<Page<CodevListRow>> => {
   await requireRole("inhouse");
   return getCodevsPage(args);
+};
+
+export const fetchInternsAction = async (
+  args: PageArgs & { filters?: CodevListFilters } = {},
+): Promise<Page<CodevCardRow>> => {
+  await requireRole("inhouse");
+  return getInternsPage(args);
 };
 
 export const fetchCodevDetailAction = async (id: string) => {

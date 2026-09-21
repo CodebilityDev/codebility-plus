@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { Box } from "@/components/shared/dashboard";
 import { Button } from "@/components/ui/button";
-import { Position, Project, SkillCategory } from "@/types/home/codev";
-import { createClientClientComponent } from "@/utils/supabase/client";
+import type { PositionOption, ProjectOption } from "@/lib/server/reference-data";
 
 import { Checkbox } from "@codevs/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@codevs/ui/tabs";
@@ -19,7 +18,9 @@ interface Filters {
 
 interface FilterCodevsProps {
   filters: Filters;
-  setFilters: React.Dispatch<React.SetStateAction<Filters>>;
+  setFilters: (filters: Filters) => void;
+  positions: PositionOption[];
+  projects: ProjectOption[];
 }
 
 const AVAILABILITY_STATUS = [
@@ -34,44 +35,14 @@ const AVAILABILITY_STATUS = [
 export default function FilterCodevs({
   filters,
   setFilters,
+  positions,
+  projects,
 }: FilterCodevsProps) {
   const [showFilter, setShowFilter] = useState(false);
-  const [positions, setPositions] = useState<Position[]>([]);
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [supabase, setSupabase] = useState<any>(null);
   
   // Track button position for dropdown placement
   const [buttonRef, setButtonRef] = useState<HTMLDivElement | null>(null);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, right: 0 });
-
-  useEffect(() => {
-    const supabaseClient = createClientClientComponent();
-    setSupabase(supabaseClient);
-  }, []);
-
-  useEffect(() => {
-    if (!supabase) return;
-    const fetchData = async () => {
-      try {
-        const [positionsRes, projectsRes] = await Promise.all([
-          supabase.from("positions").select("*"),
-          supabase.from("projects").select("*"),
-        ]);
-
-        if (positionsRes.data) {
-          setPositions(positionsRes.data.filter((p) => p.name));
-        }
-
-        if (projectsRes.data) {
-          setProjects(projectsRes.data.filter((p) => p.name));
-        }
-      } catch (err) {
-        console.error("Error fetching filter data:", err);
-      }
-    };
-
-    fetchData();
-  }, [supabase]);
 
   // Calculate dropdown position when button ref changes or filter opens
   useEffect(() => {
@@ -103,13 +74,11 @@ export default function FilterCodevs({
     });
 
   const handleCheckedChange = (key: keyof Filters, value: string) => {
-    setFilters((prev: Filters) => {
-      const current = prev[key];
-      const updated = current.includes(value)
-        ? current.filter((v: string) => v !== value)
-        : [...current, value];
-      return { ...prev, [key]: updated };
-    });
+    const current = filters[key];
+    const updated = current.includes(value)
+      ? current.filter((v: string) => v !== value)
+      : [...current, value];
+    setFilters({ ...filters, [key]: updated });
   };
 
   // Render dropdown using portal to escape stacking context
