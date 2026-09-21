@@ -1,66 +1,61 @@
 "use client";
 
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useState } from "react";
 import DefaultPagination from "@/components/ui/pagination";
 import { CATEGORIES, pageSize } from "@/constants";
 import { useModal } from "@/hooks/modals/use-modal-projects";
-import usePagination from "@/hooks/data/use-pagination";
+import { usePaginatedQuery } from "@/hooks/query/use-paginated-query";
+import { qk } from "@/lib/shared/query-keys";
+import type { Page } from "@/lib/server/paginate";
 import { Project } from "@/types/home/codev";
 
 import Container from "../../../(marketing)/_components/MarketingContainer";
 import Section from "../../../(marketing)/_components/MarketingSection";
 import ProjectCard from "./ProjectCard";
+import { getProjectsPageAction } from "@/actions/projects/actions";
 
 interface ProjectCardContainerProps {
-  projects: Project[];
+  initialData: Page<Project>;
 }
 
 // Define a special ID for the "All" category
 const ALL_CATEGORY_ID = 0;
 
-const ProjectCardContainer = ({ projects }: ProjectCardContainerProps) => {
+const ProjectCardContainer = ({ initialData }: ProjectCardContainerProps) => {
   // Initialize with "All" category
   const [currentCategory, setCurrentCategory] =
     useState<number>(ALL_CATEGORY_ID);
 
   // Track current page for each tab - initialize with empty object
-  const [tabPages, setTabPages] = useState<Record<number, number>>({});
+  const [page, setPage] = useState(1);
 
   const { onOpen } = useModal();
 
-  const filteredProjects = useMemo(() => {
-    // If "All" category is selected, show all projects
-    // Otherwise, filter by the selected category (supports many-to-many)
-    return currentCategory === ALL_CATEGORY_ID
-      ? projects
-      : projects.filter(
-          (project) => project.categories?.some(cat => cat.id === currentCategory),
-        );
-  }, [currentCategory, projects]);
+  const queryKey = qk.projects.list({ category: currentCategory, page });
 
-  const {
-    currentPage,
-    totalPages,
-    paginatedData: paginatedProjects,
-    handleNextPage,
-    handlePreviousPage,
-    setCurrentPage,
-  } = usePagination(filteredProjects, pageSize.projects);
-
-  const handleTabClick = useCallback(
-    (categoryId: number) => {
-      // Save current page for the current tab before switching
-      if (currentPage > 0 && currentPage <= totalPages) {
-        setTabPages((prev) => ({
-          ...prev,
-          [currentCategory]: currentPage,
-        }));
-      }
-      setCurrentCategory(categoryId);
-      setCurrentPage(Math.min(tabPages[categoryId] || 1, totalPages || 1));
+  const { data, isPending } = usePaginatedQuery<Project>(
+    queryKey,
+    () =>
+      getProjectsPageAction({
+        page,
+        pageSize: pageSize.projects,
+        categoryId: currentCategory === ALL_CATEGORY_ID ? undefined : currentCategory,
+      }),
+    {
+      initialData,
+      // page.tsx renders exactly this key: all categories, page 1.
+      initialDataKey: qk.projects.list({ category: ALL_CATEGORY_ID, page: 1 }),
     },
-    [currentCategory, currentPage, totalPages, tabPages, setCurrentPage],
   );
+
+  const totalPages = Math.max(Math.ceil((data?.total ?? 0) / (data?.pageSize ?? 1)), 1);
+
+  const handleTabClick = useCallback((categoryId: number) => {
+    setCurrentCategory(categoryId);
+    setPage(1);
+  }, []);
+
+  const rows = data?.rows ?? [];
 
   return (
     <Section>
@@ -95,9 +90,15 @@ const ProjectCardContainer = ({ projects }: ProjectCardContainerProps) => {
 
           {/* Projects Grid */}
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {Array.isArray(paginatedProjects) &&
-            paginatedProjects.length > 0 ? (
-              paginatedProjects.map((project) => {
+            {isPending ? (
+              Array.from({ length: pageSize.projects }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-[320px] animate-pulse rounded-2xl bg-gray-200 dark:bg-gray-800"
+                />
+              ))
+            ) : rows.length > 0 ? (
+              rows.map((project) => {
                 if (!project || !project.id) return null;
                 return (
                   <ProjectCard
@@ -119,15 +120,14 @@ const ProjectCardContainer = ({ projects }: ProjectCardContainerProps) => {
             )}
           </div>
 
-          {filteredProjects.length > pageSize.projects && totalPages > 1 && (
+          {totalPages > 1 && (
             <DefaultPagination
-              currentPage={Math.max(1, Math.min(currentPage, totalPages))}
-              handleNextPage={handleNextPage}
-              handlePreviousPage={handlePreviousPage}
-              setCurrentPage={(page: number) => {
-                const validPage = Math.max(1, Math.min(page, totalPages));
-                setCurrentPage(validPage);
-              }}
+              currentPage={Math.max(1, Math.min(page, totalPages))}
+              handleNextPage={() => setPage((p) => Math.min(p + 1, totalPages))}
+              handlePreviousPage={() => setPage((p) => Math.max(p - 1, 1))}
+              setCurrentPage={(target: number) =>
+                setPage(Math.max(1, Math.min(target, totalPages)))
+              }
               totalPages={totalPages}
             />
           )}

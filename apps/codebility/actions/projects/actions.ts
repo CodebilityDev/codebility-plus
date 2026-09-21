@@ -5,6 +5,9 @@ import { Client, Codev, Project } from "@/types/home/codev";
 import { deleteImage, getImagePath } from "@/utils/uploadImage";
 import { createClientServerComponent } from "@/utils/supabase/server";
 import { fetchProjectMembers } from "@/lib/server/project-members-query";
+import { getProjectsPage } from "@/lib/server/project.service";
+import { requireRole } from "@/lib/server/auth-guard";
+import type { Page, PageArgs } from "@/lib/server/paginate";
 import { invalidateCache } from "@/lib/server/redis-cache";
 import { cacheKeys } from "@/lib/server/redis-cache-keys";
 
@@ -1121,3 +1124,10 @@ export async function getProjectByID(id: string) {
     categories: data.categories?.map((cat: any) => cat.projects_category).filter(Boolean) || [],
   };
 }
+
+export const getProjectsPageAction = async (
+  args: PageArgs & { categoryId?: number },
+): Promise<Page<Project>> => {
+  await requireRole("inhouse");
+  return getProjectsPage(args) as Promise<Page<Project>>;
+};

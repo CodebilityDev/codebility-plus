@@ -1,10 +1,8 @@
 import H1 from "@/components/shared/dashboard/H1";
 import AsyncErrorBoundary from "@/components/AsyncErrorBoundary";
-import getProjects from "@/lib/server/project.service";
-import { getOrSetCache } from "@/lib/server/redis-cache";
-import { cacheKeys } from "@/lib/server/redis-cache-keys";
+import { pageSize } from "@/constants";
+import { getProjectsPage } from "@/lib/server/project.service";
 import { Project } from "@/types/home/codev";
-import { createClientServerComponent } from "@/utils/supabase/server";
 import PageContainer from "../_components/PageContainer";
 
 import AddProjectButton from "./_components/AddProjectButton";
@@ -20,32 +18,9 @@ type PageProps = {
 
 const Projects = async (props: PageProps) => {
   const searchParams = await props.searchParams;
-  const supabase = await createClientServerComponent();
   const filter = searchParams.filter;
 
-  /*  const allProjects = await getOrSetCache(cacheKeys.projects.all, () =>
-    getProjects(),
-  ); */
-  /* to be back on redis */
-  const allProjects = await getProjects();
-
-  const Projects =
-    filter && filter !== "all"
-      ? allProjects?.filter(
-          (project) => project.status?.toLowerCase() === filter.toLowerCase(),
-        )
-      : allProjects;
-
-  if (!Projects) {
-    return (
-      <PageContainer maxWidth="xl">
-        <H1>Projects</H1>
-        <div className="flex flex-col items-center justify-center gap-4">
-          <p className="text-lg font-semibold">No projects found</p>
-        </div>
-      </PageContainer>
-    );
-  }
+  const initialData = await getProjectsPage({ page: 1, pageSize: pageSize.projects });
 
   return (
     <PageContainer maxWidth="xl">
@@ -68,8 +43,8 @@ const Projects = async (props: PageProps) => {
               <AddProjectButton />
             </div>
           </div>
-          {Projects && Projects.length > 0 && (
-            <ProjectCardContainer projects={Projects as Project[]} />
+          {initialData.total > 0 && (
+            <ProjectCardContainer initialData={initialData as unknown as import("@/lib/server/paginate").Page<Project>} />
           )}
         </div>
       </AsyncErrorBoundary>
