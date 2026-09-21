@@ -9,7 +9,7 @@ async function NewsBannersData() {
 
   const { data, error } = await supabase
     .from("news_banners")
-    .select("*")
+    .select("id, title, message, type, image_url, is_active, priority, start_date, end_date, created_at")
     .order("priority", { ascending: false })
     .order("created_at", { ascending: false });
 

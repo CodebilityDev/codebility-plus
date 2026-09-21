@@ -11,7 +11,7 @@ async function SurveysData() {
   // RLS, so anyone with the `settings` permission still sees what they saw before.
   const { data, error } = await supabase
     .from("surveys")
-    .select("*")
+    .select("id, title, description, type, image_url, target_audience, is_active, priority, start_date, end_date, created_at")
     .order("priority", { ascending: false })
     .order("created_at", { ascending: false });
 
