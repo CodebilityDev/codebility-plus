@@ -6,8 +6,6 @@ import PageContainer from "../../_components/PageContainer";
 import { getTickets, getCodevList } from "@/actions/admin/ticket-support";
 import TicketManagementView from "./_components/TicketManagementView";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
 
 function TicketManagementLoading() {
   return (

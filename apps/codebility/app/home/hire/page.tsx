@@ -5,8 +5,6 @@ import { H1 } from "@/components/shared/dashboard";
 import PageContainer from "../_components/PageContainer";
 import { createClientServerComponent } from "@/utils/supabase/server";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
 
 export default async function HirePage() {
   const supabase = await createClientServerComponent();

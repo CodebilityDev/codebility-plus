@@ -8,6 +8,8 @@ import { Toaster } from "sonner";
 
 import HomeChrome from "./_components/HomeChrome";
 import MobileNav from "./_components/MobileNav";
+import SurveyWidget, { type Survey } from "./_components/SurveyWidget";
+import { getDismissedSurveys, getPendingSurveyForUser } from "@/actions/settings/surveys";
 import LeftSidebarServer, {
   getSidebarRoleId,
 } from "@/components/shared/dashboard/LeftSidebarServer";
@@ -27,6 +29,12 @@ export default async function HomeLayout({
   // action and is not cache()-deduped).
   const sidebarPromise = getSidebarData(getSidebarRoleId(currentUser));
 
+  // Resolved on the server so the widget issues no client request on load.
+  const surveyPromise = Promise.all([
+    getPendingSurveyForUser(),
+    getDismissedSurveys(),
+  ]);
+
   return (
     <ThemeProvider>
       <ReactQueryProvider>
@@ -40,6 +48,11 @@ export default async function HomeLayout({
             mobileNav={
               <Suspense fallback={null}>
                 <MobileNavSlot sidebarPromise={sidebarPromise} />
+              </Suspense>
+            }
+            survey={
+              <Suspense fallback={null}>
+                <SurveySlot surveyPromise={surveyPromise} />
               </Suspense>
             }
           >
@@ -76,4 +89,24 @@ async function MobileNavSlot({
   sidebarPromise: SidebarPromise;
 }) {
   return <MobileNav sidebarData={await sidebarPromise} />;
+}
+
+type SurveyPromise = Promise<
+  [
+    Awaited<ReturnType<typeof getPendingSurveyForUser>>,
+    Awaited<ReturnType<typeof getDismissedSurveys>>,
+  ]
+>;
+
+async function SurveySlot({ surveyPromise }: { surveyPromise: SurveyPromise }) {
+  const [pending, dismissed] = await surveyPromise;
+
+  return (
+    <SurveyWidget
+      pendingSurvey={"data" in pending ? pending.data : null}
+      initialDismissed={
+        ("data" in dismissed ? (dismissed.data ?? []) : []) as Survey[]
+      }
+    />
+  );
 }

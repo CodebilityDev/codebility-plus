@@ -8,7 +8,6 @@ import ServicesPageClient from "./_components/ServicesPageClient";
 // Both actions read cookies through the Supabase server client, so this route
 // cannot be statically prerendered.
 export const dynamic = "force-dynamic";
-export const revalidate = 0;
 
 export default async function ServicesPage() {
   // Both datasets were fetched in a client mount effect; resolving them here

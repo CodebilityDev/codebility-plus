@@ -1,5 +1,9 @@
 // Phase 2 regression target: kanban board drag-and-drop surface must still mount.
 // Read-only verification: opens a board, counts columns/cards, checks dnd attrs.
+//
+// The task card and "Add a card" controls sit under dnd-kit pointer listeners,
+// which consume synthetic clicks, so this script stops at the board surface and
+// screenshots it. Reach the board (2 steps + dnd nodes) is the gate.
 import path from "node:path";
 import os from "node:os";
 import fs from "node:fs";
@@ -49,9 +53,11 @@ const board = await page.evaluate(() => {
   const dnd = document.querySelectorAll("[data-rbd-draggable-id],[data-dnd-kit],[role='button'][aria-roledescription]");
   const tiptap = document.querySelectorAll(".ProseMirror,.tiptap");
   const cols = document.querySelectorAll("[data-column-id],[class*='kanban']");
+  const taskCards = document.querySelectorAll('[data-type="Task"]');
   return {
     url: location.href,
     dndNodes: dnd.length,
+    taskCards: taskCards.length,
     tiptapNodes: tiptap.length,
     kanbanish: cols.length,
     bodyLen: document.body.innerText.length,

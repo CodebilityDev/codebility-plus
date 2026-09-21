@@ -1,50 +1,34 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { MessageSquare, ChevronDown, ChevronUp } from "lucide-react";
 
 import { useModal } from "@/hooks/modals/use-modal";
 import { Button } from "@codevs/ui/button";
-import {
-  getPendingSurveyForUser,
-  getDismissedSurveys,
-  undismissSurvey,
-} from "@/actions/settings/surveys";
+import { undismissSurvey } from "@/actions/settings/surveys";
 import { getSurveyQuestions } from "@/actions/settings/survey-questions";
 
-interface Survey {
+export interface Survey {
   id: string;
   title: string;
   description: string;
   type: string;
 }
 
-const surveysKey = ["surveys", "widget"] as const;
-
-export default function SurveyWidget() {
+export default function SurveyWidget({
+  pendingSurvey,
+  initialDismissed,
+}: {
+  pendingSurvey: unknown;
+  initialDismissed: Survey[];
+}) {
   const { onOpen } = useModal();
-  const queryClient = useQueryClient();
   const [showDismissed, setShowDismissed] = useState(false);
+  const [dismissed, setDismissed] = useState(initialDismissed);
 
-  const { data, isLoading } = useQuery({
-    queryKey: surveysKey,
-    queryFn: async () => {
-      const [pending, dismissed] = await Promise.all([
-        getPendingSurveyForUser(),
-        getDismissedSurveys(),
-      ]);
-      return {
-        pending: pending.data ?? null,
-        dismissed: (dismissed.data ?? []) as Survey[],
-      };
-    },
-  });
-
-  // The modal reads its content from the store, so opening it is imperative and
-  // this cannot be expressed as render output. One-shot guard keeps a background
-  // refetch from re-opening a survey the user already dismissed.
-  const pendingSurvey = data?.pending ?? null;
+  // The modal reads its content from the store, so opening it is imperative.
+  // One-shot guard keeps a re-render from re-opening a survey already dismissed.
   const autoOpened = useRef(false);
   useEffect(() => {
     if (!pendingSurvey || autoOpened.current) return;
@@ -61,20 +45,13 @@ export default function SurveyWidget() {
     },
     onSuccess: (surveyWithQuestions) => {
       onOpen("surveyModal", surveyWithQuestions);
-      queryClient.setQueryData(surveysKey, (prev: typeof data) =>
-        prev
-          ? {
-              ...prev,
-              dismissed: prev.dismissed.filter((s) => s.id !== surveyWithQuestions.id),
-            }
-          : prev,
+      setDismissed((prev) =>
+        prev.filter((s) => s.id !== surveyWithQuestions.id),
       );
     },
   });
 
-  const dismissedSurveys = data?.dismissed ?? [];
-
-  if (isLoading || dismissedSurveys.length === 0) return null;
+  if (dismissed.length === 0) return null;
 
   return (
     <div className="fixed bottom-4 right-4 z-50">
@@ -91,8 +68,8 @@ export default function SurveyWidget() {
               Pending Surveys
             </p>
             <p className="text-xs text-gray-600 dark:text-gray-400">
-              {dismissedSurveys.length} survey
-              {dismissedSurveys.length !== 1 ? "s" : ""} waiting
+              {dismissed.length} survey
+              {dismissed.length !== 1 ? "s" : ""} waiting
             </p>
           </div>
           {showDismissed ? (
@@ -104,7 +81,7 @@ export default function SurveyWidget() {
 
         {showDismissed && (
           <div className="max-h-64 overflow-y-auto border-t border-gray-200 dark:border-gray-700">
-            {dismissedSurveys.map((survey) => (
+            {dismissed.map((survey) => (
               <div
                 key={survey.id}
                 className="border-b border-gray-100 p-4 last:border-0 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-700/50"

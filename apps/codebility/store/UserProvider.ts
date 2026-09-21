@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import type { Codev } from "@/types/home/codev";
+import type { CurrentCodev } from "@/lib/server/current-codev";
 import { useUserStore } from "@/store/codev-store";
 
 /**
@@ -19,7 +20,7 @@ export function UserProvider({
   initialUser,
 }: {
   children: React.ReactNode;
-  initialUser?: Codev | null;
+  initialUser?: Codev | CurrentCodev | null;
 }) {
   const seeded = useRef(false);
 

@@ -7,8 +7,6 @@ import { notFound } from "next/navigation";
 import CustomBreadcrumb from "@/components/shared/dashboard/CustomBreadcrumb";
 import { createClientServerComponent } from "@/utils/supabase/server";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
 
 interface TeamDetailPageProps {
   params: Promise<{

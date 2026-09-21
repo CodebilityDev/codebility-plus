@@ -1,9 +1,10 @@
 import { Codev } from "@/types/home/codev";
+import type { CurrentCodev } from "@/lib/server/current-codev";
 import { createClientClientComponent } from "@/utils/supabase/client";
 import { create } from "zustand";
 
 interface UserState {
-  user: Codev | null;
+  user: Codev | CurrentCodev | null;
   userLevel: number | null;
   setUser: (user: Codev) => void;
   setUserLevel: (level: number) => void;

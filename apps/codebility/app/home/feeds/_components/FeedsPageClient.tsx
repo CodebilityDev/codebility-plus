@@ -5,7 +5,7 @@ import CreatePostModal from "@/components/modals/CreatePostModal";
 import { defaultAvatar } from "@/public/assets/images";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import type { Codev } from "@/types/home/codev";
+import type { CurrentCodev } from "@/lib/server/current-codev";
 import type { PostType } from "@/types/feeds";
 
 import Feed from "./Feed";
@@ -33,7 +33,7 @@ export default function FeedsPageClient({
   socialPoints,
   initialPosts,
 }: {
-  user: Codev | null;
+  user: CurrentCodev | null;
   isAdmin: boolean;
   userHasNotPostedYet: boolean;
   socialPoints: number | null;

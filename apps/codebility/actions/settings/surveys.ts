@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { createClientServerComponent } from "@/utils/supabase/server";
 import { deleteImage, getImagePath } from "@/utils/uploadImage";
 import { z } from "zod";
@@ -334,6 +335,7 @@ export async function dismissSurvey(surveyId: string) {
       return { error: error.message };
     }
 
+    revalidatePath("/home", "layout");
     return { success: true };
   } catch (error) {
     return { error: "Failed to dismiss survey" };
@@ -359,6 +361,7 @@ export async function undismissSurvey(surveyId: string) {
       return { error: error.message };
     }
 
+    revalidatePath("/home", "layout");
     return { success: true };
   } catch (error) {
     return { error: "Failed to reopen survey" };

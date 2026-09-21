@@ -4,8 +4,6 @@ import { createClientServerComponent } from "@/utils/supabase/server";
 import OrgCharts from "./_components/OrgChart";
 import OrgChartSkeleton from "./_components/OrgChartSkeleton";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
 
 async function OrgChartData() {
   const supabase = await createClientServerComponent();

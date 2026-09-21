@@ -1,7 +1,6 @@
 import { cache } from "react";
-import type { Codev } from "@/types/home/codev";
 import { createClientServerComponent } from "@/utils/supabase/server";
-import { getCurrentCodev } from "./current-codev";
+import { getCurrentCodev, type CurrentCodev } from "./current-codev";
 import {
   getCachedLevels,
   getCachedSkillCategories,
@@ -24,7 +23,7 @@ import {
  */
 
 /** The /home layout already reads this row for the sidebar and user store. */
-export type DashboardUser = Codev;
+export type DashboardUser = CurrentCodev;
 
 export type DashboardProject = {
   role: string;

@@ -55,6 +55,13 @@ const config = withPlugins([[withBundleAnalyzer({ enabled: env.ANALYZE })]], {
     serverActions: {
       bodySizeLimit: "500mb",
     },
+    // Next 15 defaults the client Router Cache for dynamic segments to 0s, so
+    // every navigation refetched the RSC payload and re-fired loading.tsx.
+    // Mutations must revalidatePath so this window never serves stale writes.
+    staleTimes: {
+      dynamic: 30,
+      static: 180,
+    },
   },
   images: {
     remotePatterns: [

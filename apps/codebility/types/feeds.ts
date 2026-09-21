@@ -16,6 +16,7 @@ export type PostType = {
 
   upvote_count?: number;
   comment_count?: number;
+  has_upvoted?: boolean;
 
   tags: {
     tag_id: string;

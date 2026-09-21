@@ -7,8 +7,6 @@ import {
   getUserLikedPosts,
 } from "@/actions/overflow/actions";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
 
 export default async function OverflowPage() {
   const supabase = await createClientServerComponent();

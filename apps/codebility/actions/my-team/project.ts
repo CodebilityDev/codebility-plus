@@ -258,6 +258,7 @@ export async function syncAllAttendancePoints(projectId?: string) {
       })
     );
     
+    revalidatePath("/home/my-team");
     return {
       success: true,
       message: `Successfully synced ${uniqueCodevIds.length} members`,

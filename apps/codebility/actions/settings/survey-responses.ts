@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { createClientServerComponent } from "@/utils/supabase/server";
 import { z } from "zod";
 
@@ -44,6 +45,7 @@ export async function submitSurveyResponse(
       return { error: error.message };
     }
 
+    revalidatePath("/home", "layout");
     return { data, success: true };
   } catch (error) {
     if (error instanceof z.ZodError) {

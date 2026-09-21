@@ -11,8 +11,6 @@ import AddProjectButton from "./_components/AddProjectButton";
 import ProjectCardContainer from "./_components/ProjectCardContainer";
 import ProjectFilterButton from "./_components/ProjectFilterButton";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
 
 type PageProps = {
   searchParams: Promise<{

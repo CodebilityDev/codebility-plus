@@ -84,11 +84,13 @@ export default function AdminDashboardMonthlyApplicantsLineChart({
         ? "text-red-400"
         : "text-muted-foreground";
   const trendLabel =
-    trendDiff > 0
-      ? `Up ${trendPercent}% from last month`
-      : trendDiff < 0
-        ? `Down ${trendPercent}% from last month`
-        : "No change from last month";
+    trendPercent === null
+      ? "No prior month to compare"
+      : trendDiff > 0
+        ? `Up ${trendPercent}% from last month`
+        : trendDiff < 0
+          ? `Down ${trendPercent}% from last month`
+          : "No change from last month";
 
   // Y-axis: nice rounded max with some breathing room
   const maxApplicants = Math.max(...chartData.map((d) => d.applicants), 0);

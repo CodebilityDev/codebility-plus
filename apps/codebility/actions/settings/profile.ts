@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { cachedUser } from "@/lib/server/supabase-action";
 import {
   Codev,
@@ -27,9 +28,10 @@ export async function updateCodev(updatedData: Partial<Codev>) {
         updated_at: new Date().toISOString(),
       })
       .eq("id", user.id)
-      .select("*");
+      .select("id");
 
     if (error) throw error;
+    revalidatePath("/home/settings/profile");
     return data;
   } catch (error) {
     console.error("Error updating codev:", error);
@@ -56,9 +58,10 @@ export async function updateSocialLinks(socialData: {
         updated_at: new Date().toISOString(),
       })
       .eq("id", user.id)
-      .select("*");
+      .select("id");
 
     if (error) throw error;
+    revalidatePath("/home/settings/profile");
     return data;
   } catch (error) {
     console.error("Error updating social links:", error);
@@ -84,6 +87,7 @@ export async function createWorkExperience(
       .select();
 
     if (error) throw error;
+    revalidatePath("/home/settings/profile");
     return data;
   } catch (error) {
     console.error("Error creating work experience:", error);
@@ -108,6 +112,7 @@ export async function updateWorkExperience(
       .select();
 
     if (error) throw error;
+    revalidatePath("/home/settings/profile");
     return data;
   } catch (error) {
     console.error("Error updating work experience:", error);
@@ -128,6 +133,7 @@ export async function deleteWorkExperience(id: string) {
       .eq("id", id);
 
     if (error) throw error;
+    revalidatePath("/home/settings/profile");
   } catch (error) {
     console.error("Error deleting work experience:", error);
     throw new Error("Failed to delete work experience");
@@ -152,6 +158,7 @@ export async function createEducation(
       .select();
 
     if (error) throw error;
+    revalidatePath("/home/settings/profile");
     return data;
   } catch (error) {
     console.error("Error creating education:", error);
@@ -176,6 +183,7 @@ export async function updateEducation(
       .select();
 
     if (error) throw error;
+    revalidatePath("/home/settings/profile");
     return data;
   } catch (error) {
     console.error("Error updating education:", error);
@@ -196,6 +204,7 @@ export async function deleteEducation(id: string) {
       .eq("id", id);
 
     if (error) throw error;
+    revalidatePath("/home/settings/profile");
   } catch (error) {
     console.error("Error deleting education:", error);
     throw new Error("Failed to delete education");
@@ -280,6 +289,7 @@ export async function updateWorkSchedule(
       throw new Error("Failed to insert new schedule");
     }
 
+    revalidatePath("/home/settings/profile");
     return data[0];
   } catch (error) {
     if (error instanceof Error) {
@@ -328,6 +338,7 @@ export async function createJobStatus(jobStatus: Omit<JobStatus, "id">) {
       .single();
 
     if (error) throw error;
+    revalidatePath("/home/settings/profile");
     return [data]; // Return as array to match expected format
   } catch (error) {
     console.error("Error creating job status:", error);
@@ -355,6 +366,7 @@ export async function updateJobStatus(
       .single();
 
     if (error) throw error;
+    revalidatePath("/home/settings/profile");
     return data;
   } catch (error) {
     console.error("Error updating job status:", error);
@@ -375,6 +387,7 @@ export async function deleteJobStatus(id: string) {
       .eq("id", id);
 
     if (error) throw error;
+    revalidatePath("/home/settings/profile");
   } catch (error) {
     console.error("Error deleting job status:", error);
     throw new Error("Failed to delete job status");

@@ -9,7 +9,6 @@ import AdminDashboardProjectsPie from "./_components/AdminDashboardProjectsPie";
 import AdminDashboardStatsCard from "./_components/AdminDashboardStatsCard";
 
 // Force dynamic rendering to avoid prerender errors with Supabase env vars
-export const dynamic = "force-dynamic";
 // Use ISR with 60 second revalidation for dashboard stats
 export const revalidate = 60;
 

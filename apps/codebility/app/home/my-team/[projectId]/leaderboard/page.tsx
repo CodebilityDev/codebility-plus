@@ -9,7 +9,6 @@ import CustomBreadcrumb from "@/components/shared/dashboard/CustomBreadcrumb";
 import LeaderboardSort from "./_components/LeaderboardSort";
 import { getLeaderboardData, LeaderboardTimeRange } from "@/actions/my-team/leaderboard";
 
-export const dynamic = "force-dynamic";
 
 export default async function LeaderboardPage({
   params,

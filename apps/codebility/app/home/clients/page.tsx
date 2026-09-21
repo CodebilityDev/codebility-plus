@@ -7,8 +7,6 @@ import PageContainer from "../_components/PageContainer";
 import ClientButtons from "./_components/ClientsButton";
 import ClientCards from "./_components/ClientsCard";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
 
 export default async function Clients() {
   const { data, error } = await getClients();

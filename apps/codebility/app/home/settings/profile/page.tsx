@@ -17,8 +17,6 @@ import ProfileCompletionGuide from "./_components/ProfileCompletionGuide";
 import Loading from "./loading";
 
 // Prevent static generation at build time
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
 
 const items = [
   { label: "Settings", href: "/home/settings" },

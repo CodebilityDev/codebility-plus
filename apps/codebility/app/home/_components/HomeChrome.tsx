@@ -9,7 +9,6 @@ import Navbar from "./Navbar";
 import { NavigationOptimizer } from "./NavigationOptimizer";
 import ConditionalMainWrapper from "./ConditionalMainWrapper";
 import DynamicMainContent from "./DynamicMainContent";
-import SurveyWidget from "./SurveyWidget";
 
 // Never import an async Server Component here: this module is "use client", so
 // it throws "<X> is an async Client Component". Render it in layout.tsx instead.
@@ -17,10 +16,12 @@ export default function HomeChrome({
   children,
   sidebar,
   mobileNav,
+  survey,
 }: {
   children: ReactNode;
   sidebar: ReactNode;
   mobileNav: ReactNode;
+  survey: ReactNode;
 }) {
   return (
     <div className="background-light850_dark100 flex min-h-screen flex-col overflow-hidden">
@@ -50,7 +51,7 @@ export default function HomeChrome({
         </DynamicMainContent>
       </div>
 
-      <SurveyWidget />
+      {survey}
     </div>
   );
 }

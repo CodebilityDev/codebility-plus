@@ -1,4 +1,5 @@
 "use server";
+import { revalidatePath } from "next/cache";
 import { createClientServerComponent } from "@/utils/supabase/server";
 import { deleteImage, getImagePath } from "@/utils/uploadImage";
 import { createPostSchema, editPostSchema } from "@/utils/validations/feeds";
@@ -103,6 +104,7 @@ export const addPost = async (payload: AddPostParams) => {
       if (tagError) throw tagError;
     }
 
+    revalidatePath("/home/feeds");
     return newPost;
   } catch (error) {
     if (error instanceof ZodError) {
@@ -139,6 +141,7 @@ export const deletePost = async (post_id: string) => {
 
     if (error) throw error;
 
+    revalidatePath("/home/feeds");
     return data;
   } catch (error) {
     throw error;
@@ -250,6 +253,7 @@ export const editPost = async (payload: EditPostParams) => {
       }
     }
 
+    revalidatePath("/home/feeds");
     return updatedPost;
   } catch (error) {
     if (error instanceof ZodError) {
@@ -265,7 +269,7 @@ export const AddPostUpvote = async (postId: string, userId: string) => {
 
     const { data: postUpvote, error: fetchError } = await supabase
       .from("post_upvotes")
-      .select("*")
+      .select("id")
       .eq("post_id", postId)
       .eq("upvoter_id", userId)
       .maybeSingle();
@@ -284,6 +288,7 @@ export const AddPostUpvote = async (postId: string, userId: string) => {
 
     if (insertError) throw insertError;
 
+    revalidatePath("/home/feeds");
     return newUpvote;
   } catch (error) {
     throw error;
@@ -301,25 +306,8 @@ export const removePostUpvote = async (postId: string, userId: string) => {
       .eq("upvoter_id", userId);
 
     if (error) throw error;
-  } catch (error) {
-    throw error;
-  }
-};
 
-export const hasUserUpvoted = async (postId: string, userId: string): Promise<boolean> => {
-  try {
-    const supabase = await createClientServerComponent();
-
-    const { data: postUpvote, error } = await supabase
-      .from("post_upvotes")
-      .select("*")
-      .eq("post_id", postId)
-      .eq("upvoter_id", userId)
-      .maybeSingle();
-
-    if (error) throw error;
-
-    return !!postUpvote;
+    revalidatePath("/home/feeds");
   } catch (error) {
     throw error;
   }
@@ -463,6 +451,7 @@ export async function deletePostComment(comment_id: string) {
 
     if (error) throw error;
 
+    revalidatePath("/home/feeds");
     return { success: true };
   } catch (error) {
     throw error;
@@ -599,6 +588,7 @@ export async function createComment(
       }
     }
 
+    revalidatePath("/home/feeds");
     return comment;
   } catch (error) {
     throw error;

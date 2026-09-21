@@ -8,7 +8,6 @@ import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Certificate, { CertificateProps } from "../(dashboard)/_components/DashboardDownloadCertificate";
 
-export const dynamic = "force-dynamic";
 
 export default function CertificatePreview() {
   const router = useRouter();

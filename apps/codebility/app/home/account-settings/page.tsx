@@ -13,7 +13,6 @@ import AccountSettingsDelete from "./_components/AccountSettingsDelete";
 import AccountSettingsHeader from "./_components/AccountSettingsHeader";
 import AccountSettingsUsername from "./_components/AccountSettingsUsername";
 
-export const dynamic = "force-dynamic";
 
 const items = [
   { label: "Settings", href: "/home/settings" },

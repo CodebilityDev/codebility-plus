@@ -2,8 +2,6 @@ import { createClientServerComponent } from "@/utils/supabase/server";
 
 import TicketSupportForm from "./_components/TicketSupportForm";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
 
 interface CodevData {
     id: string;

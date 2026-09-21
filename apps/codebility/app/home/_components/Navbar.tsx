@@ -7,6 +7,7 @@ import Theme from "@/components/shared/dashboard/Theme";
 import { MobileTheme } from "@/components/shared/dashboard/theme-mobile";
 import { defaultAvatar } from "@/public/assets/images";
 import type { Codev } from "@/types/home/codev";
+import type { CurrentCodev } from "@/lib/server/current-codev";
 import {
   IconCog,
   IconDropdown,
@@ -111,7 +112,7 @@ const Navbar = ({ mobileNav }: { mobileNav: React.ReactNode }) => {
  * Isolated so that nothing else in the navbar re-renders when the dropdown's
  * internal open/close state changes.
  */
-function UserMenu({ user }: { user: Codev }) {
+function UserMenu({ user }: { user: Codev | CurrentCodev }) {
   const { first_name, last_name, email_address, image_url, role_id } = user;
 
   const menuItems = role_id === 1 ? adminMenus : defaultMenuItems;
