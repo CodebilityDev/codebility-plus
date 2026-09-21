@@ -43,6 +43,7 @@ export default function AnnouncementRichTextEditor({
       }),
     ],
     content: value,
+    immediatelyRender: false,
     editorProps: {
       attributes: {
         class:

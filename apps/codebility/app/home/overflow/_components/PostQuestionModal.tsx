@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, memo, useCallback } from "react";
 import { Button } from "@codevs/ui/button";
@@ -244,7 +244,7 @@ const ImageUploadSection = memo(function ImageUploadSection({
           )}
         </Label>
         <p className="text-xs text-gray-500">
-          Images, PDF, DOC, TXT • Max 10MB each
+          Images, PDF, DOC, TXT â€¢ Max 10MB each
         </p>
       </div>
 
@@ -296,10 +296,13 @@ export default function PostQuestionModal({
         autolink: true,
       }),
       Placeholder.configure({
-        placeholder: 'Describe your problem in detail. Include:\n• What you\'re trying to achieve\n• What you\'ve tried so far\n• Any error messages\n• Code snippets (if relevant)',
+        placeholder: 'Describe your problem in detail. Include:\nâ€¢ What you\'re trying to achieve\nâ€¢ What you\'ve tried so far\nâ€¢ Any error messages\nâ€¢ Code snippets (if relevant)',
       }),
     ],
     content: '',
+    // Tiptap warns and drops to a client render when it sees an SSR pass
+    // without this flag, which shows up as a hydration mismatch.
+    immediatelyRender: false,
     editorProps: {
       attributes: {
         class: 'prose prose-sm max-w-none focus:outline-none min-h-[250px] p-4 text-gray-900 dark:text-white dark:prose-invert',
@@ -508,7 +511,7 @@ export default function PostQuestionModal({
                 className="border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:border-customBlue-500 focus:ring-2 focus:ring-customBlue-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 dark:focus:border-customBlue-400"
               />
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                {title.length}/150 characters • Be specific and clear
+                {title.length}/150 characters â€¢ Be specific and clear
               </p>
             </div>
 
@@ -521,7 +524,7 @@ export default function PostQuestionModal({
                 <EditorContent editor={editor} />
               </div>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                {editor?.storage.characterCount?.characters() || 0} characters • Press <kbd className="px-1.5 py-0.5 text-xs font-semibold bg-gray-100 border border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600">Ctrl+Enter</kbd> to submit
+                {editor?.storage.characterCount?.characters() || 0} characters â€¢ Press <kbd className="px-1.5 py-0.5 text-xs font-semibold bg-gray-100 border border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600">Ctrl+Enter</kbd> to submit
               </p>
             </div>
 
@@ -537,7 +540,7 @@ export default function PostQuestionModal({
                 className="border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:border-customBlue-500 focus:ring-2 focus:ring-customBlue-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 dark:focus:border-customBlue-400"
               />
               <p className="text-xs text-gray-600 dark:text-gray-400">
-                Separate tags with commas • Helps others find your question
+                Separate tags with commas â€¢ Helps others find your question
               </p>
             </div>
 
@@ -552,7 +555,7 @@ export default function PostQuestionModal({
 
         <div className="flex justify-between items-center gap-3 p-6 pt-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-slate-950">
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            💡 Tip: {isEditMode ? 'Update your question to make it clearer' : 'Clear questions get better answers faster'}
+            ðŸ’¡ Tip: {isEditMode ? 'Update your question to make it clearer' : 'Clear questions get better answers faster'}
           </p>
           <div className="flex gap-2">
             <Button
@@ -605,6 +608,7 @@ export const QuestionContentDisplay = memo(function QuestionContentDisplay({
     ],
     content: content,
     editable: false,
+    immediatelyRender: false,
     editorProps: {
       attributes: {
         class: `prose prose-sm max-w-none text-gray-900 dark:text-white dark:prose-invert ${className}`,
