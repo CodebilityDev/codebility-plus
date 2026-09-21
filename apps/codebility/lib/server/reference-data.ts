@@ -4,6 +4,7 @@ import { createClientServerComponent } from "@/utils/supabase/server";
 export type RoleOption = { id: number; name: string };
 export type PositionOption = { id: string; name: string | null };
 export type ProjectOption = { id: string; name: string };
+export type SkillCategoryOption = { id: string; name: string };
 
 // Identical for every signed-in user, and read by several tables and their
 // dialogs. Created per request by React `cache()`; the client bundle passes
@@ -36,4 +37,18 @@ export const getProjectOptions = cache(async (): Promise<ProjectOption[]> => {
     return [];
   }
   return (data ?? []) as ProjectOption[];
+});
+
+// Read once per request instead of once per rendered badge; a grid of cards
+// used to issue one identical query per card.
+export const getSkillCategories = cache(async (): Promise<SkillCategoryOption[]> => {
+  const supabase = await createClientServerComponent();
+  const { data, error } = await supabase
+    .from("skill_category")
+    .select("id, name");
+  if (error) {
+    console.error("Failed to fetch skill categories:", error);
+    return [];
+  }
+  return (data ?? []) as SkillCategoryOption[];
 });

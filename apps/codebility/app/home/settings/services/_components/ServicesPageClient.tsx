@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useRef } from "react";
 import { DollarSign, Eye, X, ChevronLeft, ChevronRight } from "lucide-react";
@@ -164,192 +164,6 @@ export default function ServicesPageClient({
     }
   };
 
-  const generateServicesPDF = async () => {
-    if (services.length === 0) {
-      toast.error("No services available to export");
-      return;
-    }
-
-    if (!showPreview) {
-      toast.error("Please open the preview first, then click Download PDF from within the preview");
-      return;
-    }
-
-    try {
-      toast("Generating PDF with all pages...", { duration: 5000 });
-
-      // Dynamically import libraries
-      const html2canvas = (await import('html2canvas')).default;
-      const { default: jsPDF } = await import('jspdf');
-
-      // Get all page elements (exclude split preview pages, only use original pages for capture)
-      const pages = document.querySelectorAll('#pdf-all-pages-hidden .pdf-page:not(.pdf-split-page)');
-
-      if (pages.length === 0) {
-        toast.error("No pages found to export");
-        return;
-      }
-
-      // Create new PDF
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
-      });
-
-      // Create an overlay to hide the rendering from user
-      const overlay = document.createElement('div');
-      overlay.style.position = 'fixed';
-      overlay.style.top = '0';
-      overlay.style.left = '0';
-      overlay.style.width = '100vw';
-      overlay.style.height = '100vh';
-      overlay.style.background = 'linear-gradient(135deg, #1e293b 0%, #312e81 50%, #1e1b4b 100%)';
-      overlay.style.zIndex = '999999';
-      overlay.style.display = 'flex';
-      overlay.style.alignItems = 'center';
-      overlay.style.justifyContent = 'center';
-      overlay.innerHTML = '<div style="text-align: center;"><div style="font-size: 24px; font-weight: bold; margin-bottom: 10px; color: white;">Generating PDF...</div><div style="font-size: 16px; color: #a5b4fc;">Please wait while we capture all pages</div></div>';
-      document.body.appendChild(overlay);
-
-      // Capture each page
-      for (let i = 0; i < pages.length; i++) {
-        const page = pages[i] as HTMLElement;
-
-        // Update overlay message
-        overlay.innerHTML = `<div style="text-align: center;"><div style="font-size: 24px; font-weight: bold; margin-bottom: 10px; color: white;">Generating PDF...</div><div style="font-size: 16px; color: #a5b4fc;">Capturing page ${i + 1} of ${pages.length}</div></div>`;
-
-        // Temporarily show the page on-screen but behind the overlay
-        const originalPosition = page.style.position;
-        const originalLeft = page.style.left;
-        const originalTop = page.style.top;
-        const originalZIndex = page.style.zIndex;
-
-        page.style.position = 'fixed';
-        page.style.left = '0';
-        page.style.top = '0';
-        page.style.zIndex = '999998'; // Just below the overlay
-
-        // Wait for render
-        await new Promise(resolve => setTimeout(resolve, 300));
-
-        // Get actual page dimensions and define A4 constants
-        const a4HeightPx = 1123; // A4 height in pixels at 96 DPI
-        const pageHeight = page.scrollHeight;
-        const pageWidth = page.offsetWidth;
-
-        // Capture with html2canvas without forcing dimensions
-        const canvas = await html2canvas(page, {
-          scale: 2,
-          useCORS: true,
-          logging: false,
-          backgroundColor: '#0f172a'
-        });
-
-        // Hide the page again
-        page.style.position = originalPosition;
-        page.style.left = originalLeft;
-        page.style.top = originalTop;
-        page.style.zIndex = originalZIndex;
-
-        // Calculate how many PDF pages this content needs
-        const a4HeightMm = 297; // A4 height in mm
-        const a4WidthMm = 210; // A4 width in mm
-
-        const numPages = Math.ceil(pageHeight / a4HeightPx);
-
-        // Split the canvas into multiple PDF pages if needed
-        for (let j = 0; j < numPages; j++) {
-          if (i > 0 || j > 0) {
-            pdf.addPage();
-          }
-
-          // Set PDF page background color
-          pdf.setFillColor(15, 23, 42); // #0f172a in RGB
-          pdf.rect(0, 0, a4WidthMm, a4HeightMm, 'F');
-
-          // Calculate the portion of the canvas to use
-          const sourceY = j * a4HeightPx * 2; // *2 because canvas is scaled at 2x
-          const sourceHeight = Math.min(a4HeightPx * 2, canvas.height - sourceY);
-
-          // Skip if sourceHeight is invalid
-          if (sourceHeight <= 0) {
-            console.warn(`⚠️ Page ${i + 1}, section ${j + 1}: Invalid sourceHeight (${sourceHeight}), skipping`);
-            continue;
-          }
-
-          // Create a temporary canvas for this portion
-          const tempCanvas = document.createElement('canvas');
-          tempCanvas.width = canvas.width;
-          tempCanvas.height = sourceHeight;
-
-          const ctx = tempCanvas.getContext('2d');
-          if (ctx) {
-            // Draw the content portion (background already filled by PDF)
-            ctx.drawImage(
-              canvas,
-              0, sourceY, // source x, y
-              canvas.width, sourceHeight, // source width, height
-              0, 0, // dest x, y
-              canvas.width, sourceHeight // dest width, height
-            );
-
-            const imgData = tempCanvas.toDataURL('image/png', 1.0); // PNG with transparency
-
-            // Validate the PNG data
-            if (!imgData || imgData === 'data:,') {
-              console.error(`❌ Page ${i + 1}, section ${j + 1}: Failed to generate valid PNG data`);
-              continue;
-            }
-
-            // Calculate actual height in mm for this portion
-            const portionHeightMm = (sourceHeight / (a4HeightPx * 2)) * a4HeightMm;
-
-            pdf.addImage(imgData, 'PNG', 0, 0, a4WidthMm, portionHeightMm);
-
-            // Add footer to each split page (except if it's the last section and already has footer)
-            const isLastSection = j === numPages - 1;
-            if (!isLastSection && i > 0) { // Skip cover page (i=0) and last section of each service
-              // Draw footer background
-              pdf.setFillColor(30, 27, 75); // Dark indigo
-              const footerHeight = 15; // mm
-              const footerY = a4HeightMm - footerHeight;
-              pdf.rect(0, footerY, a4WidthMm, footerHeight, 'F');
-
-              // Draw footer text
-              pdf.setTextColor(255, 255, 255);
-              pdf.setFontSize(8);
-              pdf.text(
-                `© ${new Date().getFullYear()} Codebility • Professional Development Services`,
-                a4WidthMm / 2,
-                footerY + (footerHeight / 2) + 1,
-                { align: 'center' }
-              );
-            }
-
-          }
-        }
-      }
-
-      // Remove overlay
-      document.body.removeChild(overlay);
-
-      // Save the PDF
-      const filename = `codebility-services-catalog-${new Date().toISOString().split('T')[0]}.pdf`;
-      pdf.save(filename);
-
-      toast.success("PDF downloaded successfully!");
-    } catch (error) {
-      console.error("❌ Error generating PDF:", error);
-      toast.error("Failed to generate PDF. Please try again.");
-
-      // Remove overlay if it exists
-      const overlay = document.querySelector('[style*="z-index: 999999"]');
-      if (overlay && overlay.parentNode) {
-        overlay.parentNode.removeChild(overlay);
-      }
-    }
-  };
 
   // Preview components with A4 aspect ratio and enhanced design
   const CoverPagePreview = () => (
@@ -374,9 +188,9 @@ export default function ServicesPageClient({
         <div className="absolute bottom-1/4 left-1/3 w-16 h-16 border-2 border-white/30 transform rotate-12"></div>
         
         {/* Tech Icons Background */}
-        <div className="absolute top-1/5 right-1/3 text-white/10 text-4xl">⚛️</div>
-        <div className="absolute bottom-1/3 left-1/5 text-white/10 text-3xl">🚀</div>
-        <div className="absolute top-1/2 right-1/6 text-white/10 text-2xl">💻</div>
+        <div className="absolute top-1/5 right-1/3 text-white/10 text-4xl">âš›ï¸</div>
+        <div className="absolute bottom-1/3 left-1/5 text-white/10 text-3xl">ðŸš€</div>
+        <div className="absolute top-1/2 right-1/6 text-white/10 text-2xl">ðŸ’»</div>
       </div>
       
       {/* Main Content */}
@@ -438,7 +252,7 @@ export default function ServicesPageClient({
         <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 shadow-2xl max-w-sm w-full">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-400 rounded-lg flex items-center justify-center" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span className="text-white text-sm">📧</span>
+              <span className="text-white text-sm">ðŸ“§</span>
             </div>
             <div className="text-white/90 font-medium">Get In Touch</div>
           </div>
@@ -1086,7 +900,7 @@ export default function ServicesPageClient({
 
               <div className="relative flex items-center gap-4">
                 <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-lg border border-white/30" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <span className="text-white text-3xl">💎</span>
+                  <span className="text-white text-3xl">ðŸ’Ž</span>
                 </div>
                 <div className="flex-1 text-white">
                   <div className="font-bold text-3xl mb-1 drop-shadow-md">{service.price || 'Contact for pricing'}</div>
@@ -1104,7 +918,7 @@ export default function ServicesPageClient({
             <div className="relative z-10">
               <div className="flex items-start gap-4 mb-4">
                 <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg shrink-0" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <span className="text-white text-xl">📋</span>
+                  <span className="text-white text-xl">ðŸ“‹</span>
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold text-white drop-shadow-lg mb-2">
@@ -1123,7 +937,7 @@ export default function ServicesPageClient({
             <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-orange-500/20 rounded-full blur-3xl group-hover:bg-orange-500/30 transition-all duration-500"></div>
             <h3 className="relative z-10 text-xl font-bold text-white drop-shadow-lg mb-4 flex items-center gap-3">
               <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center shadow-lg" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span className="text-white text-sm">⚡</span>
+                <span className="text-white text-sm">âš¡</span>
               </div>
               {isCodevHireService ? 'Skills & Expertise' : 'Technologies We Use'}
             </h3>
@@ -1191,7 +1005,7 @@ export default function ServicesPageClient({
             <div className="relative z-10">
               <div className="flex items-start gap-4 mb-6">
                 <div className="w-12 h-12 bg-gradient-to-br from-purple-500 via-pink-500 to-rose-500 rounded-2xl flex items-center justify-center shadow-lg shrink-0" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <span className="text-white text-xl">✨</span>
+                  <span className="text-white text-xl">âœ¨</span>
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold text-white drop-shadow-lg mb-2">
@@ -1204,7 +1018,7 @@ export default function ServicesPageClient({
                 {service.features.map((feature, idx) => (
                   <div key={idx} className="group/item flex items-center gap-4 p-4 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl hover:bg-white/10 hover:shadow-lg hover:shadow-emerald-500/20 transition-all duration-300 hover:border-emerald-400/30 hover:scale-[1.02]">
                     <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg group-hover/item:scale-110 transition-transform duration-300" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <span className="text-white text-lg font-bold" style={{ lineHeight: '1', textAlign: 'center' }}>✓</span>
+                      <span className="text-white text-lg font-bold" style={{ lineHeight: '1', textAlign: 'center' }}>âœ“</span>
                     </div>
                     <span className="text-slate-100 font-medium text-base">{feature}</span>
                   </div>
@@ -1219,7 +1033,7 @@ export default function ServicesPageClient({
             <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl group-hover:bg-blue-500/30 transition-all duration-500"></div>
             <h3 className="relative z-10 text-xl font-bold text-white drop-shadow-lg mb-4 flex items-center gap-3">
               <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-blue-500 rounded-lg flex items-center justify-center shadow-lg" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span className="text-white text-sm" style={{ lineHeight: '1', textAlign: 'center' }}>🚀</span>
+                <span className="text-white text-sm" style={{ lineHeight: '1', textAlign: 'center' }}>ðŸš€</span>
               </div>
               Our Process
             </h3>
@@ -1309,7 +1123,7 @@ export default function ServicesPageClient({
 
             <div className="text-center p-6 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl hover:bg-white/10 hover:shadow-green-500/20 transition-all duration-300 group">
               <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:scale-110 transition-transform duration-300" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span className="text-white text-xl">🌟</span>
+                <span className="text-white text-xl">ðŸŒŸ</span>
               </div>
               <div className="text-sm text-green-200 font-medium">Premium Quality</div>
             </div>
@@ -1323,7 +1137,7 @@ export default function ServicesPageClient({
               {categories.map((category, idx) => (
                 <div key={idx} className="flex items-center gap-3 p-4 bg-white/5 backdrop-blur-md border border-white/10 rounded-xl shadow-lg hover:bg-white/10 hover:shadow-indigo-500/20 transition-all duration-300 hover:scale-[1.02]">
                   <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-lg flex items-center justify-center shadow-md" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <span className="text-white text-sm font-bold">✓</span>
+                    <span className="text-white text-sm font-bold">âœ“</span>
                   </div>
                   <span className="font-medium text-slate-100">{category}</span>
                 </div>
@@ -1341,8 +1155,8 @@ export default function ServicesPageClient({
               <h3 className="text-2xl font-bold mb-3 text-white drop-shadow-lg">Ready to Transform Your Ideas?</h3>
               <p className="text-lg mb-4 text-white/90">Let's discuss your project and bring it to life</p>
               <div className="space-y-2">
-                <div className="text-white/90 font-medium">📧 admin@codebility.tech</div>
-                <div className="text-white/90 font-medium">🌐 www.codebility.tech</div>
+                <div className="text-white/90 font-medium">ðŸ“§ admin@codebility.tech</div>
+                <div className="text-white/90 font-medium">ðŸŒ www.codebility.tech</div>
               </div>
             </div>
           </div>
@@ -1354,7 +1168,7 @@ export default function ServicesPageClient({
           <div className="absolute top-0 left-0 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
           <div className="absolute bottom-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl"></div>
           <div className="relative z-10 text-center">
-            <span className="text-sm">© {new Date().getFullYear()} Codebility • Professional Development Services</span>
+            <span className="text-sm">Â© {new Date().getFullYear()} Codebility â€¢ Professional Development Services</span>
           </div>
         </div>
       </div>

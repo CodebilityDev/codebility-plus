@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { createClientClientComponent } from "@/utils/supabase/client";
+import { useState } from "react";
+import { getClientSupabase } from "@/utils/supabase/client";
+import { useQuery } from "@tanstack/react-query";
+import { badgePrefixFor } from "@/lib/shared/badges";
 import {
   Tooltip,
   TooltipContent,
@@ -23,62 +25,35 @@ interface CodevBadgeProps {
   level: CodevLevelData;
   size?: number;
   className?: string;
-}
-
-// Helper function to get badge prefix from skill category name
-function getBadgePrefix(name: string): string {
-  const lowerName = name.toLowerCase();
-  if (lowerName.includes("frontend")) return "fe";
-  if (lowerName.includes("backend")) return "be";
-  if (lowerName.includes("mobile")) return "md";
-  if (lowerName.includes("ui") || lowerName.includes("ux")) return "uiux";
-  return name.substring(0, 2).toLowerCase();
+  categories?: SkillCategory[];
 }
 
 export default function CodevBadge({
   level,
   size = 36,
   className = "",
+  categories,
 }: CodevBadgeProps) {
-  const [skillCategories, setSkillCategories] = useState<SkillCategory[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [badgeErrors, setBadgeErrors] = useState<Record<string, boolean>>({});
-  const [supabase, setSupabase] = useState<any>(null);
 
-  // Initialize Supabase client safely
-  useEffect(() => {
-    const client = createClientClientComponent();
-    setSupabase(client);
-  }, []);
+  // Server-rendered pages pass categories down; other callers share one cached
+  // request through the query cache instead of one query per badge.
+  const { data: fetched } = useQuery({
+    queryKey: ["reference", "skillCategories"],
+    queryFn: async () => {
+      const { data, error } = await getClientSupabase()
+        .from("skill_category")
+        .select("id, name");
+      if (error) throw error;
+      return (data ?? []) as SkillCategory[];
+    },
+    enabled: !categories,
+    staleTime: 5 * 60_000,
+    gcTime: 30 * 60_000,
+  });
 
-  useEffect(() => {
-    if (!supabase) return; // Add null check
-
-    const fetchSkillCategories = async () => {
-      try {
-        const { data, error } = await supabase
-          .from("skill_category")
-          .select("id, name");
-
-        if (error) throw error;
-
-        if (data) {
-          const categoriesWithPrefix = data.map(
-            (category: { id: string; name: string }) => ({
-              ...category,
-              badge_prefix: getBadgePrefix(category.name),
-            }),
-          );
-          setSkillCategories(categoriesWithPrefix);
-        }
-      } catch (err) {
-        console.error("Error fetching skill categories:", err);
-        setError("Failed to load badges");
-      }
-    };
-
-    fetchSkillCategories();
-  }, [supabase]); // Add supabase as dependency
+  const skillCategories = categories ?? fetched ?? [];
 
   // Create a fallback badge for when images fail to load
   const FallbackBadge = ({
@@ -135,7 +110,7 @@ export default function CodevBadge({
           const category = skillCategories.find((cat) => cat.id === categoryId);
           if (!category) return null;
 
-          const prefix = category.badge_prefix;
+          const prefix = category.badge_prefix ?? badgePrefixFor(category.name);
           const badgeName =
             levelNumber >= 6
               ? `${prefix}-tier-champion.svg`
