@@ -1,12 +1,14 @@
-import { Suspense } from "react";
+import { Suspense, cache } from "react";
 import { redirect } from "next/navigation";
 import AsyncErrorBoundary from "@/components/AsyncErrorBoundary";
 import { getMembers, getTeamLead, getUserProjects } from "@/actions/projects/actions";
+import type { Project } from "@/types/home/codev";
 import MyTeamView from "./_components/MyTeamView";
 import { Users } from "lucide-react";
 
-// Team data changes occasionally, use 5 minute revalidation
-export const revalidate = 300;
+// The redirect check and TeamData both need this, and it is not request
+// deduped, so without cache() the page fetched it twice per render.
+const getUserProjectsCached = cache(getUserProjects);
 
 // Loading component for team data
 function TeamDataSkeleton() {
@@ -56,34 +58,11 @@ function TeamDataSkeleton() {
 }
 
 // Component that fetches and displays team data
-async function TeamData() {
-  // Fetch user projects outside the try-catch to allow redirect to work properly
-  const userProjectsResponse = await getUserProjects();
-
-  if (userProjectsResponse.error || !userProjectsResponse.data || userProjectsResponse.data.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center gap-8 py-24 bg-white/5 dark:bg-gray-900/40 backdrop-blur-xl rounded-[32px] border border-gray-200 dark:border-gray-800 mt-8 shadow-2xl">
-        <div className="relative">
-          <div className="absolute inset-0 bg-blue-500 blur-3xl opacity-20 animate-pulse transition-all"></div>
-          <div className="relative rounded-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 p-8 border border-white/20">
-            <Users className="h-16 w-16 text-gray-400 dark:text-gray-600" />
-          </div>
-        </div>
-        <div className="text-center space-y-3">
-          <h2 className="text-3xl font-black text-gray-900 dark:text-white">Empty Squad</h2>
-          <p className="text-lg text-gray-500 dark:text-gray-400 max-w-md mx-auto font-medium">
-            {userProjectsResponse.error?.message || "You haven't been assigned to any project teams yet. Connect with a Project Manager to get started!"}
-          </p>
-        </div>
-        <div className="bg-blue-50 dark:bg-blue-900/20 px-6 py-3 rounded-2xl border border-blue-100 dark:border-blue-800/50">
-          <p className="text-sm font-bold text-blue-600 dark:text-blue-400">Pro-Tip: Check back once you're assigned to see your team's weekly leaderboard!</p>
-        </div>
-      </div>
-    );
-  }
-
-  const userProjects = userProjectsResponse.data;
-
+async function TeamData({
+  userProjects,
+}: {
+  userProjects: { project: Project; role: string }[];
+}) {
   try {
     // Fetch team data for each project in parallel
     const projectDataPromises = userProjects.map(async ({ project, role }) => {
@@ -143,16 +122,44 @@ async function TeamData() {
 }
 
 export default async function MyTeamPage() {
-  // Pre-fetch logic for fast top-level redirection without hitting the error boundary
-  const userProjectsResponse = await getUserProjects();
-  if (userProjectsResponse.data && userProjectsResponse.data.length > 0) {
-    const isTeamLeadInAny = userProjectsResponse.data.some((p) => p.role === "team_leader" || p.role === "admin");
+  // Awaited once here so the redirect check and TeamData share one fetch.
+  const userProjectsResponse = await getUserProjectsCached();
+  const userProjects = userProjectsResponse.data ?? [];
+  if (userProjects.length > 0) {
+    const isTeamLeadInAny = userProjects.some((p) => p.role === "team_leader" || p.role === "admin");
 
     // Only auto-redirect if they are in exactly one project and are NOT a leader
     // If they are in multiple projects, we show the dashboard so they can pick which one to view
-    if (!isTeamLeadInAny && userProjectsResponse.data.length === 1 && userProjectsResponse.data[0]?.project?.id) {
-      redirect(`/home/my-team/${userProjectsResponse.data[0].project.id}/leaderboard`);
+    if (!isTeamLeadInAny && userProjects.length === 1 && userProjects[0]?.project?.id) {
+      redirect(`/home/my-team/${userProjects[0].project.id}/leaderboard`);
     }
+  }
+
+  if (userProjectsResponse.error || userProjects.length === 0) {
+    return (
+      <div className="mx-auto max-w-screen-xl">
+        <div className="mt-8 flex flex-col items-center justify-center gap-8 rounded-[32px] border border-gray-200 bg-white/5 py-24 shadow-2xl backdrop-blur-xl dark:border-gray-800 dark:bg-gray-900/40">
+          <div className="relative">
+            <div className="absolute inset-0 animate-pulse bg-blue-500 opacity-20 blur-3xl transition-all"></div>
+            <div className="relative rounded-full border border-white/20 bg-gradient-to-br from-gray-100 to-gray-200 p-8 dark:from-gray-800 dark:to-gray-900">
+              <Users className="h-16 w-16 text-gray-400 dark:text-gray-600" />
+            </div>
+          </div>
+          <div className="space-y-3 text-center">
+            <h2 className="text-3xl font-black text-gray-900 dark:text-white">Empty Squad</h2>
+            <p className="mx-auto max-w-md text-lg font-medium text-gray-500 dark:text-gray-400">
+              {userProjectsResponse.error?.message ||
+                "You haven't been assigned to any project teams yet. Connect with a Project Manager to get started!"}
+            </p>
+          </div>
+          <div className="rounded-2xl border border-blue-100 bg-blue-50 px-6 py-3 dark:border-blue-800/50 dark:bg-blue-900/20">
+            <p className="text-sm font-bold text-blue-600 dark:text-blue-400">
+              Pro-Tip: Check back once you're assigned to see your team's weekly leaderboard!
+            </p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -192,7 +199,7 @@ export default async function MyTeamPage() {
             }
           >
             <Suspense fallback={<TeamDataSkeleton />}>
-              <TeamData />
+              <TeamData userProjects={userProjects} />
             </Suspense>
           </AsyncErrorBoundary>
         </div>

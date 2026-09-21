@@ -8,9 +8,8 @@ import AdminDashboardMonthlyApplicantsLineChart from "./_components/AdminDashboa
 import AdminDashboardProjectsPie from "./_components/AdminDashboardProjectsPie";
 import AdminDashboardStatsCard from "./_components/AdminDashboardStatsCard";
 
-// Force dynamic rendering to avoid prerender errors with Supabase env vars
-// Use ISR with 60 second revalidation for dashboard stats
-export const revalidate = 60;
+// Reads cookies via the Supabase server client, so this route is already dynamic.
+export const dynamic = "force-dynamic";
 
 async function getDashboardData() {
   const supabase = await createClientServerComponent();

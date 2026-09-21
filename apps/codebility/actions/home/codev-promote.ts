@@ -1,5 +1,10 @@
 "use server";
+import { revalidatePath } from "next/cache";
 import { createClientServerComponent } from "@/utils/supabase/server";
+
+// Role and promote_declined drive the shell, so the whole /home layout must
+// refresh, not just the current page.
+const revalidateHome = () => revalidatePath("/home", "layout");
 
 export const declinePromotion = async (userId: string): Promise<void> => {
   if (!userId) {
@@ -17,6 +22,8 @@ export const declinePromotion = async (userId: string): Promise<void> => {
     console.error("Error updating promote_declined:", error);
     throw error;
   }
+
+  revalidateHome();
 };
 
 export const acceptPromotionToCodev = async (userId: string): Promise<void> => {
@@ -35,6 +42,8 @@ export const acceptPromotionToCodev = async (userId: string): Promise<void> => {
     console.error("Error updating role_id:", error);
     throw error;
   }
+
+  revalidateHome();
 };
 
 export const acceptPromotionToMentor = async (userId: string): Promise<void> => {
@@ -53,4 +62,6 @@ export const acceptPromotionToMentor = async (userId: string): Promise<void> => 
     console.error("Error updating role_id:", error);
     throw error;
   }
+
+  revalidateHome();
 };

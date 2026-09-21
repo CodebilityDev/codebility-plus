@@ -57,10 +57,12 @@ const config = withPlugins([[withBundleAnalyzer({ enabled: env.ANALYZE })]], {
     },
     // Next 15 defaults the client Router Cache for dynamic segments to 0s, so
     // every navigation refetched the RSC payload and re-fired loading.tsx.
-    // Mutations must revalidatePath so this window never serves stale writes.
+    // Server actions call revalidatePath/revalidateTag so a write is never
+    // hidden behind this window; the window only decides how long an untouched
+    // page stays warm.
     staleTimes: {
-      dynamic: 30,
-      static: 180,
+      dynamic: 3600,
+      static: 3600,
     },
   },
   images: {

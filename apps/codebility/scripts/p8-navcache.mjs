@@ -27,10 +27,17 @@ page.on("request", (r) => {
 });
 
 const skeletons = async () => {
-  // Sample across a short window: a revisit skeleton flashes, it does not persist.
+  // Counting .animate-pulse is misleading: presence dots and decorative divs
+  // carry it permanently. A loading skeleton is made of placeholder blocks, so
+  // only count pulse nodes with real block dimensions.
   let seen = 0;
   for (let i = 0; i < 24; i++) {
-    const n = await page.locator(".animate-pulse").count();
+    const n = await page.evaluate(() =>
+      [...document.querySelectorAll(".animate-pulse")].filter((e) => {
+        const r = e.getBoundingClientRect();
+        return r.height >= 24 && r.width >= 120;
+      }).length,
+    );
     if (n > seen) seen = n;
     await page.waitForTimeout(25);
   }
@@ -92,32 +99,49 @@ for (const [name, href] of [
   results.push([name, r]);
 }
 
-console.log("\n-- REVISITS within the 30s staleTimes window (must be rsc=0)");
+console.log("\n-- REVISITS within the staleTimes window (must be rsc=0, no skeleton)");
 const seen = new Set();
 for (const [name, r] of results) {
   if (!seen.has(name)) {
     seen.add(name);
     continue;
   }
-  const inWindow = r.gap !== null && r.gap < 30000;
+  const inWindow = r.gap !== null && r.gap < 3600000;
   if (!inWindow) {
-    console.log(`skip  revisit ${name.padEnd(20)} gap=${r.gap}ms exceeds 30s window`);
+    console.log(`skip  revisit ${name.padEnd(20)} gap=${r.gap}ms outside window`);
     continue;
   }
   const ok = r.rsc === 0 ? "PASS" : "FAIL";
   console.log(
-    `${ok}  revisit ${name.padEnd(20)} gap=${String(r.gap).padStart(5)}ms rsc=${r.rsc} pulse=${r.pulse}`,
+    `${ok}  revisit ${name.padEnd(20)} gap=${String(r.gap).padStart(5)}ms rsc=${r.rsc} skeleton=${r.pulse}`,
   );
 }
 
-// A route skeleton is transient. Settled pulse counts are the baseline each
-// route keeps at rest (dashboard cards, banners), so compare against that
-// rather than against zero.
-console.log("\n-- settled pulse baseline per route");
-for (const h of ["/home", "/home/feeds", "/home/overflow"]) {
+// Reported regression: my-team re-fetched when arriving from overflow, because
+// the route declared `revalidate = 300` against a 30s router window and awaited
+// getUserProjects() above its Suspense boundary.
+console.log("\n-- reported loop: my-team <-> overflow");
+await warm("/home/my-team");
+await warm("/home/overflow");
+await warm("/home/my-team");
+for (const [name, href] of [
+  ["/home/overflow", "/home/overflow"],
+  ["/home/my-team", "/home/my-team"],
+  ["/home/overflow", "/home/overflow"],
+  ["/home/my-team", "/home/my-team"],
+]) {
+  const r = await go(name, href);
+  const verdict = r.rsc === 0 && r.pulse === 0 ? "PASS" : "FAIL";
+  console.log(`  ${verdict}  ${name.padEnd(18)} rsc=${r.rsc} skeleton=${r.pulse}`);
+}
+
+// A route skeleton is transient. Settled skeleton counts are the baseline each
+// route keeps at rest, so compare against that rather than against zero.
+console.log("\n-- settled skeleton baseline per route");
+for (const h of ["/home", "/home/feeds", "/home/overflow", "/home/my-team"]) {
   await warm(h);
   await page.waitForTimeout(5000);
-  console.log(`settled ${h.padEnd(18)} pulse=${await skeletons()}`);
+  console.log(`settled ${h.padEnd(18)} skeleton=${await skeletons()}`);
 }
 
 await ctx.close();
