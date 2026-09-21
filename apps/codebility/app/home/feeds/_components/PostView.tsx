@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import Image from "next/image";
 import EditPostModal from "@/components/modals/EditPostModal";
 import { Box } from "@/components/shared/dashboard";
@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import { defaultAvatar } from "@/public/assets/images";
 import { useUserStore } from "@/store/codev-store";
 import { useFeedsStore } from "@/store/feeds-store";
+import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -22,52 +23,41 @@ import PostTags from "./PostTags";
 import PostViewCommentList from "./PostViewCommentList";
 import PostViewCreateComment from "./PostViewCreateComment";
 
+const SYSTEM_POST_ID = "00000000-0000-0000-0000-000000000001";
+
 interface PostViewProps {
   postId: string;
 }
 
 export default function PostView({ postId }: PostViewProps) {
-  const [post, setPost] = useState<PostType | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(true);
-  const [isAuthor, setIsAuthor] = useState(false);
-  const { user } = useUserStore();
   const [refreshComments, setRefreshComments] = useState(0);
+  const user = useUserStore((state) => state.user);
+  const roleId = user?.role_id ?? null;
+  const userId = user?.id ?? null;
 
-  const { posts } = useFeedsStore();
+  const posts = useFeedsStore((state) => state.posts);
+
+  // The post is a lookup in data already in the store, so it is derived during
+  // render rather than copied into state by an effect.
+  const post: PostType | null = useMemo(() => {
+    if (postId === SYSTEM_POST_ID) return SYSTEM_POST;
+    return posts.find((p) => p.id === postId) ?? null;
+  }, [posts, postId]);
+
+  const { data: role, isPending: isRolePending } = useQuery({
+    queryKey: ["feeds", "userRole", roleId],
+    enabled: roleId !== null,
+    queryFn: () => getUserRole(roleId),
+  });
+
+  // Defaults to true while the role resolves, matching the previous behaviour.
+  const isAdmin = isRolePending || role === "Admin";
+  const isAuthor = userId !== null && userId === post?.author_id?.id;
 
   const triggerRefreshComments = () => {
     setRefreshComments((prev) => prev + 1);
   };
-
-  // Find the post in the store or use system post
-  useEffect(() => {
-    if (postId === "00000000-0000-0000-0000-000000000001") {
-      setPost(SYSTEM_POST);
-    } else {
-      const foundPost = posts.find((p) => p.id === postId) || null;
-      setPost(foundPost);
-    }
-  }, [posts, postId]);
-
-  // Check roles
-  useEffect(() => {
-    const fetchRole = async () => {
-      if (!user) return;
-      const role = await getUserRole(user.role_id ?? null);
-      setIsAdmin(role === "Admin");
-    };
-
-    const checkIfAuthor = () => {
-      if (!user) return;
-      setIsAuthor(user.id === post?.author_id?.id);
-    };
-
-    if (user) {
-      fetchRole();
-      checkIfAuthor();
-    }
-  }, [user, post]);
 
   if (!post) {
     return (
@@ -82,7 +72,7 @@ export default function PostView({ postId }: PostViewProps) {
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
-  const isSystemPost = post.id === "00000000-0000-0000-0000-000000000001";
+  const isSystemPost = post.id === SYSTEM_POST_ID;
 
   return (
     <>

@@ -1,41 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useUserStore } from "@/store/codev-store";
-import { useFeedsStore } from "@/store/feeds-store";
 import { MessageSquareText } from "lucide-react";
-import { shallow } from "zustand/shallow";
 
 import { getSocialPoints } from "@/actions/feeds/post";
 
 export default function SocialPointsCard() {
-  const userId = useUserStore((state) => state.user?.id);
-  const [points, setPoints] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
+  const userId = useUserStore((state) => state.user?.id ?? null);
 
-  // `posts` used to be a dependency here, so every feed write re-fired this
-  // server action. Points do not change when the rendered post list changes.
-  useEffect(() => {
-    if (!userId) {
-      setLoading(false);
-      return;
-    }
-
-    let cancelled = false;
-    setLoading(true);
-
-    getSocialPoints(userId)
-      .then((fetchedPoints) => {
-        if (!cancelled) setPoints(fetchedPoints || 0);
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [userId]);
+  const { data: points, isPending: loading } = useQuery({
+    queryKey: ["feeds", "socialPoints", userId],
+    enabled: Boolean(userId),
+    queryFn: () => getSocialPoints(userId!),
+  });
 
   return (
     <div className="dark:bg-white/3 relative mt-4 mb-4 w-full rounded-xl border border-white/10 bg-gray-800 p-4 text-white shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/10 hover:shadow-lg dark:border-white/5 xl:fixed xl:right-6 xl:top-20 xl:z-50 xl:mt-0 xl:w-64">

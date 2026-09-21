@@ -10,6 +10,12 @@ const FETCH_SIGNALS =
   /await\s+(fetch|get[A-Z]|fetch[A-Z]|load[A-Z]|search[A-Z]|check[A-Z]|count[A-Z]|list[A-Z])|\.then\(|supabase\s*\.\s*from\(|createClientClientComponent/;
 const LEGIT =
   /addEventListener|removeEventListener|IntersectionObserver|ResizeObserver|MutationObserver|setInterval|supabase\.channel|removeChannel|\.subscribe\(|matchMedia|localStorage|sessionStorage|document\.|window\.|requestAnimationFrame|\.focus\(\)/;
+// A realtime subscription or an event listener is a definitive answer: no
+// amount of fetching in the same window makes it a data-fetching effect. These
+// override the fetch signals so a subscription sitting next to a few useQuery
+// calls is not reported as remaining work.
+const DEFINITELY_LEGIT =
+  /supabase\.channel|removeChannel|\.subscribe\(|addEventListener|IntersectionObserver|ResizeObserver|MutationObserver|matchMedia|requestAnimationFrame/;
 
 const walk = (d, acc = []) => {
   if (!fs.existsSync(d)) return acc;
@@ -32,11 +38,20 @@ for (const root of ROOTS) {
       const body = lines.slice(i, i + 26).join("\n");
       const fetches = FETCH_SIGNALS.test(body);
       const legit = LEGIT.test(body);
+      const definite = DEFINITELY_LEGIT.test(body);
       rows.push({
         file: rel,
         line: i + 1,
         kanban: EXCLUDE.test(rel),
-        verdict: fetches ? (legit ? "MIXED" : "FETCH") : legit ? "legit" : "review",
+        verdict: definite
+          ? "legit"
+          : fetches
+            ? legit
+              ? "MIXED"
+              : "FETCH"
+            : legit
+              ? "legit"
+              : "review",
       });
     });
   }

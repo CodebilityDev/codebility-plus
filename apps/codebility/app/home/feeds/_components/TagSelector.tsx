@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 
 import { Checkbox } from "@codevs/ui/checkbox";
@@ -12,49 +13,22 @@ interface TagSelectorProps {
   onChange?: (selectedTagIds: number[]) => void;
 }
 
-interface Tag {
-  id: number;
-  name: string;
-  selected: boolean;
-}
-
 const TagSelector = ({ selectedTags = [], onChange }: TagSelectorProps) => {
-  const [tags, setTags] = useState<Tag[]>([]);
+  const [selectedIds, setSelectedIds] = useState<number[]>(selectedTags);
   const [isOpen, setIsOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchTags = async () => {
-      try {
-        const data = await getPostTagsLookup();
-        if (!data) return;
-
-        const mappedTags: Tag[] = data.map((t) => ({
-          id: t.id,
-          name: t.name,
-          selected: selectedTags.includes(t.id),
-        }));
-
-        setTags(mappedTags);
-      } catch (error) {
-        console.error("Failed to fetch tags:", error);
-      }
-    };
-
-    fetchTags();
-  }, []);
+  const { data: tags = [] } = useQuery({
+    queryKey: ["feeds", "tags", "lookup"],
+    queryFn: () => getPostTagsLookup(),
+  });
 
   const toggleTag = (id: number) => {
-    const updatedTags = tags.map((t) =>
-      t.id === id ? { ...t, selected: !t.selected } : t,
-    );
-    setTags(updatedTags);
+    const next = selectedIds.includes(id)
+      ? selectedIds.filter((tagId) => tagId !== id)
+      : [...selectedIds, id];
 
-    if (onChange) {
-      const selectedIds = updatedTags
-        .filter((t) => t.selected)
-        .map((t) => t.id);
-      onChange(selectedIds);
-    }
+    setSelectedIds(next);
+    onChange?.(next);
   };
 
   return (
@@ -72,7 +46,7 @@ const TagSelector = ({ selectedTags = [], onChange }: TagSelectorProps) => {
           {tags.map((tag) => (
             <label key={tag.id} className="flex items-center gap-1">
               <Checkbox
-                checked={tag.selected}
+                checked={selectedIds.includes(tag.id)}
                 onCheckedChange={() => toggleTag(tag.id)}
               />
               <span className="text-sm">{tag.name}</span>

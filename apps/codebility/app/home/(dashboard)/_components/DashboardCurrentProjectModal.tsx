@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 import {
   Dialog,
   DialogContent,
@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import { useModal } from "@/hooks/modals/use-modal";
+import { useUserStore } from "@/store/codev-store";
 import {
   IconPriority1,
   IconPriority2,
@@ -23,12 +24,74 @@ import { getClientSupabase } from "@/utils/supabase/client";
 
 const COMPLETED_COLUMN_NAMES = ["done", "finished", "completed", "approved"];
 
+interface ProjectTasks {
+  tasks: Task[];
+  kanbanBoardId: string | null;
+}
+
+async function fetchProjectTasks(
+  codevId: string,
+  projectId: string,
+): Promise<ProjectTasks> {
+  const supabase = getClientSupabase();
+
+  const { data: membership, error: pmError } = await supabase
+    .from("project_members")
+    .select("project_id")
+    .eq("codev_id", codevId)
+    .eq("project_id", projectId)
+    .maybeSingle();
+
+  if (pmError) throw pmError;
+  if (!membership) return { tasks: [], kanbanBoardId: null };
+
+  const { data: kanbanBoards, error: kanbanError } = await supabase
+    .from("kanban_boards")
+    .select("id, project_id")
+    .eq("project_id", projectId);
+
+  if (kanbanError) throw kanbanError;
+
+  // Only fetch non-archived tasks
+  const { data: rawTasks, error: taskError } = await supabase
+    .from("tasks")
+    .select(
+      `*,
+      kanban_columns!kanban_column_id (
+        id,
+        name,
+        board_id,
+        kanban_boards!board_id (
+          id,
+          project_id
+        )
+      )`,
+    )
+    .eq("codev_id", codevId)
+    .or("is_archive.is.null,is_archive.eq.false");
+
+  if (taskError) throw taskError;
+
+  const tasks = (rawTasks || []).filter((task: any) => {
+    if (task.is_archive === true) return false;
+
+    const matchesProject =
+      task.kanban_columns?.kanban_boards?.project_id === projectId;
+
+    const columnName = task.kanban_columns?.name?.toLowerCase() || "";
+    const isCompleted = COMPLETED_COLUMN_NAMES.some((completedName) =>
+      columnName.includes(completedName),
+    );
+
+    return matchesProject && !isCompleted;
+  });
+
+  return { tasks, kanbanBoardId: kanbanBoards?.[0]?.id ?? null };
+}
+
 export default function DashboardCurrentProjectModal() {
   const { isOpen, onClose, type, data } = useModal();
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [error] = useState<string | null>(null);
-  const [kanbanBoardId, setKanbanBoardId] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const userId = useUserStore((s) => s.user?.id ?? null);
 
   const isModalOpen = isOpen && type === "dashboardCurrentProjectModal";
 
@@ -36,116 +99,21 @@ export default function DashboardCurrentProjectModal() {
 
   const projectId = data?.projectId;
 
-  const handleGoToKanban = () => {
+  const handleGoToKanban = (kanbanBoardId: string | null) => {
     if (kanbanBoardId) {
       onClose();
       router.push(`/home/kanban/${projectId}/${kanbanBoardId}`);
     }
   };
 
-  useEffect(() => {
-    const supabase = getClientSupabase();
-    const fetchUserTasks = async () => {
-      if (!isModalOpen || !projectId) return;
+  const { data: detail, isLoading } = useQuery({
+    queryKey: ["dashboard", "currentProject", projectId, userId],
+    queryFn: () => fetchProjectTasks(userId!, projectId!),
+    enabled: isModalOpen && Boolean(projectId) && Boolean(userId),
+  });
 
-      setIsLoading(true);
-
-      try {
-        const {
-          data: { user },
-          error: userError,
-        } = await supabase.auth.getUser();
-
-        if (userError || !user) {
-          console.error("Error getting user:", userError);
-          return;
-        }
-
-        const { data: projectMemberships, error: pmError } = await supabase
-          .from("project_members")
-          .select("project_id")
-          .eq("codev_id", user.id);
-
-        if (pmError || !projectMemberships) {
-          console.error("Error fetching user's project memberships:", pmError);
-          return;
-        }
-
-        const projectIds = projectMemberships.map((pm: any) => pm.project_id);
-
-        if (!projectIds.includes(projectId)) {
-          setTasks([]);
-          return;
-        }
-
-        const { data: kanbanBoards, error: kanbanError } = await supabase
-          .from("kanban_boards")
-          .select("id, project_id")
-          .eq("project_id", projectId);
-
-        if (kanbanError || !kanbanBoards) {
-          console.error("Error fetching kanban boards:", kanbanError);
-          return;
-        }
-
-        const board = kanbanBoards[0];
-        if (board) {
-          setKanbanBoardId(board.id);
-        }
-
-        // BUG FIX: Filter out archived tasks at the database level
-        const { data: rawTasks, error: taskError } = await supabase
-          .from("tasks")
-          .select(
-            `*,
-            kanban_columns!kanban_column_id (
-              id,
-              name,
-              board_id,
-              kanban_boards!board_id (
-                id,
-                project_id
-              )
-            )`,
-          )
-          .eq("codev_id", user.id)
-          // BUG FIX: Only fetch non-archived tasks
-          .or("is_archive.is.null,is_archive.eq.false");
-
-        if (taskError) {
-          console.error("Error fetching tasks:", taskError);
-          return;
-        }
-
-        // Filter logic - exclude "Done" column tasks and match project
-        const filteredTasks = (rawTasks || []).filter((task: any) => {
-          const matchesProject = task.kanban_columns?.kanban_boards?.project_id === projectId;
-          
-          // Additional safety check: exclude archived tasks
-          if (task.is_archive === true) {
-            return false;
-          }
-          
-          // Check if task is in a "completed" column
-          const columnName = task.kanban_columns?.name?.toLowerCase() || "";
-          const isCompleted = COMPLETED_COLUMN_NAMES.some(completedName => 
-            columnName.includes(completedName)
-          );
-          
-          // Show only active tasks (not in Done/Completed columns and not archived)
-          return matchesProject && !isCompleted;
-        });
-
-        setTasks(filteredTasks);
-      } catch (error) {
-        console.error("Unexpected error:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchUserTasks();
-  }, [isModalOpen, projectId]);
+  const tasks = detail?.tasks ?? [];
+  const kanbanBoardId = detail?.kanbanBoardId ?? null;
 
   if (isLoading) {
     return (
@@ -199,9 +167,7 @@ export default function DashboardCurrentProjectModal() {
         <p className="text-gray-700 dark:text-gray-300">Your Active Ticket(s):</p>
         
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2">
-          {error ? (
-            <p className="text-red-500 dark:text-red-400">{error}</p>
-          ) : tasks.length > 0 ? (
+          {tasks.length > 0 ? (
             tasks.map((tasked) => (
               <div
                 key={tasked.id}
@@ -305,7 +271,7 @@ export default function DashboardCurrentProjectModal() {
         <DialogFooter>
           <div className="flex gap-2">
             <button
-              onClick={handleGoToKanban}
+              onClick={() => handleGoToKanban(kanbanBoardId)}
               className="
                 rounded bg-customBlue-600 hover:bg-customBlue-700 
                 px-4 py-2 text-white font-medium

@@ -1,6 +1,8 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
+import { useQuery } from "@tanstack/react-query";
+import { useDebounce } from "use-debounce";
 import { defaultAvatar } from "@/public/assets/images";
 import { useUserStore } from "@/store/codev-store";
 import { useFeedsStore } from "@/store/feeds-store";
@@ -19,42 +21,24 @@ export default function PostViewCreateComment({
 }: CreateCommentProps) {
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { user } = useUserStore();
+  const user = useUserStore((state) => state.user);
 
   // Mention-related state
   const [showMentionDropdown, setShowMentionDropdown] = useState(false);
   const [mentionSearch, setMentionSearch] = useState("");
-  const [mentionUsers, setMentionUsers] = useState<UserMention[]>([]);
   const [selectedMentionIndex, setSelectedMentionIndex] = useState(0);
   const [mentionStartPos, setMentionStartPos] = useState<number | null>(null);
-  const [isSearching, setIsSearching] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Search for users when mention search changes
-  useEffect(() => {
-    const fetchUsers = async () => {
-      if (!mentionSearch || mentionSearch.length < 1) {
-        setMentionUsers([]);
-        return;
-      }
+  const [debouncedMentionSearch] = useDebounce(mentionSearch, 200);
 
-      setIsSearching(true);
-      try {
-        const users = await searchUsers(mentionSearch);
-        setMentionUsers(users);
-        setSelectedMentionIndex(0);
-      } catch {
-        setMentionUsers([]);
-      } finally {
-        setIsSearching(false);
-      }
-    };
-
-    const debounceTimer = setTimeout(fetchUsers, 200);
-    return () => clearTimeout(debounceTimer);
-  }, [mentionSearch]);
+  const { data: mentionUsers = [], isFetching: isSearching } = useQuery({
+    queryKey: ["feeds", "mentionUsers", debouncedMentionSearch],
+    enabled: debouncedMentionSearch.length > 0,
+    queryFn: () => searchUsers(debouncedMentionSearch),
+  });
 
   // Handle clicks outside dropdown
   useEffect(() => {
@@ -88,6 +72,7 @@ export default function PostViewCreateComment({
       if (!textAfterAt.includes(" ") && textAfterAt.length >= 0) {
         setMentionStartPos(lastAtIndex);
         setMentionSearch(textAfterAt);
+        setSelectedMentionIndex(0);
         setShowMentionDropdown(true);
       } else {
         setShowMentionDropdown(false);
@@ -108,6 +93,7 @@ export default function PostViewCreateComment({
     setShowMentionDropdown(false);
     setMentionStartPos(null);
     setMentionSearch("");
+    setSelectedMentionIndex(0);
 
     // Focus back on input
     setTimeout(() => {

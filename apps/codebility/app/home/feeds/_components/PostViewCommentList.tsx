@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { defaultAvatar } from "@/public/assets/images";
 import { useUserStore } from "@/store/codev-store";
 import { getPostComments } from "@/actions/feeds/post";
@@ -36,37 +36,25 @@ export default function PostViewCommentList({
   refresh,
   hasDeleteCommentPrivilege,
 }: PostViewCommentListProps) {
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [loading, setLoading] = useState(true);
-  const { user } = useUserStore();
+  const user = useUserStore((state) => state.user);
+  const currentUserId = user?.id ?? null;
 
-  useEffect(() => {
-    const fetchComments = async () => {
-      try {
+  const { data: comments = [], isPending: loading } = useQuery({
+    queryKey: ["feeds", "comments", postId, refresh],
+    queryFn: async (): Promise<Comment[]> => {
+      const data = await getPostComments(postId);
 
-        const data = await getPostComments(postId);
-        
-        // Transform the data to ensure correct structure
-        const transformedComments = (data || []).map((comment: any) => ({
-          id: comment.id,
-          content: comment.content,
-          created_at: comment.created_at,
-          commenter: Array.isArray(comment.commenter) 
-            ? comment.commenter[0] 
-            : comment.commenter,
-          mentions: comment.mentions || [],
-        }));
-        
-        setComments(transformedComments);
-      } catch (error) {
-        console.error("Error fetching comments:", error);
-        setComments([]); // Set empty array on error
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchComments();
-  }, [postId, refresh]);
+      return (data || []).map((comment: any) => ({
+        id: comment.id,
+        content: comment.content,
+        created_at: comment.created_at,
+        commenter: Array.isArray(comment.commenter)
+          ? comment.commenter[0]
+          : comment.commenter,
+        mentions: comment.mentions || [],
+      }));
+    },
+  });
 
   if (loading) {
     return (
@@ -87,18 +75,17 @@ export default function PostViewCommentList({
   return (
     <div className="flex flex-col gap-2">
       {comments.map((c) => {
-
         const userImage = c.commenter?.image_url || defaultAvatar;
         return (
           <PostViewCommentItem
             key={c.id}
             postId={postId}
             commenntId={c.id}
-            userImage={typeof userImage === 'string' ? userImage : userImage.src}
+            userImage={typeof userImage === "string" ? userImage : userImage.src}
             userName={`${c.commenter?.first_name} ${c.commenter?.last_name}`}
             content={c.content}
             userCanDelete={
-              user?.id === c.commenter?.id || hasDeleteCommentPrivilege
+              currentUserId === c.commenter?.id || hasDeleteCommentPrivilege
             }
             mentions={c.mentions || []}
           />
