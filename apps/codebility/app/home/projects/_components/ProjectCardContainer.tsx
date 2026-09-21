@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import DefaultPagination from "@/components/ui/pagination";
 import { CATEGORIES, pageSize } from "@/constants";
 import { useModal } from "@/hooks/modals/use-modal-projects";
@@ -23,16 +23,12 @@ const ProjectCardContainer = ({ projects }: ProjectCardContainerProps) => {
   const [currentCategory, setCurrentCategory] =
     useState<number>(ALL_CATEGORY_ID);
 
-  // Filter projects by current category
-  const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
-
   // Track current page for each tab - initialize with empty object
   const [tabPages, setTabPages] = useState<Record<number, number>>({});
 
   const { onOpen } = useModal();
 
-  // Memoize filtered projects to prevent unnecessary recalculation
-  const filteredProjectsMemo = useMemo(() => {
+  const filteredProjects = useMemo(() => {
     // If "All" category is selected, show all projects
     // Otherwise, filter by the selected category (supports many-to-many)
     return currentCategory === ALL_CATEGORY_ID
@@ -42,11 +38,6 @@ const ProjectCardContainer = ({ projects }: ProjectCardContainerProps) => {
         );
   }, [currentCategory, projects]);
 
-  // First filter by category, then apply pagination
-  useEffect(() => {
-    setFilteredProjects(filteredProjectsMemo);
-  }, [filteredProjectsMemo]);
-
   const {
     currentPage,
     totalPages,
@@ -55,14 +46,6 @@ const ProjectCardContainer = ({ projects }: ProjectCardContainerProps) => {
     handlePreviousPage,
     setCurrentPage,
   } = usePagination(filteredProjects, pageSize.projects);
-
-  // Update current page when switching tabs
-  useEffect(() => {
-    const savedPage = tabPages[currentCategory] || 1;
-    // Ensure the saved page doesn't exceed total pages
-    const validPage = Math.min(savedPage, totalPages || 1);
-    setCurrentPage(validPage);
-  }, [currentCategory, tabPages, setCurrentPage, totalPages]);
 
   const handleTabClick = useCallback(
     (categoryId: number) => {
@@ -74,8 +57,9 @@ const ProjectCardContainer = ({ projects }: ProjectCardContainerProps) => {
         }));
       }
       setCurrentCategory(categoryId);
+      setCurrentPage(Math.min(tabPages[categoryId] || 1, totalPages || 1));
     },
-    [currentCategory, currentPage, totalPages],
+    [currentCategory, currentPage, totalPages, tabPages, setCurrentPage],
   );
 
   return (

@@ -19,7 +19,7 @@ import {
   IconPriority5,
 } from "@/public/assets/svgs";
 import { Task } from "@/types/home/codev";
-import { createClientClientComponent } from "@/utils/supabase/client";
+import { getClientSupabase } from "@/utils/supabase/client";
 
 const COMPLETED_COLUMN_NAMES = ["done", "finished", "completed", "approved"];
 
@@ -29,14 +29,8 @@ export default function DashboardCurrentProjectModal() {
   const [error] = useState<string | null>(null);
   const [kanbanBoardId, setKanbanBoardId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [supabase, setSupabase] = useState<any>(null);
 
   const isModalOpen = isOpen && type === "dashboardCurrentProjectModal";
-
-  useEffect(() => {
-    const supabaseClient = createClientClientComponent();
-    setSupabase(supabaseClient);
-  }, []);
 
   const router = useRouter();
 
@@ -50,7 +44,7 @@ export default function DashboardCurrentProjectModal() {
   };
 
   useEffect(() => {
-    if (!supabase) return;
+    const supabase = getClientSupabase();
     const fetchUserTasks = async () => {
       if (!isModalOpen || !projectId) return;
 
@@ -151,7 +145,7 @@ export default function DashboardCurrentProjectModal() {
     };
 
     fetchUserTasks();
-  }, [isModalOpen, projectId, supabase]);
+  }, [isModalOpen, projectId]);
 
   if (isLoading) {
     return (
