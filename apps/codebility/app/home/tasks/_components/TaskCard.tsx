@@ -80,13 +80,6 @@ export default function TaskCard({ task }: Props) {
             </div>
           )}
 
-          {status && (
-            <div className="text-gray mt-1 flex items-center gap-2 text-xs">
-              Status:{" "}
-              <p className="text-dark-100 text-sm dark:text-white">{status}</p>
-            </div>
-          )}
-
           {type && (
             <div className="text-gray mt-1 flex items-center gap-2 text-xs">
               Type:{" "}
