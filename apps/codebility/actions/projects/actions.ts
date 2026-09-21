@@ -583,6 +583,8 @@ export const getTeamLead = async (
   const supabase = await createClientServerComponent();
 
   try {
+    // maybeSingle, not single: a project with no team_leader row is a normal
+    // state, and single() reports it as PGRST116 "0 rows" on every load.
     const { data, error } = (await supabase
       .from("project_members")
       .select(
@@ -601,7 +603,7 @@ export const getTeamLead = async (
       )
       .eq("project_id", projectId)
       .eq("role", "team_leader")
-      .single()) as { data: DbProjectMemberResponse | null; error: any };
+      .maybeSingle()) as { data: DbProjectMemberResponse | null; error: any };
 
     if (error) {
       console.error("Error fetching team lead:", error);
