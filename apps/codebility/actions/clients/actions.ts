@@ -3,6 +3,9 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 import { deleteImage, uploadImage } from "@/utils/uploadImage";
 import { createClientServerComponent } from "@/utils/supabase/server";
+import { getClientsPage } from "@/lib/server/codev.service";
+import type { Page, PageArgs } from "@/lib/server/paginate";
+import type { Client } from "@/types/home/codev";
 
 // Simple type definitions
 interface ActionResult {
@@ -10,6 +13,10 @@ interface ActionResult {
   error?: string;
   data?: any;
 }
+
+export const fetchClientsPageAction = async (
+  args: PageArgs & { status?: string; search?: string },
+): Promise<Page<Client>> => getClientsPage(args);
 
 /**
  * CREATE CLIENT ACTION - Simplified with better error handling

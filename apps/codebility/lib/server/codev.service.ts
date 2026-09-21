@@ -377,3 +377,55 @@ export const getClients = async (): Promise<{
 
   return { error, data: data || null };
 };
+
+// The client card renders these; active clients sort first, which is part of the
+// page contract, so it is ordered in the database rather than after the fact.
+export const getClientsPage = async ({
+  page,
+  pageSize,
+  status,
+  search,
+}: PageArgs & { status?: string; search?: string } = {}): Promise<Page<Client>> => {
+  const supabase = await createClientServerComponent();
+  const { page: current, pageSize: size, from, to } = resolvePageArgs({ page, pageSize });
+
+  let query = supabase
+    .from("clients")
+    .select(
+      `
+        id,
+        name,
+        email,
+        phone_number,
+        industry,
+        company_logo,
+        website,
+        status,
+        client_type,
+        country,
+        address,
+        created_at,
+        updated_at
+      `,
+      { count: "exact" },
+    );
+
+  if (status) query = query.eq("status", status);
+  if (search) {
+    const term = `%${search}%`;
+    query = query.or(`name.ilike.${term},email.ilike.${term},industry.ilike.${term}`);
+  }
+
+  const { data, error, count } = await query
+    .order("status", { ascending: true })
+    .order("created_at", { ascending: false, nullsFirst: false })
+    .order("id", { ascending: true })
+    .range(from, to);
+
+  if (error) {
+    console.error("Error fetching clients page:", error);
+    return toPage<Client>(null, 0, current, size);
+  }
+
+  return toPage((data ?? []) as Client[], count, current, size);
+};

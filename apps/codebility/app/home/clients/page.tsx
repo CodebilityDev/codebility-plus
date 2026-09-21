@@ -1,7 +1,7 @@
 import H1 from "@/components/shared/dashboard/H1";
 import AsyncErrorBoundary from "@/components/AsyncErrorBoundary";
-import { getClients } from "@/lib/server/codev.service";
-import { Client } from "@/types/home/codev";
+import { pageSize } from "@/constants";
+import { getClientsPage } from "@/lib/server/codev.service";
 import PageContainer from "../_components/PageContainer";
 
 import ClientButtons from "./_components/ClientsButton";
@@ -9,15 +9,7 @@ import ClientCards from "./_components/ClientsCard";
 
 
 export default async function Clients() {
-  const { data, error } = await getClients();
-
-  let clients: Client[] = data ?? [];
-
-  clients.sort((a, b) => {
-    if (a.status === b.status) return 0;
-    if (a.status === "active") return -1;
-    return 1;
-  });
+  const initialData = await getClientsPage({ page: 1, pageSize: pageSize.clients });
 
   return (
     <PageContainer maxWidth="xl">
@@ -40,12 +32,7 @@ export default async function Clients() {
             </div>
           </div>
 
-          {error ? (
-            <div className="text-white">ERROR</div>
-          ) : (
-            // Pass our sorted array to the client-card component
-            <ClientCards clients={clients} />
-          )}
+          <ClientCards initialData={initialData} />
         </div>
       </AsyncErrorBoundary>
     </PageContainer>

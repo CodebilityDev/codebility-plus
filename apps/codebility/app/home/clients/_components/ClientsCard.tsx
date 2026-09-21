@@ -10,7 +10,9 @@ import DefaultPagination from "@/components/ui/pagination";
 import SwitchStatusButton from "@/components/ui/SwitchStatusButton";
 import { pageSize } from "@/constants";
 import { useModal } from "@/hooks/modals/use-modal-clients";
-import usePagination from "@/hooks/data/use-pagination";
+import { usePaginatedQuery } from "@/hooks/query/use-paginated-query";
+import { qk } from "@/lib/shared/query-keys";
+import type { Page } from "@/lib/server/paginate";
 import {
   IconCopy,
   IconMail,
@@ -22,14 +24,19 @@ import { Client } from "@/types/home/codev";
 import toast from "react-hot-toast";
 
 import { copyToClipboard, handleDownload } from "@/utils/clients/utils";
-import { deleteClientAction, toggleClientStatusAction } from "@/actions/clients/actions";
+import {
+  deleteClientAction,
+  fetchClientsPageAction,
+  toggleClientStatusAction,
+} from "@/actions/clients/actions";
 
 interface Props {
-  clients: Client[];
+  initialData: Page<Client>;
 }
 
-export default function ClientCards({ clients }: Props) {
+export default function ClientCards({ initialData }: Props) {
   const [isLoading, setIsLoading] = useState(false);
+  const [page, setPage] = useState(1);
   const { onOpen } = useModal();
   const pathname = usePathname();
   const { user } = useUserStore();
@@ -39,14 +46,17 @@ export default function ClientCards({ clients }: Props) {
     user?.role_id === 3 ||
     user?.role_id === 5;
 
-  const {
-    currentPage,
-    totalPages,
-    paginatedData: paginatedClients,
-    handleNextPage,
-    handlePreviousPage,
-    setCurrentPage,
-  } = usePagination(clients, pageSize.clients);
+  const { data, isPending } = usePaginatedQuery<Client>(
+    qk.clients.list({ page }),
+    () => fetchClientsPageAction({ page, pageSize: pageSize.clients }),
+    {
+      initialData,
+      initialDataKey: qk.clients.list({ page: 1 }),
+    },
+  );
+
+  const clients = data?.rows ?? [];
+  const totalPages = Math.max(Math.ceil((data?.total ?? 0) / (data?.pageSize ?? 1)), 1);
 
   /**
    * Toggle client status between 'active' and 'inactive'.
@@ -101,8 +111,15 @@ export default function ClientCards({ clients }: Props) {
   return (
     <>
       <article className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-        {clients?.length > 0 ? (
-          paginatedClients?.map((client) => {
+        {isPending ? (
+          Array.from({ length: pageSize.clients }).map((_, i) => (
+            <div
+              key={i}
+              className="h-60 animate-pulse rounded-lg bg-zinc-200 dark:bg-zinc-800"
+            />
+          ))
+        ) : clients?.length > 0 ? (
+          clients.map((client) => {
             const isActive = client.status === "active";
             return (
               <div
@@ -274,12 +291,14 @@ export default function ClientCards({ clients }: Props) {
       </article>
 
       {/* Pagination */}
-      {clients.length > pageSize.clients && (
+      {totalPages > 1 && (
         <DefaultPagination
-          currentPage={currentPage}
-          handleNextPage={handleNextPage}
-          handlePreviousPage={handlePreviousPage}
-          setCurrentPage={setCurrentPage}
+          currentPage={Math.max(1, Math.min(page, totalPages))}
+          handleNextPage={() => setPage((p) => Math.min(p + 1, totalPages))}
+          handlePreviousPage={() => setPage((p) => Math.max(p - 1, 1))}
+          setCurrentPage={(target: number) =>
+            setPage(Math.max(1, Math.min(target, totalPages)))
+          }
           totalPages={totalPages}
         />
       )}
