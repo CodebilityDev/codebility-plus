@@ -13,6 +13,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@codevs/ui/tabs";
 
 import { fetchCodevsAction } from "@/actions/in-house/actions";
 import { usePaginatedQuery } from "@/hooks/query/use-paginated-query";
+import { useDebouncedValue } from "@/hooks/ui/use-debounced-value";
+import { InHouseTableSkeleton } from "./skeletons";
 import { InHouseTable } from "./table/InHouseTable";
 import { TableFilters } from "./table/table-filters";
 import type { Role } from "./EditDialog";
@@ -31,6 +33,18 @@ const EMPTY_FILTERS = {
 };
 
 export type InHouseFilters = typeof EMPTY_FILTERS;
+
+// Exactly what `page.tsx` renders: no filters, active tab, page 1.
+const EMPTY_QUERY_FILTERS = {
+  application_status: "passed",
+  internal_status: undefined,
+  display_position: undefined,
+  availability_status: true,
+  nda_status: undefined,
+  position: undefined,
+  role_id: undefined,
+  search: undefined,
+};
 
 interface InHouseViewProps {
   initialData: Page<CodevListRow>;
@@ -52,25 +66,25 @@ export default function InHouseView({
   const [page, setPage] = useState(1);
   const queryClient = useQueryClient();
 
+  const search = useDebouncedValue(filters.search);
+
   const queryFilters = useMemo(
     () => ({
       application_status: "passed",
       internal_status: filters.internal_status || filters.status || undefined,
       display_position: filters.display_position || undefined,
-      availability_status: filters.search
-        ? undefined
-        : activeTab === "active",
+      availability_status: search ? undefined : activeTab === "active",
       nda_status: filters.nda_status ? filters.nda_status === "true" : undefined,
       position: filters.position || undefined,
       role_id: filters.role || undefined,
-      search: filters.search || undefined,
+      search: search || undefined,
     }),
-    [activeTab, filters],
+    [activeTab, filters.internal_status, filters.status, filters.display_position, filters.nda_status, filters.position, filters.role, search],
   );
 
   const queryKey = qk.codevs.list({ ...queryFilters, page });
 
-  const { data, isFetching } = usePaginatedQuery(
+  const { data, isPending } = usePaginatedQuery(
     queryKey,
     () =>
       fetchCodevsAction({
@@ -78,7 +92,11 @@ export default function InHouseView({
         pageSize: pageSize.applicants,
         filters: queryFilters,
       }),
-    { initialData: page === 1 ? initialData : undefined },
+    {
+      initialData,
+      // The server only ever renders this exact key (unfiltered page 1, active tab).
+      initialDataKey: qk.codevs.list({ ...EMPTY_QUERY_FILTERS, page: 1 }),
+    },
   );
 
   const rows = data?.rows ?? [];
@@ -145,7 +163,9 @@ export default function InHouseView({
         </div>
       </div>
 
-      {rows.length === 0 && !isFetching ? (
+      {isPending ? (
+        <InHouseTableSkeleton rows={pageSize.applicants} />
+      ) : rows.length === 0 ? (
         <div className="flex min-h-[400px] flex-col items-center justify-center p-8 text-center">
           <div className="mb-4 text-4xl">🔍</div>
           <h3 className="mb-2 text-lg font-medium text-gray-900 dark:text-white">No members found</h3>
@@ -159,7 +179,7 @@ export default function InHouseView({
           roles={roles}
           positions={positions}
           projects={projects}
-          isFetching={isFetching}
+          isFetching={isPending}
           onDataChange={() => invalidate()}
           onDelete={() => invalidate()}
           pagination={{

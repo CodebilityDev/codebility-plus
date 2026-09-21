@@ -1,5 +1,6 @@
 import { getCodevStatusCounts, getCodevsPage } from "@/lib/server/codev.service";
 import { getPositions, getProjectOptions, getRoles } from "@/lib/server/reference-data";
+import { pageSize } from "@/constants";
 
 import InHouseView from "./_components/InHouseView";
 
@@ -17,7 +18,11 @@ export default async function InHousePage({
   const { page } = await searchParams;
 
   const [initialData, stats, roles, positions, projects] = await Promise.all([
-    getCodevsPage({ page: parsePage(page), filters: { application_status: "passed" } }),
+    getCodevsPage({
+      page: parsePage(page),
+      pageSize: pageSize.applicants,
+      filters: { application_status: "passed", availability_status: true },
+    }),
     getCodevStatusCounts({ application_status: "passed" }),
     getRoles(),
     getPositions(),

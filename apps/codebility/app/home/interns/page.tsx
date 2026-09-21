@@ -1,6 +1,7 @@
 import PageContainer from "../_components/PageContainer";
 import { getCodevStatusCounts, getInternsPage } from "@/lib/server/codev.service";
 import { getPositions, getProjectOptions } from "@/lib/server/reference-data";
+import { pageSize } from "@/constants";
 
 import CodevContainer from "./_components/CodevContainer";
 
@@ -18,7 +19,11 @@ export default async function CodevsPage({
   const { page } = await searchParams;
 
   const [initialData, counts, positions, projects] = await Promise.all([
-    getInternsPage({ page: parsePage(page) }),
+    getInternsPage({
+      page: parsePage(page),
+      pageSize: pageSize.codevsList,
+      filters: { availability_status: true },
+    }),
     getCodevStatusCounts({ application_status: "passed" }),
     getPositions(),
     getProjectOptions(),

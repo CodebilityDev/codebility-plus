@@ -22,6 +22,17 @@ export type InternsFilters = {
   availability: string[];
 };
 
+// Matches what page.tsx renders: active sub-tab, no filters, page 1.
+// getInternsPage pins application_status itself, so it is not part of the key's
+// server-side filter set, but the client sends it and both sides must hash equal.
+const EMPTY_QUERY_FILTERS = {
+  application_status: "passed",
+  availability_status: true,
+  display_position: undefined,
+  internal_status: undefined,
+  search: undefined,
+};
+
 export default function CodevContainer({
   initialData,
   counts,
@@ -55,7 +66,7 @@ export default function CodevContainer({
     [membersSubTab, filters, search],
   );
 
-  const { data, isFetching } = usePaginatedQuery(
+  const { data, isPending } = usePaginatedQuery(
     qk.codevs.list({ ...queryFilters, page }),
     () =>
       fetchInternsAction({
@@ -63,7 +74,11 @@ export default function CodevContainer({
         pageSize: pageSize.codevsList,
         filters: queryFilters,
       }),
-    { initialData: page === 1 ? initialData : undefined },
+    {
+      initialData,
+      // page.tsx renders exactly this key: no filters, active sub-tab, page 1.
+      initialDataKey: qk.codevs.list({ ...EMPTY_QUERY_FILTERS, page: 1 }),
+    },
   );
 
   const rows = data?.rows ?? [];
@@ -165,7 +180,7 @@ export default function CodevContainer({
       ) : (
         <CodevList
           data={rows}
-          isFetching={isFetching}
+          isFetching={isPending}
           pagination={{
             currentPage: data?.page ?? page,
             totalPages,
