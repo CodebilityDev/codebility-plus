@@ -106,7 +106,7 @@ const loadChecklistItems = async ({
 
     const { data: allChecklistItems, error: checklistError } = await supabase
       .from("member_checklists")
-      .select("*")
+      .select("id, member_id, project_id, title, description, priority, completed, created_by, due_date, created_at, updated_at")
       .eq("project_id", projectId)
       .order("created_at", { ascending: true });
 
