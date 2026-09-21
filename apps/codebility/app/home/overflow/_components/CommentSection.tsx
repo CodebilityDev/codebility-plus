@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, memo, useCallback, useRef } from "react";
+import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import DefaultAvatar from "@/components/DefaultAvatar";
 import { Button } from "@/components/ui/button";
@@ -36,14 +37,14 @@ import { createClientClientComponent } from "@/utils/supabase/client";
 
 interface CommentSectionProps {
   questionId: string;
-  questionAuthorId: string; // ← needed to show "Mark as Solution" button only to post author
+  questionAuthorId: string; // â† needed to show "Mark as Solution" button only to post author
   loggedIn: {
     id: string;
     name: string;
     image_url: string | null;
   };
   setQuestions: React.Dispatch<React.SetStateAction<Question[]>>;
-  onSolutionMarked?: () => void; // ← add this
+  onSolutionMarked?: () => void; // â† add this
 }
 
 interface MentionUser {
@@ -54,7 +55,7 @@ interface MentionUser {
   username?: string;
 }
 
-// Memoized MentionPopover component — renders absolutely above the textarea
+// Memoized MentionPopover component â€” renders absolutely above the textarea
 const MentionPopover = memo(function MentionPopover({
   isOpen,
   users,
@@ -274,7 +275,7 @@ const CommentActions = memo(function CommentActions({
 
   return (
     <div className="flex items-center gap-2 flex-shrink-0">
-      {/* Checkmark — only visible to post author */}
+      {/* Checkmark â€” only visible to post author */}
       {isPostAuthor && (
         <button
           onClick={handleMarkSolution}
@@ -381,7 +382,7 @@ const CommentEditForm = memo(function CommentEditForm({
   );
 });
 
-// ─── Solution Badge ────────────────────────────────────────────────────────────
+// â”€â”€â”€ Solution Badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const SolutionBadge = memo(function SolutionBadge() {
   return (
     <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500 px-2 py-0.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
@@ -425,7 +426,7 @@ const CommentItem = memo(
 
     return (
       <div className="flex gap-3 items-start">
-        {/* Avatar — outside the card */}
+        {/* Avatar â€” outside the card */}
         <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full bg-gray-700 mt-1">
           {comment.author.image_url ? (
             <Image
@@ -530,11 +531,8 @@ const EmptyState = memo(function EmptyState() {
 });
 
 export default function CommentSection({ questionId, questionAuthorId, loggedIn, setQuestions, onSolutionMarked }: CommentSectionProps) {
-  const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [likedComments, setLikedComments] = useState<Set<string>>(new Set());
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [commentToDelete, setCommentToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -594,23 +592,42 @@ export default function CommentSection({ questionId, questionAuthorId, loggedIn,
     setTimeout(() => textareaRef.current?.focus(), 0);
   }, [newComment]);
 
-  const loadComments = useCallback(async () => {
-    setIsLoading(true);
-    try {
+  const { data: commentsData, isPending: isLoading } = useQuery({
+    queryKey: ["overflow", "comments", questionId, loggedIn.id],
+    enabled: Boolean(questionId && loggedIn.id),
+    staleTime: 60_000,
+    queryFn: async () => {
       const [fetchedComments, likedCommentIds] = await Promise.all([
         fetchComments(questionId),
-        fetchCommentLikes(loggedIn.id, questionId)
+        fetchCommentLikes(loggedIn.id, questionId),
       ]);
-      setComments(fetchedComments);
-      setLikedComments(new Set(likedCommentIds));
-    } catch (error) {
-      console.error("Error loading comments:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [questionId, loggedIn.id]);
+      return {
+        comments: fetchedComments,
+        liked: new Set(likedCommentIds),
+      };
+    },
+  });
 
-  useEffect(() => { loadComments(); }, [loadComments]);
+  const comments = commentsData?.comments ?? [];
+  const likedComments = commentsData?.liked ?? new Set<string>();
+  // Mutations write here so the list stays responsive without refetching; the
+  // query result remains the source of truth for the initial render.
+  const [localComments, setLocalComments] = useState<Comment[] | null>(null);
+  const [localLiked, setLocalLiked] = useState<Set<string> | null>(null);
+  const visibleComments = localComments ?? comments;
+  const visibleLiked = localLiked ?? likedComments;
+
+  const setComments = (update: Comment[] | ((prev: Comment[]) => Comment[])) =>
+    setLocalComments((prev) =>
+      typeof update === "function" ? update(prev ?? comments) : update,
+    );
+
+  const setLikedComments = (
+    update: Set<string> | ((prev: Set<string>) => Set<string>),
+  ) =>
+    setLocalLiked((prev) =>
+      typeof update === "function" ? update(prev ?? likedComments) : update,
+    );
 
   const handleSubmitComment = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -637,8 +654,8 @@ export default function CommentSection({ questionId, questionAuthorId, loggedIn,
   }, [newComment, questionId, loggedIn.id, setQuestions]);
 
   const handleLikeComment = useCallback(async (commentId: string) => {
-    const wasLiked = likedComments.has(commentId);
-    const newLiked = new Set(likedComments);
+    const wasLiked = visibleLiked.has(commentId);
+    const newLiked = new Set(visibleLiked);
     if (wasLiked) {
       newLiked.delete(commentId);
       setComments(prev => prev.map(c => c.id === commentId ? { ...c, likes: c.likes - 1 } : c));
@@ -655,10 +672,10 @@ export default function CommentSection({ questionId, questionAuthorId, loggedIn,
         setLikedComments(new Set(newLiked));
       }
     } catch { /* optimistic rollback handled above */ }
-  }, [likedComments, loggedIn.id]);
+  }, [visibleLiked, loggedIn.id]);
 
   const handleEditComment = useCallback(async (commentId: string, newContent: string) => {
-    const original = comments.find(c => c.id === commentId);
+    const original = visibleComments.find(c => c.id === commentId);
     if (!original) return;
     const newUpdatedAt = new Date().toISOString();
     setComments(prev => prev.map(c => c.id === commentId ? { ...c, content: newContent, updated_at: newUpdatedAt } : c));
@@ -712,9 +729,9 @@ export default function CommentSection({ questionId, questionAuthorId, loggedIn,
     if (!open) setCommentToDelete(null);
   }, [isDeleting]);
 
-  // ─── Mark as Solution ──────────────────────────────────────────────────────
+  // â”€â”€â”€ Mark as Solution â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const handleMarkSolution = useCallback(async (commentId: string) => {
-    const comment = comments.find(c => c.id === commentId);
+    const comment = visibleComments.find(c => c.id === commentId);
     if (!comment) return;
 
     const wasMarked = comment.marked_as_solution;
@@ -722,8 +739,8 @@ export default function CommentSection({ questionId, questionAuthorId, loggedIn,
     // Optimistic update
     setComments(prev => prev.map(c => ({
       ...c,
-      // If we're marking this one → clear all others
-      // If we're unmarking this one → just toggle it off
+      // If we're marking this one â†’ clear all others
+      // If we're unmarking this one â†’ just toggle it off
       marked_as_solution: wasMarked
         ? (c.id === commentId ? false : c.marked_as_solution)
         : (c.id === commentId ? true : false),
@@ -732,7 +749,7 @@ export default function CommentSection({ questionId, questionAuthorId, loggedIn,
     try {
       const result = await markAsSolution(commentId, questionId);
       if (result.success) {
-        onSolutionMarked?.(); // ← add this
+        onSolutionMarked?.(); // â† add this
       } else{
         // Rollback
         setComments(prev => prev.map(c => ({
@@ -778,13 +795,13 @@ export default function CommentSection({ questionId, questionAuthorId, loggedIn,
       </Dialog>
 
       {/* Comments List */}
-      {comments.length > 0 && (
+      {visibleComments.length > 0 && (
         <div className="space-y-2.5 sm:space-y-3">
-          {comments.map((comment) => (
+          {visibleComments.map((comment) => (
             <CommentItem
               key={comment.id}
               comment={comment}
-              isLiked={likedComments.has(comment.id)}
+              isLiked={visibleLiked.has(comment.id)}
               onLike={handleLikeComment}
               loggedInUserId={loggedIn.id}
               questionAuthorId={questionAuthorId}
@@ -829,7 +846,7 @@ export default function CommentSection({ questionId, questionAuthorId, loggedIn,
         </div>
       </form>
 
-      {comments.length === 0 && <EmptyState />}
+      {visibleComments.length === 0 && <EmptyState />}
     </div>
   );
 }

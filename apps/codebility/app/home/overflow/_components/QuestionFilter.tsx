@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { Button } from "@codevs/ui/button";
 import { Input } from "@codevs/ui/input";
@@ -14,7 +15,6 @@ import { Card } from "@/components/ui/card";
 import { Search, X, Filter, ChevronDown, Flame, CheckCircle2 } from "lucide-react";
 import { fetchTopSolvers, type TopSolver } from "@/actions/overflow/actions";
 import DefaultAvatar from "@/components/DefaultAvatar";
-
 interface SearchFilterProps {
   onSearchChange: (search: string) => void;
   onSortChange: (sort: "newest" | "oldest" | "popular" | "myPosts") => void;
@@ -75,17 +75,12 @@ export default function SearchFilter({
 
   // Seeded from the server so arriving on /home/overflow issues no request. The
   // only refetch is an explicit refreshKey bump after a solution is marked.
-  const [topSolvers, setTopSolvers] = useState<TopSolver[]>(initialTopSolvers);
-  const [isLoadingSolvers, setIsLoadingSolvers] = useState(false);
-
-  useEffect(() => {
-    if (!refreshKey) return;
-    setIsLoadingSolvers(true);
-    fetchTopSolvers(6)
-      .then(setTopSolvers)
-      .catch(console.error)
-      .finally(() => setIsLoadingSolvers(false));
-  }, [refreshKey]);
+  const { data: topSolvers = initialTopSolvers, isFetching: isLoadingSolvers } = useQuery({
+    queryKey: ["overflow", "topSolvers", refreshKey],
+    initialData: initialTopSolvers,
+    staleTime: 60_000,
+    queryFn: () => fetchTopSolvers(6),
+  });
 
   const handleSearchChange = (value: string) => {
     setSearchQuery(value);
