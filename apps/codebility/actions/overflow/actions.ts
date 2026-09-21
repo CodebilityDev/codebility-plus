@@ -55,7 +55,11 @@ export interface Question {
     updated_at: string;
 }
 
-export async function fetchQuestions(page: number = 1, pageSize: number = 5): Promise<{
+export async function fetchQuestions(
+  page: number = 1,
+  pageSize: number = 5,
+  search?: string,
+): Promise<{
   questions: Question[];
   currentPage: number;
   totalPages: number;
@@ -68,9 +72,16 @@ export async function fetchQuestions(page: number = 1, pageSize: number = 5): Pr
   const end = start + pageSize - 1
 
   // Step 1: Fetch questions with pagination (no codev join to avoid RLS filtering)
-  const { data, error, count } = await supabase
+  let query = supabase
     .from('overflow_post')
-    .select('*', { count: 'exact' })
+    .select('id, codev_id, title, question_details, tags, image_url, likes, comments, created_at, updated_at', { count: 'exact' })
+
+  if (search) {
+    const term = `%${search}%`
+    query = query.or(`title.ilike.${term},question_details.ilike.${term}`)
+  }
+
+  const { data, error, count } = await query
     .order('created_at', { ascending: false })
     .range(start, end)
 

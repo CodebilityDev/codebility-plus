@@ -1,8 +1,10 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { useDebouncedValue } from "@/hooks/ui/use-debounced-value";
 import {
   AlertCircle,
   ChevronLeft,
@@ -599,14 +601,10 @@ export default function OverflowView({
 }: OverflowViewProps) {
   const { toast } = useToast();
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
-  const [questions, setQuestions] = useState<Question[]>(
-    initialQuestions.questions,
-  );
   const [sortBy, setSortBy] = useState<
     "newest" | "oldest" | "popular" | "myPosts"
   >("newest");
   const [isPosting, setIsPosting] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [socPoints, setSocPoints] = useState(initialSocialPoints);
   const [trendingTopics, setTrendingTopics] =
     useState<TrendingTopic[]>(initialTrendingTopics);
@@ -619,9 +617,9 @@ export default function OverflowView({
     dateTo: undefined,
   });
   const [currentPage, setCurrentPage] = useState(initialQuestions.currentPage);
-  const [totalPages, setTotalPages] = useState(initialQuestions.totalPages);
-  const [totalCount, setTotalCount] = useState(initialQuestions.totalCount);
-  const [isPending, startTransition] = useTransition();
+  const debouncedSearch = useDebouncedValue(searchQuery, 300);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const queryClient = useQueryClient();
 
   // ── Data Fetching ───────────────────────────────────────────────────────────
 
@@ -634,24 +632,46 @@ export default function OverflowView({
     }
   };
 
-  const loadQuestions = async (page: number = 1) => {
-    setIsLoading(true);
-    try {
-      const result = await fetchQuestions(page, 5);
-      setQuestions(result.questions);
-      setCurrentPage(result.currentPage);
-      setTotalPages(result.totalPages);
-      setTotalCount(result.totalCount);
-    } catch (error) {
-      console.error("Fetch error:", error);
-      toast({
-        title: "Failed to load questions",
-        description: "Please check your connection and try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+  // Server-rendered page 1 seeds this key exactly, so arriving on the route costs
+  // no client request. Search is debounced before it enters the key, and posting a
+  // question bumps refreshKey instead of imperatively reloading.
+  const {
+    data: questionsResult = initialQuestions,
+    isFetching: isLoading,
+    refetch: refetchQuestions,
+  } = useQuery({
+    queryKey: ["overflow", "questions", currentPage, debouncedSearch, refreshKey],
+    initialData:
+      currentPage === 1 && debouncedSearch === "" && refreshKey === 0
+        ? initialQuestions
+        : undefined,
+    initialDataUpdatedAt: 0,
+    staleTime: 60_000,
+    queryFn: () => fetchQuestions(currentPage, 5, debouncedSearch || undefined),
+  });
+
+  const questions = questionsResult.questions;
+  const totalPages = questionsResult.totalPages;
+  const totalCount = questionsResult.totalCount;
+
+  // Optimistic row edits (like, edit, delete) write straight into the cached
+  // page rather than a local copy, so a refetch cannot resurrect a deleted row.
+  const setQuestions = (
+    update: Question[] | ((prev: Question[]) => Question[]),
+  ) => {
+    queryClient.setQueryData(
+      ["overflow", "questions", currentPage, debouncedSearch, refreshKey],
+      (prev: typeof questionsResult | undefined) => {
+        if (!prev) return prev;
+        const next = typeof update === "function" ? update(prev.questions) : update;
+        return { ...prev, questions: next };
+      },
+    );
+  };
+
+  const loadQuestions = (page: number = 1) => {
+    setCurrentPage(page);
+    setRefreshKey((k) => k + 1);
   };
 
   const loadTrendingTopics = async () => {
@@ -675,10 +695,14 @@ export default function OverflowView({
 
   const handlePageChange = (newPage: number) => {
     if (newPage < 1 || newPage > totalPages || newPage === currentPage) return;
-    startTransition(async () => {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      await loadQuestions(newPage);
-    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    setCurrentPage(newPage);
+  };
+
+  // A new term invalidates the page offset: results are a different set now.
+  const handleSearchChange = (next: string) => {
+    setSearchQuery(next);
+    setCurrentPage(1);
   };
 
   const handlePostQuestion = async (questionData: {
@@ -698,11 +722,8 @@ export default function OverflowView({
       });
 
       if (result.success && result.question) {
-        await Promise.all([
-          loadQuestions(currentPage),
-          refreshSocialPoints(),
-          loadTrendingTopics(),
-        ]);
+        setRefreshKey((k) => k + 1);
+        await Promise.all([refreshSocialPoints(), loadTrendingTopics()]);
         setIsPostModalOpen(false);
         toast({
           title: "Question posted!",
@@ -834,7 +855,7 @@ export default function OverflowView({
 
         {/* Search & Filter */}
         <SearchFilter
-          onSearchChange={setSearchQuery}
+          onSearchChange={handleSearchChange}
           onSortChange={setSortBy}
           onFilterChange={setFilterOptions}
           currentSort={sortBy}
@@ -850,14 +871,14 @@ export default function OverflowView({
             totalPages={totalPages}
             totalCount={totalCount}
             onPageChange={handlePageChange}
-            isLoading={isPending}
+            isLoading={isLoading}
             showTotal
           />
         )}
 
         {/* Questions list */}
         <div className="space-y-3">
-          {isLoading || isPending ? (
+          {isLoading ? (
             // Skeleton loading state
             <>
               {Array.from({ length: 4 }).map((_, i) => (
@@ -887,12 +908,12 @@ export default function OverflowView({
         </div>
 
         {/* Bottom pagination */}
-        {showPagination && !isPending && (
+        {showPagination && (
           <PaginationBar
             currentPage={currentPage}
             totalPages={totalPages}
             onPageChange={handlePageChange}
-            isLoading={isPending}
+            isLoading={isLoading}
             showTotal={false}
           />
         )}
