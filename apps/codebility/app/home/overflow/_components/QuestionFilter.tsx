@@ -22,6 +22,7 @@ interface SearchFilterProps {
   currentSort: "newest" | "oldest" | "popular" | "myPosts";
   currentUserId?: string;
   refreshKey?: number;
+  initialTopSolvers: TopSolver[];
 }
 
 export interface FilterOptions {
@@ -60,7 +61,8 @@ export default function SearchFilter({
   onFilterChange,
   currentSort,
   currentUserId,
-  refreshKey
+  refreshKey,
+  initialTopSolvers,
 }: SearchFilterProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -71,16 +73,19 @@ export default function SearchFilter({
     dateTo: undefined,
   });
 
-  // Real data state
-  const [topSolvers, setTopSolvers] = useState<TopSolver[]>([]);
-  const [isLoadingSolvers, setIsLoadingSolvers] = useState(true);
+  // Seeded from the server so arriving on /home/overflow issues no request. The
+  // only refetch is an explicit refreshKey bump after a solution is marked.
+  const [topSolvers, setTopSolvers] = useState<TopSolver[]>(initialTopSolvers);
+  const [isLoadingSolvers, setIsLoadingSolvers] = useState(false);
 
   useEffect(() => {
+    if (!refreshKey) return;
+    setIsLoadingSolvers(true);
     fetchTopSolvers(6)
       .then(setTopSolvers)
       .catch(console.error)
       .finally(() => setIsLoadingSolvers(false));
-  }, [refreshKey]); 
+  }, [refreshKey]);
 
   const handleSearchChange = (value: string) => {
     setSearchQuery(value);

@@ -25,6 +25,7 @@ import {
   getSocialPoints,
   postQuestion,
   Question,
+  TopSolver,
   TrendingTopic,
 } from "@/actions/overflow/actions";
 import PostQuestionModal from "./PostQuestionModal";
@@ -50,6 +51,7 @@ interface OverflowViewProps {
   initialTrendingTopics: TrendingTopic[];
   initialSocialPoints: number;
   initialLikedPostIds: string[];
+  initialTopSolvers: TopSolver[];
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -593,6 +595,7 @@ export default function OverflowView({
   initialTrendingTopics,
   initialSocialPoints,
   initialLikedPostIds,
+  initialTopSolvers,
 }: OverflowViewProps) {
   const { toast } = useToast();
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
@@ -837,6 +840,7 @@ export default function OverflowView({
           currentSort={sortBy}
           currentUserId={author.id}
           refreshKey={solverRefreshKey}
+          initialTopSolvers={initialTopSolvers}
         />
 
         {/* Top pagination */}

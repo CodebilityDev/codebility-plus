@@ -2,6 +2,7 @@ import OverflowView from "./_components/OverflowView";
 import { createClientServerComponent } from "@/utils/supabase/server";
 import {
   fetchQuestions,
+  fetchTopSolvers,
   fetchTrendingTopics,
   getSocialPoints,
   getUserLikedPosts,
@@ -31,7 +32,7 @@ export default async function OverflowPage() {
   // post-hydration round trips. Pagination and post-question refresh still
   // re-fetch on the client. Liked post ids are fetched once here so each
   // QuestionCard does not issue its own `checkPostLike` call.
-  const [questionsResult, trendingTopics, socialPoints, liked] =
+  const [questionsResult, trendingTopics, socialPoints, liked, topSolvers] =
     await Promise.all([
       fetchQuestions(1, 5),
       fetchTrendingTopics(),
@@ -39,6 +40,7 @@ export default async function OverflowPage() {
       user?.id
         ? getUserLikedPosts(user.id)
         : Promise.resolve({ success: true, likedPostIds: [] as string[] }),
+      fetchTopSolvers(6),
     ]);
 
   return (
@@ -63,6 +65,7 @@ export default async function OverflowPage() {
             initialTrendingTopics={trendingTopics}
             initialSocialPoints={socialPoints ?? 0}
             initialLikedPostIds={liked.likedPostIds}
+            initialTopSolvers={topSolvers}
           />
         </div>
       </div>
