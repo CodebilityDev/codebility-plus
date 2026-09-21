@@ -3,11 +3,13 @@
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { X, Edit, ChevronLeft, Plus, Check, Trash2 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { AnnouncementTab } from "./AnnouncementTab";
 import { AnnouncementContent } from "./AnnouncementContent";
 import { AnnouncementEditor } from "./AnnouncementEditor";
 import { AnnouncementCategory, AnnouncementPage, AnnouncementTab as TabType } from "./types";
-import { createClientClientComponent } from "@/utils/supabase/client";
+import { getClientSupabase } from "@/utils/supabase/client";
+import { useUserStore } from "@/store/codev-store";
 import { slugToLabel, labelToSlug } from "./utils";
 
 interface AnnouncementModalProps {
@@ -20,12 +22,7 @@ export const AnnouncementModal: React.FC<AnnouncementModalProps> = ({
   onClose,
 }) => {
   const [activeTab, setActiveTab] = useState<AnnouncementCategory>("");
-  const [mounted, setMounted] = useState(false);
-  const [pages, setPages] = useState<AnnouncementPage[]>([]);
-  const [tabs, setTabs] = useState<TabType[]>([]);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [showSidebar, setShowSidebar] = useState(true);
 
   // Category management state
@@ -35,110 +32,88 @@ export const AnnouncementModal: React.FC<AnnouncementModalProps> = ({
   const [categoryActionLoading, setCategoryActionLoading] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
-  const supabase = createClientClientComponent();
+  const supabase = getClientSupabase();
+  const currentCodevId = useUserStore((s) => s.user?.id ?? null);
+  const [isAdminState, setIsAdmin] = useState(false);
 
-  const [isAdmin, setIsAdmin] = useState(false);
+  const { data: isAdminChecked = false } = useQuery({
+    queryKey: ["announcements", "isAdmin", currentCodevId],
+    enabled: Boolean(isOpen && currentCodevId),
+    staleTime: 5 * 60_000,
+    queryFn: async () => {
+      const { data: adminData } = await getClientSupabase()
+        .from("admin_users")
+        .select("id")
+        .eq("id", currentCodevId)
+        .single();
+      return Boolean(adminData);
+    },
+  });
 
-// Add this useEffect alongside your existing ones
-  useEffect(() => {
-    const checkAdminStatus = async () => {
-      if (!supabase || !isOpen) return;
+  const isAdmin = isAdminState || isAdminChecked;
 
-      try {
-        // Get current authenticated user
-        const { data: { user } } = await supabase.auth.getUser();
-      
-        if (!user) return;
+  const { data: fetchedPagesData, isPending: isPendingPages, error: pagesError } = useQuery({
+    queryKey: ["announcements", "pages"],
+    enabled: Boolean(isOpen),
+    staleTime: 60_000,
+    queryFn: async () => {
+      const { data, error: fetchError } = await getClientSupabase()
+        .from("announcements")
+        .select("*")
+        .order("created_at");
 
-        // Find the codev record matching the auth user
-        const { data: codevData, error: codevError } = await supabase
-          .from("codev")
-          .select("id")
-          .eq("id", user.id)
-          .single();
+      if (fetchError) throw fetchError;
 
-        if (codevError || !codevData) return;
-        
-        // Check if the codev id exists in admin_users
-        const { data: adminData, error: adminError } = await supabase
-          .from("admin_users")
-          .select("id")
-          .eq("id", codevData.id)
-          .single();
+      return (data || []).map((item) => ({
+        id: item.id,
+        category: item.category as AnnouncementCategory,
+        title: item.title,
+        banner_image: item.banner_image,
+        content: item.content,
+        last_updated: item.updated_at || item.created_at,
+      })) as AnnouncementPage[];
+    },
+  });
 
-        if (adminError || !adminData) return;
+  const [mutationError, setError] = useState<string | null>(null);
 
-        setIsAdmin(true);
-      } catch (err) {
-        console.error("Error checking admin status:", err);
-      }
-    };
+  const fetchedPages = fetchedPagesData ?? null;
+  const loading = isPendingPages;
+  const error: string | null = mutationError
+    ? mutationError
+    : pagesError
+      ? `Failed to load announcements: ${pagesError instanceof Error ? pagesError.message : "Unknown error"}`
+      : null;
 
-    checkAdminStatus();
-  }, [isOpen, supabase]);
+  // The saved rows seed editable drafts; edits after that stay local. Deriving
+  // the drafts during render rather than copying them in an effect keeps the
+  // first paint correct.
+  const [pagesDraftState, setPagesDraftState] = useState<AnnouncementPage[] | null>(null);
+  const [tabsDraft, setTabsDraft] = useState<TabType[] | null>(null);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const pages = pagesDraftState ?? fetchedPages ?? [];
+  const tabs: TabType[] =
+    tabsDraft ??
+    (fetchedPages ?? []).map((p) => ({
+      id: p.category,
+      label: slugToLabel(p.category),
+    }));
 
-  // Fetch announcements from database
-  useEffect(() => {
-    const fetchAnnouncements = async () => {
-       if (!isOpen || !supabase) return;
+  const setPages = (
+    update: AnnouncementPage[] | ((prev: AnnouncementPage[]) => AnnouncementPage[]),
+  ) =>
+    setPagesDraftState((prev) =>
+      typeof update === "function" ? update(prev ?? fetchedPages ?? []) : update,
+    );
 
-      try {
-        setLoading(true);
-        setError(null);
-
-        const { data, error: fetchError } = await supabase
-          .from("announcements")
-          .select("*")
-          .order("created_at");
-
-        if (fetchError) throw fetchError;
-
-        const mappedData: AnnouncementPage[] = (data || []).map((item) => ({
-          id: item.id,
-          category: item.category as AnnouncementCategory,
-          title: item.title,
-          banner_image: item.banner_image,
-          content: item.content,
-          last_updated: item.updated_at || item.created_at,
-        }));
-
-        setPages(mappedData);
-
-        // Build tabs from DB rows
-        const derivedTabs: TabType[] = mappedData.map((p) => ({
-          id: p.category,
-          label: slugToLabel(p.category),
-        }));
-        setTabs(derivedTabs);
-
-        if (derivedTabs.length > 0 && !activeTab) {
-          setActiveTab(derivedTabs[0]?.id ?? "");
-        }
-      } catch (err) {
-        console.error("Error fetching announcements:", err);
-        setError(
-          `Failed to load announcements: ${err instanceof Error ? err.message : "Unknown error"}`
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAnnouncements();
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (isOpen) {
-      setShowSidebar(true);
-    }
-  }, [isOpen]);
+  const setTabs = (
+    update: TabType[] | ((prev: TabType[]) => TabType[]),
+  ) => {
+    const current = tabs;
+    setTabsDraft(typeof update === "function" ? update(current) : update);
+  };
 
   const activeContent = pages.find((page) => page.category === activeTab);
-  if (!supabase) throw new Error("Supabase client not initialized");
 
   // ── Save existing page content ──────────────────────────────────────────
   const handleSave = async (updatedPage: AnnouncementPage) => {
@@ -362,7 +337,12 @@ export const AnnouncementModal: React.FC<AnnouncementModalProps> = ({
     if (window.innerWidth < 768) setShowSidebar(false);
   };
 
-  if (!isOpen || !mounted) return null;
+  // The portal target only exists in the browser. Reading it during render is
+  // safe because this module is client-only, and it removes the mount effect
+  // that used to flip a `mounted` flag.
+  const canPortal = typeof document !== "undefined";
+
+  if (!isOpen || !canPortal) return null;
 
   const modalContent = (
     <>
