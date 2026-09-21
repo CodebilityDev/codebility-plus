@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { createClientServerComponent } from "@/utils/supabase/server";
 import { deleteImage, getImagePath } from "@/utils/uploadImage";
 import { z } from "zod";
@@ -59,6 +60,7 @@ export async function createNewsBanner(formData: z.infer<typeof bannerSchema>) {
       return { error: error.message };
     }
 
+    revalidatePath("/home/settings/news-banners");
     return { data, success: true };
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -116,6 +118,7 @@ export async function updateNewsBanner(
       return { error: error.message };
     }
 
+    revalidatePath("/home/settings/news-banners");
     return { data, success: true };
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -180,6 +183,7 @@ export async function deleteNewsBanner(bannerId: string) {
       }
     }
 
+    revalidatePath("/home/settings/news-banners");
     return { success: true };
   } catch (error) {
     return { error: "Failed to delete banner" };
@@ -221,6 +225,7 @@ export async function toggleBannerStatus(bannerId: string, isActive: boolean) {
       return { error: error.message };
     }
 
+    revalidatePath("/home/settings/news-banners");
     return { data, success: true };
   } catch (error) {
     return { error: "Failed to update banner status" };

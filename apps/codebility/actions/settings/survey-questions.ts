@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { createClientServerComponent } from "@/utils/supabase/server";
 import { z } from "zod";
 
@@ -70,6 +71,8 @@ export async function createQuestion(surveyId: string, formData: z.infer<typeof 
       return { error: error.message };
     }
 
+    revalidatePath("/home/settings/surveys");
+
     return { data, success: true };
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -122,6 +125,8 @@ export async function updateQuestion(
       return { error: error.message };
     }
 
+    revalidatePath("/home/settings/surveys");
+
     return { data, success: true };
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -159,6 +164,8 @@ export async function deleteQuestion(questionId: string) {
     if (error) {
       return { error: error.message };
     }
+
+    revalidatePath("/home/settings/surveys");
 
     return { success: true };
   } catch (error) {
@@ -215,6 +222,8 @@ export async function reorderQuestions(updates: Array<{ id: string; order_index:
     );
 
     await Promise.all(updatePromises);
+
+    revalidatePath("/home/settings/surveys");
 
     return { success: true };
   } catch (error) {

@@ -1,5 +1,6 @@
-"use server";
+﻿"use server";
 
+import { revalidatePath } from "next/cache";
 import { createNotification } from "@/lib/server/notification.service";
 import { createClientServerComponent } from "@/utils/supabase/server";
 
@@ -220,6 +221,7 @@ export async function checkAttendanceWarnings(
       }
     }
 
+    revalidatePath("/home/my-team");
     return { success: true, warnings };
   } catch (error) {
     console.error("Error checking attendance warnings:", error);

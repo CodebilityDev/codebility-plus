@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { createClientServerComponent } from "@/utils/supabase/server";
 import { Codev } from "@/types/home/codev";
 import { z } from "zod";
@@ -167,6 +168,8 @@ export async function createService(formData: ServiceWriteInput) {
       return { error: "Failed to create service" };
     }
 
+    revalidatePath("/home/settings/services");
+
     return { error: null };
   } catch (error) {
     console.error("Error creating service:", error);
@@ -191,6 +194,8 @@ export async function updateService(id: string, formData: ServiceWriteInput) {
       console.error("Error updating service:", error);
       return { error: "Failed to update service" };
     }
+
+    revalidatePath("/home/settings/services");
 
     return { error: null };
   } catch (error) {

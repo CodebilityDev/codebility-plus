@@ -1,5 +1,6 @@
-"use server";
+﻿"use server";
 
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { useUserStore } from "@/store/codev-store";
 import { Codev } from "@/types/home/codev";
@@ -267,6 +268,7 @@ export const signupUser = async (formData: FormData) => {
       throw error;
     }
 
+    revalidatePath("/home/applicants");
     setUser(userData);
     
     // **ENHANCED: Return additional information about NDA processing**

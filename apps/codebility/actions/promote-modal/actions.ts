@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { createClientServerComponent } from "@/utils/supabase/server";
 import { requireRole } from "@/lib/server/auth-guard";
 import { FeatureModal } from "@/app/home/promote-modal/type";
@@ -62,6 +63,8 @@ export async function upsertActiveModal(
       updated_at: new Date().toISOString(),
     });
     if (error) throw error;
+    revalidatePath("/home/promote-modal");
+
     return { error: null };
   } catch {
     return { error: "Failed to save changes." };
@@ -92,6 +95,8 @@ export async function createModal(): Promise<{
       .select("id")
       .single();
     if (error) throw error;
+    revalidatePath("/home/promote-modal");
+
     return { id: data.id, error: null };
   } catch {
     return { id: null, error: "Failed to create modal." };
@@ -136,6 +141,8 @@ export async function deleteModal(
       .delete()
       .eq("id", id);
     if (error) throw error;
+    revalidatePath("/home/promote-modal");
+
     return { error: null };
   } catch {
     return { error: "Failed to delete modal." };
@@ -155,6 +162,8 @@ export async function toggleModalActive(
       .eq("id", id);
 
     if (error) throw error;
+    revalidatePath("/home/promote-modal");
+
     return { error: null };
   } catch {
     return { error: "Failed to update modal." };

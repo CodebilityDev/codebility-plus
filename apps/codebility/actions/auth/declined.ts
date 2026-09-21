@@ -1,5 +1,6 @@
-"use server";
+﻿"use server";
 
+import { revalidatePath } from "next/cache";
 import { createClientServerComponent } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 
@@ -48,6 +49,7 @@ export async function reApplyAction({ user }: { user: any }) {
 
         if (error) throw error;
 
+        revalidatePath("/auth/waiting");
         redirect("/auth/waiting");
     } catch (error) {
         console.error("Error reapplying:", error);

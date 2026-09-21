@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { createClientServerComponent } from "@/utils/supabase/server";
 import { requireUser } from "@/lib/server/auth-guard";
 
@@ -43,6 +44,8 @@ export async function submitTicket(data: SubmitTicketData) {
     console.error("Error submitting ticket:", error);
     return { success: false, error: error.message };
   }
+
+  revalidatePath("/home/ticket-support");
 
   return { success: true };
 }

@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { formatToUnix } from "@/utils/format-date-time";
 import { createClientServerComponent } from "@/utils/supabase/server";
 
@@ -91,6 +92,8 @@ export const logUserTime = async (formData: FormData) => {
   if (error) throw error;
 
   await stopUserTimer(codevId);
+
+  revalidatePath("/home");
 };
 
 export const updateUserTaskOnHand = async (codevId: string, taskId: string) => {
@@ -132,6 +135,7 @@ export const updateUserAvailabilityStatus = async ({
       .eq("id", userId);
 
     if (error) throw error;
+    revalidatePath("/home");
   } catch (error) {
     console.error(error);
   }
