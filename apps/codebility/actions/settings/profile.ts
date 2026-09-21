@@ -217,7 +217,7 @@ export async function getEducation(codevId: string) {
 
     const { data, error } = await supabase
       .from("education")
-      .select("*")
+      .select("id, codev_id, institution, degree, major_subject, category, current, achievements, description, start_date, end_date")
       .eq("codev_id", codevId)
       .order("start_date", { ascending: false });
 
@@ -399,7 +399,7 @@ export async function getJobStatuses(codevId: string) {
     const supabase = await createClientServerComponent();
     const { data, error } = await supabase
       .from("job_status")
-      .select("*")
+      .select("id, job_title, company_name, employment_type, description, status, salary_range, work_setup, shift, codev_id, hours_per_week, created_at, updated_at")
       .eq("codev_id", codevId);
 
     if (error) throw error;
@@ -409,18 +409,3 @@ export async function getJobStatuses(codevId: string) {
     throw error;
   }
 }
-
-export const getPositions = async (): Promise<{
-  error: any;
-  data: Position[] | null;
-}> => {
-  const supabase = await createClientServerComponent();
-
-  const { data, error } = await supabase.from("positions").select("*");
-  if (error) {
-    console.error("Error fetching positions:", error);
-    return { error, data: null };
-  }
-
-  return { error: null, data: data || null };
-};

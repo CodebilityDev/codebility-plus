@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Box from "@/components/shared/dashboard/Box";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,14 +13,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { IconEdit } from "@/public/assets/svgs";
-import { Codev, Position } from "@/types/home/codev";
+import { Codev } from "@/types/home/codev";
+import type { PositionOption } from "@/lib/server/reference-data";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
 import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
 
-import { getPositions, updateCodev } from "@/actions/settings/profile";
+import { updateCodev } from "@/actions/settings/profile";
 
 type PersonalInfoProps = {
   data: Codev;
@@ -35,8 +36,10 @@ type FormValues = {
   headline: string | undefined;
 };
 
-const PersonalInfo = ({ data }: PersonalInfoProps) => {
-  const [positions, setPositions] = useState<Position[]>([]);
+const PersonalInfo = ({
+  data,
+  positions,
+}: PersonalInfoProps & { positions: PositionOption[] }) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -57,26 +60,6 @@ const PersonalInfo = ({ data }: PersonalInfoProps) => {
       headline: data.headline || undefined,
     },
   });
-
-  const fetchPositions = async () => {
-    try {
-      const { data, error } = await getPositions();
-      if (error) {
-        console.error("Error fetching positions:", error);
-        toast.error("Failed to fetch positions");
-      } else if (data) {
-        setPositions(data);
-      }
-    } catch (err) {
-      console.error("Error fetching positions:", err);
-      toast.error("Failed to fetch positions");
-    }
-  };
-
-  // On mount, fetch positions
-  useEffect(() => {
-    fetchPositions();
-  }, []);
 
   const onSubmit = async (formData: FormValues) => {
     const toastId = toast.loading("Updating your information");
@@ -173,7 +156,7 @@ const PersonalInfo = ({ data }: PersonalInfoProps) => {
                 <SelectGroup>
                   <SelectLabel>Select Position</SelectLabel>
                   {/* Map the positions from DB */}
-                  {positions.map((position: Position) => (
+                  {positions.map((position: PositionOption) => (
                     <SelectItem
                       key={position.id}
                       value={position.name || `Position#${position.id}`}

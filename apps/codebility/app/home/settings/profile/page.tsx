@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { H1 } from "@/components/shared/dashboard";
 import CustomBreadcrumb from "@/components/shared/dashboard/CustomBreadcrumb";
 import { createClientServerComponent } from "@/utils/supabase/server";
+import { getPositions } from "@/lib/server/reference-data";
 import { Toaster } from "react-hot-toast";
 
 import About from "./_components/About";
@@ -69,6 +70,7 @@ async function ProfileComponent() {
     { data: workExperience },
     { data: schedules },
     { data: jobStatuses },
+    positions,
   ] = await Promise.all([
     supabase
       .from("education")
@@ -82,6 +84,7 @@ async function ProfileComponent() {
       .order("date_from", { ascending: false }),
     supabase.from("work_schedules").select("*").eq("codev_id", user.id),
     supabase.from("job_status").select("*").eq("codev_id", user.id),
+    getPositions(),
   ]);
 
   // Combine data
@@ -105,7 +108,7 @@ async function ProfileComponent() {
         <ProfileCompletionGuide />
         <div className="flex flex-col gap-8 md:flex-row">
           <div className="flex w-full basis-[70%] flex-col gap-8 2xl:basis-[60%]">
-            <PersonalInfo data={codevData} />
+            <PersonalInfo data={codevData} positions={positions} />
             <About data={codevData} />
             <ContactInfo
               data={{
