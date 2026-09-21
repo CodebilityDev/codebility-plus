@@ -1,6 +1,7 @@
-"use client";
+﻿"use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import { SimpleMemberData } from "@/actions/projects/actions";
 import DefaultAvatar from "@/components/DefaultAvatar";
@@ -31,43 +32,64 @@ interface MemberErrors {
 const CompactMemberGrid = ({ members, teamLead, projectId }: CompactMemberGridProps) => {
   const allMembers = teamLead ? [teamLead, ...members] : members;
   const memberKey = allMembers.map((m) => m.id).join(",");
-  const [memberPoints, setMemberPoints] = useState<MemberPoints>({});
-  const [memberErrors, setMemberErrors] = useState<MemberErrors>({});
-  const [isLoadingPoints, setIsLoadingPoints] = useState(false);
-  const [monthlyAttendancePoints, setMonthlyAttendancePoints] = useState<{ uniqueCodevIdsPresentDays: { codevId: string; presentDays: number }[]; }>({ uniqueCodevIdsPresentDays: [] });
   const [selectedMember, setSelectedMember] = useState<SimpleMemberData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const loadedMemberIdsRef = useRef<string>("");
+  const queryClient = useQueryClient();
 
-  // Load points for all members - runs automatically on mount and can be refreshed
-  const loadAllPoints = async () => {
-    if (isLoadingPoints) return;
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth();
 
-    setIsLoadingPoints(true);
-    const pointsData: MemberPoints = {};
-    const errorsData: MemberErrors = {};
+  const { data: monthlyAttendancePoints = { uniqueCodevIdsPresentDays: [] } } = useQuery({
+    queryKey: ["myTeam", "monthlyPoints", projectId, currentYear, currentMonth],
+    staleTime: 60_000,
+    queryFn: async () => {
+      const result = await getTeamMonthlyAttendancePoints(
+        projectId,
+        currentYear,
+        currentMonth,
+      );
+      return {
+        uniqueCodevIdsPresentDays: (result.uniqueCodevIdsPresentDays || []).map((item) => ({
+          codevId: item.codevId,
+          presentDays: item.presentDays ?? 0,
+        })),
+      };
+    },
+  });
 
-    try {
+  // One query for the whole roster: the per-member requests are batched inside
+  // it, and failures are reported per member rather than swallowed.
+  const { data: pointsResult, isPending: isLoadingPoints } = useQuery({
+    queryKey: ["myTeam", "memberPoints", memberKey],
+    enabled: allMembers.length > 0,
+    staleTime: 60_000,
+    queryFn: async () => {
+      const pointsData: MemberPoints = {};
+      const errorsData: MemberErrors = {};
       // Batched to bound concurrent requests, not to serialise the work: each
       // round awaits one batch, so a small batch multiplies wall-clock. 6 is
       // enough for a normal team size in a single round.
       const batchSize = 6;
+
       for (let i = 0; i < allMembers.length; i += batchSize) {
         const batch = allMembers.slice(i, i + batchSize);
-        const pointsPromises = batch.map(async (member) => {
-          try {
-            const response = await fetch(`/api/codev/${member.id}/points`);
-            if (!response.ok) throw new Error('Failed to fetch');
-            const data = await response.json() as { totalPoints?: number; attendancePoints?: number };
-            return { memberId: member.id, data, failed: false };
-          } catch (error) {
-            // Fix #4: Record the failure instead of silently substituting 0
-            console.warn(`Failed to load points for ${member.id}:`, error);
-            return { memberId: member.id, data: null, failed: true };
-          }
-        });
-
-        const results = await Promise.all(pointsPromises);
+        const results = await Promise.all(
+          batch.map(async (member) => {
+            try {
+              const response = await fetch(`/api/codev/${member.id}/points`);
+              if (!response.ok) throw new Error("Failed to fetch");
+              const data = (await response.json()) as {
+                totalPoints?: number;
+                attendancePoints?: number;
+              };
+              return { memberId: member.id, data, failed: false };
+            } catch (error) {
+              console.warn(`Failed to load points for ${member.id}:`, error);
+              return { memberId: member.id, data: null, failed: true };
+            }
+          }),
+        );
 
         results.forEach(({ memberId, data, failed }) => {
           if (failed || !data) {
@@ -79,67 +101,20 @@ const CompactMemberGrid = ({ members, teamLead, projectId }: CompactMemberGridPr
             };
           }
         });
-
-        setMemberPoints(prev => ({ ...prev, ...pointsData }));
-        setMemberErrors(prev => ({ ...prev, ...errorsData }));
       }
-    } catch (error) {
-      console.error("Error loading points:", error);
-    } finally {
-      setIsLoadingPoints(false);
-    }
-  };
 
-  // Retry a single member's points fetch
-  const retryMemberPoints = async (memberId: string) => {
-    setMemberErrors(prev => ({ ...prev, [memberId]: false }));
-    try {
-      const response = await fetch(`/api/codev/${memberId}/points`);
-      if (!response.ok) throw new Error('Failed to fetch');
-      const data = await response.json() as { totalPoints?: number; attendancePoints?: number };
-      setMemberPoints(prev => ({
-        ...prev,
-        [memberId]: {
-          totalPoints: data.totalPoints || 0,
-          attendancePoints: data.attendancePoints || 0,
-        },
-      }));
-    } catch (error) {
-      console.warn(`Retry failed for ${memberId}:`, error);
-      setMemberErrors(prev => ({ ...prev, [memberId]: true }));
-    }
-  };
+      return { points: pointsData, errors: errorsData };
+    },
+  });
 
-  useEffect(() => {
-    const loadAttendancePoints = async () => {
-      const currentDate = new Date();
-      const result = await getTeamMonthlyAttendancePoints(
-        projectId,
-        currentDate.getFullYear(),
-        currentDate.getMonth()
-      );
+  const memberPoints = pointsResult?.points ?? {};
+  const memberErrors = pointsResult?.errors ?? {};
 
-      if (result.success) {
-        setMonthlyAttendancePoints({
-          uniqueCodevIdsPresentDays: (result.uniqueCodevIdsPresentDays || []).map(item => ({
-            codevId: item.codevId,
-            presentDays: item.presentDays ?? 0
-          }))
-        });
-      }
-    };
+  const refreshPoints = () =>
+    queryClient.invalidateQueries({ queryKey: ["myTeam", "memberPoints"] });
 
-    loadAttendancePoints();
-  }, [projectId]);
-
-  useEffect(() => {
-    if (allMembers.length === 0) return;
-    if (memberKey === loadedMemberIdsRef.current) return;
-    loadedMemberIdsRef.current = memberKey;
-    loadAllPoints();
-  }, [memberKey]);
-
-  const hasPointsData = Object.keys(memberPoints).length > 0 || Object.keys(memberErrors).length > 0;
+  const hasPointsData =
+    Object.keys(memberPoints).length > 0 || Object.keys(memberErrors).length > 0;
 
   const handleMemberClick = (member: SimpleMemberData) => {
     setSelectedMember(member);
@@ -157,7 +132,7 @@ const CompactMemberGrid = ({ members, teamLead, projectId }: CompactMemberGridPr
       {hasPointsData && !isLoadingPoints && allMembers.length > 0 && (
         <div className="flex justify-end">
           <button
-            onClick={loadAllPoints}
+            onClick={refreshPoints}
             className="px-3 py-1.5 text-xs bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg text-gray-700 transition-colors flex items-center gap-1.5 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700"
             title="Refresh member points and stats"
           >
@@ -249,7 +224,7 @@ const CompactMemberGrid = ({ members, teamLead, projectId }: CompactMemberGridPr
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          retryMemberPoints(member.id);
+                          refreshPoints();
                         }}
                         className="flex items-center gap-1 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
                       >

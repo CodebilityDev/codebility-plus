@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, forwardRef, useImperativeHandle } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { ChevronLeft, ChevronRight, Circle, Save, Trophy, AlertTriangle, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SimpleMemberData } from "@/actions/projects/actions";
@@ -43,16 +44,88 @@ const AttendanceGrid = forwardRef<any, AttendanceGridProps>(({
   const currentDate = new Date();
   const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth());
   const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
-  const [attendanceData, setAttendanceData] = useState<AttendanceData>({});
 
   // Safely combine team lead and members
   const safeTeamMembers = teamMembers || [];
   const allMembers = teamLead ? [teamLead, ...safeTeamMembers] : safeTeamMembers;
 
-  // Get days in selected month
-  const getDaysInMonth = (year: number, month: number) => {
-    return new Date(year, month + 1, 0).getDate();
+  // Load attendance data from database
+  const buildAttendanceData = (
+    rows: any[] | null | undefined,
+    members: SimpleMemberData[],
+    year: number,
+    month: number,
+  ): AttendanceData => {
+    const monthsDays = Array.from(
+      { length: new Date(year, month + 1, 0).getDate() },
+      (_, i) => i + 1,
+    );
+    const data: AttendanceData = {};
+
+    members.forEach((member) => {
+      monthsDays.forEach((day) => {
+        const dayOfWeek = new Date(year, month, day).getDay();
+        const dateKey = `${member.id}-${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+        if (dayOfWeek === 0 || dayOfWeek === 6) {
+          data[dateKey] = "weekend";
+        } else {
+          data[dateKey] = "absent";
+        }
+      });
+    });
+
+    rows?.forEach((record: any) => {
+      data[`${record.codev_id}-${record.date}`] = record.status;
+    });
+
+    return data;
   };
+
+  const { data: attendanceRows, isPending: isLoadingAttendance } = useQuery({
+    queryKey: [
+      "myTeam",
+      "attendance",
+      projectId,
+      selectedYear,
+      selectedMonth,
+      allMembers.map((m) => m.id).join(","),
+    ],
+    enabled: allMembers.length > 0,
+    staleTime: 60_000,
+    queryFn: async () => {
+      const result = await getMonthlyAttendance(projectId, selectedYear, selectedMonth);
+      return result.success ? (result.data ?? []) : [];
+    },
+  });
+
+  // The fetched rows seed an editable draft. The month is stored with the draft
+  // so a month change re-derives it during render instead of in an effect, and
+  // edits made in the meantime are not thrown away.
+  const draftKey = `${selectedYear}-${selectedMonth}-${allMembers.length}`;
+  const [draft, setDraft] = useState<{ key: string; data: AttendanceData }>({
+    key: "",
+    data: {},
+  });
+
+  const attendanceData =
+    draft.key === draftKey
+      ? draft.data
+      : buildAttendanceData(attendanceRows, allMembers, selectedYear, selectedMonth);
+
+  const setAttendanceData = (
+    update: AttendanceData | ((prev: AttendanceData) => AttendanceData),
+  ) => {
+    const next =
+      typeof update === "function" ? update(attendanceData) : update;
+    setDraft({ key: draftKey, data: next });
+  };
+
+  const isLoading = isLoadingAttendance && allMembers.length === 0;
+  const [isSaving, setIsSaving] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  const getDaysInMonth = (year: number, month: number) =>
+    new Date(year, month + 1, 0).getDate();
 
   const daysInMonth = getDaysInMonth(selectedYear, selectedMonth);
   const monthDays = Array.from({ length: daysInMonth }, (_, i) => i + 1);
@@ -67,69 +140,6 @@ const AttendanceGrid = forwardRef<any, AttendanceGridProps>(({
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
   ];
-
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-
-  // Load attendance data from database
-  useEffect(() => {
-    const loadAttendance = async () => {
-      setIsLoading(true);
-      try {
-        const result = await getMonthlyAttendance(projectId, selectedYear, selectedMonth);
-        
-        if (result.success && result.data) {
-          const dbData: AttendanceData = {};
-          
-          // First, set all weekends
-          allMembers.forEach(member => {
-            monthDays.forEach(day => {
-              const dayOfWeek = getDayOfWeek(selectedYear, selectedMonth, day);
-              const dateKey = `${member.id}-${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-              
-              if (dayOfWeek === 0 || dayOfWeek === 6) {
-                dbData[dateKey] = "weekend";
-              }
-            });
-          });
-          
-          // Then apply saved attendance data
-          result.data.forEach((record: any) => {
-            const dateKey = `${record.codev_id}-${record.date}`;
-            dbData[dateKey] = record.status;
-          });
-          
-          setAttendanceData(dbData);
-        } else {
-          // Generate default data if no records exist
-          const defaultData: AttendanceData = {};
-          allMembers.forEach(member => {
-            monthDays.forEach(day => {
-              const dayOfWeek = getDayOfWeek(selectedYear, selectedMonth, day);
-              const dateKey = `${member.id}-${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-              
-              if (dayOfWeek === 0 || dayOfWeek === 6) {
-                defaultData[dateKey] = "weekend";
-              } else {
-                defaultData[dateKey] = "absent";
-              }
-            });
-          });
-          setAttendanceData(defaultData);
-        }
-      } catch (error) {
-        console.error("Error loading attendance:", error);
-        toast.error("Failed to load attendance data");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (allMembers.length > 0) {
-      loadAttendance();
-    }
-  }, [selectedMonth, selectedYear, allMembers.length, projectId]);
 
   // Toggle attendance status
   const toggleAttendance = (memberId: string, day: number) => {
