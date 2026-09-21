@@ -1,4 +1,6 @@
-"use server";
+﻿"use server";
+
+import { revalidatePath } from "next/cache";
 
 import { createClientServerComponent } from "@/utils/supabase/server";
 
@@ -59,6 +61,8 @@ export async function syncAttendancePoints(codevId: string) {
       return { success: false, error: result.error.message };
     }
 
+    revalidatePath("/home/my-team");
+
     return { 
       success: true, 
       data: result.data,
@@ -100,6 +104,7 @@ export async function syncAllTeamAttendancePoints(projectId: string) {
       };
     }
 
+    revalidatePath("/home/my-team");
     return { success: true, results };
   } catch (error) {
     console.error("Error in syncAllTeamAttendancePoints:", error);

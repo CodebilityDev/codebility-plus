@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { createClientServerComponent } from "@/utils/supabase/server";
 import { createClient } from "@supabase/supabase-js";
 
@@ -105,6 +106,8 @@ export async function updateJobListing(
       return { success: false, error: `Failed to update: ${error.message}` };
     }
 
+    revalidatePath("/home/hire");
+
     return { success: true, data: updatedJob };
   } catch (error) {
     return { 
@@ -197,6 +200,8 @@ export async function deleteJobListing(jobId: string) {
       return { success: false, error: `Failed to delete: ${deleteError.message}` };
     }
 
+    revalidatePath("/home/hire");
+
     return { success: true };
   } catch (error) {
     return { 
@@ -278,6 +283,8 @@ export async function updateApplicationStatus(
       return { success: false, error: error.message };
     }
 
+    revalidatePath("/home/hire");
+
     return { success: true, data: updatedApplication };
   } catch (error) {
     return { success: false, error: "An unexpected error occurred" };
@@ -336,6 +343,8 @@ export async function deleteJobApplication(applicationId: string, jobId: string)
     if (error) {
       return { success: false, error: error.message };
     }
+
+    revalidatePath("/home/hire");
 
     return { success: true };
   } catch (error) {
@@ -403,6 +412,8 @@ export async function updateJobListingStatus(
     if (error) {
       return { success: false, error: error.message };
     }
+
+    revalidatePath("/home/hire");
 
     return { success: true, data: updatedJob };
   } catch (error) {
