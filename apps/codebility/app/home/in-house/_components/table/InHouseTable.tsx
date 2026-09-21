@@ -1,31 +1,16 @@
 // app/home/in-house/_components/table/InHouseTable.tsx
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
-import SwitchStatusButton from "@/components/ui/SwitchStatusButton";
 import DefaultPagination from "@/components/ui/pagination";
-import { pageSize } from "@/constants";
+import type { PositionOption, ProjectOption } from "@/lib/server/reference-data";
 import { Codev, InternalStatus } from "@/types/home/codev";
-import { createClientClientComponent } from "@/utils/supabase/client";
-import { ArrowUpDown, Download, Link2, Mail } from "lucide-react";
+import { getClientSupabase } from "@/utils/supabase/client";
+import { ArrowUpDown, Mail } from "lucide-react";
 import { toast } from "react-hot-toast";
 
 import { Button } from "@codevs/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuPortal,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
-} from "@codevs/ui/dropdown-menu";
 import {
   Table,
   TableBody,
@@ -54,13 +39,18 @@ interface NdaEmailDialogProps {
 
 interface InHouseTableProps {
   data: Codev[];
-  onDataChange: (updatedItem: Codev) => void;
+  roles: Role[];
+  positions: PositionOption[];
+  projects: ProjectOption[];
+  isFetching?: boolean;
+  onDataChange: (updatedItem?: Codev) => void;
   onDelete: (deletedId: string) => void;
   pagination: {
     currentPage: number;
     totalPages: number;
     onNextPage: () => void;
     onPreviousPage: () => void;
+    onGoToPage: (page: number) => void;
   };
   sortConfig?: {
     key: "date_joined" | "display_position" | null;
@@ -126,44 +116,17 @@ const SendNdaButton = ({ codev, onSendNdaEmail }: NdaEmailDialogProps) => {
  */
 export function InHouseTable({
   data,
+  roles,
+  positions,
+  projects,
   onDataChange,
   pagination,
   onDelete,
   sortConfig,
   onSort,
 }: InHouseTableProps) {
-  const [supabase, setSupabase] = useState<any>(null);
   const [editingMember, setEditingMember] = useState<Codev | null>(null);
-  const [roles, setRoles] = useState<Role[]>([]);
   const [selectedMember, setSelectedMember] = useState<Codev | null>(null);
-
-  const totalPages = useMemo(
-    () => Math.ceil(data.length / pageSize.applicants),
-    [data.length],
-  );
-
-  useEffect(() => {
-    const supabaseClient = createClientClientComponent();
-    setSupabase(supabaseClient);
-  }, []);
-
-  useEffect(() => {
-    if (!supabase) return;
-
-    async function fetchRoles() {
-      const { data: rolesData, error } = await supabase
-        .from("roles")
-        .select("id, name");
-
-      if (error) {
-        console.error("Failed to fetch roles:", error);
-      } else if (rolesData) {
-        setRoles(rolesData);
-      }
-    }
-
-    fetchRoles();
-  }, [supabase]);
 
   const handleDelete = (deletedId: string) => {
     onDelete(deletedId);
@@ -180,7 +143,9 @@ export function InHouseTable({
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + 7);
 
-      const { error: dbError } = await supabase.from("nda_requests").insert({
+      const { error: dbError } = await getClientSupabase()
+        .from("nda_requests")
+        .insert({
         codev_id: codevId,
         token: token,
         expires_at: expiresAt.toISOString(),
@@ -224,7 +189,7 @@ export function InHouseTable({
 
   const handleDownloadNda = async (codevId: string) => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await getClientSupabase()
         .from("codev")
         .select("nda_document, nda_signature, first_name, last_name")
         .eq("id", codevId)
@@ -266,7 +231,7 @@ export function InHouseTable({
 
   const handleDownloadSignature = async (codevId: string) => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await getClientSupabase()
         .from("codev")
         .select("nda_signature, first_name, last_name")
         .eq("id", codevId)
@@ -298,16 +263,13 @@ export function InHouseTable({
     }
   };
 
-  const handleNextPage = useCallback(() => {
+  const handleNextPage = () => {
     if (pagination.currentPage < pagination.totalPages) {
       pagination.onNextPage();
     }
-  }, [pagination]);
+  };
 
-  const handlePreviousPage = useCallback(
-    () => pagination.onPreviousPage(),
-    [pagination],
-  );
+  const handlePreviousPage = () => pagination.onPreviousPage();
 
   const SortIndicator = ({
     columnKey,
@@ -324,28 +286,16 @@ export function InHouseTable({
     );
   };
 
-  const setCurrentPage = useCallback(
-    (pageOrFunction: number | ((page: number) => number)) => {
-      const page =
-        typeof pageOrFunction === "function"
-          ? pageOrFunction(pagination.currentPage)
-          : pageOrFunction;
+  const setCurrentPage = (pageOrFunction: number | ((page: number) => number)) => {
+    const page =
+      typeof pageOrFunction === "function"
+        ? pageOrFunction(pagination.currentPage)
+        : pageOrFunction;
 
-      const targetPage = Math.max(1, Math.min(page, pagination.totalPages));
-      const currentPage = pagination.currentPage;
-
-      if (targetPage > currentPage) {
-        for (let i = currentPage; i < targetPage; i++) {
-          pagination.onNextPage();
-        }
-      } else if (targetPage < currentPage) {
-        for (let i = currentPage; i > targetPage; i--) {
-          pagination.onPreviousPage();
-        }
-      }
-    },
-    [pagination],
-  );
+    pagination.onGoToPage(
+      Math.max(1, Math.min(page, pagination.totalPages)),
+    );
+  };
 
   return (
     <div className="mb-4 space-y-4">
@@ -520,17 +470,15 @@ export function InHouseTable({
         </Table>
       </div>
 
-      {pagination && data.length > 0 && (
+      {pagination && data.length > 0 && pagination.totalPages > 1 && (
         <div className="relative w-full">
-          {data.length > pageSize.applicants && (
-            <DefaultPagination
-              currentPage={pagination.currentPage}
-              handleNextPage={handleNextPage}
-              handlePreviousPage={handlePreviousPage}
-              setCurrentPage={setCurrentPage}
-              totalPages={pagination.totalPages}
-            />
-          )}
+          <DefaultPagination
+            currentPage={pagination.currentPage}
+            handleNextPage={handleNextPage}
+            handlePreviousPage={handlePreviousPage}
+            setCurrentPage={setCurrentPage}
+            totalPages={pagination.totalPages}
+          />
         </div>
       )}
 
@@ -545,6 +493,8 @@ export function InHouseTable({
             setEditingMember(null);
           }}
           roles={roles}
+          positions={positions}
+          projects={projects}
         />
       )}
     </div>

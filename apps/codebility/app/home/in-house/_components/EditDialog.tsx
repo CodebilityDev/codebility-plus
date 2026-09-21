@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
-import { Codev, InternalStatus, Position, Project } from "@/types/home/codev";
+import { useState } from "react";
+import { Codev, InternalStatus } from "@/types/home/codev";
+import type { PositionOption, ProjectOption } from "@/lib/server/reference-data";
 import { INTERNAL_STATUS } from "@/constants/internal_status";
 import { uploadImage } from "@/utils/uploadImage";
-import { Upload, X } from "lucide-react";
+import { Upload } from "lucide-react";
 import { toast } from "react-hot-toast";
 
 import { Button } from "@codevs/ui/button";
@@ -24,7 +25,7 @@ import {
 } from "@codevs/ui/select";
 import { Switch } from "@codevs/ui/switch";
 import { ScrollArea } from "@codevs/ui/scroll-area";
-import { createClientClientComponent } from "@/utils/supabase/client";
+import { getClientSupabase } from "@/utils/supabase/client";
 
 export interface Role {
   id: number;
@@ -37,50 +38,25 @@ interface EditDialogProps {
   data: Codev;
   onSave: (updated: Codev) => void;
   roles: Role[];
+  positions: PositionOption[];
+  projects: ProjectOption[];
 }
 
-export function EditDialog({ isOpen, onClose, data, onSave, roles }: EditDialogProps) {
+export function EditDialog({
+  isOpen,
+  onClose,
+  data,
+  onSave,
+  roles,
+  positions,
+  projects,
+}: EditDialogProps) {
   const [formData, setFormData] = useState<Codev>(data);
-  const [availableProjects, setAvailableProjects] = useState<Project[]>([]);
-  const [positions, setPositions] = useState<Position[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadedImage, setUploadedImage] = useState<string | null>(data.image_url || null);
-  const [supabase, setSupabase] = useState<any>(null);
 
-  useEffect(() => {
-    const supabaseClient = createClientClientComponent();
-    setSupabase(supabaseClient);
-  }, []);
-
-  useEffect(() => {
-    setFormData(data);
-    setUploadedImage(data.image_url || null);
-  }, [data]);
-
-  // Fetch positions and projects
-  useEffect(() => {
-    if (!supabase) return;
-
-    async function fetchData() {
-      const [projectsResult, positionsResult] = await Promise.all([
-        supabase.from("projects").select("*"),
-        supabase.from("positions").select("id, name")
-      ]);
-
-      if (!projectsResult.error && projectsResult.data) {
-        setAvailableProjects(projectsResult.data);
-      }
-
-      if (!positionsResult.error && positionsResult.data) {
-        setPositions(positionsResult.data);
-      }
-    }
-
-    if (isOpen) {
-      fetchData();
-    }
-  }, [isOpen, supabase]);
+  const availableProjects = projects;
 
   const handleChange = (key: keyof Codev, value: any) => {
     setFormData((prev) => ({
@@ -128,8 +104,7 @@ export function EditDialog({ isOpen, onClose, data, onSave, roles }: EditDialogP
   };
 
   const handleSubmit = async () => {
-    if (!supabase) return;
-
+    const supabase = getClientSupabase();
     setIsLoading(true);
     try {
       const { id, projects, ...rest } = formData;

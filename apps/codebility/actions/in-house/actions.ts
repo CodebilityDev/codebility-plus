@@ -5,6 +5,25 @@ import { Codev } from "@/types/home/codev";
 import { createClientServerComponent } from "@/utils/supabase/server";
 import { requireRole } from "@/lib/server/auth-guard";
 import { revalidatePath } from "next/cache";
+import {
+  getCodevDetail,
+  getCodevsPage,
+  type CodevListFilters,
+  type CodevListRow,
+} from "@/lib/server/codev.service";
+import type { Page, PageArgs } from "@/lib/server/paginate";
+
+export const fetchCodevsAction = async (
+  args: PageArgs & { filters?: CodevListFilters } = {},
+): Promise<Page<CodevListRow>> => {
+  await requireRole("inhouse");
+  return getCodevsPage(args);
+};
+
+export const fetchCodevDetailAction = async (id: string) => {
+  await requireRole("inhouse");
+  return getCodevDetail(id);
+};
 
 /**
  * Updates codev information with enhanced NDA URL storage support

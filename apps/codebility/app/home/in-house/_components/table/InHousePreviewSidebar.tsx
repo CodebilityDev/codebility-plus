@@ -3,12 +3,15 @@
 import { useTransition } from "react";
 import Image from "next/image";
 import { X, Mail, Briefcase, Folder, Link2, Calendar, Download, AlertCircle } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 
 import { Codev, InternalStatus } from "@/types/home/codev";
+import { qk } from "@/lib/shared/query-keys";
 import { Button } from "@codevs/ui/button";
 import { Badge } from "@codevs/ui/badge";
 import { StatusBadge } from "../shared/StatusBadge";
 import SwitchStatusButton from "@/components/ui/SwitchStatusButton";
+import { fetchCodevDetailAction } from "@/actions/in-house/actions";
 
 interface Role {
   id: string | number;
@@ -40,6 +43,18 @@ export default function InHousePreviewSidebar({
   onDownloadSignature,
 }: InHousePreviewSidebarProps) {
   const [isPending, startTransition] = useTransition();
+
+  // The list row carries only the six columns the table renders, so the full
+  // record (education, work history, projects) is fetched when a row is opened.
+  // Keyed by id, so closing and reopening the same row costs nothing.
+  const { data: detail } = useQuery({
+    queryKey: qk.codevs.detail(member.id),
+    queryFn: () => fetchCodevDetailAction(member.id),
+    staleTime: 60_000,
+    gcTime: 5 * 60_000,
+  });
+
+  const record = detail ?? member;
 
   const handleNdaSend = async () => {
     startTransition(async () => {
@@ -142,8 +157,8 @@ export default function InHousePreviewSidebar({
                 <span>Assigned Projects</span>
               </div>
               <div className="flex flex-wrap gap-1.5 pl-5">
-                {member.projects && member.projects.length > 0 ? (
-                  member.projects.map((project) => (
+                {record.projects && record.projects.length > 0 ? (
+                  record.projects.map((project) => (
                     <Badge key={project.id} variant="secondary" className="font-normal border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800">
                       {project.name}
                     </Badge>
@@ -160,9 +175,9 @@ export default function InHousePreviewSidebar({
                 <span>Portfolio Website</span>
               </div>
               <div className="pl-5">
-                {member.portfolio_website ? (
-                  <a href={member.portfolio_website} target="_blank" rel="noreferrer" className="text-sm text-blue-500 hover:text-blue-600 hover:underline dark:text-blue-400 truncate block">
-                    {member.portfolio_website}
+                {record.portfolio_website ? (
+                  <a href={record.portfolio_website} target="_blank" rel="noreferrer" className="text-sm text-blue-500 hover:text-blue-600 hover:underline dark:text-blue-400 truncate block">
+                    {record.portfolio_website}
                   </a>
                 ) : (
                   <span className="text-sm text-gray-400 dark:text-gray-500 italic">Not provided</span>

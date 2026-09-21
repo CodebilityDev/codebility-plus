@@ -1,9 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { INTERNAL_STATUS } from "@/constants/internal_status";
-import { Project } from "@/types/home/codev";
-import { createClientClientComponent } from "@/utils/supabase/client";
 
 import { Card } from "@codevs/ui/card";
 import { Input } from "@codevs/ui/input";
@@ -24,83 +21,34 @@ interface Role {
 interface TableFiltersProps {
   filters: {
     status: string;
+    position: string;
     project: string;
     internal_status: string;
     nda_status: string;
     display_position: string;
     availability_status: string;
     role: string;
-    search: string; // <-- search field
+    search: string;
   };
   onFilterChange: (
     key: keyof TableFiltersProps["filters"],
     value: string,
   ) => void;
+  roles: Role[];
+  positions: { id: string; name: string | null }[];
+  projects: { id: string; name: string }[];
 }
 
-export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [displayPositions, setDisplayPositions] = useState<string[]>([]);
-  const [roles, setRoles] = useState<Role[]>([]);
-  const [supabase, setSupabase] = useState<any>(null);
-
-  useEffect(() => {
-    const supabaseClient = createClientClientComponent();
-    setSupabase(supabaseClient);
-  }, []);
-
-  useEffect(() => {
-    if (!supabase) return;
-
-    async function fetchProjects() {
-      const { data, error } = await supabase
-        .from("projects")
-        .select("id, name, start_date");
-
-      if (error) {
-        console.error("Failed to fetch projects:", error);
-      } else if (data) {
-        setProjects(
-          data.map((proj: any) => ({
-            ...proj,
-            start_date: proj.start_date || "",
-          })) as Project[],
-        );
-      }
-    }
-
-    async function fetchDisplayPositions() {
-      const { data, error } = await supabase
-        .from("codev")
-        .select("display_position");
-
-      if (error) {
-        console.error("Failed to fetch display positions:", error);
-      } else if (data) {
-        const distinctPositions = Array.from(
-          new Set(
-            data
-              .map((row: any) => row.display_position)
-              .filter((pos: any) => pos !== null && pos !== ""),
-          ),
-        ) as string[];
-        setDisplayPositions(distinctPositions);
-      }
-    }
-
-    async function fetchRoles() {
-      const { data, error } = await supabase.from("roles").select("id, name");
-      if (error) {
-        console.error("Failed to fetch roles:", error);
-      } else if (data) {
-        setRoles(data as Role[]);
-      }
-    }
-
-    fetchProjects();
-    fetchDisplayPositions();
-    fetchRoles();
-  }, [supabase]);
+export function TableFilters({
+  filters,
+  onFilterChange,
+  roles,
+  positions,
+  projects,
+}: TableFiltersProps) {
+  const displayPositions = positions
+    .map((pos) => pos.name)
+    .filter((name): name is string => Boolean(name));
 
   return (
     <Card className="border-light-700 bg-light-300 dark:border-dark-200 dark:bg-dark-100 mb-4 p-3 sm:p-4">

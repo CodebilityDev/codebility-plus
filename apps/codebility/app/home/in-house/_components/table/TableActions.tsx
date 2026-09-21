@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Codev, InternalStatus } from "@/types/home/codev";
-import { createClientClientComponent } from "@/utils/supabase/client";
+import { getClientSupabase } from "@/utils/supabase/client";
 import { useModal } from "@/hooks/modals/use-modal-users";
 import { Edit2, Eye, MoreHorizontal, Trash2 } from "lucide-react";
 import { toast } from "react-hot-toast";
@@ -14,6 +14,7 @@ import {
 } from "@codevs/ui/dropdown-menu";
 
 import { DeleteDialog } from "../shared/DeleteDialog";
+import { fetchCodevDetailAction } from "@/actions/in-house/actions";
 
 interface TableActionsProps {
   item: Codev;
@@ -24,13 +25,7 @@ interface TableActionsProps {
 export function TableActions({ item, onEdit, onDelete }: TableActionsProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [supabase, setSupabase] = useState<any>(null);
   const { onOpen: openProfileModal } = useModal();
-
-  useEffect(() => {
-    const supabaseClient = createClientClientComponent();
-    setSupabase(supabaseClient);
-  }, []);
 
   // Calculate years from work experience
   const calculateYearsFromExperience = (workExperience: any[]): number => {
@@ -49,81 +44,50 @@ export function TableActions({ item, onEdit, onDelete }: TableActionsProps) {
     return Math.round(totalYears);
   };
 
-  // Fetch complete profile and open modal
+  // Opens the profile modal with the full record, fetched on demand (C3).
   const handleViewProfile = async () => {
     try {
-      if (!supabase) {
-        console.error('Supabase client not available');
-        return;
-      }
+      const data = await fetchCodevDetailAction(item.id);
 
-      const { data, error } = await supabase
-        .from("codev")
-        .select(`
-          *,
-          education:education(*),
-          work_experience:work_experience(*),
-          projects:project_members(
-            project:project_id(*)
-          ),
-          codev_points:codev_points(*)
-        `)
-        .eq('id', item.id)
-        .single();
-
-      if (error || !data) {
-        console.error('Error fetching complete profile:', error);
-        // Use fallback data
-        const fallbackProfile: Codev = {
+      if (!data) {
+        openProfileModal("profileModal", {
           ...item,
           years_of_experience: item.years_of_experience || 0,
           availability_status: item.availability_status ?? true,
           internal_status: (item.internal_status || 'GRADUATED') as InternalStatus
-        };
-        openProfileModal("profileModal", fallbackProfile);
+        });
         return;
       }
 
-      // Handle years_of_experience calculation
-      let finalYearsOfExperience = data.years_of_experience;
-
-      if (finalYearsOfExperience === null || finalYearsOfExperience === undefined) {
-        finalYearsOfExperience = calculateYearsFromExperience(data.work_experience || []);
-      }
-
-      const safeInternalStatus = data.internal_status as InternalStatus | undefined;
-
-      // Create enhanced profile
       const enhancedProfile: Codev = {
         ...data,
-        years_of_experience: finalYearsOfExperience,
-        internal_status: safeInternalStatus,
+        years_of_experience:
+          data.years_of_experience ??
+          calculateYearsFromExperience(data.work_experience || []),
         work_experience: data.work_experience || [],
         education: data.education || [],
         projects: data.projects || [],
         codev_points: data.codev_points || [],
         tech_stacks: data.tech_stacks || [],
-        positions: data.positions || []
+        positions: data.positions || [],
       };
 
       openProfileModal("profileModal", enhancedProfile);
     } catch (error) {
       console.error('Error in profile click handler:', error);
-      // Final fallback
-      const safeFallback: Codev = {
+      openProfileModal("profileModal", {
         ...item,
         years_of_experience: item.years_of_experience || 0,
         availability_status: item.availability_status ?? true,
         internal_status: (item.internal_status || 'GRADUATED') as InternalStatus
-      };
-      openProfileModal("profileModal", safeFallback);
+      });
     }
   };
 
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
-      const { error } = await supabase.from("codev").delete().eq("id", item.id);
+      const { error } = await getClientSupabase().from("codev").delete().eq("id", item.id);
 
       if (error) throw error;
 

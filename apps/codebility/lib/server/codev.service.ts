@@ -1,9 +1,119 @@
 import "server-only";
 
+import { cache } from "react";
 import { Client, Codev, Project, WorkExperience } from "@/types/home/codev";
 import { createClientServerComponent } from "@/utils/supabase/server";
+import { resolvePageArgs, toPage, type Page, type PageArgs } from "./paginate";
 
+// Exactly the fields the in-house and interns tables render plus the two the
+// filter bar matches on. Adding a column here costs every row on every page
+// load; the heavy relations live in getCodevDetail instead.
+export const CODEV_LIST_COLUMNS =
+  "id, first_name, last_name, email_address, image_url, role_id, display_position, internal_status, availability_status, positions, nda_status, date_joined";
 
+export type CodevListRow = Pick<
+  Codev,
+  | "id"
+  | "first_name"
+  | "last_name"
+  | "email_address"
+  | "image_url"
+  | "role_id"
+  | "display_position"
+  | "internal_status"
+  | "availability_status"
+  | "positions"
+  | "nda_status"
+  | "date_joined"
+>;
+
+export type CodevListFilters = {
+  application_status?: string;
+  internal_status?: string;
+  display_position?: string;
+  availability_status?: boolean;
+  nda_status?: boolean;
+  position?: string;
+  role_id?: number | string;
+  search?: string;
+};
+
+export const getCodevsPage = async ({
+  page,
+  pageSize,
+  filters = {},
+}: PageArgs & { filters?: CodevListFilters } = {}): Promise<Page<CodevListRow>> => {
+  const supabase = await createClientServerComponent();
+  const { page: current, pageSize: size, from, to } = resolvePageArgs({ page, pageSize });
+
+  let query = supabase
+    .from("codev")
+    .select(CODEV_LIST_COLUMNS, { count: "exact" });
+
+  if (filters.application_status)
+    query = query.eq("application_status", filters.application_status);
+  if (filters.internal_status)
+    query = query.eq("internal_status", filters.internal_status);
+  if (filters.display_position)
+    query = query.eq("display_position", filters.display_position);
+  if (filters.availability_status !== undefined)
+    query = query.eq("availability_status", filters.availability_status);
+  if (filters.nda_status !== undefined)
+    query = query.eq("nda_status", filters.nda_status);
+  if (filters.position) query = query.contains("positions", [filters.position]);
+  if (filters.role_id !== undefined) query = query.eq("role_id", filters.role_id);
+  if (filters.search) {
+    const term = `%${filters.search}%`;
+    query = query.or(
+      `first_name.ilike.${term},last_name.ilike.${term},email_address.ilike.${term},display_position.ilike.${term}`,
+    );
+  }
+
+  const { data, error, count } = await query
+    .order("date_joined", { ascending: false, nullsFirst: false })
+    .order("id", { ascending: true })
+    .range(from, to);
+
+  if (error) {
+    console.error("Error fetching codev page:", error);
+    return toPage<CodevListRow>(null, 0, current, size);
+  }
+
+  return toPage((data ?? []) as CodevListRow[], count, current, size);
+};
+
+export const getCodevStatusCounts = async (
+  filters: CodevListFilters = {},
+): Promise<{ total: number; active: number; inactive: number }> => {
+  const supabase = await createClientServerComponent();
+
+  const base = () => {
+    let query = supabase
+      .from("codev")
+      .select("id", { count: "exact", head: true });
+    if (filters.application_status)
+      query = query.eq("application_status", filters.application_status);
+    return query;
+  };
+
+  const [total, active] = await Promise.all([
+    base(),
+    base().eq("availability_status", true),
+  ]);
+
+  const totalCount = total.count ?? 0;
+  const activeCount = active.count ?? 0;
+
+  return { total: totalCount, active: activeCount, inactive: totalCount - activeCount };
+};
+
+export const getCodevDetail = cache(
+  async (id: string): Promise<Codev | null> => {
+    const { data, error } = await getCodevs({ filters: { id } });
+    if (error) return null;
+    return data?.[0] ?? null;
+  },
+);
 
 export const getCodevs = async ({
   filters = {},

@@ -1,41 +1,39 @@
-import { getCodevs } from "@/lib/server/codev.service";
-import { getOrSetCache } from "@/lib/server/redis-cache";
-import { cacheKeys } from "@/lib/server/redis-cache-keys";
-import PageContainer from "../_components/PageContainer";
+import { getCodevStatusCounts, getCodevsPage } from "@/lib/server/codev.service";
+import { getPositions, getProjectOptions, getRoles } from "@/lib/server/reference-data";
 
 import InHouseView from "./_components/InHouseView";
 
+const parsePage = (value: string | string[] | undefined) => {
+  const raw = Array.isArray(value) ? value[0] : value;
+  const parsed = Number(raw);
+  return Number.isFinite(parsed) && parsed > 0 ? Math.trunc(parsed) : 1;
+};
 
-export default async function InHousePage() {
-  const { data, error } = await getOrSetCache(
-    cacheKeys.codevs.inhouse,
-    // Fetch Codev data with the desired filter
-    () =>
-      getCodevs({
-        filters: { application_status: "passed" },
-      }),
-  );
+export default async function InHousePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string | string[] }>;
+}) {
+  const { page } = await searchParams;
 
-  // Check for errors or missing data
-  if (error || !data) {
-    return (
-      <div className="mx-auto max-w-screen-2xl">
-        <div className="flex flex-col gap-4 px-2 pt-4 sm:px-4 md:px-6 lg:px-8">
-          <div className="flex min-h-[400px] flex-col items-center justify-center p-8 text-center">
-            <div className="mb-4 text-4xl">⚠️</div>
-            <h3 className="mb-2 text-lg font-medium text-gray-900 dark:text-white">Error fetching in-house data</h3>
-            <p className="text-gray-600 dark:text-gray-400">Failed to load the in-house team members.</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const [initialData, stats, roles, positions, projects] = await Promise.all([
+    getCodevsPage({ page: parsePage(page), filters: { application_status: "passed" } }),
+    getCodevStatusCounts({ application_status: "passed" }),
+    getRoles(),
+    getPositions(),
+    getProjectOptions(),
+  ]);
 
-  // Pass the fully prepared data to the view
   return (
     <div className="mx-auto max-w-screen-2xl">
       <div className="flex flex-col gap-4 px-2 pt-4 sm:px-4 md:px-6 lg:px-8">
-        <InHouseView initialData={data} />
+        <InHouseView
+          initialData={initialData}
+          stats={stats}
+          roles={roles}
+          positions={positions}
+          projects={projects}
+        />
       </div>
     </div>
   );

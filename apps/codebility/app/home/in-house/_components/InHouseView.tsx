@@ -1,162 +1,100 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useMemo, useState } from "react";
 import { H1 } from "@/components/shared/home";
-import usePagination from "@/hooks/data/use-pagination";
-import { Codev } from "@/types/home/codev";
+import { pageSize } from "@/constants";
+import { qk } from "@/lib/shared/query-keys";
+import type { CodevListRow } from "@/lib/server/codev.service";
+import type { Page } from "@/lib/server/paginate";
+import type { Codev } from "@/types/home/codev";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@codevs/ui/tabs";
 
-import { getMemberStats } from "@/utils/in-house/utils";
+import { fetchCodevsAction } from "@/actions/in-house/actions";
+import { usePaginatedQuery } from "@/hooks/query/use-paginated-query";
 import { InHouseTable } from "./table/InHouseTable";
 import { TableFilters } from "./table/table-filters";
-import { InHouseTableSkeleton } from "./skeletons/InHouseLoadingSkeleton";
+import type { Role } from "./EditDialog";
+import type { PositionOption, ProjectOption } from "@/lib/server/reference-data";
+
+const EMPTY_FILTERS = {
+  status: "",
+  position: "",
+  project: "",
+  internal_status: "",
+  nda_status: "",
+  display_position: "",
+  availability_status: "",
+  role: "",
+  search: "",
+};
+
+export type InHouseFilters = typeof EMPTY_FILTERS;
 
 interface InHouseViewProps {
-  initialData: Codev[];
+  initialData: Page<CodevListRow>;
+  stats: { total: number; active: number; inactive: number };
+  roles: Role[];
+  positions: PositionOption[];
+  projects: ProjectOption[];
 }
 
-export default function InHouseView({ initialData }: InHouseViewProps) {
-  const [data, setData] = useState<Codev[]>(initialData);
+export default function InHouseView({
+  initialData,
+  stats,
+  roles,
+  positions,
+  projects,
+}: InHouseViewProps) {
   const [activeTab, setActiveTab] = useState<"active" | "inactive">("active");
-  const [isPending, startTransition] = useTransition();
-  const stats = getMemberStats(data);
+  const [filters, setFilters] = useState<InHouseFilters>(EMPTY_FILTERS);
+  const [page, setPage] = useState(1);
+  const queryClient = useQueryClient();
 
-  // Sorting state
-  const [sortConfig, setSortConfig] = useState<{
-    key: "date_joined" | "display_position" | null;
-    direction: "asc" | "desc";
-  }>({
-    key: null,
-    direction: "asc",
-  });
+  const queryFilters = useMemo(
+    () => ({
+      application_status: "passed",
+      internal_status: filters.internal_status || filters.status || undefined,
+      display_position: filters.display_position || undefined,
+      availability_status: filters.search
+        ? undefined
+        : activeTab === "active",
+      nda_status: filters.nda_status ? filters.nda_status === "true" : undefined,
+      position: filters.position || undefined,
+      role_id: filters.role || undefined,
+      search: filters.search || undefined,
+    }),
+    [activeTab, filters],
+  );
 
-  // Filters
-  const [filters, setFilters] = useState({
-    status: "",
-    position: "",
-    project: "",
-    internal_status: "",
-    nda_status: "",
-    display_position: "",
-    availability_status: "",
-    role: "",
-    search: "", // NEW
-  });
+  const queryKey = qk.codevs.list({ ...queryFilters, page });
 
-  // Filtering logic
-  const filteredData = data.filter((item) => {
-    // 1) Search filter (case-insensitive) - search across all users
-    if (filters.search) {
-      const searchLower = filters.search.toLowerCase();
-      // Combine fields you want to match against
-      const combinedFields = [
-        item.first_name,
-        item.last_name,
-        item.email_address,
-        item.display_position,
-        item.availability_status,
-        item.phone_number,
-      ]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase();
+  const { data, isFetching } = usePaginatedQuery(
+    queryKey,
+    () =>
+      fetchCodevsAction({
+        page,
+        pageSize: pageSize.applicants,
+        filters: queryFilters,
+      }),
+    { initialData: page === 1 ? initialData : undefined },
+  );
 
-      if (!combinedFields.includes(searchLower)) {
-        return false;
-      }
-    } else {
-      // Only filter by tab when there's no search query
-      const isActive = item.availability_status === true;
-      if (activeTab === "active" && !isActive) return false;
-      if (activeTab === "inactive" && isActive) return false;
-    }
+  const rows = data?.rows ?? [];
 
-    // 2) Other filters...
-    if (filters.status && item.internal_status !== filters.status) return false;
-    if (filters.position && !item.positions?.includes(filters.position))
-      return false;
-    if (
-      filters.project &&
-      !item.projects?.some((project) => project.id === filters.project)
-    )
-      return false;
-    if (
-      filters.internal_status &&
-      item.internal_status !== filters.internal_status
-    )
-      return false;
-    if (
-      filters.nda_status &&
-      String(item.nda_status) !== filters.nda_status.toLowerCase()
-    )
-      return false;
-    if (
-      filters.display_position &&
-      item.display_position !== filters.display_position
-    )
-      return false;
-    if (
-      filters.availability_status &&
-      String(item.availability_status) !== filters.availability_status
-    )
-      return false;
-    if (filters.role && String(item.role_id) !== filters.role) return false;
-
-    return true;
-  });
-
-  // Sorting logic
-  const sortedData = [...filteredData].sort((a, b) => {
-    if (!sortConfig.key) return 0;
-
-    if (sortConfig.key === "date_joined") {
-      const dateA = a.date_joined ? new Date(a.date_joined).getTime() : 0;
-      const dateB = b.date_joined ? new Date(b.date_joined).getTime() : 0;
-
-      return sortConfig.direction === "asc" ? dateA - dateB : dateB - dateA;
-    }
-
-    if (sortConfig.key === "display_position") {
-      const posA = (a.display_position || "").toLowerCase();
-      const posB = (b.display_position || "").toLowerCase();
-
-      if (posA < posB) return sortConfig.direction === "asc" ? -1 : 1;
-      if (posA > posB) return sortConfig.direction === "asc" ? 1 : -1;
-      return 0;
-    }
-
-    return 0;
-  });
-
-  // Handle sort toggle
-  const handleSort = (key: "date_joined" | "display_position") => {
-    setSortConfig((prev) => ({
-      key,
-      direction: prev.key === key && prev.direction === "asc" ? "desc" : "asc",
-    }));
+  const handleFilterChange = (key: keyof InHouseFilters, value: string) => {
+    setFilters((prev) => ({ ...prev, [key]: value }));
+    setPage(1);
   };
 
-  // Pagination - increased items per page for better table usage (use sortedData)
-  const {
-    currentPage,
-    totalPages,
-    paginatedData,
-    handleNextPage,
-    handlePreviousPage,
-  } = usePagination(sortedData, 50);
-
-  const sharedProps = {
-    data: paginatedData,
-    onDataChange: (newData: Codev[]) =>
-      setData(Array.isArray(newData) ? newData : []),
-    pagination: {
-      currentPage,
-      totalPages,
-      onNextPage: handleNextPage,
-      onPreviousPage: handlePreviousPage,
-    },
+  const handleTabChange = (value: string) => {
+    setActiveTab(value as "active" | "inactive");
+    setPage(1);
   };
+
+  const invalidate = () =>
+    queryClient.invalidateQueries({ queryKey: ["codevs"] });
 
   return (
     <div className="flex flex-col gap-2">
@@ -177,14 +115,9 @@ export default function InHouseView({ initialData }: InHouseViewProps) {
             </div>
           </div>
         </div>
-        
-        {/* Tabs for Active/Inactive */}
+
         <div className="flex flex-col gap-4">
-          <Tabs value={activeTab} onValueChange={(value) => {
-            startTransition(() => {
-              setActiveTab(value as "active" | "inactive");
-            });
-          }} className="w-full">
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
             <TabsList className="grid h-9 w-full max-w-[280px] grid-cols-2 bg-gray-100 dark:bg-gray-800">
               <TabsTrigger value="active" className="flex h-8 items-center gap-1 text-xs">
                 Active
@@ -199,23 +132,20 @@ export default function InHouseView({ initialData }: InHouseViewProps) {
                 </span>
               </TabsTrigger>
             </TabsList>
+            <TabsContent value={activeTab} />
           </Tabs>
-          
+
           <TableFilters
             filters={filters}
-            onFilterChange={(key, value) => {
-              startTransition(() => {
-                setFilters((prev) => ({ ...prev, [key]: value }));
-              });
-            }}
+            onFilterChange={handleFilterChange}
+            roles={roles}
+            positions={positions}
+            projects={projects}
           />
         </div>
       </div>
 
-      {/* Table View with Loading State */}
-      {isPending ? (
-        <InHouseTableSkeleton rows={10} />
-      ) : sortedData.length === 0 ? (
+      {rows.length === 0 && !isFetching ? (
         <div className="flex min-h-[400px] flex-col items-center justify-center p-8 text-center">
           <div className="mb-4 text-4xl">🔍</div>
           <h3 className="mb-2 text-lg font-medium text-gray-900 dark:text-white">No members found</h3>
@@ -225,25 +155,20 @@ export default function InHouseView({ initialData }: InHouseViewProps) {
         </div>
       ) : (
         <InHouseTable
-          // pass only the paginated subset in:
-          data={paginatedData}
-          // but merge edits into the **full** data array here:
-          onDataChange={(updatedItem: Codev) => {
-            setData((prev) =>
-              prev.map((d) => (d.id === updatedItem.id ? updatedItem : d)),
-            );
-          }}
-          onDelete={(deletedId: string) => {
-            setData((prev) => prev.filter((d) => d.id !== deletedId));
-          }}
+          data={rows as unknown as Codev[]}
+          roles={roles}
+          positions={positions}
+          projects={projects}
+          isFetching={isFetching}
+          onDataChange={() => invalidate()}
+          onDelete={() => invalidate()}
           pagination={{
-            currentPage,
-            totalPages,
-            onNextPage: handleNextPage,
-            onPreviousPage: handlePreviousPage,
+            currentPage: data?.page ?? page,
+            totalPages: Math.max(Math.ceil((data?.total ?? 0) / (data?.pageSize ?? 1)), 1),
+            onNextPage: () => setPage((p) => p + 1),
+            onPreviousPage: () => setPage((p) => Math.max(p - 1, 1)),
+            onGoToPage: (target: number) => setPage(target),
           }}
-          sortConfig={sortConfig}
-          onSort={handleSort}
         />
       )}
     </div>
