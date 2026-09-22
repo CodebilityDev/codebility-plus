@@ -88,50 +88,6 @@ export default async function CodevBioPage(props: Props) {
 
   const availableSchedule = codev.work_schedules?.[0] ?? null;
 
-<<<<<<< HEAD
-    if (!data || data.length === 0) {
-        return <div>No profiles found.</div>;
-    }
-
-    const codev = data[0] as Codev;
-    const availableSchedule = codev.work_schedules ? codev.work_schedules[0] : null;
-
-    // CBP-135 follow-up: Person schema, built only from confirmed Codev type fields.
-    // JSON.stringify drops undefined keys automatically, so optional fields
-    // that are null/missing on this codev simply won't appear in the output.
-    const personSchema = {
-        "@context": "https://schema.org",
-        "@type": "Person",
-        name: `${codev.first_name} ${codev.last_name}`,
-        jobTitle: codev.display_position || codev.positions?.[0] || undefined,
-        description: codev.about || undefined,
-        image: codev.image_url || undefined,
-        url: `https://www.codebility.tech/profiles/${id}`,
-        sameAs: [codev.github, codev.linkedin, codev.portfolio_website].filter(Boolean),
-        knowsAbout: codev.tech_stacks?.length ? codev.tech_stacks : undefined,
-    };
-
-    return (
-        <section className="from-black-500 to-black-100 relative flex min-h-screen flex-col bg-gradient-to-l">
-            <JsonLd data={personSchema} />
-            <div className="bg-section-wrapper absolute inset-0 bg-fixed bg-repeat opacity-20"></div>
-            <div className="relative flex-grow px-5 py-5 md:px-10 md:py-10 lg:px-32 lg:py-20">
-                <div className="flex justify-between gap-2">
-                    <Logo />
-                    <ProfileCloseButton />
-                </div>
-                <ProfileContent
-                    codev={codev}
-                    availableSchedule={availableSchedule}
-                />
-            </div>
-            <div className="relative flex flex-col items-center gap-4 pb-10">
-                <Logo />
-                <Paragraph>© 2023 Codebility. All Rights Reserved</Paragraph>
-            </div>
-        </section>
-    );
-=======
   return (
     <section className="from-black-500 to-black-100 relative flex min-h-screen flex-col bg-gradient-to-l">
       <div className="bg-section-wrapper absolute inset-0 bg-fixed bg-repeat opacity-20"></div>
@@ -150,5 +106,4 @@ export default async function CodevBioPage(props: Props) {
       </div>
     </section>
   );
->>>>>>> 52e0ed3533dfe84578477ada1e0703417e534f8c
 }

@@ -30,14 +30,9 @@ const WhyChoose = () => {
               </div>
               <div className="flex w-full flex-col gap-4 md:flex-row">
                 <div className=" h-[320px] w-full   rounded-lg  ">
-<<<<<<< HEAD
-                  <Image
-                    alt="Codebility developer working at a desk"
-=======
                   <LandingImage
 
                     alt="A guy sitting"
->>>>>>> 52e0ed3533dfe84578477ada1e0703417e534f8c
                     src="/assets/images/campaign/guy-sitting.png"
                     width={300}
                     height={90}
@@ -150,13 +145,8 @@ const WhyChoose = () => {
                   >
                     Hire a CoDev{" "}
                     <span className="text-black-400 flex size-7 flex-col items-center justify-center rounded-full bg-white">
-<<<<<<< HEAD
-                      <Image
-                        alt="Arrow pointing right"
-=======
                       <LandingImage
                         alt="arrow-right-icon"
->>>>>>> 52e0ed3533dfe84578477ada1e0703417e534f8c
                         src="/assets/svgs/icon-arrow-right.svg"
                         width={7}
                         height={7}
