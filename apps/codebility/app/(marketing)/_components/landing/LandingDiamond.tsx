@@ -7,7 +7,7 @@ const Diamond = ({ color }: { color?: string }) => {
       {color === "violet" ? (
         <div className="relative">
           <Image
-            alt="diamond-icon"
+            alt=""
             src="https://codebility-cdn.pages.dev/assets/svgs/icon-diamond-purple.svg"
             width={30}
             height={30}
@@ -18,7 +18,7 @@ const Diamond = ({ color }: { color?: string }) => {
       ) : color === "teal" ? (
         <div className="relative">
           <Image
-            alt="diamond-icon"
+            alt=""
             src="https://codebility-cdn.pages.dev/assets/svgs/icon-diamond-teal.svg"
             width={30}
             height={30}

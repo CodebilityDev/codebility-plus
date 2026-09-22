@@ -8,6 +8,7 @@ import { JobListing } from "../_types/job-listings";
 import JobApplicationModal from "./JobApplicationModal";
 import { createClientClientComponent } from "@/utils/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton/skeleton";
+import JsonLd from "../../_components/JsonLd";
 
 export default function JobListings() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -117,8 +118,57 @@ export default function JobListings() {
     }
   };
 
+  // CBP-135 follow-up: JobPosting JSON-LD.
+  // NOTE: this is a client component that fetches data via useEffect, so this
+  // schema only exists in the DOM post-hydration, not in initial server HTML.
+  // Works for crawlers that fully render JS (Googlebot does) but is less
+  // reliable than server-rendered JSON-LD. Proper fix is fetching job data
+  // server-side in careers/page.tsx and passing it down — flagged as a
+  // follow-up, not done here to keep this change minimal.
+  const jobPostingSchema = jobListings.length > 0 ? {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    itemListElement: jobListings.map((job, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      item: {
+        "@type": "JobPosting",
+        title: job.title,
+        description: job.description,
+        datePosted: job.posted_date,
+        // schema.org expects FULL_TIME / PART_TIME / CONTRACTOR / INTERN.
+        // Explicit map instead of a string transform — Contract and
+        // Internship don't follow the same uppercase+underscore pattern
+        // as Full-time/Part-time, so a naive transform produces wrong values.
+        employmentType: {
+          "Full-time": "FULL_TIME",
+          "Part-time": "PART_TIME",
+          "Contract": "CONTRACTOR",
+          "Internship": "INTERN",
+        }[job.type] || undefined,
+        hiringOrganization: {
+          "@type": "Organization",
+          name: "Codebility",
+          sameAs: "https://www.codebility.tech",
+        },
+        jobLocation: job.remote
+          ? undefined
+          : { "@type": "Place", address: job.location },
+        applicantLocationRequirements: job.remote
+          ? { "@type": "Country", name: "Anywhere" }
+          : undefined,
+        baseSalary: job.salary_range ? {
+          "@type": "MonetaryAmount",
+          currency: "PHP",
+          value: { "@type": "QuantitativeValue", value: job.salary_range },
+        } : undefined,
+      },
+    })),
+  } : null;
+
   return (
     <section id="open-positions" className="relative py-20 border-y border-gray-800">
+      {jobPostingSchema && <JsonLd data={jobPostingSchema} />}
       <div className="mx-auto max-w-7xl px-6">
         <div className="mb-12 text-center">
           <h2 className="mb-4 text-4xl font-light tracking-tight text-white">

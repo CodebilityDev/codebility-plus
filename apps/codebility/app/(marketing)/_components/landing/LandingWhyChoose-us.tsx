@@ -259,7 +259,7 @@ const WhyChooseUs = () => {
                 >
                   <Image
                     src="https://codebility-cdn.pages.dev/assets/images/index/choose-heart.png"
-                    alt="tailored"
+                    alt="Customer-centric solution icon"
                     width={200}
                     height={200}
                     className="h-[150px] w-[150px] object-contain lg:h-[200px] lg:w-[200px]"

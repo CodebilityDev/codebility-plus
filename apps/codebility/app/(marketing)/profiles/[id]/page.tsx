@@ -5,6 +5,7 @@ import Logo from "@/components/shared/Logo";
 import { getCodevs } from "@/lib/server/codev.service";
 import { Codev } from "@/types/home/codev";
 
+import JsonLd from "../../_components/JsonLd";
 import ProfileCloseButton from "./_components/ProfileCloseButton";
 import ProfileContent from "./_components/ProfileContent";
 
@@ -68,8 +69,24 @@ export default async function CodevBioPage(props: Props) {
     const codev = data[0] as Codev;
     const availableSchedule = codev.work_schedules ? codev.work_schedules[0] : null;
 
+    // CBP-135 follow-up: Person schema, built only from confirmed Codev type fields.
+    // JSON.stringify drops undefined keys automatically, so optional fields
+    // that are null/missing on this codev simply won't appear in the output.
+    const personSchema = {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        name: `${codev.first_name} ${codev.last_name}`,
+        jobTitle: codev.display_position || codev.positions?.[0] || undefined,
+        description: codev.about || undefined,
+        image: codev.image_url || undefined,
+        url: `https://www.codebility.tech/profiles/${id}`,
+        sameAs: [codev.github, codev.linkedin, codev.portfolio_website].filter(Boolean),
+        knowsAbout: codev.tech_stacks?.length ? codev.tech_stacks : undefined,
+    };
+
     return (
         <section className="from-black-500 to-black-100 relative flex min-h-screen flex-col bg-gradient-to-l">
+            <JsonLd data={personSchema} />
             <div className="bg-section-wrapper absolute inset-0 bg-fixed bg-repeat opacity-20"></div>
             <div className="relative flex-grow px-5 py-5 md:px-10 md:py-10 lg:px-32 lg:py-20">
                 <div className="flex justify-between gap-2">
