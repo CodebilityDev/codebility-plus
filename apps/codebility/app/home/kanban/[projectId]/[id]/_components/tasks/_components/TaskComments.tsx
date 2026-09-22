@@ -26,7 +26,7 @@ import {
 import { Textarea } from "@codevs/ui/textarea";
 import { createClientClientComponent } from "@/utils/supabase/client";
 import { useParams, useSearchParams } from "next/navigation";
-import { createNotificationAction } from "@/lib/actions/notification.actions";
+import { createNotificationAction } from "@/actions/notifications/notification.actions";
 
 interface TaskComment {
   id: string;

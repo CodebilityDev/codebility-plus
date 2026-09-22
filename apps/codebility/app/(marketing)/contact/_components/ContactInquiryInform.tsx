@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from "@radix-ui/react-select";
 import { IconDropdown } from "@/public/assets/svgs";
-import { ContactFormData } from "../page";
+import { ContactFormData } from "./ContactPage";
 
 const industries = [
   "Technology", "Healthcare", "Finance",

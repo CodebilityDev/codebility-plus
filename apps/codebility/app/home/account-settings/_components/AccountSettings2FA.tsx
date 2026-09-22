@@ -25,7 +25,6 @@ interface Factor {
 }
 
 export default function AccountSettings2FA() {
-  const [supabase] = useState(() => createClientClientComponent());
   const [loading, setLoading] = useState(true);
   const [factors, setFactors] = useState<Factor[]>([]);
   const [activeFactor, setActiveFactor] = useState<Factor | null>(null);
@@ -43,6 +42,12 @@ export default function AccountSettings2FA() {
   const [submitting, setSubmitting] = useState(false);
 
   const fetchMfaFactors = async () => {
+    const supabase = createClientClientComponent();
+    if (!supabase) {
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       const { data, error } = await supabase.auth.mfa.listFactors();
@@ -65,6 +70,12 @@ export default function AccountSettings2FA() {
   }, []);
 
   const handleStartEnrollment = async () => {
+    const supabase = createClientClientComponent();
+    if (!supabase) {
+      toast.error("Authentication service unavailable");
+      return;
+    }
+
     try {
       setSubmitting(true);
       setVerificationCode("");
@@ -96,6 +107,12 @@ export default function AccountSettings2FA() {
       return;
     }
 
+    const supabase = createClientClientComponent();
+    if (!supabase) {
+      toast.error("Authentication service unavailable");
+      return;
+    }
+
     try {
       setSubmitting(true);
 
@@ -124,6 +141,12 @@ export default function AccountSettings2FA() {
 
   const handleDisable2FA = async () => {
     if (!activeFactor) return;
+
+    const supabase = createClientClientComponent();
+    if (!supabase) {
+      toast.error("Authentication service unavailable");
+      return;
+    }
 
     try {
       setSubmitting(true);

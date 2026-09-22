@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { defaultAvatar } from "@/public/assets/images";
 import { useUserStore } from "@/store/codev-store";
-import { getPostComments } from "../_services/action";
+import { getPostComments } from "@/actions/feeds/post";
 import PostViewCommentItem from "./PostViewCommentItem";
 
 interface PostViewCommentListProps {

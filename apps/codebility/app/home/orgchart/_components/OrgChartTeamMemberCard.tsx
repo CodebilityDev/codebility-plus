@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { defaultAvatar } from "@/public/assets/images";
 import { getValidImageUrl } from "@/utils/imageValidation";
 
@@ -18,10 +19,10 @@ export const TeamMemberCard = ({
   
   // Line 15: Card wrapper now clickable with cursor pointer and enhanced hover
   return (
-    <Card 
-      onClick={() => window.location.href = `https://www.codebility.tech/profiles/${id}`}
-      className="group relative h-32 w-36 overflow-hidden border-2 border-gray-200 shadow-lg transition-all duration-300 cursor-pointer hover:-translate-y-1 hover:shadow-2xl hover:scale-[1.02] dark:border-gray-700"
-    >
+    <Link href={`/profiles/${id}`} prefetch className="block">
+      <Card
+        className="group relative h-32 w-36 overflow-hidden border-2 border-gray-200 shadow-lg transition-all duration-300 cursor-pointer hover:-translate-y-1 hover:shadow-2xl hover:scale-[1.02] dark:border-gray-700"
+      >
       <div className="absolute inset-0 bg-gradient-to-t from-customBlue-500/5 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
       <CardContent className="relative flex h-full flex-col items-center justify-center gap-1 p-2">
         <div className="relative">
@@ -45,5 +46,6 @@ export const TeamMemberCard = ({
         </div>
       </CardContent>
     </Card>
+    </Link>
   );
 };

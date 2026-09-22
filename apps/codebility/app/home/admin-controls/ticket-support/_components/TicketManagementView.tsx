@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import type { TicketSupport } from "../types";
 import TicketDataTable from "./TicketDataTable";
 import TicketPreviewSidebar from "./TicketPreviewSidebar";
-import { useNavStore } from "@/hooks/use-sidebar";
+import { useNavStore } from "@/hooks/navigation/use-sidebar";
 
 interface TicketManagementViewProps {
   initialTickets: TicketSupport[];

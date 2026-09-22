@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { useModal } from "@/hooks/use-modal";
-import { ScheduleType, useSchedule } from "@/hooks/use-timeavail";
+import { useModal } from "@/hooks/modals/use-modal";
+import { ScheduleType, useSchedule } from "@/hooks/data/use-timeavail";
 
 import { Dialog, DialogContent, DialogTitle } from "@codevs/ui/dialog";
 

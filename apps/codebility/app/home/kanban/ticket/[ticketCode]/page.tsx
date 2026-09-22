@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { getTaskDetailsByTicketCode } from './actions';
+import { getTaskDetailsByTicketCode } from "@/actions/kanban/ticket";
 
 interface PageProps {
   params: {

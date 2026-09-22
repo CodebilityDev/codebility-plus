@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-import { ApplicantType } from "../_service/type";
-import { getTestDate } from "../_service/util";
+import { ApplicantType } from "@/types/applicant-waiting";
+import { getTestDate } from "@/utils/applicant-waiting";
 
 export const TestCountdown = ({
   applicantData,

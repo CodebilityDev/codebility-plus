@@ -10,7 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/utils";
 import { set } from "date-fns";
 import { Loader2Icon, MailIcon, MoreHorizontalIcon } from "lucide-react";
 
@@ -31,14 +31,14 @@ import {
   multipleMoveApplicantToOnboardingAction,
   multipleMoveApplicantToTestingAction,
   multiplePassApplicantTestAction,
-} from "../../_service/action";
+} from "@/actions/applicants/applicant";
 import {
   sendMultipleDenyEmail,
   sendMultipleOnboardingReminderWithUpdate,
   sendMultiplePassedTestEmail,
   sendMultipleTestReminderEmailWithUpdate,
-} from "../../_service/email";
-import { NewApplicantType } from "../../_service/types";
+} from "@/actions/applicants/email";
+import { NewApplicantType } from "@/types/applicants";
 
 export default function ApplicantRowActionButton({
   applicants,

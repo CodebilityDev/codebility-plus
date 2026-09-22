@@ -24,7 +24,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { createClientClientComponent } from "@/utils/supabase/client";
+import { getClientSupabase } from "@/utils/supabase/client";
 
 const jobSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
@@ -72,7 +72,7 @@ export default function CreateJobForm({ onJobCreated }: CreateJobFormProps) {
 
   useEffect(() => {
     const fetchPositions = async () => {
-      const supabase = createClientClientComponent();
+      const supabase = getClientSupabase();
 
 
       // Fetch distinct display_positions from codev table
@@ -101,7 +101,7 @@ export default function CreateJobForm({ onJobCreated }: CreateJobFormProps) {
 
 
     try {
-      const supabase = createClientClientComponent();
+      const supabase = getClientSupabase();
 
 
       // Get current user

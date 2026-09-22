@@ -3,9 +3,8 @@
 import { Rowdies } from "next/font/google";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import pathsConfig from "@/config/paths.config";
+import pathsConfig from "@/types/zod/paths.config";
 
-import SideNavMenu from "../../_components/MarketingSidenavMenu";
 import OrbitingCirclesBackground from "./CodevsOrbitingCirclesBg";
 
 const rowdies = Rowdies({

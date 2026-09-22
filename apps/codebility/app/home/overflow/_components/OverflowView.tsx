@@ -26,7 +26,7 @@ import {
   postQuestion,
   Question,
   TrendingTopic,
-} from "../actions";
+} from "@/actions/overflow/actions";
 import PostQuestionModal from "./PostQuestionModal";
 import QuestionCard from "./QuestionCard";
 import SearchFilter, { FilterOptions } from "./QuestionFilter";

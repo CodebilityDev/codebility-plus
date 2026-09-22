@@ -9,12 +9,11 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination/pagination";
-import { Task } from "@/types/home/codev";
 
-import TaskCard from "./TaskCard";
+import TaskCard, { TaskWithRelations } from "./TaskCard";
 
 interface Props {
-  tasks: Task[];
+  tasks: TaskWithRelations[];
 }
 
 export default function TasksContainer({ tasks }: Props) {
@@ -49,7 +48,7 @@ export default function TasksContainer({ tasks }: Props) {
     <div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {paginatedTasks.length > 0 ? (
-          paginatedTasks.map((task: Task) => (
+          paginatedTasks.map((task: TaskWithRelations) => (
             <TaskCard key={task.id} task={task} />
           ))
         ) : (

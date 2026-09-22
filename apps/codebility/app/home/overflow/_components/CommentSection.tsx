@@ -30,8 +30,8 @@ import {
   fetchCommentLikes,
   markAsSolution,
   type Comment 
-} from "../actions";
-import { Question, fetchQuestions } from "../actions";
+} from "@/actions/overflow/actions";
+import { Question, fetchQuestions } from "@/actions/overflow/actions";
 import { createClientClientComponent } from "@/utils/supabase/client";
 
 interface CommentSectionProps {

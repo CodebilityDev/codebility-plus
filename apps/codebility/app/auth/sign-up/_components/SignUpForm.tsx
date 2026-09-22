@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import PrivacyPolicyModal from "@/components/modals/PrivacyPolicyModal";
 import TechStackModal from "@/components/modals/TechStackModal";
 import { Button } from "@/components/ui/button";
-import { useModal } from "@/hooks/use-modal";
-import { SignUpValidation } from "@/lib/validations/auth";
+import { useModal } from "@/hooks/modals/use-modal";
+import { SignUpValidation } from "@/utils/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormProvider, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -14,7 +14,7 @@ import { z } from "zod";
 
 import { Checkbox } from "@codevs/ui/checkbox";
 
-import { signupUser } from "../../actions";
+import { signupUser } from "@/actions/auth";
 import { FORM_STEPS } from "./form-steps";
 import { ImageUpload } from "./ImageUpload";
 import SignUpInputs from "./SignUpInput";

@@ -1,39 +1,14 @@
-"use client";
-
-import { useEffect, useState } from "react";
+import { ReactNode, Suspense } from "react";
 import AsyncErrorBoundary from "@/components/AsyncErrorBoundary";
 import H1 from "@/components/shared/dashboard/H1";
-import { useUserStore } from "@/store/codev-store";
 import { Task } from "@/types/home/codev";
-import { createClientClientComponent } from "@/utils/supabase/client";
+import { createClientServerComponent } from "@/utils/supabase/server";
 
+import { TaskWithRelations } from "./_components/TaskCard";
 import TasksContainer from "./_components/TasksContainer";
+import TasksLoading from "./loading";
 
-export default function TaskPage() {
-  const { user, isLoading: userLoading } = useUserStore();
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [isTaskLoading, setIsTaskLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [supabase, setSupabase] = useState<any>(null);
-  useEffect(() => {
-    const supabaseClient = createClientClientComponent();
-    setSupabase(supabaseClient);
-  }, []);
-
-  useEffect(() => {
-    if (!supabase) return;
-
-    async function fetchTasks() {
-      if (!user) return;
-
-      setIsTaskLoading(true);
-      setError(null);
-
-      try {
-        const { data, error } = await supabase
-          .from("tasks")
-          .select(
-            `
+const TASKS_SELECT = `
     id,
     title,
     description,
@@ -59,102 +34,126 @@ export default function TaskPage() {
     created_by,
     created_at,
     updated_at
-  `,
-          )
-          .eq("codev_id", user.id);
+  `;
 
-        if (error) throw error;
+type MaybeArray<T> = T | T[] | null;
 
-        // Normalize any array responses to single objects
-        const fetchedTasks: Task[] = (data || []).map((task: any) => {
-          // If kanban_column is an array, grab the first element
-          const column = Array.isArray(task.kanban_column)
-            ? task.kanban_column[0]
-            : task.kanban_column;
+interface RawProject {
+  id: string;
+  name: string;
+}
 
-          if (!column) {
-            // No column, return task as is
-            return { ...task, kanban_column: undefined };
-          }
+interface RawBoard {
+  id: string;
+  name: string;
+  project?: MaybeArray<RawProject>;
+}
 
-          // If board is an array, grab the first element
-          const board = Array.isArray(column.board)
-            ? column.board[0]
-            : column.board;
+interface RawColumn {
+  id: string;
+  name: string;
+  board?: MaybeArray<RawBoard>;
+}
 
-          if (!board) {
-            // Column is valid but no board
-            return {
-              ...task,
-              kanban_column: { ...column, board: undefined },
-            };
-          }
+interface RawTask extends Task {
+  kanban_column?: MaybeArray<RawColumn>;
+}
 
-          // Safely check if board has project property
-          const hasProject =
-            board && typeof board === "object" && "project" in board;
+// Supabase returns nested relations as either an object or a single-element
+// array depending on how it resolves the join, so flatten them to objects.
+function normalizeTask(task: RawTask): TaskWithRelations {
+  const column = Array.isArray(task.kanban_column)
+    ? task.kanban_column[0]
+    : task.kanban_column;
 
-          // If it has project property, normalize it
-          const project = hasProject
-            ? Array.isArray(board.project)
-              ? board.project[0]
-              : board.project
-            : undefined;
-
-          return {
-            ...task,
-            kanban_column: {
-              ...column,
-              board: {
-                ...board,
-                project: project || undefined,
-              },
-            },
-          };
-        });
-
-        setTasks(fetchedTasks);
-      } catch (err) {
-        console.error("Error fetching tasks:", err);
-        setError("Unable to load tasks. Please try again later.");
-      } finally {
-        setIsTaskLoading(false);
-      }
-    }
-
-    fetchTasks();
-  }, [user, supabase]);
-
-  // Loading state
-  if (userLoading || isTaskLoading) {
-    return (
-      <div className="mx-auto flex min-h-[70vh] max-w-screen-xl flex-col gap-4">
-        <H1>My Tasks</H1>
-        <p>Loading tasks...</p>
-      </div>
-    );
+  if (!column) {
+    return { ...task, kanban_column: undefined };
   }
 
-  // No user
-  if (!user) {
-    return (
-      <div className="mx-auto flex min-h-[70vh] max-w-screen-xl flex-col gap-4">
+  const board = Array.isArray(column.board) ? column.board[0] : column.board;
+
+  if (!board) {
+    return { ...task, kanban_column: { ...column, board: undefined } };
+  }
+
+  const project = Array.isArray(board.project)
+    ? board.project[0]
+    : board.project;
+
+  return {
+    ...task,
+    kanban_column: {
+      ...column,
+      board: { ...board, project: project || undefined },
+    },
+  };
+}
+
+function TasksShell({ children }: { children: ReactNode }) {
+  return (
+    <div className="mx-auto flex min-h-[70vh] max-w-screen-xl flex-col gap-4">
+      <div className="flex justify-between gap-4">
         <H1>My Tasks</H1>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+async function TasksData() {
+  const supabase = await createClientServerComponent();
+
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    return (
+      <TasksShell>
         <p>Please log in to view your tasks.</p>
-      </div>
+      </TasksShell>
     );
   }
 
-  // Error state
-  if (error) {
+  const { data: codev, error: codevError } = await supabase
+    .from("codev")
+    .select("id")
+    .eq("id", user.id)
+    .single();
+
+  if (codevError || !codev) {
     return (
-      <div className="mx-auto flex min-h-[70vh] max-w-screen-xl flex-col gap-4">
-        <H1>My Tasks</H1>
-        <p>{error}</p>
-      </div>
+      <TasksShell>
+        <p>Please log in to view your tasks.</p>
+      </TasksShell>
     );
   }
 
+  const { data, error } = await supabase
+    .from("tasks")
+    .select(TASKS_SELECT)
+    .eq("codev_id", codev.id);
+
+  if (error) {
+    console.error("Error fetching tasks:", error);
+    return (
+      <TasksShell>
+        <p>Unable to load tasks. Please try again later.</p>
+      </TasksShell>
+    );
+  }
+
+  const tasks = (data ?? []).map((task) => normalizeTask(task as RawTask));
+
+  return (
+    <TasksShell>
+      <TasksContainer tasks={tasks} />
+    </TasksShell>
+  );
+}
+
+export default function TaskPage() {
   return (
     <AsyncErrorBoundary
       fallback={
@@ -168,12 +167,9 @@ export default function TaskPage() {
         </div>
       }
     >
-      <div className="mx-auto flex min-h-[70vh] max-w-screen-xl flex-col gap-4">
-        <div className="flex justify-between gap-4">
-          <H1>My Tasks</H1>
-        </div>
-        <TasksContainer tasks={tasks} />
-      </div>
+      <Suspense fallback={<TasksLoading />}>
+        <TasksData />
+      </Suspense>
     </AsyncErrorBoundary>
   );
 }

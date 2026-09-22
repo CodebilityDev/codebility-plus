@@ -21,6 +21,20 @@ export interface DatabaseUser {
   updated_at?: string;
 }
 
+export type NavUserProfile = {
+  first_name: string;
+  last_name: string;
+  email: string;
+  image_url: string;
+  application_status: string;
+  role_id: number;
+  applicant: {
+    id: string;
+    codev_id: string;
+  } | null;
+};
+
+
 export interface ProjectMember {
   id: string;
   codev_id: string;

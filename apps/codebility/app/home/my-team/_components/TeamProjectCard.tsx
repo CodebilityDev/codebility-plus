@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { SimpleMemberData } from "@/app/home/projects/actions";
+import { SimpleMemberData } from "@/actions/projects/actions";
 import { Users, UserPlus, ArrowRight, Crown, Calendar } from "lucide-react";
 import DefaultAvatar from "@/components/DefaultAvatar";
 import { memo } from "react";

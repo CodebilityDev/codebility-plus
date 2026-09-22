@@ -6,7 +6,7 @@ import { useFeedsStore } from "@/store/feeds-store";
 import { MessageSquareText } from "lucide-react";
 import { shallow } from "zustand/shallow";
 
-import { getSocialPoints } from "../_services/action";
+import { getSocialPoints } from "@/actions/feeds/post";
 
 export default function SocialPointsCard() {
   const posts = useFeedsStore((state) => state.posts, shallow);

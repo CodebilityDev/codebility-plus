@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, forwardRef, useImperativeHandle } from "react";
 import { ChevronLeft, ChevronRight, Circle, Save, Trophy, AlertTriangle, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SimpleMemberData } from "@/app/home/projects/actions";
+import { SimpleMemberData } from "@/actions/projects/actions";
 import {
   Select,
   SelectContent,
@@ -12,11 +12,10 @@ import {
   SelectValue,
 } from "@codevs/ui/select";
 import { toast } from "react-hot-toast";
-import { saveAttendance, getMonthlyAttendance, bulkSaveAttendance } from "../actions";
-import { checkAttendanceWarnings } from "../actions/attendance-warnings";
+import { saveAttendance, getMonthlyAttendance, bulkSaveAttendance } from "@/actions/my-team/project";
+import { checkAttendanceWarnings } from "@/actions/my-team/attendance-warnings";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@codevs/ui/tooltip";
-
-const ATTENDANCE_POINTS_PER_DAY = 2;
+import { ATTENDANCE_POINTS_PER_DAY } from "@/constants/my-team/attendance";
 
 type AttendanceStatus = "present" | "absent" | "holiday" | "weekend";
 

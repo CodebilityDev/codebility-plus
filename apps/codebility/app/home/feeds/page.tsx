@@ -9,13 +9,13 @@ import { AnimatePresence, motion } from "framer-motion";
 
 import Feed from "./_components/Feed";
 import SortMenu from "./_components/SortMenu";
-import { SEARCH_DEBOUNCE_MS } from "./_constants";
+import { SEARCH_DEBOUNCE_MS } from "@/constants/feeds";
 import {
   getUserRole,
   hasNotPostedYet,
   hasReachedDailyPostLimit,
   getSocialPoints,
-} from "./_services/action";
+} from "@/actions/feeds/post";
 import toast from "react-hot-toast";
 import {
   PlusCircle,

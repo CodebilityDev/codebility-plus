@@ -4,7 +4,7 @@ import { useState } from "react";
 import CodevBadge from "@/components/CodevBadge";
 import DefaultAvatar from "@/components/DefaultAvatar";
 import Box from "@/components/shared/dashboard/Box";
-import { useModal } from "@/hooks/use-modal-users";
+import { useModal } from "@/hooks/modals/use-modal-users";
 import { ApplicantStatus, Codev, CodevPoints } from "@/types/home/codev";
 import {
   AnimatePresence,

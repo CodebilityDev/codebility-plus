@@ -15,7 +15,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/utils";
 import { Cell, Pie, PieChart } from "recharts";
 
 interface ApplicantStatusCounts extends Record<string, number> {}

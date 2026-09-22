@@ -2,7 +2,7 @@
 "use client";
 
 import React from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/utils";
 
 type Props = React.HTMLAttributes<HTMLElement>;
 

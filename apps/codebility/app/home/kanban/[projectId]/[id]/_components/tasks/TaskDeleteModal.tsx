@@ -8,22 +8,22 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useModal } from "@/hooks/use-modal";
-import { useKanbanStore } from "@/store/kanban-store";
+import { useKanbanModal } from "@/hooks/kanban/use-modal-kanban";
+import { useKanbanBoardSync } from "@/hooks/kanban/use-kanban-board-sync";
 import { Task } from "@/types/home/codev";
 import { Loader2Icon } from "lucide-react";
 import toast from "react-hot-toast";
 
-import { deleteTask } from "../../actions";
+import { deleteTask } from "@/actions/kanban";
 
 const TaskDeleteModal = () => {
-  const { isOpen, onClose, type, data } = useModal();
+  const { isOpen, onClose, type, data } = useKanbanModal();
   const isModalOpen = isOpen && type === "taskDeleteModal";
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const { fetchBoardData } = useKanbanStore();
+  const { refreshBoard, removeTask } = useKanbanBoardSync();
 
-  const task = data as Task;
+  const task = data as Task | undefined;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -40,8 +40,8 @@ const TaskDeleteModal = () => {
 
       if (response.success) {
         toast.success("Task deleted successfully");
-        // Refetch the board data
-        await fetchBoardData();
+        removeTask(task.id);
+        refreshBoard();
         onClose();
       } else {
         toast.error(response.error || "Failed to delete task");

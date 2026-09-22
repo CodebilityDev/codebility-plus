@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Trophy, User, AlertTriangle, RefreshCw } from "lucide-react";
-import { getWeeklyLeaderboard, LeaderboardMember } from "../leaderboard/actions";
+import { getWeeklyLeaderboard, LeaderboardMember } from "@/actions/my-team/leaderboard";
 
 interface Contributor {
   id: string;

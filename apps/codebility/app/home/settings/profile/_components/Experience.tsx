@@ -14,7 +14,7 @@ import {
   createWorkExperience,
   deleteWorkExperience,
   updateWorkExperience,
-} from "../action";
+} from "@/actions/settings/profile";
 
 interface ExperienceProps {
   data: WorkExperience[];

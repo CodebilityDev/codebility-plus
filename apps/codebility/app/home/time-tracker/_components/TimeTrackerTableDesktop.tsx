@@ -9,7 +9,7 @@ import {
 import { IconEdit } from "@/public/assets/svgs";
 
 import { TimeLog } from "../_types/time-log";
-import { convertHoursToHMS } from "../../tasks/_lib/utils";
+import { convertHoursToHMS } from "@/utils/tasks/time-conversion";
 
 interface Props {
   timeLog: TimeLog[];

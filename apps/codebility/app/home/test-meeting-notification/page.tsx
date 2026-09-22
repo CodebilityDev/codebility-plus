@@ -86,7 +86,7 @@ export default function TestMeetingNotificationPage() {
       });
       
       if (response.ok) {
-        const data = await response.json();
+        const data = (await response.json()) as { projects?: Project[] };
         setTodaysProjects(data.projects || []);
       }
     } catch (error) {
@@ -117,7 +117,7 @@ export default function TestMeetingNotificationPage() {
         },
       });
 
-      const data = await response.json();
+      const data = (await response.json()) as NotificationTestResult;
 
       if (response.ok) {
         setResults(data);

@@ -1,4 +1,4 @@
-import { SignUpValidation } from "@/lib/validations/auth";
+import { SignUpValidation } from "@/utils/validations/auth";
 
 export interface FormField {
   id: keyof typeof SignUpValidation._type;

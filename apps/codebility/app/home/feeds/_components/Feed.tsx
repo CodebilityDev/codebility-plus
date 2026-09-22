@@ -3,8 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useFeedsStore } from "@/store/feeds-store";
 
-import { POSTS_PER_PAGE } from "../_constants";
-import { SYSTEM_POST } from "../_constants/system-post";
+import { POSTS_PER_PAGE, SYSTEM_POST } from "@/constants/feeds";
 import Post from "./PostCard";
 import PostCardSkeleton from "./PostCardSkeleton";
 

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Task } from "@/types/home/codev";
-import { useKanbanStore } from "@/store/kanban-store";
+import { useKanbanBoardSync } from "@/hooks/kanban/use-kanban-board-sync";
 import { MoreHorizontal, ArrowRight, CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -15,7 +15,7 @@ import {
 } from "@codevs/ui/dropdown-menu";
 import { Button } from "@codevs/ui/button";
 
-import { updateTaskColumnId } from "../../actions";
+import { updateTaskColumnId } from "@/actions/kanban";
 
 interface Props {
   task: Task;
@@ -32,7 +32,7 @@ export default function MobileTaskMoveModal({
   availableColumns,
 }: Props) {
   const [isLoading, setIsLoading] = useState(false);
-  const { fetchBoardData } = useKanbanStore();
+  const { refreshBoard } = useKanbanBoardSync();
 
   const handleMoveTask = async (targetColumnId: string, targetColumnName: string) => {
     if (targetColumnId === currentColumnId) {
@@ -43,7 +43,7 @@ export default function MobileTaskMoveModal({
     setIsLoading(true);
     try {
       await updateTaskColumnId(task.id, targetColumnId);
-      await fetchBoardData();
+      await refreshBoard();
       toast.success(`Task moved to ${targetColumnName}`);
     } catch (error) {
       console.error("Error moving task:", error);

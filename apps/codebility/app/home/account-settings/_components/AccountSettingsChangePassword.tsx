@@ -16,6 +16,7 @@ import {
   FormMessage,
 } from "@codevs/ui/form";
 import { Input } from "@codevs/ui/input";
+import { updatePassword } from "@/actions/account-settings/actions";
 
 // Password validation schema
 const passwordChangeSchema = z

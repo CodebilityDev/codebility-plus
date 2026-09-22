@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { getTestDate } from "@/app/applicant/waiting/_service/util";
+import { getTestDate } from "@/utils/applicant-waiting";
 
-import { NewApplicantType } from "../_service/types";
+import { NewApplicantType } from "@/types/applicants";
 
 export default function ApplicantTestTimeRemaining({
   applicant,

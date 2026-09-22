@@ -1,12 +1,12 @@
 import React from "react";
-import Image from "next/image";
+import LandingImage from "./LandingImage";
 
 const Diamond = ({ color }: { color?: string }) => {
   return (
     <>
       {color === "violet" ? (
         <div className="relative">
-          <Image
+          <LandingImage
             alt="diamond-icon"
             src="https://codebility-cdn.pages.dev/assets/svgs/icon-diamond-purple.svg"
             width={30}
@@ -17,7 +17,7 @@ const Diamond = ({ color }: { color?: string }) => {
         </div>
       ) : color === "teal" ? (
         <div className="relative">
-          <Image
+          <LandingImage
             alt="diamond-icon"
             src="https://codebility-cdn.pages.dev/assets/svgs/icon-diamond-teal.svg"
             width={30}

@@ -2,7 +2,7 @@ import TimeTrackerTable from "@/app/home/time-tracker/_components/TimeTrackerTab
 import AsyncErrorBoundary from "@/components/AsyncErrorBoundary";
 import Box from "@/components/shared/dashboard/Box";
 import H1 from "@/components/shared/dashboard/H1";
-import { formatToLocaleTime } from "@/lib/format-date-time";
+import { formatToLocaleTime } from "@/utils/format-date-time";
 import { getCachedUser } from "@/lib/server/supabase-server-comp";
 import { createClientServerComponent } from "@/utils/supabase/server";
 

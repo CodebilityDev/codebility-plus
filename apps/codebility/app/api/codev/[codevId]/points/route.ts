@@ -38,13 +38,13 @@ export async function GET(
 
     // If no attendance points record exists, calculate from attendance table
     if (attendanceError && attendanceError.code === 'PGRST116') {
-      const { data: attendanceCount } = await supabase
+      const { count: attendanceCount } = await supabase
         .from("attendance")
         .select("*", { count: 'exact', head: true })
         .eq("codev_id", codevId)
         .in("status", ["present", "late"]);
 
-      attendancePoints = (attendanceCount?.count || 0) * 2;
+      attendancePoints = (attendanceCount || 0) * 2;
 
       // Create attendance_points record if there are attendance records
       if (attendancePoints > 0) {
