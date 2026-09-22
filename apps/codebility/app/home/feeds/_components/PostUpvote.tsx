@@ -27,9 +27,9 @@ export default function PostUpvote({ post }: PostUpvoteProps) {
       setUpvotes((prev) => prev + (isUpvoted ? -1 : 1));
 
       if (!isUpvoted) {
-        await AddPostUpvote(post.id, userId);
+        await AddPostUpvote(post.id);
       } else {
-        await removePostUpvote(post.id, userId);
+        await removePostUpvote(post.id);
       }
     }
   };

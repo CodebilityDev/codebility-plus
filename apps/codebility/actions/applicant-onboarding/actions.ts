@@ -2,10 +2,38 @@
 
 import { createClientServerComponent } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
+import { requireUser } from "@/lib/server/auth-guard";
+
+/**
+ * Onboarding progress is self-service, so a write is only allowed against the
+ * signed-in user's own `applicant` row.
+ *
+ * These actions used to take `applicantId` and write to it unchecked, so any
+ * caller could mark another applicant's videos complete or overwrite their quiz
+ * and commitment results.
+ */
+async function assertOwnApplicant(
+  supabase: Awaited<ReturnType<typeof createClientServerComponent>>,
+  applicantId: string,
+) {
+  const { user } = await requireUser();
+
+  const { data } = await supabase
+    .from("applicant")
+    .select("codev_id")
+    .eq("id", applicantId)
+    .maybeSingle();
+
+  if (!data || data.codev_id !== user.id) {
+    throw new Error("Forbidden");
+  }
+}
 
 export async function getOnboardingProgress(applicantId: string) {
   try {
     const supabase = await createClientServerComponent();
+
+    await assertOwnApplicant(supabase, applicantId);
 
     const { data, error } = await supabase
       .from("onboarding_videos")
@@ -55,6 +83,8 @@ export async function updateVideoProgress({
 }) {
   try {
     const supabase = await createClientServerComponent();
+
+    await assertOwnApplicant(supabase, applicantId);
 
     // Check if record exists
     const { data: existingRecord } = await supabase
@@ -119,6 +149,8 @@ export async function saveQuizProgress({
   try {
     const supabase = await createClientServerComponent();
 
+    await assertOwnApplicant(supabase, applicantId);
+
     const { error } = await supabase
       .from("applicant")
       .update({
@@ -159,6 +191,8 @@ export async function saveQuizAndCommitment({
   try {
     const supabase = await createClientServerComponent();
 
+    await assertOwnApplicant(supabase, applicantId);
+
     const { error } = await supabase
       .from("applicant")
       .update({
@@ -185,6 +219,20 @@ export async function saveQuizAndCommitment({
 
 export async function completeOnboarding(codevId: string, newStatus: string = "waitlist") {
   try {
+    // Self only, and the status is constrained: the parameter used to accept any
+    // string, so a caller could set their own application_status to "passed"
+    // and skip the pipeline.
+    const { user } = await requireUser();
+
+    if (user.id !== codevId) {
+      throw new Error("Forbidden");
+    }
+
+    const ALLOWED_STATUSES = ["onboarding", "waitlist"];
+    if (!ALLOWED_STATUSES.includes(newStatus)) {
+      throw new Error("Forbidden");
+    }
+
     const supabase = await createClientServerComponent();
 
     // Update codev status to waitlist (or specified status)

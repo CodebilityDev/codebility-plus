@@ -1,9 +1,28 @@
-
 "use server";
 
 
 import { createClientServerComponent } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
+import { requireUser } from "@/lib/server/auth-guard";
+
+/**
+ * Applicant pipeline actions are self-service: an applicant moves their own
+ * record through testing/onboarding/waitlist.
+ *
+ * `codevId` used to be trusted from the caller, so any caller could set another
+ * user's `application_status` (e.g. push themselves or someone else to
+ * "waitlist"). The codev row written is now always the signed-in user; the
+ * caller's `codevId` argument must match it.
+ */
+async function requireSelfCodev(codevId: string): Promise<string> {
+    const { user } = await requireUser();
+
+    if (user.id !== codevId) {
+        throw new Error("Forbidden");
+    }
+
+    return user.id;
+}
 
 
 export async function applicantTakeTest({
@@ -14,6 +33,7 @@ export async function applicantTakeTest({
     codevId: string;
 }) {
     try {
+        const selfCodevId = await requireSelfCodev(codevId);
         const supabase = await createClientServerComponent();
 
         const { data, error } = await supabase
@@ -36,7 +56,7 @@ export async function applicantTakeTest({
                 application_status: "testing",
                 updated_at: new Date(),
             })
-            .eq("id", codevId);
+            .eq("id", selfCodevId);
 
         if (codevError) {
             console.error("Error updating codev test:", codevError);
@@ -49,12 +69,34 @@ export async function applicantTakeTest({
     }
 }
 
+/**
+ * Confirms an `applicant` row belongs to the signed-in user before it is
+ * written. `applicantId` arrives from the client, so without this any caller
+ * could edit another applicant's fork URL or join flags.
+ */
+async function assertOwnApplicant(
+    supabase: Awaited<ReturnType<typeof createClientServerComponent>>,
+    applicantId: string,
+    codevId: string,
+) {
+    const { data } = await supabase
+        .from("applicant")
+        .select("codev_id")
+        .eq("id", applicantId)
+        .maybeSingle();
+
+    if (!data || data.codev_id !== codevId) {
+        throw new Error("Forbidden");
+    }
+}
+
 export async function applicantMoveToOnboard({
     codevId,
 }: {
     codevId: string;
 }) {
     try {
+        const selfCodevId = await requireSelfCodev(codevId);
         const supabase = await createClientServerComponent();
 
         const { data: codevData, error: codevError } = await supabase
@@ -63,7 +105,7 @@ export async function applicantMoveToOnboard({
                 application_status: "onboarding",
                 updated_at: new Date(),
             })
-            .eq("id", codevId);
+            .eq("id", selfCodevId);
 
         if (codevError) {
             console.error("Error updating codev test:", codevError);
@@ -84,7 +126,10 @@ export async function applicantSubmitTest({
     forkUrl: string;
 }) {
     try {
+        const { user } = await requireUser();
         const supabase = await createClientServerComponent();
+
+        await assertOwnApplicant(supabase, applicantId, user.id);
 
         const { data, error } = await supabase
             .from("applicant")
@@ -113,7 +158,10 @@ export async function applicantUpdateTestSubmission({
     forkUrl: string;
 }) {
     try {
+        const { user } = await requireUser();
         const supabase = await createClientServerComponent();
+
+        await assertOwnApplicant(supabase, applicantId, user.id);
 
         const { data, error } = await supabase
             .from("applicant")
@@ -144,7 +192,10 @@ export async function applicantUpdateJoinedStatus({
     joinedMessenger?: boolean;
 }) {
     try {
+        const { user } = await requireUser();
         const supabase = await createClientServerComponent();
+
+        await assertOwnApplicant(supabase, applicantId, user.id);
 
         const updateData: any = {
             updated_at: new Date(),

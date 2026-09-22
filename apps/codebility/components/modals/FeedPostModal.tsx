@@ -13,12 +13,14 @@ interface FeedPostModalProps {
   isOpen: boolean;
   onClose: () => void;
   postId: string;
+  isAdmin: boolean;
 }
 
 const FeedPostModal: React.FC<FeedPostModalProps> = ({
   isOpen,
   onClose,
   postId,
+  isAdmin,
 }) => {
   return (
     <Dialog
@@ -34,7 +36,7 @@ const FeedPostModal: React.FC<FeedPostModalProps> = ({
         </DialogTitle>
       </DialogHeader>
       <DialogContent className="flex max-w-2xl max-h-[80vh] flex-col overflow-auto">
-        <PostView postId={postId} />
+        <PostView postId={postId} isAdmin={isAdmin} />
       </DialogContent>
     </Dialog>
   );

@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { requireProjectMember } from "@/lib/server/auth-guard";
+import { getCurrentCodev } from "@/lib/server/current-codev";
 import pathsConfig from "@/types/zod/paths.config";
 import { ArrowRightIcon, IconKanban } from "@/public/assets/svgs";
 import { format } from "date-fns";
@@ -66,14 +67,22 @@ function formatDateRange(
 export default async function KanbanSprintPage({ params }: PageProps) {
   const { projectId } = await params;
 
-  try {
-    await requireProjectMember(projectId);
-  } catch (err) {
-    redirect(
-      err instanceof Error && err.message === "Unauthorized"
-        ? "/auth/sign-in"
-        : pathsConfig.app.kanban,
-    );
+  // Read the cached user first. Admins bypass the membership check inside
+  // requireProjectMember, and this row (with role_id) was already fetched by the
+  // /home layout this request, so the admin path skips that guard's own
+  // auth.getUser() + codev lookups entirely.
+  const currentUser = await getCurrentCodev();
+
+  if (currentUser?.role_id !== 1) {
+    try {
+      await requireProjectMember(projectId);
+    } catch (err) {
+      redirect(
+        err instanceof Error && err.message === "Unauthorized"
+          ? "/auth/sign-in"
+          : pathsConfig.app.kanban,
+      );
+    }
   }
 
   let project: KanbanProjectWithSprintsData | null = null;

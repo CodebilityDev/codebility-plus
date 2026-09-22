@@ -124,7 +124,12 @@ export default function Post({ post, isAdmin, onDelete }: PostProps) {
         </div>
       </div>
 
-      <FeedPostModal isOpen={isModalOpen} onClose={closeModal} postId={post.id} />
+      <FeedPostModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        postId={post.id}
+        isAdmin={isAdmin ?? false}
+      />
       <DeleteDialog
         isOpen={showDeleteDialog}
         onClose={() => setShowDeleteDialog(false)}

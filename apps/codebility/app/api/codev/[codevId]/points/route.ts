@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClientServerComponent } from "@/utils/supabase/server";
+import { requireUser } from "@/lib/server/auth-guard";
 
 export async function GET(
   request: NextRequest,
@@ -14,6 +15,10 @@ export async function GET(
         { status: 400 }
       );
     }
+
+    // Points are visible to signed-in members but not anonymously. This route
+    // previously had no auth at all, so anyone could read any codev's points.
+    await requireUser();
 
     const supabase = await createClientServerComponent();
 

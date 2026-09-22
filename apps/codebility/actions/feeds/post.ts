@@ -6,6 +6,7 @@ import { createPostSchema, editPostSchema } from "@/utils/validations/feeds";
 import { ZodError } from "zod";
 import type { UserMention } from "@/types/feeds";
 import { createNotificationAction } from "@/actions/notifications/notification.actions";
+import { requireUser } from "@/lib/server/auth-guard";
 
 
 export const getUserRole = async (userId: Number | null): Promise<string | null> => {
@@ -49,12 +50,16 @@ type AddPostParams = {
 
 export const addPost = async (payload: AddPostParams) => {
   try {
+    // Identity comes from the session, never from the caller. `author_id` in the
+    // payload is deliberately ignored: accepting it let any caller attribute a
+    // post to another user.
+    const { user } = await requireUser();
+
     const parsed = createPostSchema.parse(payload);
 
     const {
       title,
       content,
-      author_id,
       image_url,
       content_image_ids,
       tag_ids,
@@ -69,7 +74,7 @@ export const addPost = async (payload: AddPostParams) => {
         {
           title,
           content,
-          ...(author_id !== undefined && { author_id }),
+          author_id: user.id,
           ...(image_url !== undefined && { image_url }),
         },
       ])
@@ -114,11 +119,43 @@ export const addPost = async (payload: AddPostParams) => {
   }
 };
 
+/**
+ * Authorizes a write against a post the caller must own (admins may moderate).
+ *
+ * Feeds are not project-scoped, so `requireProjectMember` does not apply here.
+ * Ownership is the right check: a member may only touch their own posts.
+ */
+async function requirePostOwner(
+  supabase: Awaited<ReturnType<typeof createClientServerComponent>>,
+  postId: string,
+) {
+  const { user, roleId } = await requireUser();
+
+  const { data: post, error } = await supabase
+    .from("posts")
+    .select("author_id")
+    .eq("id", postId)
+    .single();
+
+  if (error || !post) {
+    throw new Error("Post not found");
+  }
+
+  // role_id 1 is admin, matching the bypass used across auth-guard.
+  if (post.author_id !== user.id && roleId !== 1) {
+    throw new Error("Forbidden");
+  }
+
+  return { user, roleId, post };
+}
+
 export const deletePost = async (post_id: string) => {
   try {
-    await deletePostContentImages(post_id);
-
     const supabase = await createClientServerComponent();
+
+    await requirePostOwner(supabase, post_id);
+
+    await deletePostContentImages(post_id);
 
     const { data: postData, error: fetchError } = await supabase
       .from("posts")
@@ -166,13 +203,16 @@ export const editPost = async (payload: EditPostParams) => {
       id,
       title,
       content,
-      author_id,
       image_url,
       content_image_ids,
       tag_ids,
     } = parsed;
 
     const supabase = await createClientServerComponent();
+
+    // Ownership first, and `author_id` from the payload is ignored so an edit
+    // cannot reassign authorship to another user.
+    await requirePostOwner(supabase, id);
 
     // 1. Fetch existing post for old image cleanup
     const { data: post, error: fetchError } = await supabase
@@ -187,7 +227,6 @@ export const editPost = async (payload: EditPostParams) => {
     const updates: Record<string, any> = {};
     if (title !== undefined) updates.title = title;
     if (content !== undefined) updates.content = content;
-    if (author_id !== undefined) updates.author_id = author_id;
     if (image_url !== undefined) updates.image_url = image_url;
     if (image_url === null) updates.image_url = null;
 
@@ -263,15 +302,18 @@ export const editPost = async (payload: EditPostParams) => {
   }
 };
 
-export const AddPostUpvote = async (postId: string, userId: string) => {
+export const AddPostUpvote = async (postId: string) => {
   try {
+    // Upvoter identity from the session; the parameter it used to take let any
+    // caller cast or clear votes on another user's behalf.
+    const { user } = await requireUser();
     const supabase = await createClientServerComponent();
 
     const { data: postUpvote, error: fetchError } = await supabase
       .from("post_upvotes")
       .select("id")
       .eq("post_id", postId)
-      .eq("upvoter_id", userId)
+      .eq("upvoter_id", user.id)
       .maybeSingle();
 
     if (fetchError) throw fetchError;
@@ -282,7 +324,7 @@ export const AddPostUpvote = async (postId: string, userId: string) => {
 
     const { data: newUpvote, error: insertError } = await supabase
       .from("post_upvotes")
-      .insert([{ post_id: postId, upvoter_id: userId }])
+      .insert([{ post_id: postId, upvoter_id: user.id }])
       .select()
       .single();
 
@@ -295,15 +337,16 @@ export const AddPostUpvote = async (postId: string, userId: string) => {
   }
 };
 
-export const removePostUpvote = async (postId: string, userId: string) => {
+export const removePostUpvote = async (postId: string) => {
   try {
+    const { user } = await requireUser();
     const supabase = await createClientServerComponent();
 
     const { error } = await supabase
       .from("post_upvotes")
       .delete()
       .eq("post_id", postId)
-      .eq("upvoter_id", userId);
+      .eq("upvoter_id", user.id);
 
     if (error) throw error;
 
@@ -441,9 +484,26 @@ export const getSocialPoints = async (userId: string): Promise<number | null> =>
 };
 
 export async function deletePostComment(comment_id: string) {
+  const { user, roleId } = await requireUser();
   const supabase = await createClientServerComponent();
 
   try {
+    // Ownership check: comments are not project-scoped, so only the author
+    // (or an admin) may delete. Previously any caller could delete any comment.
+    const { data: comment, error: fetchError } = await supabase
+      .from("post_comments")
+      .select("commenter_id")
+      .eq("id", comment_id)
+      .single();
+
+    if (fetchError || !comment) {
+      throw new Error("Comment not found");
+    }
+
+    if (comment.commenter_id !== user.id && roleId !== 1) {
+      throw new Error("Forbidden");
+    }
+
     const { error } = await supabase
       .from("post_comments")
       .delete()
@@ -458,8 +518,11 @@ export async function deletePostComment(comment_id: string) {
   }
 }
 
-export const hasReachedDailyPostLimit = async (author_id: string, limit = 2) => {
+export const hasReachedDailyPostLimit = async (limit = 2) => {
   try {
+    // Own posts only; the parameter it used to take let a caller probe or
+    // sidestep another user's daily limit.
+    const { user } = await requireUser();
     const supabase = await createClientServerComponent();
 
     const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
@@ -467,7 +530,7 @@ export const hasReachedDailyPostLimit = async (author_id: string, limit = 2) => 
     const { count, error } = await supabase
       .from("posts")
       .select("id", { count: "exact", head: true })
-      .eq("author_id", author_id)
+      .eq("author_id", user.id)
       .gte("created_at", twentyFourHoursAgo);
 
     if (error) throw error;
@@ -478,14 +541,15 @@ export const hasReachedDailyPostLimit = async (author_id: string, limit = 2) => 
   }
 };
 
-export const hasNotPostedYet = async (user_id: string) => {
+export const hasNotPostedYet = async () => {
   try {
+    const { user } = await requireUser();
     const supabase = await createClientServerComponent();
 
     const { count, error } = await supabase
       .from("posts")
       .select("id", { count: "exact", head: true })
-      .eq("author_id", user_id);
+      .eq("author_id", user.id);
 
     if (error) throw error;
 
@@ -524,10 +588,13 @@ export async function searchUsers(query: string): Promise<UserMention[]> {
  */
 export async function createComment(
   post_id: string,
-  commenter_id: string,
   content: string,
   mentions: string[] = []
 ) {
+  // Commenter identity from the session, not the caller.
+  const { user } = await requireUser();
+  const commenter_id = user.id;
+
   const supabase = await createClientServerComponent();
 
   try {

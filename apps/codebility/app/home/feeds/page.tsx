@@ -13,7 +13,7 @@ export default async function FeedsPage() {
   // posts on mount.
   const [role, notPostedYet, socialPoints, posts] = await Promise.all([
     user ? getUserRole(user.role_id ?? null) : Promise.resolve(null),
-    user ? hasNotPostedYet(user.id) : Promise.resolve(false),
+    user ? hasNotPostedYet() : Promise.resolve(false),
     user ? getSocialPoints(user.id) : Promise.resolve(null),
     getPosts(),
   ]);

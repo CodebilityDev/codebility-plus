@@ -1,10 +1,8 @@
 "use server";
 
-import { use } from "react";
-import { cookies } from "next/headers";
-import { signOut } from "@/actions/auth";
-import { User } from "lucide-react";
+import { cache } from "react";
 import z from "zod";
+import { getCurrentCodev } from "./current-codev";
 
 const UserSchema = z.object({
   id: z.string(),
@@ -13,17 +11,23 @@ const UserSchema = z.object({
 
 type User = z.infer<typeof UserSchema>;
 
-export async function getCachedUser(): Promise<User | null> {
-  const supabaseUser = (await cookies()).get("supabase-user");
-  let parsedSuccess = false;
+/**
+ * The signed-in user, for server components that only need an identity.
+ *
+ * This read the `supabase-user` cookie and returned it WITHOUT any session
+ * check, so a caller-supplied cookie value was treated as the signed-in user.
+ * The cookie is not httpOnly, so it is trivially forgeable from the browser.
+ *
+ * Identity now comes from the verified session. `getCurrentCodev` is React
+ * `cache()`d, so this stays a single resolve per request.
+ */
+export const getCachedUser = cache(async (): Promise<User | null> => {
+  const codev = await getCurrentCodev();
 
-  if (supabaseUser && supabaseUser.value) {
-    parsedSuccess = UserSchema.safeParse(
-      JSON.parse(supabaseUser.value),
-    ).success;
-  }
+  if (!codev) return null;
 
-  if (!parsedSuccess) return null;
-
-  return JSON.parse((supabaseUser as { value: string }).value) as User;
-}
+  return UserSchema.parse({
+    id: codev.id,
+    email: codev.email_address ?? undefined,
+  });
+});

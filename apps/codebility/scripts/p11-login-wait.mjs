@@ -10,8 +10,8 @@ const { chromium } = await import(
   "file:///C:/Users/Programming/AppData/Roaming/npm/node_modules/playwright/index.mjs"
 );
 
-const SHARED = path.join(os.tmpdir(), "codebility-probe-profile");
-const PROFILE = path.join(os.tmpdir(), "codebility-p11-login");
+const SHARED = path.join(os.tmpdir(), process.env.SHARED_PROFILE ?? "codebility-probe-profile");
+const PROFILE = path.join(os.tmpdir(), process.env.LOGIN_PROFILE ?? "codebility-p11-login");
 fs.rmSync(PROFILE, { recursive: true, force: true });
 fs.cpSync(SHARED, PROFILE, { recursive: true });
 

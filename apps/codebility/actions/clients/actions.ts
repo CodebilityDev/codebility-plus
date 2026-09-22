@@ -1,9 +1,12 @@
 "use server";
 
+import "server-only";
+
 import { revalidatePath, revalidateTag } from "next/cache";
 import { deleteImage, uploadImage } from "@/utils/uploadImage";
 import { createClientServerComponent } from "@/utils/supabase/server";
 import { getClientsPage } from "@/lib/server/codev.service";
+import { requireRole } from "@/lib/server/auth-guard";
 import type { Page, PageArgs } from "@/lib/server/paginate";
 import type { Client } from "@/types/home/codev";
 
@@ -23,6 +26,10 @@ export const fetchClientsPageAction = async (
  */
 export const createClientAction = async (formData: FormData): Promise<ActionResult> => {
   try {
+    // Client records are gated by the `clients` role permission, matching the
+    // route permission middleware applies to /home/clients.
+    await requireRole("clients");
+
     const supabase = await createClientServerComponent();
     
     // Extract form data with defaults
@@ -77,6 +84,8 @@ export const updateClientAction = async (
   formData: FormData
 ): Promise<ActionResult> => {
   try {
+    await requireRole("clients");
+
     const supabase = await createClientServerComponent();
 
     // Get existing client data
@@ -146,6 +155,8 @@ export const updateClientAction = async (
  */
 export const toggleClientStatusAction = async (clientId: string): Promise<ActionResult> => {
   try {
+    await requireRole("clients");
+
     const supabase = await createClientServerComponent();
 
     const { data: client, error: fetchError } = await supabase
@@ -187,6 +198,8 @@ export const toggleClientStatusAction = async (clientId: string): Promise<Action
  */
 export const deleteClientAction = async (clientId: string): Promise<ActionResult> => {
   try {
+    await requireRole("clients");
+
     const supabase = await createClientServerComponent();
 
     // Get client data to check for logo

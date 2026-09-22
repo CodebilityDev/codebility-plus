@@ -55,7 +55,7 @@ export default function FeedsPageClient({
   const openModal = async () => {
     if (!user) return;
     try {
-      const unallowed = await hasReachedDailyPostLimit(user.id);
+      const unallowed = await hasReachedDailyPostLimit();
       if (unallowed) {
         toast.error("Daily post limit reached. You're not allowed to create a post right now.");
         return;

@@ -2,6 +2,7 @@
 
 import { createClientServerComponent } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
+import { requireUser } from "@/lib/server/auth-guard";
 
 export const updatePassword = async (formData: FormData) => {
     const email = formData.get("email") as string;
@@ -112,7 +113,12 @@ export const getUsernameData = async (userId: string) => {
 };
 
 // Update username
-export const updateUsername = async (userId: string, newUsername: string) => {
+export const updateUsername = async (newUsername: string) => {
+    // Identity from the session. This previously took a `userId` parameter and
+    // wrote to that row unchecked, so any caller could rename another user.
+    const { user } = await requireUser();
+    const userId = user.id;
+
     const supabase = await createClientServerComponent();
 
     // 1. Validate username format

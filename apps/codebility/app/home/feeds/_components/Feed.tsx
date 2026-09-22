@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useFeedsStore } from "@/store/feeds-store";
 import type { PostType } from "@/types/feeds";
 
@@ -29,17 +29,30 @@ export default function Feed({
   const [visibleCount, setVisibleCount] = useState(POSTS_PER_PAGE);
   const loaderRef = useRef<HTMLDivElement | null>(null);
 
-  // Seed from the server render instead of fetching on mount. Written during
-  // render (same deliberate pattern as store/UserProvider.ts) so the first paint
-  // already has posts. Comparing against the last-seeded value keeps it
-  // idempotent across Strict Mode's double render while still picking up a new
-  // server payload on a later navigation. Post mutations still call
-  // `fetchPosts()` to refresh.
+  // Seed from the server render instead of fetching on mount.
+  //
+  // This runs in a layout effect, not during render. Writing to the store while
+  // rendering is only safe when the write is on this component's own behalf; a
+  // post mutation elsewhere (CreatePostForm -> fetchPosts) updates the store and
+  // re-renders Feed, and the render-time setState then counted as updating a
+  // component during another component's render, which React reports as
+  // "Cannot update a component (Feed) while rendering a different component".
+  //
+  // The `seededFrom` ref still guards against clobbering fresher store data:
+  // fetchPosts() replaces `posts` wholesale, so re-seeding from a stale
+  // `initialPosts` would discard the new post.
   const seededFrom = useRef<PostType[] | null>(null);
-  if (seededFrom.current !== initialPosts) {
+  useLayoutEffect(() => {
+    if (seededFrom.current === initialPosts) return;
     seededFrom.current = initialPosts;
-    useFeedsStore.setState({ posts: initialPosts, isFetchingPosts: false });
-  }
+
+    // Only adopt the server payload if nothing has fetched since it was
+    // produced. Once a mutation refreshes the store, the store wins.
+    const { isFetchingPosts: stillFetching } = useFeedsStore.getState();
+    if (stillFetching) {
+      useFeedsStore.setState({ posts: initialPosts, isFetchingPosts: false });
+    }
+  }, [initialPosts]);
 
   // Always prepend system post to regular posts
   const allPosts = useMemo(() => {

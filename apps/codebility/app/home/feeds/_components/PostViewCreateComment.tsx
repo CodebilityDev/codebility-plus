@@ -158,7 +158,7 @@ export default function PostViewCreateComment({
           .map((match) => match[1])
           .filter((mention): mention is string => !!mention);
 
-        await createComment(post.id, user.id, comment, mentions);
+        await createComment(post.id, comment, mentions);
 
         setComment("");
         onCommentCreated?.();

@@ -1,8 +1,36 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClientServerComponent } from "@/utils/supabase/server";
+import { requireUser } from "@/lib/server/auth-guard";
 
 const ATTENDANCE_COLUMNS =
   "id, codev_id, project_id, date, status, check_in, check_out, notes, created_at, updated_at";
+
+/**
+ * Confirms the caller may read or write attendance for a project.
+ *
+ * This route is called from the client and previously ran entirely unchecked,
+ * so any caller could read any project's attendance or write rows for any
+ * codev. Admins (role_id 1) bypass, consistent with auth-guard.
+ */
+async function assertProjectAccess(
+  supabase: Awaited<ReturnType<typeof createClientServerComponent>>,
+  projectId: string,
+  callerId: string,
+  roleId: number | null,
+) {
+  if (roleId === 1) return;
+
+  const { data: membership } = await supabase
+    .from("project_members")
+    .select("id")
+    .eq("project_id", projectId)
+    .eq("codev_id", callerId)
+    .maybeSingle();
+
+  if (!membership) {
+    throw new Error("Forbidden");
+  }
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -18,8 +46,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    const { user, roleId } = await requireUser();
     const supabase = await createClientServerComponent();
-    
+
+    await assertProjectAccess(supabase, projectId, user.id, roleId);
+
     const { data, error } = await supabase
       .from("attendance")
       .select(ATTENDANCE_COLUMNS)
@@ -64,8 +95,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const { user, roleId } = await requireUser();
     const supabase = await createClientServerComponent();
-    
+
+    await assertProjectAccess(supabase, project_id, user.id, roleId);
+
     // Check if attendance record exists
     const { data: existing } = await supabase
       .from("attendance")

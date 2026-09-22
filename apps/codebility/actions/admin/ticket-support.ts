@@ -2,6 +2,7 @@
 
 import { createClientServerComponent } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
+import { requireRole } from "@/lib/server/auth-guard";
 import type { TicketSupport, TicketStatus, TicketPriority } from "@/app/home/admin-controls/ticket-support/types";
 
 export async function getTickets(): Promise<TicketSupport[]> {
@@ -69,6 +70,10 @@ export async function updateTicketStatus(
   ticketId: string,
   status: TicketStatus
 ) {
+  // Ticket administration is gated by the `applicants` permission, matching the
+  // route permission middleware applies to /home/admin-controls.
+  await requireRole("applicants");
+
   const supabase = await createClientServerComponent();
 
   const { data, error, count } = await supabase
@@ -97,6 +102,8 @@ export async function updateTicketPriority(
   ticketId: string,
   priority: TicketPriority
 ) {
+  await requireRole("applicants");
+
   const supabase = await createClientServerComponent();
 
   const { data, error } = await supabase
@@ -125,6 +132,8 @@ export async function updateTicketAssignment(
   ticketId: string,
   assignedToId: string | null
 ) {
+  await requireRole("applicants");
+
   const supabase = await createClientServerComponent();
 
   const { data, error } = await supabase
@@ -150,6 +159,8 @@ export async function updateTicketAssignment(
 }
 
 export async function deleteTicket(ticketId: string) {
+  await requireRole("applicants");
+
   const supabase = await createClientServerComponent();
 
   // First verify the ticket exists
@@ -182,6 +193,8 @@ export async function deleteTicket(ticketId: string) {
 }
 
 export async function archiveTicket(ticketId: string) {
+  await requireRole("applicants");
+
   const supabase = await createClientServerComponent();
 
   const { data, error } = await supabase
@@ -202,6 +215,8 @@ export async function archiveTicket(ticketId: string) {
 }
 
 export async function unarchiveTicket(ticketId: string) {
+  await requireRole("applicants");
+
   const supabase = await createClientServerComponent();
 
   const { data, error } = await supabase

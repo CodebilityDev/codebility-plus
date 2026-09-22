@@ -85,7 +85,7 @@ export default function AccountSettingsUsername({ userId }: AccountSettingsUsern
     }
 
     setUpdating(true);
-    const result = await updateUsername(userId, username);
+    const result = await updateUsername(username);
     setUpdating(false);
 
     if (result.success) {

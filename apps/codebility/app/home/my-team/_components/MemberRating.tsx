@@ -43,7 +43,10 @@ interface MemberRatingProps {
  
 const MemberRating = ({ memberId, projectId }: MemberRatingProps) => {
   const currentCodevId = useUserStore((s) => s.user?.id ?? null);
-  const supabase = getClientSupabase();
+  // Resolved lazily inside the query and the handler, never during render. The
+  // browser client is null on the server, so resolving it in the component body
+  // threw inside SSR and silently downgraded the page to client rendering.
+  const getSupabase = () => createClientClientComponent();
   const [isSaving, setIsSaving] = useState(false);
   
   // Rating state - default to 0 for all criteria
@@ -65,6 +68,9 @@ const MemberRating = ({ memberId, projectId }: MemberRatingProps) => {
     enabled: Boolean(currentCodevId && projectId),
     staleTime: 60_000,
     queryFn: async () => {
+      const supabase = getSupabase();
+      if (!supabase) throw new Error("Supabase client is not available");
+
       const { data: projectMember } = await supabase
         .from("project_members")
         .select("role")
@@ -159,6 +165,7 @@ const MemberRating = ({ memberId, projectId }: MemberRatingProps) => {
 
   // Save or update rating in database
   const handleSaveRating = async () => {
+    const supabase = getSupabase();
     if (!supabase || !currentCodevId || !isTeamLead) {
       toast.error("You don't have permission to rate this member");
       return;

@@ -16,6 +16,7 @@ import {
 import pathsConfig from "@/types/zod/paths.config";
 import { IconKanban } from "@/public/assets/svgs";
 import { createClientServerComponent } from "@/utils/supabase/server";
+import { getCurrentCodev } from "@/lib/server/current-codev";
 import PageContainer from "../_components/PageContainer";
 
 import KanbanBoardsSearch from "./_components/KanbanBoardsSearch";
@@ -57,12 +58,11 @@ export default async function KanbanPage(props: PageProps) {
   const searchParams = await props.searchParams;
   const supabase = await createClientServerComponent();
 
-  //Get current user
-  const {
-    data: { user: sessionUser },
-  } = await supabase.auth.getUser();
-
-  const currentUserId = sessionUser?.id;
+  // Reuses the /home layout's cached read (getCurrentCodev is React `cache()`d),
+  // so this no longer issues a second auth.getUser() round-trip on top of the
+  // one the layout already paid for this request.
+  const currentUser = await getCurrentCodev();
+  const currentUserId = currentUser?.id;
 
   let projectQuery = supabase.from("projects").select(
     `

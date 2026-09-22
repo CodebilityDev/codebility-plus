@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, FormEvent, useMemo } from "react";
+import { useState, useEffect, FormEvent, useMemo } from "react";
 import { X, Plus, Edit2, Trash2, Check, Lock, RefreshCw, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
@@ -50,7 +50,11 @@ const ChecklistManageModal = ({
 
   // Self-contained auth
   const currentCodevId = useUserStore((s) => s.user?.id ?? null);
-  const supabase = getClientSupabase();
+  // Lazily resolved, not during render: the browser client is null on the
+  // server, so calling this in the component body threw during SSR and silently
+  // downgraded the page to client rendering. Every use site is inside a handler
+  // and already guards on `!supabase`.
+  const getSupabase = () => createClientClientComponent();
 
   // Delete confirmation dialog state
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -143,6 +147,7 @@ const ChecklistManageModal = ({
 
   // Auto-sync function - backfills missing records
   const autoSyncChecklistItems = async () => {
+    const supabase = getSupabase();
     if (!supabase || !projectId || allMemberIds.length === 0) return;
 
     setIsSyncing(true);
@@ -280,6 +285,7 @@ const ChecklistManageModal = ({
       return;
     }
 
+    const supabase = getSupabase();
     if (!supabase) {
       toast.error("Database not initialized");
       return;
@@ -382,6 +388,7 @@ const ChecklistManageModal = ({
       return;
     }
 
+    const supabase = getSupabase();
     if (!supabase) {
       toast.error("Database not initialized");
       return;
@@ -432,6 +439,7 @@ const ChecklistManageModal = ({
 
   // Handle confirm delete
   const handleConfirmDelete = async () => {
+    const supabase = getSupabase();
     if (!itemToDelete || !supabase) {
       handleCancelDelete();
       return;

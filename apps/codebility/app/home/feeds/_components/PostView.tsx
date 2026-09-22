@@ -9,7 +9,6 @@ import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import { defaultAvatar } from "@/public/assets/images";
 import { useUserStore } from "@/store/codev-store";
 import { useFeedsStore } from "@/store/feeds-store";
-import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -17,7 +16,6 @@ import remarkGfm from "remark-gfm";
 import type { PostType } from "@/types/feeds";
 import { SYSTEM_POST } from "@/constants/feeds/system-post";
 import PostUpvote from "../_components/PostUpvote";
-import { getUserRole } from "@/actions/feeds/post";
 import PostCommentCount from "./PostCommentCount";
 import PostTags from "./PostTags";
 import PostViewCommentList from "./PostViewCommentList";
@@ -27,9 +25,14 @@ const SYSTEM_POST_ID = "00000000-0000-0000-0000-000000000001";
 
 interface PostViewProps {
   postId: string;
+  /**
+   * Passed down from the server render. This component used to run its own
+   * getUserRole query on open, re-deriving a value the feed tree already had.
+   */
+  isAdmin: boolean;
 }
 
-export default function PostView({ postId }: PostViewProps) {
+export default function PostView({ postId, isAdmin }: PostViewProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [refreshComments, setRefreshComments] = useState(0);
   const user = useUserStore((state) => state.user);
@@ -45,14 +48,6 @@ export default function PostView({ postId }: PostViewProps) {
     return posts.find((p) => p.id === postId) ?? null;
   }, [posts, postId]);
 
-  const { data: role, isPending: isRolePending } = useQuery({
-    queryKey: ["feeds", "userRole", roleId],
-    enabled: roleId !== null,
-    queryFn: () => getUserRole(roleId),
-  });
-
-  // Defaults to true while the role resolves, matching the previous behaviour.
-  const isAdmin = isRolePending || role === "Admin";
   const isAuthor = userId !== null && userId === post?.author_id?.id;
 
   const triggerRefreshComments = () => {

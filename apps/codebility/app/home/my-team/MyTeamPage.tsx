@@ -198,13 +198,24 @@ const MyTeamPage = ({ projectData }: MyTeamPageProps) => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [isLoadingMembers, setIsLoadingMembers] = useState(false);
 
-  const supabase = getClientSupabase();
+  // Created lazily inside the handler below rather than during render. The
+  // browser client is null on the server, and calling this in the component body
+  // threw during SSR ("Supabase client is not available"), which silently
+  // downgraded the whole page to client rendering.
+  const getSupabase = () => {
+    try {
+      return getClientSupabase();
+    } catch {
+      return null;
+    }
+  };
 
   // Modal hook for profile integration
   const { onOpen: openProfileModal } = useModal();
 
   const getCompleteCodevProfileSafe = async (codevId: string): Promise<Codev | null> => {
     try {
+      const supabase = getSupabase();
       if (!supabase) {
         console.error('Supabase client not available');
         return null;

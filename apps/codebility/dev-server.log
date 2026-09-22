@@ -1,0 +1,1154 @@
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.overrides". See https://pnpm.io/settings for the new home of each setting.
+
+> codebility-monorepo@ codebility C:\Users\Programming\Desktop\Projects\Compile\Work\codebility-plus
+> turbo run dev -F codebility...
+
+turbo 2.6.3
+
+• Packages in scope: @codevs/eslint-config, @codevs/prettier-config, @codevs/tailwind-config, @codevs/tsconfig, @codevs/ui, codebility
+• Running dev in 6 packages
+• Remote caching disabled
+codebility:dev: cache bypass, force executing c363e5095bdedfa3
+@codevs/ui:dev: cache bypass, force executing 92a67195cef54a7e
+@codevs/ui:dev: 
+@codevs/ui:dev: > @codevs/ui@0.1.0 dev C:\Users\Programming\Desktop\Projects\Compile\Work\codebility-plus\packages\ui
+@codevs/ui:dev: > tsc --watch
+@codevs/ui:dev: 
+codebility:dev: 
+codebility:dev: > codebility@0.1.0 dev C:\Users\Programming\Desktop\Projects\Compile\Work\codebility-plus\apps\codebility
+codebility:dev: > cross-env FORCE_COLOR=1 next dev --turbopack
+codebility:dev: 
+@codevs/ui:dev: [2J[3J[H3:12:16 PM - Starting compilation in watch mode...
+@codevs/ui:dev: 
+codebility:dev:    [1m[38;2;173;127;168m▲ Next.js 15.3.7[39m[22m (Turbopack)
+codebility:dev:    - Local:        http://localhost:3000
+codebility:dev:    - Network:      http://169.254.83.107:3000
+codebility:dev:    - Environments: .env
+codebility:dev:    - Experiments (use with caution):
+codebility:dev:      · staleTimes
+codebility:dev: 
+codebility:dev:  [32m[1m✓[22m[39m Starting...
+@codevs/ui:dev: 
+@codevs/ui:dev: 3:12:28 PM - Found 0 errors. Watching for file changes.
+@codevs/ui:dev: [2J[3J[H3:12:29 PM - File change detected. Starting incremental compilation...
+@codevs/ui:dev: 
+@codevs/ui:dev: 
+@codevs/ui:dev: 3:12:29 PM - Found 0 errors. Watching for file changes.
+codebility:dev:  [37m[1m○[22m[39m Compiling middleware ...
+codebility:dev:  [32m[1m✓[22m[39m Compiled middleware in 1892ms
+codebility:dev:  [32m[1m✓[22m[39m Ready in 11.7s
+codebility:dev:  [37m[1m○[22m[39m Compiling /home/my-team ...
+codebility:dev: (node:19144) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/Programming/Desktop/Projects/Compile/Work/codebility-plus/tooling/tailwind/web.ts is not specified and it doesn't parse as CommonJS.
+codebility:dev: Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+codebility:dev: To eliminate this warning, add "type": "module" to \\?\C:\Users\Programming\Desktop\Projects\Compile\Work\codebility-plus\tooling\tailwind\package.json.
+codebility:dev: (Use `node --trace-warnings ...` to show where the warning was created)
+codebility:dev: 
+codebility:dev: [1m[33mwarn[39m[22m - The class `data-[state=closed]:slide-out-to-top-[48%]` is ambiguous and matches multiple utilities.
+codebility:dev: [1m[33mwarn[39m[22m - If this is content and not a class, replace it with `data-&lsqb;state=closed&rsqb;:slide-out-to-top-[48%]` to silence this warning.
+codebility:dev: 
+codebility:dev: [1m[33mwarn[39m[22m - The class `data-[state=open]:slide-in-from-top-[48%]` is ambiguous and matches multiple utilities.
+codebility:dev: [1m[33mwarn[39m[22m - If this is content and not a class, replace it with `data-&lsqb;state=open&rsqb;:slide-in-from-top-[48%]` to silence this warning.
+codebility:dev:  [32m[1m✓[22m[39m Compiled /home/my-team in 67.3s
+codebility:dev: Redis configuration missing - cache will be disabled
+codebility:dev:  [33m[1m⚠[22m[39m metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+codebility:dev: (node:17224) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+codebility:dev: (Use `node --trace-warnings ...` to show where the warning was created)
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error [AuthApiError]: Request rate limit reached
+codebility:dev:     at handleError (../../../src/lib/fetch.ts:102:8)
+codebility:dev:     at async _handleRequest (../../../src/lib/fetch.ts:195:4)
+codebility:dev:     at async _request (../../../src/lib/fetch.ts:157:15)
+codebility:dev:     at async (../../src/GoTrueClient.ts:2473:17)
+codebility:dev:     at async (../../../src/lib/helpers.ts:232:25) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m429[39m,
+codebility:dev:   code: [32m'over_request_rate_limit'[39m
+codebility:dev: }
+codebility:dev: Error fetching user: Error [AuthSessionMissingError]: Auth session missing!
+codebility:dev:     at <unknown> (../../src/GoTrueClient.ts:1740:48)
+codebility:dev:     at SupabaseAuthClient._useSession (../../src/GoTrueClient.ts:1580:19)
+codebility:dev:     at async SupabaseAuthClient._getUser (../../src/GoTrueClient.ts:1732:13)
+codebility:dev:     at async (../../src/GoTrueClient.ts:1712:13)
+codebility:dev:     at async (../../src/GoTrueClient.ts:1488:17) {
+codebility:dev:   __isAuthError: [33mtrue[39m,
+codebility:dev:   status: [33m400[39m,
+codebility:dev:   code: [90mundefined[39m
+codebility:dev: }
+codebility:dev:  POST /home/my-team [32m200[39m in 3023ms
+codebility:dev:  GET /home/my-team [32m200[39m in 75473ms
+codebility:dev:  [37m[1m○[22m[39m Compiling /auth/sign-in ...
+codebility:dev:  [32m[1m✓[22m[39m Compiled /auth/sign-in in 2.6s
+codebility:dev:  GET /auth/sign-in?from=%2Fhome [32m200[39m in 2961ms
+codebility:dev:  POST /auth/sign-in?from=%2Fhome [32m200[39m in 1195ms
+codebility:dev:  [37m[1m○[22m[39m Compiling /home ...
+codebility:dev:  [32m[1m✓[22m[39m Compiled /home in 15.6s
+codebility:dev:  GET /home [32m200[39m in 17658ms
+codebility:dev:  POST /home [32m200[39m in 1447ms
+codebility:dev:  [37m[1m○[22m[39m Compiling /home/kanban ...
+codebility:dev:  [32m[1m✓[22m[39m Compiled /home/kanban in 5.3s
+codebility:dev:  GET /home/kanban [32m200[39m in 6348ms
+codebility:dev:  [37m[1m○[22m[39m Compiling /home/feeds ...
+codebility:dev:  [32m[1m✓[22m[39m Compiled /home/feeds in 6.6s
+codebility:dev:  GET /home/feeds [32m200[39m in 8416ms
+codebility:dev:  [37m[1m○[22m[39m Compiling /favicon.ico ...
+codebility:dev:  [32m[1m✓[22m[39m Compiled /favicon.ico in 885ms
+codebility:dev:  GET /favicon.ico [32m200[39m in 1282ms
+codebility:dev:  [37m[1m○[22m[39m Compiling /home/kanban/[projectId] ...
+codebility:dev:  [32m[1m✓[22m[39m Compiled /home/kanban/[projectId] in 4.4s
+codebility:dev: Redis configuration missing - cache will be disabled
+codebility:dev:  GET /home/kanban/e2e1a591-3032-4ece-9b81-570a358190bc [32m200[39m in 7446ms
+codebility:dev:  GET /home/feeds [32m200[39m in 1263ms
+codebility:dev:  GET /favicon.ico [32m200[39m in 500ms
+codebility:dev:  POST /home/feeds [32m200[39m in 775ms
+codebility:dev:  POST /home/feeds [32m200[39m in 675ms
+codebility:dev:  POST /home/feeds [32m200[39m in 336ms
+codebility:dev:  POST /home/feeds [32m200[39m in 591ms

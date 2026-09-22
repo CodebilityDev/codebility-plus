@@ -53,6 +53,23 @@ export async function POST(req: NextRequest) {
       appointmentDate, appointmentTime, meetingType, meetingToolOther,
     } = body;
 
+    // Public endpoint (marketing contact form), so auth is intentionally absent.
+    // It runs with the service-role key, which bypasses RLS, so it validates the
+    // fields a booking actually needs rather than trusting the payload shape.
+    // Every column written below is set explicitly; nothing is spread from the
+    // request body.
+    if (!firstName || !lastName || !email || !appointmentDate || !appointmentTime) {
+      return NextResponse.json(
+        { error: "Missing required booking fields." },
+        { status: 400 },
+      );
+    }
+
+    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!EMAIL_RE.test(email)) {
+      return NextResponse.json({ error: "Invalid email address." }, { status: 400 });
+    }
+
     const { data, error } = await supabase
       .from("appointments")
       .insert({

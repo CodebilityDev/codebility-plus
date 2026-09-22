@@ -3,11 +3,57 @@
 import { revalidatePath } from "next/cache";
 
 import { createClientServerComponent } from "@/utils/supabase/server";
+import { requireUser } from "@/lib/server/auth-guard";
+
+/**
+ * Attendance point writes are restricted to the project's own team.
+ *
+ * Both entry points used to run with no check at all, so any caller could
+ * rewrite attendance points for any codev. `requireUser` establishes the
+ * caller; the membership check inside each function scopes them to a project
+ * they belong to.
+ */
+async function assertProjectMember(
+  supabase: Awaited<ReturnType<typeof createClientServerComponent>>,
+  projectId: string,
+  callerId: string,
+  roleId: number | null,
+) {
+  // role_id 1 is admin, consistent with auth-guard.
+  if (roleId === 1) return;
+
+  const { data: membership } = await supabase
+    .from("project_members")
+    .select("id")
+    .eq("project_id", projectId)
+    .eq("codev_id", callerId)
+    .maybeSingle();
+
+  if (!membership) {
+    throw new Error("Forbidden");
+  }
+}
 
 export async function syncAttendancePoints(codevId: string) {
+  const { user, roleId } = await requireUser();
   const supabase = await createClientServerComponent();
-  
+
   try {
+    // Resolve which project this codev belongs to and confirm the caller is on
+    // it, so a member cannot rewrite another team's points.
+    const { data: membership } = await supabase
+      .from("project_members")
+      .select("project_id")
+      .eq("codev_id", codevId)
+      .limit(1)
+      .maybeSingle();
+
+    if (membership?.project_id) {
+      await assertProjectMember(supabase, membership.project_id, user.id, roleId);
+    } else if (roleId !== 1 && user.id !== codevId) {
+      throw new Error("Forbidden");
+    }
+
     // Count all present/late days for this codev. Only the count is used, so
     // ask Postgres for the count and transfer no rows.
     const { count: attendanceCount, error: attendanceError } = await supabase
@@ -77,9 +123,12 @@ export async function syncAttendancePoints(codevId: string) {
 }
 
 export async function syncAllTeamAttendancePoints(projectId: string) {
+  const { user, roleId } = await requireUser();
   const supabase = await createClientServerComponent();
-  
+
   try {
+    await assertProjectMember(supabase, projectId, user.id, roleId);
+
     // Get all team members for this project
     const { data: members, error: membersError } = await supabase
       .from("project_members")

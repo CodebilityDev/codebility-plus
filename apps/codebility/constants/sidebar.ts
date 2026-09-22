@@ -32,6 +32,20 @@ type RolePermissions = {
 
 type PermissionKey = keyof RolePermissions;
 
+const EMPTY_PERMISSIONS: RolePermissions = {
+  dashboard: false,
+  kanban: false,
+  time_tracker: false,
+  interns: false,
+  applicants: false,
+  inhouse: false,
+  clients: false,
+  projects: false,
+  settings: false,
+  orgchart: false,
+  overflow: false,
+};
+
 export const getSidebarData = async (
   roleId: number | null,
 ): Promise<Sidebar[]> => {
@@ -81,20 +95,7 @@ export const getSidebarData = async (
 
     if (error || !rolePermissions) {
       console.error("Failed to fetch role permissions:", error);
-      // Fallback: No permissions if fetch fails
-      rolePermissions = {
-        dashboard: false,
-        kanban: false,
-        time_tracker: false,
-        interns: false,
-        applicants: false,
-        inhouse: false,
-        clients: false,
-        projects: false,
-        settings: false,
-        orgchart: false,
-        overflow: false,
-      };
+      rolePermissions = EMPTY_PERMISSIONS;
     }
   }
 

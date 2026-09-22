@@ -1,4 +1,5 @@
 import { createClientServerComponent } from "@/utils/supabase/server";
+import { requireUser } from "@/lib/server/auth-guard";
 import { createNotificationAction } from "./notification.actions";
 import { revalidatePath } from "next/cache";
 
@@ -15,6 +16,11 @@ export async function assignTaskAction({
     taskTitle,
     projectId
 }: AssignTaskParams) {
+    // Authorize before writing. Previously the task row was updated first and
+    // auth was only consulted to decide whether to send a notification, so any
+    // caller could reassign any task.
+    const { user } = await requireUser();
+
     const supabase = await createClientServerComponent();
 
     // 1. Update the database
@@ -29,7 +35,6 @@ export async function assignTaskAction({
     // We don't "await" this if we want the UI to respond faster,
     // but awaiting is safer for error handling.
 
-    const { data: { user } } = await supabase.auth.getUser();
     if (user && user.id !== assigneeId) {
         const { error: notifyError } = await createNotificationAction({
             recipientId: assigneeId,

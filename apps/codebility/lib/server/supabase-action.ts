@@ -1,37 +1,37 @@
 import "server-only";
-import { cookies } from "next/headers";
+import { cache } from "react";
 
 import z from "zod";
-import { createClientServerComponent } from "@/utils/supabase/server";
+import { getCurrentCodev } from "./current-codev";
 
 const UserSchema = z.object({
-    id: z.string(),
-    email: z.string().optional()
+  id: z.string(),
+  email: z.string().optional(),
 });
 
 type User = z.infer<typeof UserSchema>;
 
-export async function cachedUser(): Promise<User | null> {
-    const supabase = await createClientServerComponent();
-    const cookieStore = cookies();
-    const supabaseUser = (await cookieStore).get("supabase-user");
+/**
+ * The signed-in user for server actions.
+ *
+ * This previously trusted a `supabase-user` cookie: it parsed the cookie and
+ * returned it as the caller's identity WITHOUT verifying it against the
+ * session. That cookie was written with no httpOnly/secure/sameSite options, so
+ * any script (or the user) could set
+ * `supabase-user={"id":"<victim-uuid>"}` and have actions act as that user.
+ * Callers like updateCodev, work experience and education then wrote using that
+ * id, which made it an authorization bypass rather than a stale read.
+ *
+ * Identity now comes from the verified session via getCurrentCodev, which is
+ * React `cache()`d, so repeated calls within one request still resolve once.
+ */
+export const cachedUser = cache(async (): Promise<User | null> => {
+  const codev = await getCurrentCodev();
 
-    let parsedSuccess = false;
+  if (!codev) return null;
 
-    if (supabaseUser && supabaseUser.value) {
-        parsedSuccess = UserSchema.safeParse(JSON.parse(supabaseUser.value)).success;
-    }
-
-    if (!parsedSuccess) {
-        const {data: {user}, error } = await supabase.auth.getUser();
-        
-        if (!user || error) return null; 
-
-        const data = {id: user.id, email: user.email};
-        (await cookieStore).set("supabase-user", JSON.stringify(data));
-
-        return data;
-    } 
-
-    return JSON.parse((supabaseUser as {value: string}).value) as User;
-}
+  return {
+    id: codev.id,
+    email: codev.email_address ?? undefined,
+  };
+});

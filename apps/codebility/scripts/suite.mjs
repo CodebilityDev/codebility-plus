@@ -13,18 +13,43 @@ const { chromium } = await import(
   "file:///C:/Users/Programming/AppData/Roaming/npm/node_modules/playwright/index.mjs"
 );
 
-const BASE = "http://localhost:3000";
-const SHARED = path.join(os.tmpdir(), "codebility-probe-profile");
-const PROFILE = path.join(os.tmpdir(), "codebility-suite-profile");
-if (!fs.existsSync(PROFILE)) fs.cpSync(SHARED, PROFILE, { recursive: true });
+const BASE = process.env.SUITE_BASE ?? "http://localhost:3000";
+// Reuse the signed-in profile the main dev flow uses, so the suite does not
+// need its own login. OVERRIDE with SUITE_PROFILE / SUITE_SHARED if needed.
+const SHARED = process.env.SUITE_SHARED ?? path.join(os.tmpdir(), "codebility-run-profile");
+const PROFILE = process.env.SUITE_PROFILE ?? path.join(os.tmpdir(), "codebility-suite-profile");
+
+// Fail loudly when the source profile is missing. Previously this fell through
+// to an empty profile, so the suite silently sat on a sign-in page and every
+// assertion "passed" against nothing.
+if (!fs.existsSync(PROFILE)) {
+  if (!fs.existsSync(SHARED)) {
+    console.error(
+      [
+        `suite: no Chrome profile to run against.`,
+        `  looked for: ${SHARED}`,
+        ``,
+        `Start the dev environment first (scripts\\up.ps1) and sign in once,`,
+        `or point SUITE_SHARED at an existing authenticated profile.`,
+      ].join("\n"),
+    );
+    process.exit(2);
+  }
+  fs.cpSync(SHARED, PROFILE, { recursive: true });
+}
 
 const SHOTS = path.join(os.tmpdir(), "codebility-suite-shots");
 fs.mkdirSync(SHOTS, { recursive: true });
 
 const quick = process.argv.includes("--quick");
 
+// Headless by default: this suite used to open a second visible Chrome on its
+// own profile, which stole focus and collided with the shared debug browser.
+// Set SUITE_HEADED=1 only when you actually want to watch it.
+const headed = process.env.SUITE_HEADED === "1";
+
 const context = await chromium.launchPersistentContext(PROFILE, {
-  headless: false,
+  headless: !headed,
   chromiumSandbox: true,
   channel: "chrome",
   viewport: { width: 1600, height: 1200 },

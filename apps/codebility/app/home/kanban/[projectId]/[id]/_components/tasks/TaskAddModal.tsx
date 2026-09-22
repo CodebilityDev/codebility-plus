@@ -122,7 +122,10 @@ function MemberSelector({
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [supabase, setSupabase] = useState<any>(null);
-  const [user, setUser] = useState<any>(null);
+  // Seeded from the server store (see store/UserProvider.ts). Only `id` is read
+  // here, so a client-side auth.getUser() round-trip on every open was pure
+  // waste: the page that rendered this modal already resolved the user.
+  const user = useUserStore((state) => state.user);
 
   useEffect(() => {
     const supabaseClient = createClientClientComponent();
@@ -145,8 +148,6 @@ function MemberSelector({
         } else {
           setAvailableMembers([]);
         }
-        const { data: userData } = await supabase.auth.getUser();
-        setUser(userData?.user);
       } catch (error) {
         console.error("Error loading members:", error);
         setAvailableMembers([]);
