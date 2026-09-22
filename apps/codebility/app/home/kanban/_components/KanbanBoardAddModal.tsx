@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useModal } from "@/hooks/use-modal";
+import { useModal } from "@/hooks/modals/use-modal";
 import { IconAdd } from "@/public/assets/svgs";
 
 export default function KanbanBoardAddModal() {

@@ -46,11 +46,13 @@ export default function ApplicationDetailsModal({
   onStatusChange
 }: ApplicationDetailsModalProps) {
   const { toast } = useToast();
-  const [status, setStatus] = useState(application?.status || "pending");
+  const [status, setStatus] = useState<JobApplication["status"]>(
+    application?.status ?? "pending",
+  );
 
   if (!application) return null;
 
-  const handleStatusChange = (newStatus: string) => {
+  const handleStatusChange = (newStatus: JobApplication["status"]) => {
     setStatus(newStatus);
     onStatusChange?.(application.id, newStatus);
     toast({

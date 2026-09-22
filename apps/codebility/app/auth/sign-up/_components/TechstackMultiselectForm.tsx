@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import { useModal } from "@/hooks/use-modal";
-import { useTechStackStore } from "@/hooks/use-techstack";
+import { useModal } from "@/hooks/modals/use-modal";
+import { useTechStackStore } from "@/hooks/data/use-techstack";
 import { ChevronDown } from "lucide-react";
 import { useFormContext } from "react-hook-form";
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useModal } from "@/hooks/use-modal";
+import { useKanbanModal } from "@/hooks/kanban/use-modal-kanban";
 import { IconAdd } from "@/public/assets/svgs";
 
 interface KanbanColumnAddButtonProps {
@@ -11,7 +11,7 @@ interface KanbanColumnAddButtonProps {
 export default function KanbanColumnAddButton({
   boardId,
 }: KanbanColumnAddButtonProps) {
-  const { onOpen } = useModal();
+  const { onOpen } = useKanbanModal();
 
   return (
     <Button

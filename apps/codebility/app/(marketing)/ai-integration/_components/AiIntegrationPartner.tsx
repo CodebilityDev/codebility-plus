@@ -1,4 +1,4 @@
-import { partnerData } from "../_lib/dummy-data";
+import { partnerData } from "@/constants/ai-integration/dummy-data";
 import Section from "../../_components/MarketingSection";
 import PartnerCard from "./AiIntegrationPartnerCard";
 

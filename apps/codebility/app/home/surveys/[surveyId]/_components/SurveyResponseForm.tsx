@@ -1,0 +1,307 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@codevs/ui/button";
+import { Input } from "@codevs/ui/input";
+import { Textarea } from "@codevs/ui/textarea";
+import { Label } from "@codevs/ui/label";
+import { RadioGroup, RadioGroupItem } from "@codevs/ui/radio-group";
+import { Checkbox } from "@codevs/ui/checkbox";
+import PageContainer from "../../../_components/PageContainer";
+import { toast } from "sonner";
+import { submitSurveyResponse } from "@/actions/settings/survey-responses";
+
+export interface Question {
+  id: string;
+  question_text: string;
+  description?: string;
+  question_type: string;
+  options: string[];
+  settings: {
+    required: boolean;
+    placeholder?: string;
+    min_rating?: number;
+    max_rating?: number;
+  };
+}
+
+export interface Survey {
+  id: string;
+  title: string;
+  description: string;
+  is_active: boolean;
+}
+
+interface SurveyResponseFormProps {
+  surveyId: string;
+  survey: Survey;
+  questions: Question[];
+  questionsError?: string;
+  alreadyResponded: boolean;
+}
+
+export default function SurveyResponseForm({
+  surveyId,
+  survey,
+  questions,
+  questionsError,
+  alreadyResponded,
+}: SurveyResponseFormProps) {
+  const router = useRouter();
+
+  const [answers, setAnswers] = useState<Record<string, any>>({});
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (questionsError) {
+      toast.error(questionsError);
+    }
+  }, [questionsError]);
+
+  const handleAnswerChange = (questionId: string, value: any) => {
+    setAnswers((prev) => ({
+      ...prev,
+      [questionId]: value,
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Validate required questions
+    const missingRequired = questions.filter(
+      (q) => q.settings.required && !answers[q.id]
+    );
+
+    if (missingRequired.length > 0) {
+      toast.error(`Please answer all required questions`);
+      return;
+    }
+
+    setSubmitting(true);
+
+    const result = await submitSurveyResponse(surveyId, {
+      answers,
+      status: "completed",
+    });
+
+    setSubmitting(false);
+
+    if (result.error) {
+      toast.error(result.error);
+    } else {
+      toast.success("Survey submitted successfully!");
+      router.push("/home");
+    }
+  };
+
+  const renderQuestion = (question: Question) => {
+    const value = answers[question.id];
+
+    switch (question.question_type) {
+      case "text":
+      case "email":
+      case "number":
+        return (
+          <Input
+            type={question.question_type}
+            value={value || ""}
+            onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+            placeholder={question.settings.placeholder || ""}
+            className="rounded"
+            required={question.settings.required}
+          />
+        );
+
+      case "textarea":
+        return (
+          <Textarea
+            value={value || ""}
+            onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+            placeholder={question.settings.placeholder || ""}
+            rows={4}
+            className="rounded"
+            required={question.settings.required}
+          />
+        );
+
+      case "date":
+        return (
+          <Input
+            type="date"
+            value={value || ""}
+            onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+            className="rounded"
+            required={question.settings.required}
+          />
+        );
+
+      case "multiple_choice":
+        return (
+          <RadioGroup
+            value={value || ""}
+            onValueChange={(val) => handleAnswerChange(question.id, val)}
+          >
+            {question.options.map((option, index) => (
+              <div key={index} className="flex items-center space-x-2">
+                <RadioGroupItem value={option} id={`${question.id}-${index}`} />
+                <Label
+                  htmlFor={`${question.id}-${index}`}
+                  className="text-foreground dark:text-gray-300 cursor-pointer"
+                >
+                  {option}
+                </Label>
+              </div>
+            ))}
+          </RadioGroup>
+        );
+
+      case "checkbox":
+        return (
+          <div className="space-y-2">
+            {question.options.map((option, index) => (
+              <div key={index} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`${question.id}-${index}`}
+                  checked={(value || []).includes(option)}
+                  onCheckedChange={(checked) => {
+                    const current = value || [];
+                    const updated = checked
+                      ? [...current, option]
+                      : current.filter((v: string) => v !== option);
+                    handleAnswerChange(question.id, updated);
+                  }}
+                />
+                <Label
+                  htmlFor={`${question.id}-${index}`}
+                  className="text-foreground dark:text-gray-300 cursor-pointer"
+                >
+                  {option}
+                </Label>
+              </div>
+            ))}
+          </div>
+        );
+
+      case "rating":
+        const min = question.settings.min_rating || 1;
+        const max = question.settings.max_rating || 5;
+        const ratings = Array.from({ length: max - min + 1 }, (_, i) => min + i);
+
+        return (
+          <div className="flex gap-2">
+            {ratings.map((rating) => (
+              <button
+                key={rating}
+                type="button"
+                onClick={() => handleAnswerChange(question.id, rating)}
+                className={`w-12 h-12 rounded-full border-2 font-semibold transition-colors ${
+                  value === rating
+                    ? "bg-gradient-to-r from-violet-500 to-purple-500 text-white border-violet-600"
+                    : "border-gray-300 dark:border-gray-600 hover:border-violet-500 text-gray-700 dark:text-gray-300"
+                }`}
+              >
+                {rating}
+              </button>
+            ))}
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  if (alreadyResponded) {
+    return (
+      <PageContainer maxWidth="2xl">
+        <div className="text-center py-12">
+          <div className="flex flex-col items-center gap-4">
+            <div className="h-16 w-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+              <span className="text-3xl">✓</span>
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                Already Submitted
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400">
+                You have already submitted a response to this survey. Thank you!
+              </p>
+            </div>
+            <Button
+              onClick={() => router.push("/home")}
+              className="mt-4 bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white"
+            >
+              Return to Home
+            </Button>
+          </div>
+        </div>
+      </PageContainer>
+    );
+  }
+
+  return (
+    <PageContainer maxWidth="3xl">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+        {/* Survey Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-3">
+            {survey.title}
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">{survey.description}</p>
+          <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 rounded">
+            <p className="text-sm text-gray-700 dark:text-gray-300">
+              <span className="text-red-500">*</span> Required questions
+            </p>
+          </div>
+        </div>
+
+        {/* Questions Form */}
+        <form onSubmit={handleSubmit} className="space-y-8">
+          {questions.map((question, index) => (
+            <div
+              key={question.id}
+              className="p-6 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700"
+            >
+              <div className="mb-4">
+                <Label className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                  {index + 1}. {question.question_text}
+                  {question.settings.required && (
+                    <span className="text-red-500 ml-1">*</span>
+                  )}
+                </Label>
+                {question.description && (
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    {question.description}
+                  </p>
+                )}
+              </div>
+              {renderQuestion(question)}
+            </div>
+          ))}
+
+          {/* Submit Button */}
+          <div className="flex justify-end gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => router.push("/home")}
+              disabled={submitting}
+              className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={submitting}
+              className="bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white"
+            >
+              {submitting ? "Submitting..." : "Submit Survey"}
+            </Button>
+          </div>
+        </form>
+      </div>
+    </PageContainer>
+  );
+}

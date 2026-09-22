@@ -19,10 +19,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useModal } from "@/hooks/use-modal";
+import {
+  useKanbanModal,
+  type TaskAddModalPayload,
+} from "@/hooks/kanban/use-modal-kanban";
+import { useKanbanBoardSync } from "@/hooks/kanban/use-kanban-board-sync";
 import { IconPlus } from "@/public/assets/svgs";
 import { useUserStore } from "@/store/codev-store";
-import { useKanbanStore } from "@/store/kanban-store";
 import { createClientClientComponent } from "@/utils/supabase/client";
 import { Loader2Icon, Save, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
@@ -44,7 +47,7 @@ import {
   getUserDrafts,
   loadDraft,
   deleteDraft,
-} from "../../actions";
+} from "@/actions/kanban";
 import DifficultyPointsTooltip, {
   DIFFICULTY_LEVELS,
   DIFFICULTY_POINTS,
@@ -313,8 +316,11 @@ function MemberSelector({
 }
 
 const TaskAddModal = () => {
-  const { isOpen, onClose, type, data } = useModal();
+  const { isOpen, onClose, type, data } = useKanbanModal();
   const isModalOpen = isOpen && type === "taskAddModal";
+  const modalData = (isModalOpen ? data : undefined) as
+    | TaskAddModalPayload
+    | undefined;
 
   const [mainAssignee, setMainAssignee] = useState<string>("");
   const [sidekicks, setSidekicks] = useState<string[]>([]);
@@ -340,7 +346,7 @@ const TaskAddModal = () => {
 
   const user = useUserStore((state) => state.user);
   const [supabase, setSupabase] = useState<any>(null);
-  const { fetchBoardData } = useKanbanStore();
+  const { refreshBoard } = useKanbanBoardSync();
 
   const onChange = (value: string) => {
     setDescription(value);
@@ -371,7 +377,7 @@ const TaskAddModal = () => {
   }, [title, description, selectedDifficulty, priority, taskType, skillCategory, mainAssignee, sidekicks, deadline]);
 
   const autoSaveDraft = useCallback(async () => {
-    if (!user?.id || !data?.projectId || !data?.listId || !hasContent() || isAutoSavingRef.current) {
+    if (!user?.id || !modalData?.projectId || !modalData?.listId || !hasContent() || isAutoSavingRef.current) {
       return;
     }
 
@@ -381,8 +387,8 @@ const TaskAddModal = () => {
       const formData = new FormData();
 
       formData.append("created_by", user.id);
-      formData.append("project_id", data.projectId);
-      formData.append("intended_column_id", data.listId);
+      formData.append("project_id", modalData.projectId);
+      formData.append("intended_column_id", modalData.listId);
 
       if (title) formData.append("title", title);
       if (description) formData.append("description", description);
@@ -409,7 +415,7 @@ const TaskAddModal = () => {
     } finally {
       isAutoSavingRef.current = false;
     }
-  }, [user?.id, data?.projectId, data?.listId, title, description, selectedDifficulty, deadline, mainAssignee, sidekicks, priority, taskType, skillCategory, draftId, hasContent]);
+  }, [user?.id, modalData?.projectId, modalData?.listId, title, description, selectedDifficulty, deadline, mainAssignee, sidekicks, priority, taskType, skillCategory, draftId, hasContent]);
 
   useEffect(() => {
     if (!isModalOpen) return;
@@ -451,15 +457,15 @@ const TaskAddModal = () => {
   }, [isModalOpen, hasUnsavedChanges, hasContent, autoSaveDraft]);
 
   useEffect(() => {
-    if (isModalOpen && data?.projectId && user?.id) {
+    if (isModalOpen && modalData?.projectId && user?.id) {
       loadUserDrafts();
     }
-  }, [isModalOpen, data?.projectId, user?.id]);
+  }, [isModalOpen, modalData?.projectId, user?.id]);
 
   const loadUserDrafts = async () => {
-    if (!data?.projectId || !user?.id) return;
+    if (!modalData?.projectId || !user?.id) return;
 
-    const result = await getUserDrafts(data.projectId, user.id);
+    const result = await getUserDrafts(modalData.projectId, user.id);
     if (result.success && result.drafts) {
       setAvailableDrafts(result.drafts);
     }
@@ -492,7 +498,7 @@ const TaskAddModal = () => {
   };
 
   const handleSaveAsDraft = async () => {
-    if (!user?.id || !data?.projectId || !data?.listId) {
+    if (!user?.id || !modalData?.projectId || !modalData?.listId) {
       toast.error("Missing required information");
       return;
     }
@@ -508,8 +514,8 @@ const TaskAddModal = () => {
       const formData = new FormData();
 
       formData.append("created_by", user.id);
-      formData.append("project_id", data.projectId);
-      formData.append("intended_column_id", data.listId);
+      formData.append("project_id", modalData.projectId);
+      formData.append("intended_column_id", modalData.listId);
 
       if (title) formData.append("title", title);
       if (description) formData.append("description", description);
@@ -645,7 +651,7 @@ const TaskAddModal = () => {
 
         toast.success("Task created successfully");
         handleClose();
-        await fetchBoardData();
+        await refreshBoard();
       } else {
         toast.error(response.error || "Failed to create task");
       }
@@ -720,15 +726,15 @@ const TaskAddModal = () => {
             )}
           </DialogHeader>
 
-          {data?.listName && (
+          {modalData?.listName && (
             <div className="bg-customBlue-50 dark:bg-customBlue-900/20 rounded-md p-2">
               <Label className="text-customBlue-700 dark:text-customBlue-100 text-sm">
-                Adding to: {data.listName}
+                Adding to: {modalData.listName}
               </Label>
             </div>
           )}
 
-          <input type="hidden" name="kanban_column_id" value={data?.listId} />
+          <input type="hidden" name="kanban_column_id" value={modalData?.listId} />
 
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div className="space-y-2">
@@ -912,14 +918,14 @@ const TaskAddModal = () => {
                 Primary Assignee{" "}
                 <span className="ml-2 text-xs text-gray-500">(Optional)</span>
               </Label>
-              {data?.projectId ? (
+              {modalData?.projectId ? (
                 <MemberSelector
                   selectedMemberIds={mainAssignee ? [mainAssignee] : []}
                   onMembersChange={(memberIds) => {
                     setMainAssignee(memberIds[0] || "");
                     setHasUnsavedChanges(true);
                   }}
-                  projectId={data.projectId}
+                  projectId={modalData.projectId}
                   singleSelection={true}
                   label="Primary Assignee"
                 />
@@ -933,14 +939,14 @@ const TaskAddModal = () => {
                 Sidekick Helpers{" "}
                 <span className="ml-2 text-xs text-gray-500">(Optional)</span>
               </Label>
-              {data?.projectId ? (
+              {modalData?.projectId ? (
                 <MemberSelector
                   selectedMemberIds={sidekicks}
                   onMembersChange={(memberIds) => {
                     setSidekicks(memberIds);
                     setHasUnsavedChanges(true);
                   }}
-                  projectId={data.projectId}
+                  projectId={modalData.projectId}
                   disabledMembers={mainAssignee ? [mainAssignee] : []}
                   singleSelection={false}
                   label="Sidekick Helpers"

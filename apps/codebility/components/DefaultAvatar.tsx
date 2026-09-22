@@ -1,4 +1,4 @@
-import getRandomColor from "@/lib/getRandomColor";
+import getRandomColor from "@/utils/getRandomColor";
 
 interface DefaultAvatarProps {
   className?: string;

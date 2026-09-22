@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { box } from "@/components/FramerAnimation/Framer";
 import DefaultPagination from "@/components/ui/pagination";
-import usePagination from "@/hooks/use-pagination";
-import getRandomColor from "@/lib/getRandomColor";
+import usePagination from "@/hooks/data/use-pagination";
+import { getStableColor } from "@/utils/getRandomColor";
 import { Codev } from "@/types/home/codev";
 
 import CodevCard from "./CodevCard";
@@ -69,7 +69,7 @@ export default function CodevList({ codevs }: Props) {
       >
         {paginatedUsers.map((codev) => (
           <CodevCard
-            color={getRandomColor() || ""}
+            color={getStableColor(codev.id)}
             key={codev.id}
             codev={codev}
           />

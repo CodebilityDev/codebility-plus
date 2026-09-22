@@ -53,7 +53,7 @@ interface MemberChecklistProps {
 const parseTargetRole = (description: string | null): string | null => {
   if (!description) return null;
   try {
-    const parsed = JSON.parse(description);
+      const parsed = JSON.parse(description) as { target_role?: string | null };
     return parsed?.target_role ?? null;
   } catch {
     return null;

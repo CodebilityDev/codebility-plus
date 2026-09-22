@@ -1,12 +1,17 @@
 import React from "react";
-import Image from "next/image";
+import LandingImage from "./LandingImage";
 
 const MovingText = () => {
   return (
     <div className="text-md border-light-900/5 bg-light-900/5 flex w-full flex-col items-center justify-center gap-4 border-y-4 p-8 text-center text-white md:mt-20 md:text-3xl lg:text-5xl">
       <div className="flex w-full flex-row items-center justify-center gap-4 px-4">
+<<<<<<< HEAD
         <Image
           alt=""
+=======
+        <LandingImage
+          alt="diamond-icon"
+>>>>>>> 52e0ed3533dfe84578477ada1e0703417e534f8c
           src="/assets/svgs/icon-diamond-purple.svg"
 
           width={30}
@@ -14,8 +19,13 @@ const MovingText = () => {
         />
         Mobile Development{" "}
         <span>
+<<<<<<< HEAD
           <Image
             alt=""
+=======
+          <LandingImage
+            alt="diamond-icon"
+>>>>>>> 52e0ed3533dfe84578477ada1e0703417e534f8c
             src="/assets/svgs/icon-diamond-sky.svg"
             width={30}
             height={30}
@@ -24,8 +34,13 @@ const MovingText = () => {
         </span>{" "}
         Digital Marketing
         <span>
+<<<<<<< HEAD
           <Image
             alt=""
+=======
+          <LandingImage
+            alt="diamond-icon"
+>>>>>>> 52e0ed3533dfe84578477ada1e0703417e534f8c
             src="/assets/svgs/icon-diamond-purple.svg"
             width={30}
             height={30}
@@ -36,8 +51,13 @@ const MovingText = () => {
       <div className="flex w-full flex-row items-center justify-center px-4 md:gap-8">
         UI/UX Design{" "}
         <span>
+<<<<<<< HEAD
           <Image
             alt=""
+=======
+          <LandingImage
+            alt="diamond-icon"
+>>>>>>> 52e0ed3533dfe84578477ada1e0703417e534f8c
             src="/assets/svgs/icon-diamond-sky.svg"
             width={30}
             height={30}
@@ -46,8 +66,13 @@ const MovingText = () => {
         </span>{" "}
         AI-Development{" "}
         <span>
+<<<<<<< HEAD
           <Image
             alt=""
+=======
+          <LandingImage
+            alt="diamond-icon"
+>>>>>>> 52e0ed3533dfe84578477ada1e0703417e534f8c
             src="/assets/svgs/icon-diamond-purple.svg"
             width={30}
             height={30}

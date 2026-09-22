@@ -1,46 +1,123 @@
 import Image from "next/image";
 import { H2, Paragraph, SectionWrapper } from "@/components/shared/home";
 
+import MarketingProgressiveSection from "../../_shared/MarketingProgressiveSection";
+import ProgressiveMotion from "../../_shared/ProgressiveMotion";
+
 const MissionVision = () => {
+  const skeleton = (
+    <div className="z-10 flex h-full flex-col gap-12 lg:flex-row lg:gap-6">
+      <div className="my-auto flex basis-[50%] flex-col gap-4 text-center lg:basis-[25%] lg:text-end">
+        <H2 className="text-primaryColor">Mission</H2>
+        <Paragraph className="lg:max-w-auto z-10 mx-auto max-w-[400px]">
+          At Codebility, we ignite a passion for technology, offering immersive
+          programs in Web Development, Mobile Development, UI/UX Design, and
+          Digital Marketing.
+        </Paragraph>
+        <Paragraph className="lg:max-w-auto z-10 mx-auto max-w-[400px]">
+          Beyond imparting skills, we believe in the transformative power of
+          coding as a tool for a brighter future. Join us in sculpting your path
+          as tomorrow&apos;s digital architect.
+        </Paragraph>
+      </div>
+      <div className="relative hidden w-full items-center justify-center lg:flex lg:h-[600px] lg:basis-[50%]">
+        <Image
+          src="/assets/images/mission-vision-image.png"
+          alt="Codebility Devices"
+          fill
+          sizes="1200px"
+          className="absolute z-10 h-auto bg-center object-contain"
+        />
+      </div>
+      <div className="my-auto flex basis-[50%] flex-col gap-4 text-center lg:basis-[25%] lg:text-start">
+        <H2 className="text-primaryColor">Vision</H2>
+        <Paragraph className="lg:max-w-auto z-10 mx-auto max-w-[400px] lg:text-start">
+          Codebility envisions a world where coding unleashes innovation. We
+          aspire to be a global hub, nurturing a community proficient in Web,
+          Mobile, UI/UX, and Digital Marketing.
+        </Paragraph>
+        <Paragraph className="lg:max-w-auto z-10 mx-auto max-w-[400px] lg:text-start">
+          Our goal is to empower learners, shaping them into accomplished digital
+          architects who drive the future of the tech industry.
+        </Paragraph>
+      </div>
+    </div>
+  );
+
   return (
     <SectionWrapper className="relative lg:w-full lg:overflow-hidden">
-      <div className="z-10 flex h-full flex-col gap-12 lg:flex-row lg:gap-6">
-        <div className="my-auto flex basis-[50%] flex-col gap-4 text-center lg:basis-[25%] lg:text-end">
-          <H2 className="text-primaryColor">Mission</H2>
-          <Paragraph className="lg:max-w-auto z-10 mx-auto max-w-[400px]">
-            At Codebility, we ignite a passion for technology, offering
-            immersive programs in Web Development, Mobile Development, UI/UX
-            Design, and Digital Marketing.
-          </Paragraph>
-          <Paragraph className="lg:max-w-auto z-10 mx-auto max-w-[400px]">
-            Beyond imparting skills, we believe in the transformative power of
-            coding as a tool for a brighter future. Join us in sculpting your
-            path as tomorrow{`'`}s digital architect.
-          </Paragraph>
+      <MarketingProgressiveSection skeleton={skeleton}>
+        <div className="z-10 flex h-full flex-col gap-12 lg:flex-row lg:gap-6">
+          <ProgressiveMotion
+            className="my-auto flex basis-[50%] flex-col gap-4 text-center lg:basis-[25%] lg:text-end"
+            y={30}
+            duration={0.6}
+            staggerChildren={0.1}
+          >
+            <H2 data-progressive-child className="text-primaryColor">
+              Mission
+            </H2>
+            <Paragraph
+              data-progressive-child
+              className="lg:max-w-auto z-10 mx-auto max-w-[400px]"
+            >
+              At Codebility, we ignite a passion for technology, offering
+              immersive programs in Web Development, Mobile Development, UI/UX
+              Design, and Digital Marketing.
+            </Paragraph>
+            <Paragraph
+              data-progressive-child
+              className="lg:max-w-auto z-10 mx-auto max-w-[400px]"
+            >
+              Beyond imparting skills, we believe in the transformative power of
+              coding as a tool for a brighter future. Join us in sculpting your
+              path as tomorrow&apos;s digital architect.
+            </Paragraph>
+          </ProgressiveMotion>
+
+          <ProgressiveMotion
+            className="relative hidden w-full items-center justify-center lg:flex lg:h-[600px] lg:basis-[50%]"
+            y={24}
+            duration={0.55}
+          >
+            <div data-progressive-child className="relative h-full w-full">
+              <Image
+                src="/assets/images/mission-vision-image.png"
+                alt="Codebility Devices"
+                fill
+                sizes="1200px"
+                className="absolute z-10 h-auto bg-center object-contain"
+              />
+            </div>
+          </ProgressiveMotion>
+
+          <ProgressiveMotion
+            className="my-auto flex basis-[50%] flex-col gap-4 text-center lg:basis-[25%] lg:text-start"
+            y={30}
+            duration={0.6}
+            staggerChildren={0.1}
+          >
+            <H2 data-progressive-child className="text-primaryColor">
+              Vision
+            </H2>
+            <Paragraph
+              data-progressive-child
+              className="lg:max-w-auto z-10 mx-auto max-w-[400px] lg:text-start"
+            >
+              Codebility envisions a world where coding unleashes innovation. We
+              aspire to be a global hub, nurturing a community proficient in Web,
+              Mobile, UI/UX, and Digital Marketing.
+            </Paragraph>
+            <Paragraph
+              data-progressive-child
+              className="lg:max-w-auto z-10 mx-auto max-w-[400px] lg:text-start"
+            >
+              Our goal is to empower learners, shaping them into accomplished
+              digital architects who drive the future of the tech industry.
+            </Paragraph>
+          </ProgressiveMotion>
         </div>
-        <div className="relative hidden w-full items-center justify-center lg:flex lg:h-[600px] lg:basis-[50%]">
-          <Image
-            src="/assets/images/mission-vision-image.png"
-            alt="Codebility Devices"
-            fill
-            sizes="1200px"
-            className="absolute z-10 h-auto bg-center object-contain"
-            
-          />
-        </div>
-        <div className="my-auto flex basis-[50%] flex-col gap-4 text-center lg:basis-[25%] lg:text-start">
-          <H2 className="text-primaryColor">Vision</H2>
-          <Paragraph className="lg:max-w-auto z-10 mx-auto max-w-[400px] lg:text-start">
-            Codebility envisions a world where coding unleashes innovation. We
-            aspire to be a global hub, nurturing a community proficient in Web,
-            Mobile, UI/UX, and Digital Marketing.
-          </Paragraph>
-          <Paragraph className="lg:max-w-auto z-10 mx-auto max-w-[400px] lg:text-start">
-            Our goal is to empower learners, shaping them into accomplished
-            digital architects who drive the future of the tech industry.
-          </Paragraph>
-        </div>
-      </div>
+      </MarketingProgressiveSection>
 
       <div
         aria-hidden="true"

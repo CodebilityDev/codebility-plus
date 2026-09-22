@@ -1,7 +1,7 @@
 import { H1 } from "@/components/shared/dashboard";
 import AsyncErrorBoundary from "@/components/AsyncErrorBoundary";
 // ✅ Added getSubLead import
-import { getMembers, getSubLead, getTeamLead, getUserProjects } from "../../projects/actions";
+import { getMembers, getSubLead, getTeamLead, getUserProjects } from "@/actions/projects/actions";
 import TeamDetailView from "./_components/TeamDetailView";
 import { notFound } from "next/navigation";
 import CustomBreadcrumb from "@/components/shared/dashboard/CustomBreadcrumb";

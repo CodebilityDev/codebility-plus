@@ -5,7 +5,7 @@ import Image from "next/image";
 import {
   fetchAvailableMembers,
   updateTask,
-} from "@/app/home/kanban/[projectId]/[id]/actions";
+} from "@/actions/kanban/tasks";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -22,10 +22,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useModal } from "@/hooks/use-modal";
+import { useKanbanModal } from "@/hooks/kanban/use-modal-kanban";
+import { useKanbanBoardSync } from "@/hooks/kanban/use-kanban-board-sync";
 import { IconPlus } from "@/public/assets/svgs";
 import { useUserStore } from "@/store/codev-store";
-import { useKanbanStore } from "@/store/kanban-store";
+import { tryGetKanbanBoardStore } from "@/store/kanban-board/registry";
 import { SkillCategory, Task } from "@/types/home/codev";
 import { createClientClientComponent } from "@/utils/supabase/client";
 import { useEditor } from "@tiptap/react";
@@ -276,12 +277,14 @@ function MemberSelector({
 }
 
 const TaskEditModal = () => {
-  const { isOpen, onClose, type, data } = useModal();
+  const { isOpen, onClose, type, data } = useKanbanModal();
   const isModalOpen = isOpen && type === "taskEditModal";
+  const task = data as Task | undefined;
   const user = useUserStore((state) => state.user);
   const [supabase, setSupabase] = useState<any>(null);
 
-  const { fetchBoardData, boardData } = useKanbanStore();
+  const { refreshBoard } = useKanbanBoardSync();
+  const projectId = tryGetKanbanBoardStore()?.getState().projectId ?? "";
 
   const [boardId, setBoardId] = useState<string>("");
 
@@ -344,7 +347,7 @@ const TaskEditModal = () => {
           const { data: column } = await supabase
             .from("kanban_columns")
             .select("board_id")
-            .eq("id", data.kanban_column_id)
+            .eq("id", task?.kanban_column_id)
             .single();
 
           if (column?.board_id) {
@@ -357,24 +360,24 @@ const TaskEditModal = () => {
               .single();
 
             if (board?.project_id) {
-              const difficulty = data.difficulty || "";
+              const difficulty = task?.difficulty || "";
               const calculatedPoints = difficulty
                 ? getPointsFromDifficulty(difficulty)
-                : data.points || 0;
+                : task?.points || 0;
 
               setTaskData({
-                title: data.title || "",
-                description: data.description || "",
-                priority: data.priority || "",
+                title: task?.title || "",
+                description: task?.description || "",
+                priority: task?.priority || "",
                 difficulty: difficulty,
-                type: data.type || "",
-                pr_link: data.pr_link || "",
+                type: task?.type || "",
+                pr_link: task?.pr_link || "",
                 points: calculatedPoints,
-                sidekick_ids: data.sidekick_ids || [],
-                skill_category_id: data.skill_category?.id || "",
-                codev_id: data.codev?.id || "",
+                sidekick_ids: task?.sidekick_ids || [],
+                skill_category_id: task?.skill_category?.id || "",
+                codev_id: task?.codev?.id || "",
                 projectId: board.project_id,
-                deadline: data.deadline || "",
+                deadline: task?.deadline || "",
               });
             }
           }
@@ -386,7 +389,7 @@ const TaskEditModal = () => {
 
       fetchProjectData();
     }
-  }, [isModalOpen, data, supabase]);
+  }, [isModalOpen, task, supabase]);
 
   const handleInputChange = (
     key: keyof Task,
@@ -436,10 +439,10 @@ const TaskEditModal = () => {
         formData.append("sidekick_ids", "");
       }
 
-      const response = await updateTask(formData, data.id);
+      const response = await updateTask(formData, task!.id);
       if (response.success) {
         toast.success("Task updated successfully.");
-        await fetchBoardData();
+        await refreshBoard();
         onClose();
       } else {
         toast.error(response.error || "Failed to update task.");
@@ -636,7 +639,7 @@ const TaskEditModal = () => {
                 onMembersChange={(memberIds) => {
                   handleInputChange("codev_id", memberIds[0] || "");
                 }}
-                projectId={boardData.project_id}
+                projectId={projectId}
                 singleSelection={true}
                 label="Primary Assignee"
               />
@@ -652,7 +655,7 @@ const TaskEditModal = () => {
                 onMembersChange={(memberIds) => {
                   handleInputChange("sidekick_ids", memberIds);
                 }}
-                projectId={boardData.project_id}
+                projectId={projectId}
                 disabledMembers={taskData.codev_id ? [taskData.codev_id] : []}
                 singleSelection={false}
                 label="Sidekick Helpers"

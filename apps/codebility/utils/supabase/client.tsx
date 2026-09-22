@@ -1,28 +1,29 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { createBrowserClient } from "@supabase/ssr";
-import { SupabaseClient } from "@supabase/supabase-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
+
+let browserClient: SupabaseClient | null = null;
 
 export const createClientClientComponent = () => {
-  if (typeof window === "undefined") {
-    return null; // Safe during build/SSR
-  }
+  if (typeof window === "undefined") return null;
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  if (!supabaseUrl || !supabaseAnonKey) {
-    return null;
-  }
+  if (!supabaseUrl || !supabaseAnonKey) return null;
 
-  return createBrowserClient(supabaseUrl, supabaseAnonKey);
+  if (!browserClient) {
+    browserClient = createBrowserClient(supabaseUrl, supabaseAnonKey);
+  }
+  
+  return browserClient;
 };
 
-/* // Original function for backwards compatibility
-export const createClientClientComponent = () =>
-  createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-  );
- */
+export function getClientSupabase(): SupabaseClient {
+  const client = createClientClientComponent();
+  if (!client) {
+    throw new Error("Supabase client is not available");
+  }
+  return client;
+}

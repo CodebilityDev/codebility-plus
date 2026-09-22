@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { ChevronDown, ChevronUp, AlertCircle, CheckCircle, User } from "lucide-react";
-import { SimpleMemberData, getMembers, getTeamLead } from "@/app/home/projects/actions";
+import { SimpleMemberData, getMembers, getTeamLead } from "@/actions/projects/actions";
 import { createClientClientComponent } from "@/utils/supabase/client";
 
 /**

@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useModal } from "@/hooks/use-modal-sprints";
+import { useModal } from "@/hooks/modals/use-modal-sprints";
 import { useUserStore } from "@/store/codev-store";
 
 interface AddSprintButtonProps {

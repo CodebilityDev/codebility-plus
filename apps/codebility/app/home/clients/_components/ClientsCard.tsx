@@ -9,8 +9,8 @@ import { Button } from "@/components/ui/button";
 import DefaultPagination from "@/components/ui/pagination";
 import SwitchStatusButton from "@/components/ui/SwitchStatusButton";
 import { pageSize } from "@/constants";
-import { useModal } from "@/hooks/use-modal-clients";
-import usePagination from "@/hooks/use-pagination";
+import { useModal } from "@/hooks/modals/use-modal-clients";
+import usePagination from "@/hooks/data/use-pagination";
 import {
   IconCopy,
   IconMail,
@@ -21,8 +21,8 @@ import { useUserStore } from "@/store/codev-store";
 import { Client } from "@/types/home/codev";
 import toast from "react-hot-toast";
 
-import { copyToClipboard, handleDownload } from "../_lib/utils";
-import { deleteClientAction, toggleClientStatusAction } from "../action";
+import { copyToClipboard, handleDownload } from "@/utils/clients/utils";
+import { deleteClientAction, toggleClientStatusAction } from "@/actions/clients/actions";
 
 interface Props {
   clients: Client[];

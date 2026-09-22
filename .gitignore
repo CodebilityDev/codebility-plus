@@ -91,3 +91,6 @@ distapps/bot/.env
 .env
 apps/codebility/public/assets/onboardingvideos/*.mp4
 .planning/
+.cursor/
+docs/agents
+skills-lock.json

@@ -2,9 +2,9 @@
 
 import React, { Suspense } from "react";
 import { redirect } from "next/navigation";
-import { getUserData } from "@/app/auth/declined/_service/actions";
+import { getUserData } from "@/actions/auth/declined";
 
-import { applicantSchema } from "../_service/type";
+import { applicantSchema } from "@/types/applicant-waiting";
 import ApplicationSteps from "./applicationSteps";
 
 export default async function ApplicantFetchComp() {

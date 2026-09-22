@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import Input from "@/components/ui/forms/input";
 import { useToast } from "@/components/ui/use-toast";
-import { createClientClientComponent } from "@/utils/supabase/client";
+import { getClientSupabase } from "@/utils/supabase/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Upload, X } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -90,10 +90,10 @@ export default function JobApplicationModal({
     setIsSubmitting(true);
 
     try {
-      const supabase = createClientClientComponent();
+      const supabase = getClientSupabase();
 
       // Upload resume if provided
-      let resumeUrl = null;
+      let resumeUrl: string | null = null;
       if (resumeFile) {
         const fileExt = resumeFile.name.split(".").pop();
         const fileName = `${data.email.replace("@", "_")}_${Date.now()}.${fileExt}`;

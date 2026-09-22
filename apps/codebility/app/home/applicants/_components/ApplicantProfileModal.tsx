@@ -12,7 +12,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { IconFigma, IconGithub, IconLink } from "@/public/assets/svgs";
+import { IconFigma } from "@/public/assets/svgs/techstack";
+import { IconGithub, IconLink } from "@/public/assets/svgs";
 import {
   Briefcase,
   Facebook,

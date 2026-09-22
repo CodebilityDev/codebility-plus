@@ -6,7 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import { useUserStore } from "@/store/codev-store";
 import { Task } from "@/types/database";
 
-import { logUserTime } from "../actions";
+import { logUserTime } from "@/actions/dashboard/actions";
 import TimeTrackerSchedule from "./DashboardTimeTrackerSchedule";
 import TimeTrackerTimer from "./DashboardTimeTrackerTimer";
 

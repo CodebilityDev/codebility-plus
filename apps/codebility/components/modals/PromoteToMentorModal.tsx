@@ -3,7 +3,7 @@
 import {
   acceptPromotionToMentor,
   declinePromotion,
-} from "@/app/home/_services/actions";
+} from "@/actions/home/codev-promote";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

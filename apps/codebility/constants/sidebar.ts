@@ -1,6 +1,6 @@
 "use server";
 
-import pathsConfig from "@/config/paths.config";
+import pathsConfig from "@/types/zod/paths.config";
 import { createClientServerComponent } from "@/utils/supabase/server";
 
 export type SidebarLink = {

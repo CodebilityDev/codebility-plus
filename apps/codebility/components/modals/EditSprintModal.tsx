@@ -1,7 +1,7 @@
 "use client";
 
 import EditSprintForm from "@/app/home/kanban/_components/EditSprintForm";
-import { KanbanSprintData } from "@/app/home/kanban/[projectId]/page";
+import { KanbanSprintData } from "@/app/home/kanban/_types/sprint";
 import {
   Dialog,
   DialogContent,

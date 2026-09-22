@@ -1,7 +1,7 @@
 "use client";
 
 import { Skeleton } from "@codevs/ui/skeleton";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/utils";
 
 const MemberPillSkeleton = ({ size = "md" }: { size?: "md" | "lg" }) => {
   const isLg = size === "lg";

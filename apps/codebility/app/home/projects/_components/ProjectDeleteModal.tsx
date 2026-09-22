@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { deleteProject } from "@/app/home/projects/actions";
+import { deleteProject } from "@/actions/projects/actions";
 import {
   Dialog,
   DialogContent,
@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useModal } from "@/hooks/use-modal-projects";
+import { useModal } from "@/hooks/modals/use-modal-projects";
 import toast from "react-hot-toast";
 
 import { Button } from "@codevs/ui/button";

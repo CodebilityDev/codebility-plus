@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Bookmark, BookmarkCheck } from "lucide-react";
 
-import { updatePublicDisplaySwitch } from "../actions";
+import { updatePublicDisplaySwitch } from "@/actions/projects/actions";
 import { ProjectCardProps } from "./ProjectCard";
 
 export default function BookmarkButton({

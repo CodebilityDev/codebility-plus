@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClientServerComponent } from "@/utils/supabase/server";
 import { z } from "zod";
-import { getWeekRange, getMonthRange } from "@/lib/leaderboard-utils";
+import { getWeekRange, getMonthRange } from "@/utils/leaderboard-utils";
 
 interface ProjectLeader {
   project_id: string;

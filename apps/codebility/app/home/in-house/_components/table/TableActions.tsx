@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Codev, InternalStatus } from "@/types/home/codev";
 import { createClientClientComponent } from "@/utils/supabase/client";
-import { useModal } from "@/hooks/use-modal-users";
+import { useModal } from "@/hooks/modals/use-modal-users";
 import { Edit2, Eye, MoreHorizontal, Trash2 } from "lucide-react";
 import { toast } from "react-hot-toast";
 

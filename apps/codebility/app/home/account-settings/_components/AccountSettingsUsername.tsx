@@ -11,7 +11,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@codevs/ui/tooltip";
-import { checkUsernameAvailability, updateUsername, getUsernameData } from "../action";
+import { checkUsernameAvailability, updateUsername, getUsernameData } from "@/actions/account-settings/actions";
 import { useToast } from "@codevs/ui/use-toast";
 
 interface AccountSettingsUsernameProps {

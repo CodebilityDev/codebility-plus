@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { Users } from "lucide-react";
-import { SimpleMemberData } from "@/app/home/projects/actions";
+import { SimpleMemberData } from "@/actions/projects/actions";
 
 // CDN fallback avatar — consistent with rest of codebase
 const DEFAULT_AVATAR =

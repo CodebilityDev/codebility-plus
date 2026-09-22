@@ -84,7 +84,7 @@ export default function TicketSupportForm({
         setSubmitResult(null);
 
         try {
-            const { submitTicket } = await import("../actions");
+            const { submitTicket } = await import("@/actions/ticket-support/actions");
             const result = await submitTicket({
                 userId: userId,
                 fullName,
