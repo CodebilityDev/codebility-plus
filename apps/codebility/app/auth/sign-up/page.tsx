@@ -16,7 +16,7 @@ import { Checkbox } from "@codevs/ui/checkbox";
 import { Textarea } from "@codevs/ui/textarea";
 import { Toaster } from "@/components/ui/toaster";
 
-import { signupUser } from "@/actions/auth";
+import { signupUser } from "@/actions/auth/session";
 import { useModal } from "@/hooks/modals/use-modal";
 import { useTechStackStore } from "@/hooks/data/use-techstack";
 

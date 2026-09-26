@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { ChevronDown, ChevronUp, Minimize2, Maximize2, NotebookTabs, CheckCircle2, Circle, TrendingUp, Award } from "lucide-react";
-import { Box } from "@/components/shared/dashboard";
+import Box from "@/components/shared/dashboard/Box";
 import { getClientSupabase } from "@/utils/supabase/client";
 
 // Types for profile points data

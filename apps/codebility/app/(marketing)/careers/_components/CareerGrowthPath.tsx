@@ -1,6 +1,6 @@
 "use client";
 
-import { SectionWrapper } from "@/components/shared/home";
+import SectionWrapper from "@/components/shared/home/SectionWrapper";
 import { Briefcase, TrendingUp, Users, Award } from "lucide-react";
 
 import MarketingProgressiveSection from "../../_shared/MarketingProgressiveSection";

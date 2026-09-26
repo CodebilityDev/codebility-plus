@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { SectionWrapper } from "@/components/shared/home";
+import SectionWrapper from "@/components/shared/home/SectionWrapper";
 import { User, MessageSquare, UserCheck, Handshake } from "lucide-react";
 
 import MarketingProgressiveSection from "../../_shared/MarketingProgressiveSection";

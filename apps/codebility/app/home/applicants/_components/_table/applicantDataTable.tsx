@@ -2,7 +2,7 @@
 
 import React, { useCallback, useMemo } from "react";
 import { getTestDate } from "@/utils/applicant-waiting";
-import { Box } from "@/components/shared/dashboard";
+import Box from "@/components/shared/dashboard/Box";
 import DefaultPagination from "@/components/ui/pagination";
 import {
   Table,

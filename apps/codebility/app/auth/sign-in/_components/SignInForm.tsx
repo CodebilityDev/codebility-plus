@@ -10,7 +10,7 @@ import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
 
-import { resendVerificationEmail, signinUser } from "@/actions/auth";
+import { resendVerificationEmail, signinUser } from "@/actions/auth/session";
 import SignInInputs from "./SignInInput";
 
 type Inputs = z.infer<typeof SignInValidation>;

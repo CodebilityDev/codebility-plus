@@ -20,10 +20,8 @@ import {
   DropdownMenuTrigger,
 } from "@codevs/ui/dropdown-menu";
 
-import {
-  sendMultipleOnboardingReminderWithUpdate,
-  sendMultipleTestReminderEmailWithUpdate,
-} from "@/actions/applicants/email";
+import { sendMultipleOnboardingReminderWithUpdate } from "@/actions/applicants/email/actions/onboardingReminder";
+import { sendMultipleTestReminderEmailWithUpdate } from "@/actions/applicants/email/actions/testReminder";
 import { NewApplicantType } from "@/types/applicants";
 
 export default function ApplicantEmailAction({

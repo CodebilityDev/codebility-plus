@@ -4,7 +4,7 @@ import type { StaticImageData } from "next/image";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Box from "@/components/shared/dashboard/Box";
-import { Paragraph } from "@/components/shared/home";
+import Paragraph from "@/components/shared/home/Paragraph";
 import { useModal } from "@/hooks/modals/use-modal";
 import { defaultAvatar } from "@/public/assets/images";
 import { deleteImage, getImagePath, uploadImage } from "@/utils/uploadImage";

@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { H1 } from "@/components/shared/dashboard";
+import H1 from "@/components/shared/dashboard/H1";
 import { createClientServerComponent } from "@/utils/supabase/server";
 import { Toaster } from "react-hot-toast";
 

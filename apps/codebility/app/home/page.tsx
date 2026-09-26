@@ -1,4 +1,4 @@
-import { H1 } from "@/components/shared/dashboard";
+import H1 from "@/components/shared/dashboard/H1";
 
 export default function HomePage() {
   return (

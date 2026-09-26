@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { Box } from "@/components/shared/dashboard";
+import Box from "@/components/shared/dashboard/Box";
 import { Button } from "@/components/ui/button";
 import { useModal } from "@/hooks/modals/use-modal";
 import { useTechStackStore } from "@/hooks/data/use-techstack";

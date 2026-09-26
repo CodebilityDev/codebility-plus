@@ -1,5 +1,6 @@
 import Image from "next/image";import Link from "next/link";
-import { H2, Paragraph } from "@/components/shared/home";
+import H2 from "@/components/shared/home/H2";
+import Paragraph from "@/components/shared/home/Paragraph";
 import { Button } from "@/components/ui/button";
 import pathsConfig from "@/types/zod/paths.config";
 

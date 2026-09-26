@@ -6,7 +6,7 @@ import useChangeBgNavigation from "@/hooks/navigation/useChangeBgNavigation";
 import Logo from "@/components/shared/home/Logo";
 import { CareersSignIn, MobileDrawer } from "./MarkitingNavigationSubComponents";
 import dynamic from "next/dynamic";
-import { signOut } from "@/actions/auth";
+import { signOut } from "@/actions/auth/session";
 import { removeLocalStorageValue } from "@/hooks/data/useLocalStorageValue";
 
 

@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Paragraph } from "@/components/shared/home";
+import Paragraph from "@/components/shared/home/Paragraph";
 import Logo from "@/components/shared/Logo";
 import {
   getCachedProfileDetail,

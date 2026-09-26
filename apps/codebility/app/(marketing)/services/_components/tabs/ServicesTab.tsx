@@ -15,7 +15,8 @@ import type { ServicesProjectsPage } from "@/lib/server/services-projects-cached
 import { fetchApiJson } from "@/utils/api-fetch";
 
 import type { ServiceProject } from "../ui/ServicesServiceCard";
-import { ServicesGridSkeleton, ServicesServiceCard, servicesProjectsGridClass } from "../ui";
+import { ServicesGridSkeleton, servicesProjectsGridClass } from "@/app/(marketing)/services/_components/ui/ServicesGridSkeleton";
+import { ServicesServiceCard } from "@/app/(marketing)/services/_components/ui/ServicesServiceCard";
 
 const pagePromises = new Map<string, Promise<ServicesProjectsPage>>();
 const pageMetaCache = new Map<string, ServicesProjectsPage["pagination"]>();

@@ -9,7 +9,7 @@ import {
 import type { ServicesProjectsPage } from "@/lib/server/services-projects-cached";
 
 import Calendly from "../../../_components/MarketingCalendly";
-import { ServicesTab } from "../tabs";
+import { ServicesTab } from "@/app/(marketing)/services/_components/tabs/ServicesTab";
 import { Hero as ServicesHero } from "./ServicesHero";
 import { ServiceDetailModal } from "./ServiceDetailModal";
 

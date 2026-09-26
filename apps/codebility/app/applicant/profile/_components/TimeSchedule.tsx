@@ -1,7 +1,7 @@
 "use client";
 
-import { Box } from "@/components/shared/dashboard";
-import { Paragraph } from "@/components/shared/home";
+import Box from "@/components/shared/dashboard/Box";
+import Paragraph from "@/components/shared/home/Paragraph";
 import { TimePicker12 } from "@/components/time-picker/TimePicker12hourDemo";
 import { Period } from "@/components/time-picker/TimePickerUtils";
 import { Button } from "@/components/ui/button";

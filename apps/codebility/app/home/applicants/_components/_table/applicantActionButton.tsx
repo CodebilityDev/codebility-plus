@@ -41,13 +41,11 @@ import {
   moveApplicantToTestingAction,
   passApplicantTestAction,
 } from "@/actions/applicants/applicant";
-import {
-  sendDenyEmail,
-  sendFailedTestEmail,
-  sendOnboardingReminderWithUpdate,
-  sendPassedTestEmail,
-  sendTestReminderWithUpdate,
-} from "@/actions/applicants/email";
+import { sendDenyEmail } from "@/actions/applicants/email/actions/deny";
+import { sendFailedTestEmail } from "@/actions/applicants/email/actions/failedTest";
+import { sendOnboardingReminderWithUpdate } from "@/actions/applicants/email/actions/onboardingReminder";
+import { sendPassedTestEmail } from "@/actions/applicants/email/actions/passedTest";
+import { sendTestReminderWithUpdate } from "@/actions/applicants/email/actions/testReminder";
 import { NewApplicantType } from "@/types/applicants";
 
 export default function ApplicantActionButton({

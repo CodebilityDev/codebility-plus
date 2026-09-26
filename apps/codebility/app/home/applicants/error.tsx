@@ -1,6 +1,6 @@
 "use client"
 
-import { H1 } from "@/components/shared/dashboard"
+import H1 from "@/components/shared/dashboard/H1";
 import { Button } from "@/components/ui/button"
 import { useEffect } from "react"
 

@@ -1,5 +1,7 @@
 import Image from "next/image";
-import { H2, Paragraph, SectionWrapper } from "@/components/shared/home";
+import H2 from "@/components/shared/home/H2";
+import Paragraph from "@/components/shared/home/Paragraph";
+import SectionWrapper from "@/components/shared/home/SectionWrapper";
 
 import MarketingProgressiveSection from "../../_shared/MarketingProgressiveSection";
 import ProgressiveMotion from "../../_shared/ProgressiveMotion";

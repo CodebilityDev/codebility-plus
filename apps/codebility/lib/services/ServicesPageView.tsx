@@ -1,8 +1,8 @@
 import { pageSize } from "@/constants";
 import { getCachedServicesProjectsPage } from "@/lib/server/services-projects-cached";
 
-import { ServicesPageContent } from "@/app/(marketing)/services/_components/layout";
-import { ClientTechyBackground } from "@/app/(marketing)/services/_components/visuals";
+import { ServicesPageContent } from "@/app/(marketing)/services/_components/layout/ServicesPageContent";
+import { ClientTechyBackground } from "@/app/(marketing)/services/_components/visuals/ClientTechyBackground";
 
 const PAGE_SIZE = pageSize.services;
 

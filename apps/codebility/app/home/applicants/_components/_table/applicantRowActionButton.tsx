@@ -32,12 +32,10 @@ import {
   multipleMoveApplicantToTestingAction,
   multiplePassApplicantTestAction,
 } from "@/actions/applicants/applicant";
-import {
-  sendMultipleDenyEmail,
-  sendMultipleOnboardingReminderWithUpdate,
-  sendMultiplePassedTestEmail,
-  sendMultipleTestReminderEmailWithUpdate,
-} from "@/actions/applicants/email";
+import { sendMultipleDenyEmail } from "@/actions/applicants/email/actions/deny";
+import { sendMultipleOnboardingReminderWithUpdate } from "@/actions/applicants/email/actions/onboardingReminder";
+import { sendMultiplePassedTestEmail } from "@/actions/applicants/email/actions/passedTest";
+import { sendMultipleTestReminderEmailWithUpdate } from "@/actions/applicants/email/actions/testReminder";
 import { NewApplicantType } from "@/types/applicants";
 
 export default function ApplicantRowActionButton({
