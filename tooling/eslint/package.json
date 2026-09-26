@@ -6,7 +6,7 @@
   "exports": {
     "./base": "./base.js",
     "./react": "./react.js",
-    "./next": "./next.js"
+    "./nextjs": "./nextjs.js"
   },
   "scripts": {
     "clean": "rm -rf .turbo node_modules",
@@ -16,13 +16,14 @@
   },
   "dependencies": {
     "@eslint/compat": "^1.1.1",
+    "@eslint/js": "^9.39.5",
     "@next/eslint-plugin-next": "^14.2.4",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-jsx-a11y": "^6.9.0",
     "eslint-plugin-react": "^7.35.0",
     "eslint-plugin-react-hooks": "rc",
     "eslint-plugin-turbo": "^2.0.8",
-    "typescript-eslint": "rc-v8"
+    "typescript-eslint": "^8.70.1"
   },
   "devDependencies": {
     "@codevs/prettier-config": "workspace:*",

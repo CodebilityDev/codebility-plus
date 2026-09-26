@@ -71,6 +71,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Fails on new lint errors and on folder-boundary violations (see AGENTS.md).
+      - name: Lint Codebility
+        run: pnpm --filter codebility lint
+
+      # next build type-checks the app (typescript.ignoreBuildErrors is false).
       - name: Build Codebility
         run: pnpm run codebility:build
 

@@ -43,11 +43,10 @@ loadEnvForRuntime();
 const config = withPlugins([[withBundleAnalyzer({ enabled: env.ANALYZE })]], {
   reactStrictMode: true,
   typescript: {
-    // Skip type checking during build to avoid React Hook Form version conflicts
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
   eslint: {
-    // Skip ESLint during build to avoid config issues
+    // CI runs `pnpm lint` as its own step with the flat config.
     ignoreDuringBuilds: true,
   },
   /* experimental: { instrumentationHook: true }, */

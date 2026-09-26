@@ -14,7 +14,7 @@ export interface AboutUsData {
 export interface ConnectUsData {
   id: string;
   href: string;
-  icon: React.FC<React.SVGProps<SVGSVGElement>>;
+  icon: React.FC<React.SVGProps<SVGElement>>;
 }
 
 export interface FeaturedSectionData {

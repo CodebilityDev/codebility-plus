@@ -2,6 +2,7 @@
 "use client";
 
 import { forwardRef, useEffect, useRef, useState } from "react";
+import { useParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -57,10 +58,6 @@ const SignaturePad = forwardRef<SignatureCanvasRef, SignaturePadProps>(
 );
 
 SignaturePad.displayName = "SignaturePad";
-
-interface NdaSigningPageProps {
-  token?: string; // Optional token from URL params
-}
 
 /**
  * Client-side PDF generation function since jsPDF requires browser environment
@@ -211,7 +208,8 @@ async function generateNdaPdf(userData: { first_name: string; last_name: string 
   return doc.output("datauristring");
 }
 
-export default function PublicNdaSigningPage({ token }: NdaSigningPageProps) {
+export default function PublicNdaSigningPage() {
+  const { token } = useParams<{ token: string }>();
   const signatureRef = useRef<SignatureCanvasRef | null>(null);
   const [signing, setSigning] = useState(false);
   const [showNameForm, setShowNameForm] = useState(true);
