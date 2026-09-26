@@ -1,7 +1,6 @@
 import React, { memo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { CalendarIcon, ChevronDown, ChevronRight, Filter, X } from "lucide-react";
-import { move } from "react-big-calendar";
 
 import { Badge } from "@codevs/ui/badge";
 import {

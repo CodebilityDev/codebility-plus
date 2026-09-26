@@ -39,40 +39,18 @@ const TWO_FACTOR_ROUTE = "/auth/2fa-challenge";
 // Routes that authenticated users can always access regardless of application status
 const AUTH_STATUS_ROUTES = [APPLICATION_DECLINED_ROUTE, EMAIL_VERIFICATION_ROUTE, TWO_FACTOR_ROUTE] as const;
 
-const routePermissionMap: Record<string, keyof RolePermissions> = {
-  "/home/interns": "interns",
-  "/home/orgchart": "orgchart",
+// Route prefix -> boolean column on the `roles` table. Keep in sync with
+// constants/sidebar.ts when adding a private page.
+const routePermissionMap = {
   "/home/applicants": "applicants",
-  "/home/in-house": "inhouse",
-  "/home/clients": "clients",
-  "/home/hire": "clients",
-  "/home/projects": "projects",
-  "/home/settings/profile": "resume",
-  "/home/settings": "settings",
-  "/home/admin-controls": "applicants",
-};
+} as const;
 
-type RolePermissions = {
-  dashboard: boolean;
-  kanban: boolean;
-  time_tracker: boolean;
-  interns: boolean;
-  applicants: boolean;
-  inhouse: boolean;
-  clients: boolean;
-  projects: boolean;
-  settings: boolean;
-  orgchart: boolean;
-  resume?: boolean;
-};
+type Permission = (typeof routePermissionMap)[keyof typeof routePermissionMap];
+const PERMISSION_COLUMNS = [...new Set(Object.values(routePermissionMap))].join(", ");
 
 export async function middleware(req: NextRequest) {
   try {
     const { pathname } = req.nextUrl;
- 
-    if (pathname.startsWith("/home/my-team")) {
-      return NextResponse.next();
-    }
 
 
     // 1. Check if the route is public - allow access without any auth checks
@@ -216,41 +194,14 @@ export async function middleware(req: NextRequest) {
     );
     const matchedRoute = sortedRouteKeys.find((routePrefix) =>
       pathname.startsWith(routePrefix),
-    );
-
-    function isValidPermission(
-      permission: unknown,
-    ): permission is keyof RolePermissions {
-      if (!permission || typeof permission !== "string") return false;
-      const validPermissions: Array<keyof RolePermissions> = [
-        "dashboard",
-        "kanban",
-        "time_tracker",
-        "interns",
-        "applicants",
-        "inhouse",
-        "clients",
-        "projects",
-        "settings",
-        "orgchart",
-        "resume",
-      ];
-      return validPermissions.includes(permission as keyof RolePermissions);
-    }
+    ) as keyof typeof routePermissionMap | undefined;
 
     if (matchedRoute && role_id) {
-      const key = matchedRoute as keyof typeof routePermissionMap;
-      const requiredPermission = routePermissionMap[key];
-
-      if (!isValidPermission(requiredPermission)) {
-        return redirectTo(req, "/home");
-      }
+      const requiredPermission = routePermissionMap[matchedRoute];
 
       const { data: rolePermissions, error: roleError } = await supabase
         .from("roles")
-        .select(
-          "dashboard, kanban, time_tracker, interns, applicants, inhouse, clients, projects, settings, orgchart, resume",
-        )
+        .select(PERMISSION_COLUMNS)
         .eq("id", role_id)
         .single();
 
@@ -259,7 +210,8 @@ export async function middleware(req: NextRequest) {
         return redirectToLogin(req);
       }
 
-      if (!(rolePermissions as any)[requiredPermission as string]) {
+      const permissions = rolePermissions as unknown as Record<Permission, boolean>;
+      if (!permissions[requiredPermission]) {
         return redirectTo(req, "/home");
       }
     }

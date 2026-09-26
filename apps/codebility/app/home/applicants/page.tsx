@@ -1,6 +1,5 @@
 import React, { Suspense } from "react";
 import AsyncErrorBoundary from "@/components/AsyncErrorBoundary";
-import PageContainer from "../_components/PageContainer";
 
 import NewApplicantFetchComp from "./_components/applicantFetchComp";
 import ApplicantsLoading from "./loading";

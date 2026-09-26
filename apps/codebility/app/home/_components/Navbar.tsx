@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import Theme from "@/components/shared/dashboard/Theme";
 import { MobileTheme } from "@/components/shared/dashboard/theme-mobile";
 import { defaultAvatar } from "@/public/assets/images";
@@ -11,11 +10,8 @@ import {
   IconCog,
   IconDropdown,
   IconLogout,
-  IconProfile,
 } from "@/public/assets/svgs";
 import { useUserStore } from "@/store/codev-store";
-import { NotificationContainer } from "@/components/notifications/NotificationContainer";
-import { AnnouncementButton } from "@/app/home/announcements/AnnouncementButton";
 
 import {
   DropdownMenu,
@@ -28,32 +24,16 @@ import {
 import { signOut } from "@/actions/auth";
 import MobileNav from "./MobileNav";
 
-export const defaultMenuItems = [
-  { href: "/home/settings/profile", icon: IconProfile, label: "Profile" },
-];
-
-export const adminMenus = [
-  { href: "/home/settings/profile", icon: IconProfile, label: "Profile" },
+const menuItems = [
   { href: "/home/account-settings", icon: IconCog, label: "Settings" },
 ];
 
 const Navbar = () => {
-  const { user } = useUserStore(); // Get user data from Zustand store
-  const router = useRouter();
+  const { user } = useUserStore();
 
-  // // Redirect to sign-in page if no user is found
-  // useEffect(() => {
-  //   if (!user) {
-  //     router.push("/auth/sign-in");
-  //   }
-  // }, [user, router]);
-
-  // // Return null while redirecting to prevent rendering
   if (!user) return null;
 
-  const { first_name, last_name, email_address, image_url, role_id } = user;
-
-  const menuItems = role_id === 1 ? adminMenus : defaultMenuItems;
+  const { first_name, last_name, email_address, image_url } = user;
 
   return (
     <>
@@ -62,34 +42,11 @@ const Navbar = () => {
         role="banner"
       >
       <div className="flex w-full min-w-full items-center justify-end px-8 py-2">
-        {/*   <div className="md flex items-center" role="navigation" aria-label="Logo">
-          <Link
-            href="/home"
-            className="flex scale-75 items-center md:scale-100"
-          >
-            <img
-              src="/assets/svgs/codebility-black.svg"
-              alt="Codebility Logo"
-              className="h-8 w-auto dark:hidden"
-            />
-            <img
-              src="/assets/svgs/codebility-white.svg"
-              alt="Codebility Logo"
-              className="hidden h-8 w-auto dark:block"
-            />
-            <span className="sr-only">Codebility Dashboard - Go to Home</span>
-          </Link>
-        </div> */}
         <div
           className="flex items-center gap-4"
           role="navigation"
           aria-label="User menu"
         >
-          {/* Announcement Button - NEW */}
-          <AnnouncementButton />
-          
-          <NotificationContainer />
-          
           <div>
             <div className="md:hidden">
               <MobileTheme />

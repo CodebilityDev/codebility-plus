@@ -1,13 +1,11 @@
-import React from "react";
-import AccountSettingsPage from "@/app/home/account-settings/page";
+import AccountSettings from "@/components/account-settings/AccountSettings";
 
 export const dynamic = "force-dynamic";
-export const revalidate = 0;
 
-export default async function ApplicantAccountSettings() {
+export default function ApplicantAccountSettingsPage() {
   return (
     <div className="h-full">
-      <AccountSettingsPage />
+      <AccountSettings />
     </div>
   );
 }

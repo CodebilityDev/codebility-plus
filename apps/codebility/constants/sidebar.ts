@@ -16,21 +16,17 @@ export type Sidebar = {
   links: SidebarLink[];
 };
 
+// Each key is a boolean column on the `roles` table. Add a key here, in the
+// select below, and in middleware.ts when a new private page gets a permission.
 type RolePermissions = {
   dashboard: boolean;
-  kanban: boolean;
-  time_tracker: boolean;
-  interns: boolean;
   applicants: boolean;
-  inhouse: boolean;
-  clients: boolean;
-  projects: boolean;
-  settings: boolean;
-  orgchart: boolean;
-  overflow: boolean;
 };
 
 type PermissionKey = keyof RolePermissions;
+
+const NO_PERMISSIONS: RolePermissions = { dashboard: false, applicants: false };
+const INACTIVE_PERMISSIONS: RolePermissions = { dashboard: true, applicants: false };
 
 export const getSidebarData = async (
   roleId: number | null,
@@ -41,66 +37,20 @@ export const getSidebarData = async (
 
   let rolePermissions: RolePermissions;
   if (roleId == -1) {
-    // If inactive
-    rolePermissions = {
-      dashboard: true,
-      kanban: false,
-      time_tracker: false,
-      interns: false,
-      applicants: false,
-      inhouse: false,
-      clients: false,
-      projects: false,
-      settings: true,
-      orgchart: false,
-      overflow: false,
-    };
+    rolePermissions = INACTIVE_PERMISSIONS;
   } else {
     const supabase = await createClientServerComponent();
-    // Fetch role permissions
     const { data, error } = await supabase
       .from("roles")
-      .select(
-        `
-        dashboard,
-        kanban,
-        time_tracker,
-        interns,
-        applicants,
-        inhouse,
-        clients,
-        projects,
-        settings,
-        orgchart
-      `,
-      )
+      .select("dashboard, applicants")
       .eq("id", roleId)
       .single();
 
-    rolePermissions = data as RolePermissions;
-
-    if (error || !rolePermissions) {
+    if (error || !data) {
       console.error("Failed to fetch role permissions:", error);
-      // Fallback: No permissions if fetch fails
-      rolePermissions = {
-        dashboard: false,
-        kanban: false,
-        time_tracker: false,
-        interns: false,
-        applicants: false,
-        inhouse: false,
-        clients: false,
-        projects: false,
-        settings: false,
-        orgchart: false,
-        overflow: false,
-      };
     }
+    rolePermissions = (data as RolePermissions | null) ?? NO_PERMISSIONS;
   }
-
-  const hasPermission = (permission: PermissionKey): boolean => {
-    return !!rolePermissions[permission];
-  };
 
   const sidebarData: Sidebar[] = [
     {
@@ -113,129 +63,26 @@ export const getSidebarData = async (
           label: "Home",
           permission: "dashboard" as PermissionKey,
         },
-        {
-          route: pathsConfig.app.tasks,
-          imgURL: "/assets/svgs/icon-task.svg",
-          label: "My Tasks",
-          permission: "time_tracker" as PermissionKey,
-        },
-        {
-          route: pathsConfig.app.kanban,
-          imgURL: "/assets/svgs/icon-kanban.svg",
-          label: "Kanban",
-          permission: "kanban" as PermissionKey,
-        },
-        {
-          route: pathsConfig.app.feeds,
-          imgURL: "/assets/svgs/icon-feed.svg",
-          label: "Feeds",
-          permission: "interns" as PermissionKey,
-        },
-        {
-          route: pathsConfig.app.time_tracker,
-          imgURL: "/assets/svgs/icon-time-tracker.svg",
-          label: "Time Tracker",
-          permission: "time_tracker" as PermissionKey,
-        },
-      ].filter((link) => hasPermission(link.permission)),
+      ],
     },
     {
       id: "2",
-      title: "Codevs",
-      links: [
-        {
-          route: pathsConfig.app.interns,
-          imgURL: "/assets/svgs/icon-interns.svg",
-          label: "Codevs",
-          permission: "interns" as PermissionKey,
-        },
-        {
-          route: pathsConfig.app.my_team,
-          imgURL: "/assets/svgs/icon-my-team-white.svg",
-          label: "My Team",
-          permission: "interns" as PermissionKey,
-        },
-        {
-          route: pathsConfig.app.overflow,
-          imgURL: "/assets/svgs/icon-overflow.svg",
-          label: "Codev Overflow",
-          permission: "interns" as PermissionKey,
-        },
-        {
-          route: pathsConfig.app.orgchart,
-          imgURL: "/assets/svgs/icon-org-chart.svg",
-          label: "Org Chart",
-          permission: "orgchart" as PermissionKey,
-        },
-      ].filter((link) => hasPermission(link.permission)),
-    },
-    {
-      id: "3",
       title: "Management",
       links: [
-        {
-          route: pathsConfig.app.admin_dashboard,
-          imgURL: "/assets/svgs/icon-admin-dashboard.svg",
-          label: "Dashboard",
-          permission: "applicants" as PermissionKey,
-        },
         {
           route: pathsConfig.app.applicants,
           imgURL: "/assets/svgs/icon-applicant.svg",
           label: "Applicants",
           permission: "applicants" as PermissionKey,
         },
-        {
-          route: pathsConfig.app.in_hose,
-          imgURL: "/assets/svgs/icon-applicant2.svg",
-          label: "In-House",
-          permission: "inhouse" as PermissionKey,
-        },
-        {
-          route: pathsConfig.app.clients,
-          imgURL: "/assets/svgs/icon-clients.svg",
-          label: "Clients",
-          permission: "clients" as PermissionKey,
-        },
-        {
-          route: pathsConfig.app.projects,
-          imgURL: "/assets/svgs/icon-projects.svg",
-          label: "Projects",
-          permission: "projects" as PermissionKey,
-        },
-        {
-          route: "/home/hire",
-          imgURL: "/assets/svgs/icon-bag.svg",
-          label: "Hire",
-          permission: "clients" as PermissionKey,
-        },
-        {
-          route: pathsConfig.app.admin_controls,
-          imgURL: "/assets/svgs/icon-admin-dashboard.svg",
-          label: "Admin Controls",
-          permission: "applicants" as PermissionKey,
-        },
-        {
-          route: pathsConfig.app.settings,
-          imgURL: "/assets/svgs/icon-cog.svg",
-          label: "Settings",
-          permission: "settings" as PermissionKey,
-        },
-      ].filter((link) => hasPermission(link.permission)),
+      ],
     },
-    {
-      id: "4",
-      title: "Help",
-      links: [
-        {
-          route: pathsConfig.app.ticket_support,
-          imgURL: "/assets/svgs/icon-ticket-support.svg",
-          label: "Ticket Support",
-          permission: "interns" as PermissionKey,
-        },
-      ].filter((link) => hasPermission(link.permission)),
-    },
-  ].filter((section) => section.links.length > 0);
+  ]
+    .map((section) => ({
+      ...section,
+      links: section.links.filter((link) => rolePermissions[link.permission]),
+    }))
+    .filter((section) => section.links.length > 0);
 
   return sidebarData;
 };

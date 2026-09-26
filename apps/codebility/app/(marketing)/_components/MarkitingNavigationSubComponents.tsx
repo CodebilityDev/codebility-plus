@@ -124,7 +124,7 @@ const getMenuItems = (
   }
   return [
     { href: "/home", icon: IconDashboard, label: "Dashboard" },
-    { href: "/home/settings/profile", icon: IconProfile, label: "Profile" },
+    { href: "/home/account-settings", icon: IconCog, label: "Settings" },
   ];
 };
 

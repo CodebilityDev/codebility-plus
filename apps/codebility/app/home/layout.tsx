@@ -6,22 +6,16 @@ import { ThemeProvider } from "@/store/providers/ThemeProvider";
 import ReactQueryProvider from "@/hooks/query/reactQuery";
 import { UserProvider } from "@/store/UserProvider";
 import { getCurrentCodev } from "@/lib/server/current-codev";
-import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
 import { Toaster } from "sonner";
 
 import ToastNotification from "./_components/HomeToastNotification";
 import LeftSidebarServer from "@/components/shared/dashboard/LeftSidebarServer";
 import Navbar from "./_components/Navbar";
-import { NavigationOptimizer } from "./_components/NavigationOptimizer";
 import PageTransitionWrapper from "./_components/PageTransitionWrapper";
 import { PageTransitionSettings } from "./_components/PageTransitionSettings";
-import { MuiStyleRoot } from "./(dashboard)/_components/DashboardRoadmapStyleRoot";
 import ConditionalMainWrapper from "./_components/ConditionalMainWrapper";
 import DynamicMainContent from "./_components/DynamicMainContent";
-import { Toast } from "@codevs/ui/toast";
-import SurveyWidget from "./_components/SurveyWidget";
 
-// Optimize provider structure - move heavy providers to client
 export default async function HomeLayout({
   children,
 }: {
@@ -38,7 +32,6 @@ export default async function HomeLayout({
             <ModalProviderHome />
             <ToastNotification />
             <PageTransitionSettings />
-            <NavigationOptimizer />
             <Toaster
               richColors
               position="top-right"
@@ -46,8 +39,6 @@ export default async function HomeLayout({
                 className: "dark:bg-gray-800 dark:text-white",
               }}
             />
-            <AppRouterCacheProvider>
-              <MuiStyleRoot>
                 <div className="background-light850_dark100 flex min-h-screen flex-col overflow-hidden">
                   <ErrorBoundary
                     fallback={
@@ -82,10 +73,7 @@ export default async function HomeLayout({
                       </ConditionalMainWrapper>
                     </DynamicMainContent>
                   </div>
-                  <SurveyWidget />
                 </div>
-              </MuiStyleRoot>
-            </AppRouterCacheProvider>
           </ThemeProvider>
         </UserProvider>
       </ReactQueryProvider>
