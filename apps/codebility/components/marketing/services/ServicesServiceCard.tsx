@@ -1,0 +1,156 @@
+"use client";
+
+import { memo, useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { IconLink } from "@/public/assets/svgs/index";
+import type { ServicesProjectCard } from "@/lib/global/services-projects-cached";
+import { Eye } from "lucide-react";
+
+export type ServiceProject = ServicesProjectCard;
+
+interface Props {
+  service: ServiceProject;
+  onSelect?: (service: ServiceProject) => void;
+}
+
+export const ServicesServiceCard = memo(({ service, onSelect }: Props) => {
+  const {
+    name,
+    main_image,
+    description,
+    website_url,
+    categories = [],
+  } = service;
+
+  const imageUrl = useMemo(
+    () =>
+      main_image
+        ? main_image.startsWith("public")
+          ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/services-image/${main_image}`
+          : main_image
+        : "https://codebility-cdn.pages.dev/assets/images/default-avatar-1248x845.jpg",
+    [main_image],
+  );
+
+  const hasValidWebsite = useMemo(
+    () =>
+      Boolean(
+        website_url &&
+          website_url !== "" &&
+          website_url.toLowerCase() !== "n/a" &&
+          website_url !== ".",
+      ),
+    [website_url],
+  );
+
+  const [isHovered, setIsHovered] = useState(false);
+  const [showDescription, setShowDescription] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (!isHovered) {
+      setShowDescription(false);
+      if (timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current = null;
+      return;
+    }
+
+    timerRef.current = setTimeout(() => {
+      setShowDescription(true);
+    }, 2000);
+
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [isHovered]);
+
+  const handleClick = () => {
+    onSelect?.(service);
+  };
+
+  return (
+    <div className="group flex h-full cursor-pointer flex-col overflow-hidden rounded-xl bg-white/[0.04] ring-1 ring-white/[0.08] transition-all duration-300 hover:bg-white/[0.07] hover:ring-white/[0.16] hover:shadow-[0_8px_30px_rgba(0,0,0,0.3)]">
+      <div
+        className="relative w-full flex-1 overflow-hidden"
+        onClick={handleClick}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <Image
+          src={imageUrl}
+          alt={name}
+          fill
+          sizes="(min-width: 1536px) 16vw, (min-width: 1280px) 20vw, (min-width: 1024px) 25vw, (min-width: 768px) 33vw, (min-width: 640px) 50vw, 100vw"
+          className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+          quality={75}
+        />
+
+        {categories.length > 0 && (
+          <div className="absolute left-3 top-3 flex max-w-[calc(100%-1.5rem)] flex-wrap gap-1.5">
+            {categories.map((category) => (
+              <span
+                key={category.id}
+                className="rounded-md border border-white/10 bg-gray-950/75 px-2.5 py-1 text-[11px] font-semibold text-white/90"
+              >
+                {category.name}
+              </span>
+            ))}
+          </div>
+        )}
+
+        <div
+          className="pointer-events-none absolute inset-x-0 bottom-0 border-t border-white/10 bg-gray-950/75 px-4 py-3"
+          style={{
+            opacity: isHovered ? 1 : 0,
+            maxHeight: showDescription ? "40%" : "auto",
+            transition:
+              "opacity 300ms cubic-bezier(0.4,0,0.2,1), max-height 300ms cubic-bezier(0.4,0,0.2,1)",
+          }}
+        >
+          {!showDescription && (
+            <span
+              className="flex items-center gap-2 text-sm font-semibold text-white/90"
+              style={{
+                animation: "fadeSlideIn 300ms cubic-bezier(0.4,0,0.2,1) both",
+              }}
+            >
+              <Eye className="size-4 text-white/60" />
+              View Project
+            </span>
+          )}
+          {showDescription && (
+            <span
+              className="block overflow-hidden text-ellipsis text-[13px] leading-relaxed text-white/80"
+              style={{
+                display: "-webkit-box",
+                WebkitLineClamp: 3,
+                WebkitBoxOrient: "vertical",
+                animation: "fadeSlideIn 300ms cubic-bezier(0.4,0,0.2,1) both",
+              }}
+            >
+              {description || "No description available."}
+            </span>
+          )}
+        </div>
+
+        {hasValidWebsite && (
+          <Link
+            href={website_url!}
+            target="_blank"
+            onClick={(e) => e.stopPropagation()}
+            className="absolute right-2.5 top-2.5 flex size-8 items-center justify-center rounded-full bg-black/50 text-white opacity-0 backdrop-blur-md transition-all duration-300 hover:bg-white hover:text-gray-900 group-hover:opacity-100"
+          >
+            <IconLink className="size-3.5" />
+          </Link>
+        )}
+      </div>
+
+      <div className="flex items-center gap-2 px-3 py-2.5" onClick={handleClick}>
+        <h3 className="min-w-0 flex-1 truncate text-sm font-medium text-white/80 transition-colors group-hover:text-white">
+          {name}
+        </h3>
+      </div>
+    </div>
+  );
+});

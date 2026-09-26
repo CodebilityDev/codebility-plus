@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCachedCodevsProfilesPage } from "@/lib/server/codevs-profiles-cached";
+import { getCachedCodevsProfilesPage } from "@/lib/global/codevs-profiles-cached";
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 5;

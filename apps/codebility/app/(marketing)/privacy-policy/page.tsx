@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 
-import PrivacyPolicyContent from "./_components/PrivacyPolicyContent";
+import PrivacyPolicyContent from "@/components/marketing/privacy-policy/PrivacyPolicyContent";
 
 export const metadata: Metadata = {
     title: "Privacy Policy — Codebility",

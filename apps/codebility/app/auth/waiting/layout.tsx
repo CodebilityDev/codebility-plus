@@ -1,5 +1,5 @@
 import React from "react";
-import Navigation from "@/app/(marketing)/_components/MarketingNavigation";
+import Navigation from "@/components/global/marketing/MarketingNavigation";
 
 export default function AuthWaitingLayout({
   children,

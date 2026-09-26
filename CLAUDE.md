@@ -63,10 +63,10 @@ This is a Turborepo monorepo with pnpm workspaces containing multiple Next.js ap
 
 ### Database & Backend Architecture
 - **Primary Database**: Supabase
-- **Caching**: Redis with graceful fallback (ioredis), in `lib/server/redis*.ts`
+- **Caching**: Redis with graceful fallback (ioredis), in `lib/home/applicants/redis*.ts`
 - **Authentication**: Supabase Auth plus role-based permissions from the `roles` table
 - **File Storage**: Supabase Storage for images and documents
-- **Email**: Resend, called from `actions/applicants/email/`
+- **Email**: Resend, called from `actions/home/applicants/*-email.ts`
 
 ### Authentication Flow
 - `middleware.ts` protects routes and redirects by application status
@@ -131,10 +131,9 @@ A 4-step onboarding system that takes applicants from initial application to acc
 - **Admin View**: Quiz scores, mobile capability, commitment status
 
 **File Locations:**
-- Onboarding UI: `apps/codebility/app/applicant/onboarding/`
-- Waitlist UI: `apps/codebility/app/applicant/waiting/`
-- Admin View: `apps/codebility/app/home/applicants/`
-- Server actions: `apps/codebility/actions/applicants/`, `actions/applicant-onboarding/`, `actions/applicant-waiting/`
+- Routes: `apps/codebility/app/applicant/onboarding/`, `app/applicant/waiting/`, `app/home/applicants/`
+- Components: `components/applicant/onboarding/`, `components/applicant/waiting/`, `components/home/applicants/`
+- Server actions: `actions/home/applicants/`, `actions/applicant/onboarding/`, `actions/applicant/waiting/`
 - Migrations: `apps/codebility/supabase/migrations/`
 
 **Database Fields Added:**
@@ -147,7 +146,7 @@ A 4-step onboarding system that takes applicants from initial application to acc
 - `applicant.signature_data` - Base64 signature image
 
 **Admin Actions:**
-- **Accept**: Sets status to `passed` and sends the acceptance email with /home access instructions
+- **Accept**: Sets status to `passed`. The acceptance email (`actions/home/applicants/accepted-email.ts`) exists but is not sent yet.
 - **Deny**: Sends denial email with reapplication information
 - **View Progress**: See quiz scores, mobile capability, and commitment status
 

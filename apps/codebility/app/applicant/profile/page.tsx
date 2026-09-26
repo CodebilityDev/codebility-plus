@@ -1,18 +1,18 @@
 import { Suspense } from "react";
-import H1 from "@/components/shared/dashboard/H1";
-import { createClientServerComponent } from "@/utils/supabase/server";
+import H1 from "@/components/global/layout/H1";
+import { createClientServerComponent } from "@/lib/global/supabase-server";
 import { Toaster } from "react-hot-toast";
 
-import About from "./_components/About";
-import ContactInfo from "./_components/ContactInfo";
-import Experience from "./_components/Experience";
-import EducationalBackground from "./_components/EducationalBackground";
-import JobStatuses from "./_components/JobStatuses";
-import PersonalInfo from "./_components/PersonalInfo";
-import Photo from "./_components/Photo";
-import Skills from "./_components/Skills";
-import TimeSchedule from "./_components/TimeSchedule";
-import ProfileCompletionGuide from "./_components/ProfileCompletionGuide";
+import About from "@/components/applicant/profile/About";
+import ContactInfo from "@/components/applicant/profile/ContactInfo";
+import Experience from "@/components/applicant/profile/Experience";
+import EducationalBackground from "@/components/applicant/profile/EducationalBackground";
+import JobStatuses from "@/components/applicant/profile/JobStatuses";
+import PersonalInfo from "@/components/applicant/profile/PersonalInfo";
+import Photo from "@/components/applicant/profile/Photo";
+import Skills from "@/components/applicant/profile/Skills";
+import TimeSchedule from "@/components/applicant/profile/TimeSchedule";
+import ProfileCompletionGuide from "@/components/applicant/profile/ProfileCompletionGuide";
 import Loading from "./loading";
 
 // Prevent static generation at build time

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import PasswordResetForm from "./_components/PasswordResetForm";
+import PasswordResetForm from "@/components/auth/password-reset/PasswordResetForm";
 
 const PasswordReset = () => {
   return (

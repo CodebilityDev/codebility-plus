@@ -43,7 +43,7 @@ names and structure over comments.
    named fetch function; await it in an async Server Component (or call it from
    a thin API route used by the client pager).
 6. Public DB reads use **`createClientAnon()`** from
-   `apps/codebility/utils/supabase/anon.ts` only. Singleton. Do not invent a
+   `apps/codebility/lib/global/supabase-anon.ts` only. Singleton. Do not invent a
    second anon factory in landing files.
 7. Keep **`anon.ts` usage scoped** until the user asks to migrate other call
    sites. Do not mass-replace every `createClient` in the repo.
@@ -52,13 +52,13 @@ names and structure over comments.
 9. **Do not** put any comments when editing files (see Editing rule).
 10. Prefer fewest files. One server module may hold query + `unstable_cache`
     wrapper (see Interns reference). Reuse `fetchApiJson` from
-    `apps/codebility/utils/api-fetch.ts` for client → API HTTP JSON.
+    `apps/codebility/utils/global/api-fetch.ts` for client → API HTTP JSON.
 11. **Do not** SSR self-fetch `/api/...` via `fetchApiJson` for page 1 on static
     `/`. Preview builds resolve `NEXT_PUBLIC_APP_BASE_URL` to **production**, so
     the SC misses the preview API / empty section. Call the shared
     `unstable_cache` helper **directly** from the Server Component.
 12. **Do not** use Server Actions for public list reads. Mutations only.
-13. Client may `import type` from a `lib/server/...` module; do **not**
+13. Client may `import type` from a `lib/global/...` module; do **not**
     value-import `unstable_cache` / anon helpers into `"use client"` files.
     Put client-safe constants (tab slugs, href builders) in a separate module
     (e.g. `services/_lib/services-categories.ts`), not in the cached server
@@ -109,7 +109,7 @@ page.tsx (static — never awaits searchParams)
 ```
 
 Shared server module
-`apps/codebility/lib/server/landing-interns-cached.ts`:
+`apps/codebility/lib/global/landing-interns-cached.ts`:
 
 - `getLandingInternsPage(supabase, { page, limit })` — DB `.range()` + count.
 - `getCachedLandingInternsPage = unstable_cache(…)` — **same** helper for SC
@@ -167,7 +167,7 @@ services/page.tsx (static — never awaits searchParams)
             modal: use(loadDetail) → GET /api/services-projects?id=
 ```
 
-Shared server module `lib/server/services-projects-cached.ts`:
+Shared server module `lib/global/services-projects-cached.ts`:
 
 - **List** — lean card fields; DB `.range()` + count; key `(category, page, limit)`.
 - **Detail** — full payload + members; key `(projectId)`; tag `services-projects`.
@@ -215,7 +215,7 @@ Checklist:
 
 ## `fetchApiJson`
 
-File: `apps/codebility/utils/api-fetch.ts`
+File: `apps/codebility/utils/global/api-fetch.ts`
 
 - Keep for HTTP JSON (client pager, other APIs). Do **not** use it for SC
   page-1 landing lists (self-fetch / env pitfall).
@@ -245,22 +245,22 @@ File: `apps/codebility/utils/api-fetch.ts`
 
 ## Reference files
 
-- Admins: `app/(marketing)/_components/landing/LandingAdmins.tsx`
-- Interns section: `app/(marketing)/_components/landing/LandingInternSection.tsx`
-- Interns pager: `app/(marketing)/_components/landing/LandingIntern-CodevPagination.tsx`
-- Interns data + cache: `lib/server/landing-interns-cached.ts`
+- Admins: `components/marketing/LandingAdmins.tsx`
+- Interns section: `components/marketing/LandingInternSection.tsx`
+- Interns pager: `components/marketing/LandingIntern-CodevPagination.tsx`
+- Interns data + cache: `lib/global/landing-interns-cached.ts`
 - Interns API: `app/api/landing-interns/route.ts`
 - Services page: `app/(marketing)/services/page.tsx`
-- Services view: `app/(marketing)/services/_lib/ServicesPageView.tsx`
-- Services tabs: `app/(marketing)/services/_components/tabs/ServicesTab.tsx`
-- Services categories: `app/(marketing)/services/_lib/services-categories.ts`
-- Services cache: `lib/server/services-projects-cached.ts`
+- Services view: `components/marketing/services/ServicesPageView.tsx`
+- Services tabs: `components/marketing/services/ServicesTab.tsx`
+- Services categories: `constants/global/services-categories.ts` and `utils/global/services-categories.ts`
+- Services cache: `lib/global/services-projects-cached.ts`
 - Services API: `app/api/services-projects/route.ts`
 - Marketing layout (Footer once): `app/(marketing)/layout.tsx`
-- Fetch helper: `utils/api-fetch.ts`
-- Anon client: `utils/supabase/anon.ts`
-- Nav: `app/(marketing)/_components/MarketingNavigation.tsx`
-- Nav `use()`: `app/(marketing)/_components/MarkitingNavigationSubComponents.tsx`
+- Fetch helper: `utils/global/api-fetch.ts`
+- Anon client: `lib/global/supabase-anon.ts`
+- Nav: `components/global/marketing/MarketingNavigation.tsx`
+- Nav `use()`: `components/global/marketing/MarketingNavigationSubComponents.tsx`
 - Landing composition: `app/(marketing)/page.tsx`
 
 ## Invalidate on edit

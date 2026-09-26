@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import Logo from "@/components/shared/Logo";
+import Logo from "@/components/global/layout/Logo";
 
 import { Button } from "@codevs/ui/button";
 

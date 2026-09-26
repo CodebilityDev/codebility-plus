@@ -29,11 +29,7 @@ type PluginFunctionParams = {
 const config: Config = {
   content: [
     ...baseConfig.content,
-    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./app/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/**/*.{js,ts,jsx,tsx,mdx}",
-    "./@/**/*.{js,ts,jsx,tsx,mdx}",
+    "./{app,actions,components,constants,hooks,lib,providers,store,utils}/**/*.{js,ts,jsx,tsx,mdx}",
     "../../packages/ui/src/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {

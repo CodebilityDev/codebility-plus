@@ -2,15 +2,15 @@
 
 import { useRef } from "react";
 import { useRouter } from "next/navigation";
-import ExpectSectionWrapper from "./ExpectSectionWrapper";
-import HouseRulesSectionWrapper from "./HouseRulesSectionWrapper";
-import OnboardingClientWrapper from "./OnboardingClientWrapper";
-import OnboardingStepper from "./OnboardingStepper";
-import PartnersSectionWrapper from "./PartnersSectionWrapper";
-import RoadMapWrapper from "./RoadMapSectionWrapper";
-import SoftwareSectionWrapper from "./SoftwareSectionWrapper";
-import TeamSectionWrapper from "./TeamSectionWrapper";
-import WellcomeSectionWrapper from "./WellcomeSectionWrapper";
+import ExpectSectionWrapper from "@/components/auth/onboarding/ExpectSectionWrapper";
+import HouseRulesSectionWrapper from "@/components/auth/onboarding/HouseRulesSectionWrapper";
+import OnboardingClientWrapper from "@/components/auth/onboarding/OnboardingClientWrapper";
+import OnboardingStepper from "@/components/auth/onboarding/OnboardingStepper";
+import PartnersSectionWrapper from "@/components/auth/onboarding/PartnersSectionWrapper";
+import RoadMapWrapper from "@/components/auth/onboarding/RoadMapSectionWrapper";
+import SoftwareSectionWrapper from "@/components/auth/onboarding/SoftwareSectionWrapper";
+import TeamSectionWrapper from "@/components/auth/onboarding/TeamSectionWrapper";
+import WellcomeSectionWrapper from "@/components/auth/onboarding/WelcomeSectionWrapper";
 import { Button } from "@codevs/ui/button";
 
 export default function OnboardingPage() {

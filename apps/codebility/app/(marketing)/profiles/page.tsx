@@ -1,8 +1,8 @@
 import { Metadata } from "next";
 
-import Section from "../_shared/CodevsSection";
-import { CodevHireCodevModal } from "./_components/CodevHireCodevModal";
-import { ProfilesListBlock } from "./_components/ProfilesListBlock";
+import Section from "@/components/global/marketing/CodevsSection";
+import { CodevHireCodevModal } from "@/components/global/marketing/CodevHireCodevModal";
+import { ProfilesListBlock } from "@/components/marketing/profiles/ProfilesListBlock";
 
 export const metadata: Metadata = {
     title: "Developer Profiles — Browse Our Talent Pool | Codebility",

@@ -1,4 +1,3 @@
-// PublicNdaSigningPage.tsx
 "use client";
 
 import { forwardRef, useEffect, useRef, useState } from "react";
@@ -10,8 +9,8 @@ import { toast } from "react-hot-toast";
 import { Button } from "@codevs/ui/button";
 import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
-import { completeNdaSigning } from "@/utils/ndaStorageService";
-import { createClientClientComponent } from "@/utils/supabase/client";
+import { completeNdaSigning } from "@/actions/global/nda-storage";
+import { createClientClientComponent } from "@/lib/global/supabase-client";
 
 // Validation schema for user information
 const UserInfoSchema = z.object({

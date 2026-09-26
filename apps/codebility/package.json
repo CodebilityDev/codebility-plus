@@ -86,7 +86,6 @@
     "cross-env": "^7.0.3",
     "dotenv": "^17.2.3",
     "eslint": "^9.39.5",
-    "eslint-import-resolver-typescript": "^4.4.5",
     "npm-only-allow": "^1.2.6",
     "patch-package": "^8.0.0",
     "postcss": "^8",

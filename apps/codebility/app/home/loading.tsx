@@ -1,4 +1,4 @@
-import { Skeleton } from "@/components/ui/skeleton/skeleton";
+import { Skeleton } from "@/components/global/ui/skeleton";
 
 export default function HomeLoading() {
   return (

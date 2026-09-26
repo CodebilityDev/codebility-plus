@@ -1,6 +1,6 @@
 import React, { Suspense } from "react";
 
-import ApplicantFetchComp from "./_components/applicantFetchComp";
+import ApplicantFetchComp from "@/components/applicant/waiting/applicantFetchComp";
 import Loading from "./loading";
 
 export const dynamic = "force-dynamic";

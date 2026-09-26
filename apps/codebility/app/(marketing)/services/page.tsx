@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 
-import { ServicesPageView } from "@/lib/services/ServicesPageView";
+import { ServicesPageView } from "@/components/marketing/services/ServicesPageView";
 
 export const metadata: Metadata = {
   title: "Our Services — Web & App Development | Codebility",

@@ -1,20 +1,20 @@
 import React, { Suspense } from "react";
-import AsyncErrorBoundary from "@/components/AsyncErrorBoundary";
-import ErrorBoundary from "@/components/ErrorBoundary";
-import { ModalProviderHome } from "@/components/providers/modal-provider-home";
-import { ThemeProvider } from "@/store/providers/ThemeProvider";
-import ReactQueryProvider from "@/hooks/query/reactQuery";
-import { UserProvider } from "@/store/UserProvider";
-import { getCurrentCodev } from "@/lib/server/current-codev";
+import AsyncErrorBoundary from "@/components/global/feedback/AsyncErrorBoundary";
+import ErrorBoundary from "@/components/global/feedback/ErrorBoundary";
+import { ModalProviderHome } from "@/providers/home/ModalProviderHome";
+import { ThemeProvider } from "@/providers/global/ThemeProvider";
+import ReactQueryProvider from "@/providers/global/ReactQueryProvider";
+import { UserProvider } from "@/providers/home/UserProvider";
+import { getCurrentCodev } from "@/lib/home/current-codev";
 import { Toaster } from "sonner";
 
-import ToastNotification from "./_components/HomeToastNotification";
-import LeftSidebarServer from "@/components/shared/dashboard/LeftSidebarServer";
-import Navbar from "./_components/Navbar";
-import PageTransitionWrapper from "./_components/PageTransitionWrapper";
-import { PageTransitionSettings } from "./_components/PageTransitionSettings";
-import ConditionalMainWrapper from "./_components/ConditionalMainWrapper";
-import DynamicMainContent from "./_components/DynamicMainContent";
+import ToastNotification from "@/components/home/HomeToastNotification";
+import LeftSidebarServer from "@/components/home/LeftSidebarServer";
+import Navbar from "@/components/home/Navbar";
+import PageTransitionWrapper from "@/components/home/PageTransitionWrapper";
+import { PageTransitionSettings } from "@/components/home/PageTransitionSettings";
+import ConditionalMainWrapper from "@/components/home/ConditionalMainWrapper";
+import DynamicMainContent from "@/components/home/DynamicMainContent";
 
 export default async function HomeLayout({
   children,

@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { parseServicesCategory } from "@/utils/services/categories";
+import { parseServicesCategory } from "@/utils/global/services-categories";
 import {
   getCachedServicesProjectById,
   getCachedServicesProjectsPage,
-} from "@/lib/server/services-projects-cached";
+} from "@/lib/global/services-projects-cached";
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 12;

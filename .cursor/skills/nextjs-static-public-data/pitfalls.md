@@ -20,7 +20,7 @@ Marketing `/` was slow / dynamic because:
 - Logout: `signOut()` **redirects (throws)** → clear storage in `finally`.
 - Public reads: **`createClientAnon()`** only.
 - Admins: RSC + `unstable_cache` + motion client child.
-- Interns: **one** `lib/server/landing-interns-cached.ts` (query +
+- Interns: **one** `lib/global/landing-interns-cached.ts` (query +
   `getCachedLandingInternsPage`). Page 1 SC awaits cache directly. Page 2+
   client `fetch` → `/api/landing-interns` → **same** cache. Pager =
   `useState` + `use()` + module promise Map (**no URL `?page=`**).
@@ -66,7 +66,7 @@ Same bug class for landing and services — soft-nav remounts with page-1 SSR da
 
 Keep list page in React state only. `router.replace` for `?category=` / `?project=` is OK.
 
-### 20. Value-importing `lib/server/*-cached.ts` into `"use client"`
+### 20. Value-importing `lib/global/*-cached.ts` into `"use client"`
 
 **`import type` only.** Client constants in `services/_lib/services-categories.ts`.
 

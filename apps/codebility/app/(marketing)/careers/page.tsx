@@ -1,10 +1,10 @@
 import { Metadata } from "next";
 
-import CareerGrowthPath from "./_components/CareerGrowthPath";
-import { JobListingsBlock } from "./_components/JobListingsBlock";
-import CodevHero from "./_components/CodevsHero";
-import TechStack from "./_components/TechStack";
-import WorkplaceCulture from "./_components/WorkplaceCulture";
+import CareerGrowthPath from "@/components/marketing/careers/CareerGrowthPath";
+import { JobListingsBlock } from "@/components/marketing/careers/JobListingsBlock";
+import CodevHero from "@/components/marketing/careers/CodevsHero";
+import TechStack from "@/components/marketing/careers/TechStack";
+import WorkplaceCulture from "@/components/marketing/careers/WorkplaceCulture";
 
 export const metadata: Metadata = {
     title: "Careers — Join Codebility as a Developer",

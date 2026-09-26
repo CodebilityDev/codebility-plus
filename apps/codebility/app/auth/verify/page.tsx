@@ -1,6 +1,6 @@
 import Link from "next/link";
-import Logo from "@/components/shared/Logo";
-import { Button } from "@/components/ui/button";
+import Logo from "@/components/global/layout/Logo";
+import { Button } from "@/components/global/ui/button";
 
 const VerifyPage = () => {
   return (

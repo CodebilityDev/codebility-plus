@@ -1,7 +1,7 @@
-import { ModalProviderMarketing } from "@/components/providers/modal-provider-marketing";
-import Footer from "./_components/MarketingFooter";
-import Navigation from "./_components/MarketingNavigation";
-import SideNavMenu from "./_components/MarketingSidenavMenu";
+import { ModalProviderMarketing } from "@/providers/marketing/ModalProviderMarketing";
+import Footer from "@/components/marketing/MarketingFooter";
+import Navigation from "@/components/global/marketing/MarketingNavigation";
+import SideNavMenu from "@/components/marketing/MarketingSidenavMenu";
 
 export default async function MarketingLayout({
   children,

@@ -1,4 +1,4 @@
-import { createClientServerComponent } from "@/utils/supabase/server";
+import { createClientServerComponent } from "@/lib/global/supabase-server";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest, props: { params: Promise<{ id: string }> }) {

@@ -1,4 +1,4 @@
-import { createClientServerComponent } from "@/utils/supabase/server";
+import { createClientServerComponent } from "@/lib/global/supabase-server";
 
 export async function POST(request: Request) {
 

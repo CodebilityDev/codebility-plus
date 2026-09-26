@@ -1,4 +1,4 @@
-import { createClientServerComponent } from "@/utils/supabase/server";
+import { createClientServerComponent } from "@/lib/global/supabase-server";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 

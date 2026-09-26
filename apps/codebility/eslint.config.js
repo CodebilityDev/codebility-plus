@@ -1,44 +1,76 @@
-import fs from "node:fs";
+import path from "node:path";
 
 import baseConfig from "@codevs/eslint-config/base";
 import nextjsConfig from "@codevs/eslint-config/nextjs";
 import reactConfig from "@codevs/eslint-config/react";
 
-const dirs = (path) =>
-  fs
-    .readdirSync(path, { withFileTypes: true })
-    .filter((e) => e.isDirectory())
-    .map((e) => e.name);
+// Folder rules from AGENTS.md:
+// - app/ holds Next.js routing files only.
+// - Every other folder is <folder>/global/... or <folder>/<route>/...
+// - A file may import from any global/ folder and from folders of its own
+//   route, and from nothing else.
+const ROOT = import.meta.dirname;
+const FOLDERS = new Set(["actions", "components", "constants", "hooks", "lib", "providers", "store", "styles", "types", "utils"]);
+const ROUTE_FILE = /^(page|layout|loading|error|not-found|route|template|default|global-error|sitemap|robots)\.(tsx?|jsx?)$/;
 
-// Legacy: several shared files and layouts still import from the marketing
-// route group. Move those modules to components/ or lib/ instead of adding
-// new exceptions here.
-const LEGACY = "./(marketing)";
+const toSegments = (file) => path.relative(ROOT, file).split(path.sep);
 
-// Folder boundaries (see AGENTS.md). Zones are read from disk, so a new route
-// folder is covered as soon as it exists.
-const boundaryZones = [
-  {
-    target: ["./actions", "./components", "./constants", "./hooks", "./lib", "./store", "./types", "./utils"],
-    from: "./app",
-    except: [LEGACY],
-    message: "Shared code must not import from app/. Move the module out of the route folder.",
+// Route of a file: "" means global. `null` means the rule doesn't apply.
+function routeOf(segments) {
+  const [top, ...rest] = segments;
+  if (top === "app") {
+    return rest
+      .slice(0, -1)
+      .filter((s) => !s.startsWith("["))
+      .map((s) => s.replace(/^\((.*)\)$/, "$1"))
+      .join("/");
+  }
+  if (FOLDERS.has(top)) return rest[0] === "global" ? "" : rest.slice(0, -1).join("/");
+  return null;
+}
+
+const routeScope = {
+  meta: { type: "problem", schema: [] },
+  create(context) {
+    const fromSegments = toSegments(context.filename);
+    const fromRoute = routeOf(fromSegments);
+    if (fromRoute === null) return {};
+    const inApp = fromSegments[0] === "app";
+
+    function check(node) {
+      const spec = node.source && node.source.value;
+      if (typeof spec !== "string") return;
+      let target;
+      if (spec.startsWith("@/")) target = path.join(ROOT, spec.slice(2));
+      else if (spec.startsWith(".")) target = path.resolve(path.dirname(context.filename), spec);
+      else return;
+      const segments = toSegments(target);
+      if (segments[0] === "app") {
+        const sameFolder = inApp && path.dirname(target) === path.dirname(context.filename);
+        if (!sameFolder) context.report({ node: node.source, message: "Don't import from app/. Move the code to components/, lib/ or another folder (see AGENTS.md)." });
+        return;
+      }
+      const targetRoute = routeOf(segments);
+      if (targetRoute === null || targetRoute === "" || targetRoute === fromRoute) return;
+      context.report({
+        node: node.source,
+        message: `"${spec}" belongs to route "${targetRoute}", but this file is in route "${fromRoute || "global"}". If both routes need it, move it to a global/ folder.`,
+      });
+    }
+
+    return {
+      Program(node) {
+        if (inApp && !ROUTE_FILE.test(path.basename(context.filename))) {
+          context.report({ node, message: "app/ holds routing files only. Put this file in components/<route>/ or another folder (see AGENTS.md)." });
+        }
+      },
+      ImportDeclaration: check,
+      ExportNamedDeclaration: check,
+      ExportAllDeclaration: check,
+      ImportExpression: check,
+    };
   },
-  ...dirs("./app").map((route) => ({
-    target: `./app/${route}`,
-    from: "./app",
-    except: [...new Set([`./${route}`, LEGACY])],
-    message: "Route folders must not import from sibling routes. Move shared code to components/ or lib/.",
-  })),
-  ...dirs("./app/home")
-    .filter((feature) => !feature.startsWith("_"))
-    .map((feature) => ({
-      target: `./app/home/${feature}`,
-      from: "./app/home",
-      except: [`./${feature}`, "./_components"],
-      message: "A /home feature must not import from another /home feature.",
-    })),
-];
+};
 
 // Pre-existing debt: these rules already fail in code kept from before the
 // 2026-09 cleanup, so they warn instead of error. New code should pass them.
@@ -92,13 +124,11 @@ export default [
   ...nextjsConfig,
   {
     files: ["**/*.ts", "**/*.tsx"],
-    settings: {
-      "import/resolver": { typescript: { project: "./tsconfig.json" } },
-    },
+    plugins: { codebility: { rules: { "route-scope": routeScope } } },
     rules: {
       ...Object.fromEntries(DEBT_RULES.map((rule) => [rule, "warn"])),
       "@typescript-eslint/no-explicit-any": "off",
-      "import/no-restricted-paths": ["error", { zones: boundaryZones }],
+      "codebility/route-scope": "error",
     },
   },
 ];

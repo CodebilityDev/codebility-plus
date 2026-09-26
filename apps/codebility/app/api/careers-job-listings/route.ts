@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCachedCareersJobListingsPage } from "@/lib/server/careers-job-listings-cached";
+import { getCachedCareersJobListingsPage } from "@/lib/global/careers-job-listings-cached";
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 4;

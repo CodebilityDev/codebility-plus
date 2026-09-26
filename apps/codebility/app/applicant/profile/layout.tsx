@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { useUserStore } from "@/store/codev-store";
+import { useUserStore } from "@/store/global/codev-store";
 
 export default function ApplicantProfileLayout({
   children,

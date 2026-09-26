@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { createClientServerComponent } from "./utils/supabase/server";
+import { createClientServerComponent } from "@/lib/global/supabase-server";
 
 
 export const config = {
@@ -40,7 +40,7 @@ const TWO_FACTOR_ROUTE = "/auth/2fa-challenge";
 const AUTH_STATUS_ROUTES = [APPLICATION_DECLINED_ROUTE, EMAIL_VERIFICATION_ROUTE, TWO_FACTOR_ROUTE] as const;
 
 // Route prefix -> boolean column on the `roles` table. Keep in sync with
-// constants/sidebar.ts when adding a private page.
+// actions/home/sidebar.ts when adding a private page.
 const routePermissionMap = {
   "/home/applicants": "applicants",
 } as const;

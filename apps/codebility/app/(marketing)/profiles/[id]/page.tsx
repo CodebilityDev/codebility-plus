@@ -1,20 +1,20 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Paragraph from "@/components/shared/home/Paragraph";
-import Logo from "@/components/shared/Logo";
+import Paragraph from "@/components/global/typography/Paragraph";
+import Logo from "@/components/global/layout/Logo";
 import {
   getCachedProfileDetail,
   getCachedProfileDetailMeta,
-} from "@/lib/server/profile-detail-cached";
+} from "@/lib/marketing/profiles/profile-detail-cached";
 import {
   getCachedLandingAdminsData,
   getLandingAdminsProfileIds,
-} from "@/lib/server/landing-admins-cached";
-import { getCachedLandingInternsPage } from "@/lib/server/landing-interns-cached";
+} from "@/lib/global/landing-admins-cached";
+import { getCachedLandingInternsPage } from "@/lib/global/landing-interns-cached";
 
-import JsonLd from "../../_components/JsonLd";
-import ProfileCloseButton from "./_components/ProfileCloseButton";
-import ProfileContent from "./_components/ProfileContent";
+import JsonLd from "@/components/global/marketing/JsonLd";
+import ProfileCloseButton from "@/components/marketing/profiles/ProfileDetailCloseButton";
+import ProfileContent from "@/components/marketing/profiles/ProfileDetailContent";
 
 interface Props {
   params: Promise<{ id: string }>;

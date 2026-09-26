@@ -1,15 +1,15 @@
 import { Metadata } from "next";
 
-import DevelopmentProcessReactFLow from "./_components/AiIntegration-development-process-react-flow";
-import DevelopmentProcess from "./_components/AiIntegrationDevelopmentProcess";
-import HeroBackground from "./_components/AiIntegrationHeroBg";
-import LatestTech from "./_components/AiIntegrationLatestTech";
-import MobileAppServices from "./_components/AiIntegrationMobileAppServices";
-import NextStep from "./_components/AiIntegrationNextStep";
-import Partner from "./_components/AiIntegrationPartner";
-import PartnerReactFlow from "./_components/AiIntegrationPartnerReactFlow";
-import AISolutions from "./_components/AiIntegrationSolutions";
-import UnparallelDigitalSuccess from "./_components/AiIntegrationUnparallelDigitalSuccess";
+import DevelopmentProcessReactFLow from "@/components/marketing/ai-integration/AiIntegration-development-process-react-flow";
+import DevelopmentProcess from "@/components/marketing/ai-integration/AiIntegrationDevelopmentProcess";
+import HeroBackground from "@/components/marketing/ai-integration/AiIntegrationHeroBg";
+import LatestTech from "@/components/marketing/ai-integration/AiIntegrationLatestTech";
+import MobileAppServices from "@/components/marketing/ai-integration/AiIntegrationMobileAppServices";
+import NextStep from "@/components/marketing/ai-integration/AiIntegrationNextStep";
+import Partner from "@/components/marketing/ai-integration/AiIntegrationPartner";
+import PartnerReactFlow from "@/components/marketing/ai-integration/AiIntegrationPartnerReactFlow";
+import AISolutions from "@/components/marketing/ai-integration/AiIntegrationSolutions";
+import UnparallelDigitalSuccess from "@/components/marketing/ai-integration/AiIntegrationUnparallelDigitalSuccess";
 
 export const metadata: Metadata = {
     title: "AI Integration Services — Codebility",

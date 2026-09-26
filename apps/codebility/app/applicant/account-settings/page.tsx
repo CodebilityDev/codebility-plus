@@ -1,4 +1,4 @@
-import AccountSettings from "@/components/account-settings/AccountSettings";
+import AccountSettings from "@/components/global/account-settings/AccountSettings";
 
 export const dynamic = "force-dynamic";
 

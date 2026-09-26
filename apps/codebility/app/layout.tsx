@@ -1,14 +1,14 @@
-import "@/app/globals.css";
+import "@/styles/global/globals.css";
 
 import React from "react";
 import { Metadata } from "next";
 import { Outfit } from "next/font/google";
-import { Toaster } from "@/components/ui/toaster";
-import { ThemeProvider } from "@/store/providers/ThemeProvider";
-import ToasterContext from "@/store/providers/ToasterProvider";
-import ReactQueryProvider from "@/hooks/query/reactQuery";
+import { Toaster } from "@/components/global/ui/toaster";
+import { ThemeProvider } from "@/providers/global/ThemeProvider";
+import ToasterContext from "@/providers/global/ToasterProvider";
+import ReactQueryProvider from "@/providers/global/ReactQueryProvider";
 import { TooltipProvider } from "@codevs/ui/tooltip";
-import JsonLd from "@/app/(marketing)/_components/JsonLd";
+import JsonLd from "@/components/global/marketing/JsonLd";
 
 const outfit = Outfit({
     subsets: ["latin"],

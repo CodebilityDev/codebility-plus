@@ -1,7 +1,7 @@
 import React, { Suspense } from "react";
-import AsyncErrorBoundary from "@/components/AsyncErrorBoundary";
+import AsyncErrorBoundary from "@/components/global/feedback/AsyncErrorBoundary";
 
-import NewApplicantFetchComp from "./_components/applicantFetchComp";
+import NewApplicantFetchComp from "@/components/home/applicants/applicantFetchComp";
 import ApplicantsLoading from "./loading";
 
 export const dynamic = "force-dynamic";

@@ -1,12 +1,12 @@
 import { Metadata } from "next";
 
-import FeaturedSection from "../_shared/CodevsFeaturedCection";
-import CodevsFeaturedProjectsSection from "../_shared/CodevsFeaturedProjectsSection";
-import CodevsProfiles from "../_shared/CodevsProfiles";
-import CTA from "../_shared/CodevsCta";
-import Hero from "./_components/CodevsHero";
-import CodevsRoadmapStatic from "./_components/CodevsRoadmapStatic";
-import MissionVision from "./_components/CodevsMissionVision";
+import FeaturedSection from "@/components/global/marketing/CodevsFeaturedSection";
+import CodevsFeaturedProjectsSection from "@/components/global/marketing/CodevsFeaturedProjectsSection";
+import CodevsProfiles from "@/components/global/marketing/CodevsProfiles";
+import CTA from "@/components/marketing/codevs/CodevsCta";
+import Hero from "@/components/marketing/codevs/CodevsHero";
+import CodevsRoadmapStatic from "@/components/marketing/codevs/CodevsRoadmapStatic";
+import MissionVision from "@/components/marketing/codevs/CodevsMissionVision";
 
 export const metadata: Metadata = {
     title: "Our Developers — Meet the Codebility Team",

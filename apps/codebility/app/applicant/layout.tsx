@@ -1,7 +1,7 @@
 "use server";
 import React from "react";
 
-import Navigation from "../(marketing)/_components/MarketingNavigation";
+import Navigation from "@/components/global/marketing/MarketingNavigation";
 
 export default async function ApplicantLayout({
   children,

@@ -1,10 +1,9 @@
-// app/api/profile-points/[codevId]/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { createClientServerComponent } from "@/utils/supabase/server";
+import { createClientServerComponent } from "@/lib/global/supabase-server";
 import {
   computeProfilePoints,
   persistProfilePoints,
-} from "@/lib/server/profile-points";
+} from "@/lib/api/profile-points/profile-points";
 import { z } from "zod";
 
 const codevIdSchema = z.string().uuid("Invalid codev ID format");

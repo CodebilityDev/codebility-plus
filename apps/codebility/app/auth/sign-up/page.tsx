@@ -14,15 +14,15 @@ import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
 import { Checkbox } from "@codevs/ui/checkbox";
 import { Textarea } from "@codevs/ui/textarea";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "@/components/global/ui/toaster";
 
-import { signupUser } from "@/actions/auth/session";
-import { useModal } from "@/hooks/modals/use-modal";
-import { useTechStackStore } from "@/hooks/data/use-techstack";
+import { signupUser } from "@/actions/global/auth-session";
+import { useModal } from "@/hooks/global/use-modal";
+import { useTechStackStore } from "@/hooks/global/use-techstack";
 
 // Import modals
-import TechStackModal from "@/components/modals/TechStackModal";
-import PrivacyPolicyModal from "@/components/modals/PrivacyPolicyModal";
+import TechStackModal from "@/components/global/modals/TechStackModal";
+import PrivacyPolicyModal from "@/components/global/modals/PrivacyPolicyModal";
 
 // Constants
 const POSITIONS = [

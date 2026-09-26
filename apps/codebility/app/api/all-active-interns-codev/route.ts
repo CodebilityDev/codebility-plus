@@ -1,6 +1,5 @@
-// app/api/all-active-interns/route.ts
 import { NextResponse } from "next/server";
-import { createClientServerComponent } from "@/utils/supabase/server";
+import { createClientServerComponent } from "@/lib/global/supabase-server";
 
 type Intern = {
   name: string;

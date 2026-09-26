@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClientAnon } from "@/utils/supabase/anon";
+import { createClientAnon } from "@/lib/global/supabase-anon";
 
 const cacheHeaders = {
   "Cache-Control":

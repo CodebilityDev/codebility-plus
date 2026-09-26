@@ -1,7 +1,7 @@
 import { Suspense } from "react";
-import Logo from "@/components/shared/Logo";
-import { Toaster } from "@/components/ui/toaster";
-import TwoFactorForm from "./_components/TwoFactorForm";
+import Logo from "@/components/global/layout/Logo";
+import { Toaster } from "@/components/global/ui/toaster";
+import TwoFactorForm from "@/components/auth/2fa-challenge/TwoFactorForm";
 
 export const dynamic = "force-dynamic";
 

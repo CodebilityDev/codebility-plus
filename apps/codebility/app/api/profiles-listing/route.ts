@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCachedProfilesListingPage } from "@/lib/server/profiles-listing-cached";
+import { getCachedProfilesListingPage } from "@/lib/global/profiles-listing-cached";
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 5;

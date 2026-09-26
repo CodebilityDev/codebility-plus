@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCachedLandingInternsPage } from "@/lib/server/landing-interns-cached";
+import { getCachedLandingInternsPage } from "@/lib/global/landing-interns-cached";
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 10;

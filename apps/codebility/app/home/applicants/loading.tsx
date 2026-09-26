@@ -1,6 +1,6 @@
-import Box from "@/components/shared/dashboard/Box";
-import H1 from "@/components/shared/dashboard/H1";
-import { Skeleton } from "@/components/ui/skeleton/skeleton";
+import Box from "@/components/global/layout/Box";
+import H1 from "@/components/global/layout/H1";
+import { Skeleton } from "@/components/global/ui/skeleton";
 
 export default function ApplicantsLoading() {
   return (
