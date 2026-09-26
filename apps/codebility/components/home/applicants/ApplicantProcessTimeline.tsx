@@ -10,9 +10,11 @@ import { Component } from "react";
 
 import { AlertCircle } from "lucide-react";
 
-import { NewApplicantType } from "@/types/home/applicants/applicants";
+
 import { TimelineBody } from "@/components/home/applicants/TimelineBody";
 import type { BoundaryProps, BoundaryState } from "@/types/home/applicants/applicants";
+import type { ApplicantProcessTimelineProps } from "@/types/home/applicants/applicants";
+
 
 
 
@@ -52,9 +54,7 @@ class TimelineErrorBoundary extends Component<BoundaryProps, BoundaryState> {
 
 const ApplicantProcessTimeline = ({
   applicant,
-}: {
-  applicant: NewApplicantType;
-}) => {
+}: ApplicantProcessTimelineProps) => {
   return (
     <div className="space-y-3">
       <h3 className="text-lg font-medium">Application Progress</h3>

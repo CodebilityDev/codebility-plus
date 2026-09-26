@@ -7,7 +7,8 @@ import { Period } from "@/types/applicant/profile/profile";
 import { Button } from "@/components/global/ui/button";
 import { IconEdit } from "@/public/assets/svgs/index";
 import { useUserStore } from "@/store/global/codev-store";
-import { DayOfWeek, DAYS_OF_WEEK, WEEKDAYS, WorkSchedule } from "@/types/global/codev";
+import type { DayOfWeek, WorkSchedule } from "@/types/global/codev";
+import { DAYS_OF_WEEK, WEEKDAYS } from "@/constants/applicant/profile/profile";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 

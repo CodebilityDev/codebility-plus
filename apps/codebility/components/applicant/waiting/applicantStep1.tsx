@@ -3,14 +3,12 @@ import { Button } from "@/components/global/ui/button";
 import { Loader2Icon } from "lucide-react";
 
 import { applicantMoveToOnboard } from "@/actions/applicant/waiting/applicant-waiting";
+import type { ApplicantStep1Props } from "@/types/applicant/waiting/waiting";
 
 export default function ApplicantStep1({
   setActiveStep,
   user,
-}: {
-  setActiveStep: React.Dispatch<React.SetStateAction<number>>;
-  user: any;
-}) {
+}: ApplicantStep1Props) {
   const [loading, setLoading] = React.useState(false);
 
   const prioRoles = ["QA Engineer", "Project Manager", "Admin", "Marketing"];

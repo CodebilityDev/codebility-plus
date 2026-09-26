@@ -1,13 +1,11 @@
 "use client";
 
 import { TechBadge } from "@/components/marketing/careers/TechBadge";
-import { techCategories } from "@/constants/marketing/careers/careers";
+import type { TechCategoryCardProps } from "@/types/marketing/careers/careers";
 
 export const TechCategoryCard = ({
   category,
-}: {
-  category: (typeof techCategories)[0];
-}) => {
+}: TechCategoryCardProps) => {
   return (
     <div className="group relative overflow-hidden rounded-xl border border-gray-800 bg-gray-900/50 p-6 backdrop-blur-sm transition-all duration-300 hover:border-gray-600 hover:bg-gray-900/70">
       <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-transparent to-blue-900/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />

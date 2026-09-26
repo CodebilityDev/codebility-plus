@@ -1,56 +1,27 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/global/ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/global/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/global/ui/dialog";
 import { useToast } from "@/components/global/ui/use-toast";
 import { cn } from "@/utils/global/cn";
-import {
-  CheckCircle2Icon,
-  Loader2Icon,
-  MailIcon,
-  MoreHorizontalIcon,
-} from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@codevs/ui/dropdown-menu";
+import { CheckCircle2Icon, Loader2Icon, MailIcon, MoreHorizontalIcon } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@codevs/ui/dropdown-menu";
 import { useApplicantModal } from "@/components/home/applicants/ApplicantClientWrapper";
 
-import {
-  acceptApplicantAction,
-  deleteApplicantAction,
-  denyApplicantAction,
-  moveApplicantToApplyingAction,
-  moveApplicantToOnboardingAction,
-  moveApplicantToTestingAction,
-  passApplicantTestAction,
-} from "@/actions/home/applicants/applicants";
+import { acceptApplicantAction, denyApplicantAction, moveApplicantToApplyingAction, moveApplicantToOnboardingAction, moveApplicantToTestingAction, passApplicantTestAction } from "@/actions/home/applicants/applicants";
 import { sendDenyEmail } from "@/actions/home/applicants/deny-email";
 import { sendFailedTestEmail } from "@/actions/home/applicants/failed-test-email";
 import { sendOnboardingReminderWithUpdate } from "@/actions/home/applicants/onboarding-reminder-email";
 import { sendPassedTestEmail } from "@/actions/home/applicants/passed-test-email";
 import { sendTestReminderWithUpdate } from "@/actions/home/applicants/test-reminder-email";
-import { NewApplicantType } from "@/types/home/applicants/applicants";
+import type { ApplicantActionButtonProps } from "@/types/home/applicants/applicants";
+
 
 export default function ApplicantActionButton({
   applicant,
-}: {
-  applicant: NewApplicantType;
-}) {
+}: ApplicantActionButtonProps) {
   const { toast } = useToast();
   const router = useRouter();
   const { openModal } = useApplicantModal(); // Use our custom modal context

@@ -4,8 +4,7 @@ import { ChevronDown, Plus, SortAsc, SortDesc, X } from "lucide-react";
 
 import { Badge } from "@codevs/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuTrigger } from "@codevs/ui/dropdown-menu";
-import type { SortOption } from "@/types/home/applicants/applicants";
-
+import type { ApplicantSortersProps } from "@/types/home/applicants/applicants";
 
 const ApplicantSorters = ({
   sortOptions,
@@ -14,14 +13,7 @@ const ApplicantSorters = ({
   onToggleSortDirection,
   onReorderSorts,
   resetSort,
-}: {
-  sortOptions: SortOption[];
-  onAddSort: (field: string, label: string) => void;
-  onRemoveSort: (field: string) => void;
-  onToggleSortDirection: (field: string) => void;
-  onReorderSorts: (sortOptions: SortOption[]) => void;
-  resetSort: () => void;
-}) => {
+}: ApplicantSortersProps) => {
   const availableFields = [
     { field: "name", label: "Name" },
     { field: "position", label: "Position" },

@@ -1,4 +1,6 @@
-const GradientBackgroundWhite = ({ className }: { className: string }) => {
+import type { GradientBackgroundWhiteProps } from "@/types/marketing/ai-integration/ai-integration";
+
+const GradientBackgroundWhite = ({ className }: GradientBackgroundWhiteProps) => {
   return (
     <div className="mx-auto">
       <div

@@ -3,8 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { getReApplyDate } from "@/utils/global/auth-declined";
+import type { DeclinedCountdownProps } from "@/types/auth/declined/declined";
 
-export const DeclinedCountdown = ({ userData }: { userData: any }) => {
+export const DeclinedCountdown = ({ userData }: DeclinedCountdownProps) => {
 
   const reapplyDate = useMemo(
     () => getReApplyDate(userData?.date_applied),

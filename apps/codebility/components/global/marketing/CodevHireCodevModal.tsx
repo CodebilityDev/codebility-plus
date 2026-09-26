@@ -13,10 +13,8 @@ import { toast } from "@/components/global/ui/use-toast";
 import { Codev } from "@/types/global/codev";
 import { useEffect, useState } from "react";
 import { sentHireCodevEmail } from "@/actions/global/profiles-email";
-import {
-  hireCodevEmailSchema,
-  type HireCodevEmail,
-} from "@/types/global/hire-codev-email";
+import { type HireCodevEmail } from "@/types/global/hire-codev-email";
+import { hireCodevEmailSchema } from "@/utils/global/hire-codev-email";
 
 
 export function CodevHireCodevModal() {

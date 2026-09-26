@@ -1,12 +1,9 @@
 "use client";
-
-import { workplaceCultureData } from "@/constants/marketing/careers/careers";
+import type { CultureCardProps } from "@/types/marketing/careers/careers";
 
 export const CultureCard = ({
   item,
-}: {
-  item: (typeof workplaceCultureData)[0];
-}) => {
+}: CultureCardProps) => {
   const Icon = item.icon;
 
   return (

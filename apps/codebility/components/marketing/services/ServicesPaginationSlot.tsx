@@ -1,16 +1,13 @@
 "use client";
 
 import DefaultPagination from "@/components/global/ui/DefaultPagination";
+import type { ServicesPaginationSlotProps } from "@/types/marketing/services/services";
 
 export function ServicesPaginationSlot({
   page,
   totalPages,
   onPageChange,
-}: {
-  page: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
-}) {
+}: ServicesPaginationSlotProps) {
   if (totalPages <= 1) {
     return <div className="mt-6 min-h-[4.5rem]" aria-hidden="true" />;
   }

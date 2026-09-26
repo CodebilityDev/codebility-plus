@@ -1,3 +1,4 @@
+import type { DayOfWeek } from "@/types/global/codev";
 // ENter name here kung may bagong tech stack na idadagdag cause of issues with naming in database  -> svg filenames.
 export const TECH_STACK_MAPPING: Record<string, string> = {
   // Multi-word names with spaces (need hyphens in filename)
@@ -44,3 +45,21 @@ export const TECH_STACK_MAPPING: Record<string, string> = {
 export const DEFAULT_START_TIME = "09:00";
 
 export const DEFAULT_END_TIME = "17:00";
+
+export const DAYS_OF_WEEK: DayOfWeek[] = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
+
+export const WEEKDAYS: DayOfWeek[] = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+];

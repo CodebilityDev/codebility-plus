@@ -1,23 +1,15 @@
 "use client";
 
-
-
-
-
-
 import ProgressiveMotion from "@/components/global/marketing/ProgressiveMotion";
 import { InternCard } from "@/components/marketing/InternCard";
 import { ROLE_CONFIG, ROLE_STYLES } from "@/constants/marketing/marketing";
 import type { Person } from "@/types/marketing/marketing";
-
+import type { InternCardsProps } from "@/types/marketing/marketing";
 
 export default function InternCards({
   interns,
   playOnMount = false,
-}: {
-  interns: Person[];
-  playOnMount?: boolean;
-}) {
+}: InternCardsProps) {
   const isCodev = (person: Person): boolean => person.role === ROLE_CONFIG.CODEV;
 
   return (

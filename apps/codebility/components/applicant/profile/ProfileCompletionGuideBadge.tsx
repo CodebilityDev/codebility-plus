@@ -1,14 +1,11 @@
 "use client";
+import type { ProfileCompletionGuideBadgeProps } from "@/types/applicant/profile/profile";
 
 export const ProfileCompletionGuideBadge = ({
   children,
   variant,
   className,
-}: {
-  children?: React.ReactNode;
-  variant?: "secondary" | "outline" | "success" | "warning";
-  className?: string;
-}) => {
+}: ProfileCompletionGuideBadgeProps) => {
   const base =
     "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold";
   const variants: Record<string, string> = {

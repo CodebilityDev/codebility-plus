@@ -1,35 +1,14 @@
 "use client";
 
-import { Suspense, use } from "react";
-import { fetchApiJson } from "@/utils/global/api-fetch";
+import { Suspense } from "react";
 
-import StarRating from "@/components/marketing/profiles/ProfileDetailStarRating";
+
+
 import { ProfileRatingSkeleton } from "@/components/marketing/profiles/ProfileRatingSkeleton";
+import { ProfileRatingContent } from "@/components/marketing/profiles/ProfileRatingContent";
+import type { ProfileRatingSectionProps } from "@/types/marketing/profiles/profiles";
 
-const ratingPromises = new Map<string, Promise<number>>();
-
-function loadRating(codevId: string): Promise<number> {
-  const cached = ratingPromises.get(codevId);
-  if (cached) return cached;
-
-  const promise = fetchApiJson<{ rating: number }>(
-    `/api/profile-rating/${codevId}`,
-    { cache: "force-cache" },
-  ).then((result) => {
-    if (!result.ok) return 0;
-    return result.data.rating ?? 0;
-  });
-
-  ratingPromises.set(codevId, promise);
-  return promise;
-}
-
-function ProfileRatingContent({ codevId }: { codevId: string }) {
-  const rating = use(loadRating(codevId));
-  return <StarRating rating={rating} size={24} />;
-}
-
-export default function ProfileRatingSection({ codevId }: { codevId: string }) {
+export default function ProfileRatingSection({ codevId }: ProfileRatingSectionProps) {
   return (
     <Suspense fallback={<ProfileRatingSkeleton />}>
       <ProfileRatingContent codevId={codevId} />

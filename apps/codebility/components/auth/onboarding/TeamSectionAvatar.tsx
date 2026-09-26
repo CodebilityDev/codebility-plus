@@ -1,20 +1,13 @@
 "use client";
 
-import type { Person } from "@/types/auth/onboarding/onboarding";
 import { cn } from "@/utils/global/cn";
+import type { TeamSectionAvatarProps } from "@/types/auth/onboarding/onboarding";
 
-// -------------------------
-// Avatar
-// -------------------------
 export function TeamSectionAvatar({
   person,
   size = 72,
   position = "center top"
-}: {
-  person: Person;
-  size?: number;
-  position?: string;
-}) {
+}: TeamSectionAvatarProps) {
   const initials = (person.name || "")
     .split(" ")
     .slice(0, 2)

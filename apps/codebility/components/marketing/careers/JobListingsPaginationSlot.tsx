@@ -1,16 +1,13 @@
 "use client";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import type { JobListingsPaginationSlotProps } from "@/types/marketing/careers/careers";
 
 export function JobListingsPaginationSlot({
   page,
   totalPages,
   onPageChange,
-}: {
-  page: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
-}) {
+}: JobListingsPaginationSlotProps) {
   if (totalPages <= 1) {
     return <div className="mt-12 min-h-[2.5rem]" aria-hidden="true" />;
   }

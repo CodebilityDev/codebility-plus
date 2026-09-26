@@ -1,4 +1,4 @@
-import { Codev, type WorkExperience } from "@/types/global/codev";
+import type { Codev, WorkExperience } from "@/types/global/codev";
 import type { ProfilesListingPage } from "@/types/global/profiles-listing";
 
 export interface ProfilesIdPageProps {
@@ -66,3 +66,47 @@ export type ProfileDetailRow = {
   work_schedules: Codev["work_schedules"];
   codev_points: Codev["codev_points"];
 };
+
+export interface AnimatedProfilesGridProps {
+  codevs: ProfilesListingPage["codevs"];
+  animationKey: string;
+}
+
+export interface ProfileProjectsContentProps { codevId: string }
+
+export interface ProfileProjectsSectionProps {
+  codevId: string;
+}
+
+export interface ProfileRatingContentProps { codevId: string }
+
+export interface ProfileRatingSectionProps { codevId: string }
+
+export interface ProfileProjectsSkeletonProps { count?: number }
+
+export interface ProfilesGridProps {
+  codevs: ProfilesListingPage["codevs"];
+  animationKey: string;
+}
+
+export interface ProfilesListRemoteProps {
+  position: string;
+  page: number;
+  pageSize: number;
+  initialData: ProfilesListingPage;
+}
+
+export interface ProfilesListGridProps {
+  position: string;
+  page: number;
+  pageSize: number;
+  initialData: ProfilesListingPage;
+}
+
+export interface ProfilesListSkeletonProps { count?: number }
+
+export interface ProfilesPaginationSlotProps {
+  page: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}

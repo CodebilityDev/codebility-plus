@@ -6,12 +6,11 @@ import { CardDescription, CardHeader, CardTitle } from "@codevs/ui/card";
 import { Input } from "@codevs/ui/input";
 
 import AccountSettingsDialog from "@/components/global/account-settings/AccountSettingsDialog";
+import type { AccountSettingsHeaderProps } from "@/types/global/account-settings";
 
 export default function AccountSettingsHeader({
   email,
-}: {
-  email: string;
-}) {
+}: AccountSettingsHeaderProps) {
   return (
     <>
       <CardHeader className="px-0">

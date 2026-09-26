@@ -2,16 +2,13 @@
 
 import { AdminCardSkeleton } from "@/components/marketing/AdminCardSkeleton";
 import BlueBg from "@/components/marketing/LandingBlueBg";
+import type { AdminsSectionSkeletonProps } from "@/types/marketing/marketing";
 
 export function AdminsSectionSkeleton({
   title,
   description,
   cardCount,
-}: {
-  title: string;
-  description: string;
-  cardCount: number;
-}) {
+}: AdminsSectionSkeletonProps) {
   return (
     <div aria-hidden="true">
       <h1 className="bg-gradient-to-r from-white via-purple-200 to-cyan-200 bg-clip-text text-center text-3xl font-bold text-transparent">

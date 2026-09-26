@@ -1,6 +1,6 @@
-// CBP-135 follow-up: shared JSON-LD renderer.
-// Usage: <JsonLd data={someSchemaObject} />
-export default function JsonLd({ data }: { data: Record<string, unknown> }) {
+import type { JsonLdProps } from "@/types/global/marketing";
+
+export default function JsonLd({ data }: JsonLdProps) {
   return (
     <script
       type="application/ld+json"

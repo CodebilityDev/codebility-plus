@@ -1,20 +1,13 @@
 "use client";
 import { LandingInternCardsSkeleton } from "@/components/marketing/LandingInternCardsSkeleton";
 import { LandingInternPaginationChrome } from "@/components/marketing/LandingInternPaginationChrome";
-
-
-
-
+import type { LandingInternSkeletonProps } from "@/types/marketing/marketing";
 
 export default function LandingInternSkeleton({
   page = 1,
   totalPages = 1,
   showPagination = true,
-}: {
-  page?: number;
-  totalPages?: number;
-  showPagination?: boolean;
-}) {
+}: LandingInternSkeletonProps) {
   return (
     <div className="flex w-full flex-col items-center gap-6">
       <div className="w-full min-h-[300px]">

@@ -20,6 +20,8 @@ import { NavUserProfile } from "@/types/global/database";
 import { CareersSignIn } from "@/components/global/marketing/CareersSignIn";
 import { NAV_USER_PROFILE_KEY } from "@/constants/global/marketing";
 import { getMenuItems } from "@/utils/global/marketing";
+import type { DrawerAuthSectionProps, UserMenuProps } from "@/types/global/marketing";
+
 
 
 async function getNavUser() {
@@ -62,7 +64,7 @@ function getNavUserPromise() {
   return navUserPromise;
 }
 
-export const DrawerAuthSection = ({handleLogout}: {handleLogout: () => void}) =>
+export const DrawerAuthSection = ({handleLogout}: DrawerAuthSectionProps) =>
    { 
     const cachedUserData = useLocalStorageValue<NavUserProfile>(NAV_USER_PROFILE_KEY);
 
@@ -103,7 +105,7 @@ export const DrawerAuthSection = ({handleLogout}: {handleLogout: () => void}) =>
   </>
 )};
 
-export const UserMenu = ({handleLogout}: {handleLogout: () => void}) => {
+export const UserMenu = ({handleLogout}: UserMenuProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isHovered, setIsHovered] = useState<string | null>(null);
 

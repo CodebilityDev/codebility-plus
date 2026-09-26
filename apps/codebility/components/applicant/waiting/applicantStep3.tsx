@@ -1,21 +1,18 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import Logo from "@/components/global/layout/Logo";
+
 import { Button } from "@/components/global/ui/button";
 import { Checkbox } from "@codevs/ui/checkbox";
-import { ApplicantType } from "@/types/applicant/waiting/applicant-waiting";
+
 import { applicantUpdateJoinedStatus } from "@/actions/applicant/waiting/applicant-waiting";
+import type { ApplicantStep3Props } from "@/types/applicant/waiting/waiting";
 
 export default function ApplicantStep3({
   setActiveStep,
   user,
   applicantData,
-}: {
-  setActiveStep: React.Dispatch<React.SetStateAction<number>>;
-  user: any;
-  applicantData: ApplicantType;
-}) {
+}: ApplicantStep3Props) {
   const [joinedDiscord, setJoinedDiscord] = useState(applicantData.joined_discord);
   const [joinedMessenger, setJoinedMessenger] = useState(applicantData.joined_messenger);
   const [isUpdating, setIsUpdating] = useState(false);

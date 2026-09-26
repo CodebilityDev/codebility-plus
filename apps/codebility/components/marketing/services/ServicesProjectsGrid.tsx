@@ -2,17 +2,13 @@
 
 import { servicesProjectsGridClass } from "@/components/marketing/services/ServicesGridSkeleton";
 import { ServicesServiceCard } from "@/components/marketing/services/ServicesServiceCard";
-import type { ServiceProject } from "@/types/marketing/services/services";
+import type { ServicesProjectsGridProps } from "@/types/marketing/services/services";
 
 export function ServicesProjectsGrid({
   projects,
   page,
   onServiceSelect,
-}: {
-  projects: ServiceProject[];
-  page: number;
-  onServiceSelect?: (service: ServiceProject) => void;
-}) {
+}: ServicesProjectsGridProps) {
   if (projects.length === 0) {
     return (
       <div className="py-20 text-center text-white">

@@ -1,4 +1,4 @@
-import { Codev } from "@/types/global/codev";
+import type { Codev } from "@/types/global/codev";
 import type { HireCodevEmail } from "@/types/global/hire-codev-email";
 
 export interface UploadImageOptions {

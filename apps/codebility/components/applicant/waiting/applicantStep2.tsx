@@ -1,30 +1,23 @@
 "use client";
 
-import React from "react";
 
 
 
 
 
 
-import { ApplicantType } from "@/types/applicant/waiting/applicant-waiting";
+
+
 import { PostReadInstructions } from "@/components/applicant/waiting/PostReadInstructions";
 import { PostSubmitted } from "@/components/applicant/waiting/PostSubmitted";
 import { PreReadInstructions } from "@/components/applicant/waiting/PreReadInstructions";
-
-
-
-
+import type { ApplicantStep2Props } from "@/types/applicant/waiting/waiting";
 
 export default function ApplicantStep2({
   setActiveStep,
   user,
   applicantData,
-}: {
-  setActiveStep: React.Dispatch<React.SetStateAction<number>>;
-  user: any;
-  applicantData: ApplicantType;
-}) {
+}: ApplicantStep2Props) {
   const takenTest = applicantData.test_taken ? true : false;
   const submittedTest = applicantData.fork_url ? true : false;
 

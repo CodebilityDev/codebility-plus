@@ -2,16 +2,14 @@
 
 import { Button } from "@/components/global/ui/button";
 import LandingImage from "@/components/marketing/LandingImage";
-import { WorkWithUsWORK_WITH_US_CARDS } from "@/constants/marketing/marketing";
+
 import Link from "next/link";
+import type { WorkWithUsCardProps } from "@/types/marketing/marketing";
 
 export const WorkWithUsCard = ({
   card,
   index,
-}: {
-  card: (typeof WorkWithUsWORK_WITH_US_CARDS)[number];
-  index: number;
-}) => (
+}: WorkWithUsCardProps) => (
   <div data-progressive-child className="group relative w-full">
     <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-purple-500/60 via-purple-400/40 to-purple-900/20 opacity-80 blur-2xl transition-all duration-500 group-hover:opacity-100" />
     <div className="relative flex h-full flex-col overflow-hidden rounded-3xl border border-white/10 bg-white/5 bg-gradient-to-br from-white/10 via-white/5 to-purple-950/20 p-6 shadow-xl backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-purple-300/60 hover:shadow-purple-500/20 md:p-8">

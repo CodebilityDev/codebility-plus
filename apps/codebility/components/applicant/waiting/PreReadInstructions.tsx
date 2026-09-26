@@ -4,17 +4,15 @@ import { applicantTakeTest } from "@/actions/applicant/waiting/applicant-waiting
 import TestInstruction from "@/components/applicant/waiting/testInstruction";
 import TestQAInstruction from "@/components/applicant/waiting/testQAInstruction";
 import { Button } from "@/components/global/ui/button";
-import { ApplicantType } from "@/types/applicant/waiting/applicant-waiting";
+
 import { Loader2Icon } from "lucide-react";
 import React from "react";
+import type { PreReadInstructionsProps } from "@/types/applicant/waiting/waiting";
 
 export function PreReadInstructions({
   applicantData,
   user,
-}: {
-  applicantData: ApplicantType;
-  user: any;
-}) {
+}: PreReadInstructionsProps) {
   const [loading, setLoading] = React.useState(false);
 
   return (

@@ -1,17 +1,12 @@
 "use client";
+import type { ProgressBarProps } from "@/types/applicant/profile/profile";
 
-// Modern Progress Bar Component
 export const ProgressBar = ({ 
   percentage, 
   className = "",
   showLabel = true,
   size = "default"
-}: { 
-  percentage: number; 
-  className?: string;
-  showLabel?: boolean;
-  size?: "small" | "default" | "large";
-}) => {
+}: ProgressBarProps) => {
   const heights = {
     small: "h-2",
     default: "h-3",

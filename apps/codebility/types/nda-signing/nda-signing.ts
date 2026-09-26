@@ -1,5 +1,5 @@
-import { UserInfoSchema } from "@/utils/nda-signing/nda-signing";
-import { z } from "zod";
+import type { UserInfoSchema } from "@/utils/nda-signing/nda-signing";
+import type { z } from "zod";
 
 export type UserInfo = z.infer<typeof UserInfoSchema>;
 

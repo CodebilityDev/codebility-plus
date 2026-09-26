@@ -1,14 +1,9 @@
 "use client";
 
-import React, { memo, useState } from "react";
-import { StaticImageData } from "next/image";
+import { memo, useState } from "react";
+
 import { Button } from "@/components/global/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-} from "@/components/global/ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader } from "@/components/global/ui/dialog";
 import { Slider } from "@/components/applicant/profile/sliders";
 import getCroppedImg from "@/hooks/applicant/profile/useImageCrop";
 import { uploadImage } from "@/actions/applicant/profile/upload-image";
@@ -17,6 +12,7 @@ import Cropper, { Area, Point } from "react-easy-crop";
 import toast from "react-hot-toast";
 
 import { cn } from "@codevs/ui";
+import type { UploadPhotoModalProps } from "@/types/applicant/profile/profile";
 
 export default function UploadPhotoModal({
   open,
@@ -24,13 +20,7 @@ export default function UploadPhotoModal({
   image,
   setImage,
   setAvatar,
-}: {
-  open: boolean;
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  image: string;
-  setImage: React.Dispatch<React.SetStateAction<string | null>>;
-  setAvatar: React.Dispatch<React.SetStateAction<string | StaticImageData>>;
-}) {
+}: UploadPhotoModalProps) {
   const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);

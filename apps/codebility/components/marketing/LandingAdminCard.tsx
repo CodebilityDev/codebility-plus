@@ -3,12 +3,12 @@
 import { useCallback, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Codev } from "@/types/global/codev";
+
 import { motion } from "framer-motion";
 import { capitalizeWords, getInitials } from "@/utils/marketing/marketing";
+import type { AdminCardProps } from "@/types/marketing/marketing";
 
-
-const AdminCard = ({ admin }: { admin: Codev }) => {
+const AdminCard = ({ admin }: AdminCardProps) => {
   const [loaded, setLoaded] = useState(false);
   const [errored, setErrored] = useState(false);
   const src = admin.image_url;

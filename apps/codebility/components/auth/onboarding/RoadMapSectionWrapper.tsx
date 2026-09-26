@@ -1,11 +1,11 @@
-import { RefObject } from "react";
+
 import IsRoadMap from "@/components/auth/onboarding/IsRoadMap";
 import RoadMapIntro from "@/components/auth/onboarding/RoadMapIntro";
+import type { RoadMapWrapperProps } from "@/types/auth/onboarding/onboarding";
+
 export default function RoadMapWrapper({
   roadmapRef,
-}: {
-  roadmapRef: RefObject<HTMLDivElement>;
-}) {
+}: RoadMapWrapperProps) {
   // ✅ Works because IsRoadMap is forwardRef
   return (
     <>

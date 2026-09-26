@@ -2,9 +2,10 @@
 
 import { Card, CardContent } from "@/components/marketing/card";
 import { InternCardsAvatar } from "@/components/marketing/InternCardsAvatar";
-import type { Person, RoleStyle } from "@/types/marketing/marketing";
+
 import { motion } from "framer-motion";
 import Link from "next/link";
+import type { InternCardProps } from "@/types/marketing/marketing";
 
 export function InternCard({
   intern,
@@ -12,13 +13,7 @@ export function InternCard({
   isCodev,
   index,
   progressive,
-}: {
-  intern: Person;
-  roleStyles: RoleStyle;
-  isCodev: boolean;
-  index: number;
-  progressive?: boolean;
-}) {
+}: InternCardProps) {
   return (
     <motion.div
       data-progressive-child={progressive ? true : undefined}

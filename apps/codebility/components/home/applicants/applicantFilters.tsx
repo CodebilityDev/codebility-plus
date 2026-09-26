@@ -1,22 +1,15 @@
-import React, { memo, useState } from "react";
+import { memo, useState } from "react";
 import { Button } from "@/components/global/ui/button";
-import { CalendarIcon, ChevronDown, ChevronRight, Filter, X } from "lucide-react";
+import { ChevronDown, ChevronRight, Filter, X } from "lucide-react";
 
 import { Badge } from "@codevs/ui/badge";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@codevs/ui/dropdown-menu";
-import { Input } from "@codevs/ui/input";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@codevs/ui/collapsible";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuTrigger } from "@codevs/ui/dropdown-menu";
 
-import { ExperienceRanges } from "@/types/home/applicants/applicants";
-import { ApplicantFilters } from "@/types/home/applicants/applicants";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@codevs/ui/collapsible";
+import type { ApplicantFiltersComponentProps } from "@/types/home/applicants/applicants";
+
+
+
 
 const ApplicantFiltersComponent = ({
   activeFilterCount,
@@ -31,55 +24,7 @@ const ApplicantFiltersComponent = ({
   updateReminderFilter,
   updateTestStatusFilter,
   onResetFilters,
-}: {
-  activeFilterCount: number;
-  filters: {
-    hasPortfolio: boolean;
-    noPortfolio: boolean;
-    hasGithub: boolean;
-    noGithub: boolean;
-    experienceRanges: {
-      novice: boolean;
-      intermediate: boolean;
-      expert: boolean;
-    };
-    positions: {
-      [key: string]: boolean;
-    };
-    techStacks: {
-      [key: string]: boolean;
-    };
-    testStatus: {
-      taken: boolean;
-      notTaken: boolean;
-      overdue: boolean;
-    };
-    reminderCount: {
-      none: boolean;
-      low: boolean;
-      medium: boolean;
-      high: boolean;
-    };
-    applicationDate: {
-      last7Days: boolean;
-      last30Days: boolean;
-      last90Days: boolean;
-      custom: boolean;
-      startDate: string;
-      endDate: string;
-    };
-  };
-  uniquePositions: string[];
-  uniqueTechStacks: string[];
-  updateFilter: (key: keyof ApplicantFilters, value: boolean) => void;
-  updateExperienceFilter: (key: keyof ExperienceRanges, value: boolean) => void;
-  updatePositionFilter: (key: string, value: boolean) => void;
-  updateTechStackFilter: (key: string, value: boolean) => void;
-  updateDateRangeFilter: (key: string, value: boolean | string) => void;
-  updateReminderFilter: (key: string, value: boolean) => void;
-  updateTestStatusFilter: (key: string, value: boolean) => void;
-  onResetFilters: () => void;
-}) => {
+}: ApplicantFiltersComponentProps) => {
   const [expandedSections, setExpandedSections] = useState({
     basic: true,
     skills: false,

@@ -1,14 +1,11 @@
 "use client";
 
 import { AnimatedProfilesGrid } from "@/components/marketing/profiles/AnimatedProfilesGrid";
-import type { ProfilesListingPage } from "@/types/global/profiles-listing";
+import type { ProfilesGridProps } from "@/types/marketing/profiles/profiles";
 
 export function ProfilesGrid({
   codevs,
   animationKey,
-}: {
-  codevs: ProfilesListingPage["codevs"];
-  animationKey: string;
-}) {
+}: ProfilesGridProps) {
   return <AnimatedProfilesGrid codevs={codevs} animationKey={animationKey} />;
 }

@@ -1,12 +1,13 @@
 "use client";
 
 import { ORB_COLORS } from "@/constants/marketing/marketing";
-import type { Particle } from "@/types/marketing/marketing";
+
 import { wave01 } from "@/utils/marketing/marketing";
 import { useAnimationFrame } from "framer-motion";
 import { useRef } from "react";
+import type { DesktopParticlesProps } from "@/types/marketing/marketing";
 
-export function DesktopParticles({ particles }: { particles: Particle[] }) {
+export function DesktopParticles({ particles }: DesktopParticlesProps) {
   const particleRefs = useRef<(HTMLDivElement | null)[]>([]);
   const orbRefs = useRef<(HTMLDivElement | null)[]>([]);
   const ambientARef = useRef<HTMLDivElement | null>(null);

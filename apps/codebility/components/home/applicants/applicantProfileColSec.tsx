@@ -1,40 +1,29 @@
 "use client";
 
-import React, { memo } from "react";
+import { memo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import DefaultAvatar from "@/components/global/codev/DefaultAvatar";
-import { Button } from "@/components/global/ui/button";
-import { Table, TableCell, TableHeader, TableRow } from "@/components/home/applicants/table";
-import { IconEmail, IconFacebook, IconGithub, IconLink } from "@/public/assets/svgs/index";
-import { Row } from "@tanstack/react-table";
 
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@codevs/ui/accordion";
+
+import { IconFacebook, IconGithub, IconLink } from "@/public/assets/svgs/index";
+
+
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@codevs/ui/accordion";
 import { Avatar, AvatarImage } from "@codevs/ui/avatar";
-import { Checkbox } from "@codevs/ui/checkbox";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@codevs/ui/hover-card";
 
-import { NewApplicantType } from "@/types/home/applicants/applicants";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@codevs/ui/hover-card";
+
+
 import ApplicantReapplyTime from "@/components/home/applicants/applicantReapplyTime";
 import ApplicantTestTimeRemaining from "@/components/home/applicants/applicantTestTimeRemaining";
 import ApplicantActionButton from "@/components/home/applicants/applicantActionButton";
+import type { ApplicantProfileColSecProps } from "@/types/home/applicants/applicants";
 
 export default function ApplicantProfileColSec({
   applicant,
   row,
-}: {
-  applicant: NewApplicantType;
-  row: Row<NewApplicantType>;
-}) {
+}: ApplicantProfileColSecProps) {
   return (
     <div className="w-full min-w-full">
       {/* Desktop View */}

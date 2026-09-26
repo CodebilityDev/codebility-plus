@@ -1,13 +1,14 @@
 "use client";
 
 import { STATE_STYLES, STATE_BADGE } from "@/constants/home/applicants/applicants";
-import { NewApplicantType } from "@/types/home/applicants/applicants";
+
 import { cn } from "@/utils/global/cn";
 import { deriveTimeline, formatStageDate } from "@/utils/home/applicants/process-timeline";
 import { AlertCircle } from "lucide-react";
 import { useEffect } from "react";
+import type { TimelineBodyProps } from "@/types/home/applicants/applicants";
 
-export function TimelineBody({ applicant }: { applicant: NewApplicantType }) {
+export function TimelineBody({ applicant }: TimelineBodyProps) {
   const { stages, statusUnrecognized } = deriveTimeline(applicant);
 
   // Req 5.5: record exactly one diagnostic log entry when the application

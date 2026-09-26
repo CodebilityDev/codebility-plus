@@ -1,5 +1,5 @@
 import type { serviceWriteSchema } from "@/utils/proposal/proposal";
-import { z } from "zod";
+import type { z } from "zod";
 
 export interface Service {
   id: string;

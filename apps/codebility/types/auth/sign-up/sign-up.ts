@@ -1,5 +1,5 @@
-import { SignupFormSchema } from "@/utils/auth/sign-up/sign-up";
-import { z } from "zod";
+import type { SignupFormSchema } from "@/utils/auth/sign-up/sign-up";
+import type { z } from "zod";
 
 export type SignupFormData = z.infer<typeof SignupFormSchema>;
 

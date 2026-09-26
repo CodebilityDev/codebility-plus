@@ -1,9 +1,10 @@
 "use client";
 
-import React from "react";
-import Link from "next/link";
 
-export default function ApplicantStep4({ user }: { user: any }) {
+import Link from "next/link";
+import type { ApplicantStep4Props } from "@/types/applicant/waiting/waiting";
+
+export default function ApplicantStep4({ user }: ApplicantStep4Props) {
   return (
     <div className="my-10 flex flex-col items-center gap-4 text-center">
       <div className="flex flex-col items-center gap-3">

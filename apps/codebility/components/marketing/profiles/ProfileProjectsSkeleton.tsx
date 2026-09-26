@@ -1,6 +1,7 @@
 import { Skeleton } from "@/components/global/ui/skeleton";
+import type { ProfileProjectsSkeletonProps } from "@/types/marketing/profiles/profiles";
 
-export function ProfileProjectsSkeleton({ count = 2 }: { count?: number }) {
+export function ProfileProjectsSkeleton({ count = 2 }: ProfileProjectsSkeletonProps) {
   return (
     <div className="mt-4 w-full" aria-busy="true" aria-hidden="true">
       <Skeleton className="mx-auto mb-4 h-7 w-24 rounded bg-white/10" />

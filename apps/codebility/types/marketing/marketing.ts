@@ -1,6 +1,9 @@
-import { ROLE_STYLES } from "@/constants/marketing/marketing";
-import { Codev } from "@/types/global/codev";
-import { ReactNode } from "react";
+import type { ROLE_STYLES } from "@/constants/marketing/marketing";
+import type { Codev } from "@/types/global/codev";
+import type { ReactNode } from "react";
+import type { WorkWithUsWORK_WITH_US_CARDS } from "@/constants/marketing/marketing";
+import type { LandingInternsPage } from "@/types/global/lib";
+
 
 export interface AnimatedAdminsSectionProps {
   title: string;
@@ -89,4 +92,82 @@ export interface footerLinksType {
   id: string;
   title: string;
   href: string;
+}
+
+export interface MarketingLayoutProps {
+  children: React.ReactNode;
+}
+
+export interface AdminsSectionSkeletonProps {
+  title: string;
+  description: string;
+  cardCount: number;
+}
+
+export interface DesktopParticlesProps { particles: Particle[] }
+
+export interface InternCardProps {
+  intern: Person;
+  roleStyles: RoleStyle;
+  isCodev: boolean;
+  index: number;
+  progressive?: boolean;
+}
+
+export interface InternCardsAvatarProps {
+  person: Person;
+  size?: number;
+  position?: string;
+}
+
+export interface AdminCardProps { admin: Codev }
+
+export interface BlueBgProps { className?: string }
+
+export interface InternCardsProps {
+  interns: Person[];
+  playOnMount?: boolean;
+}
+
+export interface LandingInternCardsRemoteProps {
+  page: number;
+  pageSize: number;
+  initialData: LandingInternsPage;
+}
+
+export interface LandingInternCardsProps {
+  page: number;
+  pageSize: number;
+  initialData: LandingInternsPage;
+}
+
+export interface LandingInternPaginationProps {
+  initialData: LandingInternsPage;
+  pageSize?: number;
+}
+
+export interface LandingInternPaginationChromeProps {
+  page: number;
+  totalPages: number;
+}
+
+export interface LandingInternShellProps {
+  children: ReactNode;
+}
+
+export interface LandingInternSkeletonProps {
+  page?: number;
+  totalPages?: number;
+  showPagination?: boolean;
+}
+
+export interface PaginationControlsProps {
+  page: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}
+
+export interface WorkWithUsCardProps {
+  card: (typeof WorkWithUsWORK_WITH_US_CARDS)[number];
+  index: number;
 }

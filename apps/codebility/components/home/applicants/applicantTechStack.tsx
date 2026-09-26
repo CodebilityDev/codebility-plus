@@ -2,13 +2,12 @@ import React from "react";
 import Image from "next/image";
 
 import { getTechStackIconName } from "@/constants/global/techstack";
-import { NewApplicantType } from "@/types/home/applicants/applicants";
+import type { ApplicantTechStackProps } from "@/types/home/applicants/applicants";
+
 
 export default function ApplicantTechStack({
   applicant,
-}: {
-  applicant: NewApplicantType;
-}) {
+}: ApplicantTechStackProps) {
   const [showAll, setShowAll] = React.useState(false);
 
   const displayStacks = showAll

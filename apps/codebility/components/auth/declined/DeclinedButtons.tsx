@@ -1,14 +1,15 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/global/ui/button";
 import { cn } from "@/utils/global/cn";
 import toast from "react-hot-toast";
 import { reApplyAction } from "@/actions/global/auth-declined";
 import { getCanReApply } from "@/utils/global/auth-declined";
+import type { DeclinedButtonsProps } from "@/types/auth/declined/declined";
 
-export const DeclinedButtons = ({ userData }: { userData: any }) => {
+export const DeclinedButtons = ({ userData }: DeclinedButtonsProps) => {
   const router = useRouter();
 
   const canReapply = useMemo(

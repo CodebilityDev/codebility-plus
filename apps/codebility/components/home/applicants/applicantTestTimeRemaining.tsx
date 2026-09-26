@@ -1,15 +1,13 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getTestDate } from "@/utils/global/applicant-waiting";
+import type { ApplicantTestTimeRemainingProps } from "@/types/home/applicants/applicants";
 
-import { NewApplicantType } from "@/types/home/applicants/applicants";
+
 
 export default function ApplicantTestTimeRemaining({
   applicant,
   isMobile,
-}: {
-  applicant: NewApplicantType;
-  isMobile?: boolean;
-}) {
+}: ApplicantTestTimeRemainingProps) {
   const applicantData = applicant.applicant;
 
   const reapplyDate = useMemo(

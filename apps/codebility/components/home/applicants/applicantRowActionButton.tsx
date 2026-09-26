@@ -3,48 +3,26 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/global/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/global/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/global/ui/dialog";
 import { useToast } from "@/components/global/ui/use-toast";
 import { cn } from "@/utils/global/cn";
-import { set } from "date-fns";
+
 import { Loader2Icon, MailIcon, MoreHorizontalIcon } from "lucide-react";
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@codevs/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@codevs/ui/dropdown-menu";
 
-import {
-  multipleAcceptApplicantAction,
-  multipleDeleteApplicantAction,
-  multipleDenyApplicantAction,
-  multipleMoveApplicantToApplyingAction,
-  multipleMoveApplicantToOnboardingAction,
-  multipleMoveApplicantToTestingAction,
-  multiplePassApplicantTestAction,
-} from "@/actions/home/applicants/applicants";
+import { multipleAcceptApplicantAction, multipleDeleteApplicantAction, multipleDenyApplicantAction, multipleMoveApplicantToApplyingAction, multipleMoveApplicantToOnboardingAction, multipleMoveApplicantToTestingAction, multiplePassApplicantTestAction } from "@/actions/home/applicants/applicants";
 import { sendMultipleDenyEmail } from "@/actions/home/applicants/deny-email";
 import { sendMultipleOnboardingReminderWithUpdate } from "@/actions/home/applicants/onboarding-reminder-email";
 import { sendMultiplePassedTestEmail } from "@/actions/home/applicants/passed-test-email";
 import { sendMultipleTestReminderEmailWithUpdate } from "@/actions/home/applicants/test-reminder-email";
-import { NewApplicantType } from "@/types/home/applicants/applicants";
+import type { ApplicantRowActionButtonProps } from "@/types/home/applicants/applicants";
+
 
 export default function ApplicantRowActionButton({
   applicants,
   onActionComplete,
-}: {
-  applicants: NewApplicantType[];
-  onActionComplete?: () => void;
-}) {
+}: ApplicantRowActionButtonProps) {
   const { toast } = useToast();
   const router = useRouter();
   const [open, setOpen] = useState(false);

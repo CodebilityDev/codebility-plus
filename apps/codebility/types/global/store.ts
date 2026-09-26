@@ -1,4 +1,4 @@
-import { Codev } from "@/types/global/codev";
+import type { Codev } from "@/types/global/codev";
 
 export interface UserState {
   user: Codev | null;

@@ -2,20 +2,18 @@
 
 import React from "react";
 
-import { ApplicantType } from "@/types/applicant/waiting/applicant-waiting";
+
 import ApplicantStep1 from "@/components/applicant/waiting/applicantStep1";
 import ApplicantStep2 from "@/components/applicant/waiting/applicantStep2";
 import ApplicantStep3 from "@/components/applicant/waiting/applicantStep3";
 import ApplicantStep4 from "@/components/applicant/waiting/applicantStep4";
 import { Stepper, StepperBody, StepperConnector, StepperContent, StepperHeader, StepperStep } from "@/components/applicant/waiting/Stepper";
+import type { ApplicationStepsProps } from "@/types/applicant/waiting/waiting";
 
 export default function ApplicationSteps({
   user,
   applicantData,
-}: {
-  user: any;
-  applicantData: ApplicantType;
-}) {
+}: ApplicationStepsProps) {
   const steps: { title: string; description?: string }[] = [
     {
       title: "Applying",

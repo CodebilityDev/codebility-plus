@@ -1,16 +1,13 @@
 "use client";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import type { PaginationControlsProps } from "@/types/marketing/marketing";
 
 export function PaginationControls({
   page,
   totalPages,
   onPageChange,
-}: {
-  page: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
-}) {
+}: PaginationControlsProps) {
   if (totalPages <= 1) {
     return <div className="mt-8 min-h-9" aria-hidden="true" />;
   }

@@ -1,233 +1,23 @@
 "use client";
 
-import { Suspense, use, useState, useTransition } from "react";
+import { Suspense, useState, useTransition } from "react";
 
 
 
-import type { CareersJobListingsInitial, CareersJobListingsPage } from "@/types/global/careers-job-listings";
-import { fetchApiJson } from "@/utils/global/api-fetch";
+
+
 
 import type { JobListing } from "@/types/global/job-listings";
 import JobApplicationModal from "@/components/marketing/careers/JobApplicationModal";
 import { JobListingsSkeleton } from "@/components/marketing/careers/JobListingsSkeleton";
-import { JobCard } from "@/components/marketing/careers/JobCard";
+
 import { JobListingsPaginationSlot } from "@/components/marketing/careers/JobListingsPaginationSlot";
 import { JOB_TYPES, JOB_LEVELS } from "@/constants/marketing/careers/careers";
 import type { JobListingsPaginationProps } from "@/types/marketing/careers/careers";
-import { pageCacheKey, filterCacheKey } from "@/utils/marketing/careers/careers";
+import { JobListingsGrid } from "@/components/marketing/careers/JobListingsGrid";
+import { rememberPagination, resolvePagination } from "@/lib/marketing/careers/job-listings-pagination-loader";
 
 
-const pagePromises = new Map<string, Promise<CareersJobListingsPage>>();
-const pageMetaCache = new Map<string, CareersJobListingsPage["pagination"]>();
-
-function rememberPagination(
-  department: string,
-  type: string,
-  level: string,
-  page: number,
-  pageSize: number,
-  pagination: CareersJobListingsPage["pagination"],
-) {
-  pageMetaCache.set(
-    pageCacheKey(department, type, level, page, pageSize),
-    pagination,
-  );
-  pageMetaCache.set(
-    filterCacheKey(department, type, level, pageSize),
-    pagination,
-  );
-}
-
-function loadPage(
-  department: string,
-  type: string,
-  level: string,
-  page: number,
-  pageSize: number,
-  initialData: CareersJobListingsInitial,
-): Promise<CareersJobListingsPage> {
-  const key = pageCacheKey(department, type, level, page, pageSize);
-  const cached = pagePromises.get(key);
-  if (cached) return cached;
-
-  if (
-    page === initialData.pagination.page &&
-    department === initialData.department &&
-    type === initialData.type &&
-    level === initialData.level
-  ) {
-    rememberPagination(
-      department,
-      type,
-      level,
-      page,
-      pageSize,
-      initialData.pagination,
-    );
-    const resolved = Promise.resolve(initialData);
-    pagePromises.set(key, resolved);
-    return resolved;
-  }
-
-  const params = new URLSearchParams({
-    page: String(page),
-    limit: String(pageSize),
-  });
-  if (department) params.set("department", department);
-  if (type) params.set("type", type);
-  if (level) params.set("level", level);
-
-  const promise = fetchApiJson<CareersJobListingsPage>(
-    `/api/careers-job-listings?${params.toString()}`,
-    { cache: "force-cache" },
-  ).then((result) => {
-    const fallback: CareersJobListingsPage = {
-      jobs: [],
-      pagination: {
-        page,
-        limit: pageSize,
-        total: 0,
-        totalPages: 0,
-      },
-      department,
-      type,
-      level,
-    };
-
-    if (!result.ok) {
-      console.error("Error fetching careers job listings page:", result.error);
-      return fallback;
-    }
-
-    rememberPagination(
-      department,
-      type,
-      level,
-      page,
-      pageSize,
-      result.data.pagination,
-    );
-    return result.data;
-  });
-
-  pagePromises.set(key, promise);
-  return promise;
-}
-
-function resolvePagination(
-  department: string,
-  type: string,
-  level: string,
-  page: number,
-  pageSize: number,
-  initialData: CareersJobListingsInitial,
-): CareersJobListingsPage["pagination"] {
-  return (
-    pageMetaCache.get(pageCacheKey(department, type, level, page, pageSize)) ??
-    pageMetaCache.get(filterCacheKey(department, type, level, pageSize)) ??
-    (department === initialData.department &&
-    type === initialData.type &&
-    level === initialData.level
-      ? initialData.pagination
-      : { page, limit: pageSize, total: 0, totalPages: 0 })
-  );
-}
-
-function JobListingsGridRemote({
-  department,
-  type,
-  level,
-  page,
-  pageSize,
-  initialData,
-  onApply,
-}: {
-  department: string;
-  type: string;
-  level: string;
-  page: number;
-  pageSize: number;
-  initialData: CareersJobListingsInitial;
-  onApply: (job: JobListing) => void;
-}) {
-  const data = use(
-    loadPage(department, type, level, page, pageSize, initialData),
-  );
-
-  if (data.jobs.length === 0) {
-    return (
-      <div className="py-12 text-center">
-        <p className="text-gray-400">
-          No positions match your current filters. Try adjusting your criteria.
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="grid gap-6">
-      {data.jobs.map((job) => (
-        <JobCard key={job.id} job={job} onApply={onApply} />
-      ))}
-    </div>
-  );
-}
-
-function JobListingsGrid({
-  department,
-  type,
-  level,
-  page,
-  pageSize,
-  initialData,
-  onApply,
-}: {
-  department: string;
-  type: string;
-  level: string;
-  page: number;
-  pageSize: number;
-  initialData: CareersJobListingsInitial;
-  onApply: (job: JobListing) => void;
-}) {
-  if (
-    page === initialData.pagination.page &&
-    department === initialData.department &&
-    type === initialData.type &&
-    level === initialData.level
-  ) {
-    if (initialData.jobs.length === 0) {
-      return (
-        <div className="py-12 text-center">
-          <p className="text-gray-400">
-            No positions match your current filters. Try adjusting your
-            criteria.
-          </p>
-        </div>
-      );
-    }
-
-    return (
-      <div className="grid gap-6">
-        {initialData.jobs.map((job) => (
-          <JobCard key={job.id} job={job} onApply={onApply} />
-        ))}
-      </div>
-    );
-  }
-
-  return (
-    <JobListingsGridRemote
-      department={department}
-      type={type}
-      level={level}
-      page={page}
-      pageSize={pageSize}
-      initialData={initialData}
-      onApply={onApply}
-    />
-  );
-}
 
 export default function JobListingsPagination({
   initialData,

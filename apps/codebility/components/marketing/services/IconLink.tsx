@@ -1,6 +1,7 @@
 "use client";
+import type { IconLinkProps } from "@/types/marketing/services/services";
 
-export const IconLink = ({ className }: { className?: string }) => (
+export const IconLink = ({ className }: IconLinkProps) => (
   <svg
     className={className}
     viewBox="0 0 24 24"

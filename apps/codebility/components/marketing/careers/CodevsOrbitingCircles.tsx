@@ -1,6 +1,7 @@
 import React from "react";
 
 import { cn } from "@codevs/ui";
+import type { OrbitingCirclesProps } from "@/types/marketing/careers/careers";
 
 const OrbitingCircles = ({
   className,
@@ -10,15 +11,7 @@ const OrbitingCircles = ({
   delay = 10,
   radius = 50,
   path = true,
-}: {
-  className?: string;
-  children?: React.ReactNode;
-  reverse?: boolean;
-  duration?: number;
-  delay?: number;
-  radius?: number;
-  path?: boolean;
-}) => {
+}: OrbitingCirclesProps) => {
   return (
     <>
       {path && (

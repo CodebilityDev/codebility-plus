@@ -1,8 +1,9 @@
-import React from "react";
+
 
 import { cn } from "@codevs/ui";
+import type { BlueBgProps } from "@/types/marketing/marketing";
 
-const BlueBg = ({ className }: { className?: string }) => {
+const BlueBg = ({ className }: BlueBgProps) => {
   return (
     <div
       aria-hidden="true"

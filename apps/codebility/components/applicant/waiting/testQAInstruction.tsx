@@ -1,30 +1,19 @@
-import React from "react";
-import { useRouter } from 'next/navigation'
+
+import { useRouter } from 'next/navigation';
 import { Button } from "@/components/global/ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/global/ui/dialog";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/global/ui/dialog";
 import { ChevronRight } from "lucide-react";
 
 import { Separator } from "@codevs/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@codevs/ui/tabs";
+import type { TestQAInstructionProps } from "@/types/applicant/waiting/waiting";
 
-import { ApplicantType } from "@/types/applicant/waiting/applicant-waiting";
+
 
 export default function TestQAInstruction({
   children,
   applicantData,
-}: {
-  children: React.ReactNode;
-  applicantData: ApplicantType;
-}) {
+}: TestQAInstructionProps) {
   const router = useRouter();
 
   return (

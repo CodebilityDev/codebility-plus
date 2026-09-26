@@ -1,8 +1,8 @@
 import { ServicesServiceCardSkeleton } from "@/components/marketing/services/ServicesServiceCardSkeleton";
 import { GRID_CLASS } from "@/constants/marketing/services/services";
+import type { ServicesGridSkeletonProps } from "@/types/marketing/services/services";
 
-
-export function ServicesGridSkeleton({ count = 12 }: { count?: number }) {
+export function ServicesGridSkeleton({ count = 12 }: ServicesGridSkeletonProps) {
   return (
     <div className={GRID_CLASS} aria-busy="true" aria-live="polite">
       {Array.from({ length: count }, (_, index) => (

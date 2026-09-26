@@ -1,6 +1,6 @@
-import { SignInValidation } from "@/utils/auth/sign-in/auth-schema";
-import { UseFormRegister, FieldErrors } from "react-hook-form";
-import { z } from "zod";
+import type { SignInValidation } from "@/utils/auth/sign-in/auth-schema";
+import type { UseFormRegister, FieldErrors } from "react-hook-form";
+import type { z } from "zod";
 
 export type Inputs = z.infer<typeof SignInValidation>;
 

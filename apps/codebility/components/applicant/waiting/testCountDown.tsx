@@ -2,14 +2,13 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-import { ApplicantType } from "@/types/applicant/waiting/applicant-waiting";
+
 import { getTestDate } from "@/utils/global/applicant-waiting";
+import type { TestCountdownProps } from "@/types/applicant/waiting/waiting";
 
 export const TestCountdown = ({
   applicantData,
-}: {
-  applicantData: ApplicantType;
-}) => {
+}: TestCountdownProps) => {
   const reapplyDate = useMemo(
     () => getTestDate(new Date(applicantData?.test_taken || "") || new Date()),
     [applicantData?.test_taken],

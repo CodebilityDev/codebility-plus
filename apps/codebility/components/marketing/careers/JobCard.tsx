@@ -1,18 +1,16 @@
 "use client";
 
 import { Button } from "@/components/global/ui/button";
-import type { JobListing } from "@/types/global/job-listings";
+
 import { getLevelColor, getTypeColor } from "@/utils/marketing/careers/careers";
 import { Badge } from "@codevs/ui/badge";
 import { Briefcase, MapPin, DollarSign } from "lucide-react";
+import type { JobCardProps } from "@/types/marketing/careers/careers";
 
 export function JobCard({
   job,
   onApply,
-}: {
-  job: JobListing;
-  onApply: (job: JobListing) => void;
-}) {
+}: JobCardProps) {
   return (
     <div className="group relative overflow-hidden rounded-lg border border-gray-800 bg-gray-900/50 p-6 backdrop-blur-sm transition-all hover:border-customViolet-100/50 hover:bg-gray-900/70">
       <div className="absolute inset-0 bg-gradient-to-r from-customViolet-100/5 to-customBlue-100/5 opacity-0 transition-opacity group-hover:opacity-100" />

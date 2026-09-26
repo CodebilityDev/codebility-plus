@@ -1,4 +1,4 @@
-import React, { Suspense } from "react";
+import { Suspense } from "react";
 import AsyncErrorBoundary from "@/components/global/feedback/AsyncErrorBoundary";
 import ErrorBoundary from "@/components/global/feedback/ErrorBoundary";
 import { ModalProviderHome } from "@/providers/home/ModalProviderHome";
@@ -15,12 +15,11 @@ import PageTransitionWrapper from "@/components/home/PageTransitionWrapper";
 import { PageTransitionSettings } from "@/components/home/PageTransitionSettings";
 import ConditionalMainWrapper from "@/components/home/ConditionalMainWrapper";
 import DynamicMainContent from "@/components/home/DynamicMainContent";
+import type { HomeLayoutProps } from "@/types/home/home";
 
 export default async function HomeLayout({
   children,
-}: {
-  children: React.ReactNode;
-}) {
+}: HomeLayoutProps) {
   // Read once here so the sidebar and the client store share one query.
   const currentUser = await getCurrentCodev();
 

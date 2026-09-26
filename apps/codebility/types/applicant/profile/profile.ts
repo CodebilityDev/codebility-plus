@@ -1,7 +1,9 @@
 import type { UserSchema } from "@/utils/applicant/profile/profile";
-import { Codev, Education, WorkExperience, JobStatus, WorkSchedule } from "@/types/global/codev";
-import React from "react";
-import z from "zod";
+import type { Codev, Education, WorkExperience, JobStatus, WorkSchedule } from "@/types/global/codev";
+import type React from "react";
+import type z from "zod";
+import type { StaticImageData } from "next/image";
+
 
 export type AboutProps = {
   data: Codev;
@@ -247,3 +249,38 @@ export interface UploadImageOptions {
 }
 
 export type User = z.infer<typeof UserSchema>;
+
+export interface ApplicantProfileLayoutProps {
+  children: React.ReactNode;
+}
+
+export interface ProfileCompletionGuideBadgeProps {
+  children?: React.ReactNode;
+  variant?: "secondary" | "outline" | "success" | "warning";
+  className?: string;
+}
+
+// Modern Progress Bar Component
+export interface ProgressBarProps { 
+  percentage: number; 
+  className?: string;
+  showLabel?: boolean;
+  size?: "small" | "default" | "large";
+}
+
+// Section Progress Component
+export interface SectionProgressProps { 
+  title: string; 
+  points: number; 
+  maxPoints: number; 
+  icon: any;
+  completed: boolean;
+}
+
+export interface UploadPhotoModalProps {
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  image: string;
+  setImage: React.Dispatch<React.SetStateAction<string | null>>;
+  setAvatar: React.Dispatch<React.SetStateAction<string | StaticImageData>>;
+}

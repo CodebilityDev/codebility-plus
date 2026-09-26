@@ -1,6 +1,6 @@
 import "@/styles/global/globals.css";
 
-import React from "react";
+
 import { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import { Toaster } from "@/components/global/ui/toaster";
@@ -10,6 +10,8 @@ import ReactQueryProvider from "@/providers/global/ReactQueryProvider";
 import { TooltipProvider } from "@codevs/ui/tooltip";
 import JsonLd from "@/components/global/marketing/JsonLd";
 import { organizationSchema, websiteSchema } from "@/constants/global/app";
+import type { RootLayoutProps } from "@/types/global/app";
+
 
 
 const outfit = Outfit({
@@ -57,9 +59,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default function RootLayout({
     children,
-}: {
-    children: React.ReactNode;
-}) {
+}: RootLayoutProps) {
     return (
         <html lang="en" className={outfit.className} suppressHydrationWarning>
             <head>

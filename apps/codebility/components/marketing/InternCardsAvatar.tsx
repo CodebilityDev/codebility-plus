@@ -1,17 +1,13 @@
 "use client";
 
-import type { Person } from "@/types/marketing/marketing";
 import { useState } from "react";
+import type { InternCardsAvatarProps } from "@/types/marketing/marketing";
 
 export function InternCardsAvatar({
   person,
   size = 80,
   position = "center top",
-}: {
-  person: Person;
-  size?: number;
-  position?: string;
-}) {
+}: InternCardsAvatarProps) {
   const getInitials = () => {
     const fullName = (person.name ?? "").trim();
 

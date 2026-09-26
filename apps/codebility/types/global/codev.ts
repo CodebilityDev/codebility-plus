@@ -67,24 +67,6 @@ export type DayOfWeek =
   | "Saturday"
   | "Sunday";
 
-export const DAYS_OF_WEEK: DayOfWeek[] = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday",
-];
-
-export const WEEKDAYS: DayOfWeek[] = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-];
-
 // Add the nda_request_sent property to your Codev interface
 export interface Codev {
   id: string;

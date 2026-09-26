@@ -1,21 +1,15 @@
 "use client";
 
 import { ProgressBar } from "@/components/applicant/profile/ProgressBar";
+import type { SectionProgressProps } from "@/types/applicant/profile/profile";
 
-// Section Progress Component
 export const SectionProgress = ({ 
   title, 
   points, 
   maxPoints, 
   icon: Icon,
   completed 
-}: { 
-  title: string; 
-  points: number; 
-  maxPoints: number; 
-  icon: any;
-  completed: boolean;
-}) => {
+}: SectionProgressProps) => {
   const percentage = maxPoints > 0 ? Math.round((points / maxPoints) * 100) : 0;
   
   return (

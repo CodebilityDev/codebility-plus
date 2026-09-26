@@ -1,17 +1,15 @@
 "use client";
 
 import CodevCard from "@/components/global/marketing/CodevCard";
-import type { CodevsProfilesPage } from "@/types/global/codevs-profiles";
+
 import { getStableColor } from "@/utils/global/getRandomColor";
 import { motion } from "framer-motion";
+import type { CodevsGridProps } from "@/types/global/marketing";
 
 export function CodevsGrid({
   codevs,
   page,
-}: {
-  codevs: CodevsProfilesPage["codevs"];
-  page: number;
-}) {
+}: CodevsGridProps) {
   if (codevs.length === 0) {
     return (
       <p className="text-center text-2xl text-gray-500 dark:text-gray-400">

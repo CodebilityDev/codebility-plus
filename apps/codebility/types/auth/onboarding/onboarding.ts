@@ -1,4 +1,5 @@
-import React, { RefObject } from "react";
+import type React from "react";
+import type { RefObject } from "react";
 
 export interface AboutSlidesProps {
   slidesRef: RefObject<HTMLDivElement | null>;
@@ -55,4 +56,22 @@ export interface UseOnboardingAnimationsProps {
   h1Ref: RefObject<HTMLHeadingElement | null>;
   roadmapRef?: RefObject<HTMLDivElement | null>;
   setIsLogoVisible: (visible: boolean) => void;
+}
+
+// -------------------------
+// PersonCard
+// -------------------------
+export interface PersonCardProps { person: Person }
+
+export interface RoadMapWrapperProps {
+  roadmapRef: RefObject<HTMLDivElement>;
+}
+
+// -------------------------
+// Avatar
+// -------------------------
+export interface TeamSectionAvatarProps {
+  person: Person;
+  size?: number;
+  position?: string;
 }

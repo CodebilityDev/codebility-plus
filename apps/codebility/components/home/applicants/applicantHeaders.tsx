@@ -1,23 +1,19 @@
 import React, { memo, useCallback, useEffect, useMemo, useState } from "react";
 import H1 from "@/components/global/layout/H1";
 
-import { ExperienceRanges, NewApplicantType } from "@/types/home/applicants/applicants";
+import { ExperienceRanges } from "@/types/home/applicants/applicants";
 import ApplicantFiltersComponent from "@/components/home/applicants/applicantFilters";
 import ApplicantFiltersBadge from "@/components/home/applicants/applicantFiltersBadge";
 import ApplicantSorters from "@/components/home/applicants/applicantSorters";
 import { SortOption } from "@/types/home/applicants/applicants";
 import type { ApplicantFilters } from "@/types/home/applicants/applicants";
-
+import type { ApplicantFilterHeadersProps } from "@/types/home/applicants/applicants";
 
 export default function ApplicantFilterHeaders({
   applicants,
   setApplicants,
   setCurrentTab,
-}: {
-  applicants: NewApplicantType[];
-  setApplicants: React.Dispatch<React.SetStateAction<NewApplicantType[]>>;
-  setCurrentTab: React.Dispatch<React.SetStateAction<string>>;
-}) {
+}: ApplicantFilterHeadersProps) {
   const [searchTerm, setSearchTerm] = React.useState("");
   const onSearch = (value: string) => {
     setSearchTerm(value);

@@ -1,15 +1,13 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getReApplyDate } from "@/utils/global/auth-declined";
+import type { ApplicantReapplyTimeProps } from "@/types/home/applicants/applicants";
 
-import { NewApplicantType } from "@/types/home/applicants/applicants";
+
 
 export default function ApplicantReapplyTime({
   applicant,
   isMobile,
-}: {
-  applicant: NewApplicantType;
-  isMobile?: boolean;
-}) {
+}: ApplicantReapplyTimeProps) {
   const reapplyDate = useMemo(
     () =>
       applicant?.date_applied

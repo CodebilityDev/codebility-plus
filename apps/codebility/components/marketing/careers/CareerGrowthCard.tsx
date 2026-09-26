@@ -1,15 +1,12 @@
 "use client";
 
 import { careerPaths } from "@/constants/marketing/careers/careers";
-import type { CareerPath } from "@/types/marketing/careers/careers";
+import type { CareerGrowthCardProps } from "@/types/marketing/careers/careers";
 
 export const CareerGrowthCard = ({
   path,
   index,
-}: {
-  path: CareerPath;
-  index: number;
-}) => {
+}: CareerGrowthCardProps) => {
   const Icon = path.icon;
 
   return (

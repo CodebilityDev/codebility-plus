@@ -1,12 +1,9 @@
 "use client";
 
 import { TeamSectionAvatar } from "@/components/auth/onboarding/TeamSectionAvatar";
-import type { Person } from "@/types/auth/onboarding/onboarding";
+import type { PersonCardProps } from "@/types/auth/onboarding/onboarding";
 
-// -------------------------
-// PersonCard
-// -------------------------
-export function PersonCard({ person }: { person: Person }) {
+export function PersonCard({ person }: PersonCardProps) {
   return (
     <div className="flex flex-col items-center gap-2 text-center">
       <TeamSectionAvatar person={person} size={80} />

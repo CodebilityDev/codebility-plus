@@ -4,17 +4,13 @@ import { NAV_ITEMS } from "@/constants/global/marketing";
 import { IconFourDotsMenu } from "@/public/assets/svgs/index";
 import { Sheet, SheetTrigger, SheetContent, SheetTitle, SheetDescription } from "@codevs/ui";
 import Link from "next/link";
-import React from "react";
+import type { MobileDrawerProps } from "@/types/global/marketing";
 
 export const MobileDrawer = ({
   openSheet,
   setOpenSheet,
   drawerAuth,
-}: {
-  openSheet: boolean;
-  setOpenSheet: (open: boolean) => void;
-  drawerAuth?: React.ReactNode;
-}) => (
+}: MobileDrawerProps) => (
   <Sheet open={openSheet} onOpenChange={setOpenSheet}>
     <SheetTrigger>
       <IconFourDotsMenu className="lg:hidden" />

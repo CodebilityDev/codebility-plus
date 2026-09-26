@@ -1,16 +1,13 @@
 "use client";
 
 import DefaultPagination from "@/components/global/ui/DefaultPagination";
+import type { CodevsPaginationSlotProps } from "@/types/global/marketing";
 
 export function CodevsPaginationSlot({
   page,
   totalPages,
   onPageChange,
-}: {
-  page: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
-}) {
+}: CodevsPaginationSlotProps) {
   if (totalPages <= 1) {
     return <div className="mt-6 min-h-[4.5rem]" aria-hidden="true" />;
   }

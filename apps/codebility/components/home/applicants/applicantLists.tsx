@@ -1,23 +1,22 @@
 "use client";
 
-import React, { memo, useMemo } from "react";
-import { Codev } from "@/types/global/codev";
-import { prioritizeCodevs } from "@/utils/global/codev-priority";
-import { ColumnDef } from "@tanstack/react-table";
+import React from "react";
 
-import { Badge } from "@codevs/ui/badge";
+
+
+
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@codevs/ui/tabs";
 
-import { NewApplicantType } from "@/types/home/applicants/applicants";
+
 import { ApplicantDataTable } from "@/components/home/applicants/applicantDataTable";
 import { getApplicantColumns } from "@/utils/home/applicants/applicants";
 import ApplicantFilterHeaders from "@/components/home/applicants/applicantHeaders";
+import type { ApplicantListsProps } from "@/types/home/applicants/applicants";
 
 function ApplicantLists({
   applicants,
-}: {
-  applicants: NewApplicantType[];
-}) {
+}: ApplicantListsProps) {
   const [filteredApplicants, setFilteredApplicants] = React.useState(applicants);
   const [currentTab, setCurrentTab] = React.useState("applying");
 

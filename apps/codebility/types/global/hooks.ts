@@ -1,4 +1,4 @@
-import { Task, Client } from "@/types/global/codev";
+import type { Task, Client } from "@/types/global/codev";
 
 export type ModalType =
   | "companyProfile"

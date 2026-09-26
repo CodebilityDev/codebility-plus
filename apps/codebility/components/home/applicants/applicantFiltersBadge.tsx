@@ -1,20 +1,17 @@
-import React from "react";
+
 import { X } from "lucide-react";
 
 import { Badge } from "@codevs/ui/badge";
 
 import { ApplicantFilters } from "@/types/home/applicants/applicants";
 import { ExperienceRanges } from "@/types/home/applicants/applicants";
+import type { ApplicantFiltersBadgeProps } from "@/types/home/applicants/applicants";
 
 export default function ApplicantFiltersBadge({
   filters,
   setFilter,
   onFilterChange,
-}: {
-  filters: ApplicantFilters;
-  setFilter: React.Dispatch<React.SetStateAction<ApplicantFilters>>;
-  onFilterChange: (filters: ApplicantFilters) => void;
-}) {
+}: ApplicantFiltersBadgeProps) {
   // Update a specific filter
   const updateFilter = (key: keyof ApplicantFilters, value: boolean) => {
     onFilterChange({

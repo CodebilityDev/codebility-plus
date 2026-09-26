@@ -2,16 +2,14 @@
 
 import CodevCard from "@/components/global/marketing/CodevCard";
 import ProgressiveMotion from "@/components/global/marketing/ProgressiveMotion";
-import type { ProfilesListingPage } from "@/types/global/profiles-listing";
+
 import { getStableColor } from "@/utils/global/getRandomColor";
+import type { AnimatedProfilesGridProps } from "@/types/marketing/profiles/profiles";
 
 export function AnimatedProfilesGrid({
   codevs,
   animationKey,
-}: {
-  codevs: ProfilesListingPage["codevs"];
-  animationKey: string;
-}) {
+}: AnimatedProfilesGridProps) {
   if (codevs.length === 0) {
     return (
       <p className="text-center text-2xl text-gray-500 dark:text-gray-400">

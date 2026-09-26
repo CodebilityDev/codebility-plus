@@ -1,19 +1,14 @@
 "use client";
 
 import { colorClasses } from "@/constants/marketing/codevs/codevs";
-import type { RoadmapPhase } from "@/types/marketing/codevs/codevs";
+import type { RoadmapPhaseCardProps } from "@/types/marketing/codevs/codevs";
 
 export function RoadmapPhaseCard({
   phase,
   index,
   totalPhases,
   onPhaseClick,
-}: {
-  phase: RoadmapPhase;
-  index: number;
-  totalPhases: number;
-  onPhaseClick: (phaseId: string) => void;
-}) {
+}: RoadmapPhaseCardProps) {
   const isLeft = index % 2 === 0;
   const colors = colorClasses[phase.color as keyof typeof colorClasses];
 

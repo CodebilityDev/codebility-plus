@@ -1,4 +1,6 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
+import type React from "react";
+
 
 export interface ConditionalMainWrapperProps {
   children: ReactNode;
@@ -59,3 +61,7 @@ export type RolePermissions = {
 };
 
 export type PermissionKey = keyof RolePermissions;
+
+export interface HomeLayoutProps {
+  children: React.ReactNode;
+}

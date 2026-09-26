@@ -1,60 +1,9 @@
-import z from 'zod';
-import { ColumnDef, Table as ReactTable } from "@tanstack/react-table";
-import { ReactNode } from "react";
-
-
-export const newApplicantsSchema = z.object({
-    id: z.string(),
-    first_name: z.string(),
-    last_name: z.string(),
-    email_address: z.string(),
-    phone_number: z.string().nullable(),
-    address: z.string().nullable(),
-    about: z.string().nullable(),
-    positions: z.array(z.string()).nullable(),
-    display_position: z.string().nullable(),
-    portfolio_website: z.string().nullable(),
-    tech_stacks: z.array(z.string()).nullable(),
-    image_url: z.string().nullable(),
-    availability_status: z.boolean(),
-    nda_status: z.boolean().nullable(),
-    level: z.record(z.any()).nullable(),
-    application_status: z.string(),
-    rejected_count: z.number(),
-    facebook: z.string().nullable(),
-    linkedin: z.string().nullable(),
-    github: z.string().nullable(),
-    discord: z.string().nullable(),
-    years_of_experience: z.number(),
-    role_id: z.number().nullable(),
-    internal_status: z.string(),
-    mentor_id: z.string().nullable(),
-    nda_signature: z.string().nullable(),
-    nda_document: z.string().nullable(),
-    nda_signed_at: z.string().nullable(),
-    nda_request_sent: z.boolean().nullable(),
-    date_applied: z.string().datetime({ offset: true }).nullable(),
-    applicant: z.object({
-        id: z.string(),
-        codev_id: z.string(),
-        test_taken: z.string().datetime({ offset: true }).nullable(),
-        fork_url: z.string().nullable(),
-        reminded_count: z.number().min(0).nullable(),
-        last_reminded_date: z.string().datetime({ offset: true }).nullable(),
-        quiz_score: z.number().nullable(),
-        quiz_total: z.number().nullable(),
-        quiz_passed: z.boolean().nullable(),
-        quiz_completed_at: z.string().datetime({ offset: true }).nullable(),
-        can_do_mobile: z.boolean().nullable(),
-        commitment_signed_at: z.string().datetime({ offset: true }).nullable(),
-        waitlist_entered_at: z.string().datetime({ offset: true }).nullable().optional(),
-        signature_data: z.string().nullable(),
-        created_at: z.string().datetime({ offset: true }),
-        updated_at: z.string().datetime({ offset: true }),
-    }).nullable(),
-    created_at: z.string().datetime({ local: true }),
-    updated_at: z.string().datetime({ local: true }),
-})
+import type { newApplicantsSchema } from "@/utils/home/applicants/applicants";
+import type z from 'zod';
+import type { ColumnDef, Table as ReactTable } from "@tanstack/react-table";
+import type { ReactNode } from "react";
+import type { Row } from "@tanstack/react-table";
+import type React from "react";
 
 export type NewApplicantType = z.infer<typeof newApplicantsSchema>
 
@@ -146,3 +95,122 @@ export interface PipelineStageDefinition {
   /** Sequential order position (ascending). */
   order: number;
 }
+
+export interface ApplicantActionButtonProps {
+  applicant: NewApplicantType;
+}
+
+export interface ApplicantEmailActionProps {
+  applicants: NewApplicantType[];
+}
+
+export interface ApplicantFiltersComponentProps {
+  activeFilterCount: number;
+  filters: {
+    hasPortfolio: boolean;
+    noPortfolio: boolean;
+    hasGithub: boolean;
+    noGithub: boolean;
+    experienceRanges: {
+      novice: boolean;
+      intermediate: boolean;
+      expert: boolean;
+    };
+    positions: {
+      [key: string]: boolean;
+    };
+    techStacks: {
+      [key: string]: boolean;
+    };
+    testStatus: {
+      taken: boolean;
+      notTaken: boolean;
+      overdue: boolean;
+    };
+    reminderCount: {
+      none: boolean;
+      low: boolean;
+      medium: boolean;
+      high: boolean;
+    };
+    applicationDate: {
+      last7Days: boolean;
+      last30Days: boolean;
+      last90Days: boolean;
+      custom: boolean;
+      startDate: string;
+      endDate: string;
+    };
+  };
+  uniquePositions: string[];
+  uniqueTechStacks: string[];
+  updateFilter: (key: keyof ApplicantFilters, value: boolean) => void;
+  updateExperienceFilter: (key: keyof ExperienceRanges, value: boolean) => void;
+  updatePositionFilter: (key: string, value: boolean) => void;
+  updateTechStackFilter: (key: string, value: boolean) => void;
+  updateDateRangeFilter: (key: string, value: boolean | string) => void;
+  updateReminderFilter: (key: string, value: boolean) => void;
+  updateTestStatusFilter: (key: string, value: boolean) => void;
+  onResetFilters: () => void;
+}
+
+export interface ApplicantFiltersBadgeProps {
+  filters: ApplicantFilters;
+  setFilter: React.Dispatch<React.SetStateAction<ApplicantFilters>>;
+  onFilterChange: (filters: ApplicantFilters) => void;
+}
+
+export interface ApplicantFilterHeadersProps {
+  applicants: NewApplicantType[];
+  setApplicants: React.Dispatch<React.SetStateAction<NewApplicantType[]>>;
+  setCurrentTab: React.Dispatch<React.SetStateAction<string>>;
+}
+
+export interface ApplicantListsProps {
+  applicants: NewApplicantType[];
+}
+
+export interface ApplicantProcessTimelineProps {
+  applicant: NewApplicantType;
+}
+
+export interface ApplicantProfileColSecProps {
+  applicant: NewApplicantType;
+  row: Row<NewApplicantType>;
+}
+
+// Helper Components
+export interface ApplicantProfileModalSectionProps {
+  title: string;
+  children: React.ReactNode;
+}
+
+export interface ApplicantReapplyTimeProps {
+  applicant: NewApplicantType;
+  isMobile?: boolean;
+}
+
+export interface ApplicantRowActionButtonProps {
+  applicants: NewApplicantType[];
+  onActionComplete?: () => void;
+}
+
+export interface ApplicantSortersProps {
+  sortOptions: SortOption[];
+  onAddSort: (field: string, label: string) => void;
+  onRemoveSort: (field: string) => void;
+  onToggleSortDirection: (field: string) => void;
+  onReorderSorts: (sortOptions: SortOption[]) => void;
+  resetSort: () => void;
+}
+
+export interface ApplicantTechStackProps {
+  applicant: NewApplicantType;
+}
+
+export interface ApplicantTestTimeRemainingProps {
+  applicant: NewApplicantType;
+  isMobile?: boolean;
+}
+
+export interface TimelineBodyProps { applicant: NewApplicantType }

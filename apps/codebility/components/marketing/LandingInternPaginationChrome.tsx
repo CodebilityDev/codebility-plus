@@ -1,14 +1,12 @@
 "use client";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import type { LandingInternPaginationChromeProps } from "@/types/marketing/marketing";
 
 export function LandingInternPaginationChrome({
   page,
   totalPages,
-}: {
-  page: number;
-  totalPages: number;
-}) {
+}: LandingInternPaginationChromeProps) {
   return (
     <div
       className="relative z-[100] mt-8 flex min-h-9 items-center gap-3"

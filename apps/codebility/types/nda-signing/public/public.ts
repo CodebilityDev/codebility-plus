@@ -1,6 +1,6 @@
-import { UserInfoSchema } from "@/utils/nda-signing/public/public";
-import React from "react";
-import { z } from "zod";
+import type { UserInfoSchema } from "@/utils/nda-signing/public/public";
+import type React from "react";
+import type { z } from "zod";
 
 export type UserInfo = z.infer<typeof UserInfoSchema>;
 

@@ -1,6 +1,5 @@
 "use client";
 
-import type { ReactNode } from "react";
 import Link from "next/link";
 import { Button } from "@/components/global/ui/button";
 
@@ -8,12 +7,11 @@ import Section from "@/components/global/marketing/MarketingSection";
 import BlueBg from "@/components/marketing/LandingBlueBg";
 import ProgressiveMotion from "@/components/global/marketing/ProgressiveMotion";
 import LandingInternSkeleton from "@/components/marketing/LandingInternSkeleton";
+import type { LandingInternShellProps } from "@/types/marketing/marketing";
 
 export default function LandingInternShell({
   children,
-}: {
-  children: ReactNode;
-}) {
+}: LandingInternShellProps) {
   return (
     <Section id="codevs" className="text-light-900 relative w-full pt-10">
       <div data-landing-section>

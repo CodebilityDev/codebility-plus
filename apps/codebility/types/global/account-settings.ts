@@ -22,3 +22,7 @@ export interface UserDeletionFormValues {
 export interface AccountSettingsUsernameProps {
   userId: string;
 }
+
+export interface AccountSettingsHeaderProps {
+  email: string;
+}

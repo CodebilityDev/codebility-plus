@@ -1,4 +1,4 @@
-import { OnboardingProgressType } from "@/types/applicant/onboarding/applicant-onboarding";
+import type { OnboardingProgressType } from "@/types/applicant/onboarding/applicant-onboarding";
 
 export interface CommitmentProps {
   userName: string;

@@ -1,6 +1,7 @@
 import { Skeleton } from "@/components/global/ui/skeleton";
+import type { CodevsProfilesSkeletonProps } from "@/types/global/marketing";
 
-export function CodevsProfilesSkeleton({ count = 5 }: { count?: number }) {
+export function CodevsProfilesSkeleton({ count = 5 }: CodevsProfilesSkeletonProps) {
   return (
     <div
       className="grid h-full w-full grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"

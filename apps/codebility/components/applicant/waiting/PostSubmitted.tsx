@@ -5,18 +5,16 @@ import TestInstruction from "@/components/applicant/waiting/testInstruction";
 import TestQAInstruction from "@/components/applicant/waiting/testQAInstruction";
 import { Button } from "@/components/global/ui/button";
 import { useToast } from "@/components/global/ui/use-toast";
-import { ApplicantType } from "@/types/applicant/waiting/applicant-waiting";
+
 import { Loader2Icon } from "lucide-react";
 import React from "react";
 import { useForm } from "react-hook-form";
+import type { PostSubmittedProps } from "@/types/applicant/waiting/waiting";
 
 export function PostSubmitted({
   applicantData,
   user,
-}: {
-  applicantData: ApplicantType;
-  user: any;
-}) {
+}: PostSubmittedProps) {
   const { toast } = useToast();
   const [loading, setLoading] = React.useState(false);
 

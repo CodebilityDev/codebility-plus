@@ -26,3 +26,41 @@ export interface ServicesTabProps {
   pageSize: number;
   onServiceSelect?: (service: ServiceProject) => void;
 }
+
+export interface IconFigmaProps { className?: string }
+
+export interface IconGithubProps { className?: string }
+
+export interface IconLinkProps { className?: string }
+
+export interface ServiceDetailBodyProps { projectId: string }
+
+export interface ServicesGridSkeletonProps { count?: number }
+
+export interface ServicesPaginationSlotProps {
+  page: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}
+
+export interface ServicesProjectsGridProps {
+  projects: ServiceProject[];
+  page: number;
+  onServiceSelect?: (service: ServiceProject) => void;
+}
+
+export interface ServicesTabRemoteProps {
+  category: ServicesCategorySlug;
+  page: number;
+  pageSize: number;
+  initialData: ServicesProjectsPage;
+  onServiceSelect?: (service: ServiceProject) => void;
+}
+
+export interface ServicesTabGridProps {
+  category: ServicesCategorySlug;
+  page: number;
+  pageSize: number;
+  initialData: ServicesProjectsPage;
+  onServiceSelect?: (service: ServiceProject) => void;
+}

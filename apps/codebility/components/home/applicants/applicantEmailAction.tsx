@@ -1,34 +1,20 @@
 import React from "react";
 import { Button } from "@/components/global/ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/global/ui/dialog";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/global/ui/dialog";
 import { useToast } from "@/components/global/ui/use-toast";
-import { set } from "date-fns";
+
 import { Loader2Icon, MailIcon } from "lucide-react";
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@codevs/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@codevs/ui/dropdown-menu";
 
 import { sendMultipleOnboardingReminderWithUpdate } from "@/actions/home/applicants/onboarding-reminder-email";
 import { sendMultipleTestReminderEmailWithUpdate } from "@/actions/home/applicants/test-reminder-email";
-import { NewApplicantType } from "@/types/home/applicants/applicants";
+import type { ApplicantEmailActionProps } from "@/types/home/applicants/applicants";
+
 
 export default function ApplicantEmailAction({
   applicants,
-}: {
-  applicants: NewApplicantType[];
-}) {
+}: ApplicantEmailActionProps) {
   const { toast } = useToast();
 
   const [dialogState, setDialogState] = React.useState<
