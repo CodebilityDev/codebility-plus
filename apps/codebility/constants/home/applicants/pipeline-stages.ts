@@ -1,17 +1,5 @@
-export type PipelineStageKey =
-  | "applying"
-  | "testing"
-  | "onboarding"
-  | "waitlist";
+import type { PipelineStageDefinition } from "@/types/home/applicants/applicants";
 
-export interface PipelineStageDefinition {
-  /** Stable key matching the relevant application_status values. */
-  key: PipelineStageKey;
-  /** Human-readable label rendered in the timeline. */
-  label: string;
-  /** Sequential order position (ascending). */
-  order: number;
-}
 
 /**
  * The configured recruitment pipeline. Terminal outcomes (`passed`, `denied`)

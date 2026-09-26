@@ -1,71 +1,24 @@
 "use client";
 
-import type { Codev, InternalStatus } from "@/types/global/codev";
+import type { InternalStatus } from "@/types/global/codev";
 import type React from "react";
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import CodevBadge from "@/components/global/codev/CodevBadge";
-import { item } from "@/components/global/animation/Framer";
-import {
-  AnimatePresence,
-  motion,
-  useMotionValue,
-  useSpring,
-  useTransform,
-} from "framer-motion";
+import { item } from "@/constants/global/animation";
+import { AnimatePresence, motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { BookOpenIcon } from "lucide-react";
 
 import { cn } from "@codevs/ui";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@codevs/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@codevs/ui/tooltip";
 
 import { CodevHireCodevButton } from "@/components/global/marketing/CodevHireCodevButton";
+import { STATUS_CONFIG } from "@/constants/global/marketing";
+import type { CodevCardProps } from "@/types/global/marketing";
 
-interface Props {
-  codev: Codev;
-  color: string;
-  animateEntrance?: boolean;
-}
 
-const STATUS_CONFIG: Record<InternalStatus, { label: string; className: string }> = {
-  TRAINING: {
-    label: "Training",
-    className:
-      "bg-yellow-500/20 backdrop-blur-sm text-yellow-200 border border-yellow-500/30 dark:bg-yellow-500/10 dark:text-yellow-300",
-  },
-  GRADUATED: {
-    label: "Graduated",
-    className:
-      "bg-green-500/20 backdrop-blur-sm text-green-200 border border-green-500/30 dark:bg-green-500/10 dark:text-green-300",
-  },
-  INACTIVE: {
-    label: "Inactive",
-    className:
-      "bg-gray-500/20 backdrop-blur-sm text-gray-200 border border-gray-500/30 dark:bg-gray-500/10 dark:text-gray-300",
-  },
-  MENTOR: {
-    label: "Mentor",
-    className:
-      "bg-purple-500/20 backdrop-blur-sm text-purple-200 border border-purple-500/30 dark:bg-purple-500/10 dark:text-purple-300",
-  },
-  ADMIN: {
-    label: "Admin",
-    className:
-      "bg-blue-500/20 backdrop-blur-sm text-blue-200 border border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-300",
-  },
-  DEPLOYED: {
-    label: "Deployed",
-    className:
-      "bg-indigo-500/20 backdrop-blur-sm text-indigo-200 border border-indigo-500/30 dark:bg-indigo-500/10 dark:text-indigo-300",
-  },
-};
-
-const CodevCard = ({ codev, color, animateEntrance = true }: Props) => {
+const CodevCard = ({ codev, color, animateEntrance = true }: CodevCardProps) => {
   const [hovered, setHovered] = useState(false);
   const springConfig = { stiffness: 100, damping: 5 };
   const x = useMotionValue(0);

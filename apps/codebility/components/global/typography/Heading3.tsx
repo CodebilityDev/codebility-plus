@@ -1,8 +1,6 @@
-import React, { ReactNode } from "react";
+import React from "react";
+import type { Heading3 } from "@/types/global/typography";
 
-interface Heading3 {
-  children: ReactNode;
-}
 
 const Heading3: React.FC<Heading3> = ({ children }) => {
   return (

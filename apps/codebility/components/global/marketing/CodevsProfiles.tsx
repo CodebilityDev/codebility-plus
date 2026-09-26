@@ -1,11 +1,11 @@
-import { pageSize } from "@/constants/global/page-size";
+
 import { getCachedCodevsProfilesPage } from "@/lib/global/codevs-profiles-cached";
 
 import CodevsProfilesContainer from "@/components/global/marketing/CodevsProfilesContainer";
 import CodevsProfilesPagination from "@/components/global/marketing/CodevsProfilesPagination";
 import Section from "@/components/global/marketing/CodevsSection";
+import { PAGE_SIZE } from "@/constants/global/marketing";
 
-const PAGE_SIZE = pageSize.codevsProfiles;
 
 export default async function CodevsProfiles() {
   const initialData = await getCachedCodevsProfilesPage("", 1, PAGE_SIZE);

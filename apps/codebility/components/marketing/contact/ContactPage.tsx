@@ -1,40 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import {
-    IconActivityLog,
-    IconApplicant,
-    IconHuman,
-} from "@/public/assets/svgs/index";
+
 
 import InquiryForm from "@/components/marketing/contact/ContactInquiryInform";
 import ShortSurvey from "@/components/marketing/contact/ContactShortSurvey";
 import Appointment from "@/components/marketing/contact/ContactAppointment";
 import MarketingProgressiveSection from "@/components/global/marketing/MarketingProgressiveSection";
 import ProgressiveMotion from "@/components/global/marketing/ProgressiveMotion";
+import { steps } from "@/constants/marketing/contact/contact";
+import type { ContactFormData } from "@/types/marketing/contact/contact";
 
-const steps = [
-    { label: "Inquiry Form", icon: <IconHuman /> },
-    { label: "Short Survey", icon: <IconApplicant /> },
-    { label: "Set an Appointment", icon: <IconActivityLog /> },
-];
-
-export interface ContactFormData {
-    // Step 1
-    firstName: string;
-    lastName: string;
-    email: string;
-    companyName: string;
-    phoneNumber: string;
-    industry: string;
-    // Step 2
-    serviceInterest: string;
-    projectType: string;
-    featuresNeeded: string;
-    referralSource: string;
-    interestLevel: number;
-    otherRequirements: string;
-}
 
 const ContactPage = () => {
     const [currentStep, setCurrentStep] = useState(0);

@@ -7,11 +7,9 @@ import { usePathname } from "next/navigation";
 import { useNavStore } from "@/store/home/sidebar-store";
 import { cn } from "@/utils/global/cn";
 import { AnimatePresence, motion } from "framer-motion";
-import type { Sidebar, SidebarLink } from "@/actions/home/sidebar";
+import type { SidebarSidebarLink as SidebarLink } from "@/types/home/home";
+import type { LeftSidebarClientProps } from "@/types/home/home";
 
-interface LeftSidebarClientProps {
-  initialSidebarData: Sidebar[];
-}
 
 const LeftSidebarClient = ({ initialSidebarData }: LeftSidebarClientProps) => {
   const { isToggleOpen, toggleNav } = useNavStore();

@@ -1,16 +1,5 @@
-export type RoadmapStep = {
-  id: string;
-  step: string;
-};
+import type { RoadmapPhase } from "@/types/marketing/codevs/codevs";
 
-export type RoadmapPhase = {
-  id: string;
-  phase: string;
-  title: string;
-  pointsRange: string;
-  color: string;
-  steps: RoadmapStep[];
-};
 
 export const roadmapData: RoadmapPhase[] = [
   {

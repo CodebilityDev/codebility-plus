@@ -1,9 +1,11 @@
 "use client";
 
-import React, { ReactNode, useState } from "react";
+
 import { useModal } from "@/hooks/global/use-modal";
 
 import { Dialog, DialogContent, DialogTitle } from "@codevs/ui";
+import { FaqsModalAccordion } from "@/components/marketing/FaqsModalAccordion";
+
 
 function FaqsModal() {
   const { isOpen, onClose, type } = useModal();
@@ -20,13 +22,13 @@ function FaqsModal() {
             <h1 className="mb-6 text-center text-4xl font-semibold ">
               Frequently Asked Questions
             </h1>
-            <Accordion title="Q1 What makes Codebility different from other development companies?">
+            <FaqsModalAccordion title="Q1 What makes Codebility different from other development companies?">
               Lorem ipsum dolor sit amet consectetur adipiscing elit. Phasellus eu
               tempus enim. Etiam viverra a ipsum non feugiat. Sed lobortis eget
               est vitae porttitor. Nullam magna lacus, bibendum a tristique sit
               amet, luctus vitae lorem.
-            </Accordion>
-            <Accordion title="Q2 What technologies do your developers specialize in?">
+            </FaqsModalAccordion>
+            <FaqsModalAccordion title="Q2 What technologies do your developers specialize in?">
               <h3>
                 Our developers specialize in a wide range of technologies
                 including but not limited to:
@@ -39,25 +41,25 @@ function FaqsModal() {
                   AI: Machine Learning, Natural Language Processing, Data Analysis
                 </li>
               </ul>
-            </Accordion>
-            <Accordion title="Q3 How do you ensure the quality of your projects?">
+            </FaqsModalAccordion>
+            <FaqsModalAccordion title="Q3 How do you ensure the quality of your projects?">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus
               eu tempus enim. Etiam viverra a ipsum non feugiat. Sed lobortis eget
               est vitae porttitor. Nullam magna lacus, bibendum a tristique sit
               amet, luctus vitae lorem.
-            </Accordion>
-            <Accordion title="Q4 What kind of support can I expect during and after the project?">
+            </FaqsModalAccordion>
+            <FaqsModalAccordion title="Q4 What kind of support can I expect during and after the project?">
               Lorem ipsum dolor sit amet consectetur adipiscing elit. Phasellus eu
               tempus enim. Etiam viverra a ipsum non feugiat. Sed lobortis eget
               est vitae porttitor. Nullam magna lacus, bibendum a tristique sit
               amet, luctus vitae lorem.
-            </Accordion>
-            <Accordion title="Q5 What benefits do members of the Codebility Community receive?">
+            </FaqsModalAccordion>
+            <FaqsModalAccordion title="Q5 What benefits do members of the Codebility Community receive?">
               Lorem ipsum dolor sit amet consectetur adipiscing elit. Phasellus eu
               tempus enim. Etiam viverra a ipsum non feugiat. Sed lobortis eget
               est vitae porttitor. Nullam magna lacus, bibendum a tristique sit
               amet, luctus vitae lorem.
-            </Accordion>
+            </FaqsModalAccordion>
           </div>
 
 
@@ -80,37 +82,5 @@ function FaqsModal() {
     </Dialog>
   );
 }
-
-interface AccordionProps {
-  title: string;
-  children: ReactNode;
-}
-
-const Accordion: React.FC<AccordionProps> = ({ title, children }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const toggleAccordion = () => {
-    setIsOpen(!isOpen);
-  };
-
-  return (
-    <div
-      className={`rounded-xl px-12 py-7 ${isOpen ? "border border-zinc-400 bg-inherit" : "bg-black-500"}`}
-    >
-      <button
-        onClick={toggleAccordion}
-        className="flex w-full items-center justify-between"
-      >
-        <span className="text-xl font-medium">{title}</span>
-        <span className="text-2xl text-[#9747FF]">{isOpen ? "-" : "+"}</span>
-      </button>
-      {isOpen && (
-        <div className="px-4 pb-4">
-          <span className="mt-4 flex flex-col gap-4">{children}</span>
-        </div>
-      )}
-    </div>
-  );
-};
 
 export default FaqsModal;

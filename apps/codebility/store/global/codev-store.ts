@@ -1,16 +1,8 @@
-import { Codev } from "@/types/global/codev";
+
 import { createClientClientComponent } from "@/lib/global/supabase-client";
 import { create } from "zustand";
+import type { UserState } from "@/types/global/store";
 
-interface UserState {
-  user: Codev | null;
-  userLevel: number | null;
-  setUser: (user: Codev) => void;
-  setUserLevel: (level: number) => void;
-  clearUser: () => void;
-  hydrate: () => Promise<void>;
-  isLoading: boolean;
-}
 
 export const useUserStore = create<UserState>((set) => ({
   user: null,

@@ -1,15 +1,6 @@
 import { create } from "zustand";
+import type { Schedule } from "@/types/marketing/marketing";
 
-export interface ScheduleType {
-  start_time: string;
-  end_time: string;
-}
-
-interface Schedule {
-  time: ScheduleType;
-  addTime: (iTime: ScheduleType) => void;
-  clearTime: () => void;
-}
 
 export const useSchedule = create<Schedule>((set) => ({
   time: {

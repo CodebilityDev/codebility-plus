@@ -2,95 +2,14 @@
 
 import H2 from "@/components/global/typography/H2";
 import Heading3 from "@/components/global/typography/Heading3";
-import { Users, Lightbulb, Target, Heart, Zap, Globe } from "lucide-react";
+
 
 import MarketingProgressiveSection from "@/components/global/marketing/MarketingProgressiveSection";
 import ProgressiveMotion from "@/components/global/marketing/ProgressiveMotion";
 import Section from "@/components/global/marketing/CodevsSection";
+import { CultureCard } from "@/components/marketing/careers/CultureCard";
+import { inter, outfit, workplaceCultureData } from "@/constants/marketing/careers/careers";
 
-export const inter = { className: "font-sans" };
-export const outfit = { className: "font-sans" };
-
-const workplaceCultureData = [
-  {
-    id: 1,
-    title: "Collaborative Environment",
-    description:
-      "Work in cross-functional teams where every voice is heard and ideas flourish through open communication.",
-    icon: Users,
-    iconBg: "bg-customTeal/10",
-    iconColor: "text-customTeal",
-  },
-  {
-    id: 2,
-    title: "Innovation Driven",
-    description:
-      "Stay at the forefront of technology with opportunities to work on cutting-edge projects and emerging technologies.",
-    icon: Lightbulb,
-    iconBg: "bg-customViolet-100/10",
-    iconColor: "text-customViolet-100",
-  },
-  {
-    id: 3,
-    title: "Results Focused",
-    description:
-      "Deliver high-quality solutions that create real value for clients while maintaining excellent engineering standards.",
-    icon: Target,
-    iconBg: "bg-customBlue-100/10",
-    iconColor: "text-customBlue-100",
-  },
-  {
-    id: 4,
-    title: "Work-Life Balance",
-    description:
-      "Enjoy flexible schedules, remote work options, and comprehensive benefits that support your well-being.",
-    icon: Heart,
-    iconBg: "bg-purple-500/10",
-    iconColor: "text-purple-500",
-  },
-  {
-    id: 5,
-    title: "Continuous Growth",
-    description:
-      "Access learning resources, conference budgets, and mentorship programs to advance your technical expertise.",
-    icon: Zap,
-    iconBg: "bg-customTeal/10",
-    iconColor: "text-customTeal",
-  },
-  {
-    id: 6,
-    title: "Global Impact",
-    description:
-      "Contribute to projects that serve clients worldwide and make a meaningful difference in various industries.",
-    icon: Globe,
-    iconBg: "bg-customViolet-100/10",
-    iconColor: "text-customViolet-100",
-  },
-];
-
-const CultureCard = ({
-  item,
-}: {
-  item: (typeof workplaceCultureData)[0];
-}) => {
-  const Icon = item.icon;
-
-  return (
-    <div className="group relative overflow-hidden rounded-xl border border-gray-800 bg-gray-900/50 p-6 backdrop-blur-sm transition-all duration-300 hover:border-gray-600 hover:bg-gray-900/70">
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-transparent to-blue-900/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-
-      <div className="relative z-10">
-        <div className={`mb-4 inline-flex rounded-lg p-3 ${item.iconBg}`}>
-          <Icon className={`h-6 w-6 ${item.iconColor}`} />
-        </div>
-
-        <h3 className="mb-3 text-lg font-semibold text-white">{item.title}</h3>
-
-        <p className="text-sm leading-relaxed text-gray-300">{item.description}</p>
-      </div>
-    </div>
-  );
-};
 
 const WorkplaceCulture = () => {
   const skeleton = (

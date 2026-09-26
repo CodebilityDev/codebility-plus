@@ -1,67 +1,19 @@
 "use client";
 
 import { Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import {
-  parseServicesCategory,
-  servicesHref,
-} from "@/utils/global/services-categories";
-import type { ServicesProjectsPage } from "@/lib/global/services-projects-cached";
+
+
+
 
 import Calendly from "@/components/global/marketing/MarketingCalendly";
 import { ServicesTab } from "@/components/marketing/services/ServicesTab";
 import { Hero as ServicesHero } from "@/components/marketing/services/ServicesHero";
-import { ServiceDetailModal } from "@/components/marketing/services/ServiceDetailModal";
+import { ServicesPageBody } from "@/components/marketing/services/ServicesPageBody";
+import type { ServicesPageContentProps } from "@/types/marketing/services/services";
 
-interface Props {
-  initialData: ServicesProjectsPage;
-  pageSize: number;
-}
 
-function ServicesPageBody({ initialData, pageSize }: Props) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const category = parseServicesCategory(searchParams.get("category"));
-  const projectId = searchParams.get("project");
 
-  const replaceServicesUrl = (next: {
-    category?: typeof category;
-    project?: string | null;
-  }) => {
-    router.replace(
-      servicesHref({
-        category: next.category ?? category,
-        project: next.project === undefined ? projectId : next.project,
-      }),
-      { scroll: false },
-    );
-  };
-
-  return (
-    <>
-      <ServicesHero />
-      <ServicesTab
-        key={category}
-        initialData={initialData}
-        category={category}
-        pageSize={pageSize}
-        onServiceSelect={(service) => {
-          replaceServicesUrl({ project: service.id });
-        }}
-      />
-      <Calendly />
-      <ServiceDetailModal
-        projectId={projectId}
-        isOpen={!!projectId}
-        onClose={() => {
-          replaceServicesUrl({ project: null });
-        }}
-      />
-    </>
-  );
-}
-
-export const ServicesPageContent = ({ initialData, pageSize }: Props) => {
+export const ServicesPageContent = ({ initialData, pageSize }: ServicesPageContentProps) => {
   return (
     <Suspense
       fallback={

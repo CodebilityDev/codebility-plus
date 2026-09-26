@@ -3,29 +3,10 @@
 import { useCallback, useRef } from "react";
 import { animate, useMotionValue, useTransform, motion } from "framer-motion";
 
-import {
-  attachProgressiveInView,
-  isElementIntersecting,
-} from "@/utils/global/progressive-in-view";
+import { attachProgressiveInView, isElementIntersecting } from "@/utils/global/progressive-in-view";
+import { VARIANT_CONFIG } from "@/constants/marketing/marketing";
+import type { AnimatedMetricsProps } from "@/types/marketing/marketing";
 
-type AnimatedMetricsProps = {
-  value: number;
-  suffix?: string;
-  prefix?: string;
-  label?: string;
-  format?: "number" | "decimal";
-  delay?: number;
-  variant?: "hero" | "stat";
-};
-
-const VARIANT_CONFIG = {
-  hero: {
-    countDuration: 2,
-  },
-  stat: {
-    countDuration: 2.5,
-  },
-} as const;
 
 const AnimatedMetrics = ({
   value,

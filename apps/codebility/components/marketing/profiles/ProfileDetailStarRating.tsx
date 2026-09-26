@@ -1,13 +1,9 @@
 "use client";
 
 import { Star, StarHalf } from "lucide-react";
-import React from "react";
+import type { StarRatingProps } from "@/types/marketing/profiles/profiles";
 
-interface StarRatingProps {
-  rating: number; 
-  maxStars?: number;
-  size?: number; 
-}
+
 
 export default function StarRating({ rating, maxStars = 5, size = 20 }: StarRatingProps) {
   const fullStars = Math.floor(rating);

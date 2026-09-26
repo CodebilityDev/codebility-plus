@@ -1,7 +1,12 @@
 "use client";
 
-import Image from "next/image";
+
 import { motion } from "framer-motion";
+import { BriefcaseIcon } from "@/components/auth/onboarding/BriefcaseIcon";
+import { GlobeIcon } from "@/components/auth/onboarding/GlobeIcon";
+import { LightbulbIcon } from "@/components/auth/onboarding/LightbulbIcon";
+import { UsersIcon } from "@/components/auth/onboarding/UsersIcon";
+
 
 export default function WhyChooseUsSlide() {
   const features = [
@@ -55,65 +60,5 @@ export default function WhyChooseUsSlide() {
         </div>
       </div>
     </div>
-  );
-}
-function BriefcaseIcon() {
-  return (
-    <svg
-      className="h-8 w-8"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      viewBox="0 0 24 24"
-    >
-      <path d="M4 7h16v12H4z" />
-      <path d="M16 7V5a2 2 0 00-2-2H10a2 2 0 00-2 2v2" />
-    </svg>
-  );
-}
-
-function UsersIcon() {
-  return (
-    <svg
-      className="h-8 w-8"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      viewBox="0 0 24 24"
-    >
-      <path d="M17 20h5v-2a4 4 0 00-3-3.87" />
-      <path d="M9 20H4v-2a4 4 0 013-3.87" />
-      <circle cx="9" cy="7" r="4" />
-      <circle cx="17" cy="7" r="4" />
-    </svg>
-  );
-}
-
-function GlobeIcon() {
-  return (
-    <svg
-      className="h-8 w-8"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      viewBox="0 0 24 24"
-    >
-      <circle cx="12" cy="12" r="10" />
-      <path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20" />
-    </svg>
-  );
-}
-
-function LightbulbIcon() {
-  return (
-    <svg
-      className="h-8 w-8"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      viewBox="0 0 24 24"
-    >
-      <path d="M9 18h6M10 22h4M12 2a7 7 0 00-7 7c0 2.5 1.5 4.5 3 5.7V17a1 1 0 001 1h6a1 1 0 001-1v-2.3c1.5-1.2 3-3.2 3-5.7a7 7 0 00-7-7z" />
-    </svg>
   );
 }

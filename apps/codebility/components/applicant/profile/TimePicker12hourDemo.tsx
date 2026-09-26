@@ -3,17 +3,11 @@
 import * as React from "react";
 import { TimePeriodSelect } from "@/components/applicant/profile/PeriodSelect";
 import { TimePickerInput } from "@/components/applicant/profile/TimePickerInput";
-import { Period } from "@/components/applicant/profile/TimePickerUtils";
+import { Period } from "@/types/applicant/profile/profile";
 
 import { Label } from "@codevs/ui/label";
+import type { TimePickerProps } from "@/types/applicant/profile/profile";
 
-interface TimePickerProps {
-  date?: Date;
-  period: Period;
-  // eslint-disable-next-line no-unused-vars
-  setDate: (date: Date | undefined) => void;
-  disabled?: boolean;
-}
 
 export function TimePicker12({
   date,

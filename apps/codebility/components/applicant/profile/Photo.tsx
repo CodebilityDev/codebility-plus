@@ -7,20 +7,15 @@ import Box from "@/components/global/layout/Box";
 import Paragraph from "@/components/global/typography/Paragraph";
 import { useModal } from "@/hooks/global/use-modal";
 import { defaultAvatar } from "@/public/assets/images/index";
-import { deleteImage, getImagePath, uploadImage } from "@/actions/applicant/profile/upload-image";
+import { deleteImage, getImagePath } from "@/actions/applicant/profile/upload-image";
 import toast from "react-hot-toast";
 
 import { Button } from "@codevs/ui/button";
 
 import { updateCodev } from "@/actions/applicant/profile/applicant-profile";
 import UploadPhotoModal from "@/components/applicant/profile/UploadPhotoModal";
+import type { PhotoProps } from "@/types/applicant/profile/profile";
 
-type PhotoProps = {
-  data: {
-    id?: string;
-    image_url: string | null;
-  };
-};
 
 const Photo = ({ data }: PhotoProps) => {
   const [avatar, setAvatar] = useState<string | StaticImageData>(defaultAvatar);

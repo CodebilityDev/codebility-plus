@@ -1,10 +1,12 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import type { PointRuleName, ArrayFieldName, ArrayPointRule, ProfilePointsBreakdown, ProfileCompletionDetail, ProfilePointsResult } from "@/types/api/profile-points/profile-points";
+
 
 /**
  * Profile-completion scoring rules. `points` fields are all-or-nothing, while
  * `pointsPerItem` fields score per row up to `maxItems`/`maxPoints`.
  */
-const POINT_RULES = {
+export const POINT_RULES = {
   image_url: {
     points: 5,
     maxPoints: 5,
@@ -100,47 +102,6 @@ export const MAX_PROFILE_POINTS: number = Object.values(POINT_RULES).reduce(
   (total, rule) => total + rule.maxPoints,
   0,
 );
-
-type PointRuleName = keyof typeof POINT_RULES;
-type ArrayFieldName =
-  | "tech_stacks"
-  | "work_experience"
-  | "education"
-  | "positions";
-type ArrayPointRule = {
-  pointsPerItem: number;
-  maxItems: number;
-  maxPoints: number;
-  description: string;
-};
-
-export type ProfilePointsBreakdown = {
-  category: string;
-  points: number;
-};
-
-export type ProfileCompletionDetail = {
-  completed: boolean;
-  points: number;
-  maxPoints: number;
-  description?: string;
-  itemCount?: number;
-  maxItems?: number;
-};
-
-export type ProfilePointsResult = {
-  totalPoints: number;
-  maxPossiblePoints: number;
-  completionPercentage: number;
-  breakdown: ProfilePointsBreakdown[];
-  completionDetails: Record<string, ProfileCompletionDetail>;
-  dataCounts: {
-    workExperiences: number;
-    educationEntries: number;
-    techSkills: number;
-    positions: number;
-  };
-};
 
 function isFieldFilled(value: unknown, fieldName?: PointRuleName) {
   if (value === null || value === undefined) return false;

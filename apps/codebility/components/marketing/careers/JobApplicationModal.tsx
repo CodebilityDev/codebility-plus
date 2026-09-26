@@ -1,54 +1,23 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/global/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/global/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/global/ui/dialog";
 import Input from "@/components/global/ui/input";
 import { useToast } from "@/components/global/ui/use-toast";
 import { getClientSupabase } from "@/lib/global/supabase-client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, Upload, X } from "lucide-react";
+import { Loader2, Upload } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+
 
 import { Label } from "@codevs/ui/label";
 import { Textarea } from "@codevs/ui/textarea";
+import type { ApplicationFormData, JobApplicationModalProps } from "@/types/marketing/careers/careers";
+import { applicationSchema } from "@/utils/marketing/careers/careers";
 
-import { JobListing } from "@/types/global/job-listings";
 
-const applicationSchema = z.object({
-  firstName: z.string().min(2, "First name must be at least 2 characters"),
-  lastName: z.string().min(2, "Last name must be at least 2 characters"),
-  email: z.string().email("Invalid email address"),
-  phone: z.string().min(10, "Phone number must be at least 10 digits"),
-  linkedIn: z.string().url("Invalid LinkedIn URL").optional().or(z.literal("")),
-  github: z.string().url("Invalid GitHub URL").optional().or(z.literal("")),
-  portfolio: z
-    .string()
-    .url("Invalid portfolio URL")
-    .optional()
-    .or(z.literal("")),
-  yearsOfExperience: z.string().min(1, "Years of experience is required"),
-  coverLetter: z
-    .string()
-    .min(50, "Cover letter must be at least 50 characters"),
-  experience: z.string().min(20, "Please describe your relevant experience"),
-  referredBy: z.string().optional(),
-  resume: z.any().optional(),
-});
 
-type ApplicationFormData = z.infer<typeof applicationSchema>;
-
-interface JobApplicationModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  job: JobListing | null;
-}
 
 export default function JobApplicationModal({
   isOpen,

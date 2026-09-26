@@ -1,14 +1,12 @@
 "use client";
 
-import { useEffect, useState, ReactNode } from "react";
+import { useEffect, useState } from "react";
 import DeleteWarningModal from "@/components/home/DeleteWarningModal";
 import PrivacyPolicyModal from "@/components/global/modals/PrivacyPolicyModal";
 import TechStackModal from "@/components/global/modals/TechStackModal";
 import TermsOfServiceModal from "@/components/home/TermsOfServiceModal";
+import type { ModalProviderHomeProps } from "@/types/home/home";
 
-interface ModalProviderHomeProps {
-  children?: ReactNode;
-}
 
 export const ModalProviderHome = ({ children }: ModalProviderHomeProps = {}) => {
   const [isMounted, setIsMounted] = useState(false);

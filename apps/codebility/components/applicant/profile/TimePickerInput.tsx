@@ -1,25 +1,10 @@
 import React from "react";
-import {
-  getArrowByType,
-  getDateByType,
-  Period,
-  setDateByType,
-  TimePickerType,
-} from "@/components/applicant/profile/TimePickerUtils";
+import { getArrowByType, getDateByType, setDateByType } from "@/utils/applicant/profile/profile";
 
 import { cn } from "@codevs/ui";
 import { Input } from "@codevs/ui/input";
+import type { TimePickerInputProps } from "@/types/applicant/profile/profile";
 
-export interface TimePickerInputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {
-  picker: TimePickerType;
-  date: Date | undefined;
-  // eslint-disable-next-line no-unused-vars
-  setDate: (date: Date | undefined) => void;
-  period?: Period;
-  onRightFocus?: () => void;
-  onLeftFocus?: () => void;
-}
 
 const TimePickerInput = React.forwardRef<
   HTMLInputElement,

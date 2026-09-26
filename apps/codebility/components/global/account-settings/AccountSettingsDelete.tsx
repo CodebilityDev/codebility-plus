@@ -5,54 +5,23 @@ import { useRouter } from "next/navigation";
 import { createClientClientComponent } from "@/lib/global/supabase-client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DialogClose } from "@radix-ui/react-dialog";
-import { AlertCircle, HelpCircleIcon, Trash2 } from "lucide-react";
+import { HelpCircleIcon, Trash2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { z } from "zod";
 
-import { Alert, AlertDescription, AlertTitle } from "@codevs/ui/alert";
+
+
 import { Button } from "@codevs/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@codevs/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@codevs/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@codevs/ui/form";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@codevs/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@codevs/ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@codevs/ui/form";
 import { Input } from "@codevs/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@codevs/ui/popover";
 
 import AccountSettingsBackdrop from "@/components/global/account-settings/AccountSettingsBackDrop";
+import type { EmptyString, UserDeletionFormValues } from "@/types/global/account-settings";
+import { userDeletionSchema } from "@/utils/global/account-settings";
 
-const userDeletionSchema = z.object({
-  confirmation: z.string().refine((val) => val === "DELETE", {
-    message: "Please type DELETE to confirm",
-  }),
-});
-
-type DeleteConfirmation = "DELETE";
-type EmptyString = "";
-type FormConfirmation = DeleteConfirmation | EmptyString;
-
-interface UserDeletionFormValues {
-  confirmation: FormConfirmation;
-}
 
 export default function AccountSettingsDelete() {
   const [isOpen, setIsOpen] = useState<boolean>(false);

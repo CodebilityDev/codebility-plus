@@ -1,6 +1,5 @@
-type AccountSettingsBackdropProps = {
-  isOpen: boolean;
-};
+import type { AccountSettingsBackdropProps } from "@/types/global/account-settings";
+
 
 export default function AccountSettingsBackdrop({
   isOpen,

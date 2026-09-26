@@ -3,8 +3,9 @@
 import { Suspense, use } from "react";
 import { fetchApiJson } from "@/utils/global/api-fetch";
 
-import ProjectList, { type ProjectInfo } from "@/components/marketing/profiles/ProfileDetailProjectList";
-import { ProfileProjectsSkeleton } from "@/components/marketing/profiles/ProfileDetailSkeleton";
+import ProjectList from "@/components/marketing/profiles/ProfileDetailProjectList";
+import type { ProjectInfo } from "@/types/marketing/profiles/profiles";
+import { ProfileProjectsSkeleton } from "@/components/marketing/profiles/ProfileProjectsSkeleton";
 
 const projectsPromises = new Map<string, Promise<ProjectInfo[]>>();
 

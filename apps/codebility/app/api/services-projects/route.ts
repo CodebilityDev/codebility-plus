@@ -1,37 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { parseServicesCategory } from "@/utils/global/services-categories";
-import {
-  getCachedServicesProjectById,
-  getCachedServicesProjectsPage,
-} from "@/lib/global/services-projects-cached";
+import { getCachedServicesProjectById, getCachedServicesProjectsPage } from "@/lib/global/services-projects-cached";
+import { DEFAULT_PAGE, DEFAULT_LIMIT, MAX_LIMIT, cacheHeaders } from "@/constants/api/services-projects/services-projects";
+import { parsePositiveInt, emptyPage } from "@/utils/api/services-projects/services-projects";
 
-const DEFAULT_PAGE = 1;
-const DEFAULT_LIMIT = 12;
-const MAX_LIMIT = 50;
-
-function parsePositiveInt(
-  value: string | null,
-  fallback: number,
-  max?: number,
-): number {
-  const parsed = Number.parseInt(value ?? "", 10);
-  if (!Number.isFinite(parsed) || parsed < 1) return fallback;
-  if (max !== undefined) return Math.min(parsed, max);
-  return parsed;
-}
-
-function emptyPage(category: string, page: number, limit: number) {
-  return {
-    projects: [],
-    pagination: { page, limit, total: 0, totalPages: 0 },
-    category,
-  };
-}
-
-const cacheHeaders = {
-  "Cache-Control":
-    "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400",
-};
 
 export async function GET(request: NextRequest) {
   try {

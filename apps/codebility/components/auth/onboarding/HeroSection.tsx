@@ -1,9 +1,7 @@
 import { RefObject } from "react";
 import Image from "next/image";
+import type { HeroSectionProps } from "@/types/auth/onboarding/onboarding";
 
-interface HeroSectionProps {
-  h1Ref: RefObject<HTMLHeadingElement | null>;
-}
 
 export default function HeroSection({ h1Ref }: HeroSectionProps) {
   return (

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { Button } from "@/components/global/ui/button";
@@ -10,37 +10,9 @@ import Quiz from "@/components/applicant/onboarding/Quiz";
 import Commitment from "@/components/applicant/onboarding/Commitment";
 import { getOnboardingProgress, completeOnboarding, saveQuizAndCommitment } from "@/actions/applicant/onboarding/applicant-onboarding";
 import { OnboardingProgressType } from "@/types/applicant/onboarding/applicant-onboarding";
+import { VIDEO_IDS, VIDEO_TITLES, VIDEO_DESCRIPTIONS } from "@/constants/applicant/onboarding/onboarding";
+import type { OnboardingClientProps } from "@/types/applicant/onboarding/onboarding";
 
-interface OnboardingClientProps {
-  user: any;
-  applicantId: string;
-  applicantData: any;
-}
-
-// Onboarding videos are hosted as UNLISTED YouTube videos to avoid Supabase
-// Storage egress costs. Each value is a YouTube video ID (the part after
-// `watch?v=` or `youtu.be/`), configured per environment via env vars:
-//   NEXT_PUBLIC_ONBOARDING_VIDEO_ID_1 ... _4
-const VIDEO_IDS: Record<number, string> = {
-  1: process.env.NEXT_PUBLIC_ONBOARDING_VIDEO_ID_1 ?? "", // Introduction - About Codebility
-  2: process.env.NEXT_PUBLIC_ONBOARDING_VIDEO_ID_2 ?? "", // Benefits, Culture & Expectations
-  3: process.env.NEXT_PUBLIC_ONBOARDING_VIDEO_ID_3 ?? "", // Roadmaps, Milestones & Tech Stack
-  4: process.env.NEXT_PUBLIC_ONBOARDING_VIDEO_ID_4 ?? "", // Portal Tour - Gamification & Workflow
-};
-
-const VIDEO_TITLES = {
-  1: "Introduction - About Codebility",
-  2: "Benefits, Culture & Expectations",
-  3: "Roadmaps, Milestones & Tech Stack",
-  4: "Portal Tour - Gamification & Workflow",
-};
-
-const VIDEO_DESCRIPTIONS = {
-  1: "Learn about Codebility, our mission, and what to expect in your journey with us.",
-  2: "Discover the benefits you'll receive, our company culture, and what we expect from our developers.",
-  3: "Understand our development roadmaps, project milestones, admin and mentor structure, and the tech stack we use.",
-  4: "Take a tour of the Codebility portal and learn how our gamification system, points, and workflow operate.",
-};
 
 export default function OnboardingClient({
   user,

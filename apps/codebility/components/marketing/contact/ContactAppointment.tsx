@@ -2,57 +2,11 @@
 
 import { useState } from "react";
 import { Button } from "@/components/global/ui/button";
-import { ContactFormData } from "@/components/marketing/contact/ContactPage";
+import { meetingTypes, timeSlots, unavailableSlots, DAYS, MONTHS } from "@/constants/marketing/contact/contact";
+import type { AppointmentProps } from "@/types/marketing/contact/contact";
+import { getPHTToday, toDateString, formatDisplay } from "@/utils/marketing/contact/contact";
 
-const meetingTypes = [
-  { value: "zoom", label: "Zoom", sub: "Via Zoom meeting link" },
-  { value: "gmeet", label: "Google Meet", sub: "Via Google Meet link" },
-  { value: "teams", label: "Microsoft Teams", sub: "Via Teams link" },
-  { value: "other", label: "Other", sub: "Specify your preferred tool" },
-];
 
-const timeSlots = [
-  "9:00 AM", "10:00 AM", "11:00 AM",
-  "1:00 PM", "2:00 PM", "3:00 PM",
-  "4:00 PM", "5:00 PM",
-];
-
-const unavailableSlots: string[] = [];
-
-const DAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
-const MONTHS = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
-];
-
-const PHT_OFFSET = 8 * 60;
-
-const getPHTToday = () => {
-  const now = new Date();
-  const utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
-  const pht = new Date(utcMs + PHT_OFFSET * 60000);
-  pht.setHours(0, 0, 0, 0);
-  return pht;
-};
-
-const toDateString = (y: number, m: number, d: number) =>
-  `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
-
-const formatDisplay = (dateStr: string) => {
-  const parts = dateStr.split("-").map(Number);
-  const y = parts[0] ?? 0;
-  const m = parts[1] ?? 1;
-  const d = parts[2] ?? 1;
-  return new Date(y, m - 1, d).toLocaleDateString("en-PH", {
-    weekday: "long", month: "long", day: "numeric", year: "numeric",
-    timeZone: "Asia/Manila",
-  });
-};
-
-interface AppointmentProps {
-  formData: ContactFormData;
-  onBack: () => void;
-}
 
 export default function Appointment({ formData, onBack }: AppointmentProps) {
   const today = getPHTToday();

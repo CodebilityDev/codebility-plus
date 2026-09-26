@@ -1,14 +1,6 @@
 import React from "react";
+import type { ProjectListProps } from "@/types/marketing/profiles/profiles";
 
-export interface ProjectInfo {
-  project_id: string;
-  name: string;
-  main_image: string | null;
-}
-
-interface ProjectListProps {
-  projects: ProjectInfo[];
-}
 
 const ProjectList: React.FC<ProjectListProps> = ({ projects }) => {
   if (!projects || projects.length === 0) {

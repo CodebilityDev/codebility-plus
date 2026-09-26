@@ -12,8 +12,8 @@ import { z } from "zod";
 
 import { resendVerificationEmail, signinUser } from "@/actions/global/auth-session";
 import SignInInputs from "@/components/auth/sign-in/SignInInput";
+import type { Inputs } from "@/types/auth/sign-in/sign-in";
 
-type Inputs = z.infer<typeof SignInValidation>;
 
 const SignInForm = () => {
   const [isLoading, setIsLoading] = useState(false);

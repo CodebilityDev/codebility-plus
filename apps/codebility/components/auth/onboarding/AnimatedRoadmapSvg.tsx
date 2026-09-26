@@ -1,49 +1,13 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { BarChart3, Code2, Lightbulb } from "lucide-react";
+import { phases } from "@/constants/auth/onboarding/onboarding";
+
+
 
 gsap.registerPlugin(ScrollTrigger);
-
-const phases = [
-  {
-    cx: 540,
-    cy: 530,
-    color: "#9333ea",
-    textX: 280,
-    textY: 340,
-    title: "Phase 1: Intern (0-100 pts)",
-    steps: ["Learn The Basics", "Hands-On Practice", "Version Control"],
-    icon: <Lightbulb className="h-6 w-6 text-white" strokeWidth={1.5} />,
-  },
-  {
-    cx: 960,
-    cy: 430,
-    color: "#db2777",
-    textX: 1010,
-    textY: 480,
-    title: "Phase 2: Codev (100-200 pts)",
-    steps: [
-      "Deepen Language Proficiency",
-      "Explore Frameworks and Libraries",
-      "Work On Projects",
-      "Development Practices",
-    ],
-    icon: <BarChart3 className="h-6 w-6 text-white" strokeWidth={1.5} />,
-  },
-  {
-    cx: 1550,
-    cy: 360,
-    color: "#f59e0b",
-    textX: 1280,
-    textY: 220,
-    title: "Phase 3: Mentor (200+ pts)",
-    steps: ["Specialize", "Advanced Concepts", "Collaborate"],
-    icon: <Code2 className="h-6 w-6 text-white" strokeWidth={1.5} />,
-  },
-];
 
 export default function AnimatedRoadmapSvg() {
   const svgRef = useRef<SVGSVGElement | null>(null);

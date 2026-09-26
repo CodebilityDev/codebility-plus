@@ -1,26 +1,8 @@
 "use server";
 
 import { createClientServerComponent } from "@/lib/global/supabase-server";
+import type { UploadImageOptions, NdaUploadResult, UserData } from "@/types/global/actions";
 
-interface UploadImageOptions {
-  bucket?: string;
-  folder?: string;
-  cacheControl?: string;
-  upsert?: boolean;
-}
-
-interface NdaUploadResult {
-  signatureUrl: string;
-  documentUrl: string;
-  success: boolean;
-  error?: string;
-}
-
-interface UserData {
-  first_name: string;
-  last_name: string;
-  codev_id?: string;
-}
 
 /**
  * Converts data URL to File object for uploading

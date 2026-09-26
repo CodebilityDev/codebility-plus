@@ -1,32 +1,20 @@
 "use client";
 
-import React from "react";
+
 import Image from "next/image";
 import Link from "next/link";
 import Theme from "@/components/home/Theme";
 import { MobileTheme } from "@/components/home/theme-mobile";
 import { defaultAvatar } from "@/public/assets/images/index";
-import {
-  IconCog,
-  IconDropdown,
-  IconLogout,
-} from "@/public/assets/svgs/index";
+import { IconDropdown, IconLogout } from "@/public/assets/svgs/index";
 import { useUserStore } from "@/store/global/codev-store";
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@codevs/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@codevs/ui/dropdown-menu";
 
 import { signOut } from "@/actions/global/auth-session";
 import MobileNav from "@/components/home/MobileNav";
+import { menuItems } from "@/constants/home/home";
 
-const menuItems = [
-  { href: "/home/account-settings", icon: IconCog, label: "Settings" },
-];
 
 const Navbar = () => {
   const { user } = useUserStore();

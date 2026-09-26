@@ -1,22 +1,11 @@
 import { unstable_cache } from "next/cache";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClientAnon } from "@/lib/global/supabase-anon";
+import type { CodevsFeaturedProjects, ProjectRow } from "@/types/global/lib";
+
 
 const PROJECT_SELECT = "id, name, description, main_image, status";
 const FALLBACK_IMAGE = "/assets/images/index/projects-large.jpg";
-
-export type CodevsFeaturedProjects = {
-  slides: string[];
-  projectCount: number;
-};
-
-type ProjectRow = {
-  id: string;
-  name: string;
-  description: string | null;
-  main_image: string | null;
-  status: string | null;
-};
 
 function resolveProjectImageUrl(mainImage: string | null | undefined): string {
   if (!mainImage?.trim()) {

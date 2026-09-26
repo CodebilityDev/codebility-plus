@@ -1,13 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
+import type { FeaturedCardProps } from "@/types/global/marketing";
 
-interface FeaturedCardProps {
-  title: string;
-  description: string;
-  url?: string; // Optional, defaults to "#"
-  src: string;
-  alt: string;
-}
 
 const FeaturedCard: React.FC<FeaturedCardProps> = ({
   title,

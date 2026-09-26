@@ -3,6 +3,8 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Codev } from "@/types/global/codev";
 import type { CodevsProfilesPage } from "@/types/global/codevs-profiles";
 import { createClientAnon } from "@/lib/global/supabase-anon";
+import type { CodevsProfileRow } from "@/types/global/lib";
+
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 5;
@@ -25,23 +27,6 @@ const CODEVS_PROFILES_SELECT = `
   )
 `;
 
-export type { CodevsProfilesPage } from "@/types/global/codevs-profiles";
-
-type CodevsProfileRow = {
-  id: string;
-  first_name: string | null;
-  last_name: string | null;
-  image_url: string | null;
-  display_position: string | null;
-  availability_status: boolean | null;
-  internal_status: string | null;
-  level: Record<string, number> | null;
-  codev_points: Array<{
-    id: string;
-    skill_category_id: string;
-    points: number;
-  }> | null;
-};
 
 function parsePositiveInt(
   value: number | undefined,

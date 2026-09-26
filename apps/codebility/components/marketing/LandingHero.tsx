@@ -8,12 +8,8 @@ import Container from "@/components/global/marketing/MarketingContainer";
 import HeroBackground from "@/components/marketing/LandingHeroBg";
 import HeroCard from "@/components/marketing/LandingHeroCard";
 import FloatingParticles from "@/components/marketing/FloatingParticles";
+import { HIGHLIGHT_METRICS } from "@/constants/marketing/marketing";
 
-const HIGHLIGHT_METRICS = [
-  { label: "Projects shipped", display: "120+" },
-  { label: "Avg. client satisfaction", display: "4.9/5" },
-  { label: "Specialists on demand", display: "80+" },
-];
 
 const Hero = () => {
   return (

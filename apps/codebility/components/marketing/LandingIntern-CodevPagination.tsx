@@ -1,30 +1,19 @@
 "use client";
 
 import { Suspense, use, useState, useTransition } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+
 import { useMarketingPageUrl } from "@/hooks/global/use-marketing-page-url";
-import type { LandingInternsPage } from "@/lib/global/landing-interns-cached";
+import type { LandingInternsPage } from "@/types/global/lib";
 import { fetchApiJson } from "@/utils/global/api-fetch";
 
 import InternCards from "@/components/marketing/LandingIntern-CodevCard";
-import { LandingInternCardsSkeleton } from "@/components/marketing/LandingInternSkeleton";
+import { LandingInternCardsSkeleton } from "@/components/marketing/LandingInternCardsSkeleton";
+import { PaginationControls } from "@/components/marketing/PaginationControls";
+import { pageCacheKey, toTeamMembers } from "@/utils/marketing/marketing";
 
-export type PersonRole = "Intern" | "Codev";
-
-export type LandingInternMember = {
-  id: string;
-  name: string;
-  role: PersonRole;
-  image?: string;
-  display_position?: string;
-};
 
 const pagePromises = new Map<string, Promise<LandingInternsPage>>();
 const pageMetaCache = new Map<string, LandingInternsPage["pagination"]>();
-
-function pageCacheKey(page: number, pageSize: number) {
-  return `rank:${page}:${pageSize}`;
-}
 
 function rememberPagination(
   page: number,
@@ -45,18 +34,6 @@ function resolvePagination(
     pageMetaCache.get(`rank:${pageSize}`) ??
     initialData.pagination
   );
-}
-
-function toTeamMembers(
-  members: LandingInternsPage["TEAM_MEMBERS"],
-): LandingInternMember[] {
-  return members.map((member) => ({
-    id: member.id,
-    name: member.name,
-    role: member.role === "Codev" ? "Codev" : "Intern",
-    image: member.image,
-    display_position: member.display_position,
-  }));
 }
 
 function loadPage(
@@ -100,62 +77,6 @@ function loadPage(
 
   pagePromises.set(key, promise);
   return promise;
-}
-
-function PaginationControls({
-  page,
-  totalPages,
-  onPageChange,
-}: {
-  page: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
-}) {
-  if (totalPages <= 1) {
-    return <div className="mt-8 min-h-9" aria-hidden="true" />;
-  }
-
-  return (
-    <div className="relative z-[100] mt-8 flex min-h-9 items-center gap-3">
-      {page <= 1 ? (
-        <span
-          aria-disabled
-          className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white opacity-50"
-        >
-          <ChevronLeft size={16} className="shrink-0" />
-        </span>
-      ) : (
-        <button
-          type="button"
-          onClick={() => onPageChange(page - 1)}
-          className="pointer-events-auto relative z-[100] inline-flex h-9 w-9 items-center justify-center rounded-full border border-white hover:bg-white/10"
-        >
-          <ChevronLeft size={16} className="shrink-0" />
-        </button>
-      )}
-
-      <div className="px-4 text-sm tabular-nums text-gray-600 dark:text-gray-300">
-        Page {page} of {totalPages}
-      </div>
-
-      {page >= totalPages ? (
-        <span
-          aria-disabled
-          className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white opacity-50"
-        >
-          <ChevronRight size={16} className="shrink-0" />
-        </span>
-      ) : (
-        <button
-          type="button"
-          onClick={() => onPageChange(page + 1)}
-          className="pointer-events-auto relative z-[100] inline-flex h-9 w-9 items-center justify-center rounded-full border border-white hover:bg-white/10"
-        >
-          <ChevronRight size={16} className="shrink-0" />
-        </button>
-      )}
-    </div>
-  );
 }
 
 function LandingInternCardsRemote({

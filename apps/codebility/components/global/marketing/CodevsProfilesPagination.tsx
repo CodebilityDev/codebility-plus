@@ -1,27 +1,24 @@
 "use client";
 
 import { Suspense, use, useState, useTransition } from "react";
-import { motion } from "framer-motion";
-import DefaultPagination from "@/components/global/ui/DefaultPagination";
+
+
 import { useMarketingPageUrl } from "@/hooks/global/use-marketing-page-url";
-import { getStableColor } from "@/utils/global/getRandomColor";
+
 import type { CodevsProfilesPage } from "@/types/global/codevs-profiles";
 import { fetchApiJson } from "@/utils/global/api-fetch";
 
-import CodevCard from "@/components/global/marketing/CodevCard";
+
 import CodevListFilter from "@/components/global/marketing/CodevListFilter";
 import { CodevsProfilesSkeleton } from "@/components/global/marketing/CodevsProfilesSkeleton";
+import { CodevsGrid } from "@/components/global/marketing/CodevsGrid";
+import { CodevsPaginationSlot } from "@/components/global/marketing/CodevsPaginationSlot";
+import type { CodevsProfilesPaginationProps } from "@/types/global/marketing";
+import { pageCacheKey, filterCacheKey } from "@/utils/global/marketing";
+
 
 const pagePromises = new Map<string, Promise<CodevsProfilesPage>>();
 const pageMetaCache = new Map<string, CodevsProfilesPage["pagination"]>();
-
-function pageCacheKey(position: string, page: number, pageSize: number) {
-  return `${position}:${page}:${pageSize}`;
-}
-
-function filterCacheKey(position: string, pageSize: number) {
-  return `${position}:${pageSize}`;
-}
 
 function rememberPagination(
   position: string,
@@ -110,80 +107,6 @@ function loadPage(
   return promise;
 }
 
-function CodevsPaginationSlot({
-  page,
-  totalPages,
-  onPageChange,
-}: {
-  page: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
-}) {
-  if (totalPages <= 1) {
-    return <div className="mt-6 min-h-[4.5rem]" aria-hidden="true" />;
-  }
-
-  const currentPage = Math.min(page, totalPages);
-
-  return (
-    <div className="mt-6 text-white">
-      <DefaultPagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        handleNextPage={() => {
-          onPageChange(Math.min(totalPages, currentPage + 1));
-        }}
-        handlePreviousPage={() => {
-          onPageChange(Math.max(1, currentPage - 1));
-        }}
-        setCurrentPage={onPageChange}
-      />
-    </div>
-  );
-}
-
-function CodevsGrid({
-  codevs,
-  page,
-}: {
-  codevs: CodevsProfilesPage["codevs"];
-  page: number;
-}) {
-  if (codevs.length === 0) {
-    return (
-      <p className="text-center text-2xl text-gray-500 dark:text-gray-400">
-        Sorry, no data found.
-      </p>
-    );
-  }
-
-  return (
-    <div
-      key={page}
-      className="grid h-full w-full grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
-    >
-      {codevs.map((codev, index) => (
-        <motion.div
-          key={codev.id}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{
-            duration: 0.4,
-            ease: "easeOut",
-            delay: index * 0.08,
-          }}
-        >
-          <CodevCard
-            color={getStableColor(codev.id)}
-            codev={codev}
-            animateEntrance={false}
-          />
-        </motion.div>
-      ))}
-    </div>
-  );
-}
-
 function CodevsProfilesRemote({
   position,
   page,
@@ -227,15 +150,10 @@ function CodevsProfilesGrid({
   );
 }
 
-interface Props {
-  initialData: CodevsProfilesPage;
-  pageSize: number;
-}
-
 export default function CodevsProfilesPagination({
   initialData,
   pageSize,
-}: Props) {
+}: CodevsProfilesPaginationProps) {
   const [position, setPosition] = useState(initialData.position);
   const [page, setPage] = useState(initialData.pagination.page);
   const [isPending, startTransition] = useTransition();

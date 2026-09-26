@@ -1,3 +1,4 @@
+import type { ServicesCategorySlug } from "@/types/global/constants";
 export const SERVICES_CATEGORY_SLUGS = [
   "all",
   "web-application",
@@ -6,8 +7,6 @@ export const SERVICES_CATEGORY_SLUGS = [
   "ai-development",
   "cms",
 ] as const;
-
-export type ServicesCategorySlug = (typeof SERVICES_CATEGORY_SLUGS)[number];
 
 export const SERVICES_CATEGORY_TABS: Array<{
   slug: ServicesCategorySlug;

@@ -1,59 +1,11 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/global/ui/button";
 import { updateVideoProgress } from "@/actions/applicant/onboarding/applicant-onboarding";
+import { COMPLETION_THRESHOLD, POLL_INTERVAL_MS } from "@/constants/applicant/onboarding/onboarding";
+import type { VideoPlayerProps, YTPlayer, YTNamespace } from "@/types/applicant/onboarding/onboarding";
 
-interface VideoPlayerProps {
-  videoNumber: number;
-  videoId: string;
-  applicantId: string;
-  onVideoComplete: () => void;
-  canWatch: boolean;
-}
-
-// Percentage of the video that must be watched before it counts as completed.
-const COMPLETION_THRESHOLD = 98;
-// How often (ms) we poll the YouTube player for the current playback position.
-const POLL_INTERVAL_MS = 500;
-
-// --- Minimal YouTube IFrame API typings (avoids `any`) ---
-interface YTPlayer {
-  getCurrentTime: () => number;
-  getDuration: () => number;
-  playVideo: () => void;
-  destroy: () => void;
-}
-
-interface YTPlayerStateChangeEvent {
-  data: number;
-  target: YTPlayer;
-}
-
-interface YTPlayerOptions {
-  videoId: string;
-  width?: string | number;
-  height?: string | number;
-  host?: string;
-  playerVars?: Record<string, string | number>;
-  events?: {
-    onReady?: (event: { target: YTPlayer }) => void;
-    onStateChange?: (event: YTPlayerStateChangeEvent) => void;
-    onError?: (event: { data: number }) => void;
-  };
-}
-
-interface YTNamespace {
-  Player: new (element: HTMLElement | string, options: YTPlayerOptions) => YTPlayer;
-  PlayerState: {
-    ENDED: number;
-    PLAYING: number;
-    PAUSED: number;
-    BUFFERING: number;
-    CUED: number;
-    UNSTARTED: number;
-  };
-}
 
 declare global {
   interface Window {

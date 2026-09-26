@@ -1,31 +1,13 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavStore } from "@/store/home/sidebar-store";
 import PageLoadingAnimation from "@/components/home/PageLoadingAnimation";
+import { useIsDesktop } from "@/hooks/home/useIsDesktop";
+import type { PageTransitionWrapperProps } from "@/types/home/home";
 
-// Hook to detect if we're on desktop
-function useIsDesktop() {
-  const [isDesktop, setIsDesktop] = useState(false);
-  
-  useEffect(() => {
-    const checkIsDesktop = () => {
-      setIsDesktop(window.innerWidth >= 1024);
-    };
-    
-    checkIsDesktop();
-    window.addEventListener('resize', checkIsDesktop);
-    return () => window.removeEventListener('resize', checkIsDesktop);
-  }, []);
-  
-  return isDesktop;
-}
-
-interface PageTransitionWrapperProps {
-  children: React.ReactNode;
-}
 
 export default function PageTransitionWrapper({ children }: PageTransitionWrapperProps) {
   const pathname = usePathname();

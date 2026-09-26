@@ -2,27 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { createClientClientComponent } from "@/lib/global/supabase-client";
-import { ShieldCheck, ShieldAlert, CheckCircle2, Copy, QrCode, Key, Lock } from "lucide-react";
+import { ShieldCheck, ShieldAlert, CheckCircle2, Copy, QrCode, Lock } from "lucide-react";
 import toast from "react-hot-toast";
 
 import { Button } from "@codevs/ui/button";
 import { Label } from "@codevs/ui/label";
 import { Input } from "@codevs/ui/input";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@codevs/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@codevs/ui/dialog";
+import type { Factor } from "@/types/global/account-settings";
 
-interface Factor {
-  id: string;
-  status: "verified" | "unverified";
-  friendly_name?: string;
-  factor_type: string;
-}
 
 export default function AccountSettings2FA() {
   const [loading, setLoading] = useState(true);

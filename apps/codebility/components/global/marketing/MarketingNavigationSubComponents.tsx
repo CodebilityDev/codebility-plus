@@ -1,51 +1,26 @@
 "use client";
 
-import React, { useState, use, useMemo } from "react";
+import { useState, use, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Button } from "@/components/global/ui/button";
+
+
 
 import { defaultAvatar } from "@/public/assets/images/index";
-import {
-  IconCog,
-  IconDashboard,
-  IconFourDotsMenu,
-  IconLogout,
-  IconProfile,
-} from "@/public/assets/svgs/index";
-import applicationStatusIcon from "@/public/assets/svgs/icon-applicant.svg";
+import { IconLogout } from "@/public/assets/svgs/index";
+
 import { ChevronDown, ChevronUp } from "lucide-react";
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@codevs/ui";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@codevs/ui";
 
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetTitle,
-  SheetTrigger,
-} from "@codevs/ui";
+
 import { createClientClientComponent } from "@/lib/global/supabase-client";
 import { setLocalStorageValue, useLocalStorageValue } from "@/hooks/global/useLocalStorageValue";
 import { NavUserProfile } from "@/types/global/database";
+import { CareersSignIn } from "@/components/global/marketing/CareersSignIn";
+import { NAV_USER_PROFILE_KEY } from "@/constants/global/marketing";
+import { getMenuItems } from "@/utils/global/marketing";
 
-// Navigation items for top navbar and mobile drawer
-const NAV_ITEMS = [
-  { id: "1", title: "Our Services", path: "/services" },
-  { id: "2", title: "About Us", path: "/#whychooseus" },
-  { id: "3", title: "Book a Call", path: "/bookacall" },
-  { id: "4", title: "Be a Codev", path: "/codevs" }, // ✅ ADDED: New link after Book a Call
-  { id: "5", title: "Hire a CoDevs", path: "/hire-a-codev" },
-] as const;
-
-const NAV_USER_PROFILE_KEY = "user_profile";
 
 async function getNavUser() {
   const supabase = createClientClientComponent();
@@ -87,47 +62,6 @@ function getNavUserPromise() {
   return navUserPromise;
 }
 
-// Get menu items based on user application status
-const getMenuItems = (
-  status: string,
-  role_id: number,
-  applicant: {
-    id: string;
-    codev_id: string;
-  } | null,
-) => {
-  if (
-    status === "rejected" ||
-    status === "applying" ||
-    status === "testing" ||
-    status === "onboarding" ||
-    status === "denied"
-  ) {
-    return [
-      {
-        href:
-          status === "rejected" || status === "denied"
-            ? "/auth/declined"
-            : applicant?.id
-              ? "/applicant/waiting"
-              : "/auth/waiting",
-        icon: applicationStatusIcon,
-        label: "Status",
-      },
-      {
-        href: "/applicant/account-settings",
-        icon: IconCog,
-        label: "Settings",
-      },
-      { href: "/applicant/profile", icon: IconProfile, label: "Profile" },
-    ];
-  }
-  return [
-    { href: "/home", icon: IconDashboard, label: "Dashboard" },
-    { href: "/home/account-settings", icon: IconCog, label: "Settings" },
-  ];
-};
-
 export const DrawerAuthSection = ({handleLogout}: {handleLogout: () => void}) =>
    { 
     const cachedUserData = useLocalStorageValue<NavUserProfile>(NAV_USER_PROFILE_KEY);
@@ -168,68 +102,6 @@ export const DrawerAuthSection = ({handleLogout}: {handleLogout: () => void}) =>
     </button>
   </>
 )};
-
-export const MobileDrawer = ({
-  openSheet,
-  setOpenSheet,
-  drawerAuth,
-}: {
-  openSheet: boolean;
-  setOpenSheet: (open: boolean) => void;
-  drawerAuth?: React.ReactNode;
-}) => (
-  <Sheet open={openSheet} onOpenChange={setOpenSheet}>
-    <SheetTrigger>
-      <IconFourDotsMenu className="lg:hidden" />
-    </SheetTrigger>
-    <SheetContent
-      side="left"
-      className="bg-black-900 flex h-full w-full flex-col justify-start border-none bg-stone-900 pt-20 text-white"
-    >
-      <SheetTitle className="sr-only">Mobile Navbar</SheetTitle>
-      <SheetDescription className="sr-only">
-        Navbar that contains links
-      </SheetDescription>
-      {NAV_ITEMS.map((item) => (
-        <Link
-          onClick={() => setOpenSheet(false)}
-          href={item.path}
-          key={item.id}
-        >
-          <p className="w-full cursor-pointer p-4 text-left text-xl font-semibold">
-            {item.title}
-          </p>
-        </Link>
-      ))}
-      <div
-        onClick={(e) => {
-          if ((e.target as HTMLElement).closest("a, button")) {
-            setOpenSheet(false);
-          }
-        }}
-      >
-        {drawerAuth}
-      </div>
-    </SheetContent>
-  </Sheet>
-);
-
-export const CareersSignIn = () => {
-  const pathname = usePathname();
-  if (pathname !== "/careers") return null;
-  return (
-    <Link href="/auth/sign-in">
-      <Button
-        variant="default"
-        rounded="full"
-        size="lg"
-        className="hidden lg:block"
-      >
-        Sign In
-      </Button>
-    </Link>
-  );
-};
 
 export const UserMenu = ({handleLogout}: {handleLogout: () => void}) => {
   const [isOpen, setIsOpen] = useState(false);

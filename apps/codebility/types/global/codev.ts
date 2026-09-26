@@ -428,3 +428,24 @@ export interface DraftFormState {
   lastSavedAt: Date | null;
   hasUnsavedChanges: boolean;
 }
+
+export interface CodevBadgeSkillCategory {
+  id: string;
+  name: string;
+  badge_prefix?: string;
+}
+
+export interface CodevLevelData {
+  [key: string]: number;
+}
+
+export interface CodevBadgeProps {
+  level: CodevLevelData;
+  size?: number;
+  className?: string;
+}
+
+export interface DefaultAvatarProps {
+  className?: string;
+  size?: number;
+}

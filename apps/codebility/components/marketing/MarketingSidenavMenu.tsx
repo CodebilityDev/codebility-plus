@@ -2,33 +2,10 @@
 
 import Link from "next/link";
 import { useSyncExternalStore } from "react";
-import { Briefcase, Info, Phone, CodeXml, Search, Rocket } from "lucide-react";
+import { links } from "@/constants/marketing/marketing";
+import { subscribeScrollShrink, getScrollShrinkSnapshot, getServerScrollShrinkSnapshot } from "@/utils/marketing/marketing";
 
-const links = [
-  { href: "/services", label: "Our Services", icon: Briefcase },
-  { href: "/#whychooseus", label: "About Us", icon: Info },
-  { href: "/bookacall", label: "Book a Call", icon: Phone },
-  { href: "/codevs", label: "Be a Codev", icon: CodeXml },
-  { href: "/hire-a-codev", label: "Hire Codevs", icon: Search },
-  { href: "/careers", label: "Careers", icon: Rocket },
-];
 
-const SCROLL_SHRINK_Y = 200;
-
-function subscribeScrollShrink(onStoreChange: () => void) {
-  window.addEventListener("scroll", onStoreChange, { passive: true });
-  return () => {
-    window.removeEventListener("scroll", onStoreChange);
-  };
-}
-
-function getScrollShrinkSnapshot() {
-  return window.scrollY >= SCROLL_SHRINK_Y;
-}
-
-function getServerScrollShrinkSnapshot() {
-  return false;
-}
 
 const SideNavMenu = () => {
   const isScrolling = useSyncExternalStore(

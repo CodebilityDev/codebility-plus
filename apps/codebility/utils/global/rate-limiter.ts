@@ -1,7 +1,5 @@
-interface RateLimitEntry {
-  attempts: number;
-  resetAt: number;
-}
+import type { RateLimitEntry } from "@/types/global/utils";
+
 
 const rateLimitStore = new Map<string, RateLimitEntry>();
 

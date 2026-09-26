@@ -3,7 +3,7 @@ import { X } from "lucide-react";
 
 import { Badge } from "@codevs/ui/badge";
 
-import { ApplicantFilters } from "@/components/home/applicants/applicantHeaders";
+import { ApplicantFilters } from "@/types/home/applicants/applicants";
 import { ExperienceRanges } from "@/types/home/applicants/applicants";
 
 export default function ApplicantFiltersBadge({

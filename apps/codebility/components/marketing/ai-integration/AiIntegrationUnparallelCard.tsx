@@ -1,12 +1,8 @@
-import Image, { StaticImageData } from "next/image";
+import Image from "next/image";
+import type { UnparallelCardProps } from "@/types/marketing/ai-integration/ai-integration";
 
-interface Props {
-  title: string;
-  description: string;
-  image: StaticImageData | string;
-}
 
-const UnparallelCard = ({ title, description, image }: Props) => {
+const UnparallelCard = ({ title, description, image }: UnparallelCardProps) => {
   return (
     <div className="flex h-[450px] w-[355px] flex-col gap-4 rounded-lg bg-white/5 p-4">
       <div>

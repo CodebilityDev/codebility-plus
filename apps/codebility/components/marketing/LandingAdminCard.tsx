@@ -5,20 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { Codev } from "@/types/global/codev";
 import { motion } from "framer-motion";
+import { capitalizeWords, getInitials } from "@/utils/marketing/marketing";
 
-const capitalizeWords = (text: string) => {
-  return text
-    .split(" ")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(" ");
-};
-
-const getInitials = (firstName?: string, lastName?: string) => {
-  const first = (firstName ?? "").trim().charAt(0);
-  const last = (lastName ?? "").trim().charAt(0);
-  const initials = `${first}${last}`.toUpperCase();
-  return initials || "?";
-};
 
 const AdminCard = ({ admin }: { admin: Codev }) => {
   const [loaded, setLoaded] = useState(false);

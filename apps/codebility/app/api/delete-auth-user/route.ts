@@ -1,10 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
+import type { DeleteUserRequest } from "@/types/api/delete-auth-user/delete-auth-user";
 
-// Define request body type for type safety
-interface DeleteUserRequest {
-  userId: string;
-}
 
 export async function POST(request: NextRequest) {
   try {

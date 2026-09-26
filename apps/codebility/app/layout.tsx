@@ -9,29 +9,13 @@ import ToasterContext from "@/providers/global/ToasterProvider";
 import ReactQueryProvider from "@/providers/global/ReactQueryProvider";
 import { TooltipProvider } from "@codevs/ui/tooltip";
 import JsonLd from "@/components/global/marketing/JsonLd";
+import { organizationSchema, websiteSchema } from "@/constants/global/app";
+
 
 const outfit = Outfit({
     subsets: ["latin"],
     preload: false,
 });
-
-// CBP-135 follow-up: sitewide Organization + WebSite JSON-LD.
-// Static schema — no data dependency, safe to render on every page.
-const organizationSchema = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    name: "Codebility",
-    url: "https://www.codebility.tech",
-    logo: "https://www.codebility.tech/assets/images/logo.png",
-    description: "Everyone has the ability to code",
-};
-
-const websiteSchema = {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    name: "Codebility",
-    url: "https://www.codebility.tech",
-};
 
 export async function generateMetadata(): Promise<Metadata> {
     return {

@@ -1,82 +1,10 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+
 import Image from "next/image";
+import { PARTNERS } from "@/constants/auth/onboarding/onboarding";
+import { useInView } from "@/hooks/auth/onboarding/useInView";
 
-// Simple in-view hook (no 3rd-party libs)
-function useInView<T extends HTMLElement>(threshold = 0.2) {
-  const ref = useRef<T | null>(null);
-  const [inView, setInView] = useState(false);
-
-  useEffect(() => {
-    if (!ref.current) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => setInView(entry?.isIntersecting ?? false),
-      { threshold },
-    );
-    obs.observe(ref.current);
-    return () => obs.disconnect();
-  }, [threshold]);
-
-  return { ref, inView };
-}
-
-type Partner = { id: string; src: string; alt: string };
-
-const PARTNERS: Partner[] = [
-  { id: "ai", src: "/assets/images/partners/ai.png", alt: "AI" },
-  { id: "averps", src: "/assets/images/partners/averps.png", alt: "AVERPS" },
-  {
-    id: "bradwell",
-    src: "/assets/images/partners/bradwell.png",
-    alt: "Bradwell",
-  },
-  {
-    id: "federal-plans",
-    src: "/assets/images/partners/federal-plans.png",
-    alt: "Federal Plans",
-  },
-  {
-    id: "fixflow-ai",
-    src: "/assets/images/partners/fixflow-ai.png",
-    alt: "FixFlow AI",
-  },
-  {
-    id: "genius-web-services",
-    src: "/assets/images/partners/genius-web-services.png",
-    alt: "Genius Web Services",
-  },
-  {
-    id: "infraspan",
-    src: "/assets/images/partners/infraspan.png",
-    alt: "Infraspan",
-  },
-  {
-    id: "netmedia",
-    src: "/assets/images/partners/netmedia.png",
-    alt: "Netmedia",
-  },
-  {
-    id: "tolle-design",
-    src: "/assets/images/partners/tolle-design.png",
-    alt: "Tolle Design",
-  },
-  {
-    id: "travel-tribe",
-    src: "/assets/images/partners/travel-tribe.png",
-    alt: "Travel Tribe",
-  },
-  {
-    id: "web-divine",
-    src: "/assets/images/partners/web-divine.png",
-    alt: "Web Divine",
-  },
-  {
-    id: "zwift-tech",
-    src: "/assets/images/partners/zwift-tech.png",
-    alt: "Zwift Tech",
-  },
-];
 
 export default function PartnersSection() {
   const { ref, inView } = useInView<HTMLDivElement>(0.15);

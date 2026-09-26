@@ -1,12 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
-import {
-  computeProfilePoints,
-  persistProfilePoints,
-} from "@/lib/api/profile-points/profile-points";
-import { z } from "zod";
+import { computeProfilePoints, persistProfilePoints } from "@/lib/api/profile-points/profile-points";
+import { codevIdSchema } from "@/utils/api/profile-points/profile-points";
 
-const codevIdSchema = z.string().uuid("Invalid codev ID format");
+
 
 export async function GET(
   request: NextRequest,

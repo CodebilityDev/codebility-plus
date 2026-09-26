@@ -1,6 +1,8 @@
 import { unstable_cache } from "next/cache";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClientAnon } from "@/lib/global/supabase-anon";
+import type { ServicesProjectCard, ServicesProjectMember, ServicesProjectDetail, ServicesProjectsPage, ListRow } from "@/types/global/lib";
+
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 12;
@@ -60,57 +62,6 @@ const DETAIL_SELECT = `
     projects_category(id, name)
   )
 `;
-
-export type ServicesProjectCard = {
-  id: string;
-  name: string;
-  main_image?: string;
-  description?: string;
-  website_url?: string;
-  categories: Array<{ id: number; name: string }>;
-};
-
-export type ServicesProjectMember = {
-  id: string;
-  first_name: string;
-  last_name: string;
-  image_url?: string | null;
-  role?: string;
-};
-
-export type ServicesProjectDetail = ServicesProjectCard & {
-  tagline?: string;
-  key_features?: string[];
-  github_link?: string;
-  figma_link?: string;
-  start_date?: string;
-  end_date?: string;
-  tech_stack?: string[];
-  members: ServicesProjectMember[];
-};
-
-export type ServicesProjectsPage = {
-  projects: ServicesProjectCard[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
-  category: string;
-};
-
-type ListRow = {
-  id: string;
-  name: string;
-  main_image: string | null;
-  description: string | null;
-  website_url: string | null;
-  categories?: Array<{
-    category_id?: number;
-    projects_category?: { id: number; name: string } | null;
-  }> | null;
-};
 
 function parsePositiveInt(
   value: number | undefined,

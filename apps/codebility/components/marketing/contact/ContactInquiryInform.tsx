@@ -4,26 +4,12 @@ import { useState } from "react";
 import { Button } from "@/components/global/ui/button";
 import Input from "@/components/global/ui/input";
 import { Label } from "@codevs/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@radix-ui/react-select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@radix-ui/react-select";
 import { IconDropdown } from "@/public/assets/svgs/index";
-import { ContactFormData } from "@/components/marketing/contact/ContactPage";
+import { industries } from "@/constants/marketing/contact/contact";
+import type { InquiryFormProps } from "@/types/marketing/contact/contact";
 
-const industries = [
-  "Technology", "Healthcare", "Finance",
-  "Retail", "Education", "Manufacturing", "Other",
-];
 
-interface InquiryFormProps {
-  defaultValues: ContactFormData;
-  onNext: (data: Pick<ContactFormData, "firstName" | "lastName" | "email" | "companyName" | "phoneNumber" | "industry">) => void;
-}
 
 export default function InquiryForm({ defaultValues, onNext }: InquiryFormProps) {
   const [form, setForm] = useState({

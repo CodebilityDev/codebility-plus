@@ -2,6 +2,8 @@
 
 import { forwardRef, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
+import type { WellcomeSectionWrapperProps } from "@/types/auth/onboarding/onboarding";
+
 
 const WellcomeSection = dynamic(
   () => import("@/components/auth/onboarding/WelcomeSection"),
@@ -10,9 +12,7 @@ const WellcomeSection = dynamic(
   },
 );
 
-type Props = React.HTMLAttributes<HTMLDivElement>;
-
-const WellcomeSectionWrapper = forwardRef<HTMLDivElement, Props>(
+const WellcomeSectionWrapper = forwardRef<HTMLDivElement, WellcomeSectionWrapperProps>(
   function WellcomeSectionWrapper({ className = "", ...rest }, ref) {
     const [ready, setReady] = useState(false);
 

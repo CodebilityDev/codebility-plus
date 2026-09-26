@@ -5,35 +5,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { ClockIcon } from "lucide-react";
 import { cn } from "@codevs/ui";
-import {
-  IconAbout,
-  IconGithub,
-  IconLink,
-  IconSkills,
-  IconLinkedInWhiteSmall,
-} from "@/public/assets/svgs/index";
-import { Codev } from "@/types/global/codev";
+import { IconAbout, IconGithub, IconLink, IconSkills, IconLinkedInWhiteSmall } from "@/public/assets/svgs/index";
+
 import CodevBadge from "@/components/global/codev/CodevBadge";
 
 import MarketingProgressiveSection from "@/components/global/marketing/MarketingProgressiveSection";
 import ProgressiveMotion from "@/components/global/marketing/ProgressiveMotion";
 import ProfileProjectsSection from "@/components/marketing/profiles/ProfileDetailProjectsSection";
 import ProfileRatingSection from "@/components/marketing/profiles/ProfileDetailRatingSection";
+import type { ProfileContentProps } from "@/types/marketing/profiles/profiles";
+import { getFilteredLevel } from "@/utils/marketing/profiles/profiles";
 
-type LevelMap = Record<string, number>;
-
-function getFilteredLevel(level?: LevelMap): LevelMap {
-  if (!level) return {};
-
-  return Object.fromEntries(
-    Object.entries(level).filter(([_, value]) => value > 0),
-  );
-}
-
-interface ProfileContentProps {
-  codev: Codev;
-  availableSchedule: NonNullable<Codev["work_schedules"]>[number] | null;
-}
 
 export default function ProfileContent({
   codev,

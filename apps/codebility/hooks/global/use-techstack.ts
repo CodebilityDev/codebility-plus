@@ -1,13 +1,6 @@
 import { create } from "zustand";
+import type { TechStack } from "@/types/global/hooks";
 
-interface TechStack {
-  stack: string[];
-  nonTech: boolean;
-  addRemoveStack: (tech: string) => void;
-  clearStack: () => void;
-  setStack: (i: string[]) => void;
-  setNonTech: () => void;
-}
 
 export const useTechStackStore = create<TechStack>((set, get) => ({
   stack: [],

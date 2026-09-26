@@ -2,38 +2,19 @@
 
 import React, { useCallback, useMemo } from "react";
 import { getTestDate } from "@/utils/global/applicant-waiting";
-import Box from "@/components/global/layout/Box";
+
 import DefaultPagination from "@/components/global/ui/DefaultPagination";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/home/applicants/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/home/applicants/table";
 import { pageSize } from "@/constants/global/page-size";
 import { cn } from "@/utils/global/cn";
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  SortingState,
-  useReactTable,
-  VisibilityState,
-} from "@tanstack/react-table";
+import { flexRender, getCoreRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
 
 import { NewApplicantType } from "@/types/home/applicants/applicants";
-import ApplicantEmailAction from "@/components/home/applicants/applicantEmailAction";
+
 import ApplicantMobileTable from "@/components/home/applicants/applicantMobileTable";
 import ApplicantRowActionButton from "@/components/home/applicants/applicantRowActionButton";
+import type { DataTableProps } from "@/types/home/applicants/applicants";
 
-interface DataTableProps<TData extends NewApplicantType, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-}
 
 function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
   columns,

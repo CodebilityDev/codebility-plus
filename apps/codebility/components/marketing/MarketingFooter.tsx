@@ -3,7 +3,8 @@
 import Link from "next/link";
 import Logo from "@/components/global/layout/Logo";
 import { footerLinks } from "@/constants/marketing/links";
-import { ModalType, useModal } from "@/hooks/global/use-modal";
+import { useModal } from "@/hooks/global/use-modal";
+import { ModalType } from "@/types/global/hooks";
 import { IconFacebookWhite } from "@/public/assets/svgs/index";
 
 import { aboutUsData, connectUsData } from "@/constants/global/landing-data";

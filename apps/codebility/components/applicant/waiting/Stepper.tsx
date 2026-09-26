@@ -3,19 +3,8 @@
 import * as React from "react";
 import { cn } from "@/utils/global/cn";
 import { CheckIcon } from "lucide-react";
+import type { StepperContextValue, StepperProps } from "@/types/applicant/waiting/waiting";
 
-type Step = {
-  title: string;
-  description?: string;
-  optional?: boolean;
-};
-
-type StepperContextValue = {
-  activeStep: number;
-  orientation: "horizontal" | "vertical";
-  steps: Step[];
-  onChange: (step: number) => void;
-};
 
 const StepperContext = React.createContext<StepperContextValue>({
   activeStep: 0,
@@ -23,13 +12,6 @@ const StepperContext = React.createContext<StepperContextValue>({
   steps: [],
   onChange: () => null,
 });
-
-interface StepperProps extends React.HTMLAttributes<HTMLDivElement> {
-  activeStep?: number;
-  orientation?: "horizontal" | "vertical";
-  steps: Step[];
-  onStepChange?: (step: number) => void;
-}
 
 const Stepper = React.forwardRef<HTMLDivElement, StepperProps>(
   (

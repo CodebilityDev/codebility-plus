@@ -1,12 +1,8 @@
-import React, { ReactNode } from "react";
+import React from "react";
 
 import { cn } from "@codevs/ui";
+import type { Box } from "@/types/global/layout";
 
-interface Box {
-  children: ReactNode;
-  className?: string;
-  onClick?: () => void;
-}
 
 const Box: React.FC<Box> = ({ children, className, onClick }) => {
   return (

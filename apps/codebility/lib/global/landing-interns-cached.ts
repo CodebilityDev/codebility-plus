@@ -1,6 +1,8 @@
 import { unstable_cache } from "next/cache";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClientAnon } from "@/lib/global/supabase-anon";
+import type { LandingInternsPage, LandingInternRow } from "@/types/global/lib";
+
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 10;
@@ -8,31 +10,6 @@ const MAX_LIMIT = 50;
 
 const LANDING_INTERN_SELECT =
   "id, first_name, last_name, display_position, image_url, role_id";
-
-export type LandingInternsPage = {
-  TEAM_MEMBERS: Array<{
-    id: string;
-    name: string;
-    role: "Intern" | "Codev" | "Member";
-    image?: string;
-    display_position?: string;
-  }>;
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
-};
-
-type LandingInternRow = {
-  id: string;
-  first_name: string | null;
-  last_name: string | null;
-  display_position: string | null;
-  image_url: string | null;
-  role_id: number | null;
-};
 
 function parsePositiveInt(
   value: number | undefined,

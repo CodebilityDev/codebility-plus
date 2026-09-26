@@ -2,45 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { createClientClientComponent } from "@/lib/global/supabase-client";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/global/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/global/ui/tooltip";
+import type { CodevBadgeSkillCategory, CodevBadgeProps } from "@/types/global/codev";
+import { getBadgePrefix } from "@/utils/global/codev";
 
-interface SkillCategory {
-  id: string;
-  name: string;
-  badge_prefix?: string;
-}
-
-interface CodevLevelData {
-  [key: string]: number;
-}
-
-interface CodevBadgeProps {
-  level: CodevLevelData;
-  size?: number;
-  className?: string;
-}
-
-// Helper function to get badge prefix from skill category name
-function getBadgePrefix(name: string): string {
-  const lowerName = name.toLowerCase();
-  if (lowerName.includes("frontend")) return "fe";
-  if (lowerName.includes("backend")) return "be";
-  if (lowerName.includes("mobile")) return "md";
-  if (lowerName.includes("ui") || lowerName.includes("ux")) return "uiux";
-  return name.substring(0, 2).toLowerCase();
-}
 
 export default function CodevBadge({
   level,
   size = 36,
   className = "",
 }: CodevBadgeProps) {
-  const [skillCategories, setSkillCategories] = useState<SkillCategory[]>([]);
+  const [skillCategories, setSkillCategories] = useState<CodevBadgeSkillCategory[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [badgeErrors, setBadgeErrors] = useState<Record<string, boolean>>({});
   const [supabase, setSupabase] = useState<any>(null);

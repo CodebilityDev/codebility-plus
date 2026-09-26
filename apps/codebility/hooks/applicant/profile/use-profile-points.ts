@@ -1,39 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-
-export interface ProfilePointsCompletionDetail {
-  completed?: boolean;
-  points?: number;
-}
-
-export interface ProfilePointsSection {
-  completed: boolean;
-  points: number;
-  maxPoints: number;
-}
-
-export interface ProfilePointsResponse {
-  success: boolean;
-  totalPoints: number;
-  maxPossiblePoints: number;
-  completionPercentage: number;
-  pointsCount: number;
-  points: unknown[] | null;
-  breakdown: unknown;
-  completionDetails: Record<string, ProfilePointsCompletionDetail>;
-  summary: {
-    profileSections: {
-      basicInfo: ProfilePointsSection;
-      socialLinks: ProfilePointsSection;
-      professionalInfo: ProfilePointsSection;
-    };
-    datacounts: {
-      workExperiences: number;
-      educationEntries: number;
-      techSkills: number;
-      positions: number;
-    };
-  };
-}
+import type { ProfilePointsResponse } from "@/types/applicant/profile/profile";
 
 export const profilePointsKey = (codevId?: string) => [
   "profilePoints",

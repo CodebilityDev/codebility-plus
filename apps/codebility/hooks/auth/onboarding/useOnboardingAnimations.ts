@@ -1,18 +1,8 @@
 "use client";
 
-import { RefObject, useEffect } from "react";
+import { useEffect } from "react";
+import type { UseOnboardingAnimationsProps } from "@/types/auth/onboarding/onboarding";
 
-/** Keep this typing exactly as agreed */
-interface UseOnboardingAnimationsProps {
-  heroRef: RefObject<HTMLDivElement | null>;
-  logoRef: RefObject<HTMLDivElement | null>;
-  aboutRef: RefObject<HTMLDivElement | null>;
-  slidesRef: RefObject<HTMLDivElement | null>;
-  regularRef: RefObject<HTMLDivElement | null>;
-  h1Ref: RefObject<HTMLHeadingElement | null>;
-  roadmapRef?: RefObject<HTMLDivElement | null>;
-  setIsLogoVisible: (visible: boolean) => void;
-}
 
 /** IDs so we can reliably kill/rebuild */
 const IDS = {

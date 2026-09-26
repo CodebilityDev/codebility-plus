@@ -4,7 +4,8 @@ import { Suspense, useState } from "react";
 
 import useChangeBgNavigation from "@/hooks/global/useChangeBgNavigation";
 import Logo from "@/components/global/typography/Logo";
-import { CareersSignIn, MobileDrawer } from "@/components/global/marketing/MarketingNavigationSubComponents";
+import { CareersSignIn } from "@/components/global/marketing/CareersSignIn";
+import { MobileDrawer } from "@/components/global/marketing/MobileDrawer";
 import dynamic from "next/dynamic";
 import { signOut } from "@/actions/global/auth-session";
 import { removeLocalStorageValue } from "@/hooks/global/useLocalStorageValue";

@@ -1,13 +1,11 @@
 "use server";
 
-import { Codev } from "@/types/global/codev";
-import type { HireCodevEmail } from "@/types/global/hire-codev-email";
+
+
 import { HTMLTemplate, TextTemplate } from "@/lib/global/hire-codev-template";
 import { Resend } from "resend";
+import type { EmailProps } from "@/types/global/actions";
 
-type EmailProps = HireCodevEmail & {
-	codev: Codev;
-}
 
 export const sentHireCodevEmail = async (emailData: EmailProps) => {
 	try {

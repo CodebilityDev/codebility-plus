@@ -1,27 +1,8 @@
-import {
-  PIPELINE_STAGES,
-  TERMINAL_DENIED,
-  TERMINAL_PASSED,
-  type PipelineStageDefinition,
-  type PipelineStageKey,
-} from "@/constants/home/applicants/pipeline-stages";
+import { PIPELINE_STAGES, TERMINAL_DENIED, TERMINAL_PASSED } from "@/constants/home/applicants/pipeline-stages";
+import type { PipelineStageDefinition, PipelineStageKey } from "@/types/home/applicants/applicants";
 import { NewApplicantType } from "@/types/home/applicants/applicants";
+import type { StageState, DerivedStage, DerivedTimeline } from "@/types/home/applicants/applicants";
 
-export type StageState = "completed" | "current" | "pending" | "denied";
-
-export interface DerivedStage {
-  key: PipelineStageKey;
-  label: string;
-  state: StageState;
-  /** ISO timestamp string for the stage, or null when unavailable. */
-  timestamp: string | null;
-}
-
-export interface DerivedTimeline {
-  stages: DerivedStage[];
-  /** True when the application_status could not be matched to a stage. */
-  statusUnrecognized: boolean;
-}
 
 /**
  * Resolve the configured stages into a single deterministic sequence.

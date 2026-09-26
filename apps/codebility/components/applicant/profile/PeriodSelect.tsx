@@ -1,30 +1,11 @@
 "use client";
 
 import * as React from "react";
-import {
-  display12HourValue,
-  Period,
-  setDateByType,
-} from "@/components/applicant/profile/TimePickerUtils";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/global/ui/select";
+import { Period } from "@/types/applicant/profile/profile";
+import { display12HourValue, setDateByType } from "@/utils/applicant/profile/profile";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/global/ui/select";
+import type { PeriodSelectorProps } from "@/types/applicant/profile/profile";
 
-export interface PeriodSelectorProps {
-  period: Period;
-  // eslint-disable-next-line no-unused-vars
-  setPeriod: (m: Period) => void;
-  date: Date | undefined;
-  // eslint-disable-next-line no-unused-vars
-  setDate: (date: Date | undefined) => void;
-  onRightFocus?: () => void;
-  onLeftFocus?: () => void;
-  disabled?: boolean;
-}
 
 export const TimePeriodSelect = React.forwardRef<
   HTMLButtonElement,

@@ -16,7 +16,7 @@ import { Input } from "@codevs/ui/input";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@codevs/ui/collapsible";
 
 import { ExperienceRanges } from "@/types/home/applicants/applicants";
-import { ApplicantFilters } from "@/components/home/applicants/applicantHeaders";
+import { ApplicantFilters } from "@/types/home/applicants/applicants";
 
 const ApplicantFiltersComponent = ({
   activeFilterCount,

@@ -3,17 +3,9 @@
 import { useEffect, useState } from "react";
 import Box from "@/components/global/layout/Box";
 import { Button } from "@/components/global/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/global/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/global/ui/select";
 import { IconEdit } from "@/public/assets/svgs/index";
-import { Codev, Position } from "@/types/global/codev";
+import { Position } from "@/types/global/codev";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
@@ -21,19 +13,8 @@ import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
 
 import { getPositions, updateCodev } from "@/actions/applicant/profile/applicant-profile";
+import type { PersonalInfoProps, PersonalInfoFormValues } from "@/types/applicant/profile/profile";
 
-type PersonalInfoProps = {
-  data: Codev;
-};
-
-type FormValues = {
-  first_name: string;
-  last_name: string;
-  address: string | undefined;
-  display_position: string | undefined;
-  years_of_experience: number;
-  headline: string | undefined;
-};
 
 const PersonalInfo = ({ data }: PersonalInfoProps) => {
   const [positions, setPositions] = useState<Position[]>([]);
@@ -47,7 +28,7 @@ const PersonalInfo = ({ data }: PersonalInfoProps) => {
     setValue,
     reset,
     formState: { isDirty },
-  } = useForm<FormValues>({
+  } = useForm<PersonalInfoFormValues>({
     defaultValues: {
       first_name: data.first_name,
       last_name: data.last_name,
@@ -78,7 +59,7 @@ const PersonalInfo = ({ data }: PersonalInfoProps) => {
     fetchPositions();
   }, []);
 
-  const onSubmit = async (formData: FormValues) => {
+  const onSubmit = async (formData: PersonalInfoFormValues) => {
     const toastId = toast.loading("Updating your information");
     try {
       setIsLoading(true);

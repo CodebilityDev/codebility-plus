@@ -1,9 +1,5 @@
-import React, { ReactNode } from "react";
+import type { H1 } from "@/types/global/layout";
 
-interface H1 {
-  children: ReactNode;
-  className?: string;
-}
 
 export default function H1({ children, className }: H1) {
   return (

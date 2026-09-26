@@ -1,9 +1,5 @@
-import getRandomColor from "@/utils/global/getRandomColor";
+import type { DefaultAvatarProps } from "@/types/global/codev";
 
-interface DefaultAvatarProps {
-  className?: string;
-  size?: number;
-}
 
 const DefaultAvatar = ({ className = "", size = 40 }: DefaultAvatarProps) => {
   /* const bgColor = getRandomColor(); */

@@ -1,21 +1,10 @@
-import React, { forwardRef } from "react";
+import { forwardRef } from "react";
 import codes from "country-calling-code";
 import { Controller } from "react-hook-form";
 
 import { cn } from "@codevs/ui";
+import type { InputProps } from "@/types/global/layout";
 
-type InputProps = React.DetailedHTMLProps<
-  React.InputHTMLAttributes<HTMLInputElement>,
-  HTMLInputElement
-> & {
-  id?: string;
-  label: string;
-  error?: string;
-  type?: "email" | "phone";
-  inputClassName?: string;
-  disabled?: boolean;
-  control?: any;
-};
 
 // eslint-disable-next-line react/display-name
 const InputField = forwardRef<HTMLInputElement, InputProps>(

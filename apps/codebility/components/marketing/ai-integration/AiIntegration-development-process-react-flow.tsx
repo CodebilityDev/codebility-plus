@@ -6,23 +6,13 @@ import ReactFlow, { Background, useEdgesState, useNodesState } from "reactflow";
 
 import "@/styles/marketing/ai-integration/ai-integration.css";
 
-import {
-  DevProcessInitialEdges,
-  DevProcessInitialNodes,
-} from "@/constants/marketing/ai-integration/dummy-data";
+import { DevProcessInitialEdges, DevProcessInitialNodes } from "@/constants/marketing/ai-integration/dummy-data";
 import Section from "@/components/global/marketing/MarketingSection";
-import { CustomEdge } from "@/components/marketing/ai-integration/AiIntegrationEdgeTypes";
+
 import GradientBackgroundWhite from "@/components/marketing/ai-integration/AiIntegrationGradientBgWhite";
-import { DevProcessCard, DevProcessImage } from "@/components/marketing/ai-integration/AiIntegrationNodeTypes";
+import { nodeTypes, edgeTypes } from "@/constants/marketing/ai-integration/ai-integration";
 
-const nodeTypes = {
-  devProcessCard: DevProcessCard,
-  devProcessImage: DevProcessImage,
-};
 
-const edgeTypes = {
-  customEdge: CustomEdge,
-};
 
 const DevelopmentProcessReactFLow = () => {
   const [nodes, , onNodesChange] = useNodesState(DevProcessInitialNodes);

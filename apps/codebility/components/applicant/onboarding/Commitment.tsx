@@ -3,11 +3,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/global/ui/button";
 import { Checkbox } from "@codevs/ui/checkbox";
+import type { CommitmentProps } from "@/types/applicant/onboarding/onboarding";
 
-interface CommitmentProps {
-  userName: string;
-  onComplete: (signature: string, canDoMobile: boolean) => void;
-}
 
 export default function Commitment({ userName, onComplete }: CommitmentProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);

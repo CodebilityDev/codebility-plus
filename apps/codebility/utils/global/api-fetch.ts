@@ -1,16 +1,5 @@
-export type ApiOk<T> = { ok: true; data: T };
-export type ApiFail = { ok: false; error: string; status?: number };
-export type ApiResult<T> = ApiOk<T> | ApiFail;
+import type { ApiResult, FetchApiInit } from "@/types/global/utils";
 
-export type NextFetchRequestConfig = {
-  revalidate?: number | false;
-  tags?: string[];
-};
-
-export type FetchApiInit = RequestInit & {
-  next?: NextFetchRequestConfig;
-  cache?: RequestCache;
-};
 
 function errorMessageFromBody(body: unknown, fallback: string): string {
   if (typeof body === "string" && body.trim()) return body;

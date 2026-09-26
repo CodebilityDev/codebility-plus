@@ -1,17 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import type { Bubble } from "@/types/auth/onboarding/onboarding";
 
-type Bubble = {
-  id: string;
-  size: number; // px
-  topPct: number;
-  leftPct: number;
-  hue: number; // 0..360
-  depth: number; // parallax multiplier
-  floatDur: number; // s
-  delay: number; // s
-};
 
 export function BubbleBackground() {
   const ref = useRef<HTMLDivElement>(null);

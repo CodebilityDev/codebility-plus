@@ -3,29 +3,10 @@
 import LandingImage from "@/components/marketing/LandingImage";
 
 import Section from "@/components/global/marketing/MarketingSection";
-import ProgressiveMotion from "@/components/marketing/LandingProgressiveMotion";
-import { LandingPartnersSkeleton } from "@/components/marketing/LandingSectionSkeletons";
+import ProgressiveMotion from "@/components/global/marketing/ProgressiveMotion";
+import { LandingPartnersSkeleton } from "@/components/marketing/LandingPartnersSkeleton";
+import { partners } from "@/constants/marketing/marketing";
 
-const partners = [
-  {
-    name: "Genius Web Services",
-    logo: "/assets/images/partners/genius-web-services.png",
-  },
-  { name: "Travel Tribe", logo: "/assets/images/partners/travel-tribe.png" },
-  { name: "Netmedia", logo: "/assets/images/partners/netmedia.png" },
-  { name: "Zwift Tech", logo: "/assets/images/partners/zwift-tech.png" },
-  { name: "Bradwell", logo: "/assets/images/partners/bradwell.png" },
-  { name: "Ai", logo: "/assets/images/partners/ai.png" },
-  { name: "Averps", logo: "/assets/images/partners/averps.png" },
-  { name: "Tolle Design", logo: "/assets/images/partners/tolle-design.png" },
-  { name: "Infraspan", logo: "/assets/images/partners/infraspan.png" },
-  {
-    name: "Federal PLANS",
-    logo: "/assets/images/partners/federal-plans.png",
-  },
-  { name: "Web Divine", logo: "/assets/images/partners/web-divine.png" },
-  { name: "FixFlow.ai", logo: "/assets/images/partners/fixflow-ai.png" },
-];
 
 export default function Partners() {
   return (

@@ -4,8 +4,8 @@ import React, { useState, useEffect } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-hot-toast";
-import { z } from "zod";
-import { ChevronDown, Eye, EyeOff, CheckCircle, AlertCircle } from "lucide-react";
+
+import { ChevronDown, CheckCircle, AlertCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -23,56 +23,11 @@ import { useTechStackStore } from "@/hooks/global/use-techstack";
 // Import modals
 import TechStackModal from "@/components/global/modals/TechStackModal";
 import PrivacyPolicyModal from "@/components/global/modals/PrivacyPolicyModal";
+import { PasswordField } from "@/components/auth/sign-up/PasswordField";
+import { POSITIONS } from "@/constants/auth/sign-up/sign-up";
+import type { SignupFormData, FormFieldProps } from "@/types/auth/sign-up/sign-up";
+import { SignupFormSchema } from "@/utils/auth/sign-up/sign-up";
 
-// Constants
-const POSITIONS = [
-  { id: 1, name: "Frontend Developer" },
-  { id: 2, name: "Backend Developer" },
-  { id: 3, name: "Full Stack Developer" },
-  { id: 4, name: "Mobile Developer" },
-  { id: 5, name: "UI/UX Designer" },
-  { id: 6, name: "QA Engineer" },
-  { id: 7, name: "Admin" },
-];
-
-// Validation schema
-const SignupFormSchema = z.object({
-  first_name: z.string().min(1, "First name is required"),
-  last_name: z.string().min(1, "Last name is required"),
-  email_address: z.string().email("Please enter a valid email address"),
-  phone_number: z.string().min(1, "Phone number is required"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-  confirmPassword: z.string(),
-  about: z.string().optional(),
-  portfolio_website: z.string().url().optional().or(z.literal("")),
-  positions: z.array(z.object({ id: z.number(), name: z.string() })).min(1, "Please select at least one position"),
-  tech_stacks: z.array(z.string()).min(1, "Please select at least one tech stack"),
-  years_of_experience: z.number().min(0, "Experience must be 0 or more years"),
-  facebook: z.string().optional(),
-  linkedin: z.string().optional(),
-  github: z.string().optional(),
-  username: z.string().min(8, "Username must be at least 8 characters").optional(),
-  discord: z.string().optional(),
-  privacyPolicy: z.boolean().refine(val => val === true, "You must agree to the Privacy Policy"),
-  ndaAgreement: z.boolean().refine(val => val === true, "You must agree to the Non-Disclosure Agreement"),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
-
-type SignupFormData = z.infer<typeof SignupFormSchema>;
-
-// Form field component
-interface FormFieldProps {
-  label: string;
-  name: keyof SignupFormData;
-  type?: string;
-  placeholder: string;
-  register: any;
-  errors: any;
-  required?: boolean;
-  className?: string;
-}
 
 const FormField = ({ label, name, type = "text", placeholder, register, errors, required, className }: FormFieldProps) => (
   <div className="space-y-1">
@@ -85,31 +40,6 @@ const FormField = ({ label, name, type = "text", placeholder, register, errors, 
       placeholder={placeholder}
       className={`bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 h-12 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 backdrop-blur-sm ${className || ""}`}
     />
-    {errors[name] && (
-      <p className="text-sm text-red-400">{errors[name].message}</p>
-    )}
-  </div>
-);
-
-// Password field component
-const PasswordField = ({ label, name, placeholder, register, errors, showPassword, toggleShow }: any) => (
-  <div className="space-y-1">
-    <Label className="text-white text-base font-medium">{label} <span className="text-red-400">*</span></Label>
-    <div className="relative">
-      <Input
-        type={showPassword ? "text" : "password"}
-        {...register(name)}
-        placeholder={placeholder}
-        className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 h-12 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 backdrop-blur-sm pr-12"
-      />
-      <button
-        type="button"
-        onClick={toggleShow}
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
-      >
-        {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-      </button>
-    </div>
     {errors[name] && (
       <p className="text-sm text-red-400">{errors[name].message}</p>
     )}

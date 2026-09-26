@@ -1,15 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/global/ui/button";
-import { quizQuestions, QuizQuestion } from "@/constants/applicant/onboarding/quiz-data";
+import { quizQuestions } from "@/constants/applicant/onboarding/quiz-data";
 import { saveQuizProgress } from "@/actions/applicant/onboarding/applicant-onboarding";
+import type { QuizProps } from "@/types/applicant/onboarding/onboarding";
 
-interface QuizProps {
-  applicantId: string;
-  onQuizComplete: (score: number, totalQuestions: number) => void;
-  onBackToVideos?: () => void;
-}
 
 export default function Quiz({ applicantId, onQuizComplete, onBackToVideos }: QuizProps) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);

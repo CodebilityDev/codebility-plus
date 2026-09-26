@@ -1,12 +1,8 @@
-import type { ReactNode } from "react";
+
 
 import MarketingMotionReadyMarker from "@/components/global/marketing/MarketingMotionReadyMarker";
+import type { MarketingProgressiveSectionProps } from "@/types/global/marketing";
 
-type MarketingProgressiveSectionProps = {
-  children: ReactNode;
-  skeleton: ReactNode;
-  className?: string;
-};
 
 export default function MarketingProgressiveSection({
   children,

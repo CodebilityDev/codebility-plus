@@ -1,20 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCachedLandingInternsPage } from "@/lib/global/landing-interns-cached";
+import { DEFAULT_PAGE, DEFAULT_LIMIT, MAX_LIMIT } from "@/constants/api/landing-interns/landing-interns";
+import { parsePositiveInt } from "@/utils/api/landing-interns/landing-interns";
 
-const DEFAULT_PAGE = 1;
-const DEFAULT_LIMIT = 10;
-const MAX_LIMIT = 50;
-
-function parsePositiveInt(
-  value: string | null,
-  fallback: number,
-  max?: number,
-): number {
-  const parsed = Number.parseInt(value ?? "", 10);
-  if (!Number.isFinite(parsed) || parsed < 1) return fallback;
-  if (max !== undefined) return Math.min(parsed, max);
-  return parsed;
-}
 
 export async function GET(request: NextRequest) {
   try {

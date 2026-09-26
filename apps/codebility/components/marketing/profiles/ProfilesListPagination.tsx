@@ -1,27 +1,24 @@
 "use client";
 
 import { Suspense, use, useState, useTransition } from "react";
-import DefaultPagination from "@/components/global/ui/DefaultPagination";
+
 import { useMarketingPageUrl } from "@/hooks/global/use-marketing-page-url";
-import { getStableColor } from "@/utils/global/getRandomColor";
+
 import type { ProfilesListingPage } from "@/types/global/profiles-listing";
 import { fetchApiJson } from "@/utils/global/api-fetch";
 
-import CodevCard from "@/components/global/marketing/CodevCard";
+
 import CodevListFilter from "@/components/global/marketing/CodevListFilter";
 import { ProfilesListSkeleton } from "@/components/marketing/profiles/ProfilesListSkeleton";
-import ProgressiveMotion from "@/components/global/marketing/ProgressiveMotion";
+import { ProfilesGrid } from "@/components/marketing/profiles/ProfilesGrid";
+import { ProfilesPaginationSlot } from "@/components/marketing/profiles/ProfilesPaginationSlot";
+import type { ProfilesListPaginationProps } from "@/types/marketing/profiles/profiles";
+import { pageCacheKey, filterCacheKey } from "@/utils/marketing/profiles/profiles";
+
+
 
 const pagePromises = new Map<string, Promise<ProfilesListingPage>>();
 const pageMetaCache = new Map<string, ProfilesListingPage["pagination"]>();
-
-function pageCacheKey(position: string, page: number, pageSize: number) {
-  return `${position}:${page}:${pageSize}`;
-}
-
-function filterCacheKey(position: string, pageSize: number) {
-  return `${position}:${pageSize}`;
-}
 
 function rememberPagination(
   position: string,
@@ -113,85 +110,6 @@ function resolvePagination(
   );
 }
 
-function AnimatedProfilesGrid({
-  codevs,
-  animationKey,
-}: {
-  codevs: ProfilesListingPage["codevs"];
-  animationKey: string;
-}) {
-  if (codevs.length === 0) {
-    return (
-      <p className="text-center text-2xl text-gray-500 dark:text-gray-400">
-        Sorry, no data found.
-      </p>
-    );
-  }
-
-  return (
-    <ProgressiveMotion
-      key={animationKey}
-      className="grid h-full w-full grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
-      y={20}
-      duration={0.5}
-      staggerChildren={0.05}
-      playOnMount
-    >
-      {codevs.map((codev) => (
-        <div key={codev.id} data-progressive-child>
-          <CodevCard
-            color={getStableColor(codev.id)}
-            codev={codev}
-            animateEntrance={false}
-          />
-        </div>
-      ))}
-    </ProgressiveMotion>
-  );
-}
-
-function ProfilesGrid({
-  codevs,
-  animationKey,
-}: {
-  codevs: ProfilesListingPage["codevs"];
-  animationKey: string;
-}) {
-  return <AnimatedProfilesGrid codevs={codevs} animationKey={animationKey} />;
-}
-
-function ProfilesPaginationSlot({
-  page,
-  totalPages,
-  onPageChange,
-}: {
-  page: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
-}) {
-  if (totalPages <= 1) {
-    return <div className="mt-6 min-h-[4.5rem]" aria-hidden="true" />;
-  }
-
-  const currentPage = Math.min(page, totalPages);
-
-  return (
-    <div className="mt-6 text-white">
-      <DefaultPagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        handleNextPage={() => {
-          onPageChange(Math.min(totalPages, currentPage + 1));
-        }}
-        handlePreviousPage={() => {
-          onPageChange(Math.max(1, currentPage - 1));
-        }}
-        setCurrentPage={onPageChange}
-      />
-    </div>
-  );
-}
-
 function ProfilesListRemote({
   position,
   page,
@@ -248,15 +166,10 @@ function ProfilesListGrid({
   );
 }
 
-interface Props {
-  initialData: ProfilesListingPage;
-  pageSize: number;
-}
-
 export default function ProfilesListPagination({
   initialData,
   pageSize,
-}: Props) {
+}: ProfilesListPaginationProps) {
   const [position, setPosition] = useState(initialData.position);
   const [page, setPage] = useState(initialData.pagination.page);
   const [isPending, startTransition] = useTransition();

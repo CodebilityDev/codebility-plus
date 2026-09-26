@@ -1,33 +1,12 @@
 import { Suspense } from "react";
-import { getCachedLandingAdminsData } from "@/lib/global/landing-admins-cached";
+
 
 import Section from "@/components/global/marketing/MarketingSection";
-import AnimatedAdminsSection from "@/components/marketing/AnimatedAdminsSection";
+
 import { LandingAdminsSkeleton } from "@/components/marketing/LandingAdminsSkeleton";
-import { ADMINS_SECTION_COPY } from "@/constants/marketing/admins-section-copy";
+import { LandingAdminsContent } from "@/components/marketing/LandingAdminsContent";
 
-async function LandingAdminsContent() {
-  const data = await getCachedLandingAdminsData();
-  if (!data) return <div>ERROR</div>;
 
-  return (
-    <>
-      <AnimatedAdminsSection
-        {...ADMINS_SECTION_COPY.admins}
-        members={data.admins}
-        sectionId="admins"
-      />
-
-      <div className="mt-20">
-        <AnimatedAdminsSection
-          {...ADMINS_SECTION_COPY.mentors}
-          members={data.mentors}
-          sectionId="mentors"
-        />
-      </div>
-    </>
-  );
-}
 
 export default function Admins() {
   return (

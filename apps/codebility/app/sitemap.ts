@@ -1,7 +1,7 @@
 import { MetadataRoute } from "next";
 import { createClient } from "@supabase/supabase-js";
+import { BASE_URL } from "@/constants/global/app";
 
-const BASE_URL = "https://www.codebility.tech";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Use anon client — public data, no auth required

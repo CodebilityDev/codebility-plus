@@ -1,30 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import DefaultAvatar from "@/components/global/codev/DefaultAvatar";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/global/ui/dialog";
-import { IconFigma } from "@/public/assets/svgs/techstack/index";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/global/ui/dialog";
+
 import { IconGithub, IconLink } from "@/public/assets/svgs/index";
-import {
-  Briefcase,
-  Facebook,
-  Github,
-  Linkedin,
-  Mail,
-  MapPin,
-  MessageSquare,
-  Phone,
-} from "lucide-react";
+import { Facebook, Github, Linkedin, Mail, MapPin, MessageSquare, Phone } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@codevs/ui/tabs";
 import { useApplicantModal } from "@/components/home/applicants/ApplicantClientWrapper";
 import ApplicantProcessTimeline from "@/components/home/applicants/ApplicantProcessTimeline";
+import { ApplicantProfileModalSection } from "@/components/home/applicants/ApplicantProfileModalSection";
+
 
 const ApplicantProfileModal = () => {
   const { isModalOpen, selectedApplicant, closeModal } = useApplicantModal();
@@ -190,15 +178,15 @@ const ApplicantProfileModal = () => {
 
             {/* About Section */}
             {selectedApplicant.about && (
-              <Section title="About">
+              <ApplicantProfileModalSection title="About">
                 <p className="text-gray-600 dark:text-gray-300">
                   {selectedApplicant.about}
                 </p>
-              </Section>
+              </ApplicantProfileModalSection>
             )}
 
             {/* Application Details */}
-            <Section title="Application Details">
+            <ApplicantProfileModalSection title="Application Details">
               <div className="space-y-4">
                 <div className="rounded-lg border p-4">
                   <h4 className="font-medium">Application Status</h4>
@@ -307,12 +295,12 @@ const ApplicantProfileModal = () => {
                   </div>
                 )}
               </div>
-            </Section>
+            </ApplicantProfileModalSection>
           </TabsContent>
 
           {/* Experience Tab */}
           <TabsContent value="experience" className="mt-4 space-y-4 overflow-y-auto pr-2">
-            <Section title="Experience Level">
+            <ApplicantProfileModalSection title="Experience Level">
               <div className="rounded-lg border p-4">
                 <h4 className="font-medium">Years of Experience</h4>
                 <p className="text-2xl font-bold text-customBlue-500">
@@ -323,7 +311,7 @@ const ApplicantProfileModal = () => {
                    selectedApplicant.years_of_experience <= 5 ? "Intermediate Level" : "Expert Level"}
                 </p>
               </div>
-            </Section>
+            </ApplicantProfileModalSection>
           </TabsContent>
 
           {/* Projects Tab */}
@@ -356,7 +344,7 @@ const ApplicantProfileModal = () => {
           <TabsContent value="skills" className="mt-4 space-y-4 overflow-y-auto pr-2">
             {/* Tech Stacks */}
             {hasItems(selectedApplicant.tech_stacks) && (
-              <Section title="Technical Skills">
+              <ApplicantProfileModalSection title="Technical Skills">
                 <div className="flex flex-wrap gap-2">
                   {selectedApplicant.tech_stacks
                     .filter((tech): tech is string => Boolean(tech))
@@ -382,7 +370,7 @@ const ApplicantProfileModal = () => {
                       </div>
                     ))}
                 </div>
-              </Section>
+              </ApplicantProfileModalSection>
             )}
           </TabsContent>
         </Tabs>
@@ -390,19 +378,5 @@ const ApplicantProfileModal = () => {
     </Dialog>
   );
 };
-
-// Helper Components
-const Section = ({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) => (
-  <div className="space-y-3">
-    <h3 className="text-lg font-medium">{title}</h3>
-    {children}
-  </div>
-);
 
 export default ApplicantProfileModal;

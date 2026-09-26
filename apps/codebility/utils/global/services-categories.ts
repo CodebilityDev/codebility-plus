@@ -1,7 +1,5 @@
-import {
-  SERVICES_CATEGORY_SLUGS,
-  type ServicesCategorySlug,
-} from "@/constants/global/services-categories";
+import { SERVICES_CATEGORY_SLUGS } from "@/constants/global/services-categories";
+import type { ServicesCategorySlug } from "@/types/global/constants";
 
 export function parseServicesCategory(
   value: string | string[] | undefined | null,
@@ -33,4 +31,3 @@ export function categoryHref(slug: ServicesCategorySlug): string {
   return servicesHref({ category: slug });
 }
 
-export type { ServicesCategorySlug } from "@/constants/global/services-categories";

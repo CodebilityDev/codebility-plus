@@ -3,16 +3,11 @@
 import Box from "@/components/global/layout/Box";
 import Paragraph from "@/components/global/typography/Paragraph";
 import { TimePicker12 } from "@/components/applicant/profile/TimePicker12hourDemo";
-import { Period } from "@/components/applicant/profile/TimePickerUtils";
+import { Period } from "@/types/applicant/profile/profile";
 import { Button } from "@/components/global/ui/button";
 import { IconEdit } from "@/public/assets/svgs/index";
 import { useUserStore } from "@/store/global/codev-store";
-import {
-  DayOfWeek,
-  DAYS_OF_WEEK,
-  WEEKDAYS,
-  WorkSchedule,
-} from "@/types/global/codev";
+import { DayOfWeek, DAYS_OF_WEEK, WEEKDAYS, WorkSchedule } from "@/types/global/codev";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
@@ -21,13 +16,9 @@ import { Label } from "@codevs/ui/label";
 
 import { updateWorkSchedule } from "@/actions/applicant/profile/applicant-profile";
 import { cn } from "@codevs/ui";
+import { DEFAULT_START_TIME, DEFAULT_END_TIME } from "@/constants/applicant/profile/profile";
+import type { TimeScheduleProps } from "@/types/applicant/profile/profile";
 
-interface TimeScheduleProps {
-  data?: WorkSchedule | null;
-}
-
-const DEFAULT_START_TIME = "09:00";
-const DEFAULT_END_TIME = "17:00";
 
 const TimeSchedule = ({ data }: TimeScheduleProps) => {
   const { user } = useUserStore();

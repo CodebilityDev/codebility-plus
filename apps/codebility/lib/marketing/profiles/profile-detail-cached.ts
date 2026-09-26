@@ -2,6 +2,8 @@ import { unstable_cache } from "next/cache";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Codev, WorkExperience } from "@/types/global/codev";
 import { createClientAnon } from "@/lib/global/supabase-anon";
+import type { ProfileDetailMeta, ProfileDetailRow } from "@/types/marketing/profiles/profiles";
+
 
 const PROFILE_DETAIL_SELECT = `
   id,
@@ -51,34 +53,6 @@ const PROFILE_DETAIL_SELECT = `
 
 const PROFILE_META_SELECT =
   "id, first_name, last_name, image_url";
-
-export type ProfileDetailMeta = {
-  id: string;
-  first_name: string;
-  last_name: string;
-  image_url?: string;
-};
-
-type ProfileDetailRow = {
-  id: string;
-  first_name: string | null;
-  last_name: string | null;
-  image_url: string | null;
-  display_position: string | null;
-  portfolio_website: string | null;
-  about: string | null;
-  github: string | null;
-  linkedin: string | null;
-  tech_stacks: string[] | null;
-  availability_status: boolean | null;
-  nda_status: boolean | null;
-  level: Record<string, number> | null;
-  headline: string | null;
-  education: Codev["education"];
-  work_experience: WorkExperience[] | null;
-  work_schedules: Codev["work_schedules"];
-  codev_points: Codev["codev_points"];
-};
 
 function mapProfileDetail(row: ProfileDetailRow): Codev {
   return {

@@ -1,29 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { SignInValidation } from "@/utils/auth/sign-in/auth-schema";
-import { IconEye, IconEyeClose } from "@/public/assets/svgs/index";
+
+
 import clsx from "clsx";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
-import { FieldErrors, UseFormRegister } from "react-hook-form";
-import { z } from "zod";
+import type { InputProps } from "@/types/auth/sign-in/sign-in";
 
-type Inputs = z.infer<typeof SignInValidation>;
 
-interface InputProps {
-  label: string;
-  id: "email_address" | "password";
-  type?: string;
-  required?: boolean;
-  register: UseFormRegister<Inputs>;
-  errors: FieldErrors;
-  disabled?: boolean;
-  placeholder?: string;
-  values?: string;
-  onClick?: () => void;
-  onChange?: () => void;
-  readonly?: boolean;
-}
+
 
 const SignInInputs = ({
   label,

@@ -4,32 +4,13 @@ import { useState } from "react";
 import { Button } from "@/components/global/ui/button";
 import { services } from "@/constants/marketing/contact/services";
 import { IconDropdown } from "@/public/assets/svgs/index";
-import {
-  Select, SelectContent, SelectGroup,
-  SelectItem, SelectTrigger, SelectValue,
-} from "@radix-ui/react-select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@radix-ui/react-select";
 import { Label } from "@codevs/ui/label";
 import { Textarea } from "@codevs/ui/textarea";
-import { ContactFormData } from "@/components/marketing/contact/ContactPage";
+import { referralSources, existingWebsiteOptions, MAX_CHARS } from "@/constants/marketing/contact/contact";
+import type { ShortSurveyProps } from "@/types/marketing/contact/contact";
 
-const referralSources = [
-  "Search engine", "Social media", "Referral / Word of mouth",
-  "LinkedIn", "Events / Conference", "Other",
-];
 
-const existingWebsiteOptions = [
-  { value: "new", label: "New project — no existing site" },
-  { value: "existing", label: "I have an existing website" },
-  { value: "redesign", label: "Looking for a redesign" },
-];
-
-const MAX_CHARS = 500;
-
-interface ShortSurveyProps {
-  defaultValues: ContactFormData;
-  onNext: (data: Pick<ContactFormData, "serviceInterest" | "projectType" | "featuresNeeded" | "referralSource" | "interestLevel" | "otherRequirements">) => void;
-  onBack: () => void;
-}
 
 const ShortSurvey = ({ defaultValues, onNext, onBack }: ShortSurveyProps) => {
   const [selectedService, setSelectedService] = useState(defaultValues.serviceInterest);

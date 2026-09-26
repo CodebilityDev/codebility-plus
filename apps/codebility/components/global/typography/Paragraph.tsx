@@ -1,9 +1,6 @@
-import React, { ReactNode } from "react";
+import React from "react";
+import type { Paragraph } from "@/types/global/typography";
 
-interface Paragraph {
-  children: ReactNode;
-  className?: string;
-}
 
 const Paragraph: React.FC<Paragraph> = ({ children, className }) => {
   return (

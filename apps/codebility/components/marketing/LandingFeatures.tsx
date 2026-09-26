@@ -7,7 +7,7 @@ import { ServicesCardData } from "@/constants/global/landing-data";
 import Container from "@/components/global/marketing/MarketingContainer";
 import Section from "@/components/global/marketing/MarketingSection";
 import FeaturesCard from "@/components/marketing/LandingFeaturesCard";
-import ProgressiveMotion from "@/components/marketing/LandingProgressiveMotion";
+import ProgressiveMotion from "@/components/global/marketing/ProgressiveMotion";
 import { LandingFeaturesSkeleton } from "@/components/marketing/LandingSectionSkeletons";
 
 const Features = () => {

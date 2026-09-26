@@ -5,6 +5,8 @@ import type { ProfilesListingPage } from "@/types/global/profiles-listing";
 import { getQualifiedCodevs } from "@/utils/global/codev-qualification";
 import { prioritizeCodevs } from "@/utils/global/codev-priority";
 import { createClientAnon } from "@/lib/global/supabase-anon";
+import type { ProfilesListingRow } from "@/types/global/lib";
+
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 5;
@@ -28,25 +30,6 @@ const PROFILES_LISTING_SELECT = `
     points
   )
 `;
-
-type ProfilesListingRow = {
-  id: string;
-  first_name: string | null;
-  last_name: string | null;
-  image_url: string | null;
-  display_position: string | null;
-  availability_status: boolean | null;
-  internal_status: string | null;
-  application_status: string | null;
-  level: Record<string, number> | null;
-  years_of_experience: number | null;
-  work_experience: Array<{ id: string }> | null;
-  codev_points: Array<{
-    id: string;
-    skill_category_id: string;
-    points: number;
-  }> | null;
-};
 
 function parsePositiveInt(
   value: number | undefined,
@@ -165,4 +148,3 @@ export const getCachedProfilesListingPage = unstable_cache(
   { revalidate: 3600, tags: ["profiles-listing"] },
 );
 
-export type { ProfilesListingPage } from "@/types/global/profiles-listing";

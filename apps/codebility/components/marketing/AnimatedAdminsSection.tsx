@@ -4,14 +4,9 @@ import { Codev } from "@/types/global/codev";
 
 import AdminCard from "@/components/marketing/LandingAdminCard";
 import BlueBg from "@/components/marketing/LandingBlueBg";
-import ProgressiveMotion from "@/components/marketing/LandingProgressiveMotion";
+import ProgressiveMotion from "@/components/global/marketing/ProgressiveMotion";
+import type { AnimatedAdminsSectionProps } from "@/types/marketing/marketing";
 
-interface AnimatedAdminsSectionProps {
-  title: string;
-  description: string;
-  members: Codev[];
-  sectionId: string;
-}
 
 const AnimatedAdminsSection = ({
   title,

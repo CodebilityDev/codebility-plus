@@ -1,64 +1,12 @@
 "use client";
 
-import React from "react";
+
 import { cn } from "@/utils/global/cn";
+import { rules } from "@/constants/auth/onboarding/onboarding";
+import type { HouseRulesSectionProps } from "@/types/auth/onboarding/onboarding";
 
-type Props = React.HTMLAttributes<HTMLElement>;
 
-const rules = [
-  {
-    n: 1,
-    title: "Show Up With Purpose",
-    desc: "Whether you're working on a task or attending a session, be present, prepared, and proactive. Treat this opportunity like it matters — because it does.",
-  },
-  {
-    n: 2,
-    title: "Own Your Growth",
-    desc: "This isn’t school — it’s real-world learning. Be self-driven, take initiative, and don’t wait to be told what to do. If you’re stuck, ask. If you're curious, explore.",
-  },
-  {
-    n: 3,
-    title: "Respect Time — Yours and Others",
-    desc: "Be on time. Meet deadlines. Communicate if you’re delayed. Time is a shared resource, and how you manage it reflects your professionalism.",
-  },
-  {
-    n: 4,
-    title: "Communicate Clearly, Kindly, and Often",
-    desc: "Use our channels (Slack, Discord, etc.) responsibly. Give updates. Ask questions. Support others. Feedback is welcome — but make it constructive.",
-  },
-  {
-    n: 5,
-    title: "Be a Team Player",
-    desc: "We build together. Be collaborative, helpful, and open-minded. Celebrate wins — big or small — and lift others as you climb.",
-  },
-  {
-    n: 6,
-    title: "No Ghosting, No Vanishing",
-    desc: "If you need to pause or step back, that’s okay — just communicate. Silence disrupts projects and team trust.",
-  },
-  {
-    n: 7,
-    title: "Keep It Professional",
-    desc: "Treat everyone with respect, regardless of their background or role. Discrimination, harassment, or unprofessional behavior won't be tolerated.",
-  },
-  {
-    n: 8,
-    title: "Protect Our Space",
-    desc: "Don’t share internal work or sensitive information outside Codebility without permission. Confidentiality matters — to us and our clients.",
-  },
-  {
-    n: 9,
-    title: "Celebrate Progress, Not Perfection",
-    desc: "Mistakes are part of learning. Ask questions. Own errors. Share lessons. Growth is the goal, not flawless performance.",
-  },
-  {
-    n: 10,
-    title: "This Is a Stepping Stone — Make It Count",
-    desc: "We’re not offering salaries — we’re offering experience, mentorship, and a launchpad for your future. What you build here, you take with you.",
-  },
-];
-
-export default function HouseRulesSection({ className, ...rest }: Props) {
+export default function HouseRulesSection({ className, ...rest }: HouseRulesSectionProps) {
   return (
     <section
       className={cn(

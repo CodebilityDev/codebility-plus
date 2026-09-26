@@ -3,22 +3,15 @@
 import ReactFlow, { Background, useEdgesState, useNodesState } from "reactflow";
 
 import { PartnerInitialEdges, PartnerInitialNodes } from "@/constants/marketing/ai-integration/dummy-data";
-import { CustomEdge } from "@/components/marketing/ai-integration/AiIntegrationEdgeTypes";
-import { PartnerCard, PartnerTitle } from "@/components/marketing/ai-integration/AiIntegrationNodeTypes";
+
+
 
 import "reactflow/dist/style.css";
 import "@/styles/marketing/ai-integration/ai-integration.css";
 
 import GradientBackgroundWhite from "@/components/marketing/ai-integration/AiIntegrationGradientBgWhite";
+import { PartnerReactFlownodeTypes, edgeTypes } from "@/constants/marketing/ai-integration/ai-integration";
 
-const nodeTypes = {
-  partnerTitle: PartnerTitle,
-  partnerCard: PartnerCard,
-};
-
-const edgeTypes = {
-  customEdge: CustomEdge,
-};
 
 const PartnerReactFlow = () => {
   const [nodes, , onNodesChange] = useNodesState(PartnerInitialNodes);
@@ -32,7 +25,7 @@ const PartnerReactFlow = () => {
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
-        nodeTypes={nodeTypes}
+        nodeTypes={PartnerReactFlownodeTypes}
         edgeTypes={edgeTypes}
         fitView
         zoomOnScroll={false}

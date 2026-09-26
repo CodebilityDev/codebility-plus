@@ -1,82 +1,14 @@
 "use client";
 
-import {
-  useLayoutEffect,
-  useRef,
-  type CSSProperties,
-  type ReactNode,
-} from "react";
+import { useLayoutEffect, useRef } from "react";
 import { animate, stagger } from "framer-motion/dom";
 
-import {
-  attachProgressiveInView,
-  isElementIntersecting,
-} from "@/utils/global/progressive-in-view";
+import { attachProgressiveInView, isElementIntersecting } from "@/utils/global/progressive-in-view";
 import { markMarketingMotionReady } from "@/utils/global/marketing-motion-ready";
+import { VISIBLE_STYLE, CHILD_SELECTOR, EASE } from "@/constants/global/marketing";
+import type { ProgressiveMotionProps } from "@/types/global/marketing";
+import { prefersReducedMotion, snapVisible, hideForEnter, resolveStagger } from "@/utils/global/marketing";
 
-const VISIBLE_STYLE: CSSProperties = { opacity: 1, transform: "none" };
-const DEFAULT_CHILD_STAGGER = 0.08;
-const CHILD_SELECTOR = "[data-progressive-child]";
-const EASE = [0.25, 0.46, 0.45, 0.94] as const;
-
-function prefersReducedMotion() {
-  return (
-    typeof window !== "undefined" &&
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches
-  );
-}
-
-function snapVisible(element: HTMLElement) {
-  element.setAttribute("data-progressive-ready", "");
-  element.style.opacity = "1";
-  element.style.transform = "none";
-  element.querySelectorAll<HTMLElement>(CHILD_SELECTOR).forEach((child) => {
-    child.style.opacity = "1";
-    child.style.transform = "none";
-  });
-}
-
-function hideForEnter(
-  element: HTMLElement,
-  y: number,
-  staggerChildren: number,
-) {
-  const hidden = `translateY(${y}px)`;
-
-  if (staggerChildren > 0) {
-    element.style.opacity = "1";
-    element.style.transform = "none";
-    element.querySelectorAll<HTMLElement>(CHILD_SELECTOR).forEach((child) => {
-      child.style.opacity = "0";
-      child.style.transform = hidden;
-    });
-    return;
-  }
-
-  element.style.opacity = "0";
-  element.style.transform = hidden;
-}
-
-function resolveStagger(
-  element: HTMLElement,
-  staggerChildren: number,
-): number {
-  if (staggerChildren > 0) return staggerChildren;
-
-  const childCount = element.querySelectorAll(CHILD_SELECTOR).length;
-  return childCount > 1 ? DEFAULT_CHILD_STAGGER : 0;
-}
-
-type ProgressiveMotionProps = {
-  children: ReactNode;
-  className?: string;
-  y?: number;
-  duration?: number;
-  amount?: number | "some" | "all";
-  staggerChildren?: number;
-  /** Play enter animation immediately on mount (paginated lists). */
-  playOnMount?: boolean;
-};
 
 export default function ProgressiveMotion({
   children,

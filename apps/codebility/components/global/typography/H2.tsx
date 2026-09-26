@@ -1,9 +1,6 @@
-import React, { ReactNode } from "react";
+import React from "react";
+import type { H2 } from "@/types/global/typography";
 
-interface H2 {
-  children: ReactNode;
-  className?: string;
-}
 
 const H2: React.FC<H2> = ({ children, className }) => {
   return (

@@ -2,14 +2,8 @@
 
 import { updateCodev } from "@/actions/applicant/profile/applicant-profile";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
+import type { UploadImageOptions } from "@/types/applicant/profile/profile";
 
-
-interface UploadImageOptions {
-  bucket?: string;
-  folder?: string;
-  cacheControl?: string;
-  upsert?: boolean;
-}
 
 const defaultOptions: UploadImageOptions = {
   bucket: "codebility",

@@ -1,41 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCachedCareersJobListingsPage } from "@/lib/global/careers-job-listings-cached";
+import { DEFAULT_PAGE, DEFAULT_LIMIT, MAX_LIMIT, cacheHeaders } from "@/constants/api/careers-job-listings/careers-job-listings";
+import { parsePositiveInt, emptyPage } from "@/utils/api/careers-job-listings/careers-job-listings";
 
-const DEFAULT_PAGE = 1;
-const DEFAULT_LIMIT = 4;
-const MAX_LIMIT = 50;
-
-function parsePositiveInt(
-  value: string | null,
-  fallback: number,
-  max?: number,
-): number {
-  const parsed = Number.parseInt(value ?? "", 10);
-  if (!Number.isFinite(parsed) || parsed < 1) return fallback;
-  if (max !== undefined) return Math.min(parsed, max);
-  return parsed;
-}
-
-function emptyPage(
-  department: string,
-  type: string,
-  level: string,
-  page: number,
-  limit: number,
-) {
-  return {
-    jobs: [],
-    pagination: { page, limit, total: 0, totalPages: 0 },
-    department,
-    type,
-    level,
-  };
-}
-
-const cacheHeaders = {
-  "Cache-Control":
-    "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400",
-};
 
 export async function GET(request: NextRequest) {
   try {

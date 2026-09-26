@@ -3,14 +3,8 @@
 import LandingImage from "@/components/marketing/LandingImage";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { MouseEvent, useState } from "react";
+import type { FeaturesCardProps } from "@/types/marketing/marketing";
 
-interface FeaturesCardProps {
-  imageName: string;
-  imageAlt: string;
-  title: string;
-  description: string;
-  index?: number;
-}
 
 const FeaturesCard: React.FC<FeaturesCardProps> = ({
   imageName,

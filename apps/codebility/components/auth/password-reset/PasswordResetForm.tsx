@@ -8,17 +8,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { z } from "zod";
+
 
 import { resetUserPassword } from "@/actions/auth/password-reset/password-reset";
-/* import { createClientClientComponent } from "@/lib/global/supabase-client"; */
+import type { Inputs } from "@/types/auth/password-reset/password-reset";
+import { EmailValidation } from "@/utils/auth/password-reset/password-reset";
 
-// Define the schema for email validation
-const EmailValidation = z.object({
-  email: z.string().email("Invalid email address"),
-});
-
-type Inputs = z.infer<typeof EmailValidation>;
 
 const PasswordResetForm = () => {
   const [isLoading, setIsLoading] = useState(false);

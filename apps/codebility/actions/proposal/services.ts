@@ -1,35 +1,10 @@
 "use server";
 
 import { createClientServerComponent } from "@/lib/global/supabase-server";
+import { serviceWriteSchema } from "@/utils/proposal/proposal";
 import { Codev } from "@/types/global/codev";
-import { z } from "zod";
+import type { RealProject, ServiceWriteInput } from "@/types/proposal/proposal";
 
-export interface RealProject {
-  id: string;
-  name: string;
-  description?: string;
-  status?: string;
-  start_date?: string;
-  end_date?: string;
-  main_image?: string;
-  website_url?: string;
-  github_link?: string;
-  figma_link?: string;
-  tech_stack?: string[];
-  client_id?: string;
-  created_at?: string;
-  project_category_id?: number;
-  projects_category?: {
-    id: number;
-    name: string;
-    description?: string;
-  } | null;
-  categories?: {
-    id: number;
-    name: string;
-    description?: string;
-  }[];
-}
 
 // Fetch Real Projects from database
 export async function getRealProjects() {
@@ -113,17 +88,6 @@ export async function getCodevProfiles() {
   }
 }
 
-const serviceWriteSchema = z.object({
-  name: z.string().min(1, "Service name is required"),
-  description: z.string().min(1, "Description is required"),
-  price: z.number().min(0, "Price must be positive"),
-  duration: z.string().min(1, "Duration is required"),
-  features: z.array(z.string().min(1)).min(1, "At least one feature is required"),
-  category: z.string().min(1, "Category is required"),
-  is_active: z.boolean(),
-});
-
-type ServiceWriteInput = z.infer<typeof serviceWriteSchema>;
 
 async function requireAdminUser():
   Promise<

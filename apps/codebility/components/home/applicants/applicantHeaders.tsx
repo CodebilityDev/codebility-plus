@@ -4,36 +4,10 @@ import H1 from "@/components/global/layout/H1";
 import { ExperienceRanges, NewApplicantType } from "@/types/home/applicants/applicants";
 import ApplicantFiltersComponent from "@/components/home/applicants/applicantFilters";
 import ApplicantFiltersBadge from "@/components/home/applicants/applicantFiltersBadge";
-import ApplicantSorters, { SortOption } from "@/components/home/applicants/applicantSorters";
+import ApplicantSorters from "@/components/home/applicants/applicantSorters";
+import { SortOption } from "@/types/home/applicants/applicants";
+import type { ApplicantFilters } from "@/types/home/applicants/applicants";
 
-export type ApplicantFilters = {
-  hasPortfolio: boolean;
-  noPortfolio: boolean;
-  hasGithub: boolean;
-  noGithub: boolean;
-  experienceRanges: ExperienceRanges;
-  positions: Record<string, boolean>;
-  techStacks: Record<string, boolean>;
-  testStatus: {
-    taken: boolean;
-    notTaken: boolean;
-    overdue: boolean;
-  };
-  reminderCount: {
-    none: boolean;
-    low: boolean;
-    medium: boolean;
-    high: boolean;
-  };
-  applicationDate: {
-    last7Days: boolean;
-    last30Days: boolean;
-    last90Days: boolean;
-    custom: boolean;
-    startDate: string;
-    endDate: string;
-  };
-};
 
 export default function ApplicantFilterHeaders({
   applicants,

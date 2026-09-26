@@ -6,10 +6,8 @@ import AboutUsSlide from "@/components/auth/onboarding/OnboardingAboutUsSlide";
 import LaunchpadSlide from "@/components/auth/onboarding/OnboardingLaunchpadSlide";
 import MissionVisionSlide from "@/components/auth/onboarding/OnboardingMissionVisionSlide";
 import WhyChooseUsSlide from "@/components/auth/onboarding/OnboardingWhyChooseUsSlide";
+import type { AboutSlidesProps } from "@/types/auth/onboarding/onboarding";
 
-interface AboutSlidesProps {
-  slidesRef: RefObject<HTMLDivElement | null>;
-}
 
 export default function AboutSlides({ slidesRef }: AboutSlidesProps) {
   return (

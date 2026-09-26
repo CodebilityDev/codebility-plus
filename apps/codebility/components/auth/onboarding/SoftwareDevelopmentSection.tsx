@@ -1,60 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { cn } from "@/utils/global/cn";
+
 import { motion } from "framer-motion";
-import {
-  CloudCog,
-  Code2,
-  Palette,
-  Server,
-  Smartphone,
-  Users2,
-} from "lucide-react";
+import { CloudCog, Code2, Palette, Server, Smartphone, Users2 } from "lucide-react";
 
 import SoftwareDevelopmentBackground from "@/components/auth/onboarding/SoftwareDevelopmentBackground";
+import { techStacks } from "@/constants/auth/onboarding/onboarding";
 
-const techStacks = [
-  {
-    title: "Front End",
-    items: [
-      "React.js / Next.js",
-      "Tailwind CSS / Material UI",
-      "TypeScript / JavaScript",
-      "HTML5 / CSS3",
-    ],
-  },
-  {
-    title: "Back End",
-    items: [
-      "Node.js / Express.js",
-      "PostgreSQL / MongoDB",
-      "Prisma / Mongoose",
-      "Firebase / Supabase",
-    ],
-  },
-  {
-    title: "Mobile Development",
-    items: ["React Native", "Expo"],
-  },
-  {
-    title: "DevOps & Deployment",
-    items: [
-      "Docker",
-      "Vercel / Netlify",
-      "GitHub Actions",
-      "AWS / Digital Ocean",
-    ],
-  },
-  {
-    title: "UI/UX Design",
-    items: ["Figma", "Adobe XD"],
-  },
-  {
-    title: "Project Team & Management",
-    items: ["Notion", "Trello / Jira", "Slack / Discord", "GitHub Projects"],
-  },
-];
 
 export default function SoftwareDevelopmentSection() {
   const [isClient, setIsClient] = useState(false);

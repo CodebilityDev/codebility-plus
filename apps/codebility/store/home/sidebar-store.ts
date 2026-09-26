@@ -1,10 +1,6 @@
 import { create } from "zustand";
+import type { PostStore } from "@/types/home/home";
 
-interface PostStore {
-  isToggleOpen: boolean;
-  toggleNav: () => void;
-  closeNav: () => void;
-}
 
 export const useNavStore = create<PostStore>((set) => ({
   isToggleOpen: true,

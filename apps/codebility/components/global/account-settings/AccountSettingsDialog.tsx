@@ -8,31 +8,14 @@ import toast from "react-hot-toast";
 import { z } from "zod";
 
 import { Button } from "@codevs/ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@codevs/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@codevs/ui/form";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@codevs/ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@codevs/ui/form";
 import { Input } from "@codevs/ui/input";
 
 import AccountSettingsBackdrop from "@/components/global/account-settings/AccountSettingsBackDrop";
 import { createClientClientComponent } from "@/lib/global/supabase-client";
+import { emailChangeSchema } from "@/utils/global/account-settings";
 
-const emailChangeSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
-});
 
 export default function AccountSettingsDialog() {
   const [isOpen, setIsOpen] = useState<boolean>(false);

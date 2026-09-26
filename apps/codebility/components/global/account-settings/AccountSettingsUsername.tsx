@@ -5,18 +5,11 @@ import { Button } from "@codevs/ui/button";
 import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
 import { Copy, Check, Info, CheckCircle2, XCircle, Loader2 } from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@codevs/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@codevs/ui/tooltip";
 import { checkUsernameAvailability, updateUsername, getUsernameData } from "@/actions/global/account-settings";
 import { useToast } from "@codevs/ui/use-toast";
+import type { AccountSettingsUsernameProps } from "@/types/global/account-settings";
 
-interface AccountSettingsUsernameProps {
-  userId: string;
-}
 
 export default function AccountSettingsUsername({ userId }: AccountSettingsUsernameProps) {
   const [username, setUsername] = useState("");

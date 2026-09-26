@@ -1,48 +1,6 @@
-import {
-  IconDiscord,
-  IconFacebookWhite,
-  IconLinkedInWhite,
-} from "@/public/assets/svgs/index";
+import { IconDiscord, IconFacebookWhite, IconLinkedInWhite } from "@/public/assets/svgs/index";
+import type { AboutUsData, ConnectUsData, FeaturedSectionData, ServicesCard, MarketingCard, Service } from "@/types/global/constants";
 
-// Define types for each dataset
-export interface AboutUsData {
-  id: string;
-  title: string;
-  href: string;
-}
-
-export interface ConnectUsData {
-  id: string;
-  href: string;
-  icon: React.FC<React.SVGProps<SVGElement>>;
-}
-
-export interface FeaturedSectionData {
-  title: string;
-  description: string;
-  src: string;
-  alt: string;
-}
-
-export interface ServicesCardData {
-  title: string;
-  description: string;
-  imageUrl: string;
-  imageAlt: string;
-}
-
-export interface MarketingCardData {
-  title: string;
-  description: string;
-  url: string;
-  category?: string;
-}
-
-export interface Service {
-  id: string;
-  title: string;
-  starColor: "violet" | "teal"; // Limited to specific colors
-}
 
 // Data arrays with types applied
 export const aboutUsData: AboutUsData[] = [
@@ -118,7 +76,7 @@ export const FeaturedSectiondata: FeaturedSectionData[] = [
   },
 ];
 
-export const ServicesCardData: ServicesCardData[] = [
+export const ServicesCardData: ServicesCard[] = [
   {
     title: "Content Quality",
     description:
@@ -168,7 +126,7 @@ export const ServicesCardData: ServicesCardData[] = [
   },
 ];
 
-export const MarketingCardData: MarketingCardData[] = [
+export const MarketingCardData: MarketingCard[] = [
   {
     title: "AI Development",
     description:

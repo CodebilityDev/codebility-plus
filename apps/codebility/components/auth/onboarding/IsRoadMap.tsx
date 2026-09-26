@@ -4,10 +4,10 @@ import React, { forwardRef, useRef } from "react";
 
 import useOnboardingAnimations from "@/hooks/auth/onboarding/useOnboardingAnimations";
 import AnimatedRoadmapWrapper from "@/components/auth/onboarding/AnimatedRoadmapWrapper";
+import type { IsRoadMapProps } from "@/types/auth/onboarding/onboarding";
 
-type Props = React.HTMLAttributes<HTMLDivElement>;
 
-const IsRoadMap = forwardRef<HTMLDivElement, Props>(function IsRoadMap(
+const IsRoadMap = forwardRef<HTMLDivElement, IsRoadMapProps>(function IsRoadMap(
   { className = "", ...rest },
   roadmapRef,
 ) {

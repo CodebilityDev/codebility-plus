@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@codevs/ui/tabs";
 
 import { NewApplicantType } from "@/types/home/applicants/applicants";
 import { ApplicantDataTable } from "@/components/home/applicants/applicantDataTable";
-import { getApplicantColumns } from "@/components/home/applicants/applicantColumns";
+import { getApplicantColumns } from "@/utils/home/applicants/applicants";
 import ApplicantFilterHeaders from "@/components/home/applicants/applicantHeaders";
 
 function ApplicantLists({

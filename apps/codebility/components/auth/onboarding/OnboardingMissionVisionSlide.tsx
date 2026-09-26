@@ -1,4 +1,7 @@
 "use client";
+import { MissionIcon } from "@/components/auth/onboarding/MissionIcon";
+import { VisionIcon } from "@/components/auth/onboarding/VisionIcon";
+
 
 export default function MissionVisionSlide() {
   return (
@@ -61,35 +64,5 @@ export default function MissionVisionSlide() {
         </div>
       </div>
     </div>
-  );
-}
-
-// ✅ Icons (inline SVG)
-function VisionIcon() {
-  return (
-    <svg
-      className="h-8 w-8 text-purple-300"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      viewBox="0 0 24 24"
-    >
-      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" />
-      <circle cx="12" cy="12" r="3" />
-    </svg>
-  );
-}
-
-function MissionIcon() {
-  return (
-    <svg
-      className="h-8 w-8 text-teal-300"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      viewBox="0 0 24 24"
-    >
-      <path d="M12 19V6M5 12l7-7 7 7" />
-    </svg>
   );
 }

@@ -2,39 +2,8 @@
 
 import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
+import { items } from "@/constants/auth/onboarding/onboarding";
 
-const items = [
-  {
-    number: "01",
-    text: "A self-driven attitude — you’re responsible for your own learning",
-    color: "bg-cyan-400",
-  },
-  {
-    number: "02",
-    text: "Professionalism in communication, time management, and behavior",
-    color: "bg-emerald-400",
-  },
-  {
-    number: "03",
-    text: "Active participation in tasks, meetings, and community discussions",
-    color: "bg-rose-400",
-  },
-  {
-    number: "04",
-    text: "Respect for team members, deadlines, and project goals",
-    color: "bg-indigo-400",
-  },
-  {
-    number: "05",
-    text: "Willingness to grow from feedback and mistakes",
-    color: "bg-amber-400",
-  },
-  {
-    number: "06",
-    text: "Transparency — especially if you’re unavailable, struggling, or need support",
-    color: "bg-fuchsia-400",
-  },
-];
 
 export default function ExpectSectionLight() {
   const lineRef = useRef<HTMLDivElement>(null);

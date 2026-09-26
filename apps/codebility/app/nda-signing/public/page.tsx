@@ -1,35 +1,18 @@
 "use client";
 
-import React, { forwardRef, useEffect, useRef, useState } from "react";
+import { forwardRef, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { z } from "zod";
+
 
 import { Button } from "@codevs/ui/button";
 import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
+import type { UserInfo, SignatureCanvasRef, SignaturePadProps } from "@/types/nda-signing/public/public";
+import { UserInfoSchema } from "@/utils/nda-signing/public/public";
 
-// Define the validation schema for user information
-const UserInfoSchema = z.object({
-  first_name: z.string().min(1, "First name is required"),
-  last_name: z.string().min(1, "Last name is required"),
-});
-
-type UserInfo = z.infer<typeof UserInfoSchema>;
-
-type SignatureCanvasRef = {
-  clear: () => void;
-  isEmpty: () => boolean;
-  toDataURL: (type?: string, encoderOptions?: number) => string;
-};
-
-interface SignaturePadProps {
-  canvasProps?: React.CanvasHTMLAttributes<HTMLCanvasElement>;
-  backgroundColor?: string;
-  [key: string]: any;
-}
 
 // Dynamic signature pad component with loading state
 const SignaturePad = forwardRef<SignatureCanvasRef, SignaturePadProps>(

@@ -1,10 +1,6 @@
-import React, { ReactNode } from "react";
+import React from "react";
+import type { SectionProps } from "@/types/global/typography";
 
-interface SectionProps {
-  children: ReactNode;
-  className?: string;
-  id?: string;
-}
 
 const SectionWrapper: React.FC<SectionProps> = ({
   children,

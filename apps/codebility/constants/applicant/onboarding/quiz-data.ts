@@ -1,10 +1,5 @@
-export interface QuizQuestion {
-  id: number;
-  question: string;
-  options: string[];
-  correctAnswer: number; // index of correct option
-  explanation?: string;
-}
+import type { QuizQuestion } from "@/types/applicant/onboarding/onboarding";
+
 
 export const quizQuestions: QuizQuestion[] = [
   {

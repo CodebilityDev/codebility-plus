@@ -6,8 +6,8 @@ import { motion } from "framer-motion";
 import Container from "@/components/global/marketing/MarketingContainer";
 import Section from "@/components/global/marketing/MarketingSection";
 import AnimatedMetrics from "@/components/marketing/AnimatedMetrics";
-import ProgressiveMotion from "@/components/marketing/LandingProgressiveMotion";
-import { LandingWhyChooseSkeleton } from "@/components/marketing/LandingSectionSkeletons";
+import ProgressiveMotion from "@/components/global/marketing/ProgressiveMotion";
+import { LandingWhyChooseSkeleton } from "@/components/marketing/LandingWhyChooseSkeleton";
 
 const WhyChooseUs = () => {
   const stats = [

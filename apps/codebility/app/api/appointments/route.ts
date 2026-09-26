@@ -1,28 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import type { AppointmentBody } from "@/types/api/appointments/appointments";
+
 
 export const runtime = "nodejs";
-
-// ─── Request body type ─────────────────────────────────────────────────────
-
-interface AppointmentBody {
-  firstName: string;
-  lastName: string;
-  email: string;
-  companyName: string;
-  phoneNumber: string;
-  industry: string;
-  serviceInterest: string;
-  projectType: string;
-  featuresNeeded: string;
-  referralSource: string;
-  interestLevel: number;
-  otherRequirements: string;
-  appointmentDate: string;
-  appointmentTime: string;
-  meetingType: string;
-  meetingToolOther: string | null;
-}
 
 // ─── POST handler ──────────────────────────────────────────────────────────
 

@@ -1,12 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
+import type { Intern } from "@/types/api/all-active-interns-codev/all-active-interns-codev";
 
-type Intern = {
-  name: string;
-  role: string;
-  image?: string;
-  display_position?: string;
-};
 
 export async function GET() {
   try {

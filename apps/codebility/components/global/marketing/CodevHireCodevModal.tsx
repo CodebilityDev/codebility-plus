@@ -18,7 +18,6 @@ import {
   type HireCodevEmail,
 } from "@/types/global/hire-codev-email";
 
-export type { HireCodevEmail } from "@/types/global/hire-codev-email";
 
 export function CodevHireCodevModal() {
 	const { isOpen, onClose, type, data: codevId } = useModal();

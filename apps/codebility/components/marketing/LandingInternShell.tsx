@@ -6,7 +6,7 @@ import { Button } from "@/components/global/ui/button";
 
 import Section from "@/components/global/marketing/MarketingSection";
 import BlueBg from "@/components/marketing/LandingBlueBg";
-import ProgressiveMotion from "@/components/marketing/LandingProgressiveMotion";
+import ProgressiveMotion from "@/components/global/marketing/ProgressiveMotion";
 import LandingInternSkeleton from "@/components/marketing/LandingInternSkeleton";
 
 export default function LandingInternShell({

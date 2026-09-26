@@ -3,13 +3,8 @@
 import Link from "next/link";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { MouseEvent } from "react";
+import type { HeroCardProps } from "@/types/marketing/marketing";
 
-interface HeroCardProps {
-  title: string;
-  description: string;
-  url?: string;
-  category?: string;
-}
 
 const HeroCard: React.FC<HeroCardProps> = ({ title, description, url = "#", category }) => {
   const x = useMotionValue(0);

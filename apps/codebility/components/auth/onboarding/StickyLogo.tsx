@@ -1,10 +1,7 @@
 import { RefObject } from "react";
 import Image from "next/image";
+import type { StickyLogoProps } from "@/types/auth/onboarding/onboarding";
 
-type StickyLogoProps = {
-  logoRef: RefObject<HTMLDivElement | null>;
-  isVisible: boolean;
-};
 
 export default function StickyLogo({ logoRef, isVisible }: StickyLogoProps) {
   const isDesktop = typeof window !== "undefined" && window.innerWidth >= 1024;

@@ -1,10 +1,10 @@
-import { pageSize } from "@/constants/global/page-size";
+
 import { getCachedServicesProjectsPage } from "@/lib/global/services-projects-cached";
 
 import { ServicesPageContent } from "@/components/marketing/services/ServicesPageContent";
 import { ClientTechyBackground } from "@/components/marketing/services/ClientTechyBackground";
+import { PAGE_SIZE } from "@/constants/marketing/services/services";
 
-const PAGE_SIZE = pageSize.services;
 
 export async function ServicesPageView() {
   const initialData = await getCachedServicesProjectsPage("all", 1, PAGE_SIZE);

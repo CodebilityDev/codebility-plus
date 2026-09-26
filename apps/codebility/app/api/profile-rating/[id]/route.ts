@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClientAnon } from "@/lib/global/supabase-anon";
+import { cacheHeaders } from "@/constants/api/profile-rating/profile-rating";
 
-const cacheHeaders = {
-  "Cache-Control":
-    "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400",
-};
 
 export async function GET(
   _request: NextRequest,

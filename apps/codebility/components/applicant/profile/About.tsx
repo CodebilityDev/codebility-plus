@@ -3,12 +3,9 @@
 import { useState, useEffect } from "react";
 import Box from "@/components/global/layout/Box";
 import { Button } from "@/components/global/ui/button";
-import {
-  useInvalidateProfilePoints,
-  useProfilePoints,
-} from "@/hooks/applicant/profile/use-profile-points";
+import { useInvalidateProfilePoints, useProfilePoints } from "@/hooks/applicant/profile/use-profile-points";
 import { IconEdit } from "@/public/assets/svgs/index";
-import { Codev } from "@/types/global/codev";
+
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
@@ -16,16 +13,8 @@ import { Label } from "@codevs/ui/label";
 import { Textarea } from "@codevs/ui/textarea";
 
 import { updateCodev } from "@/actions/applicant/profile/applicant-profile";
+import type { AboutProps, FormValues, ProfilePointEntry } from "@/types/applicant/profile/profile";
 
-type AboutProps = {
-  data: Codev;
-};
-
-type FormValues = {
-  about: string;
-};
-
-type ProfilePointEntry = { category: string; points: number };
 
 const About = ({ data }: AboutProps) => {
   const [isEditMode, setIsEditMode] = useState(false);

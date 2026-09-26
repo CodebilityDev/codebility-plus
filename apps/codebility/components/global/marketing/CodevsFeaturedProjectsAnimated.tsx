@@ -1,18 +1,15 @@
 "use client";
 
-import type { EmblaOptionsType } from "embla-carousel";
+
 
 import MarketingProgressiveSection from "@/components/global/marketing/MarketingProgressiveSection";
 import ProgressiveMotion from "@/components/global/marketing/ProgressiveMotion";
 import EmblaCarousel from "@/components/global/marketing/CodevsCarousel";
 import Section from "@/components/global/marketing/CodevsSection";
+import type { CodevsFeaturedProjectsAnimatedProps } from "@/types/global/marketing";
 
-type Props = {
-  slides: string[];
-  options: EmblaOptionsType;
-};
 
-export function CodevsFeaturedProjectsAnimated({ slides, options }: Props) {
+export function CodevsFeaturedProjectsAnimated({ slides, options }: CodevsFeaturedProjectsAnimatedProps) {
   const skeleton = (
     <>
       <div className="mb-10 space-y-2">

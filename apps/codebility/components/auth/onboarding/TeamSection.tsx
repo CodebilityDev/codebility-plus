@@ -1,84 +1,12 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { cn } from "@/utils/global/cn";
+import { useEffect, useState } from "react";
+
 import { getTeamData } from "@/actions/auth/onboarding/onboarding-team";
+import { PersonCard } from "@/components/auth/onboarding/PersonCard";
+import { TeamSectionAvatar } from "@/components/auth/onboarding/TeamSectionAvatar";
+import type { Person } from "@/types/auth/onboarding/onboarding";
 
-// -------------------------
-// Types
-// -------------------------
-type Person = {
-  name: string;
-  role: string;
-  image?: string;
-};
-
-// -------------------------
-// Avatar
-// -------------------------
-function Avatar({
-  person,
-  size = 72,
-  position = "center top"
-}: {
-  person: Person;
-  size?: number;
-  position?: string;
-}) {
-  const initials = (person.name || "")
-    .split(" ")
-    .slice(0, 2)
-    .map((n) => n[0] ?? "")
-    .join("")
-    .toUpperCase();
-
-  return person.image ? (
-    <div
-      className="rounded-full shadow-md ring-2 ring-white/20 overflow-hidden flex-shrink-0 relative bg-gray-200"
-      style={{ height: size, width: size, minWidth: size, minHeight: size }}
-    >
-      <img
-        src={person.image}
-        alt={person.name}
-        className="absolute top-1/2 left-1/2 object-cover"
-        style={{
-          objectPosition: position,
-          width: `${size * 1.2}px`,
-          height: `${size * 1.2}px`,
-          transform: "translate(-50%, -50%)",
-          minWidth: `${size * 1.2}px`,
-          minHeight: `${size * 1.2}px`
-        }}
-        loading="lazy"
-      />
-    </div>
-  ) : (
-    <div
-      className={cn(
-        "grid place-items-center rounded-full bg-white/10 text-white shadow-md ring-2 ring-white/15 flex-shrink-0"
-      )}
-      style={{ height: size, width: size, minWidth: size, minHeight: size }}
-      aria-hidden
-    >
-      <span className="text-xl font-bold">{initials}</span>
-    </div>
-  );
-}
-
-// -------------------------
-// PersonCard
-// -------------------------
-function PersonCard({ person }: { person: Person }) {
-  return (
-    <div className="flex flex-col items-center gap-2 text-center">
-      <Avatar person={person} size={80} />
-      <div className="min-w-0">
-        <h4 className="text-sm font-semibold text-white/90">{person.name}</h4>
-        <p className="truncate text-xs text-white/60">{person.role}</p>
-      </div>
-    </div>
-  );
-}
 
 // -------------------------
 // TeamSection
@@ -166,7 +94,7 @@ export default function TeamSection() {
             <div>
               <h3 className="mb-4 text-center text-lg font-bold tracking-tight text-white/85">CEO</h3>
               <div className="flex flex-col items-center gap-3 text-center">
-                <Avatar person={ceo} size={140} />
+                <TeamSectionAvatar person={ceo} size={140} />
                 <div>
                   <h4 className="text-2xl font-extrabold tracking-tight text-white/90">{ceo.name}</h4>
                   <p className="mt-1 text-sm text-white/60">{ceo.role}</p>

@@ -1,25 +1,13 @@
 import React, { useRef } from "react";
 import { Button } from "@/components/global/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/global/ui/select";
-import { Codev } from "@/types/global/codev";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/global/ui/select";
+
 
 import { removeArrayDuplicate } from "@/utils/global/marketing-array";
+import type { CodevListFilterProps } from "@/types/global/marketing";
 
-interface Props {
-  selectedPosition: string;
-  setSelectedPosition: (position: string) => void;
-  users: Codev[];
-  positions?: string[];
-}
 
-const CodevListFilter: React.FC<Props> = ({
+const CodevListFilter: React.FC<CodevListFilterProps> = ({
   selectedPosition,
   setSelectedPosition,
   users,

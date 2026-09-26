@@ -4,34 +4,25 @@ import { Suspense, use, useState, useTransition } from "react";
 import Link from "next/link";
 import Container from "@/components/global/marketing/MarketingContainer";
 import Section from "@/components/global/marketing/MarketingSection";
-import DefaultPagination from "@/components/global/ui/DefaultPagination";
-import {
-  SERVICES_CATEGORY_TABS,
-  type ServicesCategorySlug,
-} from "@/constants/global/services-categories";
+
+import { SERVICES_CATEGORY_TABS } from "@/constants/global/services-categories";
+import type { ServicesCategorySlug } from "@/types/global/constants";
 import { useMarketingPageUrl } from "@/hooks/global/use-marketing-page-url";
 import { categoryHref } from "@/utils/global/services-categories";
-import type { ServicesProjectsPage } from "@/lib/global/services-projects-cached";
+import type { ServicesProjectsPage } from "@/types/global/lib";
 import { fetchApiJson } from "@/utils/global/api-fetch";
 
-import type { ServiceProject } from "@/components/marketing/services/ServicesServiceCard";
-import { ServicesGridSkeleton, servicesProjectsGridClass } from "@/components/marketing/services/ServicesGridSkeleton";
-import { ServicesServiceCard } from "@/components/marketing/services/ServicesServiceCard";
+import type { ServiceProject } from "@/types/marketing/services/services";
+import { ServicesGridSkeleton } from "@/components/marketing/services/ServicesGridSkeleton";
+import { ServicesPaginationSlot } from "@/components/marketing/services/ServicesPaginationSlot";
+import { ServicesProjectsGrid } from "@/components/marketing/services/ServicesProjectsGrid";
+import type { ServicesTabProps } from "@/types/marketing/services/services";
+import { pageCacheKey, filterCacheKey, resolveSkeletonCount } from "@/utils/marketing/services/services";
+
+
 
 const pagePromises = new Map<string, Promise<ServicesProjectsPage>>();
 const pageMetaCache = new Map<string, ServicesProjectsPage["pagination"]>();
-
-function pageCacheKey(
-  category: ServicesCategorySlug,
-  page: number,
-  pageSize: number,
-) {
-  return `${category}:${page}:${pageSize}`;
-}
-
-function filterCacheKey(category: ServicesCategorySlug, pageSize: number) {
-  return `${category}:${pageSize}`;
-}
 
 function rememberPagination(
   category: ServicesCategorySlug,
@@ -106,54 +97,6 @@ function loadPage(
   return promise;
 }
 
-function resolveSkeletonCount(
-  page: number,
-  pageSize: number,
-  total: number,
-) {
-  if (total <= 0) {
-    return pageSize;
-  }
-
-  const remaining = total - (page - 1) * pageSize;
-  return Math.min(pageSize, Math.max(1, remaining));
-}
-
-function ServicesProjectsGrid({
-  projects,
-  page,
-  onServiceSelect,
-}: {
-  projects: ServiceProject[];
-  page: number;
-  onServiceSelect?: (service: ServiceProject) => void;
-}) {
-  if (projects.length === 0) {
-    return (
-      <div className="py-20 text-center text-white">
-        No projects available for this category
-      </div>
-    );
-  }
-
-  return (
-    <div key={page} className={servicesProjectsGridClass}>
-      {projects.map((project, index) => (
-        <div
-          key={project.id}
-          className="animate-fade-in-up aspect-square w-full"
-          style={{
-            animationDelay: `${index * 80}ms`,
-            animationFillMode: "both",
-          }}
-        >
-          <ServicesServiceCard service={project} onSelect={onServiceSelect} />
-        </div>
-      ))}
-    </div>
-  );
-}
-
 function ServicesTabRemote({
   category,
   page,
@@ -215,51 +158,12 @@ function ServicesTabGrid({
   );
 }
 
-function ServicesPaginationSlot({
-  page,
-  totalPages,
-  onPageChange,
-}: {
-  page: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
-}) {
-  if (totalPages <= 1) {
-    return <div className="mt-6 min-h-[4.5rem]" aria-hidden="true" />;
-  }
-
-  const currentPage = Math.min(page, totalPages);
-
-  return (
-    <div id="services-pagination" className="mt-6 min-h-[4.5rem] text-white">
-      <DefaultPagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        handleNextPage={() => {
-          onPageChange(Math.min(totalPages, currentPage + 1));
-        }}
-        handlePreviousPage={() => {
-          onPageChange(Math.max(1, currentPage - 1));
-        }}
-        setCurrentPage={onPageChange}
-      />
-    </div>
-  );
-}
-
-interface Props {
-  initialData: ServicesProjectsPage;
-  category: ServicesCategorySlug;
-  pageSize: number;
-  onServiceSelect?: (service: ServiceProject) => void;
-}
-
 export const ServicesTab = ({
   initialData,
   category,
   pageSize,
   onServiceSelect,
-}: Props) => {
+}: ServicesTabProps) => {
   const [page, setPage] = useState(initialData.pagination.page);
   const [, startTransition] = useTransition();
 

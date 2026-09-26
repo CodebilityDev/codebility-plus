@@ -1,12 +1,10 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { ReactNode } from "react";
-import { useNavStore } from "@/store/home/sidebar-store";
 
-interface ConditionalMainWrapperProps {
-  children: ReactNode;
-}
+import { useNavStore } from "@/store/home/sidebar-store";
+import type { ConditionalMainWrapperProps } from "@/types/home/home";
+
 
 export default function ConditionalMainWrapper({ children }: ConditionalMainWrapperProps) {
   const pathname = usePathname();

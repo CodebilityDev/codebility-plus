@@ -7,14 +7,7 @@ import ApplicantStep1 from "@/components/applicant/waiting/applicantStep1";
 import ApplicantStep2 from "@/components/applicant/waiting/applicantStep2";
 import ApplicantStep3 from "@/components/applicant/waiting/applicantStep3";
 import ApplicantStep4 from "@/components/applicant/waiting/applicantStep4";
-import {
-  Stepper,
-  StepperBody,
-  StepperConnector,
-  StepperContent,
-  StepperHeader,
-  StepperStep,
-} from "@/components/applicant/waiting/Stepper";
+import { Stepper, StepperBody, StepperConnector, StepperContent, StepperHeader, StepperStep } from "@/components/applicant/waiting/Stepper";
 
 export default function ApplicationSteps({
   user,

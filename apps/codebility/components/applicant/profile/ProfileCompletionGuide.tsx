@@ -1,130 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ChevronDown, ChevronUp, Minimize2, Maximize2, NotebookTabs, CheckCircle2, Circle, TrendingUp, Award } from "lucide-react";
+import { ChevronDown, ChevronUp, Minimize2, Maximize2, CheckCircle2, Circle, TrendingUp, Award } from "lucide-react";
 import Box from "@/components/global/layout/Box";
 import { getClientSupabase } from "@/lib/global/supabase-client";
+import { ProfileCompletionGuideBadge } from "@/components/applicant/profile/ProfileCompletionGuideBadge";
+import { ProgressBar } from "@/components/applicant/profile/ProgressBar";
+import { SectionProgress } from "@/components/applicant/profile/SectionProgress";
+import type { ProfilePointsData } from "@/types/applicant/profile/profile";
 
-// Types for profile points data
-interface ProfilePointsData {
-  totalPoints: number;
-  maxPossiblePoints: number;
-  completionPercentage: number;
-  completionDetails: Record<string, {
-    completed: boolean;
-    points: number;
-    maxPoints: number;
-    description?: string;
-    itemCount?: number;
-    maxItems?: number;
-  }>;
-  summary: {
-    profileSections: {
-      basicInfo: { points: number; maxPoints: number; completed: boolean };
-      socialLinks: { points: number; maxPoints: number; completed: boolean };
-      professionalInfo: { points: number; maxPoints: number; completed: boolean };
-    };
-    datacounts: {
-      workExperiences: number;
-      educationEntries: number;
-      techSkills: number;
-      positions: number;
-    };
-  };
-}
-
-const Badge = ({
-  children,
-  variant,
-  className,
-}: {
-  children?: React.ReactNode;
-  variant?: "secondary" | "outline" | "success" | "warning";
-  className?: string;
-}) => {
-  const base =
-    "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold";
-  const variants: Record<string, string> = {
-    secondary: "bg-gray-700 text-gray-200",
-    outline: "border border-gray-600 text-gray-300",
-    success: "bg-green-500/20 text-green-400 border border-green-500/30",
-    warning: "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30",
-  };
-  const variantClass = variant ? variants[variant] ?? "" : "";
-  return (
-    <span className={`${base} ${variantClass} ${className ?? ""}`.trim()}>
-      {children}
-    </span>
-  );
-};
-
-// Modern Progress Bar Component
-const ProgressBar = ({ 
-  percentage, 
-  className = "",
-  showLabel = true,
-  size = "default"
-}: { 
-  percentage: number; 
-  className?: string;
-  showLabel?: boolean;
-  size?: "small" | "default" | "large";
-}) => {
-  const heights = {
-    small: "h-2",
-    default: "h-3",
-    large: "h-4"
-  };
-
-  return (
-    <div className={`w-full ${className}`}>
-      <div className={`bg-gray-700 rounded-full overflow-hidden ${heights[size]}`}>
-        <div
-          className="h-full bg-gradient-to-r from-purple-500 to-blue-500 rounded-full transition-all duration-700 ease-out"
-          style={{ width: `${Math.min(percentage, 100)}%` }}
-        />
-      </div>
-      {showLabel && (
-        <div className="flex justify-between items-center mt-1">
-          <span className="text-xs text-gray-400">Profile Completion</span>
-          <span className="text-xs font-medium text-white">{percentage}%</span>
-        </div>
-      )}
-    </div>
-  );
-};
-
-// Section Progress Component
-const SectionProgress = ({ 
-  title, 
-  points, 
-  maxPoints, 
-  icon: Icon,
-  completed 
-}: { 
-  title: string; 
-  points: number; 
-  maxPoints: number; 
-  icon: any;
-  completed: boolean;
-}) => {
-  const percentage = maxPoints > 0 ? Math.round((points / maxPoints) * 100) : 0;
-  
-  return (
-    <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-800/30 border border-gray-700">
-      <div className={`p-2 rounded-lg ${completed ? 'bg-green-500/20' : 'bg-gray-700/50'}`}>
-        <Icon className={`w-4 h-4 ${completed ? 'text-green-400' : 'text-gray-400'}`} />
-      </div>
-      <div className="flex-1">
-        <div className="flex items-center justify-between mb-1">
-          <span className="text-sm font-medium text-gray-200">{title}</span>
-          <span className="text-xs text-gray-400">{points}/{maxPoints} pts</span>
-        </div>
-        <ProgressBar percentage={percentage} showLabel={false} size="small" />
-      </div>
-    </div>
-  );
-};
 
 export default function ProfileCompletionGuide() {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -306,9 +190,9 @@ export default function ProfileCompletionGuide() {
             <h2 className="text-xl font-semibold text-white tracking-tight flex items-center gap-2">
               <Award className="w-5 h-5 text-purple-400" />
               Profile Completion
-              <Badge variant="secondary" className="ml-2">
+              <ProfileCompletionGuideBadge variant="secondary" className="ml-2">
                 {profileData.totalPoints}/{profileData.maxPossiblePoints} pts
-              </Badge>
+              </ProfileCompletionGuideBadge>
             </h2>
             {isExpanded ? (
               <Minimize2 className="w-5 h-5 text-gray-400 transition-transform duration-300" />
@@ -393,17 +277,17 @@ export default function ProfileCompletionGuide() {
                         {task.title}
                       </span>
                       {task.points > 0 && (
-                        <Badge 
+                        <ProfileCompletionGuideBadge 
                           variant={task.completed ? "success" : "outline"} 
                           className="ml-2"
                         >
                           {task.points}/{task.maxPoints} pts
-                        </Badge>
+                        </ProfileCompletionGuideBadge>
                       )}
                       {!task.completed && task.maxPoints > 0 && (
-                        <Badge variant="warning" className="ml-2">
+                        <ProfileCompletionGuideBadge variant="warning" className="ml-2">
                           +{task.maxPoints - task.points} available
-                        </Badge>
+                        </ProfileCompletionGuideBadge>
                       )}
                     </div>
                   </div>

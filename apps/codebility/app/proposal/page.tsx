@@ -2,18 +2,11 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { getRealProjects, RealProject, getCodevProfiles } from "@/actions/proposal/services";
-import { techstacks } from '@/constants/global/techstack';
+import { getRealProjects, getCodevProfiles } from "@/actions/proposal/services";
+import { RealProject } from "@/types/proposal/proposal";
+import type { Service } from "@/types/proposal/proposal";
 
-interface Service {
-  id: string;
-  name: string;
-  description: string;
-  category: string;
-  features: string[];
-  price?: string;
-  duration?: string;
-}
+
 
 export default function ProposalPage() {
   const [realProjects, setRealProjects] = useState<RealProject[]>([]);

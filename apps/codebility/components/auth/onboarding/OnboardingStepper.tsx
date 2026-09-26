@@ -3,19 +3,8 @@
 import { useEffect, useState } from "react";
 import { cn } from "@/utils/global/cn";
 import { Check } from "lucide-react";
+import { SECTIONS } from "@/constants/auth/onboarding/onboarding";
 
-// Section configuration - maps to each wrapper component
-// Line 9-17: Section labels array
-const SECTIONS = [
-  { id: "about-section", label: "About Us" },
-  { id: "software", label: "Software Development" },
-  { id: "expect", label: "What to Expect" },
-  { id: "roadmap", label: "Your Roadmap" },
-  { id: "house-rules", label: "House Rules" },
-  { id: "team", label: "Meet the Team" },
-  { id: "partners", label: "Our Partners" },
-  { id: "welcome", label: "Signup Now!" }, // ✅ CHANGED: "Welcome Aboard" → "Signup Now!"
-];
 
 export default function OnboardingStepper() {
   const [activeSection, setActiveSection] = useState<string>(SECTIONS[0]?.id || "about-section");

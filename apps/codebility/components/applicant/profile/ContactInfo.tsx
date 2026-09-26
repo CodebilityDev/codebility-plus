@@ -4,10 +4,7 @@ import { useEffect, useState } from "react";
 import Box from "@/components/global/layout/Box";
 import InputField from "@/components/global/layout/InputPhone";
 import { Button } from "@/components/global/ui/button";
-import {
-  useInvalidateProfilePoints,
-  useProfilePoints,
-} from "@/hooks/applicant/profile/use-profile-points";
+
 import { IconEdit } from "@/public/assets/svgs/index";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -15,27 +12,8 @@ import toast from "react-hot-toast";
 import { Input } from "@codevs/ui/input";
 
 import { updateSocialLinks } from "@/actions/applicant/profile/applicant-profile";
+import type { ContactInfoProps, ContactInfoFormValues } from "@/types/applicant/profile/profile";
 
-type ContactInfoProps = {
-  data: {
-    id?: string;
-    facebook?: string | null;
-    linkedin?: string | null;
-    github?: string | null;
-    discord?: string | null;
-    portfolio_website?: string | null;
-    phone_number?: string | null;
-  };
-};
-
-type FormValues = {
-  facebook?: string;
-  linkedin?: string;
-  github?: string;
-  discord?: string;
-  portfolio_website?: string;
-  phone_number?: string;
-};
 
 const ContactInfo = ({ data }: ContactInfoProps) => {
   const [isEditMode, setIsEditMode] = useState(false);
@@ -49,7 +27,7 @@ const ContactInfo = ({ data }: ContactInfoProps) => {
     control,
     watch,
     formState: { isDirty },
-  } = useForm<FormValues>({
+  } = useForm<ContactInfoFormValues>({
     defaultValues: {
       phone_number: data.phone_number || "",
       portfolio_website: data.portfolio_website || "",
@@ -90,7 +68,7 @@ const ContactInfo = ({ data }: ContactInfoProps) => {
     checkContactPoints();
   }, [data.id, data.phone_number, data.github, data.facebook, data.linkedin, data.discord, data.portfolio_website]);
 
-  const onSubmit = async (formData: FormValues) => {
+  const onSubmit = async (formData: ContactInfoFormValues) => {
     const toastId = toast.loading("Your contact info is being updated");
     try {
       setIsLoading(true);

@@ -1,4 +1,7 @@
 import z from 'zod';
+import { ColumnDef, Table as ReactTable } from "@tanstack/react-table";
+import { ReactNode } from "react";
+
 
 export const newApplicantsSchema = z.object({
     id: z.string(),
@@ -60,3 +63,86 @@ export type ExperienceRanges = {
   intermediate: boolean; // 3-5 years
   expert: boolean; // 5+ years
 };
+
+export interface DataTableProps<TData extends NewApplicantType, TValue> {
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+}
+
+export type ApplicantFilters = {
+  hasPortfolio: boolean;
+  noPortfolio: boolean;
+  hasGithub: boolean;
+  noGithub: boolean;
+  experienceRanges: ExperienceRanges;
+  positions: Record<string, boolean>;
+  techStacks: Record<string, boolean>;
+  testStatus: {
+    taken: boolean;
+    notTaken: boolean;
+    overdue: boolean;
+  };
+  reminderCount: {
+    none: boolean;
+    low: boolean;
+    medium: boolean;
+    high: boolean;
+  };
+  applicationDate: {
+    last7Days: boolean;
+    last30Days: boolean;
+    last90Days: boolean;
+    custom: boolean;
+    startDate: string;
+    endDate: string;
+  };
+};
+
+export interface ApplicantMobileTableProps<TData extends NewApplicantType> {
+  table: ReactTable<TData>;
+}
+
+export interface BoundaryProps {
+  children: ReactNode;
+}
+
+export interface BoundaryState {
+  hasError: boolean;
+}
+
+export type SortOption = {
+  field: string;
+  direction: "asc" | "desc";
+  label: string;
+};
+
+export type StageState = "completed" | "current" | "pending" | "denied";
+
+export interface DerivedStage {
+  key: PipelineStageKey;
+  label: string;
+  state: StageState;
+  /** ISO timestamp string for the stage, or null when unavailable. */
+  timestamp: string | null;
+}
+
+export interface DerivedTimeline {
+  stages: DerivedStage[];
+  /** True when the application_status could not be matched to a stage. */
+  statusUnrecognized: boolean;
+}
+
+export type PipelineStageKey =
+  | "applying"
+  | "testing"
+  | "onboarding"
+  | "waitlist";
+
+export interface PipelineStageDefinition {
+  /** Stable key matching the relevant application_status values. */
+  key: PipelineStageKey;
+  /** Human-readable label rendered in the timeline. */
+  label: string;
+  /** Sequential order position (ascending). */
+  order: number;
+}

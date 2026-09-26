@@ -1,8 +1,4 @@
-interface footerLinksType {
-  id: string;
-  title: string;
-  href: string;
-}
+
 
 export const aboutLinks = [
   { label: "What We Do", url: "/" },

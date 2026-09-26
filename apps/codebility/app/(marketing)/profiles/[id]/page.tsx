@@ -2,25 +2,16 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Paragraph from "@/components/global/typography/Paragraph";
 import Logo from "@/components/global/layout/Logo";
-import {
-  getCachedProfileDetail,
-  getCachedProfileDetailMeta,
-} from "@/lib/marketing/profiles/profile-detail-cached";
-import {
-  getCachedLandingAdminsData,
-  getLandingAdminsProfileIds,
-} from "@/lib/global/landing-admins-cached";
+import { getCachedProfileDetail, getCachedProfileDetailMeta } from "@/lib/marketing/profiles/profile-detail-cached";
+import { getCachedLandingAdminsData, getLandingAdminsProfileIds } from "@/lib/global/landing-admins-cached";
 import { getCachedLandingInternsPage } from "@/lib/global/landing-interns-cached";
 
-import JsonLd from "@/components/global/marketing/JsonLd";
+
 import ProfileCloseButton from "@/components/marketing/profiles/ProfileDetailCloseButton";
 import ProfileContent from "@/components/marketing/profiles/ProfileDetailContent";
+import { LANDING_PAGE_SIZE } from "@/constants/marketing/profiles/profiles";
+import type { ProfilesIdPageProps } from "@/types/marketing/profiles/profiles";
 
-interface Props {
-  params: Promise<{ id: string }>;
-}
-
-const LANDING_PAGE_SIZE = 10;
 
 export async function generateStaticParams() {
   const [landing, adminsData] = await Promise.all([
@@ -43,7 +34,7 @@ export async function generateStaticParams() {
   return [...ids].map((id) => ({ id }));
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({ params }: ProfilesIdPageProps): Promise<Metadata> {
   const { id } = await params;
   const profile = await getCachedProfileDetailMeta(id);
 
@@ -78,7 +69,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function CodevBioPage(props: Props) {
+export default async function CodevBioPage(props: ProfilesIdPageProps) {
   const { id } = await props.params;
   const codev = await getCachedProfileDetail(id);
 

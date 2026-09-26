@@ -1,15 +1,11 @@
 import "server-only";
 import { cookies } from "next/headers";
 
-import z from "zod";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
+import type { User } from "@/types/applicant/profile/profile";
+import { UserSchema } from "@/utils/applicant/profile/profile";
 
-const UserSchema = z.object({
-    id: z.string(),
-    email: z.string().optional()
-});
 
-type User = z.infer<typeof UserSchema>;
 
 export async function cachedUser(): Promise<User | null> {
     const supabase = await createClientServerComponent();

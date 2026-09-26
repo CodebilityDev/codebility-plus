@@ -10,9 +10,8 @@ import FeaturedCard from "@/components/global/marketing/CodevsFeaturedCard";
 import MarketingProgressiveSection from "@/components/global/marketing/MarketingProgressiveSection";
 import ProgressiveMotion from "@/components/global/marketing/ProgressiveMotion";
 import Section from "@/components/global/marketing/CodevsSection";
+import { inter, outfit } from "@/constants/global/marketing";
 
-export const inter = { className: "font-sans" };
-export const outfit = { className: "font-sans" };
 
 const FeaturedSection = () => {
   const skeleton = (

@@ -1,11 +1,9 @@
 "use client";
 
-import { ReactNode } from "react";
-import { useNavStore } from "@/store/home/sidebar-store";
 
-interface DynamicMainContentProps {
-  children: ReactNode;
-}
+import { useNavStore } from "@/store/home/sidebar-store";
+import type { DynamicMainContentProps } from "@/types/home/home";
+
 
 export default function DynamicMainContent({ children }: DynamicMainContentProps) {
   const { isToggleOpen } = useNavStore();

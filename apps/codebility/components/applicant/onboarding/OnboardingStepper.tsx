@@ -1,13 +1,9 @@
 "use client";
 
 import React from "react";
-import { OnboardingProgressType } from "@/types/applicant/onboarding/applicant-onboarding";
+import type { OnboardingStepperProps } from "@/types/applicant/onboarding/onboarding";
 
-interface OnboardingStepperProps {
-  progress: OnboardingProgressType;
-  currentVideo: number;
-  onStepClick?: (step: number) => void;
-}
+
 
 export default function OnboardingStepper({
   progress,

@@ -1,8 +1,8 @@
 "use client";
 
-import { useCallback, useMemo, useSyncExternalStore } from "react";
+import { useCallback, useSyncExternalStore } from "react";
+import type { Listener } from "@/types/global/hooks";
 
-type Listener = () => void;
 
 const listenersByKey = new Map<string, Set<Listener>>();
 

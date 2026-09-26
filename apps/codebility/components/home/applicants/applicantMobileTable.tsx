@@ -1,23 +1,14 @@
 "use client";
 
-import React from "react";
+
 import { getTestDate } from "@/utils/global/applicant-waiting";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/home/applicants/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/home/applicants/table";
 import { cn } from "@/utils/global/cn";
-import { flexRender, Table as ReactTable } from "@tanstack/react-table";
+import { flexRender } from "@tanstack/react-table";
 
 import { NewApplicantType } from "@/types/home/applicants/applicants";
+import type { ApplicantMobileTableProps } from "@/types/home/applicants/applicants";
 
-interface ApplicantMobileTableProps<TData extends NewApplicantType> {
-  table: ReactTable<TData>;
-}
 
 function ApplicantMobileTable<TData extends NewApplicantType>({
   table,

@@ -4,7 +4,7 @@ import { Suspense, use } from "react";
 import { fetchApiJson } from "@/utils/global/api-fetch";
 
 import StarRating from "@/components/marketing/profiles/ProfileDetailStarRating";
-import { ProfileRatingSkeleton } from "@/components/marketing/profiles/ProfileDetailSkeleton";
+import { ProfileRatingSkeleton } from "@/components/marketing/profiles/ProfileRatingSkeleton";
 
 const ratingPromises = new Map<string, Promise<number>>();
 

@@ -5,14 +5,13 @@ import pathsConfig from "@/constants/global/paths";
 
 import MarketingProgressiveSection from "@/components/global/marketing/MarketingProgressiveSection";
 import OrbitingCirclesBackground from "@/components/marketing/codevs/CodevsOrbitingCirclesBg";
+import { heroContentClassName } from "@/constants/marketing/codevs/codevs";
+
 
 const rowdies = Rowdies({
   weight: "300",
   subsets: ["latin"],
 });
-
-const heroContentClassName =
-  "absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 p-4 text-center text-white";
 
 export default function Hero() {
   const skeleton = (

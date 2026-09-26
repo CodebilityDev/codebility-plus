@@ -1,14 +1,10 @@
 "use client";
 
-import React, { ReactNode } from "react";
+
 import { QueryErrorResetBoundary } from "@tanstack/react-query";
 import ErrorBoundary from "@/components/global/feedback/ErrorBoundary";
+import type { AsyncErrorBoundaryProps } from "@/types/global/feedback";
 
-interface AsyncErrorBoundaryProps {
-  children: ReactNode;
-  fallback?: ReactNode;
-  onError?: (error: Error) => void;
-}
 
 /**
  * AsyncErrorBoundary specifically designed for handling async operations

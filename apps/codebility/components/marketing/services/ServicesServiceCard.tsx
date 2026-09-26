@@ -4,17 +4,12 @@ import { memo, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { IconLink } from "@/public/assets/svgs/index";
-import type { ServicesProjectCard } from "@/lib/global/services-projects-cached";
+
 import { Eye } from "lucide-react";
+import type { ServicesServiceCardProps } from "@/types/marketing/services/services";
 
-export type ServiceProject = ServicesProjectCard;
 
-interface Props {
-  service: ServiceProject;
-  onSelect?: (service: ServiceProject) => void;
-}
-
-export const ServicesServiceCard = memo(({ service, onSelect }: Props) => {
+export const ServicesServiceCard = memo(({ service, onSelect }: ServicesServiceCardProps) => {
   const {
     name,
     main_image,

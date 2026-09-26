@@ -2,20 +2,15 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
-import { EmblaCarouselType, EmblaOptionsType } from "embla-carousel";
+import { EmblaCarouselType } from "embla-carousel";
 import Autoplay from "embla-carousel-autoplay";
 import useEmblaCarousel from "embla-carousel-react";
 
-import {
-  NextButton,
-  PrevButton,
-  usePrevNextButtons,
-} from "@/components/global/marketing/CodevsEmblaCarouselArrowButtons";
+import { PrevButton } from "@/components/global/marketing/CodevsEmblaCarouselArrowButtons";
+import { NextButton } from "@/components/global/marketing/NextButton";
+import { usePrevNextButtons } from "@/hooks/global/usePrevNextButtons";
+import type { PropType } from "@/types/global/marketing";
 
-type PropType = {
-  slides: string[];
-  options: EmblaOptionsType;
-};
 
 const EmblaCarousel: React.FC<PropType> = (props) => {
   const { slides, options } = props;

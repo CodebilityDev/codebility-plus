@@ -1,49 +1,24 @@
 "use client";
 
 import { Suspense, use, useState, useTransition } from "react";
-import {
-  Briefcase,
-  ChevronLeft,
-  ChevronRight,
-  DollarSign,
-  MapPin,
-} from "lucide-react";
-import { Button } from "@/components/global/ui/button";
-import { Badge } from "@codevs/ui/badge";
-import type {
-  CareersJobListingsInitial,
-  CareersJobListingsPage,
-} from "@/types/global/careers-job-listings";
+
+
+
+import type { CareersJobListingsInitial, CareersJobListingsPage } from "@/types/global/careers-job-listings";
 import { fetchApiJson } from "@/utils/global/api-fetch";
 
 import type { JobListing } from "@/types/global/job-listings";
 import JobApplicationModal from "@/components/marketing/careers/JobApplicationModal";
 import { JobListingsSkeleton } from "@/components/marketing/careers/JobListingsSkeleton";
+import { JobCard } from "@/components/marketing/careers/JobCard";
+import { JobListingsPaginationSlot } from "@/components/marketing/careers/JobListingsPaginationSlot";
+import { JOB_TYPES, JOB_LEVELS } from "@/constants/marketing/careers/careers";
+import type { JobListingsPaginationProps } from "@/types/marketing/careers/careers";
+import { pageCacheKey, filterCacheKey } from "@/utils/marketing/careers/careers";
 
-const JOB_TYPES = ["All", "Full-time", "Part-time", "Contract", "Internship"];
-const JOB_LEVELS = ["All", "Entry", "Mid", "Senior", "Lead"];
 
 const pagePromises = new Map<string, Promise<CareersJobListingsPage>>();
 const pageMetaCache = new Map<string, CareersJobListingsPage["pagination"]>();
-
-function pageCacheKey(
-  department: string,
-  type: string,
-  level: string,
-  page: number,
-  pageSize: number,
-) {
-  return `${department}:${type}:${level}:${page}:${pageSize}`;
-}
-
-function filterCacheKey(
-  department: string,
-  type: string,
-  level: string,
-  pageSize: number,
-) {
-  return `${department}:${type}:${level}:${pageSize}`;
-}
 
 function rememberPagination(
   department: string,
@@ -158,177 +133,6 @@ function resolvePagination(
   );
 }
 
-function getLevelColor(level: string) {
-  switch (level) {
-    case "Entry":
-      return "bg-green-500/10 text-green-400 border-green-500/20";
-    case "Mid":
-      return "bg-blue-500/10 text-blue-400 border-blue-500/20";
-    case "Senior":
-      return "bg-purple-500/10 text-purple-400 border-purple-500/20";
-    case "Lead":
-      return "bg-orange-500/10 text-orange-400 border-orange-500/20";
-    default:
-      return "bg-gray-500/10 text-gray-400 border-gray-500/20";
-  }
-}
-
-function getTypeColor(type: string) {
-  switch (type) {
-    case "Full-time":
-      return "bg-customTeal/10 text-customTeal border-customTeal/20";
-    case "Part-time":
-      return "bg-yellow-500/10 text-yellow-400 border-yellow-500/20";
-    case "Contract":
-      return "bg-pink-500/10 text-pink-400 border-pink-500/20";
-    case "Internship":
-      return "bg-indigo-500/10 text-indigo-400 border-indigo-500/20";
-    default:
-      return "bg-gray-500/10 text-gray-400 border-gray-500/20";
-  }
-}
-
-function JobCard({
-  job,
-  onApply,
-}: {
-  job: JobListing;
-  onApply: (job: JobListing) => void;
-}) {
-  return (
-    <div className="group relative overflow-hidden rounded-lg border border-gray-800 bg-gray-900/50 p-6 backdrop-blur-sm transition-all hover:border-customViolet-100/50 hover:bg-gray-900/70">
-      <div className="absolute inset-0 bg-gradient-to-r from-customViolet-100/5 to-customBlue-100/5 opacity-0 transition-opacity group-hover:opacity-100" />
-
-      <div className="relative">
-        <div className="mb-4">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <h3 className="text-xl font-semibold text-white">{job.title}</h3>
-              <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-gray-400">
-                <div className="flex items-center gap-1">
-                  <Briefcase className="h-4 w-4" />
-                  <span>{job.department}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <MapPin className="h-4 w-4" />
-                  <span>{job.location}</span>
-                </div>
-                {job.salary_range && (
-                  <div className="flex items-center gap-1">
-                    <DollarSign className="h-4 w-4" />
-                    <span>{job.salary_range}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <Button
-              variant="purple"
-              size="sm"
-              className="h-8 w-full max-w-[80px] px-3 text-xs sm:mt-0 sm:w-auto"
-              onClick={() => onApply(job)}
-            >
-              Apply
-            </Button>
-          </div>
-        </div>
-
-        <p className="mb-4 line-clamp-2 text-sm text-gray-300">
-          {job.description}
-        </p>
-
-        <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="outline" className={getLevelColor(job.level)}>
-            {job.level}
-          </Badge>
-          <Badge variant="outline" className={getTypeColor(job.type)}>
-            {job.type}
-          </Badge>
-          {job.remote && (
-            <Badge
-              variant="outline"
-              className="border-green-500/20 bg-green-500/10 text-green-400"
-            >
-              Remote
-            </Badge>
-          )}
-          <span className="text-xs text-gray-500">•</span>
-          <span className="text-xs text-gray-500">
-            Posted {new Date(job.posted_date).toLocaleDateString()}
-          </span>
-        </div>
-
-        <div className="mt-4 border-t border-gray-800 pt-4">
-          <div className="flex flex-wrap gap-2">
-            {job.requirements.map((req, index) => (
-              <span
-                key={index}
-                className="rounded-full bg-gray-800/50 px-2.5 py-1 text-xs text-gray-400"
-              >
-                {req}
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function JobListingsPaginationSlot({
-  page,
-  totalPages,
-  onPageChange,
-}: {
-  page: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
-}) {
-  if (totalPages <= 1) {
-    return <div className="mt-12 min-h-[2.5rem]" aria-hidden="true" />;
-  }
-
-  const currentPage = Math.min(page, totalPages);
-
-  return (
-    <div className="mt-12 flex items-center justify-center">
-      <div className="flex items-center gap-1 rounded-lg border border-gray-800 bg-gray-900/30 p-1">
-        <button
-          onClick={() => onPageChange(Math.max(1, currentPage - 1))}
-          disabled={currentPage === 1}
-          className="flex h-8 w-8 items-center justify-center rounded text-gray-400 transition-colors hover:bg-gray-800 hover:text-white disabled:pointer-events-none disabled:opacity-50"
-        >
-          <ChevronLeft className="h-3.5 w-3.5" />
-        </button>
-
-        <div className="flex gap-1 px-1">
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-            <button
-              key={pageNum}
-              onClick={() => onPageChange(pageNum)}
-              className={`h-8 w-8 rounded text-sm font-medium transition-colors ${
-                currentPage === pageNum
-                  ? "bg-customViolet-100 text-white"
-                  : "text-gray-400 hover:bg-gray-800 hover:text-white"
-              }`}
-            >
-              {pageNum}
-            </button>
-          ))}
-        </div>
-
-        <button
-          onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
-          disabled={currentPage === totalPages}
-          className="flex h-8 w-8 items-center justify-center rounded text-gray-400 transition-colors hover:bg-gray-800 hover:text-white disabled:pointer-events-none disabled:opacity-50"
-        >
-          <ChevronRight className="h-3.5 w-3.5" />
-        </button>
-      </div>
-    </div>
-  );
-}
-
 function JobListingsGridRemote({
   department,
   type,
@@ -425,15 +229,10 @@ function JobListingsGrid({
   );
 }
 
-interface Props {
-  initialData: CareersJobListingsInitial;
-  pageSize: number;
-}
-
 export default function JobListingsPagination({
   initialData,
   pageSize,
-}: Props) {
+}: JobListingsPaginationProps) {
   const [department, setDepartment] = useState(initialData.department);
   const [type, setType] = useState(initialData.type);
   const [level, setLevel] = useState(initialData.level);

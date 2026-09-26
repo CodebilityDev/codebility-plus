@@ -3,6 +3,8 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { JobListing } from "@/types/global/job-listings";
 import type { CareersJobListingsPage } from "@/types/global/careers-job-listings";
 import { createClientAnon } from "@/lib/global/supabase-anon";
+import type { JobListingRow } from "@/types/global/lib";
+
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 4;
@@ -15,20 +17,6 @@ export type {
   CareersJobListingsInitial,
   CareersJobListingsPage,
 } from "@/types/global/careers-job-listings";
-
-type JobListingRow = {
-  id: string;
-  title: string;
-  department: string;
-  location: string;
-  type: JobListing["type"];
-  level: JobListing["level"];
-  description: string;
-  requirements: string[] | null;
-  posted_date: string;
-  salary_range: string | null;
-  remote: boolean | null;
-};
 
 function parsePositiveInt(
   value: number | undefined,

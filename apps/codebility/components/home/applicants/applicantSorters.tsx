@@ -1,22 +1,11 @@
-import React, { memo } from "react";
+
 import { Button } from "@/components/global/ui/button";
-import { ChevronDown, Plus, SortAsc, SortDesc, X, GripVertical } from "lucide-react";
+import { ChevronDown, Plus, SortAsc, SortDesc, X } from "lucide-react";
 
 import { Badge } from "@codevs/ui/badge";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@codevs/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuTrigger } from "@codevs/ui/dropdown-menu";
+import type { SortOption } from "@/types/home/applicants/applicants";
 
-export type SortOption = {
-  field: string;
-  direction: "asc" | "desc";
-  label: string;
-};
 
 const ApplicantSorters = ({
   sortOptions,
