@@ -2,7 +2,6 @@
 "use server";
 
 import { createClientServerComponent } from "@/utils/supabase/server";
-import { revalidatePath } from "next/cache";
 
 interface UploadImageOptions {
   bucket?: string;
@@ -185,9 +184,6 @@ export async function updateCodevNdaUrls(
       console.error(`Database update error for ${codevId}:`, error);
       throw error;
     }
-
-    // Revalidate the in-house page to show updated NDA status
-    revalidatePath("/home/in-house");
 
     return { success: true };
   } catch (error) {
