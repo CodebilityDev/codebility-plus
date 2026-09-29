@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest} from "next/server";
+import { NextResponse } from "next/server";
 import { parseServicesCategory } from "@/utils/global/services-categories";
 import { getCachedServicesProjectById, getCachedServicesProjectsPage } from "@/lib/global/services-projects-cached";
 import { DEFAULT_PAGE, DEFAULT_LIMIT, MAX_LIMIT, cacheHeaders } from "@/constants/api/services-projects/services-projects";

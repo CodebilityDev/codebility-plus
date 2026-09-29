@@ -1,6 +1,6 @@
 import { pageSize } from "@/constants/global/page-size";
 import type { InternalStatus } from "@/types/global/codev";
-import { EmblaOptionsType } from "embla-carousel";
+import type { EmblaOptionsType } from "embla-carousel";
 import type { CSSProperties } from "react";
 
 export const STATUS_CONFIG: Record<InternalStatus, { label: string; className: string }> = {

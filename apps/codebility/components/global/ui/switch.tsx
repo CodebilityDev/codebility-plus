@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 
-type ToggleSwitchProps = {
-  // eslint-disable-next-line no-unused-vars
+interface ToggleSwitchProps {
+   
   onClick: (event: React.MouseEvent<HTMLInputElement, MouseEvent>) => void;
   enabled?: boolean;
   // Other props...
-};
+}
 
 const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
   onClick,

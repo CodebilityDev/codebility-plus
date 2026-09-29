@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/g
 import { IconGithub, IconLink } from "@/public/assets/svgs/index";
 import { Facebook, Github, Linkedin, Mail, MapPin, MessageSquare, Phone } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@codevs/ui/tabs";
-import { useApplicantModal } from "@/components/home/applicants/ApplicantClientWrapper";
+import { useApplicantModal } from "@/providers/home/applicants/ApplicantModalProvider";
 import ApplicantProcessTimeline from "@/components/home/applicants/ApplicantProcessTimeline";
 import { ApplicantProfileModalSection } from "@/components/home/applicants/ApplicantProfileModalSection";
 

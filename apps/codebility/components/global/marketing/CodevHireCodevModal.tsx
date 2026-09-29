@@ -10,10 +10,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { getCodev } from "@/actions/global/marketing-profiles";
 import { toast } from "@/components/global/ui/use-toast";
-import { Codev } from "@/types/global/codev";
+import type { Codev } from "@/types/global/codev";
 import { useEffect, useState } from "react";
 import { sentHireCodevEmail } from "@/actions/global/profiles-email";
-import { type HireCodevEmail } from "@/types/global/hire-codev-email";
+import type {HireCodevEmail} from "@/types/global/hire-codev-email";
 import { hireCodevEmailSchema } from "@/utils/global/hire-codev-email";
 
 

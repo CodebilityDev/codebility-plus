@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { useUserStore } from "@/store/global/codev-store";
-import { Codev } from "@/types/global/codev";
+import type { Codev } from "@/types/global/codev";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import { checkRateLimit, recordRateLimitAttempt, resetRateLimit } from "@/utils/global/rate-limiter";
 import { uploadNdaToStorage, updateCodevNdaUrls } from "@/actions/global/nda-storage";

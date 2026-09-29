@@ -77,9 +77,9 @@ function parsePositiveInt(
 
 function mapCategories(
   rows?: ListRow["categories"],
-): Array<{ id: number; name: string }> {
+): { id: number; name: string }[] {
   if (!rows) return [];
-  const categories: Array<{ id: number; name: string }> = [];
+  const categories: { id: number; name: string }[] = [];
   for (const row of rows) {
     const category = row.projects_category;
     if (!category) continue;
@@ -171,10 +171,10 @@ export async function getServicesProjectById(
     start_date?: string | null;
     end_date?: string | null;
     tech_stack?: string[] | null;
-    project_members?: Array<{
+    project_members?: {
       codev_id: string;
       role: string;
-    }> | null;
+    }[] | null;
   };
 
   const codevIds = [

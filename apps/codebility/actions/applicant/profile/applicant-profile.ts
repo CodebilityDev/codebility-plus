@@ -1,7 +1,7 @@
 "use server";
 
 import { cachedUser } from "@/lib/applicant/profile/supabase-action";
-import {
+import type {
   Codev,
   Education,
   JobStatus,

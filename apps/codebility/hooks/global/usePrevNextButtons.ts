@@ -1,12 +1,12 @@
 "use client";
 
 import type { UsePrevNextButtonsType } from "@/types/global/marketing";
-import { EmblaCarouselType } from "embla-carousel";
+import type { EmblaCarouselType } from "embla-carousel";
 import { useState, useCallback, useEffect } from "react";
 
 export const usePrevNextButtons = (
   emblaApi: EmblaCarouselType | undefined,
-  // eslint-disable-next-line no-unused-vars
+   
   onButtonClick?: (emblaApi: EmblaCarouselType) => void,
 ): UsePrevNextButtonsType => {
   const [prevBtnDisabled, setPrevBtnDisabled] = useState(true);

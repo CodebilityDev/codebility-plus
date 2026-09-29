@@ -1,6 +1,6 @@
 "use client";
 
-import { RefObject } from "react";
+import type { RefObject } from "react";
 
 import AboutUsSlide from "@/components/auth/onboarding/OnboardingAboutUsSlide";
 import LaunchpadSlide from "@/components/auth/onboarding/OnboardingLaunchpadSlide";

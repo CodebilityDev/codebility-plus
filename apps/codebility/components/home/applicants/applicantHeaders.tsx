@@ -1,11 +1,11 @@
 import React, { memo, useCallback, useEffect, useMemo, useState } from "react";
 import H1 from "@/components/global/layout/H1";
 
-import { ExperienceRanges } from "@/types/home/applicants/applicants";
+import type { ExperienceRanges } from "@/types/home/applicants/applicants";
 import ApplicantFiltersComponent from "@/components/home/applicants/applicantFilters";
 import ApplicantFiltersBadge from "@/components/home/applicants/applicantFiltersBadge";
 import ApplicantSorters from "@/components/home/applicants/applicantSorters";
-import { SortOption } from "@/types/home/applicants/applicants";
+import type { SortOption } from "@/types/home/applicants/applicants";
 import type { ApplicantFilters } from "@/types/home/applicants/applicants";
 import type { ApplicantFilterHeadersProps } from "@/types/home/applicants/applicants";
 

@@ -40,7 +40,7 @@ const ContactUsModal = () => {
     if (!validateFields.success) {
       const errors = validateFields.error.errors;
 
-      const fieldErrors: { [key: string]: string } = {};
+      const fieldErrors: Record<string, string> = {};
       errors.forEach((error) => {
         const fieldName = error.path[0] ?? "";
         fieldErrors[fieldName] = error.message;

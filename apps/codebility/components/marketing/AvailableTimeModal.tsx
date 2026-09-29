@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/global/ui/button";
 import { useModal } from "@/hooks/global/use-modal";
 import { useSchedule } from "@/hooks/marketing/use-timeavail";
-import { ScheduleType } from "@/types/marketing/marketing";
+import type { ScheduleType } from "@/types/marketing/marketing";
 
 import {
   Dialog,

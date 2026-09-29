@@ -5,7 +5,7 @@ export interface AboutSlidesProps {
   slidesRef: RefObject<HTMLDivElement | null>;
 }
 
-export type Bubble = {
+export interface Bubble {
   id: string;
   size: number; // px
   topPct: number;
@@ -14,9 +14,9 @@ export type Bubble = {
   depth: number; // parallax multiplier
   floatDur: number; // s
   delay: number; // s
-};
+}
 
-export type Pos = { top: number; left: number };
+export interface Pos { top: number; left: number }
 
 export type CornerIndex = 0 | 1 | 2 | 3;
 
@@ -28,21 +28,21 @@ export type HouseRulesSectionProps = React.HTMLAttributes<HTMLElement>;
 
 export type IsRoadMapProps = React.HTMLAttributes<HTMLDivElement>;
 
-export type Partner = { id: string; src: string; alt: string };
+export interface Partner { id: string; src: string; alt: string }
 
-export type StickyLogoProps = {
+export interface StickyLogoProps {
   logoRef: RefObject<HTMLDivElement | null>;
   isVisible: boolean;
-};
+}
 
 // -------------------------
 // Types
 // -------------------------
-export type Person = {
+export interface Person {
   name: string;
   role: string;
   image?: string;
-};
+}
 
 export type WellcomeSectionWrapperProps = React.HTMLAttributes<HTMLDivElement>;
 

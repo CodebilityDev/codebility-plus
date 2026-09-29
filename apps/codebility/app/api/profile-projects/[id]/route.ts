@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest} from "next/server";
+import { NextResponse } from "next/server";
 import { createClientAnon } from "@/lib/global/supabase-anon";
 import { cacheHeaders } from "@/constants/api/profile-projects/profile-projects";
 

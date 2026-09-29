@@ -13,7 +13,7 @@ import { removeLocalStorageValue } from "@/hooks/global/useLocalStorageValue";
 
 const UserMenu = dynamic(
   () =>
-    import("@/components/global/marketing/MarketingNavigationSubComponents").then((m) => m.UserMenu),
+    import("@/components/global/marketing/UserMenu").then((m) => m.UserMenu),
   {
     ssr: false,
     loading: () => <CareersSignIn />,
@@ -21,7 +21,7 @@ const UserMenu = dynamic(
 );
 const DrawerAuthSection = dynamic(
   () =>
-    import("@/components/global/marketing/MarketingNavigationSubComponents").then(
+    import("@/components/global/marketing/DrawerAuthSection").then(
       (m) => m.DrawerAuthSection,
     ),
   {

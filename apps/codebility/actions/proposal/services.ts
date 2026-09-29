@@ -2,7 +2,7 @@
 
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import { serviceWriteSchema } from "@/utils/proposal/proposal";
-import { Codev } from "@/types/global/codev";
+import type { Codev } from "@/types/global/codev";
 import type { RealProject, ServiceWriteInput } from "@/types/proposal/proposal";
 
 

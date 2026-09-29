@@ -1,7 +1,7 @@
 /**
  * Utility functions for prioritizing Codev profiles
  */
-import { Codev, CodevFilter, CodevPoints } from "@/types/global/codev";
+import type { Codev, CodevFilter, CodevPoints } from "@/types/global/codev";
 
 /**
  * Calculate the total level score for a codev
@@ -82,7 +82,7 @@ export function rankLevelOfBadge(
  */
 export function prioritizeCodevs(
   codevs: Codev[],
-  filterAdminAndFailed: boolean = false,
+  filterAdminAndFailed = false,
 ): Codev[] {
   const adminRoleId = 1;
 
@@ -186,7 +186,7 @@ export function filterCodevs(
 export function getPrioritizedAndFilteredCodevs(
   codevs: Codev[],
   filters: CodevFilter,
-  filterAdminAndFailed: boolean = false,
+  filterAdminAndFailed = false,
 ): Codev[] {
   const prioritized = prioritizeCodevs(codevs, filterAdminAndFailed);
   return filterCodevs(prioritized, filters);

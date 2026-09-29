@@ -21,7 +21,7 @@ export interface DatabaseUser {
   updated_at?: string;
 }
 
-export type NavUserProfile = {
+export interface NavUserProfile {
   first_name: string;
   last_name: string;
   email: string;
@@ -32,7 +32,7 @@ export type NavUserProfile = {
     id: string;
     codev_id: string;
   } | null;
-};
+}
 
 
 export interface ProjectMember {

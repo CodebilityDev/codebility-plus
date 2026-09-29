@@ -2,7 +2,8 @@
 
 import LandingImage from "@/components/marketing/LandingImage";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { MouseEvent, useState } from "react";
+import type { MouseEvent} from "react";
+import { useState } from "react";
 import type { FeaturesCardProps } from "@/types/marketing/marketing";
 
 

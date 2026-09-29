@@ -8,7 +8,7 @@ import {
   enterpriseSolution,
   userCentricDesign,
 } from "@/public/assets/images/services/index";
-import { Edge, Node } from "reactflow";
+import type { Edge, Node } from "reactflow";
 
 export const partnerData = [
   {

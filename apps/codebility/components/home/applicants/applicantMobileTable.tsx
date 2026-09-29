@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { cn } from "@/utils/global/cn";
 import { flexRender } from "@tanstack/react-table";
 
-import { NewApplicantType } from "@/types/home/applicants/applicants";
+import type { NewApplicantType } from "@/types/home/applicants/applicants";
 import type { ApplicantMobileTableProps } from "@/types/home/applicants/applicants";
 
 
@@ -16,7 +16,7 @@ function ApplicantMobileTable<TData extends NewApplicantType>({
   const toBeFailed = (
     testTaken: string | null | undefined,
     forkUrl: string | null | undefined,
-  ): Boolean => {
+  ): boolean => {
     if (!testTaken) return false;
     if (forkUrl) return false;
 

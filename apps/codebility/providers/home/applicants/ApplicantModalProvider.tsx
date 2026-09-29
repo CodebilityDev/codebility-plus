@@ -1,34 +1,22 @@
 "use client";
 
-import { ReactNode, useState, createContext, useContext } from "react";
+import { useState, createContext, useContext } from "react";
 import ApplicantProfileModal from "@/components/home/applicants/ApplicantProfileModal";
-import { NewApplicantType } from "@/types/home/applicants/applicants";
+import type { ApplicantModalContextValue, ApplicantModalProviderProps, NewApplicantType } from "@/types/home/applicants/applicants";
 
-interface ModalContextType {
-  isModalOpen: boolean;
-  selectedApplicant: NewApplicantType | null;
-  openModal: (applicant: NewApplicantType) => void;
-  closeModal: () => void;
-}
-
-const ModalContext = createContext<ModalContextType | null>(null);
+const ModalContext = createContext<ApplicantModalContextValue | null>(null);
 
 export const useApplicantModal = () => {
   const context = useContext(ModalContext);
   if (!context) {
-    throw new Error('useApplicantModal must be used within ApplicantClientWrapper');
+    throw new Error('useApplicantModal must be used within ApplicantModalProvider');
   }
   return context;
 };
 
-interface ApplicantClientWrapperProps {
-  children: ReactNode;
-}
-
-// Alternative approach - manage modal state directly instead of using useModal hook
-export default function ApplicantClientWrapper({ 
+export default function ApplicantModalProvider({ 
   children 
-}: ApplicantClientWrapperProps) {
+}: ApplicantModalProviderProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedApplicant, setSelectedApplicant] = useState<NewApplicantType | null>(null);
 
@@ -42,7 +30,7 @@ export default function ApplicantClientWrapper({
     setSelectedApplicant(null);
   };
 
-  const modalValue: ModalContextType = {
+  const modalValue: ApplicantModalContextValue = {
     isModalOpen,
     selectedApplicant,
     openModal,

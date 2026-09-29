@@ -8,28 +8,28 @@ export type ArrayFieldName =
   | "education"
   | "positions";
 
-export type ArrayPointRule = {
+export interface ArrayPointRule {
   pointsPerItem: number;
   maxItems: number;
   maxPoints: number;
   description: string;
-};
+}
 
-export type ProfilePointsBreakdown = {
+export interface ProfilePointsBreakdown {
   category: string;
   points: number;
-};
+}
 
-export type ProfileCompletionDetail = {
+export interface ProfileCompletionDetail {
   completed: boolean;
   points: number;
   maxPoints: number;
   description?: string;
   itemCount?: number;
   maxItems?: number;
-};
+}
 
-export type ProfilePointsResult = {
+export interface ProfilePointsResult {
   totalPoints: number;
   maxPossiblePoints: number;
   completionPercentage: number;
@@ -41,4 +41,4 @@ export type ProfilePointsResult = {
     techSkills: number;
     positions: number;
   };
-};
+}

@@ -5,17 +5,17 @@ import type z from "zod";
 import type { StaticImageData } from "next/image";
 
 
-export type AboutProps = {
+export interface AboutProps {
   data: Codev;
-};
+}
 
-export type FormValues = {
+export interface FormValues {
   about: string;
-};
+}
 
-export type ProfilePointEntry = { category: string; points: number };
+export interface ProfilePointEntry { category: string; points: number }
 
-export type ContactInfoProps = {
+export interface ContactInfoProps {
   data: {
     id?: string;
     facebook?: string | null;
@@ -25,25 +25,23 @@ export type ContactInfoProps = {
     portfolio_website?: string | null;
     phone_number?: string | null;
   };
-};
+}
 
-export type ContactInfoFormValues = {
+export interface ContactInfoFormValues {
   facebook?: string;
   linkedin?: string;
   github?: string;
   discord?: string;
   portfolio_website?: string;
   phone_number?: string;
-};
+}
 
 export interface EducationProps {
   data: Education[];
   codevId?: string;
 }
 
-export interface EditModePerItem {
-  [key: string]: boolean;
-}
+export type EditModePerItem = Record<string, boolean>;
 
 export interface EducationFormProps {
   education: Education;
@@ -100,35 +98,35 @@ export interface JobStatusFormProps {
 
 export interface PeriodSelectorProps {
   period: Period;
-  // eslint-disable-next-line no-unused-vars
+   
   setPeriod: (m: Period) => void;
   date: Date | undefined;
-  // eslint-disable-next-line no-unused-vars
+   
   setDate: (date: Date | undefined) => void;
   onRightFocus?: () => void;
   onLeftFocus?: () => void;
   disabled?: boolean;
 }
 
-export type PersonalInfoProps = {
+export interface PersonalInfoProps {
   data: Codev;
-};
+}
 
-export type PersonalInfoFormValues = {
+export interface PersonalInfoFormValues {
   first_name: string;
   last_name: string;
   address: string | undefined;
   display_position: string | undefined;
   years_of_experience: number;
   headline: string | undefined;
-};
+}
 
-export type PhotoProps = {
+export interface PhotoProps {
   data: {
     id?: string;
     image_url: string | null;
   };
-};
+}
 
 // Types for profile points data
 export interface ProfilePointsData {
@@ -158,23 +156,23 @@ export interface ProfilePointsData {
   };
 }
 
-export type SkillsProps = {
+export interface SkillsProps {
   data: {
     id?: string;
     tech_stacks?: string[] | null;
     level?: Record<string, any> | null;
   };
-};
+}
 
-export type TechStackStore = {
+export interface TechStackStore {
   stack: string[];
   setStack: (stack: string[]) => void;
-};
+}
 
 export interface TimePickerProps {
   date?: Date;
   period: Period;
-  // eslint-disable-next-line no-unused-vars
+   
   setDate: (date: Date | undefined) => void;
   disabled?: boolean;
 }
@@ -183,20 +181,20 @@ export interface TimePickerInputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
   picker: TimePickerType;
   date: Date | undefined;
-  // eslint-disable-next-line no-unused-vars
+   
   setDate: (date: Date | undefined) => void;
   period?: Period;
   onRightFocus?: () => void;
   onLeftFocus?: () => void;
 }
 
-export type GetValidNumberConfig = { max: number; min?: number; loop?: boolean };
+export interface GetValidNumberConfig { max: number; min?: number; loop?: boolean }
 
-export type GetValidArrowNumberConfig = {
+export interface GetValidArrowNumberConfig {
   min: number;
   max: number;
   step: number;
-};
+}
 
 export type TimePickerType = "minutes" | "seconds" | "hours" | "12hours";
 

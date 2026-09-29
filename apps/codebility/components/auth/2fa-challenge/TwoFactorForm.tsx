@@ -63,7 +63,7 @@ export default function TwoFactorForm() {
     try {
       // Standard TOTP Challenge & Verify
       const { data, error } = await supabase.auth.mfa.challengeAndVerify({
-        factorId: factorId!,
+        factorId: factorId,
         code: code.trim(),
       });
 

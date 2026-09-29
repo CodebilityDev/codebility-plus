@@ -1,5 +1,5 @@
 import { getNewApplicants } from "@/actions/home/applicants/applicants-queries";
-import { NewApplicantType } from "@/types/home/applicants/applicants";
+import type { NewApplicantType } from "@/types/home/applicants/applicants";
 import ApplicantLists from "@/components/home/applicants/applicantLists";
 
 export default async function ApplicantDataWrapper() {

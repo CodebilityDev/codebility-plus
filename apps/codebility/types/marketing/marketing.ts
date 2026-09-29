@@ -12,7 +12,7 @@ export interface AnimatedAdminsSectionProps {
   sectionId: string;
 }
 
-export type AnimatedMetricsProps = {
+export interface AnimatedMetricsProps {
   value: number;
   suffix?: string;
   prefix?: string;
@@ -20,7 +20,7 @@ export type AnimatedMetricsProps = {
   format?: "number" | "decimal";
   delay?: number;
   variant?: "hero" | "stat";
-};
+}
 
 export interface Particle {
   id: number;
@@ -48,25 +48,25 @@ export interface HeroCardProps {
   category?: string;
 }
 
-export type Person = {
+export interface Person {
   id: string;
   name: string;
   role: "Intern" | "Codev";
   image?: string;
   display_position?: string;
-};
+}
 
 export type RoleStyle = (typeof ROLE_STYLES)[keyof typeof ROLE_STYLES];
 
 export type PersonRole = "Intern" | "Codev";
 
-export type LandingInternMember = {
+export interface LandingInternMember {
   id: string;
   name: string;
   role: PersonRole;
   image?: string;
   display_position?: string;
-};
+}
 
 export interface AccordionProps {
   title: string;

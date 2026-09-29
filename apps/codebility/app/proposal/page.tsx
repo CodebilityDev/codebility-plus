@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { getRealProjects, getCodevProfiles } from "@/actions/proposal/services";
-import { RealProject } from "@/types/proposal/proposal";
+import type { RealProject } from "@/types/proposal/proposal";
 import type { Service } from "@/types/proposal/proposal";
 
 
@@ -153,7 +153,7 @@ export default function ProposalPage() {
 
   // Get service-specific project data
   const getServiceProjectData = (serviceName: string) => {
-    const categoryMap: { [key: string]: number } = {
+    const categoryMap: Record<string, number> = {
       "Web Application Development": 1,
       "Mobile Application Development": 2,
       "UI/UX Design": 3,
@@ -307,7 +307,7 @@ export default function ProposalPage() {
                       projectData.map((project, idx) => (
                         <div key={idx} className="group relative overflow-hidden rounded-lg bg-black-600 border-2 border-dark-100 hover:border-purple-500/50 transition-all duration-300">
                           <img
-                            src={project.main_image!}
+                            src={project.main_image}
                             alt={project.name}
                             className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300"
                             loading="lazy"

@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 
 export default function PageLoadingAnimation() {
-  const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number; delay: number }>>([]);
+  const [particles, setParticles] = useState<{ id: number; x: number; y: number; delay: number }[]>([]);
   const [isMobile, setIsMobile] = useState(false);
 
   // Generate random particles for background effect and check if mobile

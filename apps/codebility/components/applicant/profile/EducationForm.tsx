@@ -4,7 +4,7 @@ import { createEducation, updateEducation } from "@/actions/applicant/profile/ap
 import { Button } from "@/components/global/ui/button";
 import { IconDelete, IconEdit } from "@/public/assets/svgs/index";
 import type { EducationFormProps } from "@/types/applicant/profile/profile";
-import { Education } from "@/types/global/codev";
+import type { Education } from "@/types/global/codev";
 import { Input } from "@codevs/ui/input";
 import { Textarea } from "@codevs/ui/textarea";
 import { useState, useEffect } from "react";

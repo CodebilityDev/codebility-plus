@@ -1,6 +1,6 @@
 "use server";
 
-import { Codev } from "@/types/global/codev";
+import type { Codev } from "@/types/global/codev";
 import { getCodevs } from "@/lib/global/codev-service";
 
 export async function getCodev(id: string): Promise<Codev | null> {

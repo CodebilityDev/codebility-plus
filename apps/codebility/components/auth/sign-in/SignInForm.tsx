@@ -8,7 +8,7 @@ import { SignInValidation } from "@/utils/auth/sign-in/auth-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { z } from "zod";
+import type { z } from "zod";
 
 import { resendVerificationEmail, signinUser } from "@/actions/global/auth-session";
 import SignInInputs from "@/components/auth/sign-in/SignInInput";

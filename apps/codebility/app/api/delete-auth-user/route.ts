@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest} from 'next/server';
+import { NextResponse } from 'next/server';
 import type { DeleteUserRequest } from "@/types/api/delete-auth-user/delete-auth-user";
 
 

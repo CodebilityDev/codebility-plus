@@ -1,6 +1,6 @@
 import "server-only";
 
-import { Client, Codev, Project, WorkExperience } from "@/types/global/codev";
+import type { Client, Codev, Project, WorkExperience } from "@/types/global/codev";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 
 

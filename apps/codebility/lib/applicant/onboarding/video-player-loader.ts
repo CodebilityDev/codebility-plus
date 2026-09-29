@@ -7,7 +7,7 @@ export function loadYouTubeApi(): Promise<YTNamespace> {
   if (typeof window === "undefined") {
     return Promise.reject(new Error("YouTube API can only load in the browser"));
   }
-  if (window.YT && window.YT.Player) {
+  if (window.YT?.Player) {
     return Promise.resolve(window.YT);
   }
   if (ytApiPromise) {
@@ -23,7 +23,7 @@ export function loadYouTubeApi(): Promise<YTNamespace> {
 
     // Fallback: if the script was already injected elsewhere, poll for readiness.
     const poll = window.setInterval(() => {
-      if (window.YT && window.YT.Player) {
+      if (window.YT?.Player) {
         window.clearInterval(poll);
         resolve(window.YT);
       }

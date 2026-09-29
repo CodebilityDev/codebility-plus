@@ -1,13 +1,13 @@
-export type ApiOk<T> = { ok: true; data: T };
+export interface ApiOk<T> { ok: true; data: T }
 
-export type ApiFail = { ok: false; error: string; status?: number };
+export interface ApiFail { ok: false; error: string; status?: number }
 
 export type ApiResult<T> = ApiOk<T> | ApiFail;
 
-export type NextFetchRequestConfig = {
+export interface NextFetchRequestConfig {
   revalidate?: number | false;
   tags?: string[];
-};
+}
 
 export type FetchApiInit = RequestInit & {
   next?: NextFetchRequestConfig;

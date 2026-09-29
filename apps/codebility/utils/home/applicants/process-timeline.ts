@@ -1,6 +1,6 @@
 import { PIPELINE_STAGES, TERMINAL_DENIED, TERMINAL_PASSED } from "@/constants/home/applicants/pipeline-stages";
 import type { PipelineStageDefinition, PipelineStageKey } from "@/types/home/applicants/applicants";
-import { NewApplicantType } from "@/types/home/applicants/applicants";
+import type { NewApplicantType } from "@/types/home/applicants/applicants";
 import type { StageState, DerivedStage, DerivedTimeline } from "@/types/home/applicants/applicants";
 
 

@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest} from "next/server";
+import { NextResponse } from "next/server";
 import { getCachedCareersJobListingsPage } from "@/lib/global/careers-job-listings-cached";
 import { DEFAULT_PAGE, DEFAULT_LIMIT, MAX_LIMIT, cacheHeaders } from "@/constants/api/careers-job-listings/careers-job-listings";
 import { parsePositiveInt, emptyPage } from "@/utils/api/careers-job-listings/careers-job-listings";

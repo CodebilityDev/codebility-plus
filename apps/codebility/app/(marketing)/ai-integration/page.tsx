@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 
 import DevelopmentProcessReactFLow from "@/components/marketing/ai-integration/AiIntegration-development-process-react-flow";
 import DevelopmentProcess from "@/components/marketing/ai-integration/AiIntegrationDevelopmentProcess";

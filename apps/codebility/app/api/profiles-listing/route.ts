@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest} from "next/server";
+import { NextResponse } from "next/server";
 import { getCachedProfilesListingPage } from "@/lib/global/profiles-listing-cached";
 import { DEFAULT_PAGE, DEFAULT_LIMIT, MAX_LIMIT, cacheHeaders } from "@/constants/api/profiles-listing/profiles-listing";
 import { parsePositiveInt, emptyPage } from "@/utils/api/profiles-listing/profiles-listing";

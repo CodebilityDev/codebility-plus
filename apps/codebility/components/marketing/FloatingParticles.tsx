@@ -3,33 +3,13 @@
 import { useSyncExternalStore } from "react";
 import { DesktopParticles } from "@/components/marketing/DesktopParticles";
 import { LiteAtmosphere } from "@/components/marketing/LiteAtmosphere";
-import { EMPTY_PARTICLES, PARTICLE_COLORS } from "@/constants/marketing/marketing";
-import type { Particle } from "@/types/marketing/marketing";
-import { subscribeParticles, subscribeLiteMode, getLiteModeSnapshot } from "@/utils/marketing/marketing";
-
-
-
-let cachedParticles: Particle[] | null = null;
-
-function getClientParticles(): Particle[] {
-  if (cachedParticles) return cachedParticles;
-
-  cachedParticles = Array.from({ length: 8 }, (_, i) => {
-    const randomColorIndex = Math.floor(Math.random() * PARTICLE_COLORS.length);
-    return {
-      id: i,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      size: Math.random() * 6 + 3,
-      color: PARTICLE_COLORS[randomColorIndex]!,
-      opacity: Math.random() * 0.4 + 0.15,
-      speed: Math.random() * 0.4 + 0.2,
-      direction: Math.random() * Math.PI * 2,
-    };
-  });
-
-  return cachedParticles;
-}
+import { EMPTY_PARTICLES } from "@/constants/marketing/marketing";
+import {
+  getClientParticles,
+  getLiteModeSnapshot,
+  subscribeLiteMode,
+  subscribeParticles,
+} from "@/store/marketing/floating-particles-store";
 
 const FloatingParticles = () => {
   const isLite = useSyncExternalStore(

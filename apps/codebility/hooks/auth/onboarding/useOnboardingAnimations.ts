@@ -38,11 +38,11 @@ function unwrapPinSpacers(root: HTMLElement | null) {
 /** Clear inline styles on roadmap parts (so mobile shows plain stacked content) */
 function clearRoadmapInlineStyles(wrapper: HTMLElement | null, gsap?: any) {
   if (!wrapper) return;
-  const stage = (wrapper.querySelector("svg") as SVGSVGElement | null) || null;
+  const stage = wrapper.querySelector("svg");
 
   const ids = ["#main-path", "#left-rail", "#right-rail", "#main-arrowhead"];
   ids.forEach((sel) => {
-    const el = wrapper.querySelector(sel) as SVGElement | null;
+    const el = wrapper.querySelector(sel);
     if (!el) return;
     gsap ? gsap.set(el, { clearProps: "all" }) : el.removeAttribute("style");
   });
@@ -172,34 +172,34 @@ export default function useOnboardingAnimations({
               const wrapper =
                 (sec.querySelector(
                   "#roadmap-svg-wrapper",
-                ) as HTMLElement | null) || sec;
+                )) || sec;
 
               const stage =
-                (wrapper.querySelector("svg") as SVGSVGElement | null) ||
+                (wrapper.querySelector("svg")) ||
                 wrapper;
               gsap.set(stage, { display: "block", position: "relative" });
 
-              const path = wrapper.querySelector(
+              const path = wrapper.querySelector<SVGPathElement>(
                 "#main-path",
-              ) as SVGPathElement | null;
+              );
               const left = wrapper.querySelector(
                 "#left-rail",
-              ) as SVGPathElement | null;
+              );
               const right = wrapper.querySelector(
                 "#right-rail",
-              ) as SVGPathElement | null;
+              );
               const arrow = wrapper.querySelector(
                 "#main-arrowhead",
-              ) as SVGPathElement | null;
+              );
               const startCircle = wrapper.querySelector(
                 "#starting-circle",
-              ) as SVGCircleElement | null;
+              );
 
               if (!path || !left || !right || !arrow) return false;
 
               const L = path.getTotalLength();
 
-              type Milestone = {
+              interface Milestone {
                 el: SVGGElement;
                 circle: SVGCircleElement | null;
                 polygon: SVGPolygonElement | null;
@@ -207,7 +207,7 @@ export default function useOnboardingAnimations({
                 label: SVGGElement | null;
                 cy: number;
                 revealed: boolean;
-              };
+              }
 
               const milestones: Milestone[] = Array.from(
                 wrapper.querySelectorAll<SVGGElement>(".milestone-group"),

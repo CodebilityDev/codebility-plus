@@ -18,17 +18,17 @@ export interface CodevListFilterProps {
   positions?: string[];
 }
 
-export type PropType = {
+export interface PropType {
   slides: string[];
   options: EmblaOptionsType;
-};
+}
 
-export type UsePrevNextButtonsType = {
+export interface UsePrevNextButtonsType {
   prevBtnDisabled: boolean;
   nextBtnDisabled: boolean;
   onPrevButtonClick: () => void;
   onNextButtonClick: () => void;
-};
+}
 
 export type PrevButtonPropType = ComponentPropsWithRef<"button">;
 
@@ -40,10 +40,10 @@ export interface FeaturedCardProps {
   alt: string;
 }
 
-export type CodevsFeaturedProjectsAnimatedProps = {
+export interface CodevsFeaturedProjectsAnimatedProps {
   slides: string[];
   options: EmblaOptionsType;
-};
+}
 
 export interface CodevsProfilesPaginationProps {
   initialData: CodevsProfilesPage;
@@ -56,13 +56,13 @@ export interface SectionProps {
   id?: string; // Optional id prop
 }
 
-export type MarketingProgressiveSectionProps = {
+export interface MarketingProgressiveSectionProps {
   children: ReactNode;
   skeleton: ReactNode;
   className?: string;
-};
+}
 
-export type ProgressiveMotionProps = {
+export interface ProgressiveMotionProps {
   children: ReactNode;
   className?: string;
   y?: number;
@@ -71,7 +71,7 @@ export type ProgressiveMotionProps = {
   staggerChildren?: number;
   /** Play enter animation immediately on mount (paginated lists). */
   playOnMount?: boolean;
-};
+}
 
 export interface CodevsGridProps {
   codevs: CodevsProfilesPage["codevs"];

@@ -199,10 +199,10 @@ export async function computeProfilePoints(
     }
   }
 
-  const arrayFields: Array<{
+  const arrayFields: {
     field: ArrayFieldName;
     items: unknown[] | null | undefined;
-  }> = [
+  }[] = [
     { field: "tech_stacks", items: codevData.tech_stacks as unknown[] | null },
     { field: "work_experience", items: workExperiences },
     { field: "education", items: educationData },

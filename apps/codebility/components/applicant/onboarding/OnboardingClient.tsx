@@ -9,7 +9,7 @@ import VideoPlayer from "@/components/applicant/onboarding/VideoPlayer";
 import Quiz from "@/components/applicant/onboarding/Quiz";
 import Commitment from "@/components/applicant/onboarding/Commitment";
 import { getOnboardingProgress, completeOnboarding, saveQuizAndCommitment } from "@/actions/applicant/onboarding/applicant-onboarding";
-import { OnboardingProgressType } from "@/types/applicant/onboarding/applicant-onboarding";
+import type { OnboardingProgressType } from "@/types/applicant/onboarding/applicant-onboarding";
 import { VIDEO_IDS, VIDEO_TITLES, VIDEO_DESCRIPTIONS } from "@/constants/applicant/onboarding/onboarding";
 import type { OnboardingClientProps } from "@/types/applicant/onboarding/onboarding";
 
@@ -100,7 +100,7 @@ export default function OnboardingClient({
       setCurrentStep("videos");
       setProgress((prev) => ({
         ...prev,
-        currentVideo: stepNumber as 1 | 2 | 3 | 4,
+        currentVideo: stepNumber,
       }));
     } else if (stepNumber === 5) {
       // Navigate to quiz/commitment based on quiz status

@@ -1,6 +1,7 @@
 "use client";
 
-import { Component, ErrorInfo } from "react";
+import type { ErrorInfo } from "react";
+import { Component } from "react";
 import { Button } from "@codevs/ui/button";
 import { AlertTriangle, RefreshCw } from "lucide-react";
 import type { ErrorBoundaryProps, ErrorBoundaryState } from "@/types/global/feedback";

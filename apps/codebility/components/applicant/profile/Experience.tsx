@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Box from "@/components/global/layout/Box";
 import { Button } from "@/components/global/ui/button";
 
-import { WorkExperience } from "@/types/global/codev";
+import type { WorkExperience } from "@/types/global/codev";
 import toast from "react-hot-toast";
 
 
@@ -143,7 +143,7 @@ const Experience = ({ data, codevId }: ExperienceProps) => {
                 location: "",
                 profile_id: undefined,
                 is_present: false,
-              } as WorkExperience,
+              },
             ]);
           }
         }}

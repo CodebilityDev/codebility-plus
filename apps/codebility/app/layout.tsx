@@ -1,7 +1,7 @@
 import "@/styles/global/globals.css";
 
 
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import { Toaster } from "@/components/global/ui/toaster";
 import { ThemeProvider } from "@/providers/global/ThemeProvider";

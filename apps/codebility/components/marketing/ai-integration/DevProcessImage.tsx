@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { NodeProps } from "reactflow";
+import type { NodeProps } from "reactflow";
 
 export const DevProcessImage = ({
   data: { src, alt, width, height },

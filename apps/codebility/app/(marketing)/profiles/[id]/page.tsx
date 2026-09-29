@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Paragraph from "@/components/global/typography/Paragraph";
 import Logo from "@/components/global/layout/Logo";

@@ -183,7 +183,7 @@ export async function saveQuizAndCommitment({
   }
 }
 
-export async function completeOnboarding(codevId: string, newStatus: string = "waitlist") {
+export async function completeOnboarding(codevId: string, newStatus = "waitlist") {
   try {
     const supabase = await createClientServerComponent();
 

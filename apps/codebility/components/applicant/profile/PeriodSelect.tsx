@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Period } from "@/types/applicant/profile/profile";
+import type { Period } from "@/types/applicant/profile/profile";
 import { display12HourValue, setDateByType } from "@/utils/applicant/profile/profile";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/global/ui/select";
 import type { PeriodSelectorProps } from "@/types/applicant/profile/profile";

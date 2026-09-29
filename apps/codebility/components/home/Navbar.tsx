@@ -8,6 +8,7 @@ import { MobileTheme } from "@/components/home/theme-mobile";
 import { defaultAvatar } from "@/public/assets/images/index";
 import { IconDropdown, IconLogout } from "@/public/assets/svgs/index";
 import { useUserStore } from "@/store/global/codev-store";
+import { useInitialUser } from "@/providers/home/UserProvider";
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@codevs/ui/dropdown-menu";
 
@@ -18,10 +19,12 @@ import { menuItems } from "@/constants/home/home";
 
 const Navbar = () => {
   const { user } = useUserStore();
+  const initialUser = useInitialUser();
+  const currentUser = user ?? initialUser;
 
-  if (!user) return null;
+  if (!currentUser) return null;
 
-  const { first_name, last_name, email_address, image_url } = user;
+  const { first_name, last_name, email_address, image_url } = currentUser;
 
   return (
     <>

@@ -1,6 +1,6 @@
 import type { JobListing } from "@/types/global/job-listings";
 
-export type CareersJobListingsPage = {
+export interface CareersJobListingsPage {
   jobs: JobListing[];
   pagination: {
     page: number;
@@ -11,7 +11,7 @@ export type CareersJobListingsPage = {
   department: string;
   type: string;
   level: string;
-};
+}
 
 export type CareersJobListingsInitial = CareersJobListingsPage & {
   departments: string[];

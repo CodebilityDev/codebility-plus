@@ -1,4 +1,5 @@
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { createClient  } from "@supabase/supabase-js";
+import type {SupabaseClient} from "@supabase/supabase-js";
 
 import { ensureSupabaseEnv } from "@/lib/global/supabase-ensure-env";
 

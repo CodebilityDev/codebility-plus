@@ -5,13 +5,13 @@ import ApplicantReapplyTime from "@/components/home/applicants/applicantReapplyT
 import ApplicantTechStack from "@/components/home/applicants/applicantTechStack";
 import ApplicantTestTimeRemaining from "@/components/home/applicants/applicantTestTimeRemaining";
 import { IconGithub, IconFacebook, IconLink } from "@/public/assets/svgs/index";
-import { NewApplicantType } from "@/types/home/applicants/applicants";
-import { StageState } from "@/types/home/applicants/applicants";
+import type { NewApplicantType } from "@/types/home/applicants/applicants";
+import type { StageState } from "@/types/home/applicants/applicants";
 import { Checkbox } from "@codevs/ui/checkbox";
-import { ColumnDef } from "@tanstack/react-table";
+import type { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, Check, Dot, Circle, X } from "lucide-react";
 import Link from "next/link";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 
 export const STATE_BADGE: Record<StageState, { text: string; className: string }> = {

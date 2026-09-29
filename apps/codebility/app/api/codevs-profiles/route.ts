@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest} from "next/server";
+import { NextResponse } from "next/server";
 import { getCachedCodevsProfilesPage } from "@/lib/global/codevs-profiles-cached";
 import { DEFAULT_PAGE, DEFAULT_LIMIT, MAX_LIMIT, cacheHeaders } from "@/constants/api/codevs-profiles/codevs-profiles";
 import { parsePositiveInt, emptyPage } from "@/utils/api/codevs-profiles/codevs-profiles";

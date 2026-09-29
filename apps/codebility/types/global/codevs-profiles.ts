@@ -1,6 +1,6 @@
 import type { Codev } from "@/types/global/codev";
 
-export type CodevsProfilesPage = {
+export interface CodevsProfilesPage {
   codevs: Codev[];
   pagination: {
     page: number;
@@ -10,4 +10,4 @@ export type CodevsProfilesPage = {
   };
   positions: string[];
   position: string;
-};
+}

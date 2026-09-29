@@ -7,9 +7,10 @@ import DefaultPagination from "@/components/global/ui/DefaultPagination";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/home/applicants/table";
 import { pageSize } from "@/constants/global/page-size";
 import { cn } from "@/utils/global/cn";
-import { flexRender, getCoreRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
+import type { SortingState, VisibilityState } from "@tanstack/react-table";
+import { flexRender, getCoreRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table";
 
-import { NewApplicantType } from "@/types/home/applicants/applicants";
+import type { NewApplicantType } from "@/types/home/applicants/applicants";
 
 import ApplicantMobileTable from "@/components/home/applicants/applicantMobileTable";
 import ApplicantRowActionButton from "@/components/home/applicants/applicantRowActionButton";
@@ -77,7 +78,7 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
     (
       testTaken: string | null | undefined,
       forkUrl: string | null | undefined,
-    ): Boolean => {
+    ): boolean => {
       if (!testTaken) return false;
       if (forkUrl) return false;
 

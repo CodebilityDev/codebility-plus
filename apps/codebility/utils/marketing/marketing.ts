@@ -1,20 +1,6 @@
-import { LITE_QUERY, SCROLL_SHRINK_Y } from "@/constants/marketing/marketing";
+import { SCROLL_SHRINK_Y } from "@/constants/marketing/marketing";
 import type { LandingInternsPage } from "@/types/global/lib";
 import type { LandingInternMember } from "@/types/marketing/marketing";
-
-export function subscribeParticles() {
-  return () => {};
-}
-
-export function subscribeLiteMode(onStoreChange: () => void) {
-  const media = window.matchMedia(LITE_QUERY);
-  media.addEventListener("change", onStoreChange);
-  return () => media.removeEventListener("change", onStoreChange);
-}
-
-export function getLiteModeSnapshot() {
-  return window.matchMedia(LITE_QUERY).matches;
-}
 
 export function wave01(timeMs: number, durationSec: number, delaySec: number) {
   const elapsed = Math.max(0, timeMs / 1000 - delaySec);

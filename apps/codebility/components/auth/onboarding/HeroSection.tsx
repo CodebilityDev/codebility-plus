@@ -1,4 +1,4 @@
-import { RefObject } from "react";
+import type { RefObject } from "react";
 import Image from "next/image";
 import type { HeroSectionProps } from "@/types/auth/onboarding/onboarding";
 

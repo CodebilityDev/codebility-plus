@@ -2,7 +2,7 @@
 // app/api/all-active-interns-codev-prioritized/route.ts
 import { NextResponse } from "next/server";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
-import { Codev } from "@/types/global/codev";
+import type { Codev } from "@/types/global/codev";
 import { prioritizeCodevs } from "@/utils/global/codev-priority";
 
 export async function GET() {

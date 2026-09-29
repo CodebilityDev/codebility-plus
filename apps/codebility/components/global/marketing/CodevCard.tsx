@@ -38,7 +38,7 @@ const CodevCard = ({ codev, color, animateEntrance = true }: CodevCardProps) => 
 
   const internalStatus = codev.internal_status || "MENTOR";
   const statusConfig =
-    STATUS_CONFIG[internalStatus as InternalStatus] || STATUS_CONFIG.MENTOR;
+    STATUS_CONFIG[internalStatus] || STATUS_CONFIG.MENTOR;
 
   const filteredLevel = useMemo(() => {
     return codev.level &&

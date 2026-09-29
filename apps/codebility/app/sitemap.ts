@@ -1,4 +1,4 @@
-import { MetadataRoute } from "next";
+import type { MetadataRoute } from "next";
 import { createClient } from "@supabase/supabase-js";
 import { BASE_URL } from "@/constants/global/app";
 

@@ -3,7 +3,7 @@
 import * as React from "react";
 import { TimePeriodSelect } from "@/components/applicant/profile/PeriodSelect";
 import { TimePickerInput } from "@/components/applicant/profile/TimePickerInput";
-import { Period } from "@/types/applicant/profile/profile";
+import type { Period } from "@/types/applicant/profile/profile";
 
 import { Label } from "@codevs/ui/label";
 import type { TimePickerProps } from "@/types/applicant/profile/profile";

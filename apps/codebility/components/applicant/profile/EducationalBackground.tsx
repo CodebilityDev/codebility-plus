@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Box from "@/components/global/layout/Box";
 import { Button } from "@/components/global/ui/button";
 
-import { Education } from "@/types/global/codev";
+import type { Education } from "@/types/global/codev";
 import toast from "react-hot-toast";
 
 
@@ -145,7 +145,7 @@ const EducationalBackground = ({ data, codevId }: EducationProps) => {
                 profile_id: undefined,
                 created_at: "",
                 updated_at: "",
-              } as Education,
+              },
             ]);
           }
         }}

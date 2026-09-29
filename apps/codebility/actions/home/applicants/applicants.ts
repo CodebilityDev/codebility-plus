@@ -2,7 +2,7 @@
 
 
 import { revalidatePath } from "next/cache";
-import { NewApplicantType } from "@/types/home/applicants/applicants";
+import type { NewApplicantType } from "@/types/home/applicants/applicants";
 import { createAdminClient } from "@/lib/home/applicants/supabase-admin";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import { invalidateCache } from "@/lib/home/applicants/redis-cache";

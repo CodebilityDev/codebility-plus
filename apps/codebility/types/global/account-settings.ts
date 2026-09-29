@@ -5,9 +5,9 @@ export interface Factor {
   factor_type: string;
 }
 
-export type AccountSettingsBackdropProps = {
+export interface AccountSettingsBackdropProps {
   isOpen: boolean;
-};
+}
 
 export type DeleteConfirmation = "DELETE";
 

@@ -417,9 +417,7 @@ export interface CodevBadgeSkillCategory {
   badge_prefix?: string;
 }
 
-export interface CodevLevelData {
-  [key: string]: number;
-}
+export type CodevLevelData = Record<string, number>;
 
 export interface CodevBadgeProps {
   level: CodevLevelData;

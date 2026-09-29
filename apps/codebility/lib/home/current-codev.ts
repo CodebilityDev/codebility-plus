@@ -29,5 +29,5 @@ export const getCurrentCodev = cache(async (): Promise<Codev | null> => {
     return null;
   }
 
-  return data as unknown as Codev;
+  return data;
 });

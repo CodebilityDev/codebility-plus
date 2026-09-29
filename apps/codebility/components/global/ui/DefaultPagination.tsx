@@ -77,7 +77,7 @@ const DefaultPagination = ({
                     ? "hover:bg-default dark:hover:bg-default border-0 bg-customBlue-100 text-white hover:text-white"
                     : ""
                 }`}
-                onClick={() => setCurrentPage && setCurrentPage(Number(num))}
+                onClick={() => setCurrentPage?.(Number(num))}
                 isActive={currentPage === num}
               >
                 {num}

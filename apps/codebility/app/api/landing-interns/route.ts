@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest} from "next/server";
+import { NextResponse } from "next/server";
 import { getCachedLandingInternsPage } from "@/lib/global/landing-interns-cached";
 import { DEFAULT_PAGE, DEFAULT_LIMIT, MAX_LIMIT } from "@/constants/api/landing-interns/landing-interns";
 import { parsePositiveInt } from "@/utils/api/landing-interns/landing-interns";

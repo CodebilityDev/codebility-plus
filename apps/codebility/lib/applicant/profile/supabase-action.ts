@@ -14,7 +14,7 @@ export async function cachedUser(): Promise<User | null> {
 
     let parsedSuccess = false;
 
-    if (supabaseUser && supabaseUser.value) {
+    if (supabaseUser?.value) {
         parsedSuccess = UserSchema.safeParse(JSON.parse(supabaseUser.value)).success;
     }
 

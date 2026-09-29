@@ -3,7 +3,7 @@
 import Box from "@/components/global/layout/Box";
 import Paragraph from "@/components/global/typography/Paragraph";
 import { TimePicker12 } from "@/components/applicant/profile/TimePicker12hourDemo";
-import { Period } from "@/types/applicant/profile/profile";
+import type { Period } from "@/types/applicant/profile/profile";
 import { Button } from "@/components/global/ui/button";
 import { IconEdit } from "@/public/assets/svgs/index";
 import { useUserStore } from "@/store/global/codev-store";

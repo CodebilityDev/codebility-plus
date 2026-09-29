@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 
 import FeaturedSection from "@/components/global/marketing/CodevsFeaturedSection";
 import CodevsFeaturedProjectsSection from "@/components/global/marketing/CodevsFeaturedProjectsSection";

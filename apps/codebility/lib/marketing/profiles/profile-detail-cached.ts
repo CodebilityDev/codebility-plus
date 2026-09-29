@@ -74,7 +74,7 @@ function mapProfileDetail(row: ProfileDetailRow): Codev {
     work_experience: (row.work_experience ?? []).map((exp) => ({
       ...exp,
       codev_id: row.id,
-    })) as WorkExperience[],
+    })),
     work_schedules: row.work_schedules ?? [],
     codev_points: row.codev_points ?? [],
   } as Codev;

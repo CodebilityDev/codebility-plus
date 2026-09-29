@@ -1,7 +1,7 @@
 import type { Codev } from "@/types/global/codev";
 import type { JobListing } from "@/types/global/job-listings";
 
-export type JobListingRow = {
+export interface JobListingRow {
   id: string;
   title: string;
   department: string;
@@ -13,22 +13,22 @@ export type JobListingRow = {
   posted_date: string;
   salary_range: string | null;
   remote: boolean | null;
-};
+}
 
-export type CodevsFeaturedProjects = {
+export interface CodevsFeaturedProjects {
   slides: string[];
   projectCount: number;
-};
+}
 
-export type ProjectRow = {
+export interface ProjectRow {
   id: string;
   name: string;
   description: string | null;
   main_image: string | null;
   status: string | null;
-};
+}
 
-export type CodevsProfileRow = {
+export interface CodevsProfileRow {
   id: string;
   first_name: string | null;
   last_name: string | null;
@@ -37,44 +37,44 @@ export type CodevsProfileRow = {
   availability_status: boolean | null;
   internal_status: string | null;
   level: Record<string, number> | null;
-  codev_points: Array<{
+  codev_points: {
     id: string;
     skill_category_id: string;
     points: number;
-  }> | null;
-};
+  }[] | null;
+}
 
-export type LandingAdminsData = {
+export interface LandingAdminsData {
   admins: Codev[];
   mentors: Codev[];
-};
+}
 
-export type LandingInternsPage = {
-  TEAM_MEMBERS: Array<{
+export interface LandingInternsPage {
+  TEAM_MEMBERS: {
     id: string;
     name: string;
     role: "Intern" | "Codev" | "Member";
     image?: string;
     display_position?: string;
-  }>;
+  }[];
   pagination: {
     page: number;
     limit: number;
     total: number;
     totalPages: number;
   };
-};
+}
 
-export type LandingInternRow = {
+export interface LandingInternRow {
   id: string;
   first_name: string | null;
   last_name: string | null;
   display_position: string | null;
   image_url: string | null;
   role_id: number | null;
-};
+}
 
-export type ProfilesListingRow = {
+export interface ProfilesListingRow {
   id: string;
   first_name: string | null;
   last_name: string | null;
@@ -85,30 +85,30 @@ export type ProfilesListingRow = {
   application_status: string | null;
   level: Record<string, number> | null;
   years_of_experience: number | null;
-  work_experience: Array<{ id: string }> | null;
-  codev_points: Array<{
+  work_experience: { id: string }[] | null;
+  codev_points: {
     id: string;
     skill_category_id: string;
     points: number;
-  }> | null;
-};
+  }[] | null;
+}
 
-export type ServicesProjectCard = {
+export interface ServicesProjectCard {
   id: string;
   name: string;
   main_image?: string;
   description?: string;
   website_url?: string;
-  categories: Array<{ id: number; name: string }>;
-};
+  categories: { id: number; name: string }[];
+}
 
-export type ServicesProjectMember = {
+export interface ServicesProjectMember {
   id: string;
   first_name: string;
   last_name: string;
   image_url?: string | null;
   role?: string;
-};
+}
 
 export type ServicesProjectDetail = ServicesProjectCard & {
   tagline?: string;
@@ -121,7 +121,7 @@ export type ServicesProjectDetail = ServicesProjectCard & {
   members: ServicesProjectMember[];
 };
 
-export type ServicesProjectsPage = {
+export interface ServicesProjectsPage {
   projects: ServicesProjectCard[];
   pagination: {
     page: number;
@@ -130,16 +130,16 @@ export type ServicesProjectsPage = {
     totalPages: number;
   };
   category: string;
-};
+}
 
-export type ListRow = {
+export interface ListRow {
   id: string;
   name: string;
   main_image: string | null;
   description: string | null;
   website_url: string | null;
-  categories?: Array<{
+  categories?: {
     category_id?: number;
     projects_category?: { id: number; name: string } | null;
-  }> | null;
-};
+  }[] | null;
+}

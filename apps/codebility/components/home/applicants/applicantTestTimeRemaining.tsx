@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useMemo, useState } from "react";
 import { getTestDate } from "@/utils/global/applicant-waiting";
 import type { ApplicantTestTimeRemainingProps } from "@/types/home/applicants/applicants";

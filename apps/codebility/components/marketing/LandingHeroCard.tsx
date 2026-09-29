@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { MouseEvent } from "react";
+import type { MouseEvent } from "react";
 import type { HeroCardProps } from "@/types/marketing/marketing";
 
 

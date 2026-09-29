@@ -8,7 +8,8 @@ import { Slider } from "@/components/applicant/profile/sliders";
 import getCroppedImg from "@/hooks/applicant/profile/useImageCrop";
 import { uploadImage } from "@/actions/applicant/profile/upload-image";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import Cropper, { Area, Point } from "react-easy-crop";
+import type { Area, Point } from "react-easy-crop";
+import Cropper from "react-easy-crop";
 import toast from "react-hot-toast";
 
 import { cn } from "@codevs/ui";

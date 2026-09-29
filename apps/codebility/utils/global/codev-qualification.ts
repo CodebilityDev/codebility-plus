@@ -1,4 +1,4 @@
-import { Codev, CodevPoints } from "@/types/global/codev";
+import type { Codev, CodevPoints } from "@/types/global/codev";
 /**
  * Calculate total points across all skill categories for a codev
  * @param codev_points - Array of CodevPoints from codev.codev_points

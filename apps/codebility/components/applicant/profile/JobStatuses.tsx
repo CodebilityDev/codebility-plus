@@ -6,7 +6,7 @@ import { Button } from "@/components/global/ui/button";
 
 
 
-import { JobStatus } from "@/types/global/codev";
+import type { JobStatus } from "@/types/global/codev";
 import toast from "react-hot-toast";
 
 
@@ -94,7 +94,7 @@ const JobStatuses = ({ data }: JobStatusProps) => {
                 salary_range: "",
                 work_setup: "",
                 shift: "",
-              } as JobStatus,
+              },
             ]);
           }
         }}

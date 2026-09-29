@@ -1,12 +1,11 @@
 "use client"
 
 import H1 from "@/components/global/layout/H1";
-import { Button } from "@/components/global/ui/button"
-import { useEffect } from "react"
+import { Button } from "@/components/global/ui/button";
+import { useEffect } from "react";
+import type { ApplicantsErrorProps } from "@/types/home/applicants/applicants";
 
-interface ErrorProps { error: Error & { digest?: string }; reset: () => void }
-
-export default function Error({ error, reset }: ErrorProps) {
+export default function ApplicantsError({ error, reset }: ApplicantsErrorProps) {
   useEffect(() => {
     console.error(error)
   }, [error])

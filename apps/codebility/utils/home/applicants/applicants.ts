@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { baseColumns, waitlistColumns } from "@/constants/home/applicants/applicants";
-import { NewApplicantType } from "@/types/home/applicants/applicants";
-import { ColumnDef } from "@tanstack/react-table";
+import type { NewApplicantType } from "@/types/home/applicants/applicants";
+import type { ColumnDef } from "@tanstack/react-table";
 
 /**
  * Get the appropriate columns for a specific tab

@@ -31,11 +31,11 @@ export interface JobListingsPaginationProps {
   pageSize: number;
 }
 
-export type JobListingsShellProps = {
+export interface JobListingsShellProps {
   pageSize: number;
   initialData?: CareersJobListingsInitial | null;
   loading?: boolean;
-};
+}
 
 export interface CareerGrowthCardProps {
   path: CareerPath;

@@ -1,6 +1,13 @@
 {
   "ui": "tui",
   "$schema": "https://turbo.build/schema.json",
+  "globalEnv": [
+    "DB_SERVICE_ROLE",
+    "NODE_ENV",
+    "REDIS_PASSWORD",
+    "REDIS_URL",
+    "VERCEL_URL"
+  ],
   "tasks": {
     "topo": {
       "dependsOn": ["^topo"]

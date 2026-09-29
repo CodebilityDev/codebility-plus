@@ -8,10 +8,10 @@ export const SERVICES_CATEGORY_SLUGS = [
   "cms",
 ] as const;
 
-export const SERVICES_CATEGORY_TABS: Array<{
+export const SERVICES_CATEGORY_TABS: {
   slug: ServicesCategorySlug;
   label: string;
-}> = [
+}[] = [
   { slug: "all", label: "All" },
   { slug: "web-application", label: "Web Application" },
   { slug: "mobile-application", label: "Mobile Application" },

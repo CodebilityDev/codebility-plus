@@ -1,6 +1,6 @@
 "use client";
 
-import { Codev } from "@/types/global/codev";
+import type { Codev } from "@/types/global/codev";
 
 import AdminCard from "@/components/marketing/LandingAdminCard";
 import BlueBg from "@/components/marketing/LandingBlueBg";

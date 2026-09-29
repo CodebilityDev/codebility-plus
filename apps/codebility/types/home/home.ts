@@ -40,25 +40,25 @@ export interface PostStore {
   closeNav: () => void;
 }
 
-export type SidebarSidebarLink = {
+export interface SidebarSidebarLink {
   route: string;
   imgURL: string;
   label: string;
   permission: PermissionKey;
-};
+}
 
-export type Sidebar = {
+export interface Sidebar {
   id: string;
   title: string;
   links: SidebarSidebarLink[];
-};
+}
 
 // Each key is a boolean column on the `roles` table. Add a key here, in the
 // select below, and in middleware.ts when a new private page gets a permission.
-export type RolePermissions = {
+export interface RolePermissions {
   dashboard: boolean;
   applicants: boolean;
-};
+}
 
 export type PermissionKey = keyof RolePermissions;
 

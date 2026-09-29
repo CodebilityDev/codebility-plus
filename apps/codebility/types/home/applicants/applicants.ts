@@ -7,18 +7,18 @@ import type React from "react";
 
 export type NewApplicantType = z.infer<typeof newApplicantsSchema>
 
-export type ExperienceRanges = {
+export interface ExperienceRanges {
   novice: boolean; // 0-2 years
   intermediate: boolean; // 3-5 years
   expert: boolean; // 5+ years
-};
+}
 
 export interface DataTableProps<TData extends NewApplicantType, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
 
-export type ApplicantFilters = {
+export interface ApplicantFilters {
   hasPortfolio: boolean;
   noPortfolio: boolean;
   hasGithub: boolean;
@@ -45,7 +45,7 @@ export type ApplicantFilters = {
     startDate: string;
     endDate: string;
   };
-};
+}
 
 export interface ApplicantMobileTableProps<TData extends NewApplicantType> {
   table: ReactTable<TData>;
@@ -59,11 +59,11 @@ export interface BoundaryState {
   hasError: boolean;
 }
 
-export type SortOption = {
+export interface SortOption {
   field: string;
   direction: "asc" | "desc";
   label: string;
-};
+}
 
 export type StageState = "completed" | "current" | "pending" | "denied";
 
@@ -116,12 +116,8 @@ export interface ApplicantFiltersComponentProps {
       intermediate: boolean;
       expert: boolean;
     };
-    positions: {
-      [key: string]: boolean;
-    };
-    techStacks: {
-      [key: string]: boolean;
-    };
+    positions: Record<string, boolean>;
+    techStacks: Record<string, boolean>;
     testStatus: {
       taken: boolean;
       notTaken: boolean;
@@ -214,3 +210,21 @@ export interface ApplicantTestTimeRemainingProps {
 }
 
 export interface TimelineBodyProps { applicant: NewApplicantType }
+
+export interface ApplicantModalContextValue {
+  isModalOpen: boolean;
+  selectedApplicant: NewApplicantType | null;
+  openModal: (applicant: NewApplicantType) => void;
+  closeModal: () => void;
+}
+
+export interface ApplicantModalProviderProps {
+  children: ReactNode;
+}
+
+export interface ApplicantsErrorProps {
+  error: Error & { digest?: string };
+  reset: () => void;
+}
+
+export interface ErrorProps { error: Error & { digest?: string }; reset: () => void }

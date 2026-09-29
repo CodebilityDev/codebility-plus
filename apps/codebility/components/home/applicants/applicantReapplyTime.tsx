@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useMemo, useState } from "react";
 import { getReApplyDate } from "@/utils/global/auth-declined";
 import type { ApplicantReapplyTimeProps } from "@/types/home/applicants/applicants";

@@ -2,18 +2,18 @@ import type * as React from "react";
 import type { ApplicantType } from "@/types/applicant/waiting/applicant-waiting";
 
 
-export type Step = {
+export interface Step {
   title: string;
   description?: string;
   optional?: boolean;
-};
+}
 
-export type StepperContextValue = {
+export interface StepperContextValue {
   activeStep: number;
   orientation: "horizontal" | "vertical";
   steps: Step[];
   onChange: (step: number) => void;
-};
+}
 
 export interface StepperProps extends React.HTMLAttributes<HTMLDivElement> {
   activeStep?: number;

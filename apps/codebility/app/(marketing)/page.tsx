@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 
 import Admins from "@/components/marketing/LandingAdmins";
 import Features from "@/components/marketing/LandingFeatures";

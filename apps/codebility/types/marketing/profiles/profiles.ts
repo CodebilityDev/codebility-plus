@@ -33,20 +33,20 @@ export interface ProfilesListPaginationProps {
   pageSize: number;
 }
 
-export type ProfilesListShellProps = {
+export interface ProfilesListShellProps {
   pageSize: number;
   initialData?: ProfilesListingPage | null;
   loading?: boolean;
-};
+}
 
-export type ProfileDetailMeta = {
+export interface ProfileDetailMeta {
   id: string;
   first_name: string;
   last_name: string;
   image_url?: string;
-};
+}
 
-export type ProfileDetailRow = {
+export interface ProfileDetailRow {
   id: string;
   first_name: string | null;
   last_name: string | null;
@@ -65,7 +65,7 @@ export type ProfileDetailRow = {
   work_experience: WorkExperience[] | null;
   work_schedules: Codev["work_schedules"];
   codev_points: Codev["codev_points"];
-};
+}
 
 export interface AnimatedProfilesGridProps {
   codevs: ProfilesListingPage["codevs"];

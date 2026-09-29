@@ -34,7 +34,7 @@ export default function WellcomeSection() {
         className="pointer-events-none absolute inset-0 -z-10 opacity-45"
       >
         <Lottie
-          animationData={confetti as unknown as object}
+          animationData={confetti}
           loop
           autoplay
           style={{ width: "100%", height: "100%" }}

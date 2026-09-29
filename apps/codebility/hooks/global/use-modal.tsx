@@ -1,4 +1,4 @@
-import { Client, Task } from "@/types/global/codev";
+import type { Client, Task } from "@/types/global/codev";
 import { create } from "zustand";
 import type { ModalStore } from "@/types/global/hooks";
 

@@ -4,7 +4,7 @@ import { createWorkExperience, updateWorkExperience } from "@/actions/applicant/
 import { Button } from "@/components/global/ui/button";
 import { IconDelete, IconEdit } from "@/public/assets/svgs/index";
 import type { ExperienceFormProps } from "@/types/applicant/profile/profile";
-import { WorkExperience } from "@/types/global/codev";
+import type { WorkExperience } from "@/types/global/codev";
 import { Input } from "@codevs/ui/input";
 import { Textarea } from "@codevs/ui/textarea";
 import { useState, useEffect } from "react";
@@ -69,7 +69,7 @@ export const ExperienceForm = ({
       setIsLoading(true);
       if (!experience.id) {
         const result = await createWorkExperience(
-          data as Omit<WorkExperience, "id">,
+          data,
         );
         if (result && result.length) {
           experience.id = result[0].id;

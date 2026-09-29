@@ -11,7 +11,7 @@ export interface InputProps
   required?: boolean;
 }
 
-// eslint-disable-next-line react/display-name
+ 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ 
     isKeyboard, 

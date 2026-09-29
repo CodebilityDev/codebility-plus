@@ -14,7 +14,7 @@ function cleanupExpiredEntries() {
 
 export function checkRateLimit(
   key: string,
-  maxAttempts: number = 5,
+  maxAttempts = 5,
   windowMs: number = 5 * 60 * 1000
 ): { allowed: boolean; remaining: number; retryAfterSeconds: number } {
   cleanupExpiredEntries();

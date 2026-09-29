@@ -230,7 +230,7 @@ export async function completeNdaSigning(
  */
 export async function deleteNdaFile(
   filePath: string,
-  bucket: string = "codebility"
+  bucket = "codebility"
 ): Promise<boolean> {
   const supabase = await createClientServerComponent();
   

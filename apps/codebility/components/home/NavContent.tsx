@@ -2,6 +2,7 @@
 
 import { getSidebarData } from "@/actions/home/sidebar";
 import { useUserStore } from "@/store/global/codev-store";
+import { useInitialUser } from "@/providers/home/UserProvider";
 import type { SidebarSection } from "@/types/home/home";
 import { SheetClose } from "@codevs/ui/sheet";
 import Image from "next/image";
@@ -11,27 +12,29 @@ import { useState, useEffect } from "react";
 
 export const NavContent = () => {
   const { user } = useUserStore();
+  const initialUser = useInitialUser();
+  const currentUser = user ?? initialUser;
   const pathname = usePathname();
   const [sidebarData, setSidebarData] = useState<SidebarSection[]>([]);
 
   // Fetch sidebar data based on user role
   useEffect(() => {
     const fetchSidebarData = async () => {
-      if (user?.role_id) {
+      if (currentUser?.role_id) {
         const roleId =
-          user.internal_status == "INACTIVE" ||
-          user.availability_status == false
+          currentUser.internal_status == "INACTIVE" ||
+          currentUser.availability_status == false
             ? -1
-            : user.role_id;
+            : currentUser.role_id;
         const data = await getSidebarData(roleId);
         setSidebarData(data);
       }
     };
 
     fetchSidebarData();
-  }, [user?.role_id]);
+  }, [currentUser]);
 
-  if (user?.application_status !== "passed") return null;
+  if (currentUser?.application_status !== "passed") return null;
 
   return (
     <nav

@@ -61,7 +61,7 @@ export async function uploadImage(
 
 export async function deleteImage(
   filePath: string,
-  bucket: string = "codebility",
+  bucket = "codebility",
 ) {
   const supabase = await createClientServerComponent();
   try {

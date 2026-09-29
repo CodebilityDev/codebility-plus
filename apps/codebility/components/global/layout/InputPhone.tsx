@@ -6,7 +6,7 @@ import { cn } from "@codevs/ui";
 import type { InputProps } from "@/types/global/layout";
 
 
-// eslint-disable-next-line react/display-name
+ 
 const InputField = forwardRef<HTMLInputElement, InputProps>(
   (
     { id, label, error, type = "email", inputClassName, disabled, control },
@@ -60,7 +60,7 @@ const InputField = forwardRef<HTMLInputElement, InputProps>(
     };
 
     const concatenateValues = (selectValue: string, inputValue: string) => {
-      let newInputVal = inputValue || "";
+      const newInputVal = inputValue || "";
       return `${selectValue}-${newInputVal}`;
     };
 
@@ -88,12 +88,12 @@ const InputField = forwardRef<HTMLInputElement, InputProps>(
                       "focus:outline-none",
                       inputClassName,
                     )}
-                    value={(value && value.split("-")[0]) || ""}
+                    value={(value?.split("-")[0]) || ""}
                     onChange={(e) =>
                       onChange(
                         concatenateValues(
                           e.target.value,
-                          value && value.split("-")[1],
+                          value?.split("-")[1],
                         ),
                       )
                     }
@@ -133,7 +133,7 @@ const InputField = forwardRef<HTMLInputElement, InputProps>(
                       const rawValue = e.target.value.replace(/\D/g, "");
                       onChange(
                         concatenateValues(
-                          value && value.split("-")[0],
+                          value?.split("-")[0],
                           rawValue,
                         ),
                       );

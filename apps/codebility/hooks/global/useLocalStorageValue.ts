@@ -29,8 +29,8 @@ function subscribeKey(key: string, onStoreChange: Listener) {
   window.addEventListener("storage", onStorage);
 
   return () => {
-    listeners!.delete(onStoreChange);
-    if (listeners!.size === 0) listenersByKey.delete(key);
+    listeners.delete(onStoreChange);
+    if (listeners.size === 0) listenersByKey.delete(key);
     window.removeEventListener("storage", onStorage);
   };
 }

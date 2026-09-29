@@ -54,7 +54,7 @@ export async function middleware(req: NextRequest) {
 
 
     // 1. Check if the route is public - allow access without any auth checks
-    if (PUBLIC_ROUTES.includes(pathname as any)) {
+    if (PUBLIC_ROUTES.includes(pathname)) {
       return NextResponse.next();
     }
 
@@ -68,7 +68,7 @@ export async function middleware(req: NextRequest) {
     }
 
     // 2. Special handling for auth routes
-    if (AUTH_ROUTES.includes(pathname as any)) {
+    if (AUTH_ROUTES.includes(pathname)) {
       // We need to check if user is logged in, but handle "no token" gracefully
       const supabase = await createClientServerComponent();
       const {
@@ -117,7 +117,7 @@ export async function middleware(req: NextRequest) {
 
     // Allow authenticated users to access auth status routes without further checks
     // This prevents redirect loops when users are being directed to these pages
-    if (AUTH_STATUS_ROUTES.includes(pathname as any)) {
+    if (AUTH_STATUS_ROUTES.includes(pathname)) {
       return NextResponse.next();
     }
 
@@ -138,7 +138,7 @@ export async function middleware(req: NextRequest) {
     const { data: userData, error: userError } = await supabase
       .from("codev")
       .select("id, application_status, role_id")
-      .eq("id", user!.id)
+      .eq("id", user.id)
       .single();
 
     if (userError || !userData) {

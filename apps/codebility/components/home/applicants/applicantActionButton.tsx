@@ -8,7 +8,7 @@ import { useToast } from "@/components/global/ui/use-toast";
 import { cn } from "@/utils/global/cn";
 import { CheckCircle2Icon, Loader2Icon, MailIcon, MoreHorizontalIcon } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@codevs/ui/dropdown-menu";
-import { useApplicantModal } from "@/components/home/applicants/ApplicantClientWrapper";
+import { useApplicantModal } from "@/providers/home/applicants/ApplicantModalProvider";
 
 import { acceptApplicantAction, denyApplicantAction, moveApplicantToApplyingAction, moveApplicantToOnboardingAction, moveApplicantToTestingAction, passApplicantTestAction } from "@/actions/home/applicants/applicants";
 import { sendDenyEmail } from "@/actions/home/applicants/deny-email";

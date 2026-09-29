@@ -5,7 +5,7 @@ import Box from "@/components/global/layout/Box";
 import { Button } from "@/components/global/ui/button";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/global/ui/select";
 import { IconEdit } from "@/public/assets/svgs/index";
-import { Position } from "@/types/global/codev";
+import type { Position } from "@/types/global/codev";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 

@@ -1,17 +1,17 @@
 import type React from "react";
-export type RoadmapStep = {
+export interface RoadmapStep {
   id: string;
   step: string;
-};
+}
 
-export type RoadmapPhase = {
+export interface RoadmapPhase {
   id: string;
   phase: string;
   title: string;
   pointsRange: string;
   color: string;
   steps: RoadmapStep[];
-};
+}
 
 export interface OrbitingCirclesProps {
   className?: string;
