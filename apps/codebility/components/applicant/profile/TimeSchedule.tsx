@@ -6,7 +6,6 @@ import { TimePicker12 } from "@/components/applicant/profile/TimePicker12hourDem
 import type { Period } from "@/types/applicant/profile/profile";
 import { Button } from "@/components/global/ui/button";
 import { IconEdit } from "@/public/assets/svgs/index";
-import { useUserStore } from "@/store/global/codev-store";
 import type { DayOfWeek, WorkSchedule } from "@/types/global/codev";
 import { DAYS_OF_WEEK, WEEKDAYS } from "@/constants/applicant/profile/profile";
 import { useState } from "react";
@@ -21,12 +20,11 @@ import { DEFAULT_START_TIME, DEFAULT_END_TIME } from "@/constants/applicant/prof
 import type { TimeScheduleProps } from "@/types/applicant/profile/profile";
 
 
-const TimeSchedule = ({ data }: TimeScheduleProps) => {
-  const { user } = useUserStore();
+const TimeSchedule = ({ data, codevId }: TimeScheduleProps) => {
 
   const [schedule, setSchedule] = useState<WorkSchedule>(() => ({
     id: data?.id ?? "",
-    codev_id: user?.id ?? "",
+    codev_id: codevId,
     days_of_week: data?.days_of_week ?? [],
     start_time: data?.start_time ?? DEFAULT_START_TIME,
     end_time: data?.end_time ?? DEFAULT_END_TIME,
@@ -138,7 +136,7 @@ const TimeSchedule = ({ data }: TimeScheduleProps) => {
   const handleCancel = () => {
     setSchedule({
       id: data?.id ?? "",
-      codev_id: user?.id ?? "",
+      codev_id: codevId,
       days_of_week: data?.days_of_week ?? [],
       start_time: data?.start_time ?? DEFAULT_START_TIME,
       end_time: data?.end_time ?? DEFAULT_END_TIME,

@@ -93,7 +93,7 @@ export default function VideoPlayer({
 
         if (percentWatched >= COMPLETION_THRESHOLD && !progressSavedRef.current) {
           setHasWatched(true);
-          saveVideoProgress(cur, total);
+          void saveVideoProgress(cur, total);
         }
       }
     };
@@ -103,14 +103,16 @@ export default function VideoPlayer({
       pollRef.current = window.setInterval(tick, POLL_INTERVAL_MS);
     };
 
+    const host = hostRef.current;
+
     loadYouTubeApi()
       .then((YT) => {
-        if (cancelled || !hostRef.current) return;
+        if (cancelled || !host) return;
 
         // Give the API its own element so destroying it never fights React.
         const target = document.createElement("div");
-        hostRef.current.innerHTML = "";
-        hostRef.current.appendChild(target);
+        host.innerHTML = "";
+        host.appendChild(target);
 
         playerRef.current = new YT.Player(target, {
           videoId,
@@ -150,7 +152,7 @@ export default function VideoPlayer({
                   if (!progressSavedRef.current && total > 0) {
                     setProgress(100);
                     setHasWatched(true);
-                    saveVideoProgress(total, total);
+                    void saveVideoProgress(total, total);
                   }
                 }
               }
@@ -181,9 +183,8 @@ export default function VideoPlayer({
         // Player may already be torn down; ignore.
       }
       playerRef.current = null;
-      if (hostRef.current) hostRef.current.innerHTML = "";
+      if (host) host.innerHTML = "";
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [videoId, canWatch, saveVideoProgress]);
 
   const formatTime = (seconds: number) => {

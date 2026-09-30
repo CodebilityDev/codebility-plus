@@ -21,14 +21,14 @@ export async function uploadImage(
     const { bucket, folder} = options;
 
     // Generate a cleaner file path
-    const fileExtension = file.name.split(".").pop() || "";
+    const fileExtension = file.name.split(".").pop() ?? "";
     const fileName = `${Date.now()}.${fileExtension}`;
     const filePath = `${folder}/${fileName}`; // Simpler path structure
 
     const { error: uploadError } = await supabase.storage
       .from(bucket!)
       .upload(filePath, file, {
-        cacheControl: options.cacheControl || "3600",
+        cacheControl: options.cacheControl ?? "3600",
         upsert: options.upsert ?? true,
       });
 

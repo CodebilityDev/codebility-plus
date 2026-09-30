@@ -1,3 +1,20 @@
+import type { CurrentUserProfile } from "@/types/global/current-user";
+
+export interface AccountSettings2FAProps {
+  mfaFactors: MfaFactor[];
+}
+
+export interface AccountSettingsContentProps {
+  user: CurrentUserProfile | null;
+  mfaFactors: MfaFactor[];
+}
+
+export interface MfaFactor {
+  id: string;
+  status: string;
+  friendly_name: string | null;
+}
+
 export interface Factor {
   id: string;
   status: "verified" | "unverified";

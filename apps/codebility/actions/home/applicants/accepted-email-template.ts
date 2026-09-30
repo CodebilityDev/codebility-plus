@@ -1,7 +1,7 @@
 import { EMAIL_STYLES } from "@/actions/home/applicants/email-config";
 
 export const getAcceptedTextTemplate = (name?: string) => `
-Dear ${name ? name : "Applicant"},
+Dear ${name ?? "Applicant"},
 
 🎉 Congratulations! We are thrilled to inform you that you have been ACCEPTED to join Codebility!
 
@@ -108,7 +108,7 @@ export const getAcceptedHtmlTemplate = (name?: string) => `
     </div>
 
     <div class="content">
-        <p>Dear ${name ? name : "Applicant"},</p>
+        <p>Dear ${name ?? "Applicant"},</p>
 
         <p>We are thrilled to inform you that after carefully reviewing your onboarding performance, quiz results, and commitment, <strong>you have been ACCEPTED</strong> to join Codebility!</p>
 

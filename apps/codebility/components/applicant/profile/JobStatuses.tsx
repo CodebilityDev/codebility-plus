@@ -85,15 +85,18 @@ const JobStatuses = ({ data }: JobStatusProps) => {
               ...prev,
               {
                 id: "",
-                codev_id: "",
+                codev_id: null,
                 job_title: "",
                 company_name: "",
                 employment_type: "",
-                description: "",
+                description: null,
                 status: "active",
-                salary_range: "",
+                salary_range: null,
                 work_setup: "",
-                shift: "",
+                shift: null,
+                hours_per_week: null,
+                created_at: null,
+                updated_at: null,
               },
             ]);
           }

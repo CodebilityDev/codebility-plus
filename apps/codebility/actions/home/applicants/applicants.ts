@@ -11,7 +11,9 @@ async function revalidateApplicants() {
     revalidatePath("/home/applicants");
 }
 
-export async function deleteApplicantAction(applicant: NewApplicantType) {
+export async function deleteApplicantAction(
+  applicant: { id: string; application_status: string | null },
+) {
     try {
         const supabase = await createAdminClient();
 
@@ -157,7 +159,7 @@ export async function denyApplicantAction(applicantId: string) {
         const { error: rejectedCountError } = await supabase
             .from("codev")
             .update({
-                rejected_count: (data?.rejected_count || 0) + 1,
+                rejected_count: (data?.rejected_count ?? 0) + 1,
                 updated_at: new Date().toISOString()
             })
             .eq("id", applicantId);
@@ -237,7 +239,7 @@ export async function multipleDenyApplicantAction(applicantIds: string[]) {
             return supabase
                 .from("codev")
                 .update({
-                    rejected_count: (data?.rejected_count || 0) + 1,
+                    rejected_count: (data?.rejected_count ?? 0) + 1,
                     updated_at: new Date().toISOString()
                 })
                 .eq("id", applicantId);
@@ -589,7 +591,7 @@ export async function updateReminderCountAction(applicantId: string) {
             }
         } else {
             // Update the existing record
-            const newCount = (existingApplicant.reminded_count || 0) + 1;
+            const newCount = (existingApplicant.reminded_count ?? 0) + 1;
             
             const { error: updateError } = await supabase
                 .from("applicant")
@@ -630,7 +632,7 @@ export async function updateMultipleReminderCountAction(applicantIds: string[]) 
             return supabase
                 .from("applicant")
                 .update({
-                    reminded_count: (currentData?.reminded_count || 0) + 1,
+                    reminded_count: (currentData?.reminded_count ?? 0) + 1,
                     last_reminded_date: new Date().toISOString(),
                     updated_at: new Date().toISOString()
                 })
@@ -710,7 +712,7 @@ export async function deleteApplicantById(applicantId: string) {
         // Get the full applicant data first
         const { data: applicantData } = await supabase
             .from("codev")
-            .select("*")
+            .select("id, application_status")
             .eq("id", applicantId)
             .single();
 

@@ -40,7 +40,7 @@ export async function reApplyAction({ user }: { user: any }) {
             .from("codev")
             .update({
                 application_status: "applying",
-                rejected_count: (user.rejected_count || 0) + 1,
+                rejected_count: (user.rejected_count ?? 0) + 1,
                 updated_at: new Date().toISOString(),
                 date_applied: new Date().toISOString(),
             })

@@ -16,7 +16,7 @@ export const getMenuItems = (
   role_id: number,
   applicant: {
     id: string;
-    codev_id: string;
+    codev_id: string | null;
   } | null,
 ) => {
   if (

@@ -80,7 +80,7 @@ const ApplicantProfileModal = () => {
                 </div>
 
                 <p className="truncate text-sm text-gray-600 dark:text-gray-300">
-                  {selectedApplicant.display_position || "Position not specified"}
+                  {selectedApplicant.display_position ?? "Position not specified"}
                 </p>
 
                 <div className="flex flex-wrap items-center gap-2">

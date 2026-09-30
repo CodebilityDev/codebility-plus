@@ -9,7 +9,7 @@ import { SECTIONS } from "@/constants/auth/onboarding/onboarding";
 export default function OnboardingStepper() {
   const activeSection = useActiveSection(
     SECTIONS.map((section) => section.id),
-    SECTIONS[0]?.id || "about-section",
+    SECTIONS[0]?.id ?? "about-section",
   );
 
   // Scroll to section when circle is clicked

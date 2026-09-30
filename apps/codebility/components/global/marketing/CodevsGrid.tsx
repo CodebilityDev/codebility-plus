@@ -9,6 +9,7 @@ import type { CodevsGridProps } from "@/types/global/marketing";
 export function CodevsGrid({
   codevs,
   page,
+  skillCategories,
 }: CodevsGridProps) {
   if (codevs.length === 0) {
     return (
@@ -38,6 +39,7 @@ export function CodevsGrid({
             color={getStableColor(codev.id)}
             codev={codev}
             animateEntrance={false}
+            skillCategories={skillCategories}
           />
         </motion.div>
       ))}

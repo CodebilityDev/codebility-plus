@@ -1,5 +1,5 @@
 import { cache } from "react";
-import type { Codev } from "@/types/global/codev";
+import type { CurrentUserProfile } from "@/types/global/current-user";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 
 /**
@@ -9,7 +9,8 @@ import { createClientServerComponent } from "@/lib/global/supabase-server";
  * `getCurrentCodevAction` server action so that pages never read cookies
  * during render (which would force the whole route to render dynamically).
  */
-export const getCurrentCodev = cache(async (): Promise<Codev | null> => {
+export const getCurrentCodev = cache(
+  async (): Promise<CurrentUserProfile | null> => {
   const supabase = await createClientServerComponent();
 
   const {
@@ -20,7 +21,9 @@ export const getCurrentCodev = cache(async (): Promise<Codev | null> => {
 
   const { data, error } = await supabase
     .from("codev")
-    .select("*")
+    .select(
+      "id, first_name, last_name, email_address, image_url, role_id, application_status, internal_status, availability_status",
+    )
     .eq("id", user.id)
     .single();
 
@@ -29,5 +32,6 @@ export const getCurrentCodev = cache(async (): Promise<Codev | null> => {
     return null;
   }
 
-  return data;
-});
+    return data;
+  },
+);

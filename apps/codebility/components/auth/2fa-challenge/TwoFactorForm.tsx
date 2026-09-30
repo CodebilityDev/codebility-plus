@@ -44,7 +44,7 @@ export default function TwoFactorForm({ factorId }: TwoFactorFormProps) {
       });
 
       if (error) {
-        toast.error(error.message || "Invalid 2FA code. Please try again.");
+        toast.error(error.message ?? "Invalid 2FA code. Please try again.");
         setIsLoading(false);
         return;
       }
@@ -53,7 +53,7 @@ export default function TwoFactorForm({ factorId }: TwoFactorFormProps) {
       const returnTo = searchParams.get("from") || "/home";
       router.push(returnTo);
     } catch (err: any) {
-      toast.error(err?.message || "Verification failed");
+      toast.error(err?.message ?? "Verification failed");
       setIsLoading(false);
     }
   };

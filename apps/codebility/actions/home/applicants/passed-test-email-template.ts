@@ -5,7 +5,7 @@ export const getPassedTestTextTemplate = (
   waitListLink?: string,
   discordLink?: string
 ) => `
-Dear ${name ? name : "Applicant"},
+Dear ${name ?? "Applicant"},
 Congratulations for passing the Assessment!
 
 We are thrilled to inform you that you have successfully completed the assessment with Codebility.
@@ -61,7 +61,7 @@ border-radius: 5px;
 </div>
 
 <div class="content">
-<p>Dear ${name ? name : "Applicant"},</p>
+<p>Dear ${name ?? "Applicant"},</p>
 
 <p>We are thrilled to inform you that you have successfully completed the assessment with Codebility.</p>
 <p>For now, please visit our website and check the status of your application.</p>

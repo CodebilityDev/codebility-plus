@@ -4,7 +4,7 @@ import { createClientAnon } from "@/lib/global/supabase-anon";
 import type { LandingAdminsData } from "@/types/global/lib";
 
 
-const FOUNDER_USER_ID = process.env.NEXT_PUBLIC_FOUNDER_USER_ID || "";
+const FOUNDER_USER_ID = process.env.NEXT_PUBLIC_FOUNDER_USER_ID ?? "";
 
 const ADMIN_SELECT =
   "id, first_name, last_name, image_url, display_position, availability_status, role_id";

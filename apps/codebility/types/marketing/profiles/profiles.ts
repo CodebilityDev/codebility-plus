@@ -1,4 +1,4 @@
-import type { Codev, WorkExperience } from "@/types/global/codev";
+import type { Codev, CodevBadgeSkillCategory, WorkExperience } from "@/types/global/codev";
 import type { ProfilesListingPage } from "@/types/global/profiles-listing";
 
 export interface ProfilesIdPageProps {
@@ -10,6 +10,7 @@ export type LevelMap = Record<string, number>;
 export interface ProfileContentProps {
   codev: Codev;
   availableSchedule: NonNullable<Codev["work_schedules"]>[number] | null;
+  skillCategories: CodevBadgeSkillCategory[];
 }
 
 export interface ProjectInfo {
@@ -43,6 +44,7 @@ export interface ProfilesListSectionProps {
 export interface ProfilesListPaginationProps {
   initialData: ProfilesListingPage;
   pageSize: number;
+  skillCategories: CodevBadgeSkillCategory[];
 }
 
 export interface ProfilesListShellProps {
@@ -81,6 +83,7 @@ export interface ProfileDetailRow {
 export interface AnimatedProfilesGridProps {
   codevs: ProfilesListingPage["codevs"];
   animationKey: string;
+  skillCategories: CodevBadgeSkillCategory[];
 }
 
 export interface ProfileProjectsContentProps { codevId: string }
@@ -98,6 +101,7 @@ export interface ProfileProjectsSkeletonProps { count?: number }
 export interface ProfilesGridProps {
   codevs: ProfilesListingPage["codevs"];
   animationKey: string;
+  skillCategories: CodevBadgeSkillCategory[];
 }
 
 export interface ProfilesListSkeletonProps { count?: number }

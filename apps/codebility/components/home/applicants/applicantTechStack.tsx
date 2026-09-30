@@ -16,7 +16,7 @@ export default function ApplicantTechStack({
     ? applicant.tech_stacks
     : applicant.tech_stacks?.slice(0, 4);
 
-  const hasMoreStacks = (applicant.tech_stacks?.length || 0) > 4;
+  const hasMoreStacks = (applicant.tech_stacks?.length ?? 0) > 4;
 
   return (
     <div className="flex flex-wrap items-center gap-1.5">

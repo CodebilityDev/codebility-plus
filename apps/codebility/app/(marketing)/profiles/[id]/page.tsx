@@ -5,6 +5,7 @@ import Logo from "@/components/global/layout/Logo";
 import { getCachedProfileDetail, getCachedProfileDetailMeta } from "@/lib/marketing/profiles/profile-detail-cached";
 import { getCachedLandingAdminsData, getLandingAdminsProfileIds } from "@/lib/global/landing-admins-cached";
 import { getCachedLandingInternsPage } from "@/lib/global/landing-interns-cached";
+import { getSkillCategories } from "@/lib/global/skill-categories-cached";
 
 
 import ProfileCloseButton from "@/components/marketing/profiles/ProfileDetailCloseButton";
@@ -46,7 +47,7 @@ export async function generateMetadata({ params }: ProfilesIdPageProps): Promise
   }
 
   const name = `${profile.first_name} ${profile.last_name}`.trim();
-  const image = profile.image_url || "/og-image.jpg";
+  const image = profile.image_url ?? "/og-image.jpg";
 
   return {
     title: `${name} — Developer Profile | Codebility`,
@@ -71,7 +72,10 @@ export async function generateMetadata({ params }: ProfilesIdPageProps): Promise
 
 export default async function CodevBioPage(props: ProfilesIdPageProps) {
   const { id } = await props.params;
-  const codev = await getCachedProfileDetail(id);
+  const [codev, skillCategories] = await Promise.all([
+    getCachedProfileDetail(id),
+    getSkillCategories(),
+  ]);
 
   if (!codev) {
     notFound();
@@ -89,6 +93,7 @@ export default async function CodevBioPage(props: ProfilesIdPageProps) {
         <ProfileContent
           codev={codev}
           availableSchedule={availableSchedule}
+          skillCategories={skillCategories}
         />
       </div>
       <div className="relative flex flex-col items-center gap-4 pb-10">

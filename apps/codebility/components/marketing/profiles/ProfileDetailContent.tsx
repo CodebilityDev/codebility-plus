@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ClockIcon } from "lucide-react";
 import { cn } from "@codevs/ui";
+import { asLevelRecord } from "@/utils/global/codev-level";
 import { IconAbout, IconGithub, IconLink, IconSkills, IconLinkedInWhiteSmall } from "@/public/assets/svgs/index";
 
 import CodevBadge from "@/components/global/codev/CodevBadge";
@@ -19,6 +20,7 @@ import { getFilteredLevel } from "@/utils/marketing/profiles/profiles";
 export default function ProfileContent({
   codev,
   availableSchedule,
+  skillCategories,
 }: ProfileContentProps) {
   const allDays = [
     "Monday",
@@ -53,8 +55,8 @@ export default function ProfileContent({
   const sanitizeUrl = (url: string | undefined): string => {
     if (!url) return "#";
     return url
-      .replace(process.env.NEXT_PUBLIC_APP_BASE_URL || "", "")
-      .replace(process.env.NEXT_PUBLIC_APP_BASE_URL || "", "");
+      .replace(process.env.NEXT_PUBLIC_APP_BASE_URL ?? "", "")
+      .replace(process.env.NEXT_PUBLIC_APP_BASE_URL ?? "", "");
   };
 
   const formatTime = (time: string) => {
@@ -81,7 +83,7 @@ export default function ProfileContent({
   } = codev;
 
   const filteredLevel = React.useMemo(
-    () => getFilteredLevel(codev.level),
+    () => getFilteredLevel(asLevelRecord(codev.level)),
     [codev.level],
   );
 
@@ -186,6 +188,7 @@ export default function ProfileContent({
       {codev.level && (
         <CodevBadge
           level={filteredLevel}
+          skillCategories={skillCategories}
           className="transition-transform group-hover:scale-100"
         />
       )}
@@ -317,8 +320,8 @@ export default function ProfileContent({
                     <p className="text-lg text-white">{edu.institution}</p>
                     {edu.degree && (
                       <p className="text-gray">
-                        {edu.degree} ({edu.start_date || "N/A"} -{" "}
-                        {edu.end_date || "Present"})
+                        {edu.degree} ({edu.start_date ?? "N/A"} -{" "}
+                        {edu.end_date ?? "Present"})
                       </p>
                     )}
                   </div>
@@ -345,7 +348,7 @@ export default function ProfileContent({
                       <span className="text-customViolet-100 mr-2">
                         {exp.company_name.toUpperCase()}
                       </span>
-                      ({exp.date_from} - {exp.date_to || "Present"})
+                      ({exp.date_from} - {exp.date_to ?? "Present"})
                     </p>
                     <p className="text-md text-gray font-semibold">
                       @{exp.location}

@@ -2,18 +2,22 @@
 
 import { cachedUser } from "@/lib/applicant/profile/supabase-action";
 import type {
-  Codev,
-  Education,
   JobStatus,
   Position,
   WorkExperience,
   WorkSchedule,
 } from "@/types/global/codev";
+
 import { createClientServerComponent } from "@/lib/global/supabase-server";
+import type { Database } from "@/types/global/supabase";
+
+type CodevUpdate = Database["public"]["Tables"]["codev"]["Update"];
+type EducationInsert = Database["public"]["Tables"]["education"]["Insert"];
+type EducationUpdate = Database["public"]["Tables"]["education"]["Update"];
 
 
 // Codev profile functions
-export async function updateCodev(updatedData: Partial<Codev>) {
+export async function updateCodev(updatedData: CodevUpdate) {
   try {
     const supabase = await createClientServerComponent();
 
@@ -27,7 +31,7 @@ export async function updateCodev(updatedData: Partial<Codev>) {
         updated_at: new Date().toISOString(),
       })
       .eq("id", user.id)
-      .select("*");
+      .select("id");
 
     if (error) throw error;
     return data;
@@ -56,7 +60,7 @@ export async function updateSocialLinks(socialData: {
         updated_at: new Date().toISOString(),
       })
       .eq("id", user.id)
-      .select("*");
+      .select("id");
 
     if (error) throw error;
     return data;
@@ -135,9 +139,7 @@ export async function deleteWorkExperience(id: string) {
 }
 
 // Education functions
-export async function createEducation(
-  education: Omit<Education, "id" | "created_at" | "updated_at">,
-) {
+export async function createEducation(education: EducationInsert) {
   try {
     const supabase = await createClientServerComponent();
     const user = await cachedUser();
@@ -161,7 +163,7 @@ export async function createEducation(
 
 export async function updateEducation(
   id: string,
-  educationData: Partial<Education>,
+  educationData: EducationUpdate,
 ) {
   try {
     const supabase = await createClientServerComponent();
@@ -208,7 +210,9 @@ export async function getEducation(codevId: string) {
 
     const { data, error } = await supabase
       .from("education")
-      .select("*")
+      .select(
+        "id, codev_id, institution, degree, major_subject, description, achievements, start_date, end_date, created_at, updated_at",
+      )
       .eq("codev_id", codevId)
       .order("start_date", { ascending: false });
 
@@ -297,7 +301,7 @@ export async function getWorkSchedule(codevId: string) {
 
     const { data, error } = await supabase
       .from("work_schedules")
-      .select("*")
+      .select("id, codev_id, days_of_week, start_time, end_time, created_at, updated_at")
       .eq("codev_id", codevId)
       .single();
 
@@ -324,7 +328,7 @@ export async function createJobStatus(jobStatus: Omit<JobStatus, "id">) {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
-      .select("*")
+      .select("id")
       .single();
 
     if (error) throw error;
@@ -351,7 +355,7 @@ export async function updateJobStatus(
         updated_at: new Date().toISOString(),
       })
       .eq("id", id)
-      .select("*")
+      .select("id")
       .single();
 
     if (error) throw error;
@@ -386,7 +390,9 @@ export async function getJobStatuses(codevId: string) {
     const supabase = await createClientServerComponent();
     const { data, error } = await supabase
       .from("job_status")
-      .select("*")
+      .select(
+        "id, codev_id, job_title, company_name, employment_type, description, status, salary_range, work_setup, shift, hours_per_week, created_at, updated_at",
+      )
       .eq("codev_id", codevId);
 
     if (error) throw error;
@@ -403,7 +409,7 @@ export const getPositions = async (): Promise<{
 }> => {
   const supabase = await createClientServerComponent();
 
-  const { data, error } = await supabase.from("positions").select("*");
+  const { data, error } = await supabase.from("positions").select("id, name, description");
   if (error) {
     console.error("Error fetching positions:", error);
     return { error, data: null };

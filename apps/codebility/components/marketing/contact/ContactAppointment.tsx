@@ -1,5 +1,7 @@
 "use client";
 
+import { createAppointment } from "@/actions/marketing/contact/contact-appointment";
+
 import { useState } from "react";
 import { Button } from "@/components/global/ui/button";
 import { meetingTypes, timeSlots, unavailableSlots, DAYS, MONTHS } from "@/constants/marketing/contact/contact";
@@ -61,35 +63,27 @@ export default function Appointment({ formData, onBack }: AppointmentProps) {
     setError("");
 
     try {
-      const res = await fetch("/api/appointments", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          // Step 1
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.email,
-          companyName: formData.companyName,
-          phoneNumber: formData.phoneNumber,
-          industry: formData.industry,
-          // Step 2
-          serviceInterest: formData.serviceInterest,
-          projectType: formData.projectType,
-          featuresNeeded: formData.featuresNeeded,
-          referralSource: formData.referralSource,
-          interestLevel: formData.interestLevel,
-          otherRequirements: formData.otherRequirements,
-          // Step 3
-          appointmentDate: selectedDate,
-          appointmentTime: selectedSlot,
-          meetingType,
-          meetingToolOther: meetingType === "other" ? otherTool : null,
-        }),
+      const result = await createAppointment({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        companyName: formData.companyName,
+        phoneNumber: formData.phoneNumber,
+        industry: formData.industry,
+        serviceInterest: formData.serviceInterest,
+        projectType: formData.projectType,
+        featuresNeeded: formData.featuresNeeded,
+        referralSource: formData.referralSource,
+        interestLevel: formData.interestLevel,
+        otherRequirements: formData.otherRequirements,
+        appointmentDate: selectedDate,
+        appointmentTime: selectedSlot,
+        meetingType,
+        meetingToolOther: meetingType === "other" ? otherTool : null,
       });
 
-      if (!res.ok) {
-        const data = (await res.json()) as { error?: string };
-        throw new Error(data.error || "Something went wrong.");
+      if (result.error) {
+        throw new Error(result.error);
       }
 
       setSubmitted(true);

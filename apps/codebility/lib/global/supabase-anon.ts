@@ -1,16 +1,17 @@
-import { createClient  } from "@supabase/supabase-js";
-import type {SupabaseClient} from "@supabase/supabase-js";
+import { createClient } from "@supabase/supabase-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { ensureSupabaseEnv } from "@/lib/global/supabase-ensure-env";
+import type { Database } from "@/types/global/supabase";
 
-let anonClient: SupabaseClient | null = null;
+let anonClient: SupabaseClient<Database> | null = null;
 
-export const createClientAnon = (): SupabaseClient => {
+export const createClientAnon = (): SupabaseClient<Database> => {
   if (anonClient) return anonClient;
 
   ensureSupabaseEnv();
 
-  anonClient = createClient(
+  anonClient = createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
@@ -23,4 +24,3 @@ export const createClientAnon = (): SupabaseClient => {
 
   return anonClient;
 };
-

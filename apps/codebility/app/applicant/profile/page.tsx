@@ -2,6 +2,7 @@ import H1 from "@/components/global/layout/H1";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import { getPositions } from "@/actions/applicant/profile/applicant-profile";
 import { Toaster } from "react-hot-toast";
+import { asLevelRecord } from "@/utils/global/codev-level";
 
 import About from "@/components/applicant/profile/About";
 import ContactInfo from "@/components/applicant/profile/ContactInfo";
@@ -48,7 +49,9 @@ async function ProfileComponent() {
   // Fetch user profile data
   const { data: user, error: userError } = await supabase
     .from("codev")
-    .select("*")
+    .select(
+      "id, first_name, last_name, address, display_position, headline, years_of_experience, about, facebook, linkedin, github, discord, portfolio_website, phone_number, image_url, tech_stacks, level",
+    )
     .eq("id", authUser.id)
     .single();
 
@@ -70,22 +73,34 @@ async function ProfileComponent() {
   ] = await Promise.all([
     supabase
       .from("education")
-      .select("*")
+      .select(
+        "id, codev_id, institution, degree, major_subject, description, achievements, start_date, end_date, created_at, updated_at",
+      )
       .eq("codev_id", user.id)
       .order("start_date", { ascending: false }),
     supabase
       .from("work_experience")
-      .select("*")
+      .select(
+        "id, codev_id, position, company_name, description, date_from, date_to, location, is_present, profile_id",
+      )
       .eq("codev_id", user.id)
       .order("date_from", { ascending: false }),
-    supabase.from("work_schedules").select("*").eq("codev_id", user.id),
-    supabase.from("job_status").select("*").eq("codev_id", user.id),
+    supabase
+      .from("work_schedules")
+      .select("id, codev_id, days_of_week, start_time, end_time, created_at, updated_at")
+      .eq("codev_id", user.id),
+    supabase
+      .from("job_status")
+      .select(
+        "id, codev_id, job_title, company_name, employment_type, description, status, salary_range, work_setup, shift, hours_per_week, created_at, updated_at",
+      )
+      .eq("codev_id", user.id),
   ]);
 
   // Combine data
   const codevData = {
     ...user,
-    education: education || [],
+    education: education ?? [],
   };
 
   return (
@@ -100,7 +115,14 @@ async function ProfileComponent() {
         <div className="flex flex-col gap-8 md:flex-row">
           <div className="flex w-full basis-[70%] flex-col gap-8 2xl:basis-[60%]">
             <PersonalInfo data={codevData} positions={positions ?? []} />
-            <About data={codevData} />
+            <ProfilePointsGate>
+              {(points) => (
+                <About
+                  data={codevData}
+                  earnedCategories={earnedCategories(points)}
+                />
+              )}
+            </ProfilePointsGate>
             <ProfilePointsGate>
               {(points) => (
                 <>
@@ -117,12 +139,12 @@ async function ProfileComponent() {
                   />
                   <EducationalBackground
                     earnedCategories={earnedCategories(points)}
-                    data={education || []}
+                    data={education ?? []}
                     codevId={user.id}
                   />
                   <Experience
                     earnedCategories={earnedCategories(points)}
-                    data={workExperience || []}
+                    data={workExperience ?? []}
                     codevId={user.id}
                   />
                 </>
@@ -135,20 +157,20 @@ async function ProfileComponent() {
                 <>
                   <Photo
                     earnedCategories={earnedCategories(points)}
-                    data={{ image_url: user.image_url || null }}
+                    data={{ image_url: user.image_url ?? null }}
                   />
                   <Skills
                     earnedCategories={earnedCategories(points)}
                     data={{
                       tech_stacks: user.tech_stacks,
-                      level: user.level,
+                      level: asLevelRecord(user.level),
                     }}
                   />
                 </>
               )}
             </ProfilePointsGate>
-            <TimeSchedule data={schedules?.[0] || null} />
-            <JobStatuses data={jobStatuses || []} />
+            <TimeSchedule data={schedules?.[0] || null} codevId={user.id} />
+            <JobStatuses data={jobStatuses ?? []} />
             
           </div>
         </div>

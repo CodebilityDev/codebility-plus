@@ -1,4 +1,5 @@
 import { getCachedCodevsProfilesPage } from "@/lib/global/codevs-profiles-cached";
+import { getSkillCategories } from "@/lib/global/skill-categories-cached";
 import { parsePageParam, parseStringParam } from "@/utils/global/page-param";
 
 import CodevsProfilesContainer from "@/components/global/marketing/CodevsProfilesContainer";
@@ -12,7 +13,10 @@ export default async function CodevsProfiles({ searchParams }: CodevsProfilesPro
   const position = parseStringParam(query.position);
   const page = parsePageParam(query.page);
 
-  const initialData = await getCachedCodevsProfilesPage(position, page, PAGE_SIZE);
+  const [initialData, skillCategories] = await Promise.all([
+    getCachedCodevsProfilesPage(position, page, PAGE_SIZE),
+    getSkillCategories(),
+  ]);
 
   if (!initialData || initialData.codevs.length === 0) {
     return (
@@ -40,6 +44,7 @@ export default async function CodevsProfiles({ searchParams }: CodevsProfilesPro
       <div className="relative flex flex-col gap-8">
         <CodevsProfilesContainer />
         <CodevsProfilesPagination
+          skillCategories={skillCategories}
           initialData={initialData}
           pageSize={PAGE_SIZE}
         />

@@ -25,12 +25,12 @@ export interface NavUserProfile {
   first_name: string;
   last_name: string;
   email: string;
-  image_url: string;
-  application_status: string;
-  role_id: number;
+  image_url: string | null;
+  application_status: string | null;
+  role_id: number | null;
   applicant: {
     id: string;
-    codev_id: string;
+    codev_id: string | null;
   } | null;
 }
 

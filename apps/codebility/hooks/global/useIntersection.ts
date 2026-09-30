@@ -24,11 +24,3 @@ export function useIntersection<T extends Element>(
   return { ref, inView };
 }
 
-export function useIntersectionOnce<T extends Element>(
-  options: IntersectionObserverInit = {},
-) {
-  const { ref, inView } = useIntersection<T>(options);
-  const seen = useRef(false);
-  if (inView) seen.current = true;
-  return { ref, inView: seen.current };
-}

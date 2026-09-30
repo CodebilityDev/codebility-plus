@@ -5,15 +5,14 @@ import AccountSettingsChangePassword from "@/components/global/account-settings/
 import AccountSettingsDelete from "@/components/global/account-settings/AccountSettingsDelete";
 import AccountSettingsHeader from "@/components/global/account-settings/AccountSettingsHeader";
 import AccountSettingsUsername from "@/components/global/account-settings/AccountSettingsUsername";
-import { LoadingContent } from "@/components/global/account-settings/LoadingContent";
-import { useCurrentUser } from "@/hooks/global/use-current-user";
 import { Card, CardContent } from "@codevs/ui/card";
 import { Separator } from "@codevs/ui/separator";
+import type { AccountSettingsContentProps } from "@/types/global/account-settings";
 
-export function AccountSettingsContent() {
-  const { data: user, isPending } = useCurrentUser();
-
-  if (isPending) return <LoadingContent />;
+export function AccountSettingsContent({
+  user,
+  mfaFactors,
+}: AccountSettingsContentProps) {
   if (!user) return null;
 
   return (
@@ -24,7 +23,7 @@ export function AccountSettingsContent() {
           <Separator />
           <AccountSettingsChangePassword />
           <Separator />
-          <AccountSettings2FA />
+          <AccountSettings2FA mfaFactors={mfaFactors} />
         </CardContent>
       </Card>
 

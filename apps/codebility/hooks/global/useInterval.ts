@@ -4,7 +4,10 @@ import { useEffect, useRef } from "react";
 
 export function useInterval(callback: () => void | false, delay: number | null) {
   const saved = useRef(callback);
-  saved.current = callback;
+
+  useEffect(() => {
+    saved.current = callback;
+  }, [callback]);
 
   useEffect(() => {
     if (delay === null) return;
@@ -19,7 +22,10 @@ export function useInterval(callback: () => void | false, delay: number | null) 
 
 export function useTimeout(callback: () => void, delay: number | null) {
   const saved = useRef(callback);
-  saved.current = callback;
+
+  useEffect(() => {
+    saved.current = callback;
+  }, [callback]);
 
   useEffect(() => {
     if (delay === null) return;

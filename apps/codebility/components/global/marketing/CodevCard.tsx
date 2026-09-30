@@ -18,7 +18,12 @@ import { STATUS_CONFIG } from "@/constants/global/marketing";
 import type { CodevCardProps } from "@/types/global/marketing";
 
 
-const CodevCard = ({ codev, color, animateEntrance = true }: CodevCardProps) => {
+const CodevCard = ({
+  codev,
+  color,
+  animateEntrance = true,
+  skillCategories,
+}: CodevCardProps) => {
   const [hovered, setHovered] = useState(false);
   const springConfig = { stiffness: 100, damping: 5 };
   const x = useMotionValue(0);
@@ -36,7 +41,7 @@ const CodevCard = ({ codev, color, animateEntrance = true }: CodevCardProps) => 
     x.set(event.nativeEvent.offsetX - halfWidth);
   };
 
-  const internalStatus = codev.internal_status || "MENTOR";
+  const internalStatus = codev.internal_status ?? "MENTOR";
   const statusConfig =
     STATUS_CONFIG[internalStatus] || STATUS_CONFIG.MENTOR;
 
@@ -58,11 +63,11 @@ const CodevCard = ({ codev, color, animateEntrance = true }: CodevCardProps) => 
               const pointsA =
                 codev.codev_points!.find(
                   (point) => point?.skill_category_id === skillCategoryIdA,
-                )?.points || 0;
+                )?.points ?? 0;
               const pointsB =
                 codev.codev_points!.find(
                   (point) => point?.skill_category_id === skillCategoryIdB,
-                )?.points || 0;
+                )?.points ?? 0;
               return pointsB - pointsA;
             }),
         )
@@ -177,6 +182,7 @@ const CodevCard = ({ codev, color, animateEntrance = true }: CodevCardProps) => 
           {filteredLevel && Object.keys(filteredLevel).length > 0 ? (
             <CodevBadge
               level={filteredLevel}
+              skillCategories={skillCategories}
               className="transition-transform group-hover:scale-100"
             />
           ) : null}

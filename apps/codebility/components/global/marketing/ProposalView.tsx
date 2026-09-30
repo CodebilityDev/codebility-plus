@@ -223,7 +223,7 @@ export default function ProposalView({ realProjects, codevProfiles, year }: Prop
                       <h3 className="text-xl font-semibold mb-4 text-white">Available Developers & Mentors</h3>
                       <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-3">
                         {codevProfiles.map((codev: any, idx) => {
-                        const codevName = `${codev.first_name || ''} ${codev.last_name || ''}`.trim() || 'Developer';
+                        const codevName = `${codev.first_name ?? ''} ${codev.last_name ?? ''}`.trim() || 'Developer';
                         const codevPosition = codev.display_position || codev.positions?.[0] || 'Developer';
                         const codevImage = codev.image_url;
 

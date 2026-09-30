@@ -11,7 +11,7 @@ export function useNavUser(): NavUserProfile | null {
   useEffect(() => {
     let active = true;
 
-    getNavUserPromise().then((data) => {
+    void getNavUserPromise().then((data) => {
       if (active) setProfile(data);
     });
 

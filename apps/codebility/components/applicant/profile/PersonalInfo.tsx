@@ -34,7 +34,7 @@ const PersonalInfo = ({ data, positions: positionsData }: PersonalInfoProps) => 
       last_name: data.last_name,
       address: data.address || undefined,
       display_position: data.display_position || undefined,
-      years_of_experience: data.years_of_experience || 0,
+      years_of_experience: data.years_of_experience ?? 0,
       headline: data.headline || undefined,
     },
   });
@@ -137,9 +137,9 @@ const PersonalInfo = ({ data, positions: positionsData }: PersonalInfoProps) => 
                   {positions.map((position: Position) => (
                     <SelectItem
                       key={position.id}
-                      value={position.name || `Position#${position.id}`}
+                      value={position.name ?? `Position#${position.id}`}
                     >
-                      {position.name || "Unnamed Position"}
+                      {position.name ?? "Unnamed Position"}
                     </SelectItem>
                   ))}
                 </SelectGroup>

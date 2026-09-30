@@ -1,4 +1,4 @@
-import type { Codev } from "@/types/global/codev";
+import type { Codev, CodevBadgeSkillCategory } from "@/types/global/codev";
 import type { CodevsProfilesPage } from "@/types/global/codevs-profiles";
 import type { EmblaOptionsType } from "embla-carousel";
 import type { ComponentPropsWithRef, ReactNode } from "react";
@@ -9,6 +9,7 @@ export interface CodevCardProps {
   codev: Codev;
   color: string;
   animateEntrance?: boolean;
+  skillCategories: CodevBadgeSkillCategory[];
 }
 
 export interface CodevListFilterProps {
@@ -52,6 +53,7 @@ export interface CodevsProfilesProps {
 export interface CodevsProfilesPaginationProps {
   initialData: CodevsProfilesPage;
   pageSize: number;
+  skillCategories: CodevBadgeSkillCategory[];
 }
 
 export interface SectionProps {
@@ -80,6 +82,7 @@ export interface ProgressiveMotionProps {
 export interface CodevsGridProps {
   codevs: CodevsProfilesPage["codevs"];
   page: number;
+  skillCategories: CodevBadgeSkillCategory[];
 }
 
 export interface CodevsPaginationSlotProps {

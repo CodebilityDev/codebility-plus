@@ -19,6 +19,7 @@ function buildHref(pathname: string, position: string, page: number): string {
 export default function CodevsProfilesPagination({
   initialData,
   pageSize,
+  skillCategories,
 }: CodevsProfilesPaginationProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -37,7 +38,11 @@ export default function CodevsProfilesPagination({
         positions={initialData.positions}
       />
 
-      <CodevsGrid codevs={initialData.codevs} page={page} />
+      <CodevsGrid
+          codevs={initialData.codevs}
+          page={page}
+          skillCategories={skillCategories}
+        />
 
       <CodevsPaginationSlot
         page={page}

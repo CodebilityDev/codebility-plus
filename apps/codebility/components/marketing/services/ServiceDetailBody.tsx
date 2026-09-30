@@ -62,7 +62,7 @@ export function ServiceDetailBody({ service }: ServiceDetailBodyProps) {
                 {service.name}
               </h1>
               <p className="max-w-2xl text-sm sm:text-lg text-gray-200">
-                {service.tagline || "Innovative solutions for modern challenges"}
+                {service.tagline ?? "Innovative solutions for modern challenges"}
               </p>
             </motion.div>
           </div>

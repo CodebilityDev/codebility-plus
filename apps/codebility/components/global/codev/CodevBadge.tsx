@@ -1,36 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { useAsyncValue } from "@/hooks/global/useAsyncValue";
-import { getClientSupabase } from "@/lib/global/supabase-client";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/global/ui/tooltip";
-import type { CodevBadgeSkillCategory, CodevBadgeProps } from "@/types/global/codev";
-import { getBadgePrefix } from "@/utils/global/codev";
+import type { CodevBadgeProps } from "@/types/global/codev";
 
-
-async function loadSkillCategories(): Promise<CodevBadgeSkillCategory[]> {
-  const { data, error } = await getClientSupabase()
-    .from("skill_category")
-    .select("id, name");
-
-  if (error) {
-    console.error("Error fetching skill categories:", error);
-    return [];
-  }
-
-  return (data ?? []).map((category: { id: string; name: string }) => ({
-    ...category,
-    badge_prefix: getBadgePrefix(category.name),
-  }));
-}
 
 export default function CodevBadge({
   level,
   size = 36,
   className = "",
+  skillCategories,
 }: CodevBadgeProps) {
   const [badgeErrors, setBadgeErrors] = useState<Record<string, boolean>>({});
-  const skillCategories = useAsyncValue(loadSkillCategories, [], []);
 
   // Create a fallback badge for when images fail to load
   const FallbackBadge = ({

@@ -24,6 +24,7 @@ function buildHref(
 export default function ProfilesListPagination({
   initialData,
   pageSize,
+  skillCategories,
 }: ProfilesListPaginationProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -42,7 +43,7 @@ export default function ProfilesListPagination({
         positions={initialData.positions}
       />
 
-      <ProfilesGrid codevs={initialData.codevs} animationKey={`${position}:${page}`} />
+      <ProfilesGrid codevs={initialData.codevs} animationKey={`${position}:${page}`} skillCategories={skillCategories} />
 
       <ProfilesPaginationSlot
         page={page}

@@ -1,7 +1,7 @@
 import type { Codev, CodevPoints } from "@/types/global/codev";
 /**
  * Calculate total points across all skill categories for a codev
- * @param codev_points - Array of CodevPoints from codev.codev_points
+ * @param codev_points - Array of CodevPoints from (codev.codev_points ?? [])
  * @returns Total points sum (0 if undefined/empty)
  * @example getTotalCodevPoints([{points: 50}, {points: 75}]) // Returns 125
  */
@@ -30,7 +30,7 @@ export const getTotalCodevPoints = (codev_points?: CodevPoints[]): number => {
  * @returns true if codev meets ALL qualification criteria
  */
 export const isQualifiedForShowcase = (codev: Codev): boolean => {
-  const totalPoints = getTotalCodevPoints(codev.codev_points);
+  const totalPoints = getTotalCodevPoints((codev.codev_points ?? []));
   
   const meetsPointsThreshold = totalPoints >= 100;
   const hasPassedApplication = codev.application_status === "passed";

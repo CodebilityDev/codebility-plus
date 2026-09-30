@@ -6,6 +6,13 @@ import type { ProfilesGridProps } from "@/types/marketing/profiles/profiles";
 export function ProfilesGrid({
   codevs,
   animationKey,
+  skillCategories,
 }: ProfilesGridProps) {
-  return <AnimatedProfilesGrid codevs={codevs} animationKey={animationKey} />;
+  return (
+    <AnimatedProfilesGrid
+      codevs={codevs}
+      animationKey={animationKey}
+      skillCategories={skillCategories}
+    />
+  );
 }

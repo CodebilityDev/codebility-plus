@@ -1,6 +1,3 @@
-import type { serviceWriteSchema } from "@/utils/global/proposal";
-import type { z } from "zod";
-
 export interface ProposalViewProps {
   realProjects: RealProject[];
   codevProfiles: any[];
@@ -43,5 +40,3 @@ export interface RealProject {
     description?: string;
   }[];
 }
-
-export type ServiceWriteInput = z.infer<typeof serviceWriteSchema>;

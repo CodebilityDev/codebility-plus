@@ -5,7 +5,7 @@ export const getOnboardingReminderTextTemplate = (
   waitListLink?: string,
   discordLink?: string
 ) => `
-Dear ${name ? name : "Applicant"},
+Dear ${name ?? "Applicant"},
 IMPORTANT: If you have already received this email before or checked the onboarding, please disregard this message.
 
 This is a friendly reminder to complete your onboarding process with Codebility.
@@ -54,7 +54,7 @@ ${EMAIL_STYLES}
 </div>
 
 <div class="content">
-<p>Dear ${name ? name : "Applicant"},</p>
+<p>Dear ${name ?? "Applicant"},</p>
 
 <p>This is a friendly reminder to complete your onboarding process with Codebility.</p>
 

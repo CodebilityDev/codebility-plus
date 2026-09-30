@@ -4,7 +4,6 @@ import { createWorkExperience, updateWorkExperience } from "@/actions/applicant/
 import { Button } from "@/components/global/ui/button";
 import { IconDelete, IconEdit } from "@/public/assets/svgs/index";
 import type { ExperienceFormProps } from "@/types/applicant/profile/profile";
-import type { WorkExperience } from "@/types/global/codev";
 import { Input } from "@codevs/ui/input";
 import { Textarea } from "@codevs/ui/textarea";
 import { useState, useEffect } from "react";
@@ -71,7 +70,7 @@ export const ExperienceForm = ({
         const result = await createWorkExperience(
           data,
         );
-        if (result && result.length) {
+        if (result?.[0]) {
           experience.id = result[0].id;
         }
         toast.success("Experience added successfully!");
@@ -163,7 +162,7 @@ export const ExperienceForm = ({
           onChange={(e) =>
             handleUpdateExperience(itemNo, e.target.name, e.target.value)
           }
-          value={experience.description}
+          value={experience.description ?? ""}
           name="description"
           className={`rounded transition-colors ${
             editMode
@@ -195,7 +194,7 @@ export const ExperienceForm = ({
             onChange={(e) =>
               handleUpdateExperience(itemNo, e.target.name, e.target.value)
             }
-            value={experience.date_to || ""}
+            value={experience.date_to ?? ""}
             type="date"
             name="date_to"
             variant={editMode ? "lightgray" : "darkgray"}

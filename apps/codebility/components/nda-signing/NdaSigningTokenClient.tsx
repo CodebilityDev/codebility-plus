@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, forwardRef, useEffect, useRef, useState } from "react";
+import { Suspense, forwardRef, useRef, useState } from "react";
 import { useDynamicImport } from "@/hooks/global/useDynamicImport";
 import { useParams } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -10,35 +10,10 @@ import { toast } from "react-hot-toast";
 import { Button } from "@codevs/ui/button";
 import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
-import { completeNdaSigning } from "@/actions/global/nda-storage";
-import { createClientClientComponent } from "@/lib/global/supabase-client";
+import { completeNdaRequest, completeNdaSigning } from "@/actions/global/nda-storage";
 import type { NdaSigningTokenClientProps, UserInfo, SignatureCanvasRef, SignaturePadProps } from "@/types/global/nda-signing";
 import { UserInfoSchema, generateNdaPdf } from "@/utils/global/nda-signing";
 
-
-async function fetchCodevIdFromToken(ndaToken: string): Promise<string | null> {
-  const supabase = createClientClientComponent();
-
-  if (!supabase) {
-    toast.error("Unable to connect to database");
-    return null;
-  }
-
-  const { data, error } = await supabase
-    .from("nda_requests")
-    .select("codev_id")
-    .eq("token", ndaToken)
-    .eq("status", "pending")
-    .single();
-
-  if (error) {
-    console.error("Error fetching codev ID:", error);
-    toast.error("Invalid or expired NDA link");
-    return null;
-  }
-
-  return data?.codev_id ?? null;
-}
 
 // Dynamic signature pad component with loading state
 function SignaturePadFallback() {
@@ -63,12 +38,14 @@ const SignaturePad = forwardRef<SignatureCanvasRef, SignaturePadProps>(
 
 SignaturePad.displayName = "SignaturePad";
 
-export default function NdaSigningTokenClient({ agreementDate }: NdaSigningTokenClientProps) {
-    const { token } = useParams<{ token: string }>();
+export default function NdaSigningTokenClient({
+  agreementDate,
+  codevId,
+}: NdaSigningTokenClientProps) {
+  const { token } = useParams<{ token: string }>();
   const signatureRef = useRef<SignatureCanvasRef | null>(null);
   const [signing, setSigning] = useState(false);
   const [showNameForm, setShowNameForm] = useState(true);
-  const [codevId, setCodevId] = useState<string | null>(null);
 
   const {
     register,
@@ -81,20 +58,6 @@ export default function NdaSigningTokenClient({ agreementDate }: NdaSigningToken
       last_name: "",
     },
   });
-
-  // Fetch codev ID from token on component mount
-  useEffect(() => {
-    if (!token) return;
-
-    let active = true;
-    fetchCodevIdFromToken(token).then((id) => {
-      if (active && id) setCodevId(id);
-    });
-
-    return () => {
-      active = false;
-    };
-  }, [token]);
 
   // Clear signature canvas
   const clearSignature = () => {
@@ -158,7 +121,7 @@ export default function NdaSigningTokenClient({ agreementDate }: NdaSigningToken
       );
 
       if (!result.success) {
-        throw new Error(result.error || "Failed to complete NDA signing");
+        throw new Error(result.error ?? "Failed to complete NDA signing");
       }
 
       // Update NDA request status to completed
@@ -215,22 +178,7 @@ export default function NdaSigningTokenClient({ agreementDate }: NdaSigningToken
    * Updates the NDA request status to completed after successful signing
    */
   const updateNdaRequestStatus = async (ndaToken: string) => {
-    try {
-      const supabase = createClientClientComponent();
-      
-      if (!supabase) {
-        console.error("Unable to connect to database for status update");
-        return;
-      }
-      
-      await supabase
-        .from("nda_requests")
-        .update({ status: "completed" })
-        .eq("token", ndaToken);
-    } catch (error) {
-      console.error("Error updating NDA request status:", error);
-      // Don't throw here as the main signing process was successful
-    }
+    await completeNdaRequest(ndaToken);
   };
 
   if (showNameForm) {

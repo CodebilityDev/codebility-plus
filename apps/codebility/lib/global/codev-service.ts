@@ -145,21 +145,21 @@ export const getCodevsWithClient = async (
   // Transform the data to match the Codev interface
   const normalizedData = data.map((codev: any) => ({
     ...codev,
-    education: codev.education || [],
-    work_experience: (codev.work_experience || []).map((exp: any) => ({
+    education: codev.education ?? [],
+    work_experience: (codev.work_experience ?? []).map((exp: any) => ({
       ...exp,
       codev_id: codev.id,
     })) as WorkExperience[],
-    work_schedules: codev.work_schedules || [],
-    projects: (codev.project_members || []).map(
+    work_schedules: codev.work_schedules ?? [],
+    projects: (codev.project_members ?? []).map(
       (member: any) =>
         ({
           ...member.project,
           role: member.role,
           joined_at: member.joined_at,
-          project_members: member.project?.project_members || [],
+          project_members: member.project?.project_members ?? [],
           // Flatten categories from nested structure
-          categories: (member.project?.categories || []).map(
+          categories: (member.project?.categories ?? []).map(
             (cat: any) => cat.projects_category
           ).filter(Boolean),
         }) as Project & { role: string; joined_at: string },
@@ -187,6 +187,7 @@ export const getClients = async (): Promise<{
     client_type,
     country,
     address,
+    testimony,
     created_at,
     updated_at
   `);

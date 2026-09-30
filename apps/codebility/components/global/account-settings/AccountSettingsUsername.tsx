@@ -34,7 +34,7 @@ export default function AccountSettingsUsername({ userId }: AccountSettingsUsern
 
   if (userId && loadedUserId !== userId) {
     setLoadedUserId(userId);
-    loadUsernameRecord(userId).then(setUsernameRecord);
+    void loadUsernameRecord(userId).then(setUsernameRecord);
   }
 
   const currentUsername = usernameRecord?.username ?? "";
@@ -57,14 +57,14 @@ export default function AccountSettingsUsername({ userId }: AccountSettingsUsern
 
   useTimeout(() => {
     setChecking(true);
-    checkUsernameAvailability(username, userId).then((result) => {
+    void checkUsernameAvailability(username, userId).then((result) => {
       setChecking(false);
       setAvailabilityStatus(
         result.available
           ? { available: true, message: "Username is available" }
           : {
               available: false,
-              message: result.error || "Username is not available",
+              message: result.error ?? "Username is not available",
             },
       );
     });
@@ -96,14 +96,14 @@ export default function AccountSettingsUsername({ userId }: AccountSettingsUsern
     } else {
       toast({
         title: "Error",
-        description: result.error || "Failed to update username",
+        description: result.error ?? "Failed to update username",
         variant: "destructive",
       });
     }
   };
 
   const copyAccountId = () => {
-    navigator.clipboard.writeText(userId);
+    void navigator.clipboard.writeText(userId);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };

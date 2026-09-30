@@ -3,7 +3,7 @@ import { cacheLife, cacheTag } from "next/cache";
 import { createClientAnon } from "@/lib/global/supabase-anon";
 import { getCodevsWithClient } from "@/lib/global/codev-service";
 
-const FOUNDER_USER_ID = process.env.NEXT_PUBLIC_FOUNDER_USER_ID || "";
+const FOUNDER_USER_ID = process.env.NEXT_PUBLIC_FOUNDER_USER_ID ?? "";
 
 export async function getTeamData() {
   "use cache";
@@ -28,7 +28,7 @@ export async function getTeamData() {
   }
 
   // Filter available admins and identify CEO
-  const availableAdmins = (admins || []).filter(
+  const availableAdmins = (admins ?? []).filter(
     (admin) => admin.availability_status !== false
   );
 
@@ -66,12 +66,12 @@ export async function getTeamData() {
     })
     .map((admin) => ({
       name: `${admin.first_name} ${admin.last_name}`.trim(),
-      role: admin.display_position || "Admin",
+      role: admin.display_position ?? "Admin",
       image: admin.image_url || undefined,
     }));
 
   // Sort and map mentors
-  const sortedMentors = (mentors || [])
+  const sortedMentors = (mentors ?? [])
     .filter((mentor) => mentor.availability_status !== false)
     .sort((a, b) => {
       const aHasImage = !!a.image_url;
@@ -84,7 +84,7 @@ export async function getTeamData() {
     })
     .map((mentor) => ({
       name: `${mentor.first_name} ${mentor.last_name}`.trim(),
-      role: mentor.display_position || "Mentor",
+      role: mentor.display_position ?? "Mentor",
       image: mentor.image_url || undefined,
     }));
 

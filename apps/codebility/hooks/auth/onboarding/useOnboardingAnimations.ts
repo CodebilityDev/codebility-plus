@@ -77,7 +77,7 @@ function killTriggersIn(ScrollTrigger: any, root: HTMLElement | null) {
   if (!root) return;
   ScrollTrigger.getAll().forEach((st: any) => {
     try {
-      const trg: Element | null = st.trigger || null;
+      const trg: Element | null = st.trigger ?? null;
       if (trg && root.contains(trg)) st.kill();
     } catch {
       /* ignore */
@@ -102,7 +102,7 @@ export default function useOnboardingAnimations({
     let mm: any | null = null;
     let roadmapObserver: MutationObserver | null = null;
 
-    (async () => {
+    void (async () => {
       // ✅ Load GSAP & ScrollTrigger only on the client
       const { default: gsap } = await import("gsap");
       const { ScrollTrigger } = await import("gsap/ScrollTrigger");

@@ -19,8 +19,8 @@ export async function applicantTakeTest({
         const { data, error } = await supabase
             .from("applicant")
             .update({
-                test_taken: new Date(),
-                updated_at: new Date(),
+                test_taken: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
             })
             .eq("id", applicantId);
 
@@ -34,7 +34,7 @@ export async function applicantTakeTest({
             .from("codev")
             .update({
                 application_status: "testing",
-                updated_at: new Date(),
+                updated_at: new Date().toISOString(),
             })
             .eq("id", codevId);
 
@@ -61,7 +61,7 @@ export async function applicantMoveToOnboard({
             .from("codev")
             .update({
                 application_status: "onboarding",
-                updated_at: new Date(),
+                updated_at: new Date().toISOString(),
             })
             .eq("id", codevId);
 
@@ -90,7 +90,7 @@ export async function applicantSubmitTest({
             .from("applicant")
             .update({
                 fork_url: forkUrl,
-                updated_at: new Date(),
+                updated_at: new Date().toISOString(),
             })
             .eq("id", applicantId);
 
@@ -119,7 +119,7 @@ export async function applicantUpdateTestSubmission({
             .from("applicant")
             .update({
                 fork_url: forkUrl,
-                updated_at: new Date(),
+                updated_at: new Date().toISOString(),
             })
             .eq("id", applicantId);
 
@@ -147,7 +147,7 @@ export async function applicantUpdateJoinedStatus({
         const supabase = await createClientServerComponent();
 
         const updateData: any = {
-            updated_at: new Date(),
+            updated_at: new Date().toISOString(),
         };
 
         if (joinedDiscord !== undefined) {

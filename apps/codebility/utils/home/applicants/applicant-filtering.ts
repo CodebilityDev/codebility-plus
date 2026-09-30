@@ -97,7 +97,7 @@ export function filterAndSortApplicants({
     }
 
     // Filter by reminder count
-    const reminderCount = applicant.applicant?.reminded_count || 0;
+    const reminderCount = applicant.applicant?.reminded_count ?? 0;
     if (filters.reminderCount.none && reminderCount !== 0) return false;
     if (filters.reminderCount.low && (reminderCount < 1 || reminderCount > 2)) return false;
     if (filters.reminderCount.medium && (reminderCount < 3 || reminderCount > 5)) return false;
@@ -135,12 +135,12 @@ export function filterAndSortApplicants({
 
         switch (sortOption.field) {
           case "name":
-            valueA = `${a.first_name || ""} ${a.last_name || ""}`.toLowerCase();
-            valueB = `${b.first_name || ""} ${b.last_name || ""}`.toLowerCase();
+            valueA = `${a.first_name ?? ""} ${a.last_name ?? ""}`.toLowerCase();
+            valueB = `${b.first_name ?? ""} ${b.last_name ?? ""}`.toLowerCase();
             break;
           case "position":
-            valueA = (a.display_position || "").toLowerCase();
-            valueB = (b.display_position || "").toLowerCase();
+            valueA = (a.display_position ?? "").toLowerCase();
+            valueB = (b.display_position ?? "").toLowerCase();
             break;
           case "experience":
             valueA = a.years_of_experience || 0;
@@ -155,12 +155,12 @@ export function filterAndSortApplicants({
             valueB = b.applicant?.test_taken ? new Date(b.applicant.test_taken).getTime() : 0;
             break;
           case "reminderCount":
-            valueA = a.applicant?.reminded_count || 0;
-            valueB = b.applicant?.reminded_count || 0;
+            valueA = a.applicant?.reminded_count ?? 0;
+            valueB = b.applicant?.reminded_count ?? 0;
             break;
           case "techStackCount":
-            valueA = a.tech_stacks?.length || 0;
-            valueB = b.tech_stacks?.length || 0;
+            valueA = a.tech_stacks?.length ?? 0;
+            valueB = b.tech_stacks?.length ?? 0;
             break;
           default:
             continue; // Skip unknown fields
@@ -191,12 +191,12 @@ export function filterAndSortApplicants({
 
       switch (sortField) {
         case "name":
-          valueA = `${a.first_name || ""} ${a.last_name || ""}`.toLowerCase();
-          valueB = `${b.first_name || ""} ${b.last_name || ""}`.toLowerCase();
+          valueA = `${a.first_name ?? ""} ${a.last_name ?? ""}`.toLowerCase();
+          valueB = `${b.first_name ?? ""} ${b.last_name ?? ""}`.toLowerCase();
           break;
         case "position":
-          valueA = (a.display_position || "").toLowerCase();
-          valueB = (b.display_position || "").toLowerCase();
+          valueA = (a.display_position ?? "").toLowerCase();
+          valueB = (b.display_position ?? "").toLowerCase();
           break;
         case "experience":
           valueA = a.years_of_experience || 0;
@@ -211,12 +211,12 @@ export function filterAndSortApplicants({
           valueB = b.applicant?.test_taken ? new Date(b.applicant.test_taken).getTime() : 0;
           break;
         case "reminderCount":
-          valueA = a.applicant?.reminded_count || 0;
-          valueB = b.applicant?.reminded_count || 0;
+          valueA = a.applicant?.reminded_count ?? 0;
+          valueB = b.applicant?.reminded_count ?? 0;
           break;
         case "techStackCount":
-          valueA = a.tech_stacks?.length || 0;
-          valueB = b.tech_stacks?.length || 0;
+          valueA = a.tech_stacks?.length ?? 0;
+          valueB = b.tech_stacks?.length ?? 0;
           break;
         default:
           return 0;

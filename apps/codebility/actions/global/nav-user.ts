@@ -14,7 +14,7 @@ export async function getNavUserProfile(): Promise<NavUserProfile | null> {
 
   const { data: profile } = await supabase
     .from("codev")
-    .select(`*, applicant (id, codev_id)`)
+    .select("first_name, last_name, email_address, image_url, application_status, role_id, applicant (id, codev_id)")
     .eq("id", user.id)
     .single();
 

@@ -31,12 +31,12 @@ const ContactInfo = ({ data, earnedCategories }: ContactInfoProps) => {
     formState: { isDirty },
   } = useForm<ContactInfoFormValues>({
     defaultValues: {
-      phone_number: data.phone_number || "",
-      portfolio_website: data.portfolio_website || "",
-      github: data.github || "",
-      linkedin: data.linkedin || "",
-      facebook: data.facebook || "",
-      discord: data.discord || "",
+      phone_number: data.phone_number ?? "",
+      portfolio_website: data.portfolio_website ?? "",
+      github: data.github ?? "",
+      linkedin: data.linkedin ?? "",
+      facebook: data.facebook ?? "",
+      discord: data.discord ?? "",
     },
   });
 

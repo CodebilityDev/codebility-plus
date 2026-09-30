@@ -1,7 +1,10 @@
 import ProfilesListPagination from "@/components/marketing/profiles/ProfilesListPagination";
+import { getSkillCategories } from "@/lib/global/skill-categories-cached";
 import type { ProfilesListShellProps } from "@/types/marketing/profiles/profiles";
 
-export function ProfilesListBody({ initialData, pageSize }: ProfilesListShellProps) {
+export async function ProfilesListBody({ initialData, pageSize }: ProfilesListShellProps) {
+  const skillCategories = await getSkillCategories();
+
   if (!initialData) {
     return (
       <p className="text-center text-2xl text-red-400">
@@ -19,6 +22,10 @@ export function ProfilesListBody({ initialData, pageSize }: ProfilesListShellPro
   }
 
   return (
-    <ProfilesListPagination initialData={initialData} pageSize={pageSize} />
+    <ProfilesListPagination
+      initialData={initialData}
+      pageSize={pageSize}
+      skillCategories={skillCategories}
+    />
   );
 }

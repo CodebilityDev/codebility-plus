@@ -18,7 +18,7 @@ export default async function OnboardingPage() {
   // Fetch user's codev data
   const { data: codevData, error: codevError } = await supabase
     .from("codev")
-    .select("*")
+    .select("id, first_name, last_name, application_status")
     .eq("id", user.id)
     .single();
 
@@ -35,7 +35,9 @@ export default async function OnboardingPage() {
   // Fetch applicant data
   const { data: applicantData, error: applicantError } = await supabase
     .from("applicant")
-    .select("*")
+    .select(
+      "id, quiz_passed, quiz_score, quiz_total, quiz_completed_at, commitment_signed_at",
+    )
     .eq("codev_id", user.id)
     .single();
 

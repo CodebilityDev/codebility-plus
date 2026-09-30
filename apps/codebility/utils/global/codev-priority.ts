@@ -1,6 +1,7 @@
 /**
  * Utility functions for prioritizing Codev profiles
  */
+import { asLevelRecord } from "@/utils/global/codev-level";
 import type { Codev, CodevFilter, CodevPoints } from "@/types/global/codev";
 
 /**
@@ -67,7 +68,7 @@ export function rankLevelOfBadge(
   const hasLevel2OrAbove = validLevels.some(([, levelValue]) => levelValue >= 2);
   const totalPoints = validLevels.reduce((sum, [skillCategoryId]) => {
     const point = codevPoints.find((p) => p.skill_category_id === skillCategoryId);
-    return sum + (point?.points || 0);
+    return sum + (point?.points ?? 0);
   }, 0);
   const validBadgeCount = validLevels.length;
 
@@ -100,8 +101,8 @@ export function prioritizeCodevs(
   // Sort codevs based on priority criteria
   return filteredCodevs.sort((a, b) => {
     // Priority 1: Level of badge and codev points
-    const aRank = rankLevelOfBadge(a.level, a.codev_points);
-    const bRank = rankLevelOfBadge(b.level, b.codev_points);
+    const aRank = rankLevelOfBadge(asLevelRecord(a.level), a.codev_points ?? []);
+    const bRank = rankLevelOfBadge(asLevelRecord(b.level), b.codev_points ?? []);
 
     // Priority 1a: Total points (highest first)
     if (aRank.totalPoints !== bRank.totalPoints) {
@@ -123,14 +124,14 @@ export function prioritizeCodevs(
     if (b.image_url && !a.image_url) return 1;
 
     // Priority 4: Has work experience
-    const aHasExperience = hasWorkExperience(a.work_experience);
-    const bHasExperience = hasWorkExperience(b.work_experience);
+    const aHasExperience = hasWorkExperience(a.work_experience ?? []);
+    const bHasExperience = hasWorkExperience(b.work_experience ?? []);
     if (aHasExperience && !bHasExperience) return -1;
     if (bHasExperience && !aHasExperience) return 1;
 
     // Priority 5: Years of experience
-    const aYears = a.years_of_experience || 0;
-    const bYears = b.years_of_experience || 0;
+    const aYears = a.years_of_experience ?? 0;
+    const bYears = b.years_of_experience ?? 0;
     if (aYears !== bYears) return bYears - aYears;
 
     // Priority X: Is available
@@ -154,13 +155,13 @@ export function filterCodevs(
   return codevs.filter((codev) => {
     const matchesPosition =
       positions.length === 0 ||
-      positions.includes(codev.display_position || "");
+      positions.includes(codev.display_position ?? "");
 
     const matchesAvailability =
       availability.length === 0 ||
       availability
         .map((status) => status.toUpperCase())
-        .includes(codev.internal_status || "");
+        .includes(codev.internal_status ?? "");
 
     const matchesProject =
       projects.length === 0 ||

@@ -1,8 +1,9 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { useUserStore } from "@/store/global/codev-store";
-import type { Codev } from "@/types/global/codev";
+import type { Database } from "@/types/global/supabase";
+
+type CodevInsert = Database["public"]["Tables"]["codev"]["Insert"];
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import { checkRateLimit, recordRateLimitAttempt, resetRateLimit } from "@/utils/global/rate-limiter";
 import { uploadNdaToStorage, updateCodevNdaUrls } from "@/actions/global/nda-storage";
@@ -21,7 +22,7 @@ const uploadProfileImage = async (
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
     const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-    const extension = file.name.split(".").pop() || "jpg";
+    const extension = file.name.split(".").pop() ?? "jpg";
     const filename = `${timestamp}.${extension}`;
 
     const supabase = await createClientServerComponent();
@@ -41,7 +42,7 @@ const uploadProfileImage = async (
       .from(bucketName)
       .getPublicUrl(`${folderName}/${filename}`);
 
-    return publicUrlData.publicUrl || null;
+    return publicUrlData.publicUrl ?? null;
   } catch (error) {
     console.error("Error during upload:", error);
     throw error;
@@ -79,7 +80,6 @@ const validateUsername = (username: string): { valid: boolean; error?: string } 
 export const signupUser = async (formData: FormData) => {
   try {
     const supabase = await createClientServerComponent();
-    const setUser = useUserStore.getState().setUser;
 
     // Extract form data with proper typing and convert email to lowercase
     const rawEmail = formData.get("email_address") as string;
@@ -95,7 +95,7 @@ export const signupUser = async (formData: FormData) => {
     const formattedPositions: string[] = positions.map((item) =>
       JSON.stringify(item),
     );
-    const display_position: string = positions[0]?.name || "";
+    const display_position: string = positions[0]?.name ?? "";
     const years_of_experience =
       parseInt(formData.get("years_of_experience") as string) || 0;
     const profileImage = formData.get("profileImage") as File;
@@ -141,7 +141,7 @@ export const signupUser = async (formData: FormData) => {
     // Create auth user
     const baseUrl = process.env.NODE_ENV === 'production' 
       ? 'https://www.codebility.tech' 
-      : process.env.NEXT_PUBLIC_APP_BASE_URL || 'http://localhost:3000';
+      : process.env.NEXT_PUBLIC_APP_BASE_URL ?? 'http://localhost:3000';
       
     const {
       data: { user },
@@ -214,7 +214,7 @@ export const signupUser = async (formData: FormData) => {
     }
 
     // Prepare user data for insertion into the "codev" table
-    const userData: Codev = {
+    const userData: CodevInsert = {
       id: user.id,
       first_name: firstName,
       last_name: lastName,
@@ -224,7 +224,7 @@ export const signupUser = async (formData: FormData) => {
       phone_number: formData.get("phone_number") as string,
       address: null,
       about: (formData.get("about") as string) || null,
-      positions: formattedPositions || [],
+      positions: formattedPositions ?? [],
       display_position: display_position || "",
       portfolio_website: (formData.get("portfolio_website") as string) || null,
       tech_stacks: tech_stacks as string[],
@@ -249,10 +249,11 @@ export const signupUser = async (formData: FormData) => {
       date_applied: new Date().toISOString(),
     };
 
-    // Insert user data into the "codev" table
-    const { error: insertError } = await supabase
+    const { data: insertedUser, error: insertError } = await supabase
       .from("codev")
-      .insert([userData]);
+      .insert(userData)
+      .select()
+      .single();
 
     if (insertError) throw insertError;
 
@@ -267,7 +268,6 @@ export const signupUser = async (formData: FormData) => {
       throw error;
     }
 
-    setUser(userData);
     
     // **ENHANCED: Return additional information about NDA processing**
     const responseMessage = ndaProcessedWithStorage 
@@ -285,14 +285,13 @@ export const signupUser = async (formData: FormData) => {
     console.error("Signup error:", error);
     return {
       success: false,
-      error: error.message || "Failed to create account",
+      error: error.message ?? "Failed to create account",
     };
   }
 };
 
 export const signinUser = async (email: string, password: string) => {
   const supabase = await createClientServerComponent();
-  const setUser = useUserStore.getState().setUser;
 
   // Standardize the email for comparison (assuming emails are stored in lowercase)
   const normalizedEmail = email.toLowerCase();
@@ -310,7 +309,7 @@ export const signinUser = async (email: string, password: string) => {
 
     const { data: userProfile, error: profileError } = await supabase
       .from("codev")
-      .select("*")
+      .select("id, application_status")
       .eq("email_address", normalizedEmail)
       .maybeSingle();
 
@@ -318,7 +317,6 @@ export const signinUser = async (email: string, password: string) => {
     if (!userProfile) throw new Error("Account not found");
 
     // Save the user profile to your store
-    setUser(userProfile);
 
     // Determine redirect path based on application status
     let redirectTo = "/home"; // Default for "passed" status
@@ -344,19 +342,17 @@ export const signinUser = async (email: string, password: string) => {
      };
   } catch (error: any) {
     console.error("Sign in error:", error);
-    return { success: false, error: error.message || "Failed to sign in" };
+    return { success: false, error: error.message ?? "Failed to sign in" };
   }
 };
 
 export const signOut = async (): Promise<void> => {
   try {
     const supabase = await createClientServerComponent();
-    const clearUser = useUserStore.getState().clearUser;
 
     const { error } = await supabase.auth.signOut();
     if (error) throw new Error(`Sign out error: ${error.message}`);
 
-    clearUser();
     // Redirect to the /codev page
     redirect("/codev");
   } catch (error) {
@@ -374,7 +370,7 @@ export const resendVerificationEmail = async (email: string) => {
     
     const baseUrl = process.env.NODE_ENV === 'production' 
       ? 'https://www.codebility.tech' 
-      : process.env.NEXT_PUBLIC_APP_BASE_URL || 'http://localhost:3000';
+      : process.env.NEXT_PUBLIC_APP_BASE_URL ?? 'http://localhost:3000';
 
     const { error } = await supabase.auth.resend({
       type: 'signup',
@@ -394,7 +390,7 @@ export const resendVerificationEmail = async (email: string) => {
     console.error("Resend verification error:", error);
     return { 
       success: false, 
-      error: error.message || "Failed to resend verification email" 
+      error: error.message ?? "Failed to resend verification email" 
     };
   }
 };

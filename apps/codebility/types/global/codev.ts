@@ -1,35 +1,46 @@
+import type { Database } from "@/types/global/supabase";
+
+type Row<T extends keyof Database["public"]["Tables"]> =
+  Database["public"]["Tables"][T]["Row"];
+
+export type PositionRow = Row<"positions">;
+export type EducationRow = Row<"education">;
+export type WorkExperienceRow = Row<"work_experience">;
+export type WorkScheduleRow = Row<"work_schedules">;
+export type JobStatusRow = Row<"job_status">;
+
 export interface Position {
-  id: bigint;
+  id: number;
   name: string | null;
-  description?: string;
+  description?: string | null;
 }
 
 export interface WorkExperience {
   id: string;
   codev_id: string;
   position: string;
-  description?: string;
-  date_from: string; // Consider using Date
+  description: string | null;
+  date_from: string;
   date_to: string | null;
-  company_name: string; // Has DB default
-  location: string; // Has DB default
-  profile_id?: string;
-  is_present: boolean; // Has DB default false
+  company_name: string;
+  location: string;
+  profile_id: string | null;
+  is_present: boolean;
 }
 
 export interface Education {
   id: string;
-  codev_id: string;
-  institution: string | null;        
-  degree: string | null;             
-  major_subject: string | null;      
-  description: string | null;        
-  achievements: string | null;       
-  start_date: string | null;         
-  end_date: string | null;           
-  profile_id?: string;               
-  created_at: string;
-  updated_at: string;
+  codev_id: string | null;
+  institution: string;
+  degree: string | null;
+  major_subject: string | null;
+  description: string | null;
+  achievements: string | null;
+  start_date: string | null;
+  end_date: string | null;
+  profile_id?: string | null;
+  created_at: string | null;
+  updated_at: string | null;
 }
 
 export interface JobStatus {
@@ -37,25 +48,25 @@ export interface JobStatus {
   job_title: string;
   company_name: string;
   employment_type: string;
-  description: string | null; // Changed to match DB nullability
-  status?: string; // Has DB default 'active'
-  salary_range: string | null; // Changed to match DB nullability
-  work_setup: string; // Removed optional marker
+  description: string | null;
+  status: string | null;
+  salary_range: string | null;
+  work_setup: string;
   shift: string | null;
-  codev_id?: string;
-  hours_per_week?: number;
-  created_at?: string;
-  updated_at?: string;
+  codev_id?: string | null;
+  hours_per_week?: number | null;
+  created_at?: string | null;
+  updated_at?: string | null;
 }
 
 export interface WorkSchedule {
   id: string;
-  codev_id: string;
-  days_of_week: DayOfWeek[];
-  start_time: string; // Time as string
-  end_time: string; // Time as string
-  created_at?: string;
-  updated_at?: string;
+  codev_id: string | null;
+  days_of_week: string[];
+  start_time: string;
+  end_time: string;
+  created_at?: string | null;
+  updated_at?: string | null;
 }
 
 export type DayOfWeek =
@@ -68,53 +79,18 @@ export type DayOfWeek =
   | "Sunday";
 
 // Add the nda_request_sent property to your Codev interface
-export interface Codev {
-  id: string;
-  first_name: string;
-  last_name: string;
-  username: string | null; // Added username field
-  username_updated_at: string | null; // Track when username was last updated
-  email_address: string;
-  phone_number?: string;
-  address?: string | null;
-  about?: string | null;
-  education?: Education[];
-  position_id?: bigint;
-  positions: string[];
-  display_position?: string;
-  portfolio_website?: string | null;
-  tech_stacks: string[];
-  image_url?: string | null;
-  internal_status?: InternalStatus;
-  availability_status?: boolean;
-  nda_status?: boolean;
-  nda_signature?: string;
-  nda_document?: string;
-  nda_signed_at?: string;
-  nda_request_sent?: boolean;
-  level?: Record<string, any>;
-  application_status?: string;
-  rejected_count?: number;
-  facebook?: string | null;
-  linkedin?: string | null;
-  github?: string | null;
-  discord?: string | null;
-  work_experience?: WorkExperience[];
-  created_at?: string;
-  updated_at?: string;
-  years_of_experience?: number;
-  role_id?: number;
-  mentor_id?: string;
-  codev_points?: CodevPoints[];
-  projects?: (Project & { role: string; joined_at: string })[];
-  project_members?: ProjectMember[];
-  work_schedules?: WorkSchedule[];
-  date_applied?: string;
-  promote_declined?: boolean;
-  date_passed?: string;
-  date_joined?: string;
-  headline?: string;
-}
+type CodevRow = Row<"codev">;
+
+export type Codev = CodevRow & {
+  education?: Education[] | null;
+  work_experience?: WorkExperience[] | null;
+  work_schedules?: WorkSchedule[] | null;
+  job_status?: JobStatus[] | null;
+  codev_points?: CodevPoints[] | null;
+  projects?: (Project & { role: string; joined_at: string })[] | null;
+  project_members?: ProjectMember[] | null;
+  applicant?: { id: string; codev_id: string | null }[] | null;
+};
 
 export type ApplicantStatus =
   | "applying" // Initial application
@@ -223,21 +199,7 @@ export interface CodevFilter {
 }
 
 // Other related types
-export interface Client {
-  id: string; // UUID
-  name: string;
-  email?: string;
-  phone_number?: string;
-  industry?: string;
-  company_logo?: string;
-  website?: string;
-  status?: string; // Defaults to 'prospect'
-  client_type?: string;
-  country?: string;
-  address?: string;
-  created_at?: string;
-  updated_at?: string;
-}
+export type Client = Row<"clients">;
 
 export interface PaymentScedule {
   weekly: string;
@@ -423,6 +385,7 @@ export interface CodevBadgeProps {
   level: CodevLevelData;
   size?: number;
   className?: string;
+  skillCategories: CodevBadgeSkillCategory[];
 }
 
 export interface DefaultAvatarProps {

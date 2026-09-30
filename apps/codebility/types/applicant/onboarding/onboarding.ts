@@ -1,3 +1,5 @@
+import type { Database } from "@/types/global/supabase";
+
 import type { OnboardingProgressType } from "@/types/applicant/onboarding/applicant-onboarding";
 
 export interface CommitmentProps {
@@ -5,10 +7,16 @@ export interface CommitmentProps {
   onComplete: (signature: string, canDoMobile: boolean) => void;
 }
 
+type CodevRow = Database["public"]["Tables"]["codev"]["Row"];
+type ApplicantRow = Database["public"]["Tables"]["applicant"]["Row"];
+
 export interface OnboardingClientProps {
-  user: any;
+  user: Pick<CodevRow, "id" | "first_name" | "last_name">;
   applicantId: string;
-  applicantData: any;
+  applicantData: Pick<
+    ApplicantRow,
+    "id" | "quiz_passed" | "quiz_score" | "quiz_total" | "quiz_completed_at" | "commitment_signed_at"
+  >;
 }
 
 export interface OnboardingStepperProps {

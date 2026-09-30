@@ -118,7 +118,7 @@ export const baseColumns: ColumnDef<NewApplicantType>[] = [
         <div className="px-2 py-2">
           <div className="flex flex-col gap-0.5">
             <span className="text-xs font-medium text-gray-900 dark:text-gray-100">
-              {applicant.display_position || "Not specified"}
+              {applicant.display_position ?? "Not specified"}
             </span>
             <span className="text-[10px] text-gray-500 dark:text-gray-400">
               {applicant.years_of_experience !== undefined
@@ -214,8 +214,8 @@ export const baseColumns: ColumnDef<NewApplicantType>[] = [
       );
     },
     sortingFn: (rowA, rowB) => {
-      const lengthA = rowA.original.tech_stacks?.length || 0;
-      const lengthB = rowB.original.tech_stacks?.length || 0;
+      const lengthA = rowA.original.tech_stacks?.length ?? 0;
+      const lengthB = rowB.original.tech_stacks?.length ?? 0;
       return lengthA - lengthB;
     },
     cell: ({ row }) => {

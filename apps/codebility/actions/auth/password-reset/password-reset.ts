@@ -8,7 +8,10 @@ export const resetUserPassword = async (email: string) => {
         const normalizedEmail = email.toLowerCase().trim();
         const supabase = await createClientServerComponent();
         const headersList = await headers();
-        const origin = headersList.get("origin") || process.env.NEXT_PUBLIC_APP_BASE_URL || "http://localhost:3000";
+        const origin =
+            headersList.get("origin") ??
+            process.env.NEXT_PUBLIC_APP_BASE_URL ??
+            "http://localhost:3000";
 
         // Check user record by email
         const { data, error: userError } = await supabase

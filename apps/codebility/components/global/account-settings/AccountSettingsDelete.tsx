@@ -1,5 +1,7 @@
 "use client";
 
+import { deleteAuthUser } from "@/actions/global/account-settings/delete-auth-user";
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getClientSupabase } from "@/lib/global/supabase-client";
@@ -41,65 +43,11 @@ export default function AccountSettingsDelete() {
     try {
       setIsLoading(true);
 
-      // Get current user
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      const data = await deleteAuthUser();
 
-      if (!user) {
-        toast.error("User not found");
-        return;
-      }
-
-      // Get the current session token for API authentication
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (!session) {
-        toast.error("No active session");
-        return;
-      }
-
-      // Delete user data from your codev table first
-      const { error: dbError } = await supabase
-        .from("codev")
-        .delete()
-        .eq("id", user.id);
-
-      if (dbError) {
-        toast.error("Failed to delete user data");
-        console.error("Database deletion error:", dbError);
-        return;
-      }
-
-      // Call the API route to delete the authentication user
-      const response = await fetch("/api/delete-auth-user", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({
-          userId: user.id,
-        }),
-      });
-
-      // Parse response with proper type handling
-      const rawData: unknown = await response.json();
-      
-      // Type guard for API response
-      interface ApiResponse {
-        success?: boolean;
-        message?: string;
-        error?: string;
-      }
-      
-      const data = rawData as ApiResponse;
-
-      if (!response.ok) {
-        toast.error(data.error || "Failed to delete account");
-        console.error("API error:", data);
+      if (data.error) {
+        toast.error(data.error);
+        console.error("Delete auth user error:", data.error);
         return;
       }
 

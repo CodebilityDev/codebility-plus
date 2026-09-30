@@ -1,7 +1,8 @@
 import type { getCurrentCodev } from "@/lib/global/current-codev";
+import type { CurrentUserProfile } from "@/types/global/current-user";
 
 export function getSidebarRoleId(
-  user: Awaited<ReturnType<typeof getCurrentCodev>>,
+  user: CurrentUserProfile | null,
 ): number | null {
   if (!user) return null;
 

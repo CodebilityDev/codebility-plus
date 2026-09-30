@@ -14,7 +14,7 @@ export default function ApplicantTestTimeRemaining({
   const applicantData = applicant.applicant;
 
   const reapplyDate = useMemo(
-    () => getTestDate(new Date(applicantData?.test_taken || "") || new Date()),
+    () => getTestDate(new Date(applicantData?.test_taken ?? "") ?? new Date()),
     [applicantData?.test_taken],
   );
 

@@ -8,7 +8,10 @@ export function useWindowEvent<K extends keyof WindowEventMap>(
   options?: AddEventListenerOptions,
 ) {
   const saved = useRef(handler);
-  saved.current = handler;
+
+  useEffect(() => {
+    saved.current = handler;
+  }, [handler]);
 
   const passive = options?.passive ?? type === "scroll";
   const capture = options?.capture ?? false;

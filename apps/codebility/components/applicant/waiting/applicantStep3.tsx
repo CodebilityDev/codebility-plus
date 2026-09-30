@@ -95,7 +95,7 @@ export default function ApplicantStep3({
           <div className="flex flex-col items-center gap-5">
             {!joinedMessenger && ( 
               <Link
-                href={process.env.NEXT_PUBLIC_MESSENGER_WAITLIST || ""}
+                href={process.env.NEXT_PUBLIC_MESSENGER_WAITLIST ?? ""}
                 target="_blank"
               >
                 <Button className="from-customTeal to-customViolet-100 h-10  rounded-full bg-gradient-to-r via-customBlue-100 p-0.5 hover:bg-gradient-to-br xl:h-12">
@@ -127,7 +127,7 @@ export default function ApplicantStep3({
         {/* Discord Section */}
         <div className="flex flex-col items-center gap-5">
           {!joinedDiscord && (
-            <Link href={process.env.NEXT_PUBLIC_DISCORD_LINK || ""} target="_blank">
+            <Link href={process.env.NEXT_PUBLIC_DISCORD_LINK ?? ""} target="_blank">
               <Button className="from-customTeal to-customViolet-100 h-10  rounded-full bg-gradient-to-r via-customBlue-100 p-0.5 hover:bg-gradient-to-br xl:h-12">
                 <span className="bg-black-100 flex h-full w-full items-center justify-center rounded-full px-4 text-lg text-white lg:text-lg">
                   Join Discord Server

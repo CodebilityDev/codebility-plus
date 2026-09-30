@@ -4,7 +4,6 @@ import { createEducation, updateEducation } from "@/actions/applicant/profile/ap
 import { Button } from "@/components/global/ui/button";
 import { IconDelete, IconEdit } from "@/public/assets/svgs/index";
 import type { EducationFormProps } from "@/types/applicant/profile/profile";
-import type { Education } from "@/types/global/codev";
 import { Input } from "@codevs/ui/input";
 import { Textarea } from "@codevs/ui/textarea";
 import { useState, useEffect } from "react";
@@ -59,13 +58,13 @@ export const EducationForm = ({
     }
 
     const data = {
-      institution: education.institution || null,
-      degree: education.degree || null,
-      major_subject: education.major_subject || null,
-      description: education.description || null,
-      achievements: education.achievements || null,
-      start_date: education.start_date || null,
-      end_date: education.end_date || null,
+      institution: education.institution ?? "",
+      degree: education.degree ?? null,
+      major_subject: education.major_subject ?? null,
+      description: education.description ?? null,
+      achievements: education.achievements ?? null,
+      start_date: education.start_date ?? null,
+      end_date: education.end_date ?? null,
       codev_id: education.codev_id || undefined,
       profile_id: education.profile_id || undefined,
     };
@@ -73,10 +72,8 @@ export const EducationForm = ({
     try {
       setIsLoading(true);
       if (!education.id) {
-        const result = await createEducation(
-          data as Omit<Education, "id" | "created_at" | "updated_at">,
-        );
-        if (result && result.length) {
+        const result = await createEducation(data);
+        if (result?.[0]) {
           education.id = result[0].id;
         }
         toast.success("Education added successfully!");
@@ -124,7 +121,7 @@ export const EducationForm = ({
             onChange={(e) =>
               handleUpdateEducation(itemNo, e.target.name, e.target.value)
             }
-            value={education.institution || ""}
+            value={education.institution ?? ""}
             type="text"
             name="institution"
             variant={editMode ? "lightgray" : "darkgray"}
@@ -140,7 +137,7 @@ export const EducationForm = ({
           onChange={(e) =>
             handleUpdateEducation(itemNo, e.target.name, e.target.value)
           }
-          value={education.degree || ""}
+          value={education.degree ?? ""}
           type="text"
           name="degree"
           placeholder="e.g., Bachelor of Science, Master of Arts"
@@ -156,7 +153,7 @@ export const EducationForm = ({
           onChange={(e) =>
             handleUpdateEducation(itemNo, e.target.name, e.target.value)
           }
-          value={education.major_subject || ""}
+          value={education.major_subject ?? ""}
           type="text"
           name="major_subject"
           placeholder="e.g., Computer Science, Business Administration"
@@ -173,7 +170,7 @@ export const EducationForm = ({
           onChange={(e) =>
             handleUpdateEducation(itemNo, e.target.name, e.target.value)
           }
-          value={education.description || ""}
+          value={education.description ?? ""}
           name="description"
           placeholder="Brief description of your studies or coursework"
           className={`rounded transition-colors ${
@@ -192,7 +189,7 @@ export const EducationForm = ({
           onChange={(e) =>
             handleUpdateEducation(itemNo, e.target.name, e.target.value)
           }
-          value={education.achievements || ""}
+          value={education.achievements ?? ""}
           name="achievements"
           placeholder="e.g., Dean's List, Cum Laude, Academic Awards, Honors"
           className={`rounded transition-colors ${
@@ -211,7 +208,7 @@ export const EducationForm = ({
             onChange={(e) =>
               handleUpdateEducation(itemNo, e.target.name, e.target.value)
             }
-            value={education.start_date || ""}
+            value={education.start_date ?? ""}
             type="date"
             name="start_date"
             variant={editMode ? "lightgray" : "darkgray"}
@@ -225,7 +222,7 @@ export const EducationForm = ({
             onChange={(e) =>
               handleUpdateEducation(itemNo, e.target.name, e.target.value)
             }
-            value={education.end_date || ""}
+            value={education.end_date ?? ""}
             type="date"
             name="end_date"
             variant={editMode ? "lightgray" : "darkgray"}

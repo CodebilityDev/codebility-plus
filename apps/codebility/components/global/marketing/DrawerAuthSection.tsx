@@ -17,8 +17,8 @@ export const DrawerAuthSection = ({handleLogout}: DrawerAuthSectionProps) =>
   <>
     <div className="border-t border-zinc-700 my-2" />
     {getMenuItems(
-      userData.application_status,
-      userData.role_id,
+      userData.application_status ?? "",
+      userData.role_id ?? 0,
       userData.applicant,
     ).map((item) => (
       <Link href={item.href} key={item.label}>

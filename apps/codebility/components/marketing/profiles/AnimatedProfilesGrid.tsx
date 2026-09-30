@@ -9,6 +9,7 @@ import type { AnimatedProfilesGridProps } from "@/types/marketing/profiles/profi
 export function AnimatedProfilesGrid({
   codevs,
   animationKey,
+  skillCategories,
 }: AnimatedProfilesGridProps) {
   if (codevs.length === 0) {
     return (
@@ -33,6 +34,7 @@ export function AnimatedProfilesGrid({
             color={getStableColor(codev.id)}
             codev={codev}
             animateEntrance={false}
+            skillCategories={skillCategories}
           />
         </div>
       ))}

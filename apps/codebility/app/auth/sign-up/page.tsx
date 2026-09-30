@@ -172,7 +172,7 @@ export default function SignUpForm() {
 
       // Complex fields
       formData.append("positions", JSON.stringify(selectedPositions));
-      formData.append("tech_stacks", JSON.stringify(stack || []));
+      formData.append("tech_stacks", JSON.stringify(stack ?? []));
 
       if (profileImage) {
         formData.append("profileImage", profileImage);
@@ -197,7 +197,7 @@ export default function SignUpForm() {
           router.push('/auth/verify');
         }, 2000);
       } else {
-        toast.error(result.error || "Failed to create account");
+        toast.error(result.error ?? "Failed to create account");
       }
     } catch (error) {
       console.error("Signup error:", error);

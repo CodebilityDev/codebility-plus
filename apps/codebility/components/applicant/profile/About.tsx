@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Box from "@/components/global/layout/Box";
 import { Button } from "@/components/global/ui/button";
-import { useInvalidateProfilePoints, useProfilePoints } from "@/hooks/applicant/profile/use-profile-points";
 import { IconEdit } from "@/public/assets/svgs/index";
 
 import { useForm } from "react-hook-form";
@@ -13,22 +13,16 @@ import { Label } from "@codevs/ui/label";
 import { Textarea } from "@codevs/ui/textarea";
 
 import { updateCodev } from "@/actions/applicant/profile/applicant-profile";
-import type { AboutProps, FormValues, ProfilePointEntry } from "@/types/applicant/profile/profile";
+import type { AboutProps, FormValues } from "@/types/applicant/profile/profile";
 
 
-const About = ({ data }: AboutProps) => {
+const About = ({ data, earnedCategories }: AboutProps) => {
+  const router = useRouter();
   const [isEditMode, setIsEditMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const { data: profilePoints } = useProfilePoints(data.id);
-  const invalidateProfilePoints = useInvalidateProfilePoints();
-
-  // Has the user earned points for the 'about' field?
-  const aboutPoint = (
-    (profilePoints?.points ?? []) as ProfilePointEntry[]
-  ).find((point) => point.category === "about");
-  const hasAboutPoints = !!aboutPoint && aboutPoint.points > 0;
+  const hasAboutPoints = earnedCategories.includes("about");
 
   const {
     register,
@@ -52,8 +46,7 @@ const About = ({ data }: AboutProps) => {
       toast.success("Your about was successfully updated!", { id: toastId });
       setIsEditMode(false);
 
-      // Re-check points after update
-      await invalidateProfilePoints(data.id);
+      router.refresh();
     } catch (error) {
       console.error(error);
       toast.error("Something went wrong, please try again later!");

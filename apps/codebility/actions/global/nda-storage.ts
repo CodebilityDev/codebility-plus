@@ -48,7 +48,7 @@ async function uploadFileToStorage(
 
     // Generate unique filename with timestamp
     const timestamp = Date.now();
-    const fileExtension = file.name.split(".").pop() || "";
+    const fileExtension = file.name.split(".").pop() ?? "";
     const fileName = `${timestamp}_${file.name}`;
     const filePath = `${folder}/${fileName}`;
 
@@ -93,7 +93,7 @@ export async function uploadNdaToStorage(
     
     // Generate unique filenames with timestamp
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const userIdentifier = codev_id || `${first_name}_${last_name}`;
+    const userIdentifier = codev_id ?? `${first_name}_${last_name}`;
     
     const signatureFilename = `nda_signature_${userIdentifier}_${timestamp}.png`;
     const documentFilename = `nda_document_${userIdentifier}_${timestamp}.pdf`;
@@ -196,7 +196,7 @@ export async function completeNdaSigning(
     if (!uploadResult.success) {
       return { 
         success: false, 
-        error: uploadResult.error || "Failed to upload files to storage" 
+        error: uploadResult.error ?? "Failed to upload files to storage" 
       };
     }
 
@@ -210,7 +210,7 @@ export async function completeNdaSigning(
     if (!dbResult.success) {
       return { 
         success: false, 
-        error: dbResult.error || "Failed to update database" 
+        error: dbResult.error ?? "Failed to update database" 
       };
     }
 
@@ -258,4 +258,19 @@ export async function getNdaFilePath(url: string): Promise<string | null> {
   } catch {
     return null;
   }
+}
+export async function completeNdaRequest(token: string) {
+  const supabase = await createClientServerComponent();
+
+  const { error } = await supabase
+    .from("nda_requests")
+    .update({ status: "completed" })
+    .eq("token", token);
+
+  if (error) {
+    console.error("Error updating NDA request status:", error);
+    return { error: "Failed to update NDA request status" };
+  }
+
+  return { error: null };
 }

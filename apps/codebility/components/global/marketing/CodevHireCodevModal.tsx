@@ -68,7 +68,7 @@ export function CodevHireCodevModal() {
 		} catch (error: any) {
 			toast({
 				title: "Email failed to send",
-				description: error?.text || "An error occurred while sending the email.",
+				description: error?.text ?? "An error occurred while sending the email.",
 				variant: "destructive",
 			});
 		}

@@ -113,7 +113,7 @@ export default function ApplicantProfileColSec({
                     </p>
                   </div>
                   <p className="truncate text-xs text-gray-600 dark:text-gray-400">
-                    {applicant.display_position || "Not specified"}
+                    {applicant.display_position ?? "Not specified"}
                   </p>
                   {applicant.years_of_experience !== undefined && (
                     <p className="text-xs text-gray-600 dark:text-gray-400">

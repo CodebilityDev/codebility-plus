@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClientClientComponent } from "@/lib/global/supabase-client";
 import { ShieldCheck, ShieldAlert, CheckCircle2, Copy, QrCode, Lock } from "lucide-react";
 import toast from "react-hot-toast";
@@ -9,13 +10,14 @@ import { Button } from "@codevs/ui/button";
 import { Label } from "@codevs/ui/label";
 import { Input } from "@codevs/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@codevs/ui/dialog";
-import type { Factor } from "@/types/global/account-settings";
+import type { AccountSettings2FAProps, Factor } from "@/types/global/account-settings";
 
 
-export default function AccountSettings2FA() {
-  const [loading, setLoading] = useState(true);
-  const [factors, setFactors] = useState<Factor[]>([]);
-  const [activeFactor, setActiveFactor] = useState<Factor | null>(null);
+export default function AccountSettings2FA({ mfaFactors }: AccountSettings2FAProps) {
+  const router = useRouter();
+  const [factors, setFactors] = useState<Factor[]>(mfaFactors as Factor[]);
+  const activeFactor =
+    factors.find((factor) => factor.status === "verified") ?? null;
 
   // Dialog States
   const [isEnrollOpen, setIsEnrollOpen] = useState(false);
@@ -28,34 +30,7 @@ export default function AccountSettings2FA() {
   const [secretKey, setSecretKey] = useState<string>("");
   const [verificationCode, setVerificationCode] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
-
-  const fetchMfaFactors = useCallback(async () => {
-    const supabase = createClientClientComponent();
-    if (!supabase) {
-      setLoading(false);
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const { data, error } = await supabase.auth.mfa.listFactors();
-      if (error) throw error;
-
-      const totpFactors = (data?.totp || []) as Factor[];
-      setFactors(totpFactors);
-
-      const verified = totpFactors.find((f) => f.status === "verified");
-      setActiveFactor(verified || null);
-    } catch (err) {
-      console.error("Error fetching 2FA factors:", err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchMfaFactors();
-  }, [fetchMfaFactors]);
+  const isBusy = submitting;
 
   const handleStartEnrollment = async () => {
     const supabase = createClientClientComponent();
@@ -74,7 +49,7 @@ export default function AccountSettings2FA() {
       });
 
       if (error) {
-        toast.error(error.message || "Failed to initiate 2FA setup");
+        toast.error(error.message ?? "Failed to initiate 2FA setup");
         return;
       }
 
@@ -83,7 +58,7 @@ export default function AccountSettings2FA() {
       setSecretKey(data.totp.secret);
       setIsEnrollOpen(true);
     } catch (err: any) {
-      toast.error(err?.message || "An unexpected error occurred");
+      toast.error(err?.message ?? "An unexpected error occurred");
     } finally {
       setSubmitting(false);
     }
@@ -110,7 +85,7 @@ export default function AccountSettings2FA() {
       });
 
       if (error) {
-        toast.error(error.message || "Invalid authentication code");
+        toast.error(error.message ?? "Invalid authentication code");
         return;
       }
 
@@ -119,9 +94,9 @@ export default function AccountSettings2FA() {
 
       setIsRecoveryOpen(true);
 
-      await fetchMfaFactors();
+      router.refresh();
     } catch (err: any) {
-      toast.error(err?.message || "Verification failed");
+      toast.error(err?.message ?? "Verification failed");
     } finally {
       setSubmitting(false);
     }
@@ -143,15 +118,15 @@ export default function AccountSettings2FA() {
       });
 
       if (error) {
-        toast.error(error.message || "Failed to disable 2FA");
+        toast.error(error.message ?? "Failed to disable 2FA");
         return;
       }
 
       toast.success("Two-Factor Authentication disabled");
       setIsDisableOpen(false);
-      await fetchMfaFactors();
+      router.refresh();
     } catch (err: any) {
-      toast.error(err?.message || "Failed to disable 2FA");
+      toast.error(err?.message ?? "Failed to disable 2FA");
     } finally {
       setSubmitting(false);
     }
@@ -170,7 +145,7 @@ export default function AccountSettings2FA() {
             <Label htmlFor="two-factor" className="text-base font-semibold">
               Two-Factor Authentication (2FA)
             </Label>
-            {!loading && (
+            {!false && (
               activeFactor ? (
                 <span className="inline-flex items-center gap-1 text-xs font-medium bg-green-500/10 text-green-500 px-2.5 py-0.5 rounded-full border border-green-500/20">
                   <ShieldCheck className="w-3.5 h-3.5" /> Enabled
@@ -188,7 +163,7 @@ export default function AccountSettings2FA() {
         </div>
 
         <div>
-          {loading ? (
+          {isBusy ? (
             <Button disabled className="h-9 text-sm">Loading...</Button>
           ) : activeFactor ? (
             <div className="flex gap-2">

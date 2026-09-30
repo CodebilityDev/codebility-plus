@@ -9,8 +9,30 @@ export interface EarnedCategories {
   earnedCategories: string[];
 }
 
+export type ProfileCodev = Pick<
+  Codev,
+  | "id"
+  | "first_name"
+  | "last_name"
+  | "address"
+  | "display_position"
+  | "headline"
+  | "years_of_experience"
+  | "about"
+  | "facebook"
+  | "linkedin"
+  | "github"
+  | "discord"
+  | "portfolio_website"
+  | "phone_number"
+  | "image_url"
+  | "tech_stacks"
+  | "level"
+>;
+
 export interface AboutProps {
-  data: Codev;
+  data: ProfileCodev;
+  earnedCategories: string[];
 }
 
 export interface FormValues {
@@ -116,7 +138,7 @@ export interface PeriodSelectorProps {
 }
 
 export interface PersonalInfoProps {
-  data: Codev;
+  data: ProfileCodev;
   positions: Position[];
 }
 
@@ -212,6 +234,7 @@ export type Period = "AM" | "PM";
 
 export interface TimeScheduleProps {
   data?: WorkSchedule | null;
+  codevId: string;
 }
 
 export interface ProfilePointsCompletionDetail {

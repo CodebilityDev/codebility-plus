@@ -15,6 +15,7 @@ import { Input } from "@codevs/ui/input";
 import AccountSettingsBackdrop from "@/components/global/account-settings/AccountSettingsBackDrop";
 import { getClientSupabase } from "@/lib/global/supabase-client";
 import { emailChangeSchema } from "@/utils/global/account-settings";
+import { updateCodevEmail } from "@/actions/global/account-settings/update-email";
 
 
 export default function AccountSettingsDialog() {
@@ -34,17 +35,6 @@ export default function AccountSettingsDialog() {
     try {
       setIsLoading(true);
 
-      // Get current user
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) {
-        toast.error("User not found");
-        return;
-      }
-
-      // Update email in auth
       const { error: authError } = await supabase.auth.updateUser({
         email: values.email,
       });
@@ -54,14 +44,10 @@ export default function AccountSettingsDialog() {
         return;
       }
 
-      // Update email in codev table
-      const { error: dbError } = await supabase
-        .from("codev")
-        .update({ email_address: values.email })
-        .eq("id", user.id);
+      const dbResult = await updateCodevEmail(values.email);
 
-      if (dbError) {
-        toast.error("Failed to update email in database");
+      if (dbResult.error) {
+        toast.error(dbResult.error);
         return;
       }
 

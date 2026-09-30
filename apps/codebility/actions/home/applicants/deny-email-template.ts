@@ -1,7 +1,7 @@
 import { EMAIL_STYLES } from "@/actions/home/applicants/email-config";
 
 export const getDenyTextTemplate = (name?: string) => `
-Dear ${name ? name : "Applicant"},
+Dear ${name ?? "Applicant"},
 Thank you for taking the time and applying to Codebility.
 
 We regret to inform you that your application has been denied.
@@ -43,7 +43,7 @@ border-radius: 5px;
 </div>
 
 <div class="content">
-<p>Dear ${name ? name : "Applicant"},</p>
+<p>Dear ${name ?? "Applicant"},</p>
 
 <p>Thank you for taking the time and applying to Codebility.</p>
 

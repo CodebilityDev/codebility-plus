@@ -52,7 +52,7 @@ export const UserMenu = ({handleLogout}: UserMenuProps) => {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent className="dark:bg-dark-100 bg-dark-100 absolute -left-24 top-3 border-zinc-700 md:w-[200px]">
-        {getMenuItems(application_status, role_id, applicant).map((item) => (
+        {getMenuItems(application_status ?? "", role_id ?? 0, applicant).map((item) => (
           <Link key={item.label} href={item.href}>
             <DropdownMenuItem
               className="flex cursor-pointer items-center gap-6 p-3 px-5"

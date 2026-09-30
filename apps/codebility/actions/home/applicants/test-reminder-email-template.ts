@@ -1,7 +1,7 @@
 import { EMAIL_STYLES } from "@/actions/home/applicants/email-config";
 
 export const getTestReminderTextTemplate = (name?: string) => `
-Dear ${name ? name : "Applicant"},
+Dear ${name ?? "Applicant"},
 
 IMPORTANT: If you have already completed your application or received this email before, please disregard this message.
 
@@ -44,7 +44,7 @@ export const getTestReminderHtmlTemplate = (name?: string) => `
     </div>
 
     <div class="content">
-        <p>Dear ${name ? name : "Applicant"},</p>
+        <p>Dear ${name ?? "Applicant"},</p>
 
         <p>This is a friendly reminder to complete your application process with Codebility.</p>
 

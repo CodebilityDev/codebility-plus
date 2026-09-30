@@ -49,8 +49,8 @@ export default function OnboardingClient({
 
     if (applicantData.quiz_passed && !applicantData.commitment_signed_at) {
       setCurrentStep("commitment");
-      setQuizScore(applicantData.quiz_score || 0);
-      setQuizTotal(applicantData.quiz_total || 0);
+      setQuizScore(applicantData.quiz_score ?? 0);
+      setQuizTotal(applicantData.quiz_total ?? 0);
     } else if (applicantData.quiz_completed_at) {
       setCurrentStep("quiz");
     }

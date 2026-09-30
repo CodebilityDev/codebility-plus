@@ -11,7 +11,7 @@ export const TestCountdown = ({
   applicantData,
 }: TestCountdownProps) => {
   const reapplyDate = useMemo(
-    () => getTestDate(new Date(applicantData?.test_taken || "") || new Date()),
+    () => getTestDate(new Date(applicantData?.test_taken ?? "") ?? new Date()),
     [applicantData?.test_taken],
   );
 

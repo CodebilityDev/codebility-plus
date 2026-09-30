@@ -1,7 +1,4 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
-import Logo from "@/components/global/layout/Logo";
-import { Button } from "@/components/global/ui/button";
 
 export const instant = false;
 

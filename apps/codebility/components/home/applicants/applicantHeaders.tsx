@@ -29,7 +29,7 @@ function ApplicantFilterHeaders({
       );
     });
     setApplicants(filteredApplicants);
-    moveTab(filteredApplicants[0]?.application_status || "applying");
+    moveTab(filteredApplicants[0]?.application_status ?? "applying");
   };
 
   const [sortField, setSortField] = useState<string | null>(null);
@@ -198,7 +198,7 @@ function ApplicantFilterHeaders({
   }, [applicants]);
 
   const uniqueTechStacks = useMemo(() => {
-    const allTechStacks = applicants?.flatMap((a) => a.tech_stacks || []) || [];
+    const allTechStacks = applicants?.flatMap((a) => a.tech_stacks ?? []) ?? [];
     return [...new Set(allTechStacks)].filter(Boolean);
   }, [applicants]);
 

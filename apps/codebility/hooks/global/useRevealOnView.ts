@@ -9,10 +9,11 @@ export function useRevealOnView(
   hidden: string[],
 ) {
   const classes = useRef({ visible, hidden });
-  classes.current = { visible, hidden };
   const key = JSON.stringify({ selector, visible, hidden });
 
   useEffect(() => {
+    classes.current = JSON.parse(key) as { visible: string[]; hidden: string[] };
+
     const root = container.current;
     if (!root) return;
 

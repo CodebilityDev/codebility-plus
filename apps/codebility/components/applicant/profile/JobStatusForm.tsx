@@ -39,8 +39,8 @@ export const JobStatusForm = ({
       work_setup: jobStatus.work_setup,
       description: jobStatus.description?.trim() || null,
       status: "active",
-      salary_range: jobStatus.salary_range || null,
-      shift: jobStatus.shift || null,
+      salary_range: jobStatus.salary_range ?? null,
+      shift: jobStatus.shift ?? null,
     };
 
     try {
@@ -105,7 +105,7 @@ export const JobStatusForm = ({
           onValueChange={(value) =>
             handleUpdateJobStatus(itemNo, "employment_type", value)
           }
-          value={jobStatus.employment_type || ""}
+          value={jobStatus.employment_type ?? ""}
           disabled={!editModePerItem[itemNo] || isLoading}
         >
           <SelectTrigger>
@@ -126,7 +126,7 @@ export const JobStatusForm = ({
           onValueChange={(value) =>
             handleUpdateJobStatus(itemNo, "shift", value)
           }
-          value={jobStatus.shift || ""}
+          value={jobStatus.shift ?? ""}
           disabled={!editModePerItem[itemNo] || isLoading}
         >
           <SelectTrigger>
@@ -145,7 +145,7 @@ export const JobStatusForm = ({
           onValueChange={(value) =>
             handleUpdateJobStatus(itemNo, "work_setup", value)
           }
-          value={jobStatus.work_setup || ""}
+          value={jobStatus.work_setup ?? ""}
           disabled={!editModePerItem[itemNo] || isLoading}
         >
           <SelectTrigger>
@@ -164,7 +164,7 @@ export const JobStatusForm = ({
           onValueChange={(value) =>
             handleUpdateJobStatus(itemNo, "salary_range", value)
           }
-          value={jobStatus.salary_range || ""}
+          value={jobStatus.salary_range ?? ""}
           disabled={!editModePerItem[itemNo] || isLoading}
         >
           <SelectTrigger>

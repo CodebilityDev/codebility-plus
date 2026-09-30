@@ -29,7 +29,10 @@ export const getSidebarData = async (
     if (error || !data) {
       console.error("Failed to fetch role permissions:", error);
     }
-    rolePermissions = (data) ?? NO_PERMISSIONS;
+    rolePermissions = {
+      dashboard: data?.dashboard ?? false,
+      applicants: data?.applicants ?? false,
+    };
   }
 
   const sidebarData: Sidebar[] = [

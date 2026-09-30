@@ -126,7 +126,7 @@ export default function ApplicantStep4({ user }: ApplicantStep4Props) {
               Like on Facebook
             </Link>
             <Link
-              href={process.env.NEXT_PUBLIC_DISCORD_LINK || ""}
+              href={process.env.NEXT_PUBLIC_DISCORD_LINK ?? ""}
               target="_blank"
               className="rounded-lg border border-gray-700 bg-gray-900/20 px-4 py-2 text-xs transition-colors hover:border-blue-500 hover:bg-blue-900/10"
             >

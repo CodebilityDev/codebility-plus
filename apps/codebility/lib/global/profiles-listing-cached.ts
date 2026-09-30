@@ -166,7 +166,7 @@ async function fetchProfileProjects(codevId: string) {
     .select("id, name, main_image")
     .in(
       "id",
-      members.map((row) => row.project_id),
+      members.map((row) => row.project_id).filter((id): id is string => id !== null),
     );
 
   if (projectError) return [];
