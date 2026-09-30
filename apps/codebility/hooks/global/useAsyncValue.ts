@@ -2,11 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-export function useAsyncValue<T>(
-  load: () => Promise<T>,
-  deps: unknown[],
-  fallback: T,
-): T {
+export function useAsyncValue<T>(load: () => Promise<T>, fallback: T, deps: unknown[]) {
   const [value, setValue] = useState<T>(fallback);
 
   useEffect(() => {
@@ -24,6 +20,8 @@ export function useAsyncValue<T>(
     return () => {
       active = false;
     };
+    // The caller owns the dependency list; the load function is recreated per render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 
   return value;

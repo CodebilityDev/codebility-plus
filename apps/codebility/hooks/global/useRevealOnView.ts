@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 export function useRevealOnView(
   container: React.RefObject<HTMLElement | null>,
@@ -8,6 +8,10 @@ export function useRevealOnView(
   visible: string[],
   hidden: string[],
 ) {
+  const classes = useRef({ visible, hidden });
+  classes.current = { visible, hidden };
+  const key = JSON.stringify({ selector, visible, hidden });
+
   useEffect(() => {
     const root = container.current;
     if (!root) return;
@@ -24,8 +28,8 @@ export function useRevealOnView(
           const card = entry.target as HTMLElement;
           timers.push(
             setTimeout(() => {
-              card.classList.add(...visible);
-              card.classList.remove(...hidden);
+              card.classList.add(...classes.current.visible);
+              card.classList.remove(...classes.current.hidden);
             }, Number(card.dataset.delay ?? 0)),
           );
           observer.unobserve(card);
@@ -40,5 +44,5 @@ export function useRevealOnView(
       timers.forEach(clearTimeout);
       observer.disconnect();
     };
-  }, [container, selector, visible, hidden]);
+  }, [container, selector, key]);
 }

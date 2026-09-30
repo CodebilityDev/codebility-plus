@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { createClientClientComponent } from "@/lib/global/supabase-client";
 import { ShieldCheck, ShieldAlert, CheckCircle2, Copy, QrCode, Lock } from "lucide-react";
 import toast from "react-hot-toast";
@@ -29,7 +29,7 @@ export default function AccountSettings2FA() {
   const [verificationCode, setVerificationCode] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
 
-  const fetchMfaFactors = async () => {
+  const fetchMfaFactors = useCallback(async () => {
     const supabase = createClientClientComponent();
     if (!supabase) {
       setLoading(false);
@@ -51,11 +51,11 @@ export default function AccountSettings2FA() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchMfaFactors();
-  }, []);
+  }, [fetchMfaFactors]);
 
   const handleStartEnrollment = async () => {
     const supabase = createClientClientComponent();

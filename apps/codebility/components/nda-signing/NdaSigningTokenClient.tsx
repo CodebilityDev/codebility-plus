@@ -16,6 +16,30 @@ import type { UserInfo, SignatureCanvasRef, SignaturePadProps } from "@/types/nd
 import { UserInfoSchema, generateNdaPdf } from "@/utils/nda-signing/nda-signing";
 
 
+async function fetchCodevIdFromToken(ndaToken: string): Promise<string | null> {
+  const supabase = createClientClientComponent();
+
+  if (!supabase) {
+    toast.error("Unable to connect to database");
+    return null;
+  }
+
+  const { data, error } = await supabase
+    .from("nda_requests")
+    .select("codev_id")
+    .eq("token", ndaToken)
+    .eq("status", "pending")
+    .single();
+
+  if (error) {
+    console.error("Error fetching codev ID:", error);
+    toast.error("Invalid or expired NDA link");
+    return null;
+  }
+
+  return data?.codev_id ?? null;
+}
+
 // Dynamic signature pad component with loading state
 const SignaturePad = forwardRef<SignatureCanvasRef, SignaturePadProps>(
   (props, ref) => {
@@ -63,45 +87,17 @@ export default function PublicNdaSigningPage() {
 
   // Fetch codev ID from token on component mount
   useEffect(() => {
-    if (token) {
-      fetchCodevIdFromToken(token);
-    }
+    if (!token) return;
+
+    let active = true;
+    fetchCodevIdFromToken(token).then((id) => {
+      if (active && id) setCodevId(id);
+    });
+
+    return () => {
+      active = false;
+    };
   }, [token]);
-
-  /**
-   * Fetches codev ID associated with the NDA token
-   * This connects the signing process to the specific codev record
-   */
-  const fetchCodevIdFromToken = async (ndaToken: string) => {
-    try {
-      const supabase = createClientClientComponent();
-      
-      if (!supabase) {
-        toast.error("Unable to connect to database");
-        return;
-      }
-      
-      const { data, error } = await supabase
-        .from("nda_requests")
-        .select("codev_id")
-        .eq("token", ndaToken)
-        .eq("status", "pending")
-        .single();
-
-      if (error) {
-        console.error("Error fetching codev ID:", error);
-        toast.error("Invalid or expired NDA link");
-        return;
-      }
-
-      if (data?.codev_id) {
-        setCodevId(data.codev_id);
-      }
-    } catch (error) {
-      console.error("Error in fetchCodevIdFromToken:", error);
-      toast.error("Failed to validate NDA link");
-    }
-  };
 
   // Clear signature canvas
   const clearSignature = () => {

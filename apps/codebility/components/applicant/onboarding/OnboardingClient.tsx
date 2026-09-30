@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { Button } from "@/components/global/ui/button";
@@ -33,32 +33,29 @@ export default function OnboardingClient({
   const [quizScore, setQuizScore] = useState<number>(0);
   const [quizTotal, setQuizTotal] = useState<number>(0);
 
-  useEffect(() => {
-    loadProgress();
-    restoreState();
-  }, []);
-
-  const restoreState = () => {
-    // Check if quiz was passed - if yes, go to commitment step
-    if (applicantData.quiz_passed && !applicantData.commitment_signed_at) {
-      setCurrentStep("commitment");
-      setQuizScore(applicantData.quiz_score || 0);
-      setQuizTotal(applicantData.quiz_total || 0);
-    }
-    // Check if all videos are complete but quiz not started
-    else if (applicantData.quiz_completed_at) {
-      setCurrentStep("quiz");
-    }
-  };
-
-  const loadProgress = async () => {
+  const loadProgress = useCallback(async () => {
     setIsLoading(true);
     const result = await getOnboardingProgress(applicantId);
     if (result?.progress) {
       setProgress(result.progress);
     }
     setIsLoading(false);
-  };
+  }, [applicantId]);
+
+  const restoreState = useCallback(() => {
+    if (applicantData.quiz_passed && !applicantData.commitment_signed_at) {
+      setCurrentStep("commitment");
+      setQuizScore(applicantData.quiz_score || 0);
+      setQuizTotal(applicantData.quiz_total || 0);
+    } else if (applicantData.quiz_completed_at) {
+      setCurrentStep("quiz");
+    }
+  }, [applicantData]);
+
+  useEffect(() => {
+    loadProgress();
+    restoreState();
+  }, [loadProgress, restoreState]);
 
   const handleVideoComplete = async () => {
     await loadProgress();

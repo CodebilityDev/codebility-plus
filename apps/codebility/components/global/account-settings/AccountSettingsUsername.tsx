@@ -9,6 +9,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@codev
 import { checkUsernameAvailability, updateUsername, getUsernameData } from "@/actions/global/account-settings";
 import { useToast } from "@codevs/ui/use-toast";
 import type { AccountSettingsUsernameProps } from "@/types/global/account-settings";
+import { useTimeout } from "@/hooks/global/useInterval";
 
 
 export default function AccountSettingsUsername({ userId }: AccountSettingsUsernameProps) {
@@ -47,42 +48,24 @@ export default function AccountSettingsUsername({ userId }: AccountSettingsUsern
     fetchUserData();
   }, [userId]);
 
-  // Debounced username availability check
-  useEffect(() => {
-    if (!username || username.length < 8) {
-      setAvailabilityStatus({ available: null, message: "" });
-      return;
-    }
+  const isCurrentUsername =
+    Boolean(username) && username.toLowerCase() === currentUsername.toLowerCase();
+  const canCheckUsername = username.length >= 8 && !isCurrentUsername;
 
-    // Don't check if it's the same as current username
-    if (username.toLowerCase() === currentUsername.toLowerCase()) {
-      setAvailabilityStatus({ 
-        available: null, 
-        message: "This is your current username" 
-      });
-      return;
-    }
-
-    const timeoutId = setTimeout(async () => {
-      setChecking(true);
-      const result = await checkUsernameAvailability(username, userId);
+  useTimeout(() => {
+    setChecking(true);
+    checkUsernameAvailability(username, userId).then((result) => {
       setChecking(false);
-
-      if (result.available) {
-        setAvailabilityStatus({
-          available: true,
-          message: "Username is available",
-        });
-      } else {
-        setAvailabilityStatus({
-          available: false,
-          message: result.error || "Username is not available",
-        });
-      }
-    }, 500); // 500ms debounce
-
-    return () => clearTimeout(timeoutId);
-  }, [username, userId, currentUsername]);
+      setAvailabilityStatus(
+        result.available
+          ? { available: true, message: "Username is available" }
+          : {
+              available: false,
+              message: result.error || "Username is not available",
+            },
+      );
+    });
+  }, canCheckUsername ? 500 : null);
 
   const handleChangeUsername = async () => {
     if (!username || username.length < 8) return;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/global/ui/button";
 import { updateVideoProgress } from "@/actions/applicant/onboarding/applicant-onboarding";
 import { COMPLETION_THRESHOLD, POLL_INTERVAL_MS } from "@/constants/applicant/onboarding/onboarding";
@@ -37,7 +37,7 @@ export default function VideoPlayer({
   const [isBuffering, setIsBuffering] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const saveVideoProgress = async (watched: number, total: number) => {
+  const saveVideoProgress = useCallback(async (watched: number, total: number) => {
     if (progressSavedRef.current) return;
     progressSavedRef.current = true;
 
@@ -55,7 +55,7 @@ export default function VideoPlayer({
       // Reset so the user can try again.
       progressSavedRef.current = false;
     }
-  };
+  }, [applicantId, videoNumber, onVideoComplete]);
 
   useEffect(() => {
     if (!canWatch || !videoId) return;
@@ -184,7 +184,7 @@ export default function VideoPlayer({
       if (hostRef.current) hostRef.current.innerHTML = "";
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [videoId, canWatch]);
+  }, [videoId, canWatch, saveVideoProgress]);
 
   const formatTime = (seconds: number) => {
     if (!isFinite(seconds)) return "0:00";
