@@ -1,44 +1,44 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
+import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { phases } from "@/constants/auth/onboarding/onboarding";
 
-
-
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 export default function AnimatedRoadmapSvg() {
   const svgRef = useRef<SVGSVGElement | null>(null);
 
-  useEffect(() => {
-    if (!svgRef.current) return;
-
-    // Fade-in milestones
-    gsap.utils.toArray<SVGGElement>(".milestone-group").forEach((group, i) => {
-      gsap.fromTo(
-        group,
-        { autoAlpha: 0, y: 80 },
-        {
-          autoAlpha: 1,
-          y: 0,
-          duration: 1.2,
-          delay: i * 0.4,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: group,
-            start: "top 80%",
-            toggleActions: "play none none reverse",
+  useGSAP(
+    () => {
+      gsap.utils.toArray<SVGGElement>(".milestone-group").forEach((group, i) => {
+        gsap.fromTo(
+          group,
+          { autoAlpha: 0, y: 80 },
+          {
+            autoAlpha: 1,
+            y: 0,
+            duration: 1.2,
+            delay: i * 0.4,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: group,
+              start: "top 80%",
+              toggleActions: "play none none reverse",
+            },
           },
-        }
-      );
-    });
+        );
+      });
 
-    // Animate road path draw
-    const path = svgRef.current.querySelector("#center-line");
-    if (path) {
-      const length = (path as SVGPathElement).getTotalLength();
+      const path = svgRef.current?.querySelector("#center-line") as
+        | SVGPathElement
+        | null
+        | undefined;
+      if (!path) return;
+
+      const length = path.getTotalLength();
       gsap.set(path, { strokeDasharray: length, strokeDashoffset: length });
       gsap.to(path, {
         strokeDashoffset: 0,
@@ -50,8 +50,9 @@ export default function AnimatedRoadmapSvg() {
           toggleActions: "play none none reverse",
         },
       });
-    }
-  }, []);
+    },
+    { scope: svgRef },
+  );
 
   return (
     <>
@@ -98,7 +99,7 @@ export default function AnimatedRoadmapSvg() {
 
         {/* Milestones */}
         {phases.map((p, i) => (
-          <g key={`p-${i}`} className="milestone-group" style={{ opacity: 0 }}>
+          <g key={`p-${i}`} className="milestone-group">
             <circle
               cx={p.cx}
               cy={p.cy}
