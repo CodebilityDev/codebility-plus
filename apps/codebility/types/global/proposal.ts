@@ -1,5 +1,10 @@
-import type { serviceWriteSchema } from "@/utils/proposal/proposal";
+import type { serviceWriteSchema } from "@/utils/global/proposal";
 import type { z } from "zod";
+
+export interface ProposalViewProps {
+  realProjects: RealProject[];
+  codevProfiles: any[];
+}
 
 export interface Service {
   id: string;

@@ -19,6 +19,11 @@ export interface UserDeletionFormValues {
   confirmation: FormConfirmation;
 }
 
+export interface UsernameRecord {
+  username: string;
+  cooldownDays: number;
+}
+
 export interface AccountSettingsUsernameProps {
   userId: string;
 }

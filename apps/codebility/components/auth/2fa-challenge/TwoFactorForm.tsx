@@ -1,43 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClientClientComponent } from "@/lib/global/supabase-client";
 import { Button } from "@/components/global/ui/button";
 import { Input } from "@codevs/ui/input";
 import { ArrowLeft } from "lucide-react";
 import toast from "react-hot-toast";
+import type { TwoFactorFormProps } from "@/types/auth/2fa-challenge/2fa-challenge";
 
-export default function TwoFactorForm() {
+export default function TwoFactorForm({ factorId }: TwoFactorFormProps) {
   const [code, setCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [factorId, setFactorId] = useState<string | null>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
-
-  useEffect(() => {
-    async function loadFactors() {
-      const supabase = createClientClientComponent();
-      if (!supabase) return;
-
-      try {
-        const { data, error } = await supabase.auth.mfa.listFactors();
-        if (error) throw error;
-
-        const verifiedFactor = data?.totp?.find((f) => f.status === "verified");
-        if (verifiedFactor) {
-          setFactorId(verifiedFactor.id);
-        } else {
-          // If no verified factor, redirect to sign-in or home
-          toast.error("No active 2FA factor found for this account.");
-          router.push("/auth/sign-in");
-        }
-      } catch (err) {
-        console.error("Error loading 2FA factors:", err);
-      }
-    }
-    loadFactors();
-  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

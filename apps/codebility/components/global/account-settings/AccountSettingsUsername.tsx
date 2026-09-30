@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@codevs/ui/button";
 import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
@@ -8,13 +8,38 @@ import { Copy, Check, Info, CheckCircle2, XCircle, Loader2 } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@codevs/ui/tooltip";
 import { checkUsernameAvailability, updateUsername, getUsernameData } from "@/actions/global/account-settings";
 import { useToast } from "@codevs/ui/use-toast";
-import type { AccountSettingsUsernameProps } from "@/types/global/account-settings";
+import type { AccountSettingsUsernameProps, UsernameRecord } from "@/types/global/account-settings";
 import { useTimeout } from "@/hooks/global/useInterval";
 
 
+async function loadUsernameRecord(userId: string): Promise<UsernameRecord | null> {
+  const result = await getUsernameData(userId);
+  if (!result.success || !result.data) return null;
+
+  const updatedAt = result.data.username_updated_at;
+  const daysSinceUpdate = updatedAt
+    ? Math.floor((Date.now() - new Date(updatedAt).getTime()) / (1000 * 60 * 60 * 24))
+    : 30;
+
+  return {
+    username: result.data.username ?? "",
+    cooldownDays: Math.max(0, 30 - daysSinceUpdate),
+  };
+}
+
 export default function AccountSettingsUsername({ userId }: AccountSettingsUsernameProps) {
   const [username, setUsername] = useState("");
-  const [currentUsername, setCurrentUsername] = useState("");
+  const [usernameRecord, setUsernameRecord] = useState<UsernameRecord | null>(null);
+  const [loadedUserId, setLoadedUserId] = useState<string | null>(null);
+
+  if (userId && loadedUserId !== userId) {
+    setLoadedUserId(userId);
+    loadUsernameRecord(userId).then(setUsernameRecord);
+  }
+
+  const currentUsername = usernameRecord?.username ?? "";
+  const cooldownDays = usernameRecord?.cooldownDays ?? null;
+
   const [copied, setCopied] = useState(false);
   const [checking, setChecking] = useState(false);
   const [updating, setUpdating] = useState(false);
@@ -22,31 +47,9 @@ export default function AccountSettingsUsername({ userId }: AccountSettingsUsern
     available: boolean | null;
     message: string;
   }>({ available: null, message: "" });
-  const [cooldownDays, setCooldownDays] = useState<number | null>(null);
   
   const { toast } = useToast();
 
-  // Fetch current username data on mount
-  useEffect(() => {
-    const fetchUserData = async () => {
-      const result = await getUsernameData(userId);
-      if (result.success && result.data) {
-        setCurrentUsername(result.data.username || "");
-        
-        // Calculate cooldown
-        if (result.data.username_updated_at) {
-          const lastUpdate = new Date(result.data.username_updated_at);
-          const now = new Date();
-          const daysSinceUpdate = Math.floor((now.getTime() - lastUpdate.getTime()) / (1000 * 60 * 60 * 24));
-          const remaining = Math.max(0, 30 - daysSinceUpdate);
-          setCooldownDays(remaining);
-        } else {
-          setCooldownDays(0);
-        }
-      }
-    };
-    fetchUserData();
-  }, [userId]);
 
   const isCurrentUsername =
     Boolean(username) && username.toLowerCase() === currentUsername.toLowerCase();
@@ -88,9 +91,8 @@ export default function AccountSettingsUsername({ userId }: AccountSettingsUsern
         title: "Success",
         description: "Username updated successfully",
       });
-      setCurrentUsername(username);
+      setUsernameRecord({ username, cooldownDays: 30 });
       setUsername("");
-      setCooldownDays(30);
     } else {
       toast({
         title: "Error",

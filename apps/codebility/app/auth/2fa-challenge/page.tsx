@@ -1,12 +1,21 @@
 import { Suspense } from "react";
+import { redirect } from "next/navigation";
+
 import Logo from "@/components/global/layout/Logo";
 import { Toaster } from "@/components/global/ui/toaster";
 import TwoFactorForm from "@/components/auth/2fa-challenge/TwoFactorForm";
+import { createClientServerComponent } from "@/lib/global/supabase-server";
 
 export const instant = false;
 
 
-export default function TwoFactorChallengePage() {
+export default async function TwoFactorChallengePage() {
+  const supabase = await createClientServerComponent();
+  const { data } = await supabase.auth.mfa.listFactors();
+  const verifiedFactor = data?.totp?.find((factor) => factor.status === "verified");
+
+  if (!verifiedFactor) redirect("/auth/sign-in");
+
   return (
     <>
       <Toaster />
@@ -23,7 +32,7 @@ export default function TwoFactorChallengePage() {
           </div>
 
           <Suspense fallback={<div className="text-center py-8 text-sm text-gray">Loading authentication form...</div>}>
-            <TwoFactorForm />
+            <TwoFactorForm factorId={verifiedFactor.id} />
           </Suspense>
         </div>
         <div className="bg-login hidden w-full flex-1 bg-cover bg-center lg:flex" />
