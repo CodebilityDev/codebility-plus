@@ -4,7 +4,7 @@ import ApplicantFetchComp from "@/components/applicant/waiting/applicantFetchCom
 
 export const instant = false;
 
-export default async function ApplicantWaitingPage() {
+export default function ApplicantWaitingPage() {
   return (
     <div>
         <ApplicantFetchComp />

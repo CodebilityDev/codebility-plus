@@ -109,11 +109,6 @@ export const sendTestReminderForConfig = async (email: string) => {
       throw new Error(`Failed to query applicant data: ${queryError.message}`);
     }
 
-    if (!applicantData) {
-      console.error("Applicant not found for email:", email);
-      throw new Error("Applicant not found");
-    }
-
     await sendTestReminder({
       email,
       name: `${applicantData.first_name} ${applicantData.last_name}`,

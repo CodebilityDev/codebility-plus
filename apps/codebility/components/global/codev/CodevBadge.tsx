@@ -54,7 +54,7 @@ export default function CodevBadge({
     );
   };
 
-  if (!level || Object.keys(level).length === 0) {
+  if (Object.keys(level).length === 0) {
     return null;
   }
 

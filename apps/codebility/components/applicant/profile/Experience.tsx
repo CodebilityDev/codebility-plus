@@ -71,7 +71,7 @@ const Experience = ({ data, earnedCategories }: ExperienceProps) => {
     }
 
     return true;
-  }, [experienceData]);
+  }, []);
 
   // Check if there are no experiences or all are empty
   const hasNoExperience = experienceData.length === 0;

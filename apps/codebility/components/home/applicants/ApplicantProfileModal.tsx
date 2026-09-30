@@ -358,7 +358,7 @@ const ApplicantProfileModal = () => {
                             // Fallback for missing icons
                             const target = e.target as HTMLImageElement;
                             target.style.display = 'none';
-                            target.parentElement!.innerHTML = `<span class="px-2 py-1 bg-gray-200 rounded text-sm">${tech}</span>`;
+                            if (target.parentElement) { target.parentElement.innerHTML = `<span class="px-2 py-1 bg-gray-200 rounded text-sm">${tech}</span>`; }
                           }}
                         />
                       </div>

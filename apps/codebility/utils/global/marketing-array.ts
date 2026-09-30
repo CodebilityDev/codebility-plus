@@ -5,7 +5,7 @@
  * @param array - the array that we will check for duplicates.
  * @returns {array[]} - the original array, but without duplicate.
  */
-export const removeArrayDuplicate = (array: any[]) => {
+export const removeArrayDuplicate = <T>(array: T[]): T[] => {
   return array.filter((value, index, array) => {
     if (!value) return false;
     const valueIndex = array.findIndex((val) => value === val);

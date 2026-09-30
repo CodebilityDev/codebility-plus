@@ -7,10 +7,11 @@ import { getReApplyDate } from "@/utils/global/auth-declined";
 import type { DeclinedCountdownProps } from "@/types/auth/declined/declined";
 
 export const DeclinedCountdown = ({ userData }: DeclinedCountdownProps) => {
+  const dateApplied = (userData as { date_applied?: string | null } | null | undefined)?.date_applied;
 
   const reapplyDate = useMemo(
-    () => getReApplyDate(userData?.date_applied),
-    [userData?.date_applied],
+    () => getReApplyDate(dateApplied ? new Date(dateApplied) : null),
+    [dateApplied],
   );
 
   const timeLeft = useCountdown(reapplyDate);

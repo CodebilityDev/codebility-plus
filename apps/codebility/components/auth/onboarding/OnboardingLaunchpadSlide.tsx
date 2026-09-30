@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import webDevelopmentAnimation from "@/public/assets/images/onboarding/animation/web-development.json";
 
 const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 
@@ -10,7 +11,7 @@ export default function LaunchpadSlide() {
       {/* Background Lottie */}
       <div className="pointer-events-none absolute inset-0 opacity-30">
         <Lottie
-          animationData={require("@/public/assets/images/onboarding/animation/web-development.json")}
+          animationData={webDevelopmentAnimation}
           loop
           autoplay
           className="h-full w-full object-cover"

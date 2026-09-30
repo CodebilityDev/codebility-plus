@@ -7,11 +7,9 @@ import type { NavUserProfile } from "@/types/global/database";
 let navUserPromise: Promise<NavUserProfile | null> | null = null;
 
 export function getNavUserPromise() {
-  if (!navUserPromise) {
-    navUserPromise = getNavUserProfile().then((profile) => {
-      if (profile) setLocalStorageValue(NAV_USER_PROFILE_KEY, profile);
-      return profile;
-    });
-  }
+  navUserPromise ??= getNavUserProfile().then((profile) => {
+    if (profile) setLocalStorageValue(NAV_USER_PROFILE_KEY, profile);
+    return profile;
+  });
   return navUserPromise;
 }

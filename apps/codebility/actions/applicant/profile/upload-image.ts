@@ -77,13 +77,13 @@ export async function deleteImage(
   }
 }
 
-export async function getImagePath(url: string): Promise<string | null> {
+export function getImagePath(url: string): Promise<string | null> {
   try {
     const urlObj = new URL(url);
     const pathParts = urlObj.pathname.split("/");
     // Remove the bucket name and 'object' from the path
-    return pathParts.slice(6).join("/");
+    return Promise.resolve(pathParts.slice(6).join("/"));
   } catch {
-    return null;
+    return Promise.resolve(null);
   }
 }

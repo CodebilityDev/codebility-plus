@@ -37,6 +37,17 @@ export default function VideoPlayer({
   const [isBuffering, setIsBuffering] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const [prevVideoId, setPrevVideoId] = useState(videoId);
+  if (prevVideoId !== videoId) {
+    setPrevVideoId(videoId);
+    setProgress(0);
+    setCurrentTime(0);
+    setDuration(0);
+    setHasWatched(false);
+    setError(null);
+    setIsBuffering(true);
+  }
+
   const saveVideoProgress = useCallback(async (watched: number, total: number) => {
     if (progressSavedRef.current) return;
     progressSavedRef.current = true;
@@ -64,12 +75,6 @@ export default function VideoPlayer({
 
     // Reset per-video state whenever the active video changes.
     progressSavedRef.current = false;
-    setProgress(0);
-    setCurrentTime(0);
-    setDuration(0);
-    setHasWatched(false);
-    setError(null);
-    setIsBuffering(true);
 
     const stopPolling = () => {
       if (pollRef.current !== null) {

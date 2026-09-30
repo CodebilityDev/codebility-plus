@@ -23,7 +23,6 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
 
   const onNavButtonClick = useCallback((emblaApi: EmblaCarouselType) => {
     const autoplay = emblaApi.plugins().autoplay;
-    if (!autoplay) return;
 
     // Stop autoplay when button is clicked
     autoplay.stop();

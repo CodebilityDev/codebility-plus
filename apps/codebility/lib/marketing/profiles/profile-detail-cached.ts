@@ -116,11 +116,14 @@ export async function getProfileDetailMeta(
 
   if (!data) return null;
 
+  if (typeof data !== "object") return null;
+  const d = data as Record<string, unknown>;
+
   return {
-    id: data.id,
-    first_name: data.first_name ?? "",
-    last_name: data.last_name ?? "",
-    image_url: data.image_url ?? undefined,
+    id: d.id as string,
+    first_name: (d.first_name as string | null) ?? "",
+    last_name: (d.last_name as string | null) ?? "",
+    image_url: (d.image_url as string | null) ?? undefined,
   };
 }
 

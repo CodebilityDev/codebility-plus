@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import type { InternCardsAvatarProps } from "@/types/marketing/marketing";
 
 export function InternCardsAvatar({
@@ -43,7 +44,7 @@ export function InternCardsAvatar({
         className="relative flex-shrink-0 overflow-hidden rounded-full border-2 border-neutral-700 bg-gray-800"
         style={{ height: size, width: size }}
       >
-        <img
+        <Image
           src={person.image}
           alt={person.name}
           onError={() => setImgError(true)}
@@ -64,6 +65,8 @@ export function InternCardsAvatar({
             display: "block",
           }}
           loading="lazy"
+          width={size * 1.2}
+          height={size * 1.2}
           decoding="async"
         />
         {!imgLoaded ? (

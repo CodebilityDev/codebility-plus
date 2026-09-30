@@ -14,11 +14,6 @@ const uploadProfileImage = async (
   bucketName: string,
 ): Promise<string | null> => {
   try {
-    if (!file) {
-      console.error("No file provided for upload.");
-      return null;
-    }
-
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
     const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
@@ -135,7 +130,7 @@ export const signupUser = async (formData: FormData) => {
       }
     }
     // Handle profile image upload if provided
-    const image_url = profileImage && profileImage.size > 0
+    const image_url = profileImage.size > 0
       ? await uploadProfileImage(profileImage, "profileImage", "codebility")
       : null;
 
@@ -299,14 +294,12 @@ export const signinUser = async (email: string, password: string) => {
 
   try {
     // Sign in with email and password
-    const { data: signInData, error: signInError } =
-      await supabase.auth.signInWithPassword({
+    const { error: signInError } = await supabase.auth.signInWithPassword({
         email: normalizedEmail,
         password,
       });
 
     if (signInError) throw signInError;
-    if (!signInData.user) throw new Error("Failed to sign in");
 
     const { data: userProfile, error: profileError } = await supabase
       .from("codev")

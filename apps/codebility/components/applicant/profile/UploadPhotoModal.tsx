@@ -49,7 +49,7 @@ export default function UploadPhotoModal({
     try {
       const { url, file } = await getCroppedImg(image, croppedAreaPixels, 0);
 
-      if (!url || !file) {
+      if (!url) {
         throw new Error("Failed to crop image");
       }
 

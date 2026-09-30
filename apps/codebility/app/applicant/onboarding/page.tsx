@@ -22,7 +22,7 @@ export default async function OnboardingPage() {
     .eq("id", user.id)
     .single();
 
-  if (codevError || !codevData) {
+  if (codevError) {
     console.error("Error fetching codev data:", codevError);
     redirect("/applicant/waiting");
   }
@@ -41,7 +41,7 @@ export default async function OnboardingPage() {
     .eq("codev_id", user.id)
     .single();
 
-  if (applicantError || !applicantData) {
+  if (applicantError) {
     console.error("Error fetching applicant data:", applicantError);
     redirect("/applicant/waiting");
   }

@@ -12,7 +12,9 @@ export const instant = false;
 export default async function TwoFactorChallengePage() {
   const supabase = await createClientServerComponent();
   const { data } = await supabase.auth.mfa.listFactors();
-  const verifiedFactor = data?.totp?.find((factor) => factor.status === "verified");
+  const verifiedFactor = data?.totp.find(
+    (factor) => (factor.status as string) === "verified",
+  );
 
   if (!verifiedFactor) redirect("/auth/sign-in");
 

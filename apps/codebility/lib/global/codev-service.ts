@@ -1,7 +1,7 @@
 import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Client, Codev, Project, WorkExperience } from "@/types/global/codev";
+import type { Client, Codev, Project } from "@/types/global/codev";
 import type { Database } from "@/types/global/supabase";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 
@@ -131,9 +131,7 @@ export const getCodevsWithClient = async (
 
   // Apply filters dynamically
   Object.entries(filters).forEach(([key, value]) => {
-    if (value !== undefined) {
-      query = query.eq(key, value);
-    }
+    query = query.eq(key, value);
   });
 
   const { data, error } = await query;

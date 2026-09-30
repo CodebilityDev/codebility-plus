@@ -1,6 +1,7 @@
 "use server";
 
 import { createClientServerComponent } from "@/lib/global/supabase-server";
+import { toErrorMessage } from "@/utils/global/feedback";
 import { headers } from "next/headers";
 
 export const resetUserPassword = async (email: string) => {
@@ -47,8 +48,8 @@ export const resetUserPassword = async (email: string) => {
         }
 
         return { success: true };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Error resetting password:", error);
-        throw new Error(error.message ?? "Failed to reset password");
+        throw new Error(toErrorMessage(error, "Failed to reset password"));
     }
 };

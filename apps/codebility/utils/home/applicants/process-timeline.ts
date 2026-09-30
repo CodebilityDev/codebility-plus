@@ -69,7 +69,7 @@ export function deriveTimeline(
   stages: PipelineStageDefinition[] = PIPELINE_STAGES,
 ): DerivedTimeline {
   const ordered = getOrderedStages(stages);
-  const status = (applicant.application_status ?? "").toLowerCase();
+  const status = applicant.application_status.toLowerCase();
 
   const withTimestamps = (state: (index: number) => StageState): DerivedStage[] =>
     ordered.map((stage, index) => ({

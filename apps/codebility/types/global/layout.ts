@@ -1,5 +1,6 @@
 import type React from "react";
 import type { ReactNode } from "react";
+import type { Control } from "react-hook-form";
 
 export interface Box {
   children: ReactNode;
@@ -22,5 +23,5 @@ export type InputProps = React.DetailedHTMLProps<
   type?: "email" | "phone";
   inputClassName?: string;
   disabled?: boolean;
-  control?: any;
+  control?: Control<any>;
 };

@@ -31,18 +31,19 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
   });
 
   // Memoize initial column visibility to prevent recalculation
+  const firstRowStatus = data[0]?.application_status;
   const initialColumnVisibility = useMemo(
     () => ({
-      github: data[0]?.application_status === "testing" ? false : true,
-      tech_stacks: data[0]?.application_status === "testing" ? false : true,
-      test_taken: data[0]?.application_status === "testing" ? true : false,
+      github: firstRowStatus === "testing" ? false : true,
+      tech_stacks: firstRowStatus === "testing" ? false : true,
+      test_taken: firstRowStatus === "testing" ? true : false,
       test_time_remaining:
-        data[0]?.application_status === "testing" ? true : false,
-      fork_url: data[0]?.application_status === "testing" ? true : false,
-      reapply: data[0]?.application_status === "denied" ? true : false,
-      reminded: data[0]?.application_status !== "denied" ? true : false,
+        firstRowStatus === "testing" ? true : false,
+      fork_url: firstRowStatus === "testing" ? true : false,
+      reapply: firstRowStatus === "denied" ? true : false,
+      reminded: firstRowStatus !== "denied" ? true : false,
     }),
-    [data[0]?.application_status],
+    [firstRowStatus],
   );
 
   // Calculate total pages
@@ -172,7 +173,7 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
                       key={header.id}
                       className={cn(
                         "h-12 whitespace-nowrap px-0 py-0",
-                        (header.column.columnDef.meta as any)?.className,
+                        (header.column.columnDef.meta as { className?: string }).className,
                       )}
                     >
       {header.isPlaceholder
@@ -213,7 +214,7 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
                       key={cell.id}
                       className={cn(
                         "px-0 py-2.5",
-                        (cell.column.columnDef.meta as any)?.className,
+                        (cell.column.columnDef.meta as { className?: string }).className,
                       )}
                     >
                       {flexRender(

@@ -1,12 +1,6 @@
-import { cacheLife, cacheTag } from "next/cache";
-
 import { formatNdaDate } from "@/utils/global/date";
 
-export async function getSiteDate() {
-  "use cache";
-  cacheLife("hours");
-  cacheTag("site-date");
-
+export function getSiteDate() {
   const now = new Date();
 
   return {

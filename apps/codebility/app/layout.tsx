@@ -19,7 +19,7 @@ const outfit = Outfit({
     preload: false,
 });
 
-export async function generateMetadata(): Promise<Metadata> {
+export function generateMetadata(): Metadata {
     return {
         // CBP-135 follow-up fix: metadataBase was missing on dev, confirmed via
         // pasted layout.tsx. Required so relative OG image paths (/og-image.jpg)

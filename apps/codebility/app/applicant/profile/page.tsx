@@ -25,7 +25,7 @@ function earnedCategories(points: { points: { category: string; points: number }
     .map((entry) => entry.category);
 }
 
-export default async function ApplicantProfilePage() {
+export default function ApplicantProfilePage() {
   return <ProfileComponent />;
 }
 
@@ -55,7 +55,7 @@ async function ProfileComponent() {
     .eq("id", authUser.id)
     .single();
 
-  if (userError || !user) {
+  if (userError) {
     console.error("Error fetching user:", userError);
     return (
       <div className="flex h-screen items-center justify-center">

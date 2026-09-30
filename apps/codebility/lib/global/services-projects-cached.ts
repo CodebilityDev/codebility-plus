@@ -208,7 +208,7 @@ export async function getServicesProjectById(
       );
     } else {
       for (const codev of codevs) {
-        codevMap.set(codev.id, codev);
+        codevMap.set((codev as { id: string }).id, codev);
       }
     }
   }

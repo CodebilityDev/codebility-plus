@@ -110,7 +110,7 @@ const Skills = ({ data, earnedCategories }: SkillsProps) => {
             ),
         )}
 
-        {(!stack || stack.length === 0) && (
+        {stack.length === 0 && (
           <p className="text-gray-500">No skills added yet</p>
         )}
       </div>

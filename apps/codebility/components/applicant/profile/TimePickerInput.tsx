@@ -85,13 +85,13 @@ const TimePickerInput = React.forwardRef<
     return (
       <Input
         ref={ref}
-        id={id || picker}
-        name={name || picker}
+        id={id ?? picker}
+        name={name ?? picker}
         className={cn(
           "background-box w-[48px] text-center font-mono text-base tabular-nums caret-transparent focus:bg-accent focus:text-accent-foreground [&::-webkit-inner-spin-button]:appearance-none",
           className,
         )}
-        value={value || calculatedValue}
+        value={value ?? calculatedValue}
         onChange={(e) => {
           e.preventDefault();
           onChange?.(e);

@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import developerAnimation from "@/public/assets/images/onboarding/animation/developer-01-whoooa.json";
 
 const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 
@@ -10,7 +11,7 @@ export default function AboutUsSlide() {
       {/* LEFT: Lottie Animation */}
       <div className="flex w-full items-center justify-center md:w-1/2">
         <Lottie
-          animationData={require("@/public/assets/images/onboarding/animation/developer-01-whoooa.json")}
+          animationData={developerAnimation}
           className="w-[280px] sm:w-[400px] md:w-[500px] lg:w-[550px] brightness-150 invert"
           loop
           autoplay

@@ -13,12 +13,13 @@ export default function ApplicantTestTimeRemaining({
 }: ApplicantTestTimeRemainingProps) {
   const applicantData = applicant.applicant;
 
+  const testTaken = applicantData?.test_taken;
   const reapplyDate = useMemo(
     () =>
       getTestDate(
-        applicantData?.test_taken ? new Date(applicantData.test_taken) : new Date(),
+        testTaken ? new Date(testTaken) : new Date(),
       ),
-    [applicantData?.test_taken],
+    [testTaken],
   );
 
   const isSubmitted = useMemo(

@@ -7,8 +7,9 @@ import { createAdminClient } from "@/lib/home/applicants/supabase-admin";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 
 // Helper function to revalidate the applicants page
-async function revalidateApplicants() {
+function revalidateApplicants(): Promise<void> {
     revalidatePath("/home/applicants");
+    return Promise.resolve();
 }
 
 export async function deleteApplicantAction(

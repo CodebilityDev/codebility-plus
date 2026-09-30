@@ -11,10 +11,11 @@ import type { DeclinedButtonsProps } from "@/types/auth/declined/declined";
 
 export const DeclinedButtons = ({ userData }: DeclinedButtonsProps) => {
   const router = useRouter();
+  const dateApplied = (userData as { date_applied?: string | null } | null | undefined)?.date_applied;
 
   const canReapply = useMemo(
-    () => getCanReApply(userData?.date_applied),
-    [userData?.date_applied],
+    () => getCanReApply(dateApplied ? new Date(dateApplied) : null),
+    [dateApplied],
   );
 
   const handleReapply = async () => {

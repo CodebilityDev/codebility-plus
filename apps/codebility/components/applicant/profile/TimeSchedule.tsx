@@ -43,10 +43,10 @@ const TimeSchedule = ({ data, codevId }: TimeScheduleProps) => {
     try {
       const [hours, minutes] = timeStr.split(":").map(Number);
       const date = new Date();
-      date.setHours(hours || 9, minutes ?? 0, 0);
+      date.setHours(hours ?? 9, minutes ?? 0, 0);
       return {
         date,
-        period: (hours || 9) >= 12 ? "PM" : "AM",
+        period: (hours ?? 9) >= 12 ? "PM" : "AM",
       };
     } catch (error) {
       console.error("Error parsing time:", error);
@@ -96,8 +96,8 @@ const TimeSchedule = ({ data, codevId }: TimeScheduleProps) => {
     const [endHour, endMinute] = schedule.end_time.split(":").map(Number);
 
     if (
-      endHour! < startHour! ||
-      (endHour === startHour && endMinute! <= startMinute!)
+      endHour < startHour ||
+      (endHour === startHour && endMinute <= startMinute)
     ) {
       toast.error("End time must be after start time");
       return;

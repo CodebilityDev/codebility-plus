@@ -34,13 +34,7 @@ const Stepper = React.forwardRef<HTMLDivElement, StepperProps>(
     // Check screen size and adapt orientation if needed
     React.useEffect(() => {
       const handleResize = () => {
-        if (orientation !== "vertical" && orientation !== "horizontal") {
-          setCurrentOrientation(
-            window.innerWidth < 768 ? "horizontal" : "vertical",
-          );
-        } else {
-          setCurrentOrientation(orientation);
-        }
+        setCurrentOrientation(orientation);
       };
 
       handleResize();

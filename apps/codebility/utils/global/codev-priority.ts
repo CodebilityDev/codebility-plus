@@ -165,7 +165,7 @@ export function filterCodevs(
 
     const matchesProject =
       projects.length === 0 ||
-      codev.projects?.some((project) => projects.includes(project.id)) ||
+      codev.projects?.some((project) => projects.includes(project.id)) ??
       false;
 
     const matchesActiveStatus =

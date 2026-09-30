@@ -28,7 +28,7 @@ function formatPosition(position: string) {
           .map((part) => {
             const lowerPart = part.toLowerCase();
             return (
-              specialCases[lowerPart] ||
+              specialCases[lowerPart] ??
               part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()
             );
           })

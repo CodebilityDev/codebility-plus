@@ -15,7 +15,7 @@ export async function createAppointment(body: AppointmentBody) {
 
   const supabase = createClient(supabaseUrl, supabaseKey);
 
-  const { data, error } = await supabase
+  const { data, error } = (await supabase
     .from("appointments")
     .insert({
       first_name: body.firstName,
@@ -36,7 +36,10 @@ export async function createAppointment(body: AppointmentBody) {
       meeting_tool_other: body.meetingToolOther ?? null,
     })
     .select()
-    .single();
+    .single()) as {
+    data: { id: string } | null;
+    error: { message: string } | null;
+  };
 
   if (error || !data) {
     console.error("[appointments] Supabase insert error:", error);

@@ -116,7 +116,7 @@ export const ServicesServiceCard = memo(({ service, onSelect }: ServicesServiceC
 
         {hasValidWebsite && (
           <Link
-            href={website_url!}
+            href={website_url ?? ""}
             target="_blank"
             onClick={(e) => e.stopPropagation()}
             className="absolute right-2.5 top-2.5 flex size-8 items-center justify-center rounded-full bg-black/50 text-white opacity-0 backdrop-blur-md transition-all duration-300 hover:bg-white hover:text-gray-900 group-hover:opacity-100"

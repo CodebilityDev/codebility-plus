@@ -152,44 +152,7 @@ const noRenderTimeValue = {
 // Pre-existing debt: these rules already fail in code kept from before the
 // 2026-09 cleanup, so they warn instead of error. New code should pass them.
 // When a rule reaches zero warnings, delete it from this list.
-const DEBT_RULES = [
-  "@typescript-eslint/array-type",
-  "@typescript-eslint/consistent-indexed-object-style",
-  "@typescript-eslint/consistent-type-definitions",
-  "@typescript-eslint/no-base-to-string",
-  "@typescript-eslint/no-empty-function",
-  "@typescript-eslint/no-floating-promises",
-  "@typescript-eslint/no-inferrable-types",
-  "@typescript-eslint/no-misused-promises",
-  "@typescript-eslint/no-non-null-assertion",
-  "@typescript-eslint/no-redundant-type-constituents",
-  "@typescript-eslint/no-require-imports",
-  "@typescript-eslint/no-unnecessary-condition",
-  "@typescript-eslint/no-unnecessary-type-assertion",
-  "@typescript-eslint/no-unsafe-argument",
-  "@typescript-eslint/no-unsafe-assignment",
-  "@typescript-eslint/no-unsafe-call",
-  "@typescript-eslint/no-unsafe-member-access",
-  "@typescript-eslint/no-unsafe-return",
-  "@typescript-eslint/no-unused-expressions",
-  "@typescript-eslint/no-unused-vars",
-  "@typescript-eslint/no-wrapper-object-types",
-  "@typescript-eslint/prefer-nullish-coalescing",
-  "@typescript-eslint/prefer-optional-chain",
-  "@typescript-eslint/prefer-promise-reject-errors",
-  "@typescript-eslint/require-await",
-  "import/consistent-type-specifier-style",
-  "no-case-declarations",
-  "no-constant-binary-expression",
-  "no-useless-escape",
-  "prefer-const",
-  "react-hooks/immutability",
-  "react-hooks/preserve-manual-memoization",
-  "react-hooks/purity",
-  "react-hooks/refs",
-  "react-hooks/set-state-in-effect",
-  "turbo/no-undeclared-env-vars",
-];
+const DEBT_RULES = [];
 
 /** @type {import('typescript-eslint').Config} */
 export default [

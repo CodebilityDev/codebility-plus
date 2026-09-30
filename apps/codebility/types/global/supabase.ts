@@ -10,7 +10,7 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export type Database = {
+export interface Database {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
@@ -5384,9 +5384,7 @@ export type Database = {
     Enums: {
       test_status_enum: "pending" | "passed" | "failed"
     }
-    CompositeTypes: {
-      [_ in never]: never
-    }
+    CompositeTypes: Record<never, never>
   }
 }
 
@@ -5492,7 +5490,6 @@ export type Enums<
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-    | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals

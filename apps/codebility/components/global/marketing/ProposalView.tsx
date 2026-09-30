@@ -224,16 +224,18 @@ export default function ProposalView({ realProjects, codevProfiles, year }: Prop
                       <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-3">
                         {codevProfiles.map((codev, idx) => {
                         const codevName = `${codev.first_name} ${codev.last_name}`.trim() || 'Developer';
-                        const codevPosition = codev.display_position || codev.positions?.[0] || 'Developer';
+                        const codevPosition = codev.display_position ?? codev.positions?.[0] ?? 'Developer';
                         const codevImage = codev.image_url;
 
                         return (
                           <div key={idx} className="text-center p-4 bg-black-600 rounded-lg border border-dark-100">
                             <div className="mb-2">
                               {codevImage ? (
-                                <img
+                                <Image
                                   src={codevImage}
                                   alt={codevName}
+                                  width={80}
+                                  height={80}
                                   className="w-20 h-20 rounded-full object-cover mx-auto border-2 border-purple-500/50"
                                   onError={(e) => {
                                     const target = e.target as HTMLImageElement;
@@ -241,9 +243,11 @@ export default function ProposalView({ realProjects, codevProfiles, year }: Prop
                                   }}
                                 />
                               ) : (
-                                <img
+                                <Image
                                   src="https://codebility-cdn.pages.dev/assets/images/default-avatar-200x200.jpg"
                                   alt="Codev Avatar"
+                                  width={80}
+                                  height={80}
                                   className="w-20 h-20 rounded-full object-cover mx-auto border-2 border-purple-500/50"
                                 />
                               )}
@@ -268,9 +272,11 @@ export default function ProposalView({ realProjects, codevProfiles, year }: Prop
                     {projectData.length > 0 ? (
                       projectData.map((project, idx) => (
                         <div key={idx} className="group relative overflow-hidden rounded-lg bg-black-600 border-2 border-dark-100 hover:border-purple-500/50 transition-all duration-300">
-                          <img
+                          <Image
                             src={project.main_image}
                             alt={project.name}
+                            width={400}
+                            height={160}
                             className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300"
                             loading="lazy"
                           />
@@ -296,7 +302,7 @@ export default function ProposalView({ realProjects, codevProfiles, year }: Prop
               )}
 
               {/* Price and Duration */}
-              {(service.price || service.duration) && (
+              {(service.price ?? service.duration) && (
                 <div className="bg-black-600 rounded-lg p-6 mb-8 border-2 border-dark-100 relative overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-transparent to-cyan-500/10"></div>
                   <div className="relative z-10 flex items-center gap-4">

@@ -61,19 +61,15 @@ function clearRoadmapInlineStyles(
   });
 
   wrapper.querySelectorAll<SVGGElement>(".milestone-group").forEach((g) => {
-    if (gsap) {
-      gsap.set(g, { clearProps: "all" });
-      const circle = g.querySelector("circle");
-      const polygon = g.querySelector("polygon");
-      const fo = g.querySelector("foreignObject");
-      const texts = g.querySelectorAll("g");
-      if (circle) gsap.set(circle, { clearProps: "all" });
-      if (polygon) gsap.set(polygon, { clearProps: "all" });
-      if (fo) gsap.set(fo, { clearProps: "all" });
-      texts.forEach((t) => { gsap.set(t, { clearProps: "all" }); });
-    } else {
-      g.removeAttribute("style");
-    }
+    gsap.set(g, { clearProps: "all" });
+    const circle = g.querySelector("circle");
+    const polygon = g.querySelector("polygon");
+    const fo = g.querySelector("foreignObject");
+    const texts = g.querySelectorAll("g");
+    if (circle) gsap.set(circle, { clearProps: "all" });
+    if (polygon) gsap.set(polygon, { clearProps: "all" });
+    if (fo) gsap.set(fo, { clearProps: "all" });
+    texts.forEach((t) => { gsap.set(t, { clearProps: "all" }); });
   });
 
   if (stage) stage.removeAttribute("style");
@@ -131,8 +127,8 @@ export default function useOnboardingAnimations({
           const roadmapWrapper =
             (roadmapSection?.querySelector(
               "#roadmap-svg-wrapper",
-            ) as HTMLElement | null) ||
-            roadmapSection ||
+            ) as HTMLElement | null) ??
+            roadmapSection ??
             null;
 
           // Kill roadmap triggers & clean styles
@@ -185,10 +181,10 @@ export default function useOnboardingAnimations({
               const wrapper =
                 (sec.querySelector(
                   "#roadmap-svg-wrapper",
-                )) || sec;
+                )) ?? sec;
 
               const stage =
-                (wrapper.querySelector("svg")) ||
+                (wrapper.querySelector("svg")) ??
                 wrapper;
               gsap.set(stage, { display: "block", position: "relative" });
 
@@ -447,7 +443,7 @@ export default function useOnboardingAnimations({
           resetLogo();
           setIsLogoVisible(true);
 
-          const slideCount = slides.children?.length ?? 1;
+          const slideCount = slides.children.length;
           const slideWidth = window.innerWidth;
           const distance = slideWidth * Math.max(slideCount - 1, 0);
           const logoEndY = window.innerHeight - 210 - 120;
@@ -524,7 +520,6 @@ export default function useOnboardingAnimations({
             anticipatePin: 1,
             invalidateOnRefresh: true,
             onUpdate: (self) => {
-              if (!slides) return;
               if (getWillChange(slides) !== true) {
                 slides.style.willChange = "transform";
                 setWillChange(slides, true);
@@ -630,8 +625,8 @@ export default function useOnboardingAnimations({
       try {
         roadmapObserver?.disconnect();
         roadmapObserver = null;
-        mm?.revert?.();
-        ctx?.revert?.();
+        mm.revert();
+        ctx.revert();
       } catch {
         /* noop */
       }

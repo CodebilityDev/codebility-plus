@@ -27,6 +27,7 @@ export function PostSubmitted({
   } = useForm();
 
   const onSubmit = async (data: any) => {
+    const forkUrl = (data as { fork_url: string }).fork_url;
     setLoading(true);
     try {
       /* if non ui/ux role */
@@ -35,7 +36,7 @@ export function PostSubmitted({
         const urlPattern =
           /^(https?:\/\/)?(www\.)?github\.com\/[a-zA-Z0-9_-]+\/codebility-assessment(\.git)?(\/.*)?$/;
 
-        if (!urlPattern.test(data.fork_url)) {
+        if (!urlPattern.test(forkUrl)) {
           throw new Error(
             "Please enter a valid GitHub repository URL (e.g., https://github.com/username/codebility-assessment)",
           );
@@ -43,7 +44,7 @@ export function PostSubmitted({
       }
 
       await applicantUpdateTestSubmission({
-        forkUrl: data.fork_url,
+        forkUrl,
         applicantId: applicantData.id,
       });
 
@@ -101,7 +102,7 @@ export function PostSubmitted({
 
             {errors.fork_url && (
               <p className="text-sm text-red-500">
-                {String(errors.fork_url.message)}
+                {String(errors.fork_url.message as string)}
               </p>
             )}
 

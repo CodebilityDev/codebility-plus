@@ -40,9 +40,8 @@ const CodevCard = ({
     x.set(event.nativeEvent.offsetX - halfWidth);
   };
 
-  const internalStatus = codev.internal_status ?? "MENTOR";
-  const statusConfig =
-    STATUS_CONFIG[internalStatus] ?? STATUS_CONFIG.MENTOR;
+  const internalStatus = typeof codev.internal_status === "string" ? codev.internal_status : "MENTOR";
+  const statusConfig = (STATUS_CONFIG[internalStatus] ?? STATUS_CONFIG.MENTOR) as { className: string; label: string };
 
   const filteredLevel = useMemo(() => {
     return codev.level &&
@@ -53,18 +52,18 @@ const CodevCard = ({
             .filter(([skillCategoryId, levelValue]) => {
               return (
                 levelValue > 0 &&
-                codev.codev_points!.some(
+                codev.codev_points?.some(
                   (point) => point.skill_category_id === skillCategoryId,
                 )
               );
             })
             .sort(([skillCategoryIdA], [skillCategoryIdB]) => {
               const pointsA =
-                codev.codev_points!.find(
+                codev.codev_points?.find(
                   (point) => point.skill_category_id === skillCategoryIdA,
                 )?.points ?? 0;
               const pointsB =
-                codev.codev_points!.find(
+                codev.codev_points?.find(
                   (point) => point.skill_category_id === skillCategoryIdB,
                 )?.points ?? 0;
               return pointsB - pointsA;
@@ -178,7 +177,7 @@ const CodevCard = ({
           </div>
         </div>
         <div className="flex min-h-[24px] items-center justify-center">
-          {filteredLevel && Object.keys(filteredLevel).length > 0 ? (
+          {Object.keys(filteredLevel).length > 0 ? (
             <CodevBadge
               level={filteredLevel}
               skillCategories={skillCategories}

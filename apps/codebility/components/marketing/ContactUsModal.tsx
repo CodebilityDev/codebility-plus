@@ -33,7 +33,7 @@ const ContactUsModal = () => {
     onClose();
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     const newMessage = { name, email, telephone, message };
     const validateFields = contactUsValidation.safeParse(newMessage);
 
@@ -45,7 +45,7 @@ const ContactUsModal = () => {
         const fieldName = error.path[0] ?? "";
         fieldErrors[fieldName] = error.message;
       });
-      setValidationErrors(fieldErrors as any);
+      setValidationErrors(fieldErrors as { name: string; telephone: string; email: string; message: string });
 
       return;
     }

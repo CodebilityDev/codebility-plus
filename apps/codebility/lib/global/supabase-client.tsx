@@ -15,9 +15,7 @@ export const createClientClientComponent = () => {
 
   if (!supabaseUrl || !supabaseAnonKey) return null;
 
-  if (!browserClient) {
-    browserClient = createBrowserClient<Database, "public">(supabaseUrl, supabaseAnonKey);
-  }
+  browserClient ??= createBrowserClient<Database, "public">(supabaseUrl, supabaseAnonKey);
   
   return browserClient;
 };

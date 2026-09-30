@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/global/ui/button";
 
 import { getLevelColor, getTypeColor } from "@/utils/marketing/careers/careers";
@@ -11,6 +12,7 @@ export function JobCard({
   job,
   onApply,
 }: JobCardProps) {
+  const [postedDate] = useState(() => new Date(job.posted_date).toLocaleDateString());
   return (
     <div className="group relative overflow-hidden rounded-lg border border-gray-800 bg-gray-900/50 p-6 backdrop-blur-sm transition-all hover:border-customViolet-100/50 hover:bg-gray-900/70">
       <div className="absolute inset-0 bg-gradient-to-r from-customViolet-100/5 to-customBlue-100/5 opacity-0 transition-opacity group-hover:opacity-100" />
@@ -70,7 +72,7 @@ export function JobCard({
           )}
           <span className="text-xs text-gray-500">•</span>
           <span className="text-xs text-gray-500">
-            Posted {new Date(job.posted_date).toLocaleDateString()}
+            Posted {postedDate}
           </span>
         </div>
 

@@ -38,7 +38,7 @@ const PasswordResetForm = () => {
       const { email } = data;
 
       // call resetUserPassword function
-      await resetUserPassword(email);
+      await resetUserPassword(email as string);
 
       toast.success("Password reset email sent successfully.");
       setIsSubmitted(true);

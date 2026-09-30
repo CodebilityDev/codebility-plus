@@ -6,7 +6,7 @@ import { cn } from "@codevs/ui";
 import type { InputProps } from "@/types/global/layout";
 
 
- 
+
 const InputField = forwardRef<HTMLInputElement, InputProps>(
   (
     { id, label, error, type = "email", inputClassName, disabled, control },
@@ -78,7 +78,9 @@ const InputField = forwardRef<HTMLInputElement, InputProps>(
               rules={{
                 validate: validatePhoneNumber,
               }}
-              render={({ field: { onChange, onBlur, value }, fieldState }) => (
+              render={({ field: { onChange, onBlur, value: rawValue }, fieldState }) => {
+                const value = rawValue as string | undefined;
+                return (
                 <>
                   <select
                     disabled={disabled}
@@ -88,12 +90,12 @@ const InputField = forwardRef<HTMLInputElement, InputProps>(
                       "focus:outline-none",
                       inputClassName,
                     )}
-                    value={(value?.split("-")[0]) || ""}
+                    value={(value?.split("-")[0]) ?? ""}
                     onChange={(e) =>
                       onChange(
                         concatenateValues(
                           e.target.value,
-                          value?.split("-")[1],
+                          value?.split("-")[1] ?? "",
                         ),
                       )
                     }
@@ -124,16 +126,16 @@ const InputField = forwardRef<HTMLInputElement, InputProps>(
                     value={
                       (value &&
                         formatPhoneNumber(
-                          value.split("-")[1],
-                          value.split("-")[0],
-                        )) ||
+                          value.split("-")[1] ?? "",
+                          value.split("-")[0] ?? "",
+                        )) ??
                       ""
                     }
                     onChange={(e) => {
                       const rawValue = e.target.value.replace(/\D/g, "");
                       onChange(
                         concatenateValues(
-                          value?.split("-")[0],
+                          value?.split("-")[0] ?? "",
                           rawValue,
                         ),
                       );
@@ -148,13 +150,13 @@ const InputField = forwardRef<HTMLInputElement, InputProps>(
                     placeholder={label}
                     disabled={disabled}
                   />
-                  {(error || fieldState.error?.message) && (
+                  {(error ?? fieldState.error?.message) && (
                     <p className="mt-2 text-sm text-red-400">
-                      {error || fieldState.error?.message}
+                      {error ?? fieldState.error?.message}
                     </p>
                   )}
                 </>
-              )}
+              );}}
             />
           </div>
         </div>
@@ -167,8 +169,10 @@ const InputField = forwardRef<HTMLInputElement, InputProps>(
         <label htmlFor={id}>{label}</label>
         <Controller
           control={control}
-          name={id || "email"} // Ensure this matches your form field name
-          render={({ field: { onChange, onBlur, value }, fieldState }) => (
+          name={id ?? "email"} // Ensure this matches your form field name
+          render={({ field: { onChange, onBlur, value: rawValue }, fieldState }) => {
+            const value = rawValue as string | undefined;
+            return (
             <>
               <input
                 type="email"
@@ -181,18 +185,18 @@ const InputField = forwardRef<HTMLInputElement, InputProps>(
                   inputClassName,
                 )}
                 placeholder={label}
-                value={value || ""}
+                value={value ?? ""}
                 onChange={onChange}
                 onBlur={onBlur}
                 disabled={disabled}
               />
-              {(error || fieldState.error?.message) && (
+              {(error ?? fieldState.error?.message) && (
                 <p className="mt-2 text-sm text-red-400">
-                  {error || fieldState.error?.message}
+                  {error ?? fieldState.error?.message}
                 </p>
               )}
             </>
-          )}
+          );}}
         />
       </div>
     );

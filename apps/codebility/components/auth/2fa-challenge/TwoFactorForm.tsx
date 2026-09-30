@@ -53,7 +53,7 @@ export default function TwoFactorForm({ factorId }: TwoFactorFormProps) {
       const returnTo = searchParams.get("from") ?? "/home";
       router.push(returnTo);
     } catch (err: any) {
-      toast.error(err?.message ?? "Verification failed");
+      toast.error(((err as { message?: string }).message) ?? "Verification failed");
       setIsLoading(false);
     }
   };

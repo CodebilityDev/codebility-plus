@@ -15,14 +15,6 @@ import Link from "next/link";
 
 export function ServiceDetailBody({ service }: ServiceDetailBodyProps) {
 
-  if (!service) {
-    return (
-      <div className="px-4 py-12 text-center text-sm text-gray-500 sm:px-6">
-        Project details unavailable.
-      </div>
-    );
-  }
-
   const teamLead =
     service.members.find((member) => member.role === "team_leader") ?? null;
   const members = service.members.filter(
@@ -97,7 +89,7 @@ export function ServiceDetailBody({ service }: ServiceDetailBodyProps) {
                     Description / Project Overview
                   </h3>
                   <p className="leading-relaxed text-gray-600 dark:text-gray-300 text-sm sm:text-base">
-                    {service.description ||
+                    {service.description ??
                       "A comprehensive overview of the project's goals, scope, and implementation."}
                   </p>
                 </div>

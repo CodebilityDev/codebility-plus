@@ -4,7 +4,7 @@ export const createImage = (url: string) =>
   new Promise<HTMLImageElement>((resolve, reject) => {
     const image = new Image();
     image.addEventListener("load", () => resolve(image));
-    image.addEventListener("error", (error) => reject(error));
+    image.addEventListener("error", () => reject(new Error("Image failed to load")));
     image.setAttribute("crossOrigin", "anonymous"); // needed to avoid cross-origin issues on CodeSandbox
     image.src = url;
   });
@@ -43,7 +43,7 @@ export default async function getCroppedImg(
     return Promise.reject(new Error("PixelCrop is null"));
   }
 
-  const image = await createImage(imageSrc);
+  const image = await createImage(imageSrc as string);
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
 

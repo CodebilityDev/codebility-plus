@@ -32,7 +32,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Dynamic profile pages — one entry per codev
     const profileRoutes: MetadataRoute.Sitemap = (codevs ?? []).map((codev) => ({
         url: `${BASE_URL}/profiles/${codev.id}`,
-        lastModified: codev.updated_at ? new Date(codev.updated_at) : new Date(),
+        lastModified: codev.updated_at ? new Date(codev.updated_at as string) : new Date(),
         changeFrequency: "monthly" as const,
         priority: 0.5,
     }));

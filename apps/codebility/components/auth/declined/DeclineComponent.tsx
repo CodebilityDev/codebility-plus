@@ -7,11 +7,13 @@ import { getCanReApply } from "@/utils/global/auth-declined";
 import { DeclinedButtons } from "@/components/auth/declined/DeclinedButtons";
 import { DeclinedCountdown } from "@/components/auth/declined/DeclinedCountdown";
 
+function checkCanReapply(dateApplied: string | null | undefined): boolean {
+  return getCanReApply(dateApplied ? new Date(dateApplied) : null);
+}
+
 export default async function DeclinedComponent() {
   const user = await getUserData();
-  const canReapply = getCanReApply(
-    user?.date_applied ? new Date(user.date_applied) : null,
-  );
+  const canReapply = checkCanReapply(user?.date_applied);
 
   if (!user) {
     return (

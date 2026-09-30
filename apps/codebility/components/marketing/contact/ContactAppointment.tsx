@@ -2,7 +2,7 @@
 
 import { createAppointment } from "@/actions/marketing/contact/contact-appointment";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/global/ui/button";
 import { meetingTypes, timeSlots, unavailableSlots, DAYS, MONTHS } from "@/constants/marketing/contact/contact";
 import type { AppointmentProps } from "@/types/marketing/contact/contact";
@@ -26,8 +26,8 @@ export default function Appointment({ formData, onBack }: AppointmentProps) {
   const canSubmit = selectedDate && selectedSlot && meetingType &&
     (meetingType !== "other" || otherTool.trim());
 
-  const firstDayOfMonth = new Date(viewYear, viewMonth, 1).getDay();
-  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+  const firstDayOfMonth = useMemo(() => new Date(viewYear, viewMonth, 1).getDay(), [viewYear, viewMonth]);
+  const daysInMonth = useMemo(() => new Date(viewYear, viewMonth + 1, 0).getDate(), [viewYear, viewMonth]);
 
   const prevMonth = () => {
     if (viewMonth === 0) { setViewMonth(11); setViewYear(y => y - 1); }

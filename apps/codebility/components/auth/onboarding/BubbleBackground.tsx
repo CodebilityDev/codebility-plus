@@ -4,103 +4,106 @@ import { useEffect, useRef, useState } from "react";
 import type { Bubble } from "@/types/auth/onboarding/onboarding";
 
 
+
+function generateBubbles(): { big: Bubble[]; small: Bubble[] } {
+  const vw = Math.max(320, window.innerWidth);
+  const vh = Math.max(480, window.innerHeight);
+  const minDim = Math.min(vw, vh);
+
+  const hues = [285, 200, 165, 320, 255, 210, 300, 180];
+
+  // --- helpers
+  const toPct = (px: number, total: number) => (px / total) * 100;
+  const dist = (a: { x: number; y: number }, b: { x: number; y: number }) =>
+    Math.hypot(a.x - b.x, a.y - b.y);
+
+  // --- place 2 big spheres non-overlapping
+  const r1 = (0.2 + Math.random() * 0.06) * minDim; // diameter in px (18-24% of min side)
+  const r2 = (0.16 + Math.random() * 0.06) * minDim; // diameter in px (16-22%)
+  const pad = 24;
+
+  const placeOne = (diam: number) => {
+    const r = diam / 2;
+    const x = pad + r + Math.random() * (vw - 2 * (pad + r));
+    const y = pad + r + Math.random() * (vh - 2 * (pad + r));
+    return { x, y, r };
+  };
+
+  let A = placeOne(r1);
+  let B = placeOne(r2);
+  let tries = 0;
+  const minGap = 16; // extra spacing buffer
+  while (dist(A, B) < A.r + B.r + minGap && tries < 60) {
+    B = placeOne(r2);
+    tries++;
+  }
+  // Fallback fixed positions if random couldn't separate enough
+  if (tries >= 60) {
+    A = { x: vw * 0.22, y: vh * 0.35, r: r1 / 2 };
+    B = { x: vw * 0.76, y: vh * 0.58, r: r2 / 2 };
+  }
+
+  const big: Bubble[] = [
+    {
+      id: "big-0",
+      size: A.r * 2,
+      topPct: toPct(A.y - A.r, vh),
+      leftPct: toPct(A.x - A.r, vw),
+      hue: hues[0] ?? 285,
+      depth: 0.75,
+      floatDur: 12 + Math.random() * 5,
+      delay: Math.random() * 1.2,
+    },
+    {
+      id: "big-1",
+      size: B.r * 2,
+      topPct: toPct(B.y - B.r, vh),
+      leftPct: toPct(B.x - B.r, vw),
+      hue: hues[2] ?? 200,
+      depth: 1.0,
+      floatDur: 12 + Math.random() * 5,
+      delay: Math.random() * 1.2,
+    },
+  ];
+
+  // --- small accent spheres (avoid overlapping bigs)
+  const small: Bubble[] = [];
+  const wantSmall = 4; // a few accents
+  let guard = 0;
+  while (small.length < wantSmall && guard < 200) {
+    guard++;
+    const d = 28 + Math.random() * 40; // 28-68px
+    const r = d / 2;
+    const cx = pad + r + Math.random() * (vw - 2 * (pad + r));
+    const cy = pad + r + Math.random() * (vh - 2 * (pad + r));
+
+    const center = { x: cx, y: cy };
+    const overlapsBig = [A, B].some((C) => dist(center, C) < C.r + r + 12);
+    if (overlapsBig) continue;
+
+    small.push({
+      id: `s-${small.length}`,
+      size: d,
+      topPct: toPct(cy - r, vh),
+      leftPct: toPct(cx - r, vw),
+      hue: hues[(3 + small.length) % hues.length] ?? 255,
+      depth: 0.9,
+      floatDur: 7 + Math.random() * 4,
+      delay: Math.random() * 3,
+    });
+  }
+
+  return { big, small };
+}
+
 export function BubbleBackground() {
   const ref = useRef<HTMLDivElement>(null);
-  const [big, setBig] = useState<Bubble[]>([]);
-  const [small, setSmall] = useState<Bubble[]>([]);
+  const [bubbles] = useState<{ big: Bubble[]; small: Bubble[] }>(() => {
+    if (typeof window === "undefined") return { big: [], small: [] };
+    return generateBubbles();
+  });
+  const { big, small } = bubbles;
 
-  // Generate layout once on mount (prevents SSR mismatch)
-  useEffect(() => {
-    const vw = Math.max(320, window.innerWidth);
-    const vh = Math.max(480, window.innerHeight);
-    const minDim = Math.min(vw, vh);
-
-    const hues = [285, 200, 165, 320, 255, 210, 300, 180];
-
-    // --- helpers
-    const toPct = (px: number, total: number) => (px / total) * 100;
-    const dist = (a: { x: number; y: number }, b: { x: number; y: number }) =>
-      Math.hypot(a.x - b.x, a.y - b.y);
-
-    // --- place 2 big spheres non-overlapping
-    const r1 = (0.2 + Math.random() * 0.06) * minDim; // diameter in px (18–24% of min side)
-    const r2 = (0.16 + Math.random() * 0.06) * minDim; // diameter in px (16–22%)
-    const pad = 24;
-
-    const placeOne = (diam: number) => {
-      const r = diam / 2;
-      const x = pad + r + Math.random() * (vw - 2 * (pad + r));
-      const y = pad + r + Math.random() * (vh - 2 * (pad + r));
-      return { x, y, r };
-    };
-
-    let A = placeOne(r1);
-    let B = placeOne(r2);
-    let tries = 0;
-    const minGap = 16; // extra spacing buffer
-    while (dist(A, B) < A.r + B.r + minGap && tries < 60) {
-      B = placeOne(r2);
-      tries++;
-    }
-    // Fallback fixed positions if random couldn’t separate enough
-    if (tries >= 60) {
-      A = { x: vw * 0.22, y: vh * 0.35, r: r1 / 2 };
-      B = { x: vw * 0.76, y: vh * 0.58, r: r2 / 2 };
-    }
-
-    const bigSpheres: Bubble[] = [
-      {
-        id: "big-0",
-        size: A.r * 2,
-        topPct: toPct(A.y - A.r, vh),
-        leftPct: toPct(A.x - A.r, vw),
-        hue: hues[0] ?? 285,
-        depth: 0.75,
-        floatDur: 12 + Math.random() * 5,
-        delay: Math.random() * 1.2,
-      },
-      {
-        id: "big-1",
-        size: B.r * 2,
-        topPct: toPct(B.y - B.r, vh),
-        leftPct: toPct(B.x - B.r, vw),
-        hue: hues[2] ?? 200,
-        depth: 1.0,
-        floatDur: 12 + Math.random() * 5,
-        delay: Math.random() * 1.2,
-      },
-    ];
-
-    // --- small accent spheres (avoid overlapping bigs)
-    const smallSpheres: Bubble[] = [];
-    const wantSmall = 4; // a few accents
-    let guard = 0;
-    while (smallSpheres.length < wantSmall && guard < 200) {
-      guard++;
-      const d = 28 + Math.random() * 40; // 28–68px
-      const r = d / 2;
-      const cx = pad + r + Math.random() * (vw - 2 * (pad + r));
-      const cy = pad + r + Math.random() * (vh - 2 * (pad + r));
-
-      const center = { x: cx, y: cy };
-      const overlapsBig = [A, B].some((C) => dist(center, C) < C.r + r + 12);
-      if (overlapsBig) continue;
-
-      smallSpheres.push({
-        id: `s-${smallSpheres.length}`,
-        size: d,
-        topPct: toPct(cy - r, vh),
-        leftPct: toPct(cx - r, vw),
-        hue: hues[(3 + smallSpheres.length) % hues.length] ?? 255,
-        depth: 0.9,
-        floatDur: 7 + Math.random() * 4,
-        delay: Math.random() * 3,
-      });
-    }
-
-    setBig(bigSpheres);
-    setSmall(smallSpheres);
-  }, []);
 
   // Mouse parallax via CSS variables (hook-safe)
   useEffect(() => {

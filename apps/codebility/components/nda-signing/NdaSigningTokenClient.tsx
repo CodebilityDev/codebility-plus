@@ -138,7 +138,7 @@ export default function NdaSigningTokenClient({
       // Send message to parent window
       try {
         if (window.opener) {
-          window.opener.postMessage(
+          (window.opener as Window).postMessage(
             {
               type: "NDA_SIGNED",
               signed: true,

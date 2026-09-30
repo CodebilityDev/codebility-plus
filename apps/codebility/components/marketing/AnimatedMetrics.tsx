@@ -45,7 +45,7 @@ const AnimatedMetrics = ({
         ease: "easeOut",
       });
     },
-    [config.countDuration, count, delay, value],
+    [config, count, delay, value],
   );
 
   const metricRef = useCallback(

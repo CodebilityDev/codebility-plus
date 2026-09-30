@@ -24,7 +24,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     "aria-describedby": ariaDescribedBy,
     ...props 
   }, ref) => {
-    const disableKeyboardInput = (e: any) => {
+    const disableKeyboardInput = (e: React.KeyboardEvent) => {
       e.preventDefault();
     };
     

@@ -29,7 +29,7 @@ const Photo = ({ data, earnedCategories }: PhotoProps) => {
 
   // Check if user has earned points for uploading a photo
 
-  const handleUploadAvatar = async (
+  const handleUploadAvatar = (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     try {
@@ -64,7 +64,7 @@ const Photo = ({ data, earnedCategories }: PhotoProps) => {
   };
 
   const handleDeleteWarning = () => {
-    onOpen("deleteWarningModal", {}, {}, handleRemoveAvatar);
+    onOpen("deleteWarningModal", {}, {}, () => { void handleRemoveAvatar(); });
   };
 
   // Show message only if: no image_url AND hasn't earned points yet

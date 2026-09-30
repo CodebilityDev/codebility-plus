@@ -18,7 +18,7 @@ import { hireCodevEmailSchema } from "@/utils/global/hire-codev-email";
 
 
 export function CodevHireCodevModal() {
-	const { isOpen, onClose, type, data: codevId } = useModal();
+	const { isOpen, onClose, type, data: codevId } = useModal() as { isOpen: boolean; onClose: () => void; type: string; data: string };
 	const isModalOpen = isOpen && type === "marketingCodevHireCodevModal";
 
 	const codev = useAsyncValue(() => getCodev(codevId), null, [codevId]);
@@ -33,23 +33,26 @@ export function CodevHireCodevModal() {
 	});
 
 	const onSubmit = async (values: HireCodevEmail) => {
+		if (!codev) {
+			toast({ title: "Codev data not available", variant: "destructive" });
+			return;
+		}
+
 		try {
 			// Prepare template parameters
-			const response = await sentHireCodevEmail({
+			await sentHireCodevEmail({
 				name: values.name,
 				email: values.email,
 				message: values.message,
-				codev: codev!,
+				codev: codev,
 			});
 
 
-			if (response) {
-				toast({
+			toast({
 					title: "Email sent successfully",
 					description: "We'll get back to you soon!",
 					duration: 4000,
 				});
-			}
 
 			// Reset form and close modal
 			form.reset();

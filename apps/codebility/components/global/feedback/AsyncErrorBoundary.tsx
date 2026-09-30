@@ -26,7 +26,7 @@ export default function AsyncErrorBoundary({
             }
           }}
           fallback={
-            fallback || (
+            fallback ?? (
               <div className="flex min-h-[200px] flex-col items-center justify-center p-6 text-center">
                 <div className="mb-4 text-2xl">⚠️</div>
                 <h3 className="mb-2 text-lg font-medium text-gray-900 dark:text-gray-100">

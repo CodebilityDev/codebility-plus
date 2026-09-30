@@ -15,7 +15,7 @@ export default function TeamSection({ team }: TeamSectionProps) {
 
   const admins = result.success ? result.admins : [];
   const mentors = result.success ? result.mentors : [];
-  const ceo = (result.success && result.ceo) || FALLBACK_CEO;
+  const ceo = (result.success ? result.ceo : null) ?? FALLBACK_CEO;
 
   return (
     <section className="relative w-full overflow-hidden bg-gradient-to-br from-zinc-900 via-zinc-950 to-black py-16 sm:py-20 lg:py-24">

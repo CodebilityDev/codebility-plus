@@ -121,11 +121,9 @@ export const baseColumns: ColumnDef<NewApplicantType>[] = [
               {applicant.display_position ?? "Not specified"}
             </span>
             <span className="text-[10px] text-gray-500 dark:text-gray-400">
-              {applicant.years_of_experience !== undefined
-                ? `${applicant.years_of_experience} ${
-                    applicant.years_of_experience === 1 ? "yr" : "yrs"
-                  }`
-                : "No exp"}
+              {`${applicant.years_of_experience} ${
+                applicant.years_of_experience === 1 ? "yr" : "yrs"
+              }`}
             </span>
           </div>
         </div>

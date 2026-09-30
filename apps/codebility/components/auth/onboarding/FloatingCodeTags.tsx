@@ -1,6 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { codeTags } from "@/constants/auth/onboarding/onboarding";
 import { mulberry32, placeAwayFromCenter } from "@/utils/auth/onboarding/onboarding";
@@ -8,8 +7,7 @@ import { mulberry32, placeAwayFromCenter } from "@/utils/auth/onboarding/onboard
 export function FloatingCodeTags() {
   const reduceMotion = useReducedMotion();
 
-  const configs = useMemo(() => {
-    return codeTags.map((tag, i) => {
+  const configs = codeTags.map((tag, i) => {
       const seed =
         Array.from((tag + i).toString()).reduce(
           (a, c) => a + c.charCodeAt(0),
@@ -41,7 +39,6 @@ export function FloatingCodeTags() {
         driftDelay,
       };
     });
-  }, []);
 
   return (
     <div

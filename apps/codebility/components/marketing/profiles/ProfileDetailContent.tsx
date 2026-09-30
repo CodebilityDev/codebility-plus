@@ -61,7 +61,7 @@ export default function ProfileContent({
 
   const formatTime = (time: string) => {
     const [hours, minutes] = time.split(":");
-    const hour = Number.parseInt(hours!);
+    const hour = Number.parseInt(hours ?? "0");
     const ampm = hour >= 12 ? "PM" : "AM";
     const displayHour = hour % 12 || 12;
     return `${displayHour}:${minutes} ${ampm}`;

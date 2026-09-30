@@ -1,9 +1,11 @@
 import React from "react";
+import Image from "next/image";
+import Image from "next/image";
 import type { ProjectListProps } from "@/types/marketing/profiles/profiles";
 
 
 const ProjectList: React.FC<ProjectListProps> = ({ projects }) => {
-  if (!projects || projects.length === 0) {
+  if (projects.length === 0) {
     return <p>No projects found.</p>;
   }
 
@@ -22,10 +24,12 @@ const ProjectList: React.FC<ProjectListProps> = ({ projects }) => {
             className="w-40 rounded-lg p-4 text-center bg-black-100"
           >
             {project.main_image ? (
-              <img
+              <Image
                 src={project.main_image}
                 alt={project.name}
                 className="w-full h-32 object-cover rounded"
+                width={160}
+                height={128}
               />
             ) : (
               <div className="w-full h-32 bg-gray-200 flex items-center justify-center rounded">

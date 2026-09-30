@@ -72,7 +72,7 @@ const SignInInputs = ({
 
       {errors[id]?.message && (
         <p className="text-md mt-2 text-red-400">
-          {(errors[id]?.message as string) ?? "An error occurred"}
+          {errors[id].message}
         </p>
       )}
     </div>

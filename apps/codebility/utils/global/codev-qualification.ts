@@ -11,7 +11,7 @@ export const getTotalCodevPoints = (codev_points?: CodevPoints[]): number => {
   }
   
   return codev_points.reduce((sum, point) => {
-    const pointValue = point?.points || 0;
+    const pointValue = point.points || 0;
     return sum + pointValue;
   }, 0);
 };

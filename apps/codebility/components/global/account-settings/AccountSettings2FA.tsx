@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { createClientClientComponent } from "@/lib/global/supabase-client";
 import { ShieldCheck, ShieldAlert, CheckCircle2, Copy, QrCode, Lock } from "lucide-react";
@@ -180,7 +181,7 @@ export default function AccountSettings2FA({ mfaFactors }: AccountSettings2FAPro
               disabled={submitting}
               className="bg-customBlue-200 text-white duration-300 hover:bg-customBlue-300 text-sm h-9"
             >
-              {submitting ? "Initiating..." : "Enable 2FA"}
+              "Enable 2FA"
             </Button>
           )}
         </div>
@@ -201,7 +202,7 @@ export default function AccountSettings2FA({ mfaFactors }: AccountSettings2FAPro
           <div className="flex flex-col items-center gap-4 py-2">
             {qrCodeSvg && (
               <div className="bg-white p-3 rounded-lg border border-gray-200">
-                <img src={qrCodeSvg} alt="2FA QR Code" className="w-48 h-48" />
+                <Image src={qrCodeSvg} alt="2FA QR Code" width={192} height={192} className="w-48 h-48" />
               </div>
             )}
 

@@ -38,12 +38,12 @@ function ApplicantFilterHeaders({
   // Add a new sort option
   const addSort = useCallback((field: string, label: string) => {
     setSortOptions(prev => [...prev, { field, direction: "desc", label }]);
-  }, []);
+  }, [setSortOptions]);
 
   // Remove a sort option
   const removeSort = useCallback((field: string) => {
     setSortOptions(prev => prev.filter(option => option.field !== field));
-  }, []);
+  }, [setSortOptions]);
 
   // Toggle sort direction for a specific field
   const toggleSortDirection = useCallback((field: string) => {
@@ -54,12 +54,12 @@ function ApplicantFilterHeaders({
           : option
       )
     );
-  }, []);
+  }, [setSortOptions]);
 
   // Reorder sort options (for priority)
   const reorderSorts = useCallback((newSortOptions: SortOption[]) => {
     setSortOptions(newSortOptions);
-  }, []);
+  }, [setSortOptions]);
 
   const moveTab = (status: string) => {
     switch (status) {

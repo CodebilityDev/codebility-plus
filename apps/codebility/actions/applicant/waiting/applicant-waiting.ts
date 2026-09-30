@@ -146,7 +146,11 @@ export async function applicantUpdateJoinedStatus({
     try {
         const supabase = await createClientServerComponent();
 
-        const updateData: any = {
+        const updateData: {
+            updated_at: string;
+            joined_discord?: boolean;
+            joined_messenger?: boolean;
+        } = {
             updated_at: new Date().toISOString(),
         };
 

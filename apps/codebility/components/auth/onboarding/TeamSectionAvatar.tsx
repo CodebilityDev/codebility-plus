@@ -20,17 +20,15 @@ export function TeamSectionAvatar({
       className="rounded-full shadow-md ring-2 ring-white/20 overflow-hidden flex-shrink-0 relative bg-gray-200"
       style={{ height: size, width: size, minWidth: size, minHeight: size }}
     >
-      <img
+      <Image
         src={person.image}
         alt={person.name}
+        width={size * 1.2}
+        height={size * 1.2}
         className="absolute top-1/2 left-1/2 object-cover"
         style={{
           objectPosition: position,
-          width: `${size * 1.2}px`,
-          height: `${size * 1.2}px`,
           transform: "translate(-50%, -50%)",
-          minWidth: `${size * 1.2}px`,
-          minHeight: `${size * 1.2}px`
         }}
         loading="lazy"
       />

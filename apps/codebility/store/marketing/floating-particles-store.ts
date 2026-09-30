@@ -18,7 +18,7 @@ export function getClientParticles(): Particle[] {
       x: Math.random() * 100,
       y: Math.random() * 100,
       size: Math.random() * 6 + 3,
-      color: PARTICLE_COLORS[randomColorIndex]!,
+      color: PARTICLE_COLORS[randomColorIndex] ?? "#60A5FA",
       opacity: Math.random() * 0.4 + 0.15,
       speed: Math.random() * 0.4 + 0.2,
       direction: Math.random() * Math.PI * 2,

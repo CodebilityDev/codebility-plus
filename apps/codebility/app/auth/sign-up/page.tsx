@@ -394,7 +394,7 @@ export default function SignUpForm() {
                   <Label className="text-white text-base font-medium">Positions <span className="text-red-400">*</span></Label>
                   <div className="relative">
                     <select
-                      value={selectedPositions[0]?.id?.toString() ?? ""}
+                      value={selectedPositions[0]?.id.toString() ?? ""}
                       onChange={(e) => {
                         const position = POSITIONS.find(p => p.id === parseInt(e.target.value));
                         if (position) {
@@ -456,15 +456,15 @@ export default function SignUpForm() {
                     }`}
                     onClick={() => onOpen("techStackModal")}
                   >
-                    {stack?.includes("none")
+                    {stack.includes("none")
                       ? "Non-tech role"
-                      : stack && stack.length > 0
+                      : stack.length > 0
                         ? `${stack.length} tech stack${stack.length > 1 ? "s" : ""} selected`
                         : "Select your tech stack"}
                     <ChevronDown className="h-5 w-5" />
                   </Button>
                   
-                  {stack && stack.length > 0 && !stack.includes("none") && (
+                  {stack.length > 0 && !stack.includes("none") && (
                     <div className="text-xs text-gray-400 flex flex-wrap gap-1">
                       {stack.map((tech) => (
                         <span key={tech} className="bg-blue-600/80 text-white px-2 py-1 rounded backdrop-blur-sm">

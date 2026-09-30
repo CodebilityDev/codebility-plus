@@ -1,6 +1,6 @@
 "use client";
 
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import DefaultAvatar from "@/components/global/codev/DefaultAvatar";
@@ -23,6 +23,26 @@ import type { ApplicantProfileColSecProps } from "@/types/home/applicants/applic
 export default function ApplicantProfileColSec({
   applicant,
 }: ApplicantProfileColSecProps) {
+  // Format dates on client to avoid hydration mismatch
+  const dateAppliedFormatted = useMemo(
+    () => applicant.date_applied
+      ? new Date(applicant.date_applied).toLocaleDateString()
+      : "N/A",
+    [applicant.date_applied]
+  );
+  const testTakenFormatted = useMemo(
+    () => applicant.applicant?.test_taken
+      ? new Date(applicant.applicant.test_taken).toLocaleDateString()
+      : "N/A",
+    [applicant.applicant]
+  );
+  const lastRemindedFormatted = useMemo(
+    () => applicant.applicant?.last_reminded_date
+      ? new Date(applicant.applicant.last_reminded_date).toLocaleDateString()
+      : "",
+    [applicant.applicant]
+  );
+
   return (
     <div className="w-full min-w-full">
       {/* Desktop View */}
@@ -114,13 +134,11 @@ export default function ApplicantProfileColSec({
                   <p className="truncate text-xs text-gray-600 dark:text-gray-400">
                     {applicant.display_position ?? "Not specified"}
                   </p>
-                  {applicant.years_of_experience !== undefined && (
-                    <p className="text-xs text-gray-600 dark:text-gray-400">
-                      {applicant.years_of_experience}{" "}
-                      {applicant.years_of_experience === 1 ? "year" : "years"}{" "}
-                      experience
-                    </p>
-                  )}
+                  <p className="text-xs text-gray-600 dark:text-gray-400">
+                    {applicant.years_of_experience}{" "}
+                    {applicant.years_of_experience === 1 ? "year" : "years"}{" "}
+                    experience
+                  </p>
                 </div>
               </div>
             </AccordionTrigger>
@@ -215,9 +233,7 @@ export default function ApplicantProfileColSec({
                 <div className="flex items-center justify-between border-b border-gray-200 pb-2 dark:border-gray-700">
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Date Applied</span>
                   <span className="text-sm text-gray-900 dark:text-gray-100">
-                    {applicant.date_applied
-                      ? new Date(applicant.date_applied).toLocaleDateString()
-                      : "N/A"}
+                    {dateAppliedFormatted}
                   </span>
                 </div>
 
@@ -227,9 +243,7 @@ export default function ApplicantProfileColSec({
                     <div className="flex items-center justify-between border-b border-gray-200 pb-2 dark:border-gray-700">
                       <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Test Taken</span>
                       <span className="text-sm text-gray-900 dark:text-gray-100">
-                        {applicant.applicant?.test_taken
-                          ? new Date(applicant.applicant.test_taken).toLocaleDateString()
-                          : "N/A"}
+                        {testTakenFormatted}
                       </span>
                     </div>
 
@@ -285,9 +299,7 @@ export default function ApplicantProfileColSec({
                       </span>
                       {applicant.applicant?.last_reminded_date && (
                         <span className="text-xs text-gray-500 dark:text-gray-400">
-                          {new Date(
-                            applicant.applicant.last_reminded_date,
-                          ).toLocaleDateString()}
+                          {lastRemindedFormatted}
                         </span>
                       )}
                     </div>

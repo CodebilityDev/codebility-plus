@@ -3,7 +3,7 @@
 import Navigation from "@/components/global/marketing/MarketingNavigation";
 import type { ApplicantLayoutProps } from "@/types/applicant/applicant";
 
-export default async function ApplicantLayout({
+export default function ApplicantLayout({
   children,
 }: ApplicantLayoutProps) {
   return (

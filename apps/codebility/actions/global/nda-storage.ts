@@ -253,9 +253,9 @@ export async function getNdaFilePath(url: string): Promise<string | null> {
     const urlObj = new URL(url);
     const pathParts = urlObj.pathname.split("/");
     // Remove the bucket name and 'object' from the path
-    return pathParts.slice(6).join("/");
+    return Promise.resolve(pathParts.slice(6).join("/"));
   } catch {
-    return null;
+    return Promise.resolve(null);
   }
 }
 export async function completeNdaRequest(token: string) {

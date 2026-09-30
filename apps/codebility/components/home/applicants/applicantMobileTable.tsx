@@ -45,7 +45,7 @@ function ApplicantMobileTable<TData extends NewApplicantType>({
                     key={header.id}
                     className={cn(
                       "h-12 whitespace-nowrap px-4 py-3 text-sm font-semibold text-gray-800 dark:text-gray-100",
-                      (header.column.columnDef.meta as any)?.className,
+                      (header.column.columnDef.meta as { className?: string }).className,
                     )}
                   >
                     {header.isPlaceholder
@@ -90,7 +90,7 @@ function ApplicantMobileTable<TData extends NewApplicantType>({
                       key={cell.id}
                       className={cn(
                         "px-4 py-2",
-                        (cell.column.columnDef.meta as any)?.className,
+                        (cell.column.columnDef.meta as { className?: string }).className,
                       )}
                     >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}

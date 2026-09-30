@@ -18,8 +18,7 @@ const MobileAppServices = () => {
           <div key={service.id} className="relative">
             <Image
               src={
-                service.image ||
-                "https://codebility-cdn.pages.dev/assets/images/dafault-avatar-1248x845.jpg"
+                service.image
               }
               width={0}
               height={0}

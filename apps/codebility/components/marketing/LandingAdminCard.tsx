@@ -53,7 +53,7 @@ const AdminCard = ({ admin }: AdminCardProps) => {
           {showPhoto ? (
             <Image
               alt={`${admin.first_name} Avatar`}
-              src={src!}
+              src={src ?? ""}
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               className={`rounded-lg object-cover transition-opacity duration-200 ${

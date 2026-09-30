@@ -16,7 +16,7 @@ export const SignUpValidation = z
     phone_number: z
       .string()
       .min(1, "Phone number is required")
-      .regex(/^[\d\s\+\-\(\)]+$/, "Please enter a valid phone number"),
+      .regex(/^[\d\s+\-()]+$/, "Please enter a valid phone number"),
 
     years_of_experience: z.preprocess(
       (val) => (typeof val === "string" ? Number(val) : val),
@@ -71,11 +71,11 @@ export const SignUpValidation = z
       .optional()
       .nullable()
       .refine(
-        (file) => !file || file?.size <= 5000000,
+        (file) => !file || (file as { size: number }).size <= 5000000,
         "Image must be 5MB or less",
       )
       .refine(
-        (file) => !file || ACCEPTED_IMAGE_TYPES.includes(file?.type),
+        (file) => !file || ACCEPTED_IMAGE_TYPES.includes((file as { type: string }).type),
         "Use .jpg, .jpeg, .png or .webp",
       ),
 

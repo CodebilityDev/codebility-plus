@@ -16,10 +16,10 @@ import {
 export default function DeleteWarningModal() {
   const { isOpen, onClose, type, callback } = useModal();
   const isModalOpen = isOpen && type === "deleteWarningModal";
-  const handleDelete = callback!;
+  const handleDelete = callback;
 
   function handleConfirmDelete() {
-    handleDelete();
+    handleDelete?.();
 
     onClose();
   }
