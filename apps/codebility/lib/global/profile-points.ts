@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { PointRuleName, ArrayFieldName, ArrayPointRule, ProfilePointsBreakdown, ProfileCompletionDetail, ProfilePointsResult } from "@/types/api/profile-points/profile-points";
+import type { PointRuleName, ArrayFieldName, ArrayPointRule, ProfilePointsBreakdown, ProfileCompletionDetail, ProfilePointsResult } from "@/types/global/profile-points";
 
 
 /**

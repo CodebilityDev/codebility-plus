@@ -5,6 +5,10 @@ import type z from "zod";
 import type { StaticImageData } from "next/image";
 
 
+export interface EarnedCategories {
+  earnedCategories: string[];
+}
+
 export interface AboutProps {
   data: Codev;
 }
@@ -16,6 +20,7 @@ export interface FormValues {
 export interface ProfilePointEntry { category: string; points: number }
 
 export interface ContactInfoProps {
+  earnedCategories: string[];
   data: {
     id?: string;
     facebook?: string | null;
@@ -39,6 +44,7 @@ export interface ContactInfoFormValues {
 export interface EducationProps {
   data: Education[];
   codevId?: string;
+  earnedCategories: string[];
 }
 
 export type EditModePerItem = Record<string, boolean>;
@@ -61,6 +67,7 @@ export interface EducationFormProps {
 export interface ExperienceProps {
   data: WorkExperience[];
   codevId?: string;
+  earnedCategories: string[];
 }
 
 export interface ExperienceFormProps {
@@ -122,6 +129,7 @@ export interface PersonalInfoFormValues {
 }
 
 export interface PhotoProps {
+  earnedCategories: string[];
   data: {
     id?: string;
     image_url: string | null;
@@ -157,6 +165,7 @@ export interface ProfilePointsData {
 }
 
 export interface SkillsProps {
+  earnedCategories: string[];
   data: {
     id?: string;
     tech_stacks?: string[] | null;

@@ -15,36 +15,12 @@ import { EducationForm } from "@/components/applicant/profile/EducationForm";
 import type { EducationProps, EditModePerItem } from "@/types/applicant/profile/profile";
 
 
-const EducationalBackground = ({ data, codevId }: EducationProps) => {
+const EducationalBackground = ({ data, codevId, earnedCategories }: EducationProps) => {
   const [educationData, setEducationData] = useState<Education[]>(data);
   const [isLoadingMain, setIsLoadingMain] = useState(false);
-  const [hasEducationPoints, setHasEducationPoints] = useState(false);
   const editModePerItem = useRef<EditModePerItem>({});
 
-  // Check if user has earned points for education
-  useEffect(() => {
-    async function checkEducationPoints() {
-      if (!codevId) return;
-
-      try {
-        const res = await fetch(`/api/profile-points/${codevId}`);
-        if (res.ok) {
-          const pointsData: { points?: { category: string; points: number }[] } = 
-            await res.json() as { points?: { category: string; points: number }[] };
-          
-          const educationPoint = pointsData?.points?.find(
-            (point) => point.category === 'education'
-          );
-          
-          setHasEducationPoints(!!educationPoint && educationPoint.points > 0);
-        }
-      } catch (error) {
-        console.error("Failed to check education points:", error);
-      }
-    }
-
-    checkEducationPoints();
-  }, [codevId, educationData.length]);
+  const hasPoints = earnedCategories.some((category) => category === "education");
 
   const handleUpdateEducation = (
     itemNo: number,
@@ -101,7 +77,7 @@ const EducationalBackground = ({ data, codevId }: EducationProps) => {
   const hasNoEducation = educationData.length === 0;
 
   // Show message only if: no education added AND hasn't earned points yet
-  const shouldShowMessage = hasNoEducation && !hasEducationPoints;
+  const shouldShowMessage = hasNoEducation && !hasPoints;
 
   return (
     <Box className="bg-light-900 dark:bg-dark-100 relative flex flex-col gap-2">

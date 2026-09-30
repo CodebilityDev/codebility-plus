@@ -11,11 +11,19 @@ import PersonalInfo from "@/components/applicant/profile/PersonalInfo";
 import Photo from "@/components/applicant/profile/Photo";
 import Skills from "@/components/applicant/profile/Skills";
 import TimeSchedule from "@/components/applicant/profile/TimeSchedule";
+import { ProfilePointsGate } from "@/components/applicant/profile/ProfilePointsGate";
 import ProfileCompletionGuide from "@/components/applicant/profile/ProfileCompletionGuide";
 
 export const instant = false;
 
 // Prevent static generation at build time
+
+function earnedCategories(points: { points: { category: string; points: number }[] } | null): string[] {
+  if (!points) return [];
+  return points.points
+    .filter((entry) => entry.points > 0)
+    .map((entry) => entry.category);
+}
 
 export default async function ApplicantProfilePage() {
   return <ProfileComponent />;
@@ -93,27 +101,52 @@ async function ProfileComponent() {
           <div className="flex w-full basis-[70%] flex-col gap-8 2xl:basis-[60%]">
             <PersonalInfo data={codevData} />
             <About data={codevData} />
-            <ContactInfo
-              data={{
-                facebook: user.facebook,
-                linkedin: user.linkedin,
-                github: user.github,
-                discord: user.discord,
-                portfolio_website: user.portfolio_website,
-                phone_number: user.phone_number,
-              }}
-            />
-            <EducationalBackground data={education || []} codevId={user.id} />
-            <Experience data={workExperience || []} codevId={user.id} />
+            <ProfilePointsGate>
+              {(points) => (
+                <>
+                  <ContactInfo
+                    earnedCategories={earnedCategories(points)}
+                    data={{
+                      facebook: user.facebook,
+                      linkedin: user.linkedin,
+                      github: user.github,
+                      discord: user.discord,
+                      portfolio_website: user.portfolio_website,
+                      phone_number: user.phone_number,
+                    }}
+                  />
+                  <EducationalBackground
+                    earnedCategories={earnedCategories(points)}
+                    data={education || []}
+                    codevId={user.id}
+                  />
+                  <Experience
+                    earnedCategories={earnedCategories(points)}
+                    data={workExperience || []}
+                    codevId={user.id}
+                  />
+                </>
+              )}
+            </ProfilePointsGate>
           </div>
           <div className="flex w-full basis-[30%] flex-col gap-8 2xl:basis-[40%]">
-            <Photo data={{ image_url: user.image_url || null }} />
-            <Skills
-              data={{
-                tech_stacks: user.tech_stacks,
-                level: user.level,
-              }}
-            />
+            <ProfilePointsGate>
+              {(points) => (
+                <>
+                  <Photo
+                    earnedCategories={earnedCategories(points)}
+                    data={{ image_url: user.image_url || null }}
+                  />
+                  <Skills
+                    earnedCategories={earnedCategories(points)}
+                    data={{
+                      tech_stacks: user.tech_stacks,
+                      level: user.level,
+                    }}
+                  />
+                </>
+              )}
+            </ProfilePointsGate>
             <TimeSchedule data={schedules?.[0] || null} />
             <JobStatuses data={jobStatuses || []} />
             

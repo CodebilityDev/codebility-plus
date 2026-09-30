@@ -14,24 +14,21 @@ export const useApplicantModal = () => {
   return context;
 };
 
-export default function ApplicantModalProvider({ 
-  children 
+export default function ApplicantModalProvider({
+  children
 }: ApplicantModalProviderProps) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedApplicant, setSelectedApplicant] = useState<NewApplicantType | null>(null);
 
   const openModal = (applicant: NewApplicantType) => {
     setSelectedApplicant(applicant);
-    setIsModalOpen(true);
   };
 
   const closeModal = () => {
-    setIsModalOpen(false);
     setSelectedApplicant(null);
   };
 
   const modalValue: ApplicantModalContextValue = {
-    isModalOpen,
+    isModalOpen: selectedApplicant !== null,
     selectedApplicant,
     openModal,
     closeModal,
@@ -40,7 +37,7 @@ export default function ApplicantModalProvider({
   return (
     <ModalContext.Provider value={modalValue}>
       {children}
-      <ApplicantProfileModal />
+      {selectedApplicant ? <ApplicantProfileModal /> : null}
     </ModalContext.Provider>
   );
 }

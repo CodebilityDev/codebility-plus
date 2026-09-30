@@ -8,11 +8,10 @@ import { FaqsModalAccordion } from "@/components/marketing/FaqsModalAccordion";
 
 
 function FaqsModal() {
-  const { isOpen, onClose, type } = useModal();
-  const isModalOpen = isOpen && type === "homeFAQSModal";
+  const { onClose } = useModal();
 
   return (
-    <Dialog open={isModalOpen} onOpenChange={onClose}>
+    <Dialog open onOpenChange={onClose}>
       <DialogContent className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] bg-black-800 max-w-[1260px]">
         <div className="flex flex-col justify-between gap-4 text-white">
           <DialogTitle className="sr-only">Frequently Asked Questions</DialogTitle>

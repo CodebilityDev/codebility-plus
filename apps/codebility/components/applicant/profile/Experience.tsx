@@ -15,36 +15,12 @@ import { ExperienceForm } from "@/components/applicant/profile/ExperienceForm";
 import type { ExperienceProps, EditModePerItem } from "@/types/applicant/profile/profile";
 
 
-const Experience = ({ data, codevId }: ExperienceProps) => {
+const Experience = ({ data, codevId, earnedCategories }: ExperienceProps) => {
   const [experienceData, setExperienceData] = useState<WorkExperience[]>(data);
   const [isLoadingMain, setIsLoadingMain] = useState(false);
-  const [hasWorkExperiencePoints, setHasWorkExperiencePoints] = useState(false);
   const editModePerItem = useRef<EditModePerItem>({});
 
-  // Check if user has earned points for work experience
-  useEffect(() => {
-    async function checkWorkExperiencePoints() {
-      if (!codevId) return;
-
-      try {
-        const res = await fetch(`/api/profile-points/${codevId}`);
-        if (res.ok) {
-          const pointsData: { points?: { category: string; points: number }[] } = 
-            await res.json() as { points?: { category: string; points: number }[] };
-          
-          const workExpPoint = pointsData?.points?.find(
-            (point) => point.category === 'work_experience'
-          );
-          
-          setHasWorkExperiencePoints(!!workExpPoint && workExpPoint.points > 0);
-        }
-      } catch (error) {
-        console.error("Failed to check work experience points:", error);
-      }
-    }
-
-    checkWorkExperiencePoints();
-  }, [codevId, experienceData.length]);
+  const hasPoints = earnedCategories.some((category) => category === "work_experience");
 
   const handleUpdateExperience = (
     itemNo: number,
@@ -102,7 +78,7 @@ const Experience = ({ data, codevId }: ExperienceProps) => {
   const hasNoExperience = experienceData.length === 0;
 
   // Show message only if: no experiences added AND hasn't earned points yet
-  const shouldShowMessage = hasNoExperience && !hasWorkExperiencePoints;
+  const shouldShowMessage = hasNoExperience && !hasPoints;
 
   return (
     <Box className="bg-light-900 dark:bg-dark-100 relative flex flex-col gap-2">

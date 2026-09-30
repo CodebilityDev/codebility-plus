@@ -2,7 +2,7 @@ import { connection } from "next/server";
 import type { NextRequest} from "next/server";
 import { NextResponse } from "next/server";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
-import { computeProfilePoints, persistProfilePoints } from "@/lib/api/profile-points/profile-points";
+import { computeProfilePoints, persistProfilePoints } from "@/lib/global/profile-points";
 import { codevIdSchema } from "@/utils/api/profile-points/profile-points";
 
 

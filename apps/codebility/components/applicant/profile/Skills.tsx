@@ -14,11 +14,11 @@ import { TECH_STACK_MAPPING } from "@/constants/applicant/profile/profile";
 import type { SkillsProps, TechStackStore } from "@/types/applicant/profile/profile";
 
 
-const Skills = ({ data }: SkillsProps) => {
+const Skills = ({ data, earnedCategories }: SkillsProps) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [hasTechStackPoints, setHasTechStackPoints] = useState(false);
   const { onOpen } = useModal();
+  const hasPoints = earnedCategories.some((category) => ["tech_stacks"].includes(category));
   const { stack, setStack } = useTechStackStore() as TechStackStore;
 
   useEffect(() => {
@@ -30,29 +30,6 @@ const Skills = ({ data }: SkillsProps) => {
   }, [data?.tech_stacks, setStack]);
 
   // Check if user has earned points for tech stacks
-  useEffect(() => {
-    async function checkTechStackPoints() {
-      if (!data.id) return;
-
-      try {
-        const res = await fetch(`/api/profile-points/${data.id}`);
-        if (res.ok) {
-          const pointsData: { points?: { category: string; points: number }[] } = 
-            await res.json() as { points?: { category: string; points: number }[] };
-          
-          const techStackPoint = pointsData?.points?.find(
-            (point) => point.category === 'tech_stacks'
-          );
-          
-          setHasTechStackPoints(!!techStackPoint && techStackPoint.points > 0);
-        }
-      } catch (error) {
-        console.error("Failed to check tech stack points:", error);
-      }
-    }
-
-    checkTechStackPoints();
-  }, [data.id, data.tech_stacks]);
 
   const handleEditMode = () => {
     setIsEditMode(true);
@@ -98,7 +75,7 @@ const Skills = ({ data }: SkillsProps) => {
   const hasNoSkills = !data?.tech_stacks || data.tech_stacks.length === 0;
 
   // Show message only if: no skills AND hasn't earned points yet
-  const shouldShowMessage = hasNoSkills && !hasTechStackPoints;
+  const shouldShowMessage = hasNoSkills && !hasPoints;
 
   return (
     <Box className="bg-light-900 dark:bg-dark-100 relative">

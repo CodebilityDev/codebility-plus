@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import Box from "@/components/global/layout/Box";
 import InputField from "@/components/global/layout/InputPhone";
 import { Button } from "@/components/global/ui/button";
 
 import { IconEdit } from "@/public/assets/svgs/index";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
@@ -15,10 +16,11 @@ import { updateSocialLinks } from "@/actions/applicant/profile/applicant-profile
 import type { ContactInfoProps, ContactInfoFormValues } from "@/types/applicant/profile/profile";
 
 
-const ContactInfo = ({ data }: ContactInfoProps) => {
+const ContactInfo = ({ data, earnedCategories }: ContactInfoProps) => {
+  const router = useRouter();
   const [isEditMode, setIsEditMode] = useState(false);
+  const hasPoints = earnedCategories.some((category) => ["phone_number","github","facebook","linkedin","discord","portfolio_website"].includes(category));
   const [isLoading, setIsLoading] = useState(false);
-  const [hasContactPoints, setHasContactPoints] = useState(false);
 
   const {
     register,
@@ -42,31 +44,6 @@ const ContactInfo = ({ data }: ContactInfoProps) => {
   const watchedFields = watch();
 
   // Check if user has earned points for any contact field
-  useEffect(() => {
-    async function checkContactPoints() {
-      if (!data.id) return;
-
-      try {
-        const res = await fetch(`/api/profile-points/${data.id}`);
-        if (res.ok) {
-          const pointsData: { points?: { category: string; points: number }[] } = 
-            await res.json() as { points?: { category: string; points: number }[] };
-          
-          // Check if any contact-related categories have points
-          const contactCategories = ['phone_number', 'github', 'facebook', 'linkedin', 'discord', 'portfolio_website'];
-          const hasAnyContactPoints = pointsData?.points?.some(
-            (point) => contactCategories.includes(point.category) && point.points > 0
-          );
-          
-          setHasContactPoints(!!hasAnyContactPoints);
-        }
-      } catch (error) {
-        console.error("Failed to check contact points:", error);
-      }
-    }
-
-    checkContactPoints();
-  }, [data.id, data.phone_number, data.github, data.facebook, data.linkedin, data.discord, data.portfolio_website]);
 
   const onSubmit = async (formData: ContactInfoFormValues) => {
     const toastId = toast.loading("Your contact info is being updated");
@@ -78,21 +55,7 @@ const ContactInfo = ({ data }: ContactInfoProps) => {
       });
       setIsEditMode(false);
 
-      // Re-check points after update
-      if (data.id) {
-        const res = await fetch(`/api/profile-points/${data.id}`);
-        if (res.ok) {
-          const pointsData: { points?: { category: string; points: number }[] } = 
-            await res.json() as { points?: { category: string; points: number }[] };
-          
-          const contactCategories = ['phone_number', 'github', 'facebook', 'linkedin', 'discord', 'portfolio_website'];
-          const hasAnyContactPoints = pointsData?.points?.some(
-            (point) => contactCategories.includes(point.category) && point.points > 0
-          );
-          
-          setHasContactPoints(!!hasAnyContactPoints);
-        }
-      }
+      router.refresh();
     } catch (error) {
       console.error(error);
       toast.error("Something went wrong, please try again later!");
@@ -119,7 +82,7 @@ const ContactInfo = ({ data }: ContactInfoProps) => {
                          !watchedFields.discord;
 
   // Show message only if: has empty fields AND hasn't earned points yet
-  const shouldShowMessage = hasEmptyFields && !hasContactPoints;
+  const shouldShowMessage = hasEmptyFields && !hasPoints;
 
   return (
     <Box className="bg-light-900 dark:bg-dark-100 relative flex flex-col gap-6">

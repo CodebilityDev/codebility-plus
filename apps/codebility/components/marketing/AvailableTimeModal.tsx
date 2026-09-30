@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { Button } from "@/components/global/ui/button";
 import { useModal } from "@/hooks/global/use-modal";

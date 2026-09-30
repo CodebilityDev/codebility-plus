@@ -11,11 +11,10 @@ import { TermsAndConditionNavBar } from "@/components/marketing/TermsAndConditio
 
 
 function TermsAndCondition() {
-  const { isOpen, onClose, type } = useModal();
-  const isModalOpen = isOpen && type === "homeTermsAndConditionModal";
+  const { onClose } = useModal();
 
   return (
-    <Dialog open={isModalOpen} onOpenChange={onClose}>
+    <Dialog open onOpenChange={onClose}>
       <DialogContent className="bg-black-800 flex max-h-full max-w-[1260px] flex-col justify-between text-white">
         <DialogTitle className="sr-only">Terms and Conditions</DialogTitle>
         <div className="flex h-full overflow-hidden rounded-[10px] border border-[#1D1D1E]">

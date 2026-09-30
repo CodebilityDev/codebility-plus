@@ -11,11 +11,10 @@ import { PrivacyPolicyModalNavBar } from "@/components/marketing/PrivacyPolicyMo
 
 
 function PrivacyPolicyModal() {
-  const { isOpen, onClose, type } = useModal();
-  const isModalOpen = isOpen && type === "homePrivacyPolicyModal";
+  const { onClose } = useModal();
 
   return (
-    <Dialog open={isModalOpen} onOpenChange={onClose}>
+    <Dialog open onOpenChange={onClose}>
       {/* CRITICAL FIX: Match Terms structure - bg-black-800 on DialogContent */}
       <DialogContent className="bg-black-800 flex max-h-full max-w-[1260px] flex-col justify-between text-white">
         <DialogTitle className="sr-only">Privacy Policy</DialogTitle>
