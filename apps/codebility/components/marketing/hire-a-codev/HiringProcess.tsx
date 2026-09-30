@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
+import { useRevealOnView } from "@/hooks/global/useRevealOnView";
 import { motion } from "framer-motion";
 import SectionWrapper from "@/components/global/typography/SectionWrapper";
 
@@ -14,37 +15,12 @@ const HiringProcess = () => {
   // Ref to the cards container — used to attach IntersectionObserver
   const sectionRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const cards = sectionRef.current?.querySelectorAll<HTMLElement>("[data-card]");
-    if (!cards) return;
-
-    // IntersectionObserver fires animation only when section enters viewport
-    // (task requirement: no animation on load before section is visible)
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const card = entry.target as HTMLElement;
-            const delay = card.dataset.delay ?? "0";
-
-            // Apply visible class after delay — triggers CSS transition
-            setTimeout(() => {
-              card.classList.add("opacity-100", "translate-y-0");
-              card.classList.remove("opacity-0", "translate-y-8");
-            }, Number(delay));
-
-            // Stop observing once animated — each card animates once
-            observer.unobserve(card);
-          }
-        });
-      },
-      { threshold: 0.15 } // Fire when 15% of card is visible
-    );
-
-    cards.forEach((card) => observer.observe(card));
-
-    return () => observer.disconnect();
-  }, []);
+  useRevealOnView(
+    sectionRef,
+    "[data-card]",
+    ["opacity-100", "translate-y-0"],
+    ["opacity-0", "translate-y-8"],
+  );
 
   return (
     <SectionWrapper className="relative lg:w-full lg:overflow-hidden py-20">

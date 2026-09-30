@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClientClientComponent } from "@/lib/global/supabase-client";
+import { getClientSupabase } from "@/lib/global/supabase-client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { HelpCircleIcon, Trash2 } from "lucide-react";
@@ -27,12 +27,6 @@ export default function AccountSettingsDelete() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const [supabase, setSupabase] = useState<any>(null);
-
-  useEffect(() => {
-    const supabaseClient = createClientClientComponent();
-    setSupabase(supabaseClient);
-  }, []);
 
   const form = useForm<UserDeletionFormValues>({
     resolver: zodResolver(userDeletionSchema),
@@ -43,6 +37,7 @@ export default function AccountSettingsDelete() {
   });
 
   const onSubmit = async (values: UserDeletionFormValues) => {
+    const supabase = getClientSupabase();
     try {
       setIsLoading(true);
 

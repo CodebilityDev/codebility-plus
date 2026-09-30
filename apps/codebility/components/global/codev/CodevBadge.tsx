@@ -1,56 +1,36 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { createClientClientComponent } from "@/lib/global/supabase-client";
+import { useState } from "react";
+import { useAsyncValue } from "@/hooks/global/useAsyncValue";
+import { getClientSupabase } from "@/lib/global/supabase-client";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/global/ui/tooltip";
 import type { CodevBadgeSkillCategory, CodevBadgeProps } from "@/types/global/codev";
 import { getBadgePrefix } from "@/utils/global/codev";
 
+
+async function loadSkillCategories(): Promise<CodevBadgeSkillCategory[]> {
+  const { data, error } = await getClientSupabase()
+    .from("skill_category")
+    .select("id, name");
+
+  if (error) {
+    console.error("Error fetching skill categories:", error);
+    return [];
+  }
+
+  return (data ?? []).map((category: { id: string; name: string }) => ({
+    ...category,
+    badge_prefix: getBadgePrefix(category.name),
+  }));
+}
 
 export default function CodevBadge({
   level,
   size = 36,
   className = "",
 }: CodevBadgeProps) {
-  const [skillCategories, setSkillCategories] = useState<CodevBadgeSkillCategory[]>([]);
-  const [error, setError] = useState<string | null>(null);
   const [badgeErrors, setBadgeErrors] = useState<Record<string, boolean>>({});
-  const [supabase, setSupabase] = useState<any>(null);
-
-  // Initialize Supabase client safely
-  useEffect(() => {
-    const client = createClientClientComponent();
-    setSupabase(client);
-  }, []);
-
-  useEffect(() => {
-    if (!supabase) return; // Add null check
-
-    const fetchSkillCategories = async () => {
-      try {
-        const { data, error } = await supabase
-          .from("skill_category")
-          .select("id, name");
-
-        if (error) throw error;
-
-        if (data) {
-          const categoriesWithPrefix = data.map(
-            (category: { id: string; name: string }) => ({
-              ...category,
-              badge_prefix: getBadgePrefix(category.name),
-            }),
-          );
-          setSkillCategories(categoriesWithPrefix);
-        }
-      } catch (err) {
-        console.error("Error fetching skill categories:", err);
-        setError("Failed to load badges");
-      }
-    };
-
-    fetchSkillCategories();
-  }, [supabase]); // Add supabase as dependency
+  const skillCategories = useAsyncValue(loadSkillCategories, [], []);
 
   // Create a fallback badge for when images fail to load
   const FallbackBadge = ({
@@ -91,10 +71,6 @@ export default function CodevBadge({
       </div>
     );
   };
-
-  if (error) {
-    return <div className="text-sm text-red-500">{error}</div>;
-  }
 
   if (!level || Object.keys(level).length === 0) {
     return null;

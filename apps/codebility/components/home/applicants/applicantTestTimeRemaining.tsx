@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
+import { useDeferredCountdown } from "@/hooks/global/useCountdown";
 import { getTestDate } from "@/utils/global/applicant-waiting";
 import type { ApplicantTestTimeRemainingProps } from "@/types/home/applicants/applicants";
 
@@ -22,67 +23,7 @@ export default function ApplicantTestTimeRemaining({
     [applicantData?.fork_url],
   );
 
-  const [timeLeft, setTimeLeft] = useState<{
-    days: number;
-    hours: number;
-    minutes: number;
-    seconds: number;
-    isExpired: boolean;
-  } | null>(null);
-
-  useEffect(() => {
-    // Calculate initial time on client side
-    const calculateTime = () => {
-      const now = new Date();
-      const difference = reapplyDate.getTime() - now.getTime();
-
-      if (difference <= 0) {
-        return {
-          days: 0,
-          hours: 0,
-          minutes: 0,
-          seconds: 0,
-          isExpired: true,
-        };
-      }
-
-      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((difference / 1000 / 60) % 60);
-      const seconds = Math.floor((difference / 1000) % 60);
-
-      return { days, hours, minutes, seconds, isExpired: false };
-    };
-
-    // Set initial value
-    setTimeLeft(calculateTime());
-
-    const interval = setInterval(() => {
-      const now = new Date();
-      const difference = reapplyDate.getTime() - now.getTime();
-
-      if (difference <= 0) {
-        setTimeLeft({
-          days: 0,
-          hours: 0,
-          minutes: 0,
-          seconds: 0,
-          isExpired: true,
-        });
-        clearInterval(interval);
-        return;
-      }
-
-      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((difference / 1000 / 60) % 60);
-      const seconds = Math.floor((difference / 1000) % 60);
-
-      setTimeLeft({ days, hours, minutes, seconds, isExpired: false });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [reapplyDate]);
+  const timeLeft = useDeferredCountdown(reapplyDate);
 
   // Show loading state during SSR
   if (!timeLeft) {

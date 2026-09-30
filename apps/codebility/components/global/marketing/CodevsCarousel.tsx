@@ -8,6 +8,7 @@ import useEmblaCarousel from "embla-carousel-react";
 
 import { PrevButton } from "@/components/global/marketing/CodevsEmblaCarouselArrowButtons";
 import { NextButton } from "@/components/global/marketing/NextButton";
+import { useEmblaIndex } from "@/hooks/global/useEmblaIndex";
 import { usePrevNextButtons } from "@/hooks/global/usePrevNextButtons";
 import type { PropType } from "@/types/global/marketing";
 
@@ -19,7 +20,6 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
       stopOnInteraction: true,
     }),
   ]);
-  const [activeIndex, setActiveIndex] = useState(0);
 
   const onNavButtonClick = useCallback((emblaApi: EmblaCarouselType) => {
     const autoplay = emblaApi.plugins().autoplay;
@@ -39,14 +39,7 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
     onNavButtonClick,
   );
 
-  useEffect(() => {
-    if (!emblaApi) return;
-    const onSelect = () => {
-      setActiveIndex(emblaApi.selectedScrollSnap());
-    };
-    emblaApi.on("select", onSelect);
-    onSelect();
-  }, [emblaApi]);
+  const activeIndex = useEmblaIndex(emblaApi);
   return (
     <section className=" w-full pt-8 text-white">
       <div className="relative overflow-hidden" ref={emblaRef}>

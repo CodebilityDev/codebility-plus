@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { createClientClientComponent } from "@/lib/global/supabase-client";
+import { useState } from "react";
+import { getClientSupabase } from "@/lib/global/supabase-client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -34,12 +34,6 @@ const passwordChangeSchema = z
   });
 
 export default function AccountSettingsChangePassword() {
-  const [supabase, setSupabase] = useState<any>(null);
-
-  useEffect(() => {
-    const supabaseClient = createClientClientComponent();
-    setSupabase(supabaseClient);
-  }, []);
 
   const form = useForm<z.infer<typeof passwordChangeSchema>>({
     resolver: zodResolver(passwordChangeSchema),
@@ -52,6 +46,7 @@ export default function AccountSettingsChangePassword() {
 
   const onSubmit = async (values: z.infer<typeof passwordChangeSchema>) => {
     try {
+      const supabase = getClientSupabase();
       const { error } = await supabase.auth.updateUser({
         password: values.password,
       });

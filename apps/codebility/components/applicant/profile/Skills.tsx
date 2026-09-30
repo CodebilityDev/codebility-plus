@@ -21,15 +21,7 @@ const Skills = ({ data, earnedCategories }: SkillsProps) => {
   const hasPoints = earnedCategories.some((category) => ["tech_stacks"].includes(category));
   const { stack, setStack } = useTechStackStore() as TechStackStore;
 
-  useEffect(() => {
-    if (data?.tech_stacks?.length) {
-      setStack(data.tech_stacks.map((stack) => stack.toLowerCase()));
-    } else {
-      setStack([]);
-    }
-  }, [data?.tech_stacks, setStack]);
-
-  // Check if user has earned points for tech stacks
+  const initialStack = (data.tech_stacks ?? []).map((entry) => entry.toLowerCase());
 
   const handleEditMode = () => {
     setIsEditMode(true);
@@ -37,18 +29,8 @@ const Skills = ({ data, earnedCategories }: SkillsProps) => {
   };
 
   const handleCancel = () => {
-    try {
-      // Reset to original data
-      if (data?.tech_stacks?.length) {
-        setStack(data.tech_stacks.map((stack) => stack.toLowerCase()));
-      } else {
-        setStack([]);
-      }
-      setIsEditMode(false);
-    } catch (error) {
-      console.error("Error resetting tech stack:", error);
-      toast.error("Failed to reset tech stack");
-    }
+    setStack(initialStack);
+    setIsEditMode(false);
   };
 
   const handleSave = async () => {

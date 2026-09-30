@@ -11,7 +11,7 @@ import { useForm } from "react-hook-form";
 import { getCodev } from "@/actions/global/marketing-profiles";
 import { toast } from "@/components/global/ui/use-toast";
 import type { Codev } from "@/types/global/codev";
-import { useEffect, useState } from "react";
+import { useAsyncValue } from "@/hooks/global/useAsyncValue";
 import { sentHireCodevEmail } from "@/actions/global/profiles-email";
 import type {HireCodevEmail} from "@/types/global/hire-codev-email";
 import { hireCodevEmailSchema } from "@/utils/global/hire-codev-email";
@@ -20,13 +20,8 @@ import { hireCodevEmailSchema } from "@/utils/global/hire-codev-email";
 export function CodevHireCodevModal() {
 	const { isOpen, onClose, type, data: codevId } = useModal();
 	const isModalOpen = isOpen && type === "marketingCodevHireCodevModal";
-	const [codev, setCodev] = useState<Codev | null>(null);
 
-	useEffect(() => {
-		getCodev(codevId).then((data) => {
-			setCodev(data);
-		});
-	}, [codevId]);
+	const codev = useAsyncValue(() => getCodev(codevId), [codevId], null);
 
 	const form = useForm<HireCodevEmail>({
 		resolver: zodResolver(hireCodevEmailSchema),

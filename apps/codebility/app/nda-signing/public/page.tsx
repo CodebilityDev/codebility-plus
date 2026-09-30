@@ -3,6 +3,7 @@
 import { forwardRef, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useFormattedDate } from "@/hooks/global/useFormattedDate";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 
@@ -40,11 +41,7 @@ const SignaturePad = forwardRef<SignatureCanvasRef, SignaturePadProps>(
 SignaturePad.displayName = "SignaturePad";
 
 export default function PublicNdaSigningPage() {
-  const [formattedDate, setFormattedDate] = useState("");
-
-  useEffect(() => {
-    setFormattedDate(new Date().toLocaleDateString());
-  }, []);
+  const formattedDate = useFormattedDate();
   const signatureRef = useRef<SignatureCanvasRef | null>(null);
   const [signing, setSigning] = useState(false);
   const [showNameForm, setShowNameForm] = useState(true);

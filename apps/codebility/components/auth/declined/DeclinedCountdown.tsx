@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
+import { useCountdown } from "@/hooks/global/useCountdown";
 
 import { getReApplyDate } from "@/utils/global/auth-declined";
 import type { DeclinedCountdownProps } from "@/types/auth/declined/declined";
@@ -12,54 +13,11 @@ export const DeclinedCountdown = ({ userData }: DeclinedCountdownProps) => {
     [userData?.date_applied],
   );
 
-  const [timeLeft, setTimeLeft] = useState(() => {
-    const now = new Date();
-    const difference = reapplyDate.getTime() - now.getTime();
-    const isExpired = difference <= 0;
-
-    if (isExpired) {
-      return { days: 0, hours: 0, minutes: 0, seconds: 0, isExpired: true };
-    }
-
-    const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
-    const minutes = Math.floor((difference / 1000 / 60) % 60);
-    const seconds = Math.floor((difference / 1000) % 60);
-
-    return { days, hours, minutes, seconds, isExpired };
-  });
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const now = new Date();
-      const difference = reapplyDate.getTime() - now.getTime();
-
-      if (difference <= 0) {
-        setTimeLeft({
-          days: 0,
-          hours: 0,
-          minutes: 0,
-          seconds: 0,
-          isExpired: true,
-        });
-        clearInterval(interval);
-        return;
-      }
-
-      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((difference / 1000 / 60) % 60);
-      const seconds = Math.floor((difference / 1000) % 60);
-
-      setTimeLeft({ days, hours, minutes, seconds, isExpired: false });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [reapplyDate]);
+  const timeLeft = useCountdown(reapplyDate);
 
   return (
     <div className="mb-6">
-      {!timeLeft.isExpired ? (
+      {!timeLeft?.isExpired ? (
         <>
           <p className="mb-2 text-lg font-semibold">
             Time until you can reapply:

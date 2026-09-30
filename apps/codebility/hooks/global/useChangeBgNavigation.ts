@@ -1,19 +1,15 @@
-import { useEffect, useState } from "react";
+"use client";
+
+import { useState } from "react";
+
+import { useWindowEvent } from "@/hooks/global/useWindowEvent";
 
 const useChangeBgNavigation = () => {
   const [color, setColor] = useState(false);
 
-  const changeColor = () => {
-    if (window.scrollY >= 90) {
-      setColor(true);
-    } else {
-      setColor(false);
-    }
-  };
-
-  useEffect(() => {
-    window.addEventListener("scroll", changeColor);
-  }, []);
+  useWindowEvent("scroll", () => {
+    setColor(window.scrollY >= 90);
+  });
 
   return { color };
 };

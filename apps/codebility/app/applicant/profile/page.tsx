@@ -1,5 +1,6 @@
 import H1 from "@/components/global/layout/H1";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
+import { getPositions } from "@/actions/applicant/profile/applicant-profile";
 import { Toaster } from "react-hot-toast";
 
 import About from "@/components/applicant/profile/About";
@@ -16,8 +17,6 @@ import ProfileCompletionGuide from "@/components/applicant/profile/ProfileComple
 
 export const instant = false;
 
-// Prevent static generation at build time
-
 function earnedCategories(points: { points: { category: string; points: number }[] } | null): string[] {
   if (!points) return [];
   return points.points
@@ -31,6 +30,7 @@ export default async function ApplicantProfilePage() {
 
 async function ProfileComponent() {
   const supabase = await createClientServerComponent();
+  const { data: positions } = await getPositions();
 
   // Get current user
   const {
@@ -99,7 +99,7 @@ async function ProfileComponent() {
         <ProfileCompletionGuide />
         <div className="flex flex-col gap-8 md:flex-row">
           <div className="flex w-full basis-[70%] flex-col gap-8 2xl:basis-[60%]">
-            <PersonalInfo data={codevData} />
+            <PersonalInfo data={codevData} positions={positions ?? []} />
             <About data={codevData} />
             <ProfilePointsGate>
               {(points) => (

@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Logo from "@/components/global/layout/Logo";
 import { footerLinks } from "@/constants/marketing/links";
 import { useModal } from "@/hooks/global/use-modal";
+import { useCurrentYear } from "@/hooks/global/useCurrentYear";
 import type { ModalType } from "@/types/global/hooks";
 import { IconFacebookWhite } from "@/public/assets/svgs/index";
 
@@ -13,11 +14,7 @@ import Container from "@/components/global/marketing/MarketingContainer";
 
 const Footer = () => {
   const { onOpen } = useModal();
-  const [year, setYear] = useState<number | null>(null);
-
-  useEffect(() => {
-    setYear(new Date().getFullYear());
-  }, []);
+  const year = useCurrentYear();
 
   return (
     <section className="w-full overflow-hidden">

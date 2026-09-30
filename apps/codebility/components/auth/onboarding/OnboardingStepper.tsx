@@ -1,43 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useActiveSection } from "@/hooks/global/useActiveSection";
 import { cn } from "@/utils/global/cn";
 import { Check } from "lucide-react";
 import { SECTIONS } from "@/constants/auth/onboarding/onboarding";
 
 
 export default function OnboardingStepper() {
-  const [activeSection, setActiveSection] = useState<string>(SECTIONS[0]?.id || "about-section");
-
-  useEffect(() => {
-    // Intersection Observer to track which section is in view
-    const observerOptions = {
-      root: null,
-      rootMargin: "-50% 0px -50% 0px", // Trigger when section crosses middle of viewport
-      threshold: 0,
-    };
-
-    const observerCallback = (entries: IntersectionObserverEntry[]) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          setActiveSection(entry.target.id);
-        }
-      });
-    };
-
-    const observer = new IntersectionObserver(
-      observerCallback,
-      observerOptions
-    );
-
-    // Observe each section
-    SECTIONS.forEach(({ id }) => {
-      const element = document.getElementById(id);
-      if (element) observer.observe(element);
-    });
-
-    return () => observer.disconnect();
-  }, []);
+  const activeSection = useActiveSection(
+    SECTIONS.map((section) => section.id),
+    SECTIONS[0]?.id || "about-section",
+  );
 
   // Scroll to section when circle is clicked
   const scrollToSection = (sectionId: string) => {

@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useResetKey } from "@/hooks/global/useResetKey";
 import { Button } from "@/components/global/ui/button";
 import { useModal } from "@/hooks/global/use-modal";
 import { useSchedule } from "@/hooks/marketing/use-timeavail";
@@ -16,12 +17,9 @@ import {
 
 const AvailableTimeModal = () => {
   const { isOpen, onClose, type } = useModal();
-  const [time, setTime] = useState<ScheduleType>({
-    start_time: "",
-    end_time: "",
-  });
-
   const { addTime, clearTime, time: newTime } = useSchedule();
+  const modalKey = useResetKey(isOpen);
+  const [time, setTime] = useState<ScheduleType>(newTime);
 
   function convertTo24HourFormat(time12: string): string {
     const [time, period]: string[] = time12.split(" ");
@@ -71,12 +69,6 @@ const AvailableTimeModal = () => {
   }
   const isModalOpen = isOpen && type === "scheduleModal";
 
-  useEffect(() => {
-    if (isModalOpen) {
-      setTime(newTime);
-    }
-  }, [isModalOpen, newTime]);
-
   return (
     <Dialog
       open={isModalOpen}
@@ -85,6 +77,7 @@ const AvailableTimeModal = () => {
       }}
     >
       <DialogContent
+        key={modalKey}
         aria-describedby={undefined}
         className="bg-black-100 w-[90%] flex max-w-[30rem] flex-col gap-8 overflow-y-auto p-6 text-white lg:p-12"
       >

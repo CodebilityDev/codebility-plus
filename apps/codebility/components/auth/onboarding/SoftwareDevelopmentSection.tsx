@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
 import { motion } from "framer-motion";
 import { CloudCog, Code2, Palette, Server, Smartphone, Users2 } from "lucide-react";
 
@@ -10,9 +8,6 @@ import { techStacks } from "@/constants/auth/onboarding/onboarding";
 
 
 export default function SoftwareDevelopmentSection() {
-  const [isClient, setIsClient] = useState(false);
-  useEffect(() => setIsClient(true), []);
-
   return (
     <section
       id="software-dev"

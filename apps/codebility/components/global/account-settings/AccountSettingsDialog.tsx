@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useForm } from "react-hook-form";
@@ -13,19 +13,13 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@codevs/ui/
 import { Input } from "@codevs/ui/input";
 
 import AccountSettingsBackdrop from "@/components/global/account-settings/AccountSettingsBackDrop";
-import { createClientClientComponent } from "@/lib/global/supabase-client";
+import { getClientSupabase } from "@/lib/global/supabase-client";
 import { emailChangeSchema } from "@/utils/global/account-settings";
 
 
 export default function AccountSettingsDialog() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(false);
-   const [supabase, setSupabase] = useState<any>(null);
-
-  useEffect(() => {
-    const supabaseClient = createClientClientComponent();
-    setSupabase(supabaseClient);
-  }, []);
 
 
   const form = useForm<z.infer<typeof emailChangeSchema>>({
@@ -36,6 +30,7 @@ export default function AccountSettingsDialog() {
   });
 
   const onSubmit = async (values: z.infer<typeof emailChangeSchema>) => {
+    const supabase = getClientSupabase();
     try {
       setIsLoading(true);
 

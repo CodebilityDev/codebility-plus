@@ -1,37 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useNavUser } from "@/hooks/global/useNavUser";
 import Link from "next/link";
 
 import { IconLogout } from "@/public/assets/svgs/index";
-import { NAV_USER_PROFILE_KEY } from "@/constants/global/marketing";
-import { useLocalStorageValue } from "@/hooks/global/useLocalStorageValue";
-import { getNavUserPromise } from "@/lib/global/nav-user-loader";
-import type { NavUserProfile } from "@/types/global/database";
 import type { DrawerAuthSectionProps } from "@/types/global/marketing";
 import { getMenuItems } from "@/utils/global/marketing";
 
 export const DrawerAuthSection = ({handleLogout}: DrawerAuthSectionProps) =>
    { 
-    const cachedUserData = useLocalStorageValue<NavUserProfile>(NAV_USER_PROFILE_KEY);
-
-    const [userData, setUserData] = useState<NavUserProfile | null>(cachedUserData);
-
-    // Started in an effect, not during render: getNavUserPromise dispatches a
-    // server action, and a render-phase dispatch updates the Router mid-render.
-    useEffect(() => {
-      if (cachedUserData) {
-        setUserData(cachedUserData);
-        return;
-      }
-      let active = true;
-      getNavUserPromise().then((profile) => {
-        if (active) setUserData(profile);
-      });
-      return () => {
-        active = false;
-      };
-    }, [cachedUserData]);
+    const userData = useNavUser();
 
     if (!userData) return null;
     

@@ -1,6 +1,7 @@
 "use client";
 
-import { memo, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useMemo, useState } from "react";
+import { useTimeout } from "@/hooks/global/useInterval";
 import Image from "next/image";
 import Link from "next/link";
 import { IconLink } from "@/public/assets/svgs/index";
@@ -41,24 +42,8 @@ export const ServicesServiceCard = memo(({ service, onSelect }: ServicesServiceC
 
   const [isHovered, setIsHovered] = useState(false);
   const [showDescription, setShowDescription] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => {
-    if (!isHovered) {
-      setShowDescription(false);
-      if (timerRef.current) clearTimeout(timerRef.current);
-      timerRef.current = null;
-      return;
-    }
-
-    timerRef.current = setTimeout(() => {
-      setShowDescription(true);
-    }, 2000);
-
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
-  }, [isHovered]);
+  useTimeout(() => setShowDescription(true), isHovered ? 2000 : null);
 
   const handleClick = () => {
     onSelect?.(service);

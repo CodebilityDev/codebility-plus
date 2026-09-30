@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Box from "@/components/global/layout/Box";
 import { Button } from "@/components/global/ui/button";
 import { useInvalidateProfilePoints, useProfilePoints } from "@/hooks/applicant/profile/use-profile-points";
@@ -43,11 +43,6 @@ const About = ({ data }: AboutProps) => {
   });
 
   const currentAboutValue = watch("about");
-
-  useEffect(() => {
-    if (isEditMode) setIsExpanded(true);
-    else setIsExpanded(false);
-  }, [isEditMode]);
 
   const onSubmit = async (formData: FormValues) => {
     const toastId = toast.loading("Your info is being updated");

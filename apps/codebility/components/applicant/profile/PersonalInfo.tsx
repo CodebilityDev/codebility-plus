@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Box from "@/components/global/layout/Box";
 import { Button } from "@/components/global/ui/button";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/global/ui/select";
@@ -12,12 +12,12 @@ import toast from "react-hot-toast";
 import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
 
-import { getPositions, updateCodev } from "@/actions/applicant/profile/applicant-profile";
+import { updateCodev } from "@/actions/applicant/profile/applicant-profile";
 import type { PersonalInfoProps, PersonalInfoFormValues } from "@/types/applicant/profile/profile";
 
 
-const PersonalInfo = ({ data }: PersonalInfoProps) => {
-  const [positions, setPositions] = useState<Position[]>([]);
+const PersonalInfo = ({ data, positions: positionsData }: PersonalInfoProps) => {
+  const positions = positionsData;
   const [isEditMode, setIsEditMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -38,26 +38,6 @@ const PersonalInfo = ({ data }: PersonalInfoProps) => {
       headline: data.headline || undefined,
     },
   });
-
-  const fetchPositions = async () => {
-    try {
-      const { data, error } = await getPositions();
-      if (error) {
-        console.error("Error fetching positions:", error);
-        toast.error("Failed to fetch positions");
-      } else if (data) {
-        setPositions(data);
-      }
-    } catch (err) {
-      console.error("Error fetching positions:", err);
-      toast.error("Failed to fetch positions");
-    }
-  };
-
-  // On mount, fetch positions
-  useEffect(() => {
-    fetchPositions();
-  }, []);
 
   const onSubmit = async (formData: PersonalInfoFormValues) => {
     const toastId = toast.loading("Updating your information");

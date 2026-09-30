@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useCurrentYear } from "@/hooks/global/useCurrentYear";
 import { getRealProjects, getCodevProfiles } from "@/actions/proposal/services";
 import type { RealProject } from "@/types/proposal/proposal";
 import type { Service } from "@/types/proposal/proposal";
@@ -9,11 +10,7 @@ import type { Service } from "@/types/proposal/proposal";
 
 
 export default function ProposalPage() {
-  const [year, setYear] = useState<number | null>(null);
-
-  useEffect(() => {
-    setYear(new Date().getFullYear());
-  }, []);
+  const year = useCurrentYear();
   const [realProjects, setRealProjects] = useState<RealProject[]>([]);
   const [codevProfiles, setCodevProfiles] = useState<any[]>([]);
   const [isLoadingProjects, setIsLoadingProjects] = useState(true);

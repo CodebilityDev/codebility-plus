@@ -9,7 +9,7 @@ import { IconEdit } from "@/public/assets/svgs/index";
 import { useUserStore } from "@/store/global/codev-store";
 import type { DayOfWeek, WorkSchedule } from "@/types/global/codev";
 import { DAYS_OF_WEEK, WEEKDAYS } from "@/constants/applicant/profile/profile";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
 
 import { Checkbox } from "@codevs/ui/checkbox";
@@ -34,12 +34,6 @@ const TimeSchedule = ({ data }: TimeScheduleProps) => {
 
   const [isEditMode, setIsEditMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    if (user?.id) {
-      setSchedule((prev) => ({ ...prev, codev_id: user.id }));
-    }
-  }, [user]);
 
   const parseTime = (timeStr: string): { date: Date; period: Period } => {
     if (!timeStr || timeStr === "") {

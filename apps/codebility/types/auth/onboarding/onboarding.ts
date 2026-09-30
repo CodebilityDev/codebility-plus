@@ -70,6 +70,15 @@ export interface RoadMapWrapperProps {
 // -------------------------
 // Avatar
 // -------------------------
+export interface TeamSectionProps {
+  team: {
+    success: boolean;
+    admins: Person[];
+    mentors: Person[];
+    ceo: Person | null;
+  };
+}
+
 export interface TeamSectionAvatarProps {
   person: Person;
   size?: number;

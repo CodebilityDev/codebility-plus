@@ -1,7 +1,7 @@
 "use client";
 
 import type { StaticImageData } from "next/image";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Box from "@/components/global/layout/Box";
 import Paragraph from "@/components/global/typography/Paragraph";
@@ -18,7 +18,7 @@ import type { PhotoProps } from "@/types/applicant/profile/profile";
 
 
 const Photo = ({ data, earnedCategories }: PhotoProps) => {
-  const [avatar, setAvatar] = useState<string | StaticImageData>(defaultAvatar);
+  const [uploadedAvatar, setUploadedAvatar] = useState<string | StaticImageData | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const { onOpen } = useModal();
   const hasImagePoints = earnedCategories.some((category) => ["image_url"].includes(category));
@@ -26,11 +26,7 @@ const Photo = ({ data, earnedCategories }: PhotoProps) => {
   const [croppedAvatar, setCroppedAvatar] = useState<string | null>(null);
   const [openUploadModal, setOpenUploadModal] = useState(false);
 
-  useEffect(() => {
-    if (data?.image_url) {
-      setAvatar(data.image_url);
-    }
-  }, [data?.image_url]);
+  const avatar = uploadedAvatar ?? data.image_url ?? defaultAvatar;
 
   // Check if user has earned points for uploading a photo
 
@@ -60,7 +56,7 @@ const Photo = ({ data, earnedCategories }: PhotoProps) => {
 
       await updateCodev({ image_url: null });
 
-      setAvatar(defaultAvatar);
+      setUploadedAvatar(null);
       toast.success("Avatar removed successfully!", { id: toastId });
     } catch (error) {
       console.error("Error removing avatar:", error);
@@ -146,7 +142,7 @@ const Photo = ({ data, earnedCategories }: PhotoProps) => {
           setOpen={setOpenUploadModal}
           image={croppedAvatar || ""}
           setImage={setCroppedAvatar}
-          setAvatar={setAvatar}
+          setAvatar={setUploadedAvatar}
         />
       </div>
     </Box>

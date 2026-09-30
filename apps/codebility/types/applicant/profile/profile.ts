@@ -1,5 +1,5 @@
 import type { UserSchema } from "@/utils/applicant/profile/profile";
-import type { Codev, Education, WorkExperience, JobStatus, WorkSchedule } from "@/types/global/codev";
+import type { Codev, Education, WorkExperience, JobStatus, WorkSchedule, Position } from "@/types/global/codev";
 import type React from "react";
 import type z from "zod";
 import type { StaticImageData } from "next/image";
@@ -117,6 +117,7 @@ export interface PeriodSelectorProps {
 
 export interface PersonalInfoProps {
   data: Codev;
+  positions: Position[];
 }
 
 export interface PersonalInfoFormValues {
@@ -289,5 +290,5 @@ export interface UploadPhotoModalProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   image: string;
   setImage: React.Dispatch<React.SetStateAction<string | null>>;
-  setAvatar: React.Dispatch<React.SetStateAction<string | StaticImageData>>;
+  setAvatar: React.Dispatch<React.SetStateAction<string | StaticImageData | null>>;
 }

@@ -84,7 +84,6 @@ export default function SignUpForm() {
     },
   });
 
-  // Initialize NDA status and message listener
   useEffect(() => {
     // Check for existing NDA data in localStorage
     const checkNdaData = () => {
@@ -121,14 +120,6 @@ export default function SignUpForm() {
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
   }, [form]);
-
-  // Sync tech stack with form validation
-  useEffect(() => {
-    if (stack && stack.length > 0) {
-      form.setValue("tech_stacks", stack);
-      form.clearErrors("tech_stacks");
-    }
-  }, [stack, form]);
 
   // NDA signing handler
   const handleSignNda = () => {

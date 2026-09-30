@@ -1,30 +1,14 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
+import { useIntersection } from "@/hooks/global/useIntersection";
 import { motion } from "framer-motion";
 import { items } from "@/constants/auth/onboarding/onboarding";
 
 
 export default function ExpectSectionLight() {
   const lineRef = useRef<HTMLDivElement>(null);
-  const sectionRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const target = sectionRef.current;
-    const line = lineRef.current;
-    if (!target || !line) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const [entry] = entries;
-        if (entry?.isIntersecting) line.style.height = "100%";
-      },
-      { threshold: 0.25 },
-    );
-
-    observer.observe(target);
-    return () => observer.disconnect();
-  }, []);
+  const { ref: sectionRef, inView } = useIntersection<HTMLElement>({ threshold: 0.25 });
 
   return (
     <section
@@ -55,7 +39,7 @@ export default function ExpectSectionLight() {
           <motion.div
             ref={lineRef}
             initial={{ height: 0 }}
-            animate={{ height: "100%" }}
+            animate={{ height: inView ? "100%" : 0 }}
             transition={{ duration: 1.2, ease: "easeInOut" }}
             className="absolute left-1/2 hidden w-px -translate-x-1/2 bg-gradient-to-b from-cyan-400/50 via-purple-500/50 to-pink-400/50 md:block"
           />

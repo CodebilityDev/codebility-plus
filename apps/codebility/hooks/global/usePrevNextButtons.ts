@@ -1,12 +1,12 @@
 "use client";
 
-import type { UsePrevNextButtonsType } from "@/types/global/marketing";
+import { useCallback, useEffect, useState } from "react";
 import type { EmblaCarouselType } from "embla-carousel";
-import { useState, useCallback, useEffect } from "react";
+
+import type { UsePrevNextButtonsType } from "@/types/global/marketing";
 
 export const usePrevNextButtons = (
   emblaApi: EmblaCarouselType | undefined,
-   
   onButtonClick?: (emblaApi: EmblaCarouselType) => void,
 ): UsePrevNextButtonsType => {
   const [prevBtnDisabled, setPrevBtnDisabled] = useState(true);
@@ -15,18 +15,18 @@ export const usePrevNextButtons = (
   const onPrevButtonClick = useCallback(() => {
     if (!emblaApi) return;
     emblaApi.scrollPrev();
-    if (onButtonClick) onButtonClick(emblaApi);
+    onButtonClick?.(emblaApi);
   }, [emblaApi, onButtonClick]);
 
   const onNextButtonClick = useCallback(() => {
     if (!emblaApi) return;
     emblaApi.scrollNext();
-    if (onButtonClick) onButtonClick(emblaApi);
+    onButtonClick?.(emblaApi);
   }, [emblaApi, onButtonClick]);
 
-  const onSelect = useCallback((emblaApi: EmblaCarouselType) => {
-    setPrevBtnDisabled(!emblaApi.canScrollPrev());
-    setNextBtnDisabled(!emblaApi.canScrollNext());
+  const onSelect = useCallback((api: EmblaCarouselType) => {
+    setPrevBtnDisabled(!api.canScrollPrev());
+    setNextBtnDisabled(!api.canScrollNext());
   }, []);
 
   useEffect(() => {
@@ -34,6 +34,10 @@ export const usePrevNextButtons = (
 
     onSelect(emblaApi);
     emblaApi.on("reInit", onSelect).on("select", onSelect);
+
+    return () => {
+      emblaApi.off("reInit", onSelect).off("select", onSelect);
+    };
   }, [emblaApi, onSelect]);
 
   return {

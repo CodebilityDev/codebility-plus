@@ -2,6 +2,7 @@
 
 import { forwardRef, useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
+import { useFormattedDate } from "@/hooks/global/useFormattedDate";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -41,11 +42,7 @@ const SignaturePad = forwardRef<SignatureCanvasRef, SignaturePadProps>(
 SignaturePad.displayName = "SignaturePad";
 
 export default function PublicNdaSigningPage() {
-  const [agreementDate, setAgreementDate] = useState("");
-
-  useEffect(() => {
-    setAgreementDate(new Date().toLocaleDateString());
-  }, []);
+  const agreementDate = useFormattedDate();
   const { token } = useParams<{ token: string }>();
   const signatureRef = useRef<SignatureCanvasRef | null>(null);
   const [signing, setSigning] = useState(false);

@@ -1,20 +1,31 @@
 import "server-only";
 
+import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Client, Codev, Project, WorkExperience } from "@/types/global/codev";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 
-
-
-export const getCodevs = async ({
-  filters = {},
-}: {
+export async function getCodevs(options?: {
   filters?: {
     id?: string;
     role_id?: number | string;
     application_status?: string;
   };
-} = {}): Promise<{ error: any; data: Codev[] | null }> => {
-   const supabase = await createClientServerComponent();
+}) {
+  return getCodevsWithClient(await createClientServerComponent(), options);
+}
+
+export const getCodevsWithClient = async (
+  supabase: SupabaseClient,
+  {
+    filters = {},
+  }: {
+  filters?: {
+    id?: string;
+    role_id?: number | string;
+    application_status?: string;
+  };
+  } = {},
+): Promise<{ error: any; data: Codev[] | null }> => {
   let query = supabase.from("codev").select(`
     id,
     first_name,
@@ -157,6 +168,7 @@ export const getCodevs = async ({
 
   return { error: null, data: normalizedData };
 };
+
 
 export const getClients = async (): Promise<{
   error: any;
