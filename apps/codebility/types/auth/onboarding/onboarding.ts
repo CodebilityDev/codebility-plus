@@ -64,7 +64,7 @@ export interface UseOnboardingAnimationsProps {
 export interface PersonCardProps { person: Person }
 
 export interface RoadMapWrapperProps {
-  roadmapRef: RefObject<HTMLDivElement>;
+  roadmapRef: RefObject<HTMLDivElement | null>;
 }
 
 // -------------------------

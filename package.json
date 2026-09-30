@@ -8,8 +8,8 @@
     "@codevs/tsconfig": "workspace:*",
     "@turbo/gen": "^2.1.1",
     "@types/minimatch": "^6.0.0",
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
     "eslint": "^8.57.0",
     "prettier": "^3.3.3",
     "react": "^19.2.1",
@@ -42,14 +42,22 @@
   },
   "pnpm": {
     "overrides": {
-      "@types/react": "18.3.3",
-      "@types/react-dom": "18.3.0",
+      "@types/react": "19.3.0",
+      "@types/react-dom": "19.3.0",
       "react": "^18.3.1",
       "react-dom": "^18.3.1",
       "react-signature-canvas": "npm:react-signature-canvas@1.1.0-alpha.1",
       "reactjs-qr-code-reader": "npm:reactjs-qr-code-reader@1.0.3",
       "react-smooth": "npm:react-smooth@4.0.4",
-      "react-overlays": "npm:react-overlays@5.2.1"
+      "react-overlays": "npm:react-overlays@5.2.1",
+      "codebility>react": "19.3.0",
+      "codebility>react-dom": "19.3.0",
+      "codebility>@types/react": "19.3.0",
+      "codebility>@types/react-dom": "19.3.0",
+      "@codevs/ui>react": "19.3.0",
+      "@codevs/ui>react-dom": "19.3.0",
+      "@codevs/ui>@types/react": "19.3.0",
+      "@codevs/ui>@types/react-dom": "19.3.0"
     }
   },
   "nohoist": [
