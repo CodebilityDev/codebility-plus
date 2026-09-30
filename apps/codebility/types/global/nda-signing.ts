@@ -1,4 +1,12 @@
-import type { UserInfoSchema } from "@/utils/nda-signing/public/public";
+export interface NdaSigningTokenClientProps {
+  agreementDate: string;
+}
+
+export interface NdaSigningPublicViewProps {
+  formattedDate: string;
+}
+
+import type { UserInfoSchema } from "@/utils/global/nda-signing";
 import type React from "react";
 import type { z } from "zod";
 

@@ -5,17 +5,16 @@ import Link from "next/link";
 import Logo from "@/components/global/layout/Logo";
 import { footerLinks } from "@/constants/marketing/links";
 import { useModal } from "@/hooks/global/use-modal";
-import { useCurrentYear } from "@/hooks/global/useCurrentYear";
+import type { MarketingFooterProps } from "@/types/marketing/marketing";
 import type { ModalType } from "@/types/global/hooks";
 import { IconFacebookWhite } from "@/public/assets/svgs/index";
 
 import { aboutUsData, connectUsData } from "@/constants/global/landing-data";
 import Container from "@/components/global/marketing/MarketingContainer";
 
-const Footer = () => {
+const Footer = ({ year }: MarketingFooterProps) => {
   const { onOpen } = useModal();
-  const year = useCurrentYear();
-
+  
   return (
     <section className="w-full overflow-hidden">
       <Container className="bg-black-600 mx-auto flex flex-col gap-2 text-white xl:rounded-3xl">
@@ -74,7 +73,7 @@ const Footer = () => {
         </div>
         <div className="border-darkgray flex border-t px-0 py-3 md:p-8 lg:items-center lg:justify-center">
           <p className="text-md text-gray">
-            Copyright {year ? `${year} ` : ""}
+            Copyright {year} 
             <Link href="/">Codebility</Link>. All Right Reserved.
           </p>
         </div>

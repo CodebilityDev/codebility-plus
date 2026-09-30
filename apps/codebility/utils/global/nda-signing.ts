@@ -1,24 +1,26 @@
 import { z } from "zod";
 
-// Validation schema for user information
+// Define the validation schema for user information
 export const UserInfoSchema = z.object({
   first_name: z.string().min(1, "First name is required"),
   last_name: z.string().min(1, "Last name is required"),
 });
-
 /**
  * Client-side PDF generation function since jsPDF requires browser environment
  * @param userData - User information for the document
  * @param signatureDataUrl - Base64 signature image
  */
-export async function generateNdaPdf(userData: { first_name: string; last_name: string }, signatureDataUrl: string): Promise<string> {
+export async function generateNdaPdf(
+  userData: { first_name: string; last_name: string },
+  signatureDataUrl: string,
+  formattedDate: string,
+): Promise<string> {
   const { jsPDF } = await import("jspdf");
   const doc = new jsPDF();
   
   const { first_name, last_name } = userData;
   const pageWidth = doc.internal.pageSize.getWidth();
   const lineWidth = 150;
-  const formattedDate = new Date().toLocaleDateString();
 
   // Page 1 - Cover and Terms
   doc.setFont("times", "normal");

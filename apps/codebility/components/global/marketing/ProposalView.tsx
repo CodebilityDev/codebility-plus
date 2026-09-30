@@ -2,13 +2,11 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { useCurrentYear } from "@/hooks/global/useCurrentYear";
 import type { ProposalViewProps, Service } from "@/types/global/proposal";
 
 
 
-export default function ProposalView({ realProjects, codevProfiles }: ProposalViewProps) {
-  const year = useCurrentYear();
+export default function ProposalView({ realProjects, codevProfiles, year }: ProposalViewProps) {
   const [activeTab, setActiveTab] = useState(0);
 
   const [services] = useState<Service[]>([
@@ -344,7 +342,7 @@ export default function ProposalView({ realProjects, codevProfiles }: ProposalVi
             <div>🌐 www.codebility.tech</div>
           </div>
           <div className="text-sm text-white/40 pt-8 border-t border-dark-100">
-            © {year ?? ""} Codebility • Professional Development Services
+            © {year} Codebility • Professional Development Services
           </div>
         </div>
       </footer>

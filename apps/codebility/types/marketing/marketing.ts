@@ -1,3 +1,7 @@
+export interface MarketingFooterProps {
+  year: number;
+}
+
 import type { ROLE_STYLES } from "@/constants/marketing/marketing";
 import type { Codev } from "@/types/global/codev";
 import type { ReactNode } from "react";

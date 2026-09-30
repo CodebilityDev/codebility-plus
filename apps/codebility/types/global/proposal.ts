@@ -4,6 +4,7 @@ import type { z } from "zod";
 export interface ProposalViewProps {
   realProjects: RealProject[];
   codevProfiles: any[];
+  year: number;
 }
 
 export interface Service {

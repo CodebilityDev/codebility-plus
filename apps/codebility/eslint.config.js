@@ -72,6 +72,83 @@ const routeScope = {
   },
 };
 
+
+// A mount flag that only gates rendering defers a value to a second client pass.
+// That is what useIsMounted, the old modal providers and four removed components all
+// did. Compute the value on the server and pass it down instead.
+const noMountFlag = {
+  meta: { type: "problem", schema: [] },
+  create(context) {
+    const flags = new Set();
+
+    return {
+      "CallExpression[callee.name='useEffect']"(node) {
+        const body = node.arguments[0]?.body?.body ?? [];
+        const single = body.length === 1 ? body[0] : null;
+        const stmt = single?.type === "ExpressionStatement" ? single.expression : single;
+        if (stmt?.type !== "CallExpression") return;
+        const callee = stmt.callee;
+        if (callee?.type !== "Identifier" || !/^set[A-Z]/.test(callee.name)) return;
+        if (stmt.arguments?.[0]?.value !== true) return;
+        flags.add(callee.name.slice(3));
+      },
+      "Program:exit"(node) {
+        if (flags.size === 0) return;
+        for (const name of flags) {
+          const lower = name[0].toLowerCase() + name.slice(1);
+          context.report({
+            node,
+            message: `"${lower}" is set once after mount and only gates rendering. Pass the value from a server component instead of deferring it to a second render.`,
+          });
+        }
+      },
+    };
+  },
+};
+
+// A clock or random read during render makes the server and client disagree.
+// Both have already caused hydration work in this codebase.
+const noRenderTimeValue = {
+  meta: { type: "problem", schema: [] },
+  create(context) {
+    // Only a component body counts. A clock read inside a callback, an event handler
+    // or a module-scope function runs on demand, not during render.
+    function inComponentBody(node) {
+      let current = node.parent;
+      while (current) {
+        if (
+          current.type === "FunctionDeclaration" &&
+          /^[A-Z]/.test(current.id?.name ?? "")
+        ) {
+          return true;
+        }
+        if (
+          current.type === "ArrowFunctionExpression" ||
+          current.type === "FunctionExpression"
+        ) {
+          return false;
+        }
+        current = current.parent;
+      }
+      return false;
+    }
+
+    function report(node, message) {
+      if (!inComponentBody(node)) return;
+      context.report({ node, message });
+    }
+
+    return {
+      "NewExpression[callee.name='Date']"(node) {
+        report(node, "Don't read the clock during render. Compute the date on the server and pass it down.");
+      },
+      "CallExpression[callee.object.name='Math'][callee.property.name='random']"(node) {
+        report(node, "Don't call Math.random during render. Generate the value on the server or use React.useId().");
+      },
+    };
+  },
+};
+
 // Pre-existing debt: these rules already fail in code kept from before the
 // 2026-09 cleanup, so they warn instead of error. New code should pass them.
 // When a rule reaches zero warnings, delete it from this list.
@@ -124,11 +201,21 @@ export default [
   ...nextjsConfig,
   {
     files: ["**/*.ts", "**/*.tsx"],
-    plugins: { codebility: { rules: { "route-scope": routeScope } } },
+    plugins: {
+      codebility: {
+        rules: {
+          "route-scope": routeScope,
+          "no-mount-flag": noMountFlag,
+          "no-render-time-value": noRenderTimeValue,
+        },
+      },
+    },
     rules: {
       ...Object.fromEntries(DEBT_RULES.map((rule) => [rule, "warn"])),
       "@typescript-eslint/no-explicit-any": "off",
       "codebility/route-scope": "error",
+      "codebility/no-mount-flag": "warn",
+      "codebility/no-render-time-value": "warn",
     },
   },
 ];

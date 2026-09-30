@@ -3,7 +3,6 @@
 import { Suspense, forwardRef, useEffect, useRef, useState } from "react";
 import { useDynamicImport } from "@/hooks/global/useDynamicImport";
 import { useParams } from "next/navigation";
-import { useFormattedDate } from "@/hooks/global/useFormattedDate";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -13,8 +12,8 @@ import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
 import { completeNdaSigning } from "@/actions/global/nda-storage";
 import { createClientClientComponent } from "@/lib/global/supabase-client";
-import type { UserInfo, SignatureCanvasRef, SignaturePadProps } from "@/types/nda-signing/nda-signing";
-import { UserInfoSchema, generateNdaPdf } from "@/utils/nda-signing/nda-signing";
+import type { NdaSigningTokenClientProps, UserInfo, SignatureCanvasRef, SignaturePadProps } from "@/types/global/nda-signing";
+import { UserInfoSchema, generateNdaPdf } from "@/utils/global/nda-signing";
 
 
 async function fetchCodevIdFromToken(ndaToken: string): Promise<string | null> {
@@ -64,9 +63,8 @@ const SignaturePad = forwardRef<SignatureCanvasRef, SignaturePadProps>(
 
 SignaturePad.displayName = "SignaturePad";
 
-export default function PublicNdaSigningPage() {
-  const agreementDate = useFormattedDate();
-  const { token } = useParams<{ token: string }>();
+export default function NdaSigningTokenClient({ agreementDate }: NdaSigningTokenClientProps) {
+    const { token } = useParams<{ token: string }>();
   const signatureRef = useRef<SignatureCanvasRef | null>(null);
   const [signing, setSigning] = useState(false);
   const [showNameForm, setShowNameForm] = useState(true);
@@ -146,7 +144,7 @@ export default function PublicNdaSigningPage() {
       const signatureDataUrl = signatureRef.current.toDataURL("image/png");
 
       // Generate PDF document on client side since jsPDF requires browser environment
-      const documentDataUrl = await generateNdaPdf({ first_name, last_name }, signatureDataUrl);
+      const documentDataUrl = await generateNdaPdf({ first_name, last_name }, signatureDataUrl, agreementDate);
 
       // Use the new storage service for complete workflow
       const result = await completeNdaSigning(
