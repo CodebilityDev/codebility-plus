@@ -1,4 +1,8 @@
-﻿export type Json =
+// Generated from the live schema. Do not edit by hand.
+// Regenerate from apps/codebility with:
+//   npx supabase gen types typescript --project-id <ref> > types/global/supabase.ts
+// The token is read from SUPABASE_ACCESS_TOKEN in .env.
+export type Json =
   | string
   | number
   | boolean

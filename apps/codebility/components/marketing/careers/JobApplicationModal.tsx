@@ -5,7 +5,7 @@ import { Button } from "@/components/global/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/global/ui/dialog";
 import Input from "@/components/global/ui/input";
 import { useToast } from "@/components/global/ui/use-toast";
-import { getClientSupabase } from "@/lib/global/supabase-client";
+import { submitJobApplication } from "@/actions/marketing/careers/job-application";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Upload } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -59,47 +59,10 @@ export default function JobApplicationModal({
     setIsSubmitting(true);
 
     try {
-      const supabase = getClientSupabase();
+      const result = await submitJobApplication(job.id, data, resumeFile);
 
-      // Upload resume if provided
-      let resumeUrl: string | null = null;
-      if (resumeFile) {
-        const fileExt = resumeFile.name.split(".").pop();
-        const fileName = `${data.email.replace("@", "_")}_${Date.now()}.${fileExt}`;
-
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from("codebility")
-          .upload(`resumes/${fileName}`, resumeFile);
-
-        if (uploadError) {
-          console.error("Resume upload error:", uploadError);
-        } else {
-          resumeUrl = uploadData.path;
-        }
-      }
-
-      // Save application to database
-      const { error } = await supabase.from("job_applications").insert({
-        job_id: job.id,
-        first_name: data.firstName,
-        last_name: data.lastName,
-        email: data.email,
-        phone: data.phone,
-        linkedin: data.linkedIn ?? null,
-        github: data.github ?? null,
-        portfolio: data.portfolio ?? null,
-        years_of_experience: parseInt(data.yearsOfExperience),
-        cover_letter: data.coverLetter,
-        experience: data.experience,
-        resume_url: resumeUrl,
-        status: "pending",
-        notes: data.referredBy
-          ? `Referred by: ${data.referredBy}`
-          : "Direct Application",
-      });
-
-      if (error) {
-        throw error;
+      if (result.error) {
+        throw new Error(result.error);
       }
 
       toast({
