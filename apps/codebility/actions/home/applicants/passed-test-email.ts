@@ -14,7 +14,7 @@ export const sendPassedTestEmail = async ({ email, name }: EmailRecipient) => {
     const waitListLink = process.env.NEXT_PUBLIC_MESSENGER_WAITLIST;
     const discordLink = process.env.NEXT_PUBLIC_DISCORD_LINK;
 
-    const { data, error } = await resend.emails.send({
+    const { error } = await resend.emails.send({
       from: DEFAULT_EMAIL_CONFIG.from,
       to: email,
       cc: DEFAULT_EMAIL_CONFIG.cc,
@@ -51,7 +51,7 @@ export const sendMultiplePassedTestEmail = async (
       const waitListLink = process.env.NEXT_PUBLIC_MESSENGER_WAITLIST;
       const discordLink = process.env.NEXT_PUBLIC_DISCORD_LINK;
 
-      const { data, error } = await resend.emails.send({
+      const { error } = await resend.emails.send({
         from: DEFAULT_EMAIL_CONFIG.from,
         to: email,
         cc: DEFAULT_EMAIL_CONFIG.cc,

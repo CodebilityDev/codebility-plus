@@ -9,11 +9,11 @@ let anonClient: SupabaseClient<Database> | null = null;
 export const createClientAnon = (): SupabaseClient<Database> => {
   if (anonClient) return anonClient;
 
-  ensureSupabaseEnv();
+  const { url, anonKey } = ensureSupabaseEnv();
 
   anonClient = createClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    url,
+    anonKey,
     {
       auth: {
         persistSession: false,

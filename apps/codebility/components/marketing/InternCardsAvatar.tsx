@@ -9,7 +9,7 @@ export function InternCardsAvatar({
   position = "center top",
 }: InternCardsAvatarProps) {
   const getInitials = () => {
-    const fullName = (person.name ?? "").trim();
+    const fullName = person.name.trim();
 
     if (!fullName) return "";
 

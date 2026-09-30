@@ -32,10 +32,10 @@ const PersonalInfo = ({ data, positions: positionsData }: PersonalInfoProps) => 
     defaultValues: {
       first_name: data.first_name,
       last_name: data.last_name,
-      address: data.address || undefined,
-      display_position: data.display_position || undefined,
+      address: data.address ?? undefined,
+      display_position: data.display_position ?? undefined,
       years_of_experience: data.years_of_experience ?? 0,
-      headline: data.headline || undefined,
+      headline: data.headline ?? undefined,
     },
   });
 
@@ -116,7 +116,7 @@ const PersonalInfo = ({ data, positions: positionsData }: PersonalInfoProps) => 
               onValueChange={(value) =>
                 setValue("display_position", value, { shouldDirty: true })
               }
-              value={watch("display_position") || ""}
+              value={watch("display_position") ?? ""}
               disabled={!isEditMode}
             >
                 <SelectTrigger

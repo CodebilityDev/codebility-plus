@@ -169,7 +169,7 @@ async function ProfileComponent() {
                 </>
               )}
             </ProfilePointsGate>
-            <TimeSchedule data={schedules?.[0] || null} codevId={user.id} />
+            <TimeSchedule data={schedules?.[0] ?? null} codevId={user.id} />
             <JobStatuses data={jobStatuses ?? []} />
             
           </div>

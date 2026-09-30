@@ -9,7 +9,6 @@ import { applicantUpdateJoinedStatus } from "@/actions/applicant/waiting/applica
 import type { ApplicantStep3Props } from "@/types/applicant/waiting/waiting";
 
 export default function ApplicantStep3({
-  setActiveStep,
   user,
   applicantData,
 }: ApplicantStep3Props) {
@@ -18,10 +17,6 @@ export default function ApplicantStep3({
   const [isUpdating, setIsUpdating] = useState(false);
   const isOnboarding = user.application_status === "onboarding";
   const router = useRouter();
-
-  const handleTakeTest = () => {
-    setActiveStep(1);
-  };
 
   const handleDiscordChange = async (checked: boolean) => {
     setIsUpdating(true);

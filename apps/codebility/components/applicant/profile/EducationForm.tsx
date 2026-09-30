@@ -58,22 +58,22 @@ export const EducationForm = ({
     }
 
     const data = {
-      institution: education.institution ?? "",
+      institution: education.institution,
       degree: education.degree ?? null,
       major_subject: education.major_subject ?? null,
       description: education.description ?? null,
       achievements: education.achievements ?? null,
       start_date: education.start_date ?? null,
       end_date: education.end_date ?? null,
-      codev_id: education.codev_id || undefined,
-      profile_id: education.profile_id || undefined,
+      codev_id: education.codev_id ?? undefined,
+      profile_id: education.profile_id ?? undefined,
     };
 
     try {
       setIsLoading(true);
       if (!education.id) {
         const result = await createEducation(data);
-        if (result?.[0]) {
+        if (result[0]) {
           education.id = result[0].id;
         }
         toast.success("Education added successfully!");
@@ -83,7 +83,7 @@ export const EducationForm = ({
       }
       handleEditModePerItem(itemNo, false);
       setEditMode(false);
-    } catch (error) {
+    } catch {
       toast.error("Something went wrong!");
     } finally {
       setIsLoading(false);
@@ -121,7 +121,7 @@ export const EducationForm = ({
             onChange={(e) =>
               handleUpdateEducation(itemNo, e.target.name, e.target.value)
             }
-            value={education.institution ?? ""}
+            value={education.institution}
             type="text"
             name="institution"
             variant={editMode ? "lightgray" : "darkgray"}

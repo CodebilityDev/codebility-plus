@@ -1,4 +1,3 @@
-import type { Task, Client } from "@/types/global/codev";
 
 export type ModalType =
   | "companyProfile"
@@ -21,13 +20,13 @@ export type ModalType =
 
 export interface ModalStore {
   type: ModalType | null;
-  data?: Task | Client[] | any;
+  data?: any;
   dataObject?: any;
   callback?: () => void;
   isOpen: boolean;
   onOpen: (
     type: ModalType,
-    data?: Task | Client[] | any,
+    data?: any,
     dataObject?: any,
     callback?: () => void,
   ) => void;

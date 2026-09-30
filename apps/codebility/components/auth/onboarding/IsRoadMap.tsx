@@ -19,7 +19,7 @@ const IsRoadMap = forwardRef<HTMLDivElement, IsRoadMapProps>(function IsRoadMap(
   const regularRef = useRef<HTMLDivElement | null>(null);
   const h1Ref = useRef<HTMLHeadingElement | null>(null);
 
-  const setIsLogoVisible = (_: boolean) => {};
+  const setIsLogoVisible = (_: boolean) => undefined;
 
   useOnboardingAnimations({
     heroRef,

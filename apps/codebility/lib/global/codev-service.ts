@@ -2,6 +2,7 @@ import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Client, Codev, Project, WorkExperience } from "@/types/global/codev";
+import type { Database } from "@/types/global/supabase";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 
 export async function getCodevs(options?: {
@@ -15,7 +16,7 @@ export async function getCodevs(options?: {
 }
 
 export const getCodevsWithClient = async (
-  supabase: SupabaseClient,
+  supabase: SupabaseClient<Database>,
   {
     filters = {},
   }: {
@@ -25,7 +26,7 @@ export const getCodevsWithClient = async (
     application_status?: string;
   };
   } = {},
-): Promise<{ error: any; data: Codev[] | null }> => {
+): Promise<{ error: unknown; data: Codev[] | null }> => {
   let query = supabase.from("codev").select(`
     id,
     first_name,
@@ -143,16 +144,16 @@ export const getCodevsWithClient = async (
   }
 
   // Transform the data to match the Codev interface
-  const normalizedData = data.map((codev: any) => ({
+  const normalizedData = data.map((codev) => ({
     ...codev,
-    education: codev.education ?? [],
-    work_experience: (codev.work_experience ?? []).map((exp: any) => ({
+    education: codev.education,
+    work_experience: codev.work_experience.map((exp) => ({
       ...exp,
       codev_id: codev.id,
-    })) as WorkExperience[],
-    work_schedules: codev.work_schedules ?? [],
-    projects: (codev.project_members ?? []).map(
-      (member: any) =>
+    })),
+    work_schedules: codev.work_schedules,
+    projects: codev.project_members.map(
+      (member) =>
         ({
           ...member.project,
           role: member.role,
@@ -160,7 +161,7 @@ export const getCodevsWithClient = async (
           project_members: member.project?.project_members ?? [],
           // Flatten categories from nested structure
           categories: (member.project?.categories ?? []).map(
-            (cat: any) => cat.projects_category
+            (cat) => cat.projects_category
           ).filter(Boolean),
         }) as Project & { role: string; joined_at: string },
     ),
@@ -171,7 +172,7 @@ export const getCodevsWithClient = async (
 
 
 export const getClients = async (): Promise<{
-  error: any;
+  error: unknown;
   data: Client[] | null;
 }> => {
    const supabase = await createClientServerComponent();
@@ -192,5 +193,5 @@ export const getClients = async (): Promise<{
     updated_at
   `);
 
-  return { error, data: data || null };
+  return { error, data: data ?? null };
 };

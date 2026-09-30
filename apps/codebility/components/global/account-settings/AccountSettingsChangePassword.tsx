@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { getClientSupabase } from "@/lib/global/supabase-client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -16,7 +15,6 @@ import {
   FormMessage,
 } from "@codevs/ui/form";
 import { Input } from "@codevs/ui/input";
-import { updatePassword } from "@/actions/global/account-settings";
 
 // Password validation schema
 const passwordChangeSchema = z
@@ -58,7 +56,7 @@ export default function AccountSettingsChangePassword() {
 
       toast.success("Password updated successfully!");
       form.reset();
-    } catch (err) {
+    } catch {
       toast.error("An unexpected error occurred. Please try again.");
     }
   };

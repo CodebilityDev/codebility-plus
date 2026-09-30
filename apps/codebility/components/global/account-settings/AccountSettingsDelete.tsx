@@ -2,7 +2,7 @@
 
 import { deleteAuthUser } from "@/actions/global/account-settings/delete-auth-user";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { getClientSupabase } from "@/lib/global/supabase-client";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -38,7 +38,7 @@ export default function AccountSettingsDelete() {
     },
   });
 
-  const onSubmit = async (values: UserDeletionFormValues) => {
+  const onSubmit = async (_values: UserDeletionFormValues) => {
     const supabase = getClientSupabase();
     try {
       setIsLoading(true);

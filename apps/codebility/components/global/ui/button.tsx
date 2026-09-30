@@ -80,7 +80,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={isDisabled}
         aria-disabled={isDisabled}
         aria-busy={loading}
-        aria-describedby={loading ? `loading-state ${ariaDescribedBy || ''}`.trim() : ariaDescribedBy}
+        aria-describedby={loading ? `loading-state ${ariaDescribedBy ?? ''}`.trim() : ariaDescribedBy}
         {...props}
       >
         {loading && (

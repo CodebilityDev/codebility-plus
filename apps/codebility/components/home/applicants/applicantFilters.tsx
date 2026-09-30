@@ -207,7 +207,7 @@ const ApplicantFiltersComponent = ({
                             <label key={position} className="flex items-center space-x-2 text-sm">
                               <input
                                 type="checkbox"
-                                checked={filters.positions[position] || false}
+                                checked={filters.positions[position] ?? false}
                                 onChange={(e) => updatePositionFilter(position, e.target.checked)}
                                 className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                               />
@@ -255,7 +255,7 @@ const ApplicantFiltersComponent = ({
                             <label key={techStack} className="flex items-center space-x-2 text-sm">
                               <input
                                 type="checkbox"
-                                checked={filters.techStacks[techStack] || false}
+                                checked={filters.techStacks[techStack] ?? false}
                                 onChange={(e) => updateTechStackFilter(techStack, e.target.checked)}
                                 className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                               />

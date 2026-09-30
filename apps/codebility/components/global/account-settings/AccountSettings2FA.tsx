@@ -11,11 +11,12 @@ import { Label } from "@codevs/ui/label";
 import { Input } from "@codevs/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@codevs/ui/dialog";
 import type { AccountSettings2FAProps, Factor } from "@/types/global/account-settings";
+import { toErrorMessage } from "@/utils/global/feedback";
 
 
 export default function AccountSettings2FA({ mfaFactors }: AccountSettings2FAProps) {
   const router = useRouter();
-  const [factors, setFactors] = useState<Factor[]>(mfaFactors as Factor[]);
+  const [factors] = useState<Factor[]>(mfaFactors as Factor[]);
   const activeFactor =
     factors.find((factor) => factor.status === "verified") ?? null;
 
@@ -49,7 +50,7 @@ export default function AccountSettings2FA({ mfaFactors }: AccountSettings2FAPro
       });
 
       if (error) {
-        toast.error(error.message ?? "Failed to initiate 2FA setup");
+        toast.error(error.message);
         return;
       }
 
@@ -57,8 +58,8 @@ export default function AccountSettings2FA({ mfaFactors }: AccountSettings2FAPro
       setQrCodeSvg(data.totp.qr_code);
       setSecretKey(data.totp.secret);
       setIsEnrollOpen(true);
-    } catch (err: any) {
-      toast.error(err?.message ?? "An unexpected error occurred");
+    } catch (err) {
+      toast.error(toErrorMessage(err, "An unexpected error occurred"));
     } finally {
       setSubmitting(false);
     }
@@ -79,13 +80,13 @@ export default function AccountSettings2FA({ mfaFactors }: AccountSettings2FAPro
     try {
       setSubmitting(true);
 
-      const { data, error } = await supabase.auth.mfa.challengeAndVerify({
+      const { error } = await supabase.auth.mfa.challengeAndVerify({
         factorId: enrollingFactorId,
         code: verificationCode.trim(),
       });
 
       if (error) {
-        toast.error(error.message ?? "Invalid authentication code");
+        toast.error(error.message);
         return;
       }
 
@@ -95,8 +96,8 @@ export default function AccountSettings2FA({ mfaFactors }: AccountSettings2FAPro
       setIsRecoveryOpen(true);
 
       router.refresh();
-    } catch (err: any) {
-      toast.error(err?.message ?? "Verification failed");
+    } catch (err) {
+      toast.error(toErrorMessage(err, "Verification failed"));
     } finally {
       setSubmitting(false);
     }
@@ -118,22 +119,22 @@ export default function AccountSettings2FA({ mfaFactors }: AccountSettings2FAPro
       });
 
       if (error) {
-        toast.error(error.message ?? "Failed to disable 2FA");
+        toast.error(error.message);
         return;
       }
 
       toast.success("Two-Factor Authentication disabled");
       setIsDisableOpen(false);
       router.refresh();
-    } catch (err: any) {
-      toast.error(err?.message ?? "Failed to disable 2FA");
+    } catch (err) {
+      toast.error(toErrorMessage(err, "Failed to disable 2FA"));
     } finally {
       setSubmitting(false);
     }
   };
 
   const copyToClipboard = (text: string, label: string) => {
-    navigator.clipboard.writeText(text);
+    void navigator.clipboard.writeText(text);
     toast.success(`${label} copied to clipboard`);
   };
 
@@ -145,8 +146,7 @@ export default function AccountSettings2FA({ mfaFactors }: AccountSettings2FAPro
             <Label htmlFor="two-factor" className="text-base font-semibold">
               Two-Factor Authentication (2FA)
             </Label>
-            {!false && (
-              activeFactor ? (
+            {activeFactor ? (
                 <span className="inline-flex items-center gap-1 text-xs font-medium bg-green-500/10 text-green-500 px-2.5 py-0.5 rounded-full border border-green-500/20">
                   <ShieldCheck className="w-3.5 h-3.5" /> Enabled
                 </span>
@@ -154,8 +154,7 @@ export default function AccountSettings2FA({ mfaFactors }: AccountSettings2FAPro
                 <span className="inline-flex items-center gap-1 text-xs font-medium bg-amber-500/10 text-amber-500 px-2.5 py-0.5 rounded-full border border-amber-500/20">
                   <ShieldAlert className="w-3.5 h-3.5" /> Disabled
                 </span>
-              )
-            )}
+              )}
           </div>
           <p className="text-xs text-muted-foreground">
             Protect your account with a Time-based One-Time Password (TOTP) from Google Authenticator, Authy, or 1Password.

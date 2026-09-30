@@ -8,7 +8,6 @@ import ApplicantSorters from "@/components/home/applicants/applicantSorters";
 import type { SortOption } from "@/types/home/applicants/applicants";
 import type { ApplicantFilters } from "@/types/home/applicants/applicants";
 import type { ApplicantFilterHeadersProps } from "@/types/home/applicants/applicants";
-import { filterAndSortApplicants } from "@/utils/home/applicants/applicant-filtering";
 
 function ApplicantFilterHeaders({
   applicants,
@@ -32,8 +31,8 @@ function ApplicantFilterHeaders({
     moveTab(filteredApplicants[0]?.application_status ?? "applying");
   };
 
-  const [sortField, setSortField] = useState<string | null>(null);
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+  const [, setSortField] = useState<string | null>(null);
+  const [, setSortDirection] = useState<"asc" | "desc">("desc");
   const [sortOptions, setSortOptions] = useState<SortOption[]>([]);
 
   // Add a new sort option
@@ -61,19 +60,6 @@ function ApplicantFilterHeaders({
   const reorderSorts = useCallback((newSortOptions: SortOption[]) => {
     setSortOptions(newSortOptions);
   }, []);
-
-  // Legacy toggle sort function (for backward compatibility)
-  const toggleSort = useCallback(
-    (field: string) => {
-      if (sortField === field) {
-        setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
-      } else {
-        setSortField(field);
-        setSortDirection("desc");
-      }
-    },
-    [sortField],
-  );
 
   const moveTab = (status: string) => {
     switch (status) {
@@ -132,19 +118,6 @@ function ApplicantFilterHeaders({
     },
   });
 
-  const filteredApplicants = useMemo(
-    () =>
-      filterAndSortApplicants({
-        applicants,
-        filters,
-        sortField,
-        sortDirection,
-        sortOptions,
-        searchTerm,
-      }),
-    [applicants, filters, sortField, sortDirection, sortOptions, searchTerm],
-  );
-
   const activeFilterCount = useMemo(() => {
     let count = 0;
 
@@ -192,13 +165,13 @@ function ApplicantFilterHeaders({
   const uniquePositions = useMemo(() => {
     return [
       ...new Set(
-        applicants?.map((a) => a.display_position).filter(Boolean) || [],
+        applicants.map((a) => a.display_position).filter(Boolean),
       ),
     ];
   }, [applicants]);
 
   const uniqueTechStacks = useMemo(() => {
-    const allTechStacks = applicants?.flatMap((a) => a.tech_stacks ?? []) ?? [];
+    const allTechStacks = applicants.flatMap((a) => a.tech_stacks);
     return [...new Set(allTechStacks)].filter(Boolean);
   }, [applicants]);
 

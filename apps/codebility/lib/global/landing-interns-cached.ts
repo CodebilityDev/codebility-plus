@@ -57,7 +57,7 @@ export async function getLandingInternsPage(
 
   const total = count ?? 0;
   const totalPages = total === 0 ? 0 : Math.ceil(total / limit);
-  const rows = (data ?? []) as LandingInternRow[];
+  const rows = data as LandingInternRow[];
 
   return {
     TEAM_MEMBERS: rows.map((row) => ({

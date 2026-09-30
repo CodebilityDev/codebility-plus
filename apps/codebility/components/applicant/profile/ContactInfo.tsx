@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useState } from "react";
 import Box from "@/components/global/layout/Box";
 import InputField from "@/components/global/layout/InputPhone";
 import { Button } from "@/components/global/ui/button";

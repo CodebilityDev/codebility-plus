@@ -11,15 +11,18 @@ export const TestCountdown = ({
   applicantData,
 }: TestCountdownProps) => {
   const reapplyDate = useMemo(
-    () => getTestDate(new Date(applicantData?.test_taken ?? "") ?? new Date()),
-    [applicantData?.test_taken],
+    () =>
+      getTestDate(
+        applicantData.test_taken ? new Date(applicantData.test_taken) : new Date(),
+      ),
+    [applicantData.test_taken],
   );
 
   const timeLeft = useCountdown(reapplyDate);
 
   return (
     <div className="mb-6">
-      {!timeLeft?.isExpired ? (
+      {!timeLeft.isExpired ? (
         <>
           <p className="mb-2 text-lg font-semibold">
             Time until the deadline to submit your test:

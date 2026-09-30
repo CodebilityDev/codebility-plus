@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import Box from "@/components/global/layout/Box";
 import { Button } from "@/components/global/ui/button";
@@ -54,7 +54,7 @@ const Skills = ({ data, earnedCategories }: SkillsProps) => {
   };
 
   // Check if there are no skills added
-  const hasNoSkills = !data?.tech_stacks || data.tech_stacks.length === 0;
+  const hasNoSkills = !data.tech_stacks || data.tech_stacks.length === 0;
 
   // Show message only if: no skills AND hasn't earned points yet
   const shouldShowMessage = hasNoSkills && !hasPoints;
@@ -92,13 +92,13 @@ const Skills = ({ data, earnedCategories }: SkillsProps) => {
       </div>
 
       <div className="mt-4 flex w-full flex-wrap items-center justify-start gap-2">
-        {stack?.map(
+        {stack.map(
           (item, index) =>
             item && (
               <div key={`${item}-${index}`} className="flex items-center">
                 <Image
                   src={`/assets/svgs/techstack/icon-${
-                    TECH_STACK_MAPPING[item.toLowerCase()] || item.toLowerCase()
+                    TECH_STACK_MAPPING[item.toLowerCase()] ?? item.toLowerCase()
                   }.svg`}
                   alt={`${item} icon`}
                   width={40}

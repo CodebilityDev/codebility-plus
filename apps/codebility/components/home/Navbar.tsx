@@ -63,7 +63,7 @@ const Navbar = () => {
               <div className="from-customViolet-300 to-customBlue-500 relative size-[44px] rounded-full bg-gradient-to-b p-[1.5px]">
                 <Image
                   alt={`${first_name} ${last_name}'s profile picture`}
-                  src={image_url || defaultAvatar}
+                  src={image_url ?? defaultAvatar}
                   fill
                   sizes="44px"
                   className="h-auto w-full rounded-full object-cover"

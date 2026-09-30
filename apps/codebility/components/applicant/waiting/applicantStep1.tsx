@@ -34,7 +34,7 @@ export default function ApplicantStep1({
   return (
     <div className="my-20 flex flex-col items-center gap-8 text-center lg:gap-10">
       <div className="flex flex-col items-center gap-4">
-        {prioRoles.includes(user.display_position) ? (
+        {prioRoles.includes(user.display_position ?? "") ? (
           <p className="mb-2 text-lg md:text-lg lg:text-2xl">
             Click the onboard button to proceed to the next step
           </p>
@@ -45,11 +45,11 @@ export default function ApplicantStep1({
         )}
 
         {/*  */}
-        {prioRoles.includes(user.display_position) ? (
+        {prioRoles.includes(user.display_position ?? "") ? (
           <p className="text-gray mx-auto text-xs md:text-lg lg:max-w-[500px] lg:text-lg">
             {`Hello ${user.first_name}, thank you for applying to Codebility as a
-            ${user.display_position}. We're excited to move forward with
-            your application! As a ${user.display_position}, you are on our
+            ${user.display_position ?? ""}. We're excited to move forward with
+            your application! As a ${user.display_position ?? ""}, you are on our
             priority list and have the privilege to skip the assessment. Please
             click the onboard button to proceed to the next step.`}
           </p>
@@ -63,7 +63,7 @@ export default function ApplicantStep1({
       </div>
 
       <div className="flex gap-4">
-        {prioRoles.includes(user.display_position) ? (
+        {prioRoles.includes(user.display_position ?? "") ? (
           <Button
             className="from-customTeal to-customViolet-100 h-10 w-32 rounded-full bg-gradient-to-r via-customBlue-100 p-0.5 hover:bg-gradient-to-br xl:h-12 xl:w-36"
             onClick={handleOnboard}

@@ -137,7 +137,7 @@ export default function ProposalView({ realProjects, codevProfiles, year }: Prop
     }
 
     const filtered = realProjects.filter(project => {
-      return project.categories?.some((c: any) => c.id === categoryId);
+      return project.categories?.some((c) => c.id === categoryId);
     });
 
     const withImages = filtered.filter(p => p.main_image && p.main_image.trim() !== '');
@@ -222,8 +222,8 @@ export default function ProposalView({ realProjects, codevProfiles, year }: Prop
                     <div className="mb-8">
                       <h3 className="text-xl font-semibold mb-4 text-white">Available Developers & Mentors</h3>
                       <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-3">
-                        {codevProfiles.map((codev: any, idx) => {
-                        const codevName = `${codev.first_name ?? ''} ${codev.last_name ?? ''}`.trim() || 'Developer';
+                        {codevProfiles.map((codev, idx) => {
+                        const codevName = `${codev.first_name} ${codev.last_name}`.trim() || 'Developer';
                         const codevPosition = codev.display_position || codev.positions?.[0] || 'Developer';
                         const codevImage = codev.image_url;
 

@@ -13,7 +13,7 @@ export default async function ProposalPage() {
   return (
     <ProposalView
       realProjects={projectsResult.data ?? []}
-      codevProfiles={codevsResult.data ?? []}
+      codevProfiles={codevsResult.data}
       year={year}
     />
   );

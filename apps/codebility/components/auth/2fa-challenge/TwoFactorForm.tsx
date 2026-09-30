@@ -38,19 +38,19 @@ export default function TwoFactorForm({ factorId }: TwoFactorFormProps) {
 
     try {
       // Standard TOTP Challenge & Verify
-      const { data, error } = await supabase.auth.mfa.challengeAndVerify({
+      const { error } = await supabase.auth.mfa.challengeAndVerify({
         factorId: factorId,
         code: code.trim(),
       });
 
       if (error) {
-        toast.error(error.message ?? "Invalid 2FA code. Please try again.");
+        toast.error(error.message);
         setIsLoading(false);
         return;
       }
 
       toast.success("Identity verified successfully!");
-      const returnTo = searchParams.get("from") || "/home";
+      const returnTo = searchParams.get("from") ?? "/home";
       router.push(returnTo);
     } catch (err: any) {
       toast.error(err?.message ?? "Verification failed");

@@ -23,8 +23,7 @@ const PasswordResetForm = () => {
   const {
     control,
     handleSubmit,
-    reset,
-    formState: { errors },
+      formState: { errors },
   } = useForm<Inputs>({
     resolver: zodResolver(EmailValidation),
     defaultValues: {

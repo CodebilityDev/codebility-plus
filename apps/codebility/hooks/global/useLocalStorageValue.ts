@@ -44,7 +44,7 @@ function readValue<T>(key: string): T | null {
   const raw = readRaw(key);
   const cached = cacheByKey.get(key);
 
-  if (cached && cached.raw === raw) {
+  if (cached?.raw === raw) {
     return cached.value as T | null;
   }
 

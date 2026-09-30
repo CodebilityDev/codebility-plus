@@ -29,7 +29,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     };
     
     const generatedId = React.useId();
-    const inputId = id || generatedId;
+    const inputId = id ?? generatedId;
     const errorId = error ? `${inputId}-error` : undefined;
     const helperTextId = helperText ? `${inputId}-helper` : undefined;
     
@@ -66,7 +66,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           aria-describedby={describedByIds || undefined}
           aria-required={required}
           ref={ref}
-          onKeyDown={isKeyboard ? disableKeyboardInput : () => {}}
+          onKeyDown={isKeyboard ? disableKeyboardInput : () => undefined}
           {...props}
         />
         {error && (

@@ -20,10 +20,10 @@ export async function getOnboardingProgress(applicantId: string) {
 
     // Transform the data into a more usable format
     const progress = {
-      video1: data?.find((v) => v.video_number === 1)?.completed || false,
-      video2: data?.find((v) => v.video_number === 2)?.completed || false,
-      video3: data?.find((v) => v.video_number === 3)?.completed || false,
-      video4: data?.find((v) => v.video_number === 4)?.completed || false,
+      video1: data?.find((v) => v.video_number === 1)?.completed ?? false,
+      video2: data?.find((v) => v.video_number === 2)?.completed ?? false,
+      video3: data?.find((v) => v.video_number === 3)?.completed ?? false,
+      video4: data?.find((v) => v.video_number === 4)?.completed ?? false,
       currentVideo: 1,
     };
 

@@ -19,7 +19,6 @@ import type { PhotoProps } from "@/types/applicant/profile/profile";
 
 const Photo = ({ data, earnedCategories }: PhotoProps) => {
   const [uploadedAvatar, setUploadedAvatar] = useState<string | StaticImageData | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
   const { onOpen } = useModal();
   const hasImagePoints = earnedCategories.some((category) => ["image_url"].includes(category));
 
@@ -113,14 +112,13 @@ const Photo = ({ data, earnedCategories }: PhotoProps) => {
             {avatar === defaultAvatar ? (
               <label htmlFor="image" className="cursor-pointer">
                 <p className="transition duration-300 hover:text-customBlue-100">
-                  {isUploading ? "Uploading..." : "Upload Image"}
+                  "Upload Image"
                 </p>
                 <input
                   id="image"
                   type="file"
                   accept="image/*"
                   onChange={handleUploadAvatar}
-                  disabled={isUploading}
                   className="hidden"
                 />
               </label>
@@ -128,7 +126,6 @@ const Photo = ({ data, earnedCategories }: PhotoProps) => {
               <Button
                 variant="link"
                 onClick={handleDeleteWarning}
-                disabled={isUploading}
                 className="cursor-pointer transition duration-300 hover:text-customBlue-100 hover:no-underline dark:text-white"
               >
                 Remove Image
@@ -140,7 +137,7 @@ const Photo = ({ data, earnedCategories }: PhotoProps) => {
         <UploadPhotoModal
           open={openUploadModal}
           setOpen={setOpenUploadModal}
-          image={croppedAvatar || ""}
+          image={croppedAvatar ?? ""}
           setImage={setCroppedAvatar}
           setAvatar={setUploadedAvatar}
         />

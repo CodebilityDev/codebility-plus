@@ -8,7 +8,6 @@ import type { LandingInternPaginationProps } from "@/types/marketing/marketing";
 
 export default function LandingInternPagination({
   initialData,
-  pageSize = 10,
 }: LandingInternPaginationProps) {
   const router = useRouter();
 

@@ -61,7 +61,7 @@ export async function getCareersJobDepartments(
 
   return [
     ...new Set(
-      (data ?? [])
+      data
         .map((row: { department: string | null }) => row.department)
         .filter((value): value is string => Boolean(value)),
     ),
@@ -112,7 +112,7 @@ export async function getCareersJobListingsPage(
 
   const total = count ?? 0;
   const totalPages = total === 0 ? 0 : Math.ceil(total / limit);
-  const rows = (data ?? []) as JobListingRow[];
+  const rows = data as JobListingRow[];
 
   return {
     jobs: rows.map(mapRow),

@@ -22,7 +22,6 @@ import type { ApplicantProfileColSecProps } from "@/types/home/applicants/applic
 
 export default function ApplicantProfileColSec({
   applicant,
-  row,
 }: ApplicantProfileColSecProps) {
   return (
     <div className="w-full min-w-full">

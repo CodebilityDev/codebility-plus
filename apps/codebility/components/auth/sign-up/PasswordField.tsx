@@ -4,8 +4,18 @@ import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
 import { EyeOff, Eye } from "lucide-react";
 
+import type { PasswordFieldProps } from "@/types/auth/sign-up/sign-up";
+
 // Password field component
-export const PasswordField = ({ label, name, placeholder, register, errors, showPassword, toggleShow }: any) => (
+export const PasswordField = ({
+  label,
+  name,
+  placeholder,
+  register,
+  errors,
+  showPassword,
+  toggleShow,
+}: PasswordFieldProps) => (
   <div className="space-y-1">
     <Label className="text-white text-base font-medium">{label} <span className="text-red-400">*</span></Label>
     <div className="relative">

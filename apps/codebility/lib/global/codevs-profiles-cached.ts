@@ -72,7 +72,7 @@ export async function getCodevsProfilePositions(
 
   const positions = [
     ...new Set(
-      (data ?? [])
+      data
         .map((row: { display_position: string | null }) => row.display_position)
         .filter((value): value is string => Boolean(value)),
     ),
@@ -121,7 +121,7 @@ export async function getCodevsProfilesPage(
 
   const total = count ?? 0;
   const totalPages = total === 0 ? 0 : Math.ceil(total / limit);
-  const rows = (data ?? []) as CodevsProfileRow[];
+  const rows = data as CodevsProfileRow[];
 
   return {
     codevs: rows.map(mapRow),

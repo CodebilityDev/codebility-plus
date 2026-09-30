@@ -141,12 +141,12 @@ export async function proxy(req: NextRequest) {
       .eq("id", user.id)
       .single();
 
-    if (userError || !userData) {
+    if (userError) {
       console.error("Failed to fetch user data:", userError);
       return redirectToLogin(req);
     }
 
-    const { application_status, role_id } = userData || {};
+    const { application_status, role_id } = userData;
 
     // 4. Handle application status redirects
     if (application_status === "passed") {
@@ -205,7 +205,7 @@ export async function proxy(req: NextRequest) {
         .eq("id", role_id)
         .single();
 
-      if (roleError || !rolePermissions) {
+      if (roleError) {
         console.error("Failed to fetch role permissions:", roleError);
         return redirectToLogin(req);
       }

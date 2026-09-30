@@ -5,7 +5,7 @@ import { createClientServerComponent } from "@/lib/global/supabase-server";
 import type { Sidebar, RolePermissions, PermissionKey } from "@/types/home/home";
 
 
-const NO_PERMISSIONS: RolePermissions = { dashboard: false, applicants: false };
+export const NO_PERMISSIONS: RolePermissions = { dashboard: false, applicants: false };
 const INACTIVE_PERMISSIONS: RolePermissions = { dashboard: true, applicants: false };
 
 export const getSidebarData = async (
@@ -26,7 +26,7 @@ export const getSidebarData = async (
       .eq("id", roleId)
       .single();
 
-    if (error || !data) {
+    if (error) {
       console.error("Failed to fetch role permissions:", error);
     }
     rolePermissions = {

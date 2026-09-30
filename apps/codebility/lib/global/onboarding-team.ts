@@ -42,7 +42,7 @@ export async function getTeamData() {
     ? {
         name: `${founderAdmin.first_name} ${founderAdmin.last_name}`.trim(),
         role: "Founder / CEO",
-        image: founderAdmin.image_url || undefined,
+        image: founderAdmin.image_url ?? undefined,
       }
     : {
         name: "CEO Name",
@@ -67,7 +67,7 @@ export async function getTeamData() {
     .map((admin) => ({
       name: `${admin.first_name} ${admin.last_name}`.trim(),
       role: admin.display_position ?? "Admin",
-      image: admin.image_url || undefined,
+      image: admin.image_url ?? undefined,
     }));
 
   // Sort and map mentors
@@ -85,7 +85,7 @@ export async function getTeamData() {
     .map((mentor) => ({
       name: `${mentor.first_name} ${mentor.last_name}`.trim(),
       role: mentor.display_position ?? "Mentor",
-      image: mentor.image_url || undefined,
+      image: mentor.image_url ?? undefined,
     }));
 
   return {

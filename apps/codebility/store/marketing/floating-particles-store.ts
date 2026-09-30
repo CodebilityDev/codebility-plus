@@ -5,7 +5,7 @@ import type { Particle } from "@/types/marketing/marketing";
 let cachedParticles: Particle[] | null = null;
 
 export function subscribeParticles() {
-  return () => {};
+  return () => undefined;
 }
 
 export function getClientParticles(): Particle[] {

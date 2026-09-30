@@ -31,9 +31,9 @@ export async function getRealProjects() {
     }
 
     // Flatten the categories structure - same approach as getPublicProjects
-    const projectsWithCategories = (data ?? []).map((project: any) => ({
+    const projectsWithCategories = data.map((project) => ({
       ...project,
-      categories: project.categories?.map((cat: any) => cat.projects_category).filter(Boolean) || [],
+      categories: project.categories.map((cat) => cat.projects_category).filter(Boolean),
     }));
 
     return { data: projectsWithCategories as RealProject[], error: null };
@@ -76,8 +76,13 @@ export async function getCodevProfiles() {
     }
 
     // Filter for active codevs and mentors
-    const activeCodevs = (data ?? []).filter((c: any) => {
-      const validStatuses = ['GRADUATED', 'TRAINING', 'MENTOR', 'ADMIN'];
+    const activeCodevs = data.filter((c) => {
+      const validStatuses: (string | null)[] = [
+        "GRADUATED",
+        "TRAINING",
+        "MENTOR",
+        "ADMIN",
+      ];
       const isValidStatus = validStatuses.includes(c.internal_status);
 
       return isValidStatus;

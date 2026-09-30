@@ -142,7 +142,7 @@ async function fetchCodevProfile(supabase: SupabaseClient, codevId: string) {
     .eq("id", codevId)
     .single();
 
-  if (error || !data) {
+  if (error) {
     if (error) console.error("Error fetching codev profile data:", error);
     return null;
   }

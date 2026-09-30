@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, forwardRef, useEffect, useRef, useState } from "react";
+import { Suspense, forwardRef, useRef, useState } from "react";
 import { useDynamicImport } from "@/hooks/global/useDynamicImport";
 import Image from "next/image";
 import { zodResolver } from "@hookform/resolvers/zod";

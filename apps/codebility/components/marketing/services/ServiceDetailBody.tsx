@@ -207,7 +207,7 @@ export function ServiceDetailBody({ service }: ServiceDetailBodyProps) {
             </div>
           </div>
 
-          {(teamLead || members.length > 0) && (
+          {(teamLead ?? members.length > 0) && (
             <div
               id="service-detail-team"
               className="rounded-lg bg-gray-50 p-4 dark:bg-gray-800/50 sm:p-6"

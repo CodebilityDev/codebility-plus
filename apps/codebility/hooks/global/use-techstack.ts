@@ -20,8 +20,8 @@ export const useTechStackStore = create<TechStack>((set, get) => ({
         return { stack: [...state.stack, tech] };
       }
     }),
-  clearStack: () => set((state) => ({ stack: [] })),
-  setStack: (i) => set((state) => ({ stack: i })),
+  clearStack: () => set(() => ({ stack: [] })),
+  setStack: (i) => set(() => ({ stack: i })),
   setNonTech: () => {
     get().clearStack();
     set((state) =>

@@ -1,6 +1,6 @@
 import { cacheLife, cacheTag } from "next/cache";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Codev, WorkExperience } from "@/types/global/codev";
+import type { Codev } from "@/types/global/codev";
 import { createClientAnon } from "@/lib/global/supabase-anon";
 import type { ProfileDetailMeta, ProfileDetailRow } from "@/types/marketing/profiles/profiles";
 

@@ -109,7 +109,7 @@ export const ServicesServiceCard = memo(({ service, onSelect }: ServicesServiceC
                 animation: "fadeSlideIn 300ms cubic-bezier(0.4,0,0.2,1) both",
               }}
             >
-              {description || "No description available."}
+              {description ?? "No description available."}
             </span>
           )}
         </div>

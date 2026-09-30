@@ -36,7 +36,7 @@ export const UserMenu = ({handleLogout}: UserMenuProps) => {
         <div className="from-customViolet-300 relative overflow-hidden rounded-full bg-gradient-to-b to-customBlue-500 lg:h-[44px] lg:w-[52px]">
           <Image
             alt="Avatar"
-            src={image_url || defaultAvatar}
+            src={image_url ?? defaultAvatar}
             fill
             sizes="52px"
             title={`${first_name}'s Avatar`}

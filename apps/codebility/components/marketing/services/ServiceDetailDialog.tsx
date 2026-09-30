@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 
 import { Dialog, DialogContent } from "@/components/global/ui/dialog";
-import { parseServicesCategory, servicesHref } from "@/utils/global/services-categories";
+import { servicesHref } from "@/utils/global/services-categories";
 
 export function ServiceDetailDialog({ children }: { children: React.ReactNode }) {
   const router = useRouter();

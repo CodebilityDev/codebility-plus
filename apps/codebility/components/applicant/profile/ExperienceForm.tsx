@@ -61,7 +61,7 @@ export const ExperienceForm = ({
       location: experience.location,
       codev_id: experience.codev_id,
       profile_id: experience.profile_id,
-      is_present: experience.is_present ?? false,
+      is_present: experience.is_present,
     };
 
     try {
@@ -70,7 +70,7 @@ export const ExperienceForm = ({
         const result = await createWorkExperience(
           data,
         );
-        if (result?.[0]) {
+        if (result[0]) {
           experience.id = result[0].id;
         }
         toast.success("Experience added successfully!");
@@ -80,7 +80,7 @@ export const ExperienceForm = ({
       }
       handleEditModePerItem(itemNo, false);
       setEditMode(false);
-    } catch (error) {
+    } catch {
       toast.error("Something went wrong!");
     } finally {
       setIsLoading(false);
@@ -205,7 +205,7 @@ export const ExperienceForm = ({
             <input
               type="checkbox"
               name="is_present"
-              checked={experience.is_present ?? false}
+              checked={experience.is_present}
               onChange={(e) =>
                 handleUpdateExperience(itemNo, e.target.name, e.target.checked)
               }

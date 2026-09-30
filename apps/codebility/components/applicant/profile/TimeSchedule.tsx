@@ -43,7 +43,7 @@ const TimeSchedule = ({ data, codevId }: TimeScheduleProps) => {
     try {
       const [hours, minutes] = timeStr.split(":").map(Number);
       const date = new Date();
-      date.setHours(hours || 9, minutes || 0, 0);
+      date.setHours(hours || 9, minutes ?? 0, 0);
       return {
         date,
         period: (hours || 9) >= 12 ? "PM" : "AM",

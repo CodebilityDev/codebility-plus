@@ -12,7 +12,6 @@ const FeaturesCard: React.FC<FeaturesCardProps> = ({
   imageAlt,
   title,
   description,
-  index = 0,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const x = useMotionValue(0);

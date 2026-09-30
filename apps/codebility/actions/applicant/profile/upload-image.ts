@@ -5,7 +5,7 @@ import { createClientServerComponent } from "@/lib/global/supabase-server";
 import type { UploadImageOptions } from "@/types/applicant/profile/profile";
 
 
-const defaultOptions: UploadImageOptions = {
+const defaultOptions: Required<UploadImageOptions> = {
   bucket: "codebility",
   folder: "profileImage",
   cacheControl: "3600",
@@ -18,7 +18,8 @@ export async function uploadImage(
 ) {
   const supabase = await createClientServerComponent();
   try {
-    const { bucket, folder} = options;
+    const bucket = options.bucket ?? defaultOptions.bucket;
+    const folder = options.folder ?? defaultOptions.folder;
 
     // Generate a cleaner file path
     const fileExtension = file.name.split(".").pop() ?? "";
@@ -26,7 +27,7 @@ export async function uploadImage(
     const filePath = `${folder}/${fileName}`; // Simpler path structure
 
     const { error: uploadError } = await supabase.storage
-      .from(bucket!)
+      .from(bucket)
       .upload(filePath, file, {
         cacheControl: options.cacheControl ?? "3600",
         upsert: options.upsert ?? true,
@@ -35,10 +36,10 @@ export async function uploadImage(
     if (uploadError) throw uploadError;
 
     const { data: publicUrlData } = supabase.storage
-      .from(bucket!)
+      .from(bucket)
       .getPublicUrl(filePath);
 
-    if (!publicUrlData?.publicUrl) {
+    if (!publicUrlData.publicUrl) {
       throw new Error("Failed to get public URL");
     }
 

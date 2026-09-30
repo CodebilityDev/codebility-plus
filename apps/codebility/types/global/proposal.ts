@@ -1,6 +1,21 @@
+import type { Database } from "@/types/global/supabase";
+
+type CodevRow = Database["public"]["Tables"]["codev"]["Row"];
+
+export type ProposalCodev = Pick<
+  CodevRow,
+  | "id"
+  | "first_name"
+  | "last_name"
+  | "display_position"
+  | "positions"
+  | "image_url"
+  | "internal_status"
+>;
+
 export interface ProposalViewProps {
   realProjects: RealProject[];
-  codevProfiles: any[];
+  codevProfiles: ProposalCodev[];
   year: number;
 }
 

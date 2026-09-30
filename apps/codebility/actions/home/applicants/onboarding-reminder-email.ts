@@ -14,7 +14,7 @@ export const sendOnboardingReminder = async ({ email, name }: EmailRecipient) =>
     const discordLink = process.env.NEXT_PUBLIC_DISCORD_LINK;
     const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
 
-    const { data, error } = await resend.emails.send({
+    const { error } = await resend.emails.send({
       from: DEFAULT_EMAIL_CONFIG.from,
       to: email,
       cc: DEFAULT_EMAIL_CONFIG.cc,
@@ -45,7 +45,7 @@ export const sendMultipleOnboardingReminder = async (emails: string[]) => {
     const discordLink = process.env.NEXT_PUBLIC_DISCORD_LINK;
     const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
 
-    const { data, error } = await resend.emails.send({
+    const { error } = await resend.emails.send({
       from: DEFAULT_EMAIL_CONFIG.from,
       bcc: emails,
       cc: DEFAULT_EMAIL_CONFIG.cc,

@@ -115,7 +115,7 @@ export function InternCard({
 
               <div className="flex items-center justify-center">
                 <p className="line-clamp-2 px-1 text-center text-xs leading-tight opacity-70 sm:px-2 sm:text-sm">
-                  {intern.display_position || roleStyles.label}
+                  {intern.display_position ?? roleStyles.label}
                 </p>
               </div>
             </div>

@@ -1,5 +1,4 @@
 import { createClientServerComponent } from "@/lib/global/supabase-server";
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 
@@ -12,7 +11,6 @@ export async function GET(request: Request) {
   const tokenHash = requestUrl.searchParams.get("token_hash");
 
   if (tokenHash) {
-    const cookieStore = await cookies();
     const supabase = await createClientServerComponent();
 
     // Recovery links carry a recovery token, so verify with the "recovery" OTP type.
@@ -33,7 +31,6 @@ export async function GET(request: Request) {
   }
 
   if (code) {
-    const cookieStore = await cookies();
     const supabase = await createClientServerComponent();
 
     try {
@@ -48,7 +45,7 @@ export async function GET(request: Request) {
         throw new Error(`Failed to fetch role ID: ${rolesError.message}`);
       }
 
-      const applicantRoleId = rolesData?.id;
+      const applicantRoleId = rolesData.id;
 
       // Ensure user is fetched from session or some other means
       const {

@@ -75,7 +75,7 @@ async function fetchQualifiedProfiles(
     return null;
   }
 
-  const rows = (data ?? []) as ProfilesListingRow[];
+  const rows = data as ProfilesListingRow[];
   const codevs = rows.map(mapRow);
   const qualified = getQualifiedCodevs(codevs);
   return prioritizeCodevs(qualified);
@@ -159,7 +159,7 @@ async function fetchProfileProjects(codevId: string) {
     .select("project_id")
     .eq("codev_id", codevId);
 
-  if (memberError || !members || members.length === 0) return [];
+  if (memberError || members.length === 0) return [];
 
   const { data: projects, error: projectError } = await supabase
     .from("projects")
@@ -171,7 +171,7 @@ async function fetchProfileProjects(codevId: string) {
 
   if (projectError) return [];
 
-  return (projects ?? []).map((project) => ({
+  return projects.map((project) => ({
     project_id: project.id,
     name: project.name,
     main_image: project.main_image,

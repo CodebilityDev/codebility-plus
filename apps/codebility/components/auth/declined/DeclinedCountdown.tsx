@@ -17,7 +17,7 @@ export const DeclinedCountdown = ({ userData }: DeclinedCountdownProps) => {
 
   return (
     <div className="mb-6">
-      {!timeLeft?.isExpired ? (
+      {!timeLeft.isExpired ? (
         <>
           <p className="mb-2 text-lg font-semibold">
             Time until you can reapply:

@@ -6,13 +6,13 @@ import { cookies } from "next/headers";
 import { ensureSupabaseEnv } from "@/lib/global/supabase-ensure-env";
 
 export const createAdminClient = async () => {
-  ensureSupabaseEnv();
+  const { url, serviceRoleKey } = ensureSupabaseEnv();
 
   const cookieStore = await cookies();
 
   return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.DB_SERVICE_ROLE!,
+    url,
+    serviceRoleKey ?? "",
     {
       cookies: {
         getAll() {
@@ -23,7 +23,7 @@ export const createAdminClient = async () => {
             cookiesToSet.forEach(({ name, value, options }) => {
               cookieStore.set(name, value, options);
             });
-          } catch (error) {
+          } catch {
             // The `set` method was called from a Server Component.
             // This can be ignored if you have a proxy refreshing
             // user sessions.

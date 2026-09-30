@@ -23,15 +23,14 @@ export function PostReadInstructions({
     register,
     handleSubmit,
     setError,
-    watch,
-    formState: { errors, isSubmitting },
+      formState: { errors, isSubmitting },
   } = useForm();
 
   const onSubmit = async (data: any) => {
     setLoading(true);
     try {
       /* if non ui/ux role */
-      if (user?.display_position.includes("UI/UX Designer") === false) {
+      if (user.display_position?.includes("UI/UX Designer") === false) {
         // Validate the fork url
         const urlPattern =
           /^(https?:\/\/)?(www\.)?github\.com\/[a-zA-Z0-9_-]+\/codebility-assessment(\.git)?(\/.*)?$/;
@@ -75,7 +74,7 @@ export function PostReadInstructions({
     <>
       <div className="flex flex-col items-center gap-4">
         <p className="mb-2 text-lg md:text-lg lg:text-2xl">
-          {user?.display_position.includes("UI/UX Designer")
+          {user.display_position?.includes("UI/UX Designer")
             ? "Submit your Figma file link before deadline"
             : "Submit your fork of the repository before deadline"}
         </p>
@@ -91,7 +90,7 @@ export function PostReadInstructions({
               })}
               type="text"
               placeholder={
-                user?.display_position.includes("UI/UX Designer")
+                user.display_position?.includes("UI/UX Designer")
                   ? "Enter your Figma File link"
                   : "Enter your GitHub repository link"
               }
@@ -105,7 +104,7 @@ export function PostReadInstructions({
             )}
 
             <div className="flex flex-col gap-4 *:w-[16rem] sm:flex-row sm:*:w-auto">
-              {user?.display_position.includes("UI/UX Designer") ? (
+              {user.display_position?.includes("UI/UX Designer") ? (
                 <TestQAInstruction applicantData={applicantData}>
                   <Button className="from-customTeal to-customViolet-100h-10 via-customBlue-100 rounded-full bg-gradient-to-r p-0.5 hover:bg-gradient-to-br xl:h-12">
                     <span className="bg-black-100 flex h-full w-full items-center justify-center rounded-full px-4 text-lg text-white lg:text-lg">

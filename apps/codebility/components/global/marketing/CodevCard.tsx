@@ -1,6 +1,5 @@
 "use client";
 
-import type { InternalStatus } from "@/types/global/codev";
 import type React from "react";
 import { useMemo, useState } from "react";
 import Image from "next/image";
@@ -43,7 +42,7 @@ const CodevCard = ({
 
   const internalStatus = codev.internal_status ?? "MENTOR";
   const statusConfig =
-    STATUS_CONFIG[internalStatus] || STATUS_CONFIG.MENTOR;
+    STATUS_CONFIG[internalStatus] ?? STATUS_CONFIG.MENTOR;
 
   const filteredLevel = useMemo(() => {
     return codev.level &&
@@ -55,18 +54,18 @@ const CodevCard = ({
               return (
                 levelValue > 0 &&
                 codev.codev_points!.some(
-                  (point) => point?.skill_category_id === skillCategoryId,
+                  (point) => point.skill_category_id === skillCategoryId,
                 )
               );
             })
             .sort(([skillCategoryIdA], [skillCategoryIdB]) => {
               const pointsA =
                 codev.codev_points!.find(
-                  (point) => point?.skill_category_id === skillCategoryIdA,
+                  (point) => point.skill_category_id === skillCategoryIdA,
                 )?.points ?? 0;
               const pointsB =
                 codev.codev_points!.find(
-                  (point) => point?.skill_category_id === skillCategoryIdB,
+                  (point) => point.skill_category_id === skillCategoryIdB,
                 )?.points ?? 0;
               return pointsB - pointsA;
             }),

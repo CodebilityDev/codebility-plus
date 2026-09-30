@@ -21,7 +21,7 @@ function ApplicantMobileTable<TData extends NewApplicantType>({
     if (forkUrl) return false;
 
     const currentDate = new Date();
-    const testTakenDate = getTestDate(new Date(testTaken || "") || new Date());
+    const testTakenDate = getTestDate(testTaken ? new Date(testTaken) : new Date());
     const difference = testTakenDate.getTime() - currentDate.getTime();
 
     return difference <= 0;
@@ -61,7 +61,7 @@ function ApplicantMobileTable<TData extends NewApplicantType>({
         </TableHeader>
 
         <TableBody>
-          {table.getRowModel().rows?.length ? (
+          {table.getRowModel().rows.length ? (
             table.getRowModel().rows.map((row) => (
               <TableRow
                 key={`${row.id}-${row.index}`}

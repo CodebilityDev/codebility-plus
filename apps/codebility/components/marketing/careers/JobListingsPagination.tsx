@@ -23,7 +23,6 @@ function buildHref(filters: Record<string, string>, page: number): string {
 
 export default function JobListingsPagination({
   initialData,
-  pageSize,
 }: JobListingsPaginationProps) {
   const router = useRouter();
   const [selectedJob, setSelectedJob] = useState<JobListing | null>(null);

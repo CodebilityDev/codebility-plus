@@ -34,7 +34,7 @@ const TechStackModal = () => {
   const filterByCategory = (category: string) => {
     return techstacks.filter(
       (item) =>
-        item.category && item.category.toLowerCase() === category.toLowerCase(),
+        item.category?.toLowerCase() === category.toLowerCase(),
     );
   };
 

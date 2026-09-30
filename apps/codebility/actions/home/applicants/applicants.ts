@@ -573,7 +573,7 @@ export async function updateReminderCountAction(applicantId: string) {
 
         if (!existingApplicant) {
             // Create a new applicant record if it doesn't exist
-            const { data: newApplicant, error: insertError } = await supabase
+            const { error: insertError } = await supabase
                 .from("applicant")
                 .insert({
                     codev_id: applicantId,

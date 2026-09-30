@@ -37,7 +37,7 @@ export const JobStatusForm = ({
       company_name: jobStatus.company_name.trim(),
       employment_type: jobStatus.employment_type,
       work_setup: jobStatus.work_setup,
-      description: jobStatus.description?.trim() || null,
+      description: jobStatus.description?.trim() ?? null,
       status: "active",
       salary_range: jobStatus.salary_range ?? null,
       shift: jobStatus.shift ?? null,
@@ -47,7 +47,7 @@ export const JobStatusForm = ({
       setIsLoading(true);
       if (!jobStatus.id) {
         const result = await createJobStatus(data);
-        if (result?.[0]) {
+        if (result[0]) {
           handleUpdateJobStatus(itemNo, "id", result[0].id);
         }
       } else {
@@ -105,7 +105,7 @@ export const JobStatusForm = ({
           onValueChange={(value) =>
             handleUpdateJobStatus(itemNo, "employment_type", value)
           }
-          value={jobStatus.employment_type ?? ""}
+          value={jobStatus.employment_type}
           disabled={!editModePerItem[itemNo] || isLoading}
         >
           <SelectTrigger>
@@ -145,7 +145,7 @@ export const JobStatusForm = ({
           onValueChange={(value) =>
             handleUpdateJobStatus(itemNo, "work_setup", value)
           }
-          value={jobStatus.work_setup ?? ""}
+          value={jobStatus.work_setup}
           disabled={!editModePerItem[itemNo] || isLoading}
         >
           <SelectTrigger>

@@ -92,7 +92,7 @@ export default function ProfileContent({
       <div className="relative">
         <Image
           alt={`${first_name} Avatar`}
-          src={image_url || "/assets/svgs/icon-codebility-black.svg"}
+          src={image_url ?? "/assets/svgs/icon-codebility-black.svg"}
           width={200}
           height={200}
           className={`${getBgColor(codev.id)} h-[150px] w-[150px] rounded-full object-cover`}
@@ -125,7 +125,7 @@ export default function ProfileContent({
       <div className="relative transition-transform hover:scale-105">
         <Image
           alt={`${first_name} Avatar`}
-          src={image_url || "/assets/svgs/icon-codebility-black.svg"}
+          src={image_url ?? "/assets/svgs/icon-codebility-black.svg"}
           width={200}
           height={200}
           className={`${getBgColor(codev.id)} h-[150px] w-[150px] rounded-full object-cover`}

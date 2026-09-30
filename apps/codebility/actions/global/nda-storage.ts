@@ -48,7 +48,6 @@ async function uploadFileToStorage(
 
     // Generate unique filename with timestamp
     const timestamp = Date.now();
-    const fileExtension = file.name.split(".").pop() ?? "";
     const fileName = `${timestamp}_${file.name}`;
     const filePath = `${folder}/${fileName}`;
 
@@ -68,7 +67,7 @@ async function uploadFileToStorage(
       .from(bucket)
       .getPublicUrl(filePath);
 
-    if (!publicUrlData?.publicUrl) {
+    if (!publicUrlData.publicUrl) {
       throw new Error("Failed to get public URL");
     }
 

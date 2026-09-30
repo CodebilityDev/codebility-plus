@@ -1,6 +1,6 @@
 "use server";
 
-import React, { Suspense } from "react";
+import React from "react";
 import { redirect } from "next/navigation";
 import { getUserData } from "@/actions/global/auth-declined";
 

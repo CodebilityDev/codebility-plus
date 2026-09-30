@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/global/ui/tooltip";
 import type { CodevBadgeProps } from "@/types/global/codev";
 
@@ -83,13 +84,13 @@ export default function CodevBadge({
                       levelNumber={levelNumber}
                     />
                   ) : (
-                    <img
+                    <Image
                       src={badgePath}
                       alt={`${category.name} Level ${levelNumber} Badge`}
                       width={size}
                       height={size}
                       className="object-contain"
-                      onError={(e) => {
+                      onError={() => {
                         // Track which badges have errors
                         setBadgeErrors((prev) => ({
                           ...prev,

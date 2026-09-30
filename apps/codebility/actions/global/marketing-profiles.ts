@@ -15,5 +15,5 @@ export async function getCodev(id: string): Promise<Codev | null> {
 		return null;
 	}
 
-	return data[0] || null;
+	return data[0] ?? null;
 }

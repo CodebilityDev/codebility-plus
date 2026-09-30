@@ -10,7 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { getCodev } from "@/actions/global/marketing-profiles";
 import { toast } from "@/components/global/ui/use-toast";
-import type { Codev } from "@/types/global/codev";
+import { toErrorMessage } from "@/utils/global/feedback";
 import { useAsyncValue } from "@/hooks/global/useAsyncValue";
 import { sentHireCodevEmail } from "@/actions/global/profiles-email";
 import type {HireCodevEmail} from "@/types/global/hire-codev-email";
@@ -35,16 +35,6 @@ export function CodevHireCodevModal() {
 	const onSubmit = async (values: HireCodevEmail) => {
 		try {
 			// Prepare template parameters
-			const templateParams = {
-				from_name: values.name,
-				from_email: values.email,
-				message: values.message,
-				codev_id: codevId,
-				codev_first_name: codev?.first_name,
-				codev_last_name: codev?.last_name,
-				codev_display_position: codev?.display_position,
-			};
-
 			const response = await sentHireCodevEmail({
 				name: values.name,
 				email: values.email,
@@ -65,10 +55,13 @@ export function CodevHireCodevModal() {
 			form.reset();
 			handleClose();
 
-		} catch (error: any) {
+		} catch (error) {
 			toast({
 				title: "Email failed to send",
-				description: error?.text ?? "An error occurred while sending the email.",
+				description: toErrorMessage(
+					error,
+					"An error occurred while sending the email.",
+				),
 				variant: "destructive",
 			});
 		}

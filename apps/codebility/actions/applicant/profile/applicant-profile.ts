@@ -415,5 +415,5 @@ export const getPositions = async (): Promise<{
     return { error, data: null };
   }
 
-  return { error: null, data: data || null };
+  return { error: null, data };
 };

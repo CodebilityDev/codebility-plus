@@ -54,7 +54,7 @@ const ContactUsModal = () => {
       // await axios.post(`${API.USERS}/contact-us`, newMessage);
 
       handleReset();
-    } catch (error) {
+    } catch {
       // handle error
     }
   };

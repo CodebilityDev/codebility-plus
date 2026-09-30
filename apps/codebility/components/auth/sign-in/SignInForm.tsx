@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 import type { z } from "zod";
 
 import { resendVerificationEmail, signinUser } from "@/actions/global/auth-session";
+import { toErrorMessage } from "@/utils/global/feedback";
 import SignInInputs from "@/components/auth/sign-in/SignInInput";
 import type { Inputs } from "@/types/auth/sign-in/sign-in";
 
@@ -57,12 +58,13 @@ const SignInForm = () => {
           router.replace(response.redirectTo);
         }, 500);
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("Sign in error:", error);
+      const message = toErrorMessage(error, "");
 
       if (
-        error.message?.includes("verify your email") ||
-        error.message?.includes("Email not confirmed")
+        message.includes("verify your email") ||
+        message.includes("Email not confirmed")
       ) {
         toast.error("Please verify your email first");
 
@@ -83,8 +85,8 @@ const SignInForm = () => {
 
         router.push("/auth/verify");
       } else if (
-        error.message?.includes("Invalid login credentials") ||
-        error.message?.includes("Account not found")
+        message.includes("Invalid login credentials") ||
+        message.includes("Account not found")
       ) {
         toast.error("Invalid email or password");
       } else {

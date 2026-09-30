@@ -11,7 +11,6 @@ function buildHref(
   pathname: string,
   position: string,
   page: number,
-  pageSize: number,
 ): string {
   const params = new URLSearchParams();
   if (position) params.set("position", position);
@@ -23,7 +22,6 @@ function buildHref(
 
 export default function ProfilesListPagination({
   initialData,
-  pageSize,
   skillCategories,
 }: ProfilesListPaginationProps) {
   const router = useRouter();
@@ -37,7 +35,7 @@ export default function ProfilesListPagination({
       <CodevListFilter
         selectedPosition={position}
         setSelectedPosition={(next) => {
-          router.push(buildHref(pathname, next, 1, pageSize), { scroll: false });
+          router.push(buildHref(pathname, next, 1), { scroll: false });
         }}
         users={initialData.codevs}
         positions={initialData.positions}
@@ -49,7 +47,7 @@ export default function ProfilesListPagination({
         page={page}
         totalPages={Math.max(0, pagination.totalPages)}
         onPageChange={(next) => {
-          router.push(buildHref(pathname, position, next, pageSize), { scroll: false });
+          router.push(buildHref(pathname, position, next), { scroll: false });
         }}
       />
     </div>

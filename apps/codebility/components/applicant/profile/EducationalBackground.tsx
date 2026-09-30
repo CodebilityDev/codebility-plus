@@ -15,7 +15,7 @@ import { EducationForm } from "@/components/applicant/profile/EducationForm";
 import type { EducationProps, EditModePerItem } from "@/types/applicant/profile/profile";
 
 
-const EducationalBackground = ({ data, codevId, earnedCategories }: EducationProps) => {
+const EducationalBackground = ({ data, earnedCategories }: EducationProps) => {
   const [educationData, setEducationData] = useState<Education[]>(data);
   const [isLoadingMain, setIsLoadingMain] = useState(false);
   const editModePerItem = useRef<EditModePerItem>({});
@@ -46,7 +46,7 @@ const EducationalBackground = ({ data, codevId, earnedCategories }: EducationPro
 
       editModePerItem.current[itemNo] = false;
       toast.success("Education deleted successfully");
-    } catch (error) {
+    } catch {
       toast.error("Something went wrong while deleting");
     } finally {
       setIsLoadingMain(false);
@@ -131,7 +131,7 @@ const EducationalBackground = ({ data, codevId, earnedCategories }: EducationPro
         Add Education
       </Button>
 
-      {educationData?.map((item, index) => (
+      {educationData.map((item, index) => (
         <EducationForm
           key={item.id || index}
           handleUpdateEducation={handleUpdateEducation}

@@ -1,6 +1,5 @@
-import React from 'react';
 
-export const TextTemplate = ({ from_name, from_email, message, codev_id, codev_first_name, codev_last_name, codev_display_position }) => {
+export const TextTemplate = ({ from_name, from_email, message, codev_first_name, codev_last_name, codev_display_position }) => {
 	return (
 		`
 		New Message from ${from_name}
@@ -19,7 +18,7 @@ export const TextTemplate = ({ from_name, from_email, message, codev_id, codev_f
 	)
 }
 
-export const HTMLTemplate = ({ from_name, from_email, message, codev_id, codev_first_name, codev_last_name, codev_display_position }) => {
+export const HTMLTemplate = ({ from_name, from_email, message, codev_first_name, codev_last_name, codev_display_position }) => {
 	return (
 		`
     <!DOCTYPE html>

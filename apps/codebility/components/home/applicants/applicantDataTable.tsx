@@ -23,7 +23,7 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [rowSelection, setRowSelection] = React.useState({});
-  const [columnVisibility, setColumnVisibility] =
+  const [, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
@@ -85,7 +85,7 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
       const currentDate = new Date();
 
       const testTakenDate = getTestDate(
-        new Date(testTaken || "") || new Date(),
+        testTaken ? new Date(testTaken) : new Date(),
       );
 
       const difference = testTakenDate.getTime() - currentDate.getTime();
@@ -188,7 +188,7 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={`${row.id}-${row.index}`}

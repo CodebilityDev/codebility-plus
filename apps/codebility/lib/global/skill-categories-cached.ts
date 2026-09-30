@@ -18,8 +18,8 @@ export async function getSkillCategories(): Promise<CodevBadgeSkillCategory[]> {
     return [];
   }
 
-  return (data ?? []).map((category) => ({
+  return data.map((category) => ({
     ...category,
-    badge_prefix: getBadgePrefix(category.name ?? ""),
+    badge_prefix: getBadgePrefix(category.name),
   }));
 }

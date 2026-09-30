@@ -64,14 +64,18 @@ const LeftSidebarClient = () => {
                   className="flex items-center gap-2"
                 >
                   <div>
-                    <img
+                    <Image
                       src="/assets/svgs/codebility-black.svg"
                       alt="Codebility Logo"
+                      width={32}
+                      height={32}
                       className="h-8 w-auto dark:hidden"
                     />
-                    <img
+                    <Image
                       src="/assets/svgs/codebility-white.svg"
                       alt="Codebility Logo"
+                      width={32}
+                      height={32}
                       className="hidden h-8 w-auto dark:block"
                     />
                   </div>

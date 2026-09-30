@@ -194,7 +194,7 @@ const DEBT_RULES = [
 /** @type {import('typescript-eslint').Config} */
 export default [
   {
-    ignores: [".next/**", "public/**", "scripts/**"],
+    ignores: [".next/**", "public/**/*.js", "public/**/*.svg", "scripts/**"],
   },
   ...baseConfig,
   ...reactConfig,

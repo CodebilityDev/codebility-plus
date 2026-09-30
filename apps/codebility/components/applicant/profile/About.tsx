@@ -65,8 +65,6 @@ const About = ({ data, earnedCategories }: AboutProps) => {
   };
 
   // Show message only if: field is empty OR (field has content but no points earned yet)
-  const shouldShowMessage = !currentAboutValue || (!hasAboutPoints && currentAboutValue);
-
   return (
     <Box className="bg-light-900 dark:bg-dark-100 relative flex flex-col gap-2">
       <div className="flex items-center justify-between">

@@ -18,7 +18,6 @@ function buildHref(pathname: string, position: string, page: number): string {
 
 export default function CodevsProfilesPagination({
   initialData,
-  pageSize,
   skillCategories,
 }: CodevsProfilesPaginationProps) {
   const router = useRouter();

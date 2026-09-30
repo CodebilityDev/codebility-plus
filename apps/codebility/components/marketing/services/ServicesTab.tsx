@@ -6,11 +6,8 @@ import Container from "@/components/global/marketing/MarketingContainer";
 import Section from "@/components/global/marketing/MarketingSection";
 
 import { SERVICES_CATEGORY_TABS } from "@/constants/global/services-categories";
-import type { ServicesCategorySlug } from "@/types/global/constants";
 import { servicesHref } from "@/utils/global/services-categories";
-import { resolveSkeletonCount } from "@/utils/marketing/services/services";
 
-import { ServicesGridSkeleton } from "@/components/marketing/services/ServicesGridSkeleton";
 import { ServicesPaginationSlot } from "@/components/marketing/services/ServicesPaginationSlot";
 import { ServicesProjectsGrid } from "@/components/marketing/services/ServicesProjectsGrid";
 
@@ -19,15 +16,13 @@ import type { ServicesTabProps } from "@/types/marketing/services/services";
 export const ServicesTab = ({
   initialData,
   category,
-  pageSize,
 }: ServicesTabProps) => {
   const router = useRouter();
 
   const { pagination } = initialData;
   const page = pagination.page;
   const totalPages = Math.max(1, pagination.totalPages);
-  const skeletonCount = resolveSkeletonCount(page, pageSize, pagination.total);
-
+  
   const openService = (service: { id: string }) => {
     router.replace(
       servicesHref({ category, project: service.id }),
@@ -48,7 +43,7 @@ export const ServicesTab = ({
               return (
                 <Link
                   key={tab.slug}
-                  href={servicesHref({ category: tab.slug as ServicesCategorySlug })}
+                  href={servicesHref({ category: tab.slug })}
                   scroll={false}
                   className={`rounded-xl px-2.5 py-1 text-xs font-semibold transition-all duration-200 sm:px-5 sm:py-2.5 sm:text-base ${
                     isActive

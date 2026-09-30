@@ -130,7 +130,7 @@ export default function VideoPlayer({
             onReady: () => {
               if (cancelled) return;
               setIsBuffering(false);
-              const total = playerRef.current?.getDuration() || 0;
+              const total = playerRef.current?.getDuration() ?? 0;
               if (total > 0) setDuration(total);
             },
             onStateChange: (event) => {

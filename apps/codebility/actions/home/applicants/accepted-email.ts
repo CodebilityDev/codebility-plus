@@ -12,7 +12,7 @@ export const sendAcceptedEmail = async ({ email, name }: EmailRecipient) => {
   try {
     const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
 
-    const { data, error } = await resend.emails.send({
+    const { error } = await resend.emails.send({
       from: DEFAULT_EMAIL_CONFIG.from,
       to: email,
       cc: DEFAULT_EMAIL_CONFIG.cc,

@@ -44,7 +44,7 @@ export async function getCodevsFeaturedProjects(
     return null;
   }
 
-  const rows = (data ?? []) as ProjectRow[];
+  const rows = data as ProjectRow[];
   const slides = rows.map((project) =>
     resolveProjectImageUrl(project.main_image),
   );

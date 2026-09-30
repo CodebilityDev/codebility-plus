@@ -135,8 +135,8 @@ export function filterAndSortApplicants({
 
         switch (sortOption.field) {
           case "name":
-            valueA = `${a.first_name ?? ""} ${a.last_name ?? ""}`.toLowerCase();
-            valueB = `${b.first_name ?? ""} ${b.last_name ?? ""}`.toLowerCase();
+            valueA = `${a.first_name} ${a.last_name}`.toLowerCase();
+            valueB = `${b.first_name} ${b.last_name}`.toLowerCase();
             break;
           case "position":
             valueA = (a.display_position ?? "").toLowerCase();
@@ -191,8 +191,8 @@ export function filterAndSortApplicants({
 
       switch (sortField) {
         case "name":
-          valueA = `${a.first_name ?? ""} ${a.last_name ?? ""}`.toLowerCase();
-          valueB = `${b.first_name ?? ""} ${b.last_name ?? ""}`.toLowerCase();
+          valueA = `${a.first_name} ${a.last_name}`.toLowerCase();
+          valueB = `${b.first_name} ${b.last_name}`.toLowerCase();
           break;
         case "position":
           valueA = (a.display_position ?? "").toLowerCase();

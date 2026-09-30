@@ -25,7 +25,11 @@ import TechStackModal from "@/components/global/modals/TechStackModal";
 import PrivacyPolicyModal from "@/components/global/modals/PrivacyPolicyModal";
 import { PasswordField } from "@/components/auth/sign-up/PasswordField";
 import { POSITIONS } from "@/constants/auth/sign-up/sign-up";
-import type { SignupFormData, FormFieldProps } from "@/types/auth/sign-up/sign-up";
+import type {
+  SignupFormData,
+  FormFieldProps,
+  NdaSignedPayload,
+} from "@/types/auth/sign-up/sign-up";
 import { SignupFormSchema } from "@/utils/auth/sign-up/sign-up";
 
 const FormField = ({ label, name, type = "text", placeholder, register, errors, required, className }: FormFieldProps) => (
@@ -37,7 +41,7 @@ const FormField = ({ label, name, type = "text", placeholder, register, errors, 
       type={type}
       {...register(name)}
       placeholder={placeholder}
-      className={`bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 h-12 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 backdrop-blur-sm ${className || ""}`}
+      className={`bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 h-12 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 backdrop-blur-sm ${className ?? ""}`}
     />
     {errors[name] && (
       <p className="text-sm text-red-400">{errors[name].message}</p>
@@ -101,14 +105,18 @@ export default function SignUpForm() {
 
     // Listen for NDA signing completion
     const handleMessage = (event: MessageEvent) => {
-      if (event.data?.type === "NDA_SIGNED" && event.data?.signed === true) {
+      if (event.origin !== window.location.origin) return;
+
+      const payload = event.data as NdaSignedPayload | undefined;
+
+      if (payload?.type === "NDA_SIGNED" && payload.signed === true) {
         // Store NDA data temporarily in localStorage
-        if (event.data.signatureDataUrl && event.data.documentDataUrl) {
-          localStorage.setItem("ndaSignature", event.data.signatureDataUrl);
-          localStorage.setItem("ndaDocument", event.data.documentDataUrl);
+        if (payload.signatureDataUrl && payload.documentDataUrl) {
+          localStorage.setItem("ndaSignature", payload.signatureDataUrl);
+          localStorage.setItem("ndaDocument", payload.documentDataUrl);
           setNdaData({
-            signature: event.data.signatureDataUrl,
-            document: event.data.documentDataUrl
+            signature: payload.signatureDataUrl,
+            document: payload.documentDataUrl
           });
         }
         setNdaSigned(true);
@@ -172,7 +180,7 @@ export default function SignUpForm() {
 
       // Complex fields
       formData.append("positions", JSON.stringify(selectedPositions));
-      formData.append("tech_stacks", JSON.stringify(stack ?? []));
+      formData.append("tech_stacks", JSON.stringify(stack));
 
       if (profileImage) {
         formData.append("profileImage", profileImage);
@@ -386,7 +394,7 @@ export default function SignUpForm() {
                   <Label className="text-white text-base font-medium">Positions <span className="text-red-400">*</span></Label>
                   <div className="relative">
                     <select
-                      value={selectedPositions[0]?.id?.toString() || ""}
+                      value={selectedPositions[0]?.id?.toString() ?? ""}
                       onChange={(e) => {
                         const position = POSITIONS.find(p => p.id === parseInt(e.target.value));
                         if (position) {
@@ -448,7 +456,7 @@ export default function SignUpForm() {
                     }`}
                     onClick={() => onOpen("techStackModal")}
                   >
-                    {stack && stack.includes("none")
+                    {stack?.includes("none")
                       ? "Non-tech role"
                       : stack && stack.length > 0
                         ? `${stack.length} tech stack${stack.length > 1 ? "s" : ""} selected`

@@ -15,7 +15,7 @@ import { ExperienceForm } from "@/components/applicant/profile/ExperienceForm";
 import type { ExperienceProps, EditModePerItem } from "@/types/applicant/profile/profile";
 
 
-const Experience = ({ data, codevId, earnedCategories }: ExperienceProps) => {
+const Experience = ({ data, earnedCategories }: ExperienceProps) => {
   const [experienceData, setExperienceData] = useState<WorkExperience[]>(data);
   const [isLoadingMain, setIsLoadingMain] = useState(false);
   const editModePerItem = useRef<EditModePerItem>({});
@@ -46,7 +46,7 @@ const Experience = ({ data, codevId, earnedCategories }: ExperienceProps) => {
 
       editModePerItem.current[itemNo] = false;
       toast.success("Work Experience deleted successfully");
-    } catch (error) {
+    } catch {
       toast.error("Something went wrong while deleting");
     } finally {
       setIsLoadingMain(false);
@@ -61,8 +61,7 @@ const Experience = ({ data, codevId, earnedCategories }: ExperienceProps) => {
   );
 
   const canAddNew = useCallback(() => {
-    const experienceLast = experienceData[experienceData.length - 1];
-    const hasEditMode = Object.values(editModePerItem.current).some(
+      const hasEditMode = Object.values(editModePerItem.current).some(
       (value) => value,
     );
 
@@ -129,7 +128,7 @@ const Experience = ({ data, codevId, earnedCategories }: ExperienceProps) => {
         Add Experience
       </Button>
 
-      {experienceData?.map((item, index) => (
+      {experienceData.map((item, index) => (
         <ExperienceForm
           key={item.id || index}
           handleUpdateExperience={handleUpdateExperience}

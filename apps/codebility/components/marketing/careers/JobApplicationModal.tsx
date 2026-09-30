@@ -33,8 +33,7 @@ export default function JobApplicationModal({
     handleSubmit,
     formState: { errors },
     reset,
-    setValue,
-  } = useForm<ApplicationFormData>({
+    } = useForm<ApplicationFormData>({
     resolver: zodResolver(applicationSchema),
   });
 

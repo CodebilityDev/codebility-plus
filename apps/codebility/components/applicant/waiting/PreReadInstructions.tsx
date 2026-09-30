@@ -34,7 +34,7 @@ export function PreReadInstructions({
       </div>
 
       <div className="flex gap-4">
-        {user?.display_position.includes("UI/UX Designer") ? (
+        {user.display_position?.includes("UI/UX Designer") ? (
           <TestQAInstruction applicantData={applicantData}>
             <Button
               className="from-customTeal to-customViolet-100 via-customBlue-100 h-10 rounded-full bg-gradient-to-r p-0.5 hover:bg-gradient-to-br xl:h-12"

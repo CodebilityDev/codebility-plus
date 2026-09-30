@@ -30,7 +30,7 @@ export function PostSubmitted({
     setLoading(true);
     try {
       /* if non ui/ux role */
-      if (user?.display_position.includes("UI/UX Designer") === false) {
+      if (user.display_position?.includes("UI/UX Designer") === false) {
         // Validate the fork url
         const urlPattern =
           /^(https?:\/\/)?(www\.)?github\.com\/[a-zA-Z0-9_-]+\/codebility-assessment(\.git)?(\/.*)?$/;
@@ -91,7 +91,7 @@ export function PostSubmitted({
               })}
               type="text"
               placeholder={
-                user?.display_position.includes("UI/UX Designer")
+                user.display_position?.includes("UI/UX Designer")
                   ? "Update your Figma File link"
                   : "Update your GitHub repository link"
               }
@@ -106,7 +106,7 @@ export function PostSubmitted({
             )}
 
             <div className="flex gap-4">
-              {user?.display_position.includes("UI/UX Designer") ? (
+              {user.display_position?.includes("UI/UX Designer") ? (
                 <TestQAInstruction applicantData={applicantData}>
                   <Button className="from-customTeal to-customViolet-100h-10 via-customBlue-100 rounded-full bg-gradient-to-r p-0.5 hover:bg-gradient-to-br xl:h-12">
                     <span className="bg-black-100 flex h-full w-full items-center justify-center rounded-full px-4 text-lg text-white lg:text-lg">

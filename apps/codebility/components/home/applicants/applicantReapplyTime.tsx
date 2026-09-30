@@ -9,14 +9,13 @@ import type { ApplicantReapplyTimeProps } from "@/types/home/applicants/applican
 
 export default function ApplicantReapplyTime({
   applicant,
-  isMobile,
 }: ApplicantReapplyTimeProps) {
   const reapplyDate = useMemo(
     () =>
-      applicant?.date_applied
+      applicant.date_applied
         ? getReApplyDate(new Date(applicant.date_applied))
         : new Date(),
-    [applicant?.date_applied],
+    [applicant.date_applied],
   );
 
   const timeLeft = useDeferredCountdown(reapplyDate);

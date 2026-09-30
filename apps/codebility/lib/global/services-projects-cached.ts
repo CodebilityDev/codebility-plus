@@ -137,7 +137,7 @@ export async function getServicesProjectsPage(
 
   const total = count ?? 0;
   const totalPages = total === 0 ? 0 : Math.ceil(total / limit);
-  const rows = (data ?? []) as unknown as ListRow[];
+  const rows = data as unknown as ListRow[];
 
   return {
     projects: rows.map(mapCard),
@@ -207,7 +207,7 @@ export async function getServicesProjectById(
         codevError,
       );
     } else {
-      for (const codev of codevs ?? []) {
+      for (const codev of codevs) {
         codevMap.set(codev.id, codev);
       }
     }

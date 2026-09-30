@@ -45,7 +45,7 @@ export default function ApplicationSteps({
       return 2;
     } else if (user.application_status === "testing") {
       return 1;
-    } else if (!applicantData?.test_taken) {
+    } else if (!applicantData.test_taken) {
       return 0;
     } else {
       return 0;

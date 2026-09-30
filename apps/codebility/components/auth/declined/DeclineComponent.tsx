@@ -1,6 +1,5 @@
 "use server";
 
-import { Suspense } from "react";
 import Logo from "@/components/global/layout/Logo";
 
 import { getUserData } from "@/actions/global/auth-declined";
@@ -10,7 +9,9 @@ import { DeclinedCountdown } from "@/components/auth/declined/DeclinedCountdown"
 
 export default async function DeclinedComponent() {
   const user = await getUserData();
-  const canReapply = getCanReApply(user?.date_applied);
+  const canReapply = getCanReApply(
+    user?.date_applied ? new Date(user.date_applied) : null,
+  );
 
   if (!user) {
     return (

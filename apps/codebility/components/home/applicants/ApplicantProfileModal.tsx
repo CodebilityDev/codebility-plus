@@ -85,7 +85,7 @@ const ApplicantProfileModal = () => {
 
                 <div className="flex flex-wrap items-center gap-2">
                   <div className={`inline-flex rounded px-2 py-1 text-xs text-white ${getStatusColor(selectedApplicant.application_status)}`}>
-                    {selectedApplicant.application_status?.toUpperCase() || "UNKNOWN"}
+                    {selectedApplicant.application_status.toUpperCase()}
                   </div>
                   <span className="text-sm text-gray-600 dark:text-gray-400">
                     {selectedApplicant.years_of_experience} years experience
@@ -185,7 +185,7 @@ const ApplicantProfileModal = () => {
                 <div className="rounded-lg border p-4">
                   <h4 className="font-medium">Application Status</h4>
                   <div className={`inline-flex rounded px-3 py-1 text-sm text-white ${getStatusColor(selectedApplicant.application_status)}`}>
-                    {selectedApplicant.application_status?.toUpperCase()}
+                    {selectedApplicant.application_status.toUpperCase()}
                   </div>
                   {selectedApplicant.date_applied && (
                     <p className="mt-2 text-sm text-gray-500">

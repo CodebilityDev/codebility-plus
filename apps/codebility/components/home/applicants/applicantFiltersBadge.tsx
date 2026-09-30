@@ -9,7 +9,6 @@ import type { ApplicantFiltersBadgeProps } from "@/types/home/applicants/applica
 
 export default function ApplicantFiltersBadge({
   filters,
-  setFilter,
   onFilterChange,
 }: ApplicantFiltersBadgeProps) {
   // Update a specific filter

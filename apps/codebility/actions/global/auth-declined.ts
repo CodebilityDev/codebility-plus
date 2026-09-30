@@ -1,56 +1,68 @@
 "use server";
 
-import { createClientServerComponent } from "@/lib/global/supabase-server";
 import { redirect } from "next/navigation";
 
-export async function getUserData(): Promise<any> {
-    try {
-        const supabase = await createClientServerComponent();
+import { createClientServerComponent } from "@/lib/global/supabase-server";
+import type { WaitingUser } from "@/types/global/waiting-user";
 
-        // FIXED: Use getUser() instead of getSession()
-        const { data: { user }, error: authError } = await supabase.auth.getUser();
-        
-        if (authError || !user) {
-            redirect("/auth/sign-in");
-        }
+export async function getUserData(): Promise<WaitingUser | null> {
+  const supabase = await createClientServerComponent();
 
-        const { data } = await supabase
-            .from("codev")
-            .select(`*,
-                    applicant (*)
-                `)
-            .eq("id", user.id)
-            .single();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
 
-        if (!data) {
-            redirect("/auth/sign-in");
-        }
+  if (authError || !user) {
+    redirect("/auth/sign-in");
+  }
 
-        return data;
-    } catch (error) {
-        console.error("Error fetching user data:", error);
-    }
+  const { data } = await supabase
+    .from("codev")
+    .select(
+      "id, first_name, display_position, application_status, rejected_count, date_applied, applicant(id, codev_id, test_taken, fork_url, joined_discord, joined_messenger, created_at, updated_at)",
+    )
+    .eq("id", user.id)
+    .single();
+
+  if (!data) {
+    redirect("/auth/sign-in");
+  }
+
+  return data;
 }
 
-export async function reApplyAction({ user }: { user: any }) {
-    try {
-        const supabase = await createClientServerComponent();
+export async function reApplyAction() {
+  const supabase = await createClientServerComponent();
 
-        const { error } = await supabase
-            .from("codev")
-            .update({
-                application_status: "applying",
-                rejected_count: (user.rejected_count ?? 0) + 1,
-                updated_at: new Date().toISOString(),
-                date_applied: new Date().toISOString(),
-            })
-            .eq("id", user.id);
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-        if (error) throw error;
+  if (!user) {
+    redirect("/auth/sign-in");
+  }
 
-        redirect("/auth/waiting");
-    } catch (error) {
-        console.error("Error reapplying:", error);
-        throw error;
-    }
+  const { data: current } = await supabase
+    .from("codev")
+    .select("rejected_count")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  const { error } = await supabase
+    .from("codev")
+    .update({
+      application_status: "applying",
+      rejected_count: (current?.rejected_count ?? 0) + 1,
+      updated_at: new Date().toISOString(),
+      date_applied: new Date().toISOString(),
+    })
+    .eq("id", user.id);
+
+  if (error) {
+    console.error("Error reapplying:", error);
+    throw error;
+  }
+
+  redirect("/auth/waiting");
 }

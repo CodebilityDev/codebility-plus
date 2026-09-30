@@ -41,7 +41,7 @@ const JobStatuses = ({ data }: JobStatusProps) => {
       const updatedStatuses = jobStatusData.filter((_, id) => id !== itemNo);
       setJobStatusData(updatedStatuses);
       toast.success("Job Status deleted successfully");
-    } catch (error) {
+    } catch {
       toast.error("Something went wrong while deleting");
     } finally {
       setIsLoadingMain(false);

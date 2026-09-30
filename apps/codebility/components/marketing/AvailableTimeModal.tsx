@@ -23,9 +23,9 @@ const AvailableTimeModal = () => {
 
   function convertTo24HourFormat(time12: string): string {
     const [time, period]: string[] = time12.split(" ");
-    const [hours, minutes]: string[] = (time || "").split(":");
+    const [hours, minutes]: string[] = (time ?? "").split(":");
 
-    let hours24: number = parseInt(hours || "", 10);
+    let hours24: number = parseInt(hours ?? "", 10);
 
     if (period === "PM" && hours24 !== 12) {
       hours24 += 12;

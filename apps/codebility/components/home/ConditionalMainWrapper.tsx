@@ -8,7 +8,7 @@ import type { ConditionalMainWrapperProps } from "@/types/home/home";
 
 export default function ConditionalMainWrapper({ children }: ConditionalMainWrapperProps) {
   const pathname = usePathname();
-  const { isToggleOpen } = useNavStore();
+  useNavStore();
   
   // Check if current route is kanban
   const isKanbanRoute = pathname.includes("/kanban");

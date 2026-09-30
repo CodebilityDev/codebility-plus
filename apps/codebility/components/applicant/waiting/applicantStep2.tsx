@@ -14,7 +14,6 @@ import { PreReadInstructions } from "@/components/applicant/waiting/PreReadInstr
 import type { ApplicantStep2Props } from "@/types/applicant/waiting/waiting";
 
 export default function ApplicantStep2({
-  setActiveStep,
   user,
   applicantData,
 }: ApplicantStep2Props) {

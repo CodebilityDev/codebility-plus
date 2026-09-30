@@ -12,7 +12,7 @@ export default function Quiz({ applicantId, onQuizComplete, onBackToVideos }: Qu
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, number>>({});
   const [showResults, setShowResults] = useState(false);
   const [score, setScore] = useState(0);
-  const [isSaving, setIsSaving] = useState(false);
+  const [, setIsSaving] = useState(false);
 
   const currentQuestion = quizQuestions[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === quizQuestions.length - 1;

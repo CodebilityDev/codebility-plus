@@ -5,8 +5,8 @@ import type { Database } from "@/types/global/supabase";
 
 type CodevInsert = Database["public"]["Tables"]["codev"]["Insert"];
 import { createClientServerComponent } from "@/lib/global/supabase-server";
-import { checkRateLimit, recordRateLimitAttempt, resetRateLimit } from "@/utils/global/rate-limiter";
-import { uploadNdaToStorage, updateCodevNdaUrls } from "@/actions/global/nda-storage";
+import { uploadNdaToStorage } from "@/actions/global/nda-storage";
+import { toErrorMessage } from "@/utils/global/feedback";
 
 const uploadProfileImage = async (
   file: File,
@@ -27,7 +27,7 @@ const uploadProfileImage = async (
 
     const supabase = await createClientServerComponent();
 
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from(bucketName)
       .upload(`${folderName}/${filename}`, buffer, {
         contentType: file.type,
@@ -42,7 +42,7 @@ const uploadProfileImage = async (
       .from(bucketName)
       .getPublicUrl(`${folderName}/${filename}`);
 
-    return publicUrlData.publicUrl ?? null;
+    return publicUrlData.publicUrl;
   } catch (error) {
     console.error("Error during upload:", error);
     throw error;
@@ -86,12 +86,13 @@ export const signupUser = async (formData: FormData) => {
     const email_address = rawEmail.toLowerCase();
     const password = formData.get("password") as string;
     const username = formData.get("username") as string;
-    const tech_stacks = JSON.parse(formData.get("tech_stacks") as string) || [];
-    const positions: { id: number; name: string }[] =
-      (JSON.parse(formData.get("positions") as string) as {
-        id: number;
-        name: string;
-      }[]) || [];
+    const tech_stacks = JSON.parse(formData.get("tech_stacks") as string) as string[];
+    const positions: { id: number; name: string }[] = JSON.parse(
+      formData.get("positions") as string,
+    ) as {
+      id: number;
+      name: string;
+    }[];
     const formattedPositions: string[] = positions.map((item) =>
       JSON.stringify(item),
     );
@@ -224,10 +225,10 @@ export const signupUser = async (formData: FormData) => {
       phone_number: formData.get("phone_number") as string,
       address: null,
       about: (formData.get("about") as string) || null,
-      positions: formattedPositions ?? [],
+      positions: formattedPositions,
       display_position: display_position || "",
       portfolio_website: (formData.get("portfolio_website") as string) || null,
-      tech_stacks: tech_stacks as string[],
+      tech_stacks,
       image_url,
       availability_status: true,
       nda_status,
@@ -249,7 +250,7 @@ export const signupUser = async (formData: FormData) => {
       date_applied: new Date().toISOString(),
     };
 
-    const { data: insertedUser, error: insertError } = await supabase
+    const { error: insertError } = await supabase
       .from("codev")
       .insert(userData)
       .select()
@@ -281,11 +282,11 @@ export const signupUser = async (formData: FormData) => {
       ndaStorageMethod: ndaProcessedWithStorage ? 'storage' : 'database',
       message: responseMessage
     };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Signup error:", error);
     return {
       success: false,
-      error: error.message ?? "Failed to create account",
+      error: toErrorMessage(error, "Failed to create account"),
     };
   }
 };
@@ -340,9 +341,9 @@ export const signinUser = async (email: string, password: string) => {
       success: true, 
       redirectTo, 
      };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Sign in error:", error);
-    return { success: false, error: error.message ?? "Failed to sign in" };
+    return { success: false, error: toErrorMessage(error, "Failed to sign in") };
   }
 };
 
@@ -386,11 +387,11 @@ export const resendVerificationEmail = async (email: string) => {
     }
 
     return { success: true, message: "Verification email sent successfully" };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Resend verification error:", error);
-    return { 
-      success: false, 
-      error: error.message ?? "Failed to resend verification email" 
+    return {
+      success: false,
+      error: toErrorMessage(error, "Failed to resend verification email"),
     };
   }
 };

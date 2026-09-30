@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { Button } from "@/components/global/ui/button";
@@ -28,7 +28,7 @@ export default function OnboardingClient({
     currentVideo: 1,
   });
   const [isLoading, setIsLoading] = useState(true);
-  const [isCompleting, setIsCompleting] = useState(false);
+  const [, setIsCompleting] = useState(false);
   const [currentStep, setCurrentStep] = useState<"videos" | "quiz" | "commitment">("videos");
   const [quizScore, setQuizScore] = useState<number>(0);
   const [quizTotal, setQuizTotal] = useState<number>(0);
@@ -160,7 +160,7 @@ export default function OnboardingClient({
     return false;
   };
 
-  const allVideosComplete = progress.video1 && progress.video2 && progress.video3 && progress.video4;
+  
 
   if (isLoading) {
     return (

@@ -12,7 +12,7 @@ export const getMfaFactors = cache(async (): Promise<MfaFactor[]> => {
     return [];
   }
 
-  return (data?.totp ?? []).map((factor) => ({
+  return data.totp.map((factor) => ({
     id: factor.id,
     status: factor.status,
     friendly_name: factor.friendly_name ?? null,

@@ -83,11 +83,11 @@ export async function getLandingAdminsData(): Promise<LandingAdminsData | null> 
 
   return {
     admins: mapMembers(
-      sortMembers((admins ?? []) as Codev[], true).filter(
+      sortMembers(admins as Codev[], true).filter(
         (admin) => !admin.display_position?.includes("Developer"),
       ),
     ),
-    mentors: mapMembers(sortMembers((mentors ?? []) as Codev[])),
+    mentors: mapMembers(sortMembers(mentors as Codev[])),
   };
 }
 

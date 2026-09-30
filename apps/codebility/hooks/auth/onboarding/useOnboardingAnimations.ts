@@ -3,6 +3,15 @@
 import { useEffect } from "react";
 import type { UseOnboardingAnimationsProps } from "@/types/auth/onboarding/onboarding";
 
+type WillChangeElement = Element & { __willChangeSet?: boolean };
+
+function getWillChange(el: Element): boolean {
+  return (el as WillChangeElement).__willChangeSet === true;
+}
+
+function setWillChange(el: Element, value: boolean): void {
+  (el as WillChangeElement).__willChangeSet = value;
+}
 
 /** IDs so we can reliably kill/rebuild */
 const IDS = {
@@ -36,7 +45,10 @@ function unwrapPinSpacers(root: HTMLElement | null) {
 }
 
 /** Clear inline styles on roadmap parts (so mobile shows plain stacked content) */
-function clearRoadmapInlineStyles(wrapper: HTMLElement | null, gsap?: any) {
+function clearRoadmapInlineStyles(
+  wrapper: HTMLElement | null,
+  instance?: typeof gsap,
+) {
   if (!wrapper) return;
   const stage = wrapper.querySelector("svg");
 
@@ -44,7 +56,8 @@ function clearRoadmapInlineStyles(wrapper: HTMLElement | null, gsap?: any) {
   ids.forEach((sel) => {
     const el = wrapper.querySelector(sel);
     if (!el) return;
-    gsap ? gsap.set(el, { clearProps: "all" }) : el.removeAttribute("style");
+    if (instance) instance.set(el, { clearProps: "all" });
+    else el.removeAttribute("style");
   });
 
   wrapper.querySelectorAll<SVGGElement>(".milestone-group").forEach((g) => {
@@ -57,7 +70,7 @@ function clearRoadmapInlineStyles(wrapper: HTMLElement | null, gsap?: any) {
       if (circle) gsap.set(circle, { clearProps: "all" });
       if (polygon) gsap.set(polygon, { clearProps: "all" });
       if (fo) gsap.set(fo, { clearProps: "all" });
-      texts.forEach((t) => gsap.set(t, { clearProps: "all" }));
+      texts.forEach((t) => { gsap.set(t, { clearProps: "all" }); });
     } else {
       g.removeAttribute("style");
     }
@@ -68,17 +81,17 @@ function clearRoadmapInlineStyles(wrapper: HTMLElement | null, gsap?: any) {
 }
 
 /** Kill specific triggers by ID */
-function killById(ScrollTrigger: any, ...ids: string[]) {
-  ids.forEach((id) => ScrollTrigger.getById(id)?.kill());
+function killById(st: typeof ScrollTrigger, ...ids: string[]) {
+  ids.forEach((id) => st.getById(id)?.kill());
 }
 
 /** Kill any triggers whose trigger element is inside 'root' */
-function killTriggersIn(ScrollTrigger: any, root: HTMLElement | null) {
+function killTriggersIn(st: typeof ScrollTrigger, root: HTMLElement | null) {
   if (!root) return;
-  ScrollTrigger.getAll().forEach((st: any) => {
+  st.getAll().forEach((trigger) => {
     try {
-      const trg: Element | null = st.trigger ?? null;
-      if (trg && root.contains(trg)) st.kill();
+      const trg: Element | null = trigger.trigger ?? null;
+      if (trg && root.contains(trg)) trigger.kill();
     } catch {
       /* ignore */
     }
@@ -98,8 +111,8 @@ export default function useOnboardingAnimations({
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    let ctx: any | null = null;
-    let mm: any | null = null;
+    let ctx: gsap.Context | null = null;
+    let mm: gsap.MatchMedia | null = null;
     let roadmapObserver: MutationObserver | null = null;
 
     void (async () => {
@@ -156,7 +169,7 @@ export default function useOnboardingAnimations({
           if (slidesEl) {
             slidesEl.style.transform = "";
             slidesEl.style.willChange = "";
-            (slidesEl as any).__willChangeSet = false;
+            setWillChange(slidesEl, false);
           }
 
           ScrollTrigger.refresh();
@@ -434,7 +447,7 @@ export default function useOnboardingAnimations({
           resetLogo();
           setIsLogoVisible(true);
 
-          const slideCount = slides?.children?.length ?? 1;
+          const slideCount = slides.children?.length ?? 1;
           const slideWidth = window.innerWidth;
           const distance = slideWidth * Math.max(slideCount - 1, 0);
           const logoEndY = window.innerHeight - 210 - 120;
@@ -512,9 +525,9 @@ export default function useOnboardingAnimations({
             invalidateOnRefresh: true,
             onUpdate: (self) => {
               if (!slides) return;
-              if ((slides as any).__willChangeSet !== true) {
+              if (getWillChange(slides) !== true) {
                 slides.style.willChange = "transform";
-                (slides as any).__willChangeSet = true;
+                setWillChange(slides, true);
               }
               const x = -distance * self.progress;
               slides.style.transform = `translate3d(${x}px,0,0)`;
@@ -603,7 +616,7 @@ export default function useOnboardingAnimations({
               IDS.regularHideLogo,
             );
             killTriggersIn(ScrollTrigger, sec);
-            unwrapPinSpacers(sec || (undefined as any));
+            unwrapPinSpacers(sec ?? null);
           };
         });
 

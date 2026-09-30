@@ -1,5 +1,6 @@
 import type * as React from "react";
 import type { ApplicantType } from "@/types/applicant/waiting/applicant-waiting";
+import type { WaitingUser } from "@/types/global/waiting-user";
 
 
 export interface Step {
@@ -24,41 +25,43 @@ export interface StepperProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export interface ApplicantStep1Props {
   setActiveStep: React.Dispatch<React.SetStateAction<number>>;
-  user: any;
+  user: WaitingUser;
 }
 
 export interface ApplicantStep2Props {
   setActiveStep: React.Dispatch<React.SetStateAction<number>>;
-  user: any;
+  user: WaitingUser;
   applicantData: ApplicantType;
 }
 
 export interface ApplicantStep3Props {
   setActiveStep: React.Dispatch<React.SetStateAction<number>>;
-  user: any;
+  user: WaitingUser;
   applicantData: ApplicantType;
 }
 
-export interface ApplicantStep4Props { user: any }
+export interface ApplicantStep4Props {
+  user: WaitingUser;
+}
 
 export interface ApplicationStepsProps {
-  user: any;
+  user: WaitingUser;
   applicantData: ApplicantType;
 }
 
 export interface PostReadInstructionsProps {
   applicantData: ApplicantType;
-  user: any;
+  user: WaitingUser;
 }
 
 export interface PostSubmittedProps {
   applicantData: ApplicantType;
-  user: any;
+  user: WaitingUser;
 }
 
 export interface PreReadInstructionsProps {
   applicantData: ApplicantType;
-  user: any;
+  user: WaitingUser;
 }
 
 export interface TestCountdownProps {

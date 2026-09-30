@@ -1,8 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Button } from "@/components/global/ui/button";
-import { Moon, Sun, SunIcon } from "lucide-react";
+import { Moon, SunIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 
 import {
@@ -13,7 +12,7 @@ import {
 } from "@codevs/ui/dropdown-menu";
 
 export function MobileTheme() {
-  const { setTheme, theme } = useTheme();
+  const { setTheme } = useTheme();
 
   return (
     <DropdownMenu>

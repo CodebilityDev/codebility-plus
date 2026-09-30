@@ -16,7 +16,7 @@ export async function applicantTakeTest({
     try {
         const supabase = await createClientServerComponent();
 
-        const { data, error } = await supabase
+        const { error } = await supabase
             .from("applicant")
             .update({
                 test_taken: new Date().toISOString(),
@@ -30,7 +30,7 @@ export async function applicantTakeTest({
         }
 
 
-        const { data: codevData, error: codevError } = await supabase
+        const { error: codevError } = await supabase
             .from("codev")
             .update({
                 application_status: "testing",
@@ -57,7 +57,7 @@ export async function applicantMoveToOnboard({
     try {
         const supabase = await createClientServerComponent();
 
-        const { data: codevData, error: codevError } = await supabase
+        const { error: codevError } = await supabase
             .from("codev")
             .update({
                 application_status: "onboarding",
@@ -86,7 +86,7 @@ export async function applicantSubmitTest({
     try {
         const supabase = await createClientServerComponent();
 
-        const { data, error } = await supabase
+        const { error } = await supabase
             .from("applicant")
             .update({
                 fork_url: forkUrl,
@@ -115,7 +115,7 @@ export async function applicantUpdateTestSubmission({
     try {
         const supabase = await createClientServerComponent();
 
-        const { data, error } = await supabase
+        const { error } = await supabase
             .from("applicant")
             .update({
                 fork_url: forkUrl,
@@ -158,7 +158,7 @@ export async function applicantUpdateJoinedStatus({
             updateData.joined_messenger = joinedMessenger;
         }
 
-        const { data, error } = await supabase
+        const { error } = await supabase
             .from("applicant")
             .update(updateData)
             .eq("id", applicantId);

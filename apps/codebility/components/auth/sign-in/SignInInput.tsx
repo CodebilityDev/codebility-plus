@@ -39,7 +39,7 @@ const SignInInputs = ({
           disabled={disabled}
           autoComplete={id}
           {...register(id, {
-            onChange: (e) => {
+            onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
               if (id === "email_address") {
                 e.target.value = e.target.value.toLowerCase();
               }
@@ -72,7 +72,7 @@ const SignInInputs = ({
 
       {errors[id]?.message && (
         <p className="text-md mt-2 text-red-400">
-          {(errors[id]?.message as string) || "An error occurred"}
+          {(errors[id]?.message as string) ?? "An error occurred"}
         </p>
       )}
     </div>

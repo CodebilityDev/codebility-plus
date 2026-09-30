@@ -32,10 +32,7 @@ export default function AnimatedRoadmapSvg() {
         );
       });
 
-      const path = svgRef.current?.querySelector("#center-line") as
-        | SVGPathElement
-        | null
-        | undefined;
+      const path = svgRef.current?.querySelector<SVGPathElement>("#center-line");
       if (!path) return;
 
       const length = path.getTotalLength();

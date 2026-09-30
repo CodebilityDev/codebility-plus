@@ -19,7 +19,7 @@ export const DeclinedButtons = ({ userData }: DeclinedButtonsProps) => {
 
   const handleReapply = async () => {
     try {
-      await reApplyAction({ user: userData });
+      await reApplyAction();
 
       toast.success("Reapplication submitted");
     } catch (error) {
