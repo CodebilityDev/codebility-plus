@@ -1,14 +1,18 @@
-
 import { getCachedCodevsProfilesPage } from "@/lib/global/codevs-profiles-cached";
+import { parsePageParam, parseStringParam } from "@/utils/global/page-param";
 
 import CodevsProfilesContainer from "@/components/global/marketing/CodevsProfilesContainer";
 import CodevsProfilesPagination from "@/components/global/marketing/CodevsProfilesPagination";
 import Section from "@/components/global/marketing/CodevsSection";
 import { PAGE_SIZE } from "@/constants/global/marketing";
+import type { CodevsProfilesProps } from "@/types/global/marketing";
 
+export default async function CodevsProfiles({ searchParams }: CodevsProfilesProps) {
+  const query = await searchParams;
+  const position = parseStringParam(query.position);
+  const page = parsePageParam(query.page);
 
-export default async function CodevsProfiles() {
-  const initialData = await getCachedCodevsProfilesPage("", 1, PAGE_SIZE);
+  const initialData = await getCachedCodevsProfilesPage(position, page, PAGE_SIZE);
 
   if (!initialData || initialData.codevs.length === 0) {
     return (

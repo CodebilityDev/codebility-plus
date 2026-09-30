@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Section from "@/components/global/marketing/CodevsSection";
 import { CodevHireCodevModal } from "@/components/global/marketing/CodevHireCodevModal";
 import { ProfilesListBlock } from "@/components/marketing/profiles/ProfilesListBlock";
+import type { ProfilesPageProps } from "@/types/marketing/profiles/profiles";
 
 export const metadata: Metadata = {
     title: "Developer Profiles — Browse Our Talent Pool | Codebility",
@@ -22,7 +23,7 @@ export const metadata: Metadata = {
     },
 };
 
-export default function Profiles() {
+export default function Profiles({ searchParams }: ProfilesPageProps) {
     return (
         <>
             <Section
@@ -33,7 +34,7 @@ export default function Profiles() {
                 <div className="absolute inset-0 bg-gradient-to-br from-customBlue-950/20 to-purple-950/20" />
                 <div className="absolute -top-4 -right-4 h-96 w-96 rounded-full bg-gradient-to-br from-yellow-400/10 to-orange-400/10 blur-3xl" />
                 <div className="absolute -bottom-4 -left-4 h-96 w-96 rounded-full bg-gradient-to-br from-purple-400/10 to-pink-400/10 blur-3xl" />
-                <ProfilesListBlock />
+                <ProfilesListBlock searchParams={searchParams} />
             </Section>
             <CodevHireCodevModal />
         </>

@@ -1,18 +1,7 @@
-"use client";
-
 import ProfilesListPagination from "@/components/marketing/profiles/ProfilesListPagination";
-import { ProfilesListSkeleton } from "@/components/marketing/profiles/ProfilesListSkeleton";
 import type { ProfilesListShellProps } from "@/types/marketing/profiles/profiles";
 
-export function ProfilesListBody({
-  initialData,
-  pageSize,
-  loading,
-}: ProfilesListShellProps) {
-  if (loading) {
-    return <ProfilesListSkeleton count={pageSize} />;
-  }
-
+export function ProfilesListBody({ initialData, pageSize }: ProfilesListShellProps) {
   if (!initialData) {
     return (
       <p className="text-center text-2xl text-red-400">

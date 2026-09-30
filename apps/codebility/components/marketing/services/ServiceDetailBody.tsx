@@ -6,17 +6,14 @@ import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/global/ui/
 import { IconFigma } from "@/components/marketing/services/IconFigma";
 import { IconGithub } from "@/components/marketing/services/IconGithub";
 import { IconLink } from "@/components/marketing/services/IconLink";
-import { loadDetail } from "@/lib/marketing/services/service-detail-modal-loader";
 import type { ServiceDetailBodyProps } from "@/types/marketing/services/services";
 import { getImageUrl, formatDate } from "@/utils/marketing/services/services";
 import { motion } from "framer-motion";
 import { Crown } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { use } from "react";
 
-export function ServiceDetailBody({ projectId }: ServiceDetailBodyProps) {
-  const service = use(loadDetail(projectId));
+export function ServiceDetailBody({ service }: ServiceDetailBodyProps) {
 
   if (!service) {
     return (

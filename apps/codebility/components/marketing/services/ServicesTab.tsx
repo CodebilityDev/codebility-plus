@@ -1,66 +1,38 @@
 "use client";
 
-import { Suspense, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Container from "@/components/global/marketing/MarketingContainer";
 import Section from "@/components/global/marketing/MarketingSection";
 
 import { SERVICES_CATEGORY_TABS } from "@/constants/global/services-categories";
 import type { ServicesCategorySlug } from "@/types/global/constants";
-import { useMarketingPageUrl } from "@/hooks/global/use-marketing-page-url";
-import { categoryHref } from "@/utils/global/services-categories";
-
-
-
+import { servicesHref } from "@/utils/global/services-categories";
+import { resolveSkeletonCount } from "@/utils/marketing/services/services";
 
 import { ServicesGridSkeleton } from "@/components/marketing/services/ServicesGridSkeleton";
 import { ServicesPaginationSlot } from "@/components/marketing/services/ServicesPaginationSlot";
+import { ServicesProjectsGrid } from "@/components/marketing/services/ServicesProjectsGrid";
 
 import type { ServicesTabProps } from "@/types/marketing/services/services";
-import { resolveSkeletonCount } from "@/utils/marketing/services/services";
-import { ServicesTabGrid } from "@/components/marketing/services/ServicesTabGrid";
-import { rememberPagination, resolvePagination } from "@/lib/marketing/services/services-tab-loader";
-
 
 export const ServicesTab = ({
   initialData,
   category,
   pageSize,
-  onServiceSelect,
 }: ServicesTabProps) => {
-  const [page, setPage] = useState(initialData.pagination.page);
-  const [, startTransition] = useTransition();
+  const router = useRouter();
 
-  rememberPagination(
-    initialData.category as ServicesCategorySlug,
-    initialData.pagination.page,
-    pageSize,
-    initialData.pagination,
-  );
+  const { pagination } = initialData;
+  const page = pagination.page;
+  const totalPages = Math.max(1, pagination.totalPages);
+  const skeletonCount = resolveSkeletonCount(page, pageSize, pagination.total);
 
-  const activePagination = resolvePagination(
-    category,
-    page,
-    pageSize,
-    initialData,
-  );
-  const totalPages = Math.max(1, activePagination.totalPages);
-  const skeletonCount = resolveSkeletonCount(
-    page,
-    pageSize,
-    activePagination.total,
-  );
-
-  useMarketingPageUrl(page, (nextPage) => {
-    startTransition(() => {
-      setPage(nextPage);
-    });
-  });
-
-  const onPageChange = (nextPage: number) => {
-    startTransition(() => {
-      setPage(nextPage);
-    });
+  const openService = (service: { id: string }) => {
+    router.replace(
+      servicesHref({ category, project: service.id }),
+      { scroll: false },
+    );
   };
 
   return (
@@ -76,7 +48,7 @@ export const ServicesTab = ({
               return (
                 <Link
                   key={tab.slug}
-                  href={categoryHref(tab.slug)}
+                  href={servicesHref({ category: tab.slug as ServicesCategorySlug })}
                   scroll={false}
                   className={`rounded-xl px-2.5 py-1 text-xs font-semibold transition-all duration-200 sm:px-5 sm:py-2.5 sm:text-base ${
                     isActive
@@ -91,24 +63,22 @@ export const ServicesTab = ({
           </div>
 
           <div id="services-grid">
-            <Suspense
-              key={`${category}:${page}`}
-              fallback={<ServicesGridSkeleton count={skeletonCount} />}
-            >
-              <ServicesTabGrid
-                category={category}
-                page={page}
-                pageSize={pageSize}
-                initialData={initialData}
-                onServiceSelect={onServiceSelect}
-              />
-            </Suspense>
+            <ServicesProjectsGrid
+              projects={initialData.projects}
+              page={page}
+              onServiceSelect={openService}
+            />
           </div>
 
           <ServicesPaginationSlot
             page={page}
             totalPages={totalPages}
-            onPageChange={onPageChange}
+            onPageChange={(nextPage) => {
+              router.replace(
+                servicesHref({ category, page: nextPage }),
+                { scroll: false },
+              );
+            }}
           />
         </div>
       </Container>

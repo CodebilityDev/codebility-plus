@@ -28,6 +28,18 @@ export interface StarRatingProps {
   size?: number; 
 }
 
+export interface ProfilesPageProps {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}
+
+export interface ProfilesListBlockProps {
+  searchParams: ProfilesPageProps["searchParams"];
+}
+
+export interface ProfilesListSectionProps {
+  searchParams: ProfilesPageProps["searchParams"];
+}
+
 export interface ProfilesListPaginationProps {
   initialData: ProfilesListingPage;
   pageSize: number;
@@ -35,8 +47,7 @@ export interface ProfilesListPaginationProps {
 
 export interface ProfilesListShellProps {
   pageSize: number;
-  initialData?: ProfilesListingPage | null;
-  loading?: boolean;
+  initialData: ProfilesListingPage | null;
 }
 
 export interface ProfileDetailMeta {
@@ -87,20 +98,6 @@ export interface ProfileProjectsSkeletonProps { count?: number }
 export interface ProfilesGridProps {
   codevs: ProfilesListingPage["codevs"];
   animationKey: string;
-}
-
-export interface ProfilesListRemoteProps {
-  position: string;
-  page: number;
-  pageSize: number;
-  initialData: ProfilesListingPage;
-}
-
-export interface ProfilesListGridProps {
-  position: string;
-  page: number;
-  pageSize: number;
-  initialData: ProfilesListingPage;
 }
 
 export interface ProfilesListSkeletonProps { count?: number }

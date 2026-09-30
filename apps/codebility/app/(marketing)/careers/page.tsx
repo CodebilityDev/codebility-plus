@@ -5,6 +5,7 @@ import { JobListingsBlock } from "@/components/marketing/careers/JobListingsBloc
 import CodevHero from "@/components/marketing/careers/CodevsHero";
 import TechStack from "@/components/marketing/careers/TechStack";
 import WorkplaceCulture from "@/components/marketing/careers/WorkplaceCulture";
+import type { CareersPageProps } from "@/types/marketing/careers/careers";
 
 export const metadata: Metadata = {
     title: "Careers — Join Codebility as a Developer",
@@ -24,11 +25,11 @@ export const metadata: Metadata = {
     },
 };
 
-export default function Careers() {
+export default function Careers({ searchParams }: CareersPageProps) {
     return (
         <div className="bg-black-400 relative flex w-full flex-col">
             <CodevHero />
-            <JobListingsBlock />
+            <JobListingsBlock searchParams={searchParams} />
             <WorkplaceCulture />
             <TechStack />
             <CareerGrowthPath />

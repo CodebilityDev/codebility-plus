@@ -45,6 +45,10 @@ export interface CodevsFeaturedProjectsAnimatedProps {
   options: EmblaOptionsType;
 }
 
+export interface CodevsProfilesProps {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}
+
 export interface CodevsProfilesPaginationProps {
   initialData: CodevsProfilesPage;
   pageSize: number;
@@ -82,20 +86,6 @@ export interface CodevsPaginationSlotProps {
   page: number;
   totalPages: number;
   onPageChange: (page: number) => void;
-}
-
-export interface CodevsProfilesRemoteProps {
-  position: string;
-  page: number;
-  pageSize: number;
-  initialData: CodevsProfilesPage;
-}
-
-export interface CodevsProfilesGridProps {
-  position: string;
-  page: number;
-  pageSize: number;
-  initialData: CodevsProfilesPage;
 }
 
 export interface CodevsProfilesSkeletonProps { count?: number }

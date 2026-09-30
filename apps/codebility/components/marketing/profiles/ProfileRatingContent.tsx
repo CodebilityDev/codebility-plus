@@ -1,11 +1,8 @@
-"use client";
-
 import StarRating from "@/components/marketing/profiles/ProfileDetailStarRating";
-import { loadRating } from "@/lib/marketing/profiles/profile-detail-rating-section-loader";
+import { getCachedProfileRating } from "@/lib/global/profiles-listing-cached";
 import type { ProfileRatingContentProps } from "@/types/marketing/profiles/profiles";
-import { use } from "react";
 
-export function ProfileRatingContent({ codevId }: ProfileRatingContentProps) {
-  const rating = use(loadRating(codevId));
+export async function ProfileRatingContent({ codevId }: ProfileRatingContentProps) {
+  const rating = await getCachedProfileRating(codevId);
   return <StarRating rating={rating} size={24} />;
 }

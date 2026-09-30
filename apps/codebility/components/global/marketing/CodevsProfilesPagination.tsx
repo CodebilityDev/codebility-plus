@@ -1,96 +1,50 @@
 "use client";
 
-import { Suspense, useState, useTransition } from "react";
-
-
-import { useMarketingPageUrl } from "@/hooks/global/use-marketing-page-url";
-
-
-
-
+import { usePathname, useRouter } from "next/navigation";
 
 import CodevListFilter from "@/components/global/marketing/CodevListFilter";
-import { CodevsProfilesSkeleton } from "@/components/global/marketing/CodevsProfilesSkeleton";
-
+import { CodevsGrid } from "@/components/global/marketing/CodevsGrid";
 import { CodevsPaginationSlot } from "@/components/global/marketing/CodevsPaginationSlot";
 import type { CodevsProfilesPaginationProps } from "@/types/global/marketing";
-import { CodevsProfilesGrid } from "@/components/global/marketing/CodevsProfilesGrid";
-import { rememberPagination, resolvePagination } from "@/lib/global/codevs-profiles-pagination-loader";
 
+function buildHref(pathname: string, position: string, page: number): string {
+  const params = new URLSearchParams();
+  if (position) params.set("position", position);
+  if (page > 1) params.set("page", String(page));
 
+  const query = params.toString();
+  return query ? `${pathname}?${query}` : pathname;
+}
 
 export default function CodevsProfilesPagination({
   initialData,
   pageSize,
 }: CodevsProfilesPaginationProps) {
-  const [position, setPosition] = useState(initialData.position);
-  const [page, setPage] = useState(initialData.pagination.page);
-  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
+  const pathname = usePathname();
 
-  rememberPagination(
-    initialData.position,
-    initialData.pagination.page,
-    pageSize,
-    initialData.pagination,
-  );
-
-  const activePagination = resolvePagination(
-    position,
-    page,
-    pageSize,
-    initialData,
-  );
-
-  useMarketingPageUrl(page, (nextPage) => {
-    startTransition(() => {
-      setPage(nextPage);
-    });
-  });
-
-  const onPageChange = (nextPage: number) => {
-    startTransition(() => {
-      setPage(nextPage);
-    });
-  };
-
-  const onPositionChange = (nextPosition: string) => {
-    startTransition(() => {
-      setPosition(nextPosition);
-      setPage(1);
-    });
-  };
+  const { position, pagination } = initialData;
+  const page = pagination.page;
 
   return (
     <div className="m-auto h-full w-full max-w-7xl px-4 sm:px-6 lg:px-8">
       <CodevListFilter
         selectedPosition={position}
-        setSelectedPosition={onPositionChange}
+        setSelectedPosition={(next) => {
+          router.push(buildHref(pathname, next, 1), { scroll: false });
+        }}
         users={initialData.codevs}
         positions={initialData.positions}
       />
 
-      <div
-        className={`transition-opacity duration-200 ${
-          isPending ? "opacity-60" : "opacity-100"
-        }`}
-      >
-        <Suspense
-          key={`${position}:${page}`}
-          fallback={<CodevsProfilesSkeleton count={pageSize} />}
-        >
-          <CodevsProfilesGrid
-            position={position}
-            page={page}
-            pageSize={pageSize}
-            initialData={initialData}
-          />
-        </Suspense>
-      </div>
+      <CodevsGrid codevs={initialData.codevs} page={page} />
 
       <CodevsPaginationSlot
         page={page}
-        totalPages={Math.max(0, activePagination.totalPages)}
-        onPageChange={onPageChange}
+        totalPages={Math.max(0, pagination.totalPages)}
+        onPageChange={(next) => {
+          router.push(buildHref(pathname, position, next), { scroll: false });
+        }}
       />
     </div>
   );

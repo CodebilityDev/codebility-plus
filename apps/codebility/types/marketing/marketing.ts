@@ -129,15 +129,12 @@ export interface InternCardsProps {
   playOnMount?: boolean;
 }
 
-export interface LandingInternCardsRemoteProps {
-  page: number;
-  pageSize: number;
-  initialData: LandingInternsPage;
+export interface LandingInternProps {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
 export interface LandingInternCardsProps {
   page: number;
-  pageSize: number;
   initialData: LandingInternsPage;
 }
 

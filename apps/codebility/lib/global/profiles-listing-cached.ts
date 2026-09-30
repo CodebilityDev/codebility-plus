@@ -152,3 +152,53 @@ export async function getCachedProfilesListingPage(
   return paginateCodevs(qualified, position, page, limit);
 }
 
+async function fetchProfileProjects(codevId: string) {
+  const supabase = createClientAnon();
+  const { data: members, error: memberError } = await supabase
+    .from("project_members")
+    .select("project_id")
+    .eq("codev_id", codevId);
+
+  if (memberError || !members || members.length === 0) return [];
+
+  const { data: projects, error: projectError } = await supabase
+    .from("projects")
+    .select("id, name, main_image")
+    .in(
+      "id",
+      members.map((row) => row.project_id),
+    );
+
+  if (projectError) return [];
+
+  return (projects ?? []).map((project) => ({
+    project_id: project.id,
+    name: project.name,
+    main_image: project.main_image,
+  }));
+}
+
+async function fetchProfileRating(codevId: string) {
+  const { data, error } = await createClientAnon()
+    .rpc("calculate_member_rating_score", { member_uuid: codevId })
+    .single();
+
+  if (error) return 0;
+  if (typeof data === "number") return data;
+  return (data as { calculate_member_rating_score?: number } | null)
+    ?.calculate_member_rating_score ?? 0;
+}
+
+export async function getCachedProfileProjects(codevId: string) {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("profiles-listing");
+  return fetchProfileProjects(codevId);
+}
+
+export async function getCachedProfileRating(codevId: string) {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("profiles-listing");
+  return fetchProfileRating(codevId);
+}

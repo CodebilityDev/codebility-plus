@@ -18,10 +18,12 @@ export function parseServicesCategory(
 export function servicesHref(options?: {
   category?: ServicesCategorySlug | null;
   project?: string | null;
+  page?: number;
 }): string {
   const params = new URLSearchParams();
   const category = options?.category ?? "all";
   if (category !== "all") params.set("category", category);
+  if (options?.page && options.page > 1) params.set("page", String(options.page));
   if (options?.project) params.set("project", options.project);
   const query = params.toString();
   return query ? `/services?${query}` : "/services";
@@ -30,4 +32,3 @@ export function servicesHref(options?: {
 export function categoryHref(slug: ServicesCategorySlug): string {
   return servicesHref({ category: slug });
 }
-

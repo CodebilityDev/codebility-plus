@@ -1,18 +1,7 @@
-"use client";
-
 import JobListingsPagination from "@/components/marketing/careers/JobListingsPagination";
-import { JobListingsSkeleton } from "@/components/marketing/careers/JobListingsSkeleton";
 import type { JobListingsShellProps } from "@/types/marketing/careers/careers";
 
-export function JobListingsBody({
-  initialData,
-  pageSize,
-  loading,
-}: JobListingsShellProps) {
-  if (loading) {
-    return <JobListingsSkeleton count={pageSize} />;
-  }
-
+export function JobListingsBody({ initialData, pageSize }: JobListingsShellProps) {
   if (!initialData) {
     return (
       <p className="py-12 text-center text-red-400">
@@ -29,7 +18,5 @@ export function JobListingsBody({
     );
   }
 
-  return (
-    <JobListingsPagination initialData={initialData} pageSize={pageSize} />
-  );
+  return <JobListingsPagination initialData={initialData} pageSize={pageSize} />;
 }

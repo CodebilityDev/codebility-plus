@@ -31,10 +31,21 @@ export interface JobListingsPaginationProps {
   pageSize: number;
 }
 
+export interface CareersPageProps {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}
+
+export interface JobListingsBlockProps {
+  searchParams: CareersPageProps["searchParams"];
+}
+
+export interface JobListingsSectionProps {
+  searchParams: CareersPageProps["searchParams"];
+}
+
 export interface JobListingsShellProps {
   pageSize: number;
-  initialData?: CareersJobListingsInitial | null;
-  loading?: boolean;
+  initialData: CareersJobListingsInitial | null;
 }
 
 export interface CareerGrowthCardProps {
@@ -58,26 +69,6 @@ export interface CultureCardProps {
 
 export interface JobCardProps {
   job: JobListing;
-  onApply: (job: JobListing) => void;
-}
-
-export interface JobListingsGridRemoteProps {
-  department: string;
-  type: string;
-  level: string;
-  page: number;
-  pageSize: number;
-  initialData: CareersJobListingsInitial;
-  onApply: (job: JobListing) => void;
-}
-
-export interface JobListingsGridProps {
-  department: string;
-  type: string;
-  level: string;
-  page: number;
-  pageSize: number;
-  initialData: CareersJobListingsInitial;
   onApply: (job: JobListing) => void;
 }
 

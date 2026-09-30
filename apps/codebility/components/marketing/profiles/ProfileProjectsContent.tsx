@@ -1,12 +1,9 @@
-"use client";
-
 import ProjectList from "@/components/marketing/profiles/ProfileDetailProjectList";
-import { loadProjects } from "@/lib/marketing/profiles/profile-detail-projects-section-loader";
+import { getCachedProfileProjects } from "@/lib/global/profiles-listing-cached";
 import type { ProfileProjectsContentProps } from "@/types/marketing/profiles/profiles";
-import { use } from "react";
 
-export function ProfileProjectsContent({ codevId }: ProfileProjectsContentProps) {
-  const projects = use(loadProjects(codevId));
+export async function ProfileProjectsContent({ codevId }: ProfileProjectsContentProps) {
+  const projects = await getCachedProfileProjects(codevId);
 
   if (projects.length === 0) {
     return null;

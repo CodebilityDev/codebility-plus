@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 
 import FeaturedSection from "@/components/global/marketing/CodevsFeaturedSection";
@@ -7,6 +8,7 @@ import CTA from "@/components/marketing/codevs/CodevsCta";
 import Hero from "@/components/marketing/codevs/CodevsHero";
 import CodevsRoadmapStatic from "@/components/marketing/codevs/CodevsRoadmapStatic";
 import MissionVision from "@/components/marketing/codevs/CodevsMissionVision";
+import type { CodevsProfilesProps } from "@/types/global/marketing";
 
 export const metadata: Metadata = {
     title: "Our Developers — Meet the Codebility Team",
@@ -26,11 +28,13 @@ export const metadata: Metadata = {
     },
 };
 
-export default function Codevs() {
+export default function Codevs({ searchParams }: CodevsProfilesProps) {
     return (
         <div className="bg-black-400 relative flex w-full flex-col">
             <Hero />
-            <CodevsProfiles />
+            <Suspense fallback={null}>
+                <CodevsProfiles searchParams={searchParams} />
+            </Suspense>
             <FeaturedSection />
             <CodevsFeaturedProjectsSection />
             <CodevsRoadmapStatic />

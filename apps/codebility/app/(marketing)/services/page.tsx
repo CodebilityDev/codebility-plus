@@ -1,6 +1,8 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 
 import { ServicesPageView } from "@/components/marketing/services/ServicesPageView";
+import type { ServicesPageProps } from "@/types/marketing/services/services";
 
 export const metadata: Metadata = {
   title: "Our Services — Web & App Development | Codebility",
@@ -30,8 +32,12 @@ export const metadata: Metadata = {
   },
 };
 
-const ServicesPage = async () => {
-  return <ServicesPageView />;
+const ServicesPage = ({ searchParams }: ServicesPageProps) => {
+  return (
+    <Suspense fallback={null}>
+      <ServicesPageView searchParams={searchParams} />
+    </Suspense>
+  );
 };
 
 export default ServicesPage;

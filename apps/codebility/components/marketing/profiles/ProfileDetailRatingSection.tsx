@@ -1,8 +1,4 @@
-"use client";
-
 import { Suspense } from "react";
-
-
 
 import { ProfileRatingSkeleton } from "@/components/marketing/profiles/ProfileRatingSkeleton";
 import { ProfileRatingContent } from "@/components/marketing/profiles/ProfileRatingContent";

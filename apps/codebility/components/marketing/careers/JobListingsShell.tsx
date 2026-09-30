@@ -1,7 +1,3 @@
-"use client";
-
-
-
 import MarketingProgressiveSection from "@/components/global/marketing/MarketingProgressiveSection";
 import ProgressiveMotion from "@/components/global/marketing/ProgressiveMotion";
 import { JobListingsBody } from "@/components/marketing/careers/JobListingsBody";
@@ -11,9 +7,8 @@ import type { JobListingsShellProps } from "@/types/marketing/careers/careers";
 
 
 export default function JobListingsShell({
-  initialData = null,
+  initialData,
   pageSize,
-  loading = false,
 }: JobListingsShellProps) {
   const skeleton = (
     <div className="mb-12 text-center">
@@ -41,11 +36,7 @@ export default function JobListingsShell({
             </div>
 
             <div data-progressive-child>
-              <JobListingsBody
-                initialData={initialData}
-                pageSize={pageSize}
-                loading={loading}
-              />
+              <JobListingsBody initialData={initialData} pageSize={pageSize} />
             </div>
           </ProgressiveMotion>
         </MarketingProgressiveSection>

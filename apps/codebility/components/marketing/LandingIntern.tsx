@@ -2,10 +2,15 @@ import LandingInternPagination from "@/components/marketing/LandingIntern-CodevP
 import LandingInternSkeleton from "@/components/marketing/LandingInternSkeleton";
 import { PAGE_SIZE } from "@/constants/marketing/marketing";
 import { getCachedLandingInternsPage } from "@/lib/global/landing-interns-cached";
+import { parsePageParam } from "@/utils/global/page-param";
 import { Suspense } from "react";
+import type { LandingInternProps } from "@/types/marketing/marketing";
 
-export async function LandingIntern() {
-  const data = await getCachedLandingInternsPage(1, PAGE_SIZE);
+export async function LandingIntern({ searchParams }: LandingInternProps) {
+  const query = await searchParams;
+  const page = parsePageParam(query.page);
+
+  const data = await getCachedLandingInternsPage(page, PAGE_SIZE);
 
   if (!data || data.TEAM_MEMBERS.length === 0) {
     return (
@@ -19,7 +24,7 @@ export async function LandingIntern() {
     <Suspense
       fallback={
         <LandingInternSkeleton
-          page={1}
+          page={page}
           totalPages={Math.max(1, data.pagination.totalPages)}
         />
       }

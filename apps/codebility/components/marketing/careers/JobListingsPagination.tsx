@@ -1,80 +1,57 @@
 "use client";
 
-import { Suspense, useState, useTransition } from "react";
-
-
-
-
-
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 import type { JobListing } from "@/types/global/job-listings";
 import JobApplicationModal from "@/components/marketing/careers/JobApplicationModal";
-import { JobListingsSkeleton } from "@/components/marketing/careers/JobListingsSkeleton";
-
+import { JobCard } from "@/components/marketing/careers/JobCard";
 import { JobListingsPaginationSlot } from "@/components/marketing/careers/JobListingsPaginationSlot";
 import { JOB_TYPES, JOB_LEVELS } from "@/constants/marketing/careers/careers";
 import type { JobListingsPaginationProps } from "@/types/marketing/careers/careers";
-import { JobListingsGrid } from "@/components/marketing/careers/JobListingsGrid";
-import { rememberPagination, resolvePagination } from "@/lib/marketing/careers/job-listings-pagination-loader";
 
+function buildHref(filters: Record<string, string>, page: number): string {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(filters)) {
+    if (value) params.set(key, value);
+  }
+  if (page > 1) params.set("page", String(page));
 
+  const query = params.toString();
+  return query ? `/careers?${query}` : "/careers";
+}
 
 export default function JobListingsPagination({
   initialData,
   pageSize,
 }: JobListingsPaginationProps) {
-  const [department, setDepartment] = useState(initialData.department);
-  const [type, setType] = useState(initialData.type);
-  const [level, setLevel] = useState(initialData.level);
-  const [page, setPage] = useState(initialData.pagination.page);
+  const router = useRouter();
   const [selectedJob, setSelectedJob] = useState<JobListing | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isPending, startTransition] = useTransition();
 
-  rememberPagination(
-    initialData.department,
-    initialData.type,
-    initialData.level,
-    initialData.pagination.page,
-    pageSize,
-    initialData.pagination,
-  );
-
+  const { department, type, level, pagination } = initialData;
+  const page = pagination.page;
+  const filters = { department, type, level };
   const departments = ["All", ...initialData.departments];
   const hasActiveFilters = Boolean(department || type || level);
-  const activePagination = resolvePagination(
-    department,
-    type,
-    level,
-    page,
-    pageSize,
-    initialData,
-  );
+
+  const navigate = (next: Record<string, string>, nextPage: number) => {
+    router.push(buildHref({ ...filters, ...next }, nextPage), { scroll: false });
+  };
 
   const onPageChange = (nextPage: number) => {
-    startTransition(() => setPage(nextPage));
+    router.push(buildHref(filters, nextPage), { scroll: false });
   };
 
   const onFilterChange = (
     value: string,
     filterType: "department" | "type" | "level",
   ) => {
-    const normalized = value === "All" ? "" : value;
-    startTransition(() => {
-      if (filterType === "department") setDepartment(normalized);
-      if (filterType === "type") setType(normalized);
-      if (filterType === "level") setLevel(normalized);
-      setPage(1);
-    });
+    navigate({ [filterType]: value === "All" ? "" : value }, 1);
   };
 
   const clearFilters = () => {
-    startTransition(() => {
-      setDepartment("");
-      setType("");
-      setLevel("");
-      setPage(1);
-    });
+    navigate({ department: "", type: "", level: "" }, 1);
   };
 
   const handleApply = (job: JobListing) => {
@@ -171,8 +148,8 @@ export default function JobListingsPagination({
 
           <div className="flex items-center justify-between border-t border-gray-800 pt-4 lg:mt-6">
             <span className="text-sm text-gray-400">
-              {activePagination.total} position
-              {activePagination.total !== 1 ? "s" : ""} found
+              {pagination.total} position
+              {pagination.total !== 1 ? "s" : ""} found
             </span>
             {hasActiveFilters && (
               <button
@@ -186,30 +163,23 @@ export default function JobListingsPagination({
         </div>
       </div>
 
-      <div
-        className={`transition-opacity duration-200 ${
-          isPending ? "opacity-60" : "opacity-100"
-        }`}
-      >
-        <Suspense
-          key={`${department}:${type}:${level}:${page}`}
-          fallback={<JobListingsSkeleton count={pageSize} />}
-        >
-          <JobListingsGrid
-            department={department}
-            type={type}
-            level={level}
-            page={page}
-            pageSize={pageSize}
-            initialData={initialData}
-            onApply={handleApply}
-          />
-        </Suspense>
-      </div>
+      {initialData.jobs.length === 0 ? (
+        <div className="py-12 text-center">
+          <p className="text-gray-400">
+            No positions match your current filters. Try adjusting your criteria.
+          </p>
+        </div>
+      ) : (
+        <div className="grid gap-6">
+          {initialData.jobs.map((job) => (
+            <JobCard key={job.id} job={job} onApply={handleApply} />
+          ))}
+        </div>
+      )}
 
       <JobListingsPaginationSlot
         page={page}
-        totalPages={Math.max(0, activePagination.totalPages)}
+        totalPages={Math.max(0, pagination.totalPages)}
         onPageChange={onPageChange}
       />
 
