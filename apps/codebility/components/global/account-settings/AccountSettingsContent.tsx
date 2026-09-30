@@ -1,29 +1,26 @@
+"use client";
+
 import AccountSettings2FA from "@/components/global/account-settings/AccountSettings2FA";
 import AccountSettingsChangePassword from "@/components/global/account-settings/AccountSettingsChangePassword";
 import AccountSettingsDelete from "@/components/global/account-settings/AccountSettingsDelete";
 import AccountSettingsHeader from "@/components/global/account-settings/AccountSettingsHeader";
 import AccountSettingsUsername from "@/components/global/account-settings/AccountSettingsUsername";
-import { createClientServerComponent } from "@/lib/global/supabase-server";
+import { LoadingContent } from "@/components/global/account-settings/LoadingContent";
+import { useCurrentUser } from "@/hooks/global/use-current-user";
 import { Card, CardContent } from "@codevs/ui/card";
 import { Separator } from "@codevs/ui/separator";
-import { redirect } from "next/navigation";
 
-export async function AccountSettingsContent() {
-  const supabase = await createClientServerComponent();
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
+export function AccountSettingsContent() {
+  const { data: user, isPending } = useCurrentUser();
 
-  if (error || !user) {
-    redirect("/auth/sign-in");
-  }
+  if (isPending) return <LoadingContent />;
+  if (!user) return null;
 
   return (
     <div className="grid gap-6 lg:grid-cols-2 p-2">
       <Card className="background-box text-dark100_light900 h-fit">
         <CardContent className="space-y-4 ">
-          <AccountSettingsHeader email={user.email || "No email available"} />
+          <AccountSettingsHeader email={user.email_address} />
           <Separator />
           <AccountSettingsChangePassword />
           <Separator />

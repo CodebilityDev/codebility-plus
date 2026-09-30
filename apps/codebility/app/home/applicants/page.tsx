@@ -1,12 +1,8 @@
-import React from "react";
 import AsyncErrorBoundary from "@/components/global/feedback/AsyncErrorBoundary";
 
 import NewApplicantFetchComp from "@/components/home/applicants/applicantFetchComp";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
-
-export default async function NewApplicants() {
+export default function NewApplicants() {
   return (
     <div className="mx-auto max-w-screen-xl">
       <div className="flex flex-col gap-4 pt-4">

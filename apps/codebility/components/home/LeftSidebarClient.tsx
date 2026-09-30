@@ -5,14 +5,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useNavStore } from "@/store/home/sidebar-store";
+import { useSidebarData } from "@/hooks/home/use-sidebar-data";
 import { cn } from "@/utils/global/cn";
 import { AnimatePresence, motion } from "framer-motion";
 import type { SidebarSidebarLink as SidebarLink } from "@/types/home/home";
-import type { LeftSidebarClientProps } from "@/types/home/home";
 
 
-const LeftSidebarClient = ({ initialSidebarData }: LeftSidebarClientProps) => {
+const LeftSidebarClient = () => {
   const { isToggleOpen, toggleNav } = useNavStore();
+  const { data: sidebarData = [] } = useSidebarData();
   const pathname = usePathname();
   
   // Check if we're in staging environment
@@ -34,15 +35,6 @@ const LeftSidebarClient = ({ initialSidebarData }: LeftSidebarClientProps) => {
       },
     },
   };
-
-  // Filter out unimplemented features
-  const filteredSidebarData = initialSidebarData.map((section) => ({
-    ...section,
-    links: section.links.filter((link) => {
-
-      return true;
-    })
-  }));
 
   return (
     <motion.aside
@@ -132,7 +124,7 @@ const LeftSidebarClient = ({ initialSidebarData }: LeftSidebarClientProps) => {
         role="navigation"
         aria-label="Main navigation"
       >
-        {filteredSidebarData.map((section) => (
+        {sidebarData.map((section) => (
           <div
             key={section.id}
             role="group"

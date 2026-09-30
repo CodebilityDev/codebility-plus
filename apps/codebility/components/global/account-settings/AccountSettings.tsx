@@ -1,19 +1,5 @@
-import { Suspense } from "react";
-
 import H1 from "@/components/global/layout/H1";
 import { AccountSettingsContent } from "@/components/global/account-settings/AccountSettingsContent";
-import { LoadingContent } from "@/components/global/account-settings/LoadingContent";
-
-
-
-
-
-
-
-
-
-
-
 
 export default function AccountSettings() {
   return (
@@ -24,9 +10,7 @@ export default function AccountSettings() {
           Manage your account credentials and security settings.
         </span>
 
-        <Suspense fallback={<LoadingContent />}>
-          <AccountSettingsContent />
-        </Suspense>
+        <AccountSettingsContent />
       </div>
     </div>
   );

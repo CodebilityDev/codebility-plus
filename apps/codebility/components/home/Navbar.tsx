@@ -7,8 +7,7 @@ import Theme from "@/components/home/Theme";
 import { MobileTheme } from "@/components/home/theme-mobile";
 import { defaultAvatar } from "@/public/assets/images/index";
 import { IconDropdown, IconLogout } from "@/public/assets/svgs/index";
-import { useUserStore } from "@/store/global/codev-store";
-import { useInitialUser } from "@/providers/home/UserProvider";
+import { useCurrentUser } from "@/hooks/global/use-current-user";
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@codevs/ui/dropdown-menu";
 
@@ -18,9 +17,7 @@ import { menuItems } from "@/constants/home/home";
 
 
 const Navbar = () => {
-  const { user } = useUserStore();
-  const initialUser = useInitialUser();
-  const currentUser = user ?? initialUser;
+  const { data: currentUser } = useCurrentUser();
 
   if (!currentUser) return null;
 

@@ -1,8 +1,7 @@
 import ApplicantModalProvider from "@/providers/home/applicants/ApplicantModalProvider";
 import ApplicantDataWrapper from "@/components/home/applicants/ApplicantDataWrapper";
 
-export default async function NewApplicantFetchComp() {
-  // Wrap with client component to handle modal rendering
+export default function NewApplicantFetchComp() {
   return (
     <ApplicantModalProvider>
       <ApplicantDataWrapper />

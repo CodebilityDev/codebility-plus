@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import DefaultAvatar from "@/components/global/codev/DefaultAvatar";
@@ -16,11 +15,6 @@ import { ApplicantProfileModalSection } from "@/components/home/applicants/Appli
 
 const ApplicantProfileModal = () => {
   const { isModalOpen, selectedApplicant, closeModal } = useApplicantModal();
-
-  // Debug logging
-  useEffect(() => {
-    
-  }, [isModalOpen, selectedApplicant]);
 
   // Helper function to safely check array length
   const hasItems = (arr: string[] | null | undefined): arr is string[] => {

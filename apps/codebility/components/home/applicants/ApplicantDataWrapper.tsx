@@ -1,13 +1,20 @@
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
 import { getNewApplicants } from "@/actions/home/applicants/applicants-queries";
-import type { NewApplicantType } from "@/types/home/applicants/applicants";
 import ApplicantLists from "@/components/home/applicants/applicantLists";
 
-export default async function ApplicantDataWrapper() {
-  // Fetch applicants directly without caching
-  const applicants: NewApplicantType[] = await getNewApplicants();
+export default function ApplicantDataWrapper() {
+  const { data: applicants = [], isPending } = useQuery({
+    queryKey: ["applicants"],
+    queryFn: () => getNewApplicants(),
+  });
 
-  // Handle no applicants case
-  if (!applicants || applicants.length === 0) {
+  if (isPending) {
+    return null;
+  }
+
+  if (applicants.length === 0) {
     return (
       <div className="flex min-h-[400px] flex-col items-center justify-center p-8 text-center">
         <div className="mb-4 text-4xl">📋</div>

@@ -20,11 +20,6 @@ function ApplicantLists({
   const [filteredApplicants, setFilteredApplicants] = React.useState(applicants);
   const [currentTab, setCurrentTab] = React.useState("applying");
 
-  // Always use the latest applicants data for filtering
-  React.useEffect(() => {
-    setFilteredApplicants(applicants);
-  }, [applicants]);
-
   const applicantsApplying = React.useMemo(
     () =>
       filteredApplicants.filter(

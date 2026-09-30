@@ -10,10 +10,6 @@ export interface DynamicMainContentProps {
   children: ReactNode;
 }
 
-export interface LeftSidebarClientProps {
-  initialSidebarData: Sidebar[];
-}
-
 export interface SidebarLink {
   route: string;
   label: string;

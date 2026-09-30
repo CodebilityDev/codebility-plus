@@ -1,38 +1,16 @@
 "use client";
 
-import { getSidebarData } from "@/actions/home/sidebar";
-import { useUserStore } from "@/store/global/codev-store";
-import { useInitialUser } from "@/providers/home/UserProvider";
-import type { SidebarSection } from "@/types/home/home";
+import { useCurrentUser } from "@/hooks/global/use-current-user";
+import { useSidebarData } from "@/hooks/home/use-sidebar-data";
 import { SheetClose } from "@codevs/ui/sheet";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
 
 export const NavContent = () => {
-  const { user } = useUserStore();
-  const initialUser = useInitialUser();
-  const currentUser = user ?? initialUser;
+  const { data: currentUser } = useCurrentUser();
+  const { data: sidebarData = [] } = useSidebarData();
   const pathname = usePathname();
-  const [sidebarData, setSidebarData] = useState<SidebarSection[]>([]);
-
-  // Fetch sidebar data based on user role
-  useEffect(() => {
-    const fetchSidebarData = async () => {
-      if (currentUser?.role_id) {
-        const roleId =
-          currentUser.internal_status == "INACTIVE" ||
-          currentUser.availability_status == false
-            ? -1
-            : currentUser.role_id;
-        const data = await getSidebarData(roleId);
-        setSidebarData(data);
-      }
-    };
-
-    fetchSidebarData();
-  }, [currentUser]);
 
   if (currentUser?.application_status !== "passed") return null;
 
