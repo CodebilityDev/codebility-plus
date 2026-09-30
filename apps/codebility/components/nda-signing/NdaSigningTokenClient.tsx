@@ -1,6 +1,7 @@
 "use client";
 
-import { forwardRef, useEffect, useRef, useState } from "react";
+import { Suspense, forwardRef, useEffect, useRef, useState } from "react";
+import { useDynamicImport } from "@/hooks/global/useDynamicImport";
 import { useParams } from "next/navigation";
 import { useFormattedDate } from "@/hooks/global/useFormattedDate";
 import { useForm } from "react-hook-form";
@@ -41,25 +42,23 @@ async function fetchCodevIdFromToken(ndaToken: string): Promise<string | null> {
 }
 
 // Dynamic signature pad component with loading state
+function SignaturePadFallback() {
+  return (
+    <div className="flex h-[180px] items-center justify-center border border-gray-300 bg-white">
+      <p className="text-gray-500">Loading signature pad...</p>
+    </div>
+  );
+}
+
 const SignaturePad = forwardRef<SignatureCanvasRef, SignaturePadProps>(
   (props, ref) => {
-    const [SignatureComponent, setSignatureComponent] = useState<any>(null);
+    const SignatureComponent = useDynamicImport(() => import("react-signature-canvas"));
 
-    useEffect(() => {
-      import("react-signature-canvas").then((mod) => {
-        setSignatureComponent(() => mod.default);
-      });
-    }, []);
-
-    if (!SignatureComponent) {
-      return (
-        <div className="flex h-[180px] items-center justify-center border border-gray-300 bg-white">
-          <p className="text-gray-500">Loading signature pad...</p>
-        </div>
-      );
-    }
-
-    return <SignatureComponent {...props} ref={ref} />;
+    return (
+      <Suspense fallback={<SignaturePadFallback />}>
+        <SignatureComponent {...props} ref={ref} />
+      </Suspense>
+    );
   },
 );
 

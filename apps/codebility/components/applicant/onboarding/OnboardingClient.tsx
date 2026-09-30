@@ -42,7 +42,11 @@ export default function OnboardingClient({
     setIsLoading(false);
   }, [applicantId]);
 
-  const restoreState = useCallback(() => {
+  const [posed, setPosed] = useState(false);
+
+  if (!posed) {
+    setPosed(true);
+
     if (applicantData.quiz_passed && !applicantData.commitment_signed_at) {
       setCurrentStep("commitment");
       setQuizScore(applicantData.quiz_score || 0);
@@ -50,12 +54,10 @@ export default function OnboardingClient({
     } else if (applicantData.quiz_completed_at) {
       setCurrentStep("quiz");
     }
-  }, [applicantData]);
 
-  useEffect(() => {
-    loadProgress();
-    restoreState();
-  }, [loadProgress, restoreState]);
+    void loadProgress();
+  }
+
 
   const handleVideoComplete = async () => {
     await loadProgress();
