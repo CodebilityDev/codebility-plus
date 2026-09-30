@@ -4,7 +4,6 @@ import { createClient } from "@supabase/supabase-js";
 import type { AppointmentBody } from "@/types/api/appointments/appointments";
 
 
-export const runtime = "nodejs";
 
 // ─── POST handler ──────────────────────────────────────────────────────────
 

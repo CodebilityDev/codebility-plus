@@ -9,6 +9,11 @@ import type { Service } from "@/types/proposal/proposal";
 
 
 export default function ProposalPage() {
+  const [year, setYear] = useState<number | null>(null);
+
+  useEffect(() => {
+    setYear(new Date().getFullYear());
+  }, []);
   const [realProjects, setRealProjects] = useState<RealProject[]>([]);
   const [codevProfiles, setCodevProfiles] = useState<any[]>([]);
   const [isLoadingProjects, setIsLoadingProjects] = useState(true);
@@ -380,7 +385,7 @@ export default function ProposalPage() {
             <div>🌐 www.codebility.tech</div>
           </div>
           <div className="text-sm text-white/40 pt-8 border-t border-dark-100">
-            © {new Date().getFullYear()} Codebility • Professional Development Services
+            © {year ?? ""} Codebility • Professional Development Services
           </div>
         </div>
       </footer>

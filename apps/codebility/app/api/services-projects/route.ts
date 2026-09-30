@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import type { NextRequest} from "next/server";
 import { NextResponse } from "next/server";
 import { parseServicesCategory } from "@/utils/global/services-categories";
@@ -7,6 +8,7 @@ import { parsePositiveInt, emptyPage } from "@/utils/api/services-projects/servi
 
 
 export async function GET(request: NextRequest) {
+  await connection();
   try {
     const { searchParams } = request.nextUrl;
     const projectId = searchParams.get("id");

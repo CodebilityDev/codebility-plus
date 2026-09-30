@@ -1,4 +1,4 @@
-import { unstable_cache } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClientAnon } from "@/lib/global/supabase-anon";
 import type { ServicesProjectCard, ServicesProjectMember, ServicesProjectDetail, ServicesProjectsPage, ListRow } from "@/types/global/lib";
@@ -239,16 +239,20 @@ export async function getServicesProjectById(
   };
 }
 
-export const getCachedServicesProjectsPage = unstable_cache(
-  async (category: string, page: number, limit: number) =>
-    getServicesProjectsPage(createClientAnon(), { category, page, limit }),
-  ["services-projects"],
-  { revalidate: 3600, tags: ["services-projects"] },
-);
+export async function getCachedServicesProjectsPage(
+  category: string,
+  page: number,
+  limit: number,
+) {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("services-projects");
+  return getServicesProjectsPage(createClientAnon(), { category, page, limit });
+}
 
-export const getCachedServicesProjectById = unstable_cache(
-  async (projectId: string) =>
-    getServicesProjectById(createClientAnon(), projectId),
-  ["services-project-detail"],
-  { revalidate: 3600, tags: ["services-projects"] },
-);
+export async function getCachedServicesProjectById(projectId: string) {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("services-projects");
+  return getServicesProjectById(createClientAnon(), projectId);
+}

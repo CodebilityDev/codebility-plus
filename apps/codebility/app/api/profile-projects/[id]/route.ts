@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import type { NextRequest} from "next/server";
 import { NextResponse } from "next/server";
 import { createClientAnon } from "@/lib/global/supabase-anon";
@@ -8,6 +9,7 @@ export async function GET(
   _request: NextRequest,
   context: { params: Promise<{ id: string }> },
 ) {
+  await connection();
   try {
     const { id } = await context.params;
     const supabase = createClientAnon();

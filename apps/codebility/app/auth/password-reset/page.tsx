@@ -3,6 +3,8 @@ import Link from "next/link";
 
 import PasswordResetForm from "@/components/auth/password-reset/PasswordResetForm";
 
+export const instant = false;
+
 const PasswordReset = () => {
   return (
     <div className="bg-dark-300 flex min-h-screen flex-col items-center justify-center text-white lg:flex-row">

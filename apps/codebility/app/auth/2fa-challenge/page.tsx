@@ -3,7 +3,8 @@ import Logo from "@/components/global/layout/Logo";
 import { Toaster } from "@/components/global/ui/toaster";
 import TwoFactorForm from "@/components/auth/2fa-challenge/TwoFactorForm";
 
-export const dynamic = "force-dynamic";
+export const instant = false;
+
 
 export default function TwoFactorChallengePage() {
   return (

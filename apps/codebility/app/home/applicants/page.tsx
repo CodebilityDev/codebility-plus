@@ -2,6 +2,8 @@ import AsyncErrorBoundary from "@/components/global/feedback/AsyncErrorBoundary"
 
 import NewApplicantFetchComp from "@/components/home/applicants/applicantFetchComp";
 
+export const instant = false;
+
 export default function NewApplicants() {
   return (
     <div className="mx-auto max-w-screen-xl">

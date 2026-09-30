@@ -3,8 +3,9 @@ import { redirect } from "next/navigation";
 import Logo from "@/components/global/layout/Logo";
 import { Button } from "@/components/global/ui/button";
 
+export const instant = false;
+
 // Add this line to prevent static generation
-export const dynamic = "force-dynamic";
 
 const WaitingPage = () => {
   /* redirect to new page*/

@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+
 import AsyncErrorBoundary from "@/components/global/feedback/AsyncErrorBoundary";
 import ErrorBoundary from "@/components/global/feedback/ErrorBoundary";
 import { ModalProviderHome } from "@/providers/home/ModalProviderHome";
@@ -11,6 +13,8 @@ import Navbar from "@/components/home/Navbar";
 import ConditionalMainWrapper from "@/components/home/ConditionalMainWrapper";
 import DynamicMainContent from "@/components/home/DynamicMainContent";
 import type { HomeLayoutProps } from "@/types/home/home";
+
+export const instant = false;
 
 export default function HomeLayout({ children }: HomeLayoutProps) {
   return (
@@ -34,7 +38,9 @@ export default function HomeLayout({ children }: HomeLayoutProps) {
                 </div>
               }
             >
-              <Navbar />
+              <Suspense fallback={<div className="h-[60px]" />}>
+                <Navbar />
+              </Suspense>
             </ErrorBoundary>
             <div className="flex flex-1 overflow-hidden">
               <ErrorBoundary
@@ -42,7 +48,13 @@ export default function HomeLayout({ children }: HomeLayoutProps) {
                   <div className="w-16 bg-gray-100 dark:bg-gray-800 flex-shrink-0" />
                 }
               >
-                <LeftSidebarClient />
+                <Suspense
+                  fallback={
+                    <div className="w-16 bg-gray-100 dark:bg-gray-800 flex-shrink-0" />
+                  }
+                >
+                  <LeftSidebarClient />
+                </Suspense>
               </ErrorBoundary>
               <DynamicMainContent>
                 <ConditionalMainWrapper>

@@ -1,4 +1,4 @@
-import { unstable_cache } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClientAnon } from "@/lib/global/supabase-anon";
 import type { CodevsFeaturedProjects, ProjectRow } from "@/types/global/lib";
@@ -55,8 +55,9 @@ export async function getCodevsFeaturedProjects(
   };
 }
 
-export const getCachedCodevsFeaturedProjects = unstable_cache(
-  async () => getCodevsFeaturedProjects(createClientAnon()),
-  ["codevs-featured-projects"],
-  { revalidate: 3600, tags: ["codevs-featured-projects"] },
-);
+export async function getCachedCodevsFeaturedProjects() {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("codevs-featured-projects");
+  return getCodevsFeaturedProjects(createClientAnon());
+}

@@ -1,6 +1,7 @@
 import AccountSettings from "@/components/global/account-settings/AccountSettings";
 
-export const dynamic = "force-dynamic";
+export const instant = false;
+
 
 export default function ApplicantAccountSettingsPage() {
   return (

@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import type { NextRequest} from "next/server";
 import { NextResponse } from "next/server";
 import { getCachedCodevsProfilesPage } from "@/lib/global/codevs-profiles-cached";
@@ -6,6 +7,7 @@ import { parsePositiveInt, emptyPage } from "@/utils/api/codevs-profiles/codevs-
 
 
 export async function GET(request: NextRequest) {
+  await connection();
   try {
     const { searchParams } = request.nextUrl;
     const position = searchParams.get("position")?.trim() ?? "";

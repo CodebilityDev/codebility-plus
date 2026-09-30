@@ -1,9 +1,11 @@
+import { connection } from "next/server";
 import { NextResponse } from "next/server";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import type { Intern } from "@/types/api/all-active-interns-codev/all-active-interns-codev";
 
 
 export async function GET() {
+  await connection();
   try {
     const supabase = await createClientServerComponent();
     const { data, error } = await supabase

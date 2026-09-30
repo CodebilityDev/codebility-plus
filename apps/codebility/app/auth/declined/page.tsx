@@ -2,7 +2,8 @@ import { Suspense } from "react";
 
 import DeclinedComponent from "@/components/auth/declined/DeclineComponent";
 
-export const dynamic = "force-dynamic";
+export const instant = false;
+
 export default async function DeclinedPage() {
   return (
     <section className="bg-backgroundColor text-primaryColor flex h-screen w-screen items-center justify-center overflow-hidden">

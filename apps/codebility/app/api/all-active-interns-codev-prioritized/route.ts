@@ -1,11 +1,13 @@
 // @deprecated Prefer lib/global/landing-interns-cached (+ /api/landing-interns) for the marketing intern section.
 // app/api/all-active-interns-codev-prioritized/route.ts
+import { connection } from "next/server";
 import { NextResponse } from "next/server";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import type { Codev } from "@/types/global/codev";
 import { prioritizeCodevs } from "@/utils/global/codev-priority";
 
 export async function GET() {
+  await connection();
   try {
     const supabase = await createClientServerComponent();
     

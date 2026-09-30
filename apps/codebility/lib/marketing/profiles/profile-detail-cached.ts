@@ -1,4 +1,4 @@
-import { unstable_cache } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Codev, WorkExperience } from "@/types/global/codev";
 import { createClientAnon } from "@/lib/global/supabase-anon";
@@ -124,14 +124,16 @@ export async function getProfileDetailMeta(
   };
 }
 
-export const getCachedProfileDetail = unstable_cache(
-  async (id: string) => getProfileDetail(createClientAnon(), id),
-  ["profile-detail"],
-  { revalidate: 3600, tags: ["profile-detail"] },
-);
+export async function getCachedProfileDetail(id: string) {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("profile-detail");
+  return getProfileDetail(createClientAnon(), id);
+}
 
-export const getCachedProfileDetailMeta = unstable_cache(
-  async (id: string) => getProfileDetailMeta(createClientAnon(), id),
-  ["profile-detail-meta"],
-  { revalidate: 3600, tags: ["profile-detail"] },
-);
+export async function getCachedProfileDetailMeta(id: string) {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("profile-detail");
+  return getProfileDetailMeta(createClientAnon(), id);
+}

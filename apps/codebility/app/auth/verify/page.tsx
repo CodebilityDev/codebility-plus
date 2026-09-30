@@ -2,6 +2,8 @@ import Link from "next/link";
 import Logo from "@/components/global/layout/Logo";
 import { Button } from "@/components/global/ui/button";
 
+export const instant = false;
+
 const VerifyPage = () => {
   return (
     <section className="bg-backgroundColor text-primaryColor flex h-screen w-screen items-center justify-center overflow-hidden">

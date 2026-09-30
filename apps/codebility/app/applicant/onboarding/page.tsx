@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import OnboardingClient from "@/components/applicant/onboarding/OnboardingClient";
 
+export const instant = false;
+
 export default async function OnboardingPage() {
   const supabase = await createClientServerComponent();
 

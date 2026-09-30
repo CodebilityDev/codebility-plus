@@ -1,4 +1,4 @@
-import { unstable_cache } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Codev } from "@/types/global/codev";
 import type { ProfilesListingPage } from "@/types/global/profiles-listing";
@@ -132,19 +132,23 @@ export async function getProfilesListingPage(
   return paginateCodevs(qualified, position, page, limit);
 }
 
-const getCachedQualifiedProfiles = unstable_cache(
-  async () => fetchQualifiedProfiles(createClientAnon()),
-  ["profiles-listing-qualified"],
-  { revalidate: 3600, tags: ["profiles-listing"] },
-);
+async function getCachedQualifiedProfiles() {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("profiles-listing");
+  return fetchQualifiedProfiles(createClientAnon());
+}
 
-export const getCachedProfilesListingPage = unstable_cache(
-  async (position: string, page: number, limit: number) => {
-    const qualified = await getCachedQualifiedProfiles();
-    if (!qualified) return null;
-    return paginateCodevs(qualified, position, page, limit);
-  },
-  ["profiles-listing"],
-  { revalidate: 3600, tags: ["profiles-listing"] },
-);
+export async function getCachedProfilesListingPage(
+  position: string,
+  page: number,
+  limit: number,
+) {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("profiles-listing");
+  const qualified = await getCachedQualifiedProfiles();
+  if (!qualified) return null;
+  return paginateCodevs(qualified, position, page, limit);
+}
 

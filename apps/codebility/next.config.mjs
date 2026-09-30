@@ -36,6 +36,7 @@ loadEnvForRuntime();
  * @type {import('next').NextConfig}
  */
 const config = {
+  cacheComponents: true,
   reactStrictMode: true,
   typescript: {
     ignoreBuildErrors: false,

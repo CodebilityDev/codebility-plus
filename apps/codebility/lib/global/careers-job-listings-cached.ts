@@ -1,4 +1,4 @@
-import { unstable_cache } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { JobListing } from "@/types/global/job-listings";
 import type { CareersJobListingsPage } from "@/types/global/careers-job-listings";
@@ -123,27 +123,28 @@ export async function getCareersJobListingsPage(
   };
 }
 
-export const getCachedCareersJobDepartments = unstable_cache(
-  async () => getCareersJobDepartments(createClientAnon()),
-  ["careers-job-departments"],
-  { revalidate: 3600, tags: ["careers-job-listings"] },
-);
+export async function getCachedCareersJobDepartments() {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("careers-job-listings");
+  return getCareersJobDepartments(createClientAnon());
+}
 
-export const getCachedCareersJobListingsPage = unstable_cache(
-  async (
-    department: string,
-    type: string,
-    level: string,
-    page: number,
-    limit: number,
-  ) =>
-    getCareersJobListingsPage(createClientAnon(), {
-      department: department || undefined,
-      type: type || undefined,
-      level: level || undefined,
-      page,
-      limit,
-    }),
-  ["careers-job-listings-page"],
-  { revalidate: 3600, tags: ["careers-job-listings"] },
-);
+export async function getCachedCareersJobListingsPage(
+  department: string,
+  type: string,
+  level: string,
+  page: number,
+  limit: number,
+) {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("careers-job-listings");
+  return getCareersJobListingsPage(createClientAnon(), {
+    department: department || undefined,
+    type: type || undefined,
+    level: level || undefined,
+    page,
+    limit,
+  });
+}

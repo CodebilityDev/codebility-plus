@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import type { NextRequest} from "next/server";
 import { NextResponse } from "next/server";
 import { getCachedLandingInternsPage } from "@/lib/global/landing-interns-cached";
@@ -6,6 +7,7 @@ import { parsePositiveInt } from "@/utils/api/landing-interns/landing-interns";
 
 
 export async function GET(request: NextRequest) {
+  await connection();
   try {
     const { searchParams } = request.nextUrl;
     const page = parsePositiveInt(searchParams.get("page"), DEFAULT_PAGE);

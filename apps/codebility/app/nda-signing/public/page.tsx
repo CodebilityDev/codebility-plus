@@ -40,6 +40,11 @@ const SignaturePad = forwardRef<SignatureCanvasRef, SignaturePadProps>(
 SignaturePad.displayName = "SignaturePad";
 
 export default function PublicNdaSigningPage() {
+  const [formattedDate, setFormattedDate] = useState("");
+
+  useEffect(() => {
+    setFormattedDate(new Date().toLocaleDateString());
+  }, []);
   const signatureRef = useRef<SignatureCanvasRef | null>(null);
   const [signing, setSigning] = useState(false);
   const [showNameForm, setShowNameForm] = useState(true);
@@ -331,8 +336,6 @@ export default function PublicNdaSigningPage() {
       setSigning(false);
     }
   };
-
-  const formattedDate = new Date().toLocaleDateString();
 
   // Name form view
   if (showNameForm) {

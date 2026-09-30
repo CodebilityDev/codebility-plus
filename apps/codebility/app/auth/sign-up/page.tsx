@@ -28,7 +28,6 @@ import { POSITIONS } from "@/constants/auth/sign-up/sign-up";
 import type { SignupFormData, FormFieldProps } from "@/types/auth/sign-up/sign-up";
 import { SignupFormSchema } from "@/utils/auth/sign-up/sign-up";
 
-
 const FormField = ({ label, name, type = "text", placeholder, register, errors, required, className }: FormFieldProps) => (
   <div className="space-y-1">
     <Label className="text-white text-base font-medium">

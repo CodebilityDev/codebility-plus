@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Logo from "@/components/global/layout/Logo";
 import { footerLinks } from "@/constants/marketing/links";
@@ -12,6 +13,11 @@ import Container from "@/components/global/marketing/MarketingContainer";
 
 const Footer = () => {
   const { onOpen } = useModal();
+  const [year, setYear] = useState<number | null>(null);
+
+  useEffect(() => {
+    setYear(new Date().getFullYear());
+  }, []);
 
   return (
     <section className="w-full overflow-hidden">
@@ -71,7 +77,7 @@ const Footer = () => {
         </div>
         <div className="border-darkgray flex border-t px-0 py-3 md:p-8 lg:items-center lg:justify-center">
           <p className="text-md text-gray">
-            Copyright {new Date().getFullYear()}{" "}
+            Copyright {year ? `${year} ` : ""}
             <Link href="/">Codebility</Link>. All Right Reserved.
           </p>
         </div>

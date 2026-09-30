@@ -1,4 +1,4 @@
-import { unstable_cache } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Codev } from "@/types/global/codev";
 import type { CodevsProfilesPage } from "@/types/global/codevs-profiles";
@@ -131,19 +131,24 @@ export async function getCodevsProfilesPage(
   };
 }
 
-export const getCachedCodevsProfilePositions = unstable_cache(
-  async () => getCodevsProfilePositions(createClientAnon()),
-  ["codevs-profile-positions"],
-  { revalidate: 3600, tags: ["codevs-profiles"] },
-);
+export async function getCachedCodevsProfilePositions() {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("codevs-profiles");
+  return getCodevsProfilePositions(createClientAnon());
+}
 
-export const getCachedCodevsProfilesPage = unstable_cache(
-  async (position: string, page: number, limit: number) =>
-    getCodevsProfilesPage(createClientAnon(), {
-      position: position || undefined,
-      page,
-      limit,
-    }),
-  ["codevs-profiles"],
-  { revalidate: 3600, tags: ["codevs-profiles"] },
-);
+export async function getCachedCodevsProfilesPage(
+  position: string,
+  page: number,
+  limit: number,
+) {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("codevs-profiles");
+  return getCodevsProfilesPage(createClientAnon(), {
+    position: position || undefined,
+    page,
+    limit,
+  });
+}

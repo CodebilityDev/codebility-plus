@@ -1,4 +1,4 @@
-import { unstable_cache } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClientAnon } from "@/lib/global/supabase-anon";
 import type { LandingInternsPage, LandingInternRow } from "@/types/global/lib";
@@ -76,9 +76,9 @@ export async function getLandingInternsPage(
   };
 }
 
-export const getCachedLandingInternsPage = unstable_cache(
-  async (page: number, limit: number) =>
-    getLandingInternsPage(createClientAnon(), { page, limit }),
-  ["landing-interns"],
-  { revalidate: 3600, tags: ["landing-interns"] },
-);
+export async function getCachedLandingInternsPage(page: number, limit: number) {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("landing-interns");
+  return getLandingInternsPage(createClientAnon(), { page, limit });
+}

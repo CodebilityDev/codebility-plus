@@ -13,9 +13,9 @@ import Skills from "@/components/applicant/profile/Skills";
 import TimeSchedule from "@/components/applicant/profile/TimeSchedule";
 import ProfileCompletionGuide from "@/components/applicant/profile/ProfileCompletionGuide";
 
+export const instant = false;
+
 // Prevent static generation at build time
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
 
 export default async function ApplicantProfilePage() {
   return <ProfileComponent />;

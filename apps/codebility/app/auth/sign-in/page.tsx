@@ -5,6 +5,8 @@ import pathsConfig from "@/constants/global/paths";
 
 import AuthForm from "@/components/auth/sign-in/SignInForm";
 
+export const instant = false;
+
 const SignIn = () => {
   return (
     <>

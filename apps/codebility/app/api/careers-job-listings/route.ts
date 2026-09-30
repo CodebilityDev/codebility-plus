@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import type { NextRequest} from "next/server";
 import { NextResponse } from "next/server";
 import { getCachedCareersJobListingsPage } from "@/lib/global/careers-job-listings-cached";
@@ -6,6 +7,7 @@ import { parsePositiveInt, emptyPage } from "@/utils/api/careers-job-listings/ca
 
 
 export async function GET(request: NextRequest) {
+  await connection();
   try {
     const { searchParams } = request.nextUrl;
     const department = searchParams.get("department")?.trim() ?? "";

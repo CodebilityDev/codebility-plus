@@ -1,8 +1,10 @@
+import { connection } from "next/server";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import type { NextRequest} from "next/server";
 import { NextResponse } from "next/server";
 
 export async function GET(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  await connection();
   const params = await props.params;
   
   try {

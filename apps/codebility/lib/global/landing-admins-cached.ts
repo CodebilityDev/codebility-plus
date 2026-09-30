@@ -1,4 +1,4 @@
-import { unstable_cache } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import type { Codev } from "@/types/global/codev";
 import { createClientAnon } from "@/lib/global/supabase-anon";
 import type { LandingAdminsData } from "@/types/global/lib";
@@ -91,11 +91,12 @@ export async function getLandingAdminsData(): Promise<LandingAdminsData | null> 
   };
 }
 
-export const getCachedLandingAdminsData = unstable_cache(
-  getLandingAdminsData,
-  ["landing-admins"],
-  { revalidate: 3600, tags: ["landing-admins"] },
-);
+export async function getCachedLandingAdminsData() {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("landing-admins");
+  return getLandingAdminsData();
+}
 
 export function getLandingAdminsProfileIds(data: LandingAdminsData): string[] {
   return [...data.admins, ...data.mentors].map((member) => member.id);
