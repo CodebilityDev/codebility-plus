@@ -16,7 +16,6 @@
     "preinstall": "npx npm-only-allow@latest --PM pnpm",
     "postinstall": "npx patch-package -y",
     "coupling-graph": "npx madge --extensions js,jsx,ts,tsx,css,md,mdx ./ --exclude '.next|tailwind.config.js|reset.d.ts|prettier.config.js|postcss.config.js|playwright.config.ts|next.config.js|next-env.d.ts|instrumentation.ts|e2e/|README.md|.storybook/|.eslintrc.js' --image graph.svg",
-    "cache:clear": "pnpm tsx scripts/clear-cache.ts",
     "applicants:cleanup": "pnpm tsx scripts/archive-passed-applicants.ts"
   },
   "dependencies": {
@@ -45,7 +44,6 @@
     "embla-carousel-react": "^8.0.0",
     "framer-motion": "^11.2.10",
     "gsap": "^3.13.0",
-    "ioredis": "^5.6.1",
     "jspdf": "^3.0.1",
     "lottie-react": "^2.4.1",
     "lucide-react": "^0.427.0",

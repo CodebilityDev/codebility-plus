@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import AsyncErrorBoundary from "@/components/global/feedback/AsyncErrorBoundary";
 import ErrorBoundary from "@/components/global/feedback/ErrorBoundary";
 import { ModalProviderHome } from "@/providers/home/ModalProviderHome";
@@ -11,8 +10,6 @@ import { Toaster } from "sonner";
 import ToastNotification from "@/components/home/HomeToastNotification";
 import LeftSidebarServer from "@/components/home/LeftSidebarServer";
 import Navbar from "@/components/home/Navbar";
-import PageTransitionWrapper from "@/components/home/PageTransitionWrapper";
-import { PageTransitionSettings } from "@/components/home/PageTransitionSettings";
 import ConditionalMainWrapper from "@/components/home/ConditionalMainWrapper";
 import DynamicMainContent from "@/components/home/DynamicMainContent";
 import type { HomeLayoutProps } from "@/types/home/home";
@@ -30,7 +27,6 @@ export default async function HomeLayout({
           <ThemeProvider>
             <ModalProviderHome />
             <ToastNotification />
-            <PageTransitionSettings />
             <Toaster
               richColors
               position="top-right"
@@ -58,17 +54,7 @@ export default async function HomeLayout({
                 </ErrorBoundary>
                 <DynamicMainContent>
                   <ConditionalMainWrapper>
-                    <PageTransitionWrapper>
-                      <Suspense fallback={
-                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                          <div className="flex h-64 items-center justify-center">
-                            <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-t-2 border-customBlue-500"></div>
-                          </div>
-                        </div>
-                      }>
-                        <AsyncErrorBoundary>{children}</AsyncErrorBoundary>
-                      </Suspense>
-                    </PageTransitionWrapper>
+                    <AsyncErrorBoundary>{children}</AsyncErrorBoundary>
                   </ConditionalMainWrapper>
                 </DynamicMainContent>
               </div>

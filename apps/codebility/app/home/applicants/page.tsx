@@ -1,8 +1,7 @@
-import React, { Suspense } from "react";
+import React from "react";
 import AsyncErrorBoundary from "@/components/global/feedback/AsyncErrorBoundary";
 
 import NewApplicantFetchComp from "@/components/home/applicants/applicantFetchComp";
-import ApplicantsLoading from "./loading";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -22,9 +21,8 @@ export default async function NewApplicants() {
             </div>
           }
         >
-          <Suspense fallback={<ApplicantsLoading />}>
             <NewApplicantFetchComp />
-          </Suspense>
+
         </AsyncErrorBoundary>
       </div>
     </div>

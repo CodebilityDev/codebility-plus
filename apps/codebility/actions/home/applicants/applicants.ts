@@ -5,12 +5,9 @@ import { revalidatePath } from "next/cache";
 import type { NewApplicantType } from "@/types/home/applicants/applicants";
 import { createAdminClient } from "@/lib/home/applicants/supabase-admin";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
-import { invalidateCache } from "@/lib/home/applicants/redis-cache";
-import { cacheKeys } from "@/lib/home/applicants/redis-cache-keys";
 
-// Helper function to revalidate both cache and path
+// Helper function to revalidate the applicants page
 async function revalidateApplicants() {
-    await invalidateCache(cacheKeys.codevs.applicants);
     revalidatePath("/home/applicants");
 }
 

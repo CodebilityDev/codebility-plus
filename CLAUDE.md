@@ -63,7 +63,6 @@ This is a Turborepo monorepo with pnpm workspaces containing multiple Next.js ap
 
 ### Database & Backend Architecture
 - **Primary Database**: Supabase
-- **Caching**: Redis with graceful fallback (ioredis), in `lib/home/applicants/redis*.ts`
 - **Authentication**: Supabase Auth plus role-based permissions from the `roles` table
 - **File Storage**: Supabase Storage for images and documents
 - **Email**: Resend, called from `actions/home/applicants/*-email.ts`

@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import H1 from "@/components/global/layout/H1";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import { Toaster } from "react-hot-toast";
@@ -13,18 +12,13 @@ import Photo from "@/components/applicant/profile/Photo";
 import Skills from "@/components/applicant/profile/Skills";
 import TimeSchedule from "@/components/applicant/profile/TimeSchedule";
 import ProfileCompletionGuide from "@/components/applicant/profile/ProfileCompletionGuide";
-import Loading from "./loading";
 
 // Prevent static generation at build time
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function ApplicantProfilePage() {
-  return (
-    <Suspense fallback={<Loading />}>
-      <ProfileComponent />
-    </Suspense>
-  );
+  return <ProfileComponent />;
 }
 
 async function ProfileComponent() {

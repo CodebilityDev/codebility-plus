@@ -26,10 +26,6 @@ export interface SidebarSection {
   links: SidebarLink[];
 }
 
-export interface PageTransitionWrapperProps {
-  children: React.ReactNode;
-}
-
 export interface ModalProviderHomeProps {
   children?: ReactNode;
 }
