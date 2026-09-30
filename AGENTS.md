@@ -50,7 +50,7 @@ Examples:
 | `actions/home/applicants/applicants.ts` | Accept, deny and move actions for `/home/applicants` |
 | `components/global/account-settings/AccountSettings.tsx` | Used by `/home/account-settings` and `/applicant/account-settings` |
 | `providers/global/ThemeProvider.tsx` | Used by more than one route |
-| `lib/global/supabase-server.ts` | Used everywhere, including `middleware.ts` |
+| `lib/global/supabase-server.ts` | Used everywhere, including `proxy.ts` |
 | `constants/global/paths.ts` | Route paths used across the app |
 | `actions/home/sidebar.ts` | The `/home` sidebar links and permission lookup |
 
@@ -79,7 +79,7 @@ Example: a `reports` feature under `/home/reports`.
 3. Add the route to `constants/global/paths.ts` under `app`.
 4. Add a sidebar link in `actions/home/sidebar.ts`, with a `permission` key.
 5. In the same file, add the key to the `RolePermissions` type, to `NO_PERMISSIONS` and `INACTIVE_PERMISSIONS`, and to the `roles` select.
-6. Add `"/home/reports": "reports"` to `routePermissionMap` in `middleware.ts`. The middleware builds its `roles` select from this map.
+6. Add `"/home/reports": "reports"` to `routePermissionMap` in `proxy.ts`. The proxy builds its `roles` select from this map.
 7. Add the column with a migration, for example `supabase/migrations/20261001_add_reports_permission.sql`:
 
    ```sql
@@ -108,7 +108,7 @@ pnpm codebility:build
 
 CI runs both on every push and pull request to `dev`. The build type-checks the app, so a type error fails it. Lint fails on errors, including folder-layout violations. `pnpm --filter codebility typecheck` also works once `next-env.d.ts` exists, which the first `dev` or `build` run creates.
 
-For changes to auth, middleware or applicant approval, also click through in `pnpm codebility`: sign up, sign in, the applicant pages, and accepting or denying a test applicant at `/home/applicants`.
+For changes to auth, proxy or applicant approval, also click through in `pnpm codebility`: sign up, sign in, the applicant pages, and accepting or denying a test applicant at `/home/applicants`.
 
 ## Known exceptions
 

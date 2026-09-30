@@ -52,11 +52,11 @@ This is a Turborepo monorepo with pnpm workspaces containing multiple Next.js ap
 - `tooling/typescript` - Shared TypeScript configuration
 
 ### Technology Stack
-- **Frontend**: Next.js 15, React 19, TypeScript
+- **Frontend**: Next.js 16, React 19, TypeScript
 - **Styling**: Tailwind CSS with shared configuration
 - **UI Components**: shadcn/ui with Radix UI primitives
 - **Database**: Supabase (PostgreSQL)
-- **Authentication**: Supabase Auth with custom middleware
+- **Authentication**: Supabase Auth with custom proxy
 - **State Management**: Zustand (global) + TanStack Query (server state)
 - **Forms**: React Hook Form with Zod validation
 - **Build System**: Turborepo for build orchestration
@@ -68,16 +68,16 @@ This is a Turborepo monorepo with pnpm workspaces containing multiple Next.js ap
 - **Email**: Resend, called from `actions/home/applicants/*-email.ts`
 
 ### Authentication Flow
-- `middleware.ts` protects routes and redirects by application status
+- `proxy.ts` protects routes and redirects by application status
 - Application status: `applying` → `testing` → `onboarding` → `waitlist` → `passed` (accepted) or `denied`/`failed`
 - Email verification is required, and 2FA is enforced when the user has enrolled it
 - Approved (`passed`) users land on `/home`. Everyone else stays in `/applicant/*` or `/auth/*`.
-- Per-route permissions: `routePermissionMap` in `middleware.ts`, backed by boolean columns on `roles`
+- Per-route permissions: `routePermissionMap` in `proxy.ts`, backed by boolean columns on `roles`
 
 ### Important Configuration Files
 - `turbo.json` - Turborepo task configuration and caching rules
 - `pnpm-workspace.yaml` - Workspace package definitions
-- `apps/codebility/middleware.ts` - Authentication and route protection logic
+- `apps/codebility/proxy.ts` - Authentication and route protection logic
 - `apps/codebility/eslint.config.js` - Lint rules, including folder boundaries
 - `apps/codebility/database-schema.md` - Database schema documentation with table relationships
 

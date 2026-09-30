@@ -46,7 +46,7 @@ export interface Sidebar {
 }
 
 // Each key is a boolean column on the `roles` table. Add a key here, in the
-// select below, and in middleware.ts when a new private page gets a permission.
+// select below, and in proxy.ts when a new private page gets a permission.
 export interface RolePermissions {
   dashboard: boolean;
   applicants: boolean;

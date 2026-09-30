@@ -48,7 +48,7 @@ const routePermissionMap = {
 type Permission = (typeof routePermissionMap)[keyof typeof routePermissionMap];
 const PERMISSION_COLUMNS = [...new Set(Object.values(routePermissionMap))].join(", ");
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   try {
     const { pathname } = req.nextUrl;
 
@@ -219,7 +219,7 @@ export async function middleware(req: NextRequest) {
 
     return NextResponse.next();
   } catch (error) {
-    console.error("Middleware error:", error);
+    console.error("Proxy error:", error);
     return redirectToLogin(req);
   }
 }
