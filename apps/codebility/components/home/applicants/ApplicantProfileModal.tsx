@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@codevs/ui/tabs";
 import { useApplicantModal } from "@/providers/home/applicants/ApplicantModalProvider";
 import ApplicantProcessTimeline from "@/components/home/applicants/ApplicantProcessTimeline";
 import { ApplicantProfileModalSection } from "@/components/home/applicants/ApplicantProfileModalSection";
+import { getTechStackIconName } from "@/constants/global/techstack";
 
 
 const ApplicantProfileModal = () => {
@@ -348,7 +349,7 @@ const ApplicantProfileModal = () => {
                         className="flex items-center"
                       >
                         <Image
-                          src={`/assets/svgs/techstack/icon-${tech.toLowerCase()}.svg`}
+                          src={`/assets/svgs/techstack/icon-${getTechStackIconName(tech)}.svg`}
                           alt={`${tech} icon`}
                           width={32}
                           height={32}

@@ -21,7 +21,11 @@ export function CodevHireCodevModal() {
 	const { isOpen, onClose, type, data: codevId } = useModal() as { isOpen: boolean; onClose: () => void; type: string; data: string };
 	const isModalOpen = isOpen && type === "marketingCodevHireCodevModal";
 
-	const codev = useAsyncValue(() => getCodev(codevId), null, [codevId]);
+	const codev = useAsyncValue(
+		() => (isModalOpen && codevId ? getCodev(codevId) : Promise.resolve(null)),
+		null,
+		[codevId, isModalOpen],
+	);
 
 	const form = useForm<HireCodevEmail>({
 		resolver: zodResolver(hireCodevEmailSchema),

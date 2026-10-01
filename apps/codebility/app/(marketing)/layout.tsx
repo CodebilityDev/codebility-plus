@@ -5,10 +5,10 @@ import SideNavMenu from "@/components/marketing/MarketingSidenavMenu";
 import { getSiteDate } from "@/lib/global/site-date";
 import type { MarketingLayoutProps } from "@/types/marketing/marketing";
 
-export default function MarketingLayout({
+export default async function MarketingLayout({
   children,
 }: MarketingLayoutProps) {
-  const { year } = getSiteDate();
+  const { year } = await getSiteDate();
 
   return (
       <main className="bg-black-400 relative w-full overflow-x-hidden">

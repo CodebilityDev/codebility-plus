@@ -1,5 +1,6 @@
 import { cacheLife, cacheTag } from "next/cache";
 
+import { CACHE_TAGS } from "@/lib/global/cache-tags";
 import { createClientAnon } from "@/lib/global/supabase-anon";
 import type { Codev } from "@/types/global/codev";
 import type { RealProject } from "@/types/global/proposal";
@@ -7,7 +8,7 @@ import type { RealProject } from "@/types/global/proposal";
 export async function getRealProjects() {
   "use cache";
   cacheLife("hours");
-  cacheTag("proposal-projects");
+  cacheTag(CACHE_TAGS.proposalProjects);
   try {
     const supabase = createClientAnon();
 
@@ -46,7 +47,7 @@ export async function getRealProjects() {
 export async function getCodevProfiles() {
   "use cache";
   cacheLife("hours");
-  cacheTag("proposal-codevs");
+  cacheTag(CACHE_TAGS.proposalCodevs);
   try {
     const supabase = createClientAnon();
 

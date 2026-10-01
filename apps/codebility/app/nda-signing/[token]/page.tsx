@@ -10,7 +10,7 @@ export const instant = false;
 export default async function NdaSigningTokenPage({ params }: NdaSigningTokenPageProps) {
   const { token } = await params;
   const [{ formatted }, codevId] = await Promise.all([
-    Promise.resolve(getSiteDate()),
+    getSiteDate(),
     getNdaRequestCodevId(token),
   ]);
 

@@ -1,12 +1,14 @@
 "use server";
 
 import { cachedUser } from "@/lib/applicant/profile/supabase-action";
+import { CACHE_TAGS, expireCodevCaches } from "@/lib/global/cache-tags";
 import type {
   JobStatus,
   Position,
   WorkExperience,
   WorkSchedule,
 } from "@/types/global/codev";
+import { revalidatePath, updateTag } from "next/cache";
 
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import type { Database } from "@/types/global/supabase";
@@ -34,6 +36,7 @@ export async function updateCodev(updatedData: CodevUpdate) {
       .select("id");
 
     if (error) throw error;
+    await expireCodevCaches();
     return data;
   } catch (error) {
     console.error("Error updating codev:", error);
@@ -63,6 +66,7 @@ export async function updateSocialLinks(socialData: {
       .select("id");
 
     if (error) throw error;
+    updateTag(CACHE_TAGS.profileDetail);
     return data;
   } catch (error) {
     console.error("Error updating social links:", error);
@@ -88,6 +92,8 @@ export async function createWorkExperience(
       .select();
 
     if (error) throw error;
+    updateTag(CACHE_TAGS.profileDetail);
+    updateTag(CACHE_TAGS.profilesListing);
     return data;
   } catch (error) {
     console.error("Error creating work experience:", error);
@@ -112,6 +118,8 @@ export async function updateWorkExperience(
       .select();
 
     if (error) throw error;
+    updateTag(CACHE_TAGS.profileDetail);
+    updateTag(CACHE_TAGS.profilesListing);
     return data;
   } catch (error) {
     console.error("Error updating work experience:", error);
@@ -132,6 +140,8 @@ export async function deleteWorkExperience(id: string) {
       .eq("id", id);
 
     if (error) throw error;
+    updateTag(CACHE_TAGS.profileDetail);
+    updateTag(CACHE_TAGS.profilesListing);
   } catch (error) {
     console.error("Error deleting work experience:", error);
     throw new Error("Failed to delete work experience");
@@ -154,6 +164,7 @@ export async function createEducation(education: EducationInsert) {
       .select();
 
     if (error) throw error;
+    updateTag(CACHE_TAGS.profileDetail);
     return data;
   } catch (error) {
     console.error("Error creating education:", error);
@@ -178,6 +189,7 @@ export async function updateEducation(
       .select();
 
     if (error) throw error;
+    updateTag(CACHE_TAGS.profileDetail);
     return data;
   } catch (error) {
     console.error("Error updating education:", error);
@@ -198,6 +210,7 @@ export async function deleteEducation(id: string) {
       .eq("id", id);
 
     if (error) throw error;
+    updateTag(CACHE_TAGS.profileDetail);
   } catch (error) {
     console.error("Error deleting education:", error);
     throw new Error("Failed to delete education");
@@ -284,6 +297,7 @@ export async function updateWorkSchedule(
       throw new Error("Failed to insert new schedule");
     }
 
+    updateTag(CACHE_TAGS.profileDetail);
     return data[0];
   } catch (error) {
     if (error instanceof Error) {
@@ -332,6 +346,7 @@ export async function createJobStatus(jobStatus: Omit<JobStatus, "id">) {
       .single();
 
     if (error) throw error;
+    revalidatePath("/applicant/profile");
     return [data]; // Return as array to match expected format
   } catch (error) {
     console.error("Error creating job status:", error);
@@ -359,6 +374,7 @@ export async function updateJobStatus(
       .single();
 
     if (error) throw error;
+    revalidatePath("/applicant/profile");
     return data;
   } catch (error) {
     console.error("Error updating job status:", error);
@@ -379,6 +395,7 @@ export async function deleteJobStatus(id: string) {
       .eq("id", id);
 
     if (error) throw error;
+    revalidatePath("/applicant/profile");
   } catch (error) {
     console.error("Error deleting job status:", error);
     throw new Error("Failed to delete job status");

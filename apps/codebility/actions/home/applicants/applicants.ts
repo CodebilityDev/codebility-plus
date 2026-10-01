@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import type { NewApplicantType } from "@/types/home/applicants/applicants";
 import { createAdminClient } from "@/lib/home/applicants/supabase-admin";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
+import { expireCodevCaches } from "@/lib/global/cache-tags";
 
 // Helper function to revalidate the applicants page
 function revalidateApplicants(): Promise<void> {
@@ -47,6 +48,7 @@ export async function deleteApplicantAction(
 
         //revalidate the cache
         await revalidateApplicants();
+        await expireCodevCaches();
     } catch (error) {
         console.error("Error deleting applicant:", error);
         throw new Error("Failed to delete applicant");
@@ -96,6 +98,7 @@ export async function multipleDeleteApplicantAction(applicant: NewApplicantType[
         }
 
         await revalidateApplicants();
+        await expireCodevCaches();
     } catch (error) {
         console.error("Error deleting applicants:", error);
         throw new Error("Failed to delete applicants");
@@ -290,6 +293,7 @@ export async function acceptApplicantAction(applicantId: string) {
         await resetReminderDataAction(applicantId);
 
         await revalidateApplicants();
+        await expireCodevCaches();
     } catch (error) {
         console.error("Error accepting applicant test:", error);
         throw new Error("Failed to accept applicant test");
@@ -320,6 +324,7 @@ export async function multipleAcceptApplicantAction(applicantIds: string[]) {
         await resetMultipleReminderDataAction(applicantIds);
 
         await revalidateApplicants();
+        await expireCodevCaches();
     } catch (error) {
         console.error("Error accepting multiple applicants test:", error);
         throw new Error("Failed to accept multiple applicants test");
@@ -675,6 +680,8 @@ export async function resetReminderDataAction(applicantId: string) {
             console.error("Error resetting reminder data:", error);
             throw new Error(`Failed to reset reminder data: ${error.message}`);
         }
+
+        await revalidateApplicants();
     } catch (error) {
         console.error("Error resetting reminder data:", error);
         throw new Error("Failed to reset reminder data");
@@ -699,6 +706,8 @@ export async function resetMultipleReminderDataAction(applicantIds: string[]) {
             console.error("Error resetting reminder data for multiple applicants:", error);
             throw new Error(`Failed to reset reminder data for multiple applicants: ${error.message}`);
         }
+
+        await revalidateApplicants();
     } catch (error) {
         console.error("Error resetting multiple reminder data:", error);
         throw new Error("Failed to reset multiple reminder data");

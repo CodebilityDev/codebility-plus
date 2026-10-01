@@ -1,5 +1,6 @@
 import { cacheLife, cacheTag } from "next/cache";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { CACHE_TAGS } from "@/lib/global/cache-tags";
 import { createClientAnon } from "@/lib/global/supabase-anon";
 import type { ServicesProjectCard, ServicesProjectMember, ServicesProjectDetail, ServicesProjectsPage, ListRow } from "@/types/global/lib";
 
@@ -246,13 +247,13 @@ export async function getCachedServicesProjectsPage(
 ) {
   "use cache";
   cacheLife("hours");
-  cacheTag("services-projects");
+  cacheTag(CACHE_TAGS.servicesProjects);
   return getServicesProjectsPage(createClientAnon(), { category, page, limit });
 }
 
 export async function getCachedServicesProjectById(projectId: string) {
   "use cache";
   cacheLife("hours");
-  cacheTag("services-projects");
+  cacheTag(CACHE_TAGS.servicesProjects);
   return getServicesProjectById(createClientAnon(), projectId);
 }

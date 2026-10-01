@@ -1,7 +1,12 @@
+import { cacheLife } from "next/cache";
+
 import { formatNdaDate } from "@/utils/global/date";
 
-export function getSiteDate() {
-  const now = new Date();
+export async function getSiteDate() {
+  "use cache";
+  cacheLife("hours");
+
+  const now = await Promise.resolve(new Date());
 
   return {
     year: now.getFullYear(),

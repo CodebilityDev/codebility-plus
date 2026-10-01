@@ -92,8 +92,8 @@ const TimeSchedule = ({ data, codevId }: TimeScheduleProps) => {
       return;
     }
 
-    const [startHour, startMinute] = schedule.start_time.split(":").map(Number);
-    const [endHour, endMinute] = schedule.end_time.split(":").map(Number);
+    const [startHour = 0, startMinute = 0] = schedule.start_time.split(":").map(Number);
+    const [endHour = 0, endMinute = 0] = schedule.end_time.split(":").map(Number);
 
     if (
       endHour < startHour ||

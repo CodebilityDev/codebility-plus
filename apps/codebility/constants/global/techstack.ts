@@ -194,6 +194,7 @@ export function getTechStackIconName(stackName: string): string {
     return tech.alias;
   }
 
-  // Default: convert to lowercase and replace spaces with hyphens
-  return stackName.toLowerCase().replace(/\s+/g, '-');
+  // Default: lowercase, drop dots, and replace spaces with hyphens so the
+  // result matches the icon file naming (e.g. "Node.js" -> "nodejs")
+  return stackName.toLowerCase().replace(/\./g, "").replace(/\s+/g, "-");
 }

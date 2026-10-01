@@ -6,7 +6,7 @@ import InputField from "@/components/global/layout/InputPhone";
 import { Button } from "@/components/global/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import type { FieldValues, SubmitHandler} from "react-hook-form";
+import type { FieldValues, SubmitHandler, Control } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
@@ -72,7 +72,7 @@ const PasswordResetForm = () => {
               id="email"
               label="Email"
               type="email"
-              control={control}
+              control={control as Control<any>}
               error={errors.email?.message}
               disabled={isLoading}
               inputClassName="bg-gray-50 border-gray-300"

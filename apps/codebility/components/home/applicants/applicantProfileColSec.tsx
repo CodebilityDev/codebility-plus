@@ -19,6 +19,7 @@ import ApplicantReapplyTime from "@/components/home/applicants/applicantReapplyT
 import ApplicantTestTimeRemaining from "@/components/home/applicants/applicantTestTimeRemaining";
 import ApplicantActionButton from "@/components/home/applicants/applicantActionButton";
 import type { ApplicantProfileColSecProps } from "@/types/home/applicants/applicants";
+import { getTechStackIconName } from "@/constants/global/techstack";
 
 export default function ApplicantProfileColSec({
   applicant,
@@ -213,7 +214,7 @@ export default function ApplicantProfileColSec({
                       applicant.tech_stacks.slice(0, 4).map((stack, i) => (
                         <Image
                           key={i}
-                          src={`/assets/svgs/techstack/icon-${stack.toLowerCase()}.svg`}
+                          src={`/assets/svgs/techstack/icon-${getTechStackIconName(stack)}.svg`}
                           alt={`${stack} icon`}
                           width={24}
                           height={24}

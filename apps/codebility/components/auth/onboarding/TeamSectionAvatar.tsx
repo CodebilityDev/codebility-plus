@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { cn } from "@/utils/global/cn";
 import type { TeamSectionAvatarProps } from "@/types/auth/onboarding/onboarding";
 

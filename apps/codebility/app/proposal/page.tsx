@@ -7,7 +7,7 @@ export default async function ProposalPage() {
   const [projectsResult, codevsResult, { year }] = await Promise.all([
     getRealProjects(),
     getCodevProfiles(),
-    Promise.resolve(getSiteDate()),
+    getSiteDate(),
   ]);
 
   return (

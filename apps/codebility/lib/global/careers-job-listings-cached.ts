@@ -2,6 +2,7 @@ import { cacheLife, cacheTag } from "next/cache";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { JobListing } from "@/types/global/job-listings";
 import type { CareersJobListingsPage } from "@/types/global/careers-job-listings";
+import { CACHE_TAGS } from "@/lib/global/cache-tags";
 import { createClientAnon } from "@/lib/global/supabase-anon";
 import type { JobListingRow } from "@/types/global/lib";
 
@@ -126,7 +127,7 @@ export async function getCareersJobListingsPage(
 export async function getCachedCareersJobDepartments() {
   "use cache";
   cacheLife("hours");
-  cacheTag("careers-job-listings");
+  cacheTag(CACHE_TAGS.careersJobListings);
   return getCareersJobDepartments(createClientAnon());
 }
 
@@ -139,7 +140,7 @@ export async function getCachedCareersJobListingsPage(
 ) {
   "use cache";
   cacheLife("hours");
-  cacheTag("careers-job-listings");
+  cacheTag(CACHE_TAGS.careersJobListings);
   return getCareersJobListingsPage(createClientAnon(), {
     department: department || undefined,
     type: type || undefined,

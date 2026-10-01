@@ -4,6 +4,16 @@ Goal: every read happens in a React Server Component behind a cache, every write
 goes through a server action, no client fetch remains, clients are typed against
 the generated schema, and queries select only the columns they use.
 
+## Current state
+
+As of this change, `cacheComponents: true` is enabled in `next.config.mjs`. All 19 data
+loaders in `lib/` carry the `"use cache"` directive with `cacheLife("hours")`, a one hour
+hard cache, and `cacheTag(...)`. The legacy `unstable_cache` wrapper is fully removed.
+On-demand revalidation is done with `updateTag` and `revalidateTag` called from server
+actions. The earlier note that `cacheComponents` is incompatible with Supabase
+prerendering was a misdiagnosis. The real blocker was a `new Date()` read during
+prerender, and that read is now cached.
+
 ## Starting state
 
 | Fact | Value |

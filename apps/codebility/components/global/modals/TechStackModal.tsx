@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/global/ui/dialog";
-import { techstacks } from "@/constants/global/techstack";
+import { getTechStackIconName, techstacks } from "@/constants/global/techstack";
 import { useModal } from "@/hooks/global/use-modal";
 import { useTechStackStore } from "@/hooks/global/use-techstack";
 import { IconClose } from "@/public/assets/svgs/index";
@@ -80,11 +80,7 @@ const TechStackModal = () => {
                 >
                   <div className="relative mx-auto h-4 w-4 sm:mx-0 sm:h-5 sm:w-5">
                     <Image
-                      src={
-                        stackItem.alias
-                          ? `/assets/svgs/techstack/icon-${stackItem.alias.toLowerCase()}.svg`
-                          : `/assets/svgs/techstack/icon-${stackItem.name.toLowerCase()}.svg`
-                      }
+                      src={`/assets/svgs/techstack/icon-${getTechStackIconName(stackItem.name)}.svg`}
                       alt={`${stackItem.name} icon`}
                       fill
                       sizes="(min-width: 640px) 24px, 20px"
@@ -112,11 +108,7 @@ const TechStackModal = () => {
                 >
                   <div className="relative mx-auto h-4 w-4 sm:mx-0 sm:h-5 sm:w-5">
                     <Image
-                      src={
-                        stackItem.alias
-                          ? `/assets/svgs/techstack/icon-${stackItem.alias.toLowerCase()}.svg`
-                          : `/assets/svgs/techstack/icon-${stackItem.name.toLowerCase()}.svg`
-                      }
+                      src={`/assets/svgs/techstack/icon-${getTechStackIconName(stackItem.name)}.svg`}
                       alt={`${stackItem.name} icon`}
                       fill
                       sizes="(min-width: 640px) 24px, 20px"
@@ -144,11 +136,7 @@ const TechStackModal = () => {
                 >
                   <div className="relative mx-auto h-4 w-4 sm:mx-0 sm:h-5 sm:w-5">
                     <Image
-                      src={
-                        stackItem.alias
-                          ? `/assets/svgs/techstack/icon-${stackItem.alias.toLowerCase()}.svg`
-                          : `/assets/svgs/techstack/icon-${stackItem.name.toLowerCase()}.svg`
-                      }
+                      src={`/assets/svgs/techstack/icon-${getTechStackIconName(stackItem.name)}.svg`}
                       alt={`${stackItem.name} icon`}
                       fill
                       sizes="(min-width: 640px) 24px, 20px"
@@ -176,11 +164,7 @@ const TechStackModal = () => {
                 >
                   <div className="relative mx-auto h-4 w-4 sm:mx-0 sm:h-5 sm:w-5">
                     <Image
-                      src={
-                        stackItem.alias
-                          ? `/assets/svgs/techstack/icon-${stackItem.alias.toLowerCase()}.svg`
-                          : `/assets/svgs/techstack/icon-${stackItem.name.toLowerCase()}.svg`
-                      }
+                      src={`/assets/svgs/techstack/icon-${getTechStackIconName(stackItem.name)}.svg`}
                       alt={`${stackItem.name} icon`}
                       fill
                       sizes="(min-width: 640px) 24px, 20px"
@@ -208,11 +192,7 @@ const TechStackModal = () => {
                 >
                   <div className="relative mx-auto h-4 w-4 sm:mx-0 sm:h-5 sm:w-5">
                     <Image
-                      src={
-                        stackItem.alias
-                          ? `/assets/svgs/techstack/icon-${stackItem.alias.toLowerCase()}.svg`
-                          : `/assets/svgs/techstack/icon-${stackItem.name.toLowerCase()}.svg`
-                      }
+                      src={`/assets/svgs/techstack/icon-${getTechStackIconName(stackItem.name)}.svg`}
                       alt={`${stackItem.name} icon`}
                       fill
                       sizes="(min-width: 640px) 24px, 20px"
@@ -240,11 +220,7 @@ const TechStackModal = () => {
                 >
                   <div className="relative mx-auto h-4 w-4 sm:mx-0 sm:h-5 sm:w-5">
                     <Image
-                      src={
-                        stackItem.alias
-                          ? `/assets/svgs/techstack/icon-${stackItem.alias.toLowerCase()}.svg`
-                          : `/assets/svgs/techstack/icon-${stackItem.name.toLowerCase()}.svg`
-                      }
+                      src={`/assets/svgs/techstack/icon-${getTechStackIconName(stackItem.name)}.svg`}
                       alt={`${stackItem.name} icon`}
                       fill
                       sizes="(min-width: 640px) 24px, 20px"
@@ -272,11 +248,7 @@ const TechStackModal = () => {
                 >
                   <div className="relative mx-auto h-4 w-4 sm:mx-0 sm:h-5 sm:w-5">
                     <Image
-                      src={
-                        stackItem.alias
-                          ? `/assets/svgs/techstack/icon-${stackItem.alias.toLowerCase()}.svg`
-                          : `/assets/svgs/techstack/icon-${stackItem.name.toLowerCase()}.svg`
-                      }
+                      src={`/assets/svgs/techstack/icon-${getTechStackIconName(stackItem.name)}.svg`}
                       alt={`${stackItem.name} icon`}
                       fill
                       sizes="(min-width: 640px) 24px, 20px"
@@ -304,11 +276,7 @@ const TechStackModal = () => {
                 >
                   <div className="relative mx-auto h-4 w-4 sm:mx-0 sm:h-5 sm:w-5">
                     <Image
-                      src={
-                        stackItem.alias
-                          ? `/assets/svgs/techstack/icon-${stackItem.alias.toLowerCase()}.svg`
-                          : `/assets/svgs/techstack/icon-${stackItem.name.toLowerCase()}.svg`
-                      }
+                      src={`/assets/svgs/techstack/icon-${getTechStackIconName(stackItem.name)}.svg`}
                       alt={`${stackItem.name} icon`}
                       fill
                       sizes="(min-width: 640px) 24px, 20px"

@@ -1,5 +1,6 @@
 import { cacheLife, cacheTag } from "next/cache";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { CACHE_TAGS } from "@/lib/global/cache-tags";
 import { createClientAnon } from "@/lib/global/supabase-anon";
 import type { LandingInternsPage, LandingInternRow } from "@/types/global/lib";
 
@@ -79,6 +80,6 @@ export async function getLandingInternsPage(
 export async function getCachedLandingInternsPage(page: number, limit: number) {
   "use cache";
   cacheLife("hours");
-  cacheTag("landing-interns");
+  cacheTag(CACHE_TAGS.landingInterns);
   return getLandingInternsPage(createClientAnon(), { page, limit });
 }

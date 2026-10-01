@@ -625,8 +625,8 @@ export default function useOnboardingAnimations({
       try {
         roadmapObserver?.disconnect();
         roadmapObserver = null;
-        mm.revert();
-        ctx.revert();
+        mm?.revert();
+        ctx?.revert();
       } catch {
         /* noop */
       }

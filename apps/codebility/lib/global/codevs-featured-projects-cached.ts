@@ -1,5 +1,6 @@
 import { cacheLife, cacheTag } from "next/cache";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { CACHE_TAGS } from "@/lib/global/cache-tags";
 import { createClientAnon } from "@/lib/global/supabase-anon";
 import type { CodevsFeaturedProjects, ProjectRow } from "@/types/global/lib";
 
@@ -58,6 +59,6 @@ export async function getCodevsFeaturedProjects(
 export async function getCachedCodevsFeaturedProjects() {
   "use cache";
   cacheLife("hours");
-  cacheTag("codevs-featured-projects");
+  cacheTag(CACHE_TAGS.codevsFeaturedProjects);
   return getCodevsFeaturedProjects(createClientAnon());
 }

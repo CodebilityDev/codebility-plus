@@ -15,6 +15,7 @@ import ProfileProjectsSection from "@/components/marketing/profiles/ProfileDetai
 import ProfileRatingSection from "@/components/marketing/profiles/ProfileDetailRatingSection";
 import type { ProfileContentProps } from "@/types/marketing/profiles/profiles";
 import { getFilteredLevel } from "@/utils/marketing/profiles/profiles";
+import { getTechStackIconName } from "@/constants/global/techstack";
 
 
 export default function ProfileContent({
@@ -52,11 +53,15 @@ export default function ProfileContent({
         ? "Under NDA"
         : "Unavailable";
 
-  const sanitizeUrl = (url: string | undefined): string => {
-    if (!url) return "#";
-    return url
+  const sanitizeUrl = (url: string | null | undefined): string | null => {
+    if (!url) return null;
+
+    const value = url
       .replace(process.env.NEXT_PUBLIC_APP_BASE_URL ?? "", "")
-      .replace(process.env.NEXT_PUBLIC_APP_BASE_URL ?? "", "");
+      .replace(process.env.NEXT_PUBLIC_APP_BASE_URL ?? "", "")
+      .trim();
+
+    return /^https?:\/\//i.test(value) ? value : null;
   };
 
   const formatTime = (time: string) => {
@@ -86,6 +91,10 @@ export default function ProfileContent({
     () => getFilteredLevel(asLevelRecord(codev.level)),
     [codev.level],
   );
+
+  const linkedinUrl = sanitizeUrl(linkedin);
+  const githubUrl = sanitizeUrl(github);
+  const portfolioUrl = sanitizeUrl(portfolio_website);
 
   const sidebarSkeleton = (
     <div className="bg-black-500 flex h-auto w-full basis-[30%] flex-col items-center justify-start gap-4 rounded-lg p-6 text-white shadow-lg lg:p-8">
@@ -156,27 +165,27 @@ export default function ProfileContent({
         </p>
       )}
       <div className="flex gap-4">
-        {linkedin && (
+        {linkedinUrl && (
           <Link
-            href={sanitizeUrl(linkedin)}
+            href={linkedinUrl}
             target="_blank"
             className="bg-darkgray hover:bg-black-100 block rounded-lg p-2 transition duration-300 hover:scale-110"
           >
             <IconLinkedInWhiteSmall className="text-2xl" />
           </Link>
         )}
-        {github && (
+        {githubUrl && (
           <Link
-            href={sanitizeUrl(github)}
+            href={githubUrl}
             target="_blank"
             className="bg-darkgray hover:bg-black-100 block rounded-lg p-2 transition duration-300 hover:scale-110"
           >
             <IconGithub className="text-2xl" />
           </Link>
         )}
-        {portfolio_website && (
+        {portfolioUrl && (
           <Link
-            href={sanitizeUrl(portfolio_website)}
+            href={portfolioUrl}
             target="_blank"
             className="bg-darkgray hover:bg-black-100 block rounded-lg p-2 transition duration-300 hover:scale-110"
           >
@@ -208,7 +217,7 @@ export default function ProfileContent({
                 className="transition-transform duration-300 hover:scale-125"
               >
                 <Image
-                  src={`/assets/svgs/techstack/icon-${stack.toLowerCase()}.svg`}
+                  src={`/assets/svgs/techstack/icon-${getTechStackIconName(stack)}.svg`}
                   alt={stack}
                   width={25}
                   height={25}

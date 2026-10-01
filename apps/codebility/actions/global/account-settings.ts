@@ -27,7 +27,8 @@ export const updatePassword = async (formData: FormData) => {
         return { success: false, error: updateError.message };
     }
 
-    revalidatePath("/account-settings");
+    revalidatePath("/home/account-settings");
+    revalidatePath("/applicant/account-settings");
     return { success: true };
 };
 
@@ -168,6 +169,7 @@ export const updateUsername = async (userId: string, newUsername: string) => {
         return { success: false, error: "Failed to update username" };
     }
 
-    revalidatePath("/account-settings");
+    revalidatePath("/home/account-settings");
+    revalidatePath("/applicant/account-settings");
     return { success: true };
 };

@@ -1,5 +1,6 @@
 import { cacheLife, cacheTag } from "next/cache";
 
+import { CACHE_TAGS } from "@/lib/global/cache-tags";
 import { createClientAnon } from "@/lib/global/supabase-anon";
 import { getCodevsWithClient } from "@/lib/global/codev-service";
 
@@ -8,7 +9,7 @@ const FOUNDER_USER_ID = process.env.NEXT_PUBLIC_FOUNDER_USER_ID ?? "";
 export async function getTeamData() {
   "use cache";
   cacheLife("hours");
-  cacheTag("onboarding-team");
+  cacheTag(CACHE_TAGS.onboardingTeam);
   // Fetch both admins and mentors in parallel
   const [
     { data: admins, error: adminError },

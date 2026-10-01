@@ -1,7 +1,9 @@
 "use server";
 
 import { createClient } from "@supabase/supabase-js";
+import { revalidatePath } from "next/cache";
 
+import { expireCodevCaches } from "@/lib/global/cache-tags";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 
 export async function deleteAuthUser() {
@@ -43,6 +45,9 @@ export async function deleteAuthUser() {
     console.error("Error deleting user:", deleteError);
     return { error: "Failed to delete user authentication" };
   }
+
+  await expireCodevCaches();
+  revalidatePath("/home/applicants");
 
   return { success: true, message: "User authentication deleted successfully" };
 }

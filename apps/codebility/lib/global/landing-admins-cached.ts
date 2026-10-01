@@ -1,5 +1,6 @@
 import { cacheLife, cacheTag } from "next/cache";
 import type { Codev } from "@/types/global/codev";
+import { CACHE_TAGS } from "@/lib/global/cache-tags";
 import { createClientAnon } from "@/lib/global/supabase-anon";
 import type { LandingAdminsData } from "@/types/global/lib";
 
@@ -94,7 +95,7 @@ export async function getLandingAdminsData(): Promise<LandingAdminsData | null> 
 export async function getCachedLandingAdminsData() {
   "use cache";
   cacheLife("hours");
-  cacheTag("landing-admins");
+  cacheTag(CACHE_TAGS.landingAdmins);
   return getLandingAdminsData();
 }
 

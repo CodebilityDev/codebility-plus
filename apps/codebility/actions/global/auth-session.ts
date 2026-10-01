@@ -347,8 +347,7 @@ export const signOut = async (): Promise<void> => {
     const { error } = await supabase.auth.signOut();
     if (error) throw new Error(`Sign out error: ${error.message}`);
 
-    // Redirect to the /codev page
-    redirect("/codev");
+    redirect("/codevs");
   } catch (error) {
     console.error("Sign out error:", error);
     throw error;

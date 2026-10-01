@@ -1,6 +1,7 @@
 "use server";
 
 import { updateCodev } from "@/actions/applicant/profile/applicant-profile";
+import { expireCodevCaches } from "@/lib/global/cache-tags";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import type { UploadImageOptions } from "@/types/applicant/profile/profile";
 
@@ -49,8 +50,10 @@ export async function uploadImage(
       publicUrl: String(publicUrlData.publicUrl),
     }; */
 
-    if (folder == "profileImage")
+    if (folder == "profileImage") {
       await updateCodev({ image_url: publicUrlData.publicUrl });
+      await expireCodevCaches();
+    }
 
     return publicUrlData.publicUrl.toString();
 
@@ -77,7 +80,7 @@ export async function deleteImage(
   }
 }
 
-export function getImagePath(url: string): Promise<string | null> {
+export async function getImagePath(url: string): Promise<string | null> {
   try {
     const urlObj = new URL(url);
     const pathParts = urlObj.pathname.split("/");

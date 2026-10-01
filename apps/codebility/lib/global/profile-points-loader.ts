@@ -1,5 +1,4 @@
 import { cache } from "react";
-import { cacheLife, cacheTag } from "next/cache";
 
 import { computeProfilePoints } from "@/lib/global/profile-points";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
@@ -8,10 +7,6 @@ import type { ProfilePointsData, ProfilePointsResult } from "@/types/global/prof
 
 export const loadProfilePoints = cache(
   async (): Promise<ProfilePointsResult | null> => {
-    "use cache";
-    cacheLife("minutes");
-    cacheTag("profile-points");
-
     const supabase = await createClientServerComponent();
     const {
       data: { user },

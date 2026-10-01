@@ -36,9 +36,7 @@ export function InternCardsAvatar({
   const initials = getInitials();
   const [imgError, setImgError] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
-  const hasImage = Boolean(person.image) && !imgError;
-
-  if (hasImage) {
+  if (person.image && !imgError) {
     return (
       <div
         className="relative flex-shrink-0 overflow-hidden rounded-full border-2 border-neutral-700 bg-gray-800"

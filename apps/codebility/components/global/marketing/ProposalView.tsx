@@ -272,14 +272,18 @@ export default function ProposalView({ realProjects, codevProfiles, year }: Prop
                     {projectData.length > 0 ? (
                       projectData.map((project, idx) => (
                         <div key={idx} className="group relative overflow-hidden rounded-lg bg-black-600 border-2 border-dark-100 hover:border-purple-500/50 transition-all duration-300">
-                          <Image
-                            src={project.main_image}
-                            alt={project.name}
-                            width={400}
-                            height={160}
-                            className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300"
-                            loading="lazy"
-                          />
+                          {project.main_image ? (
+                            <Image
+                              src={project.main_image}
+                              alt={project.name}
+                              width={400}
+                              height={160}
+                              className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300"
+                              loading="lazy"
+                            />
+                          ) : (
+                            <div className="w-full h-40 bg-gray-800" />
+                          )}
                           <div className="absolute inset-0 bg-gradient-to-t from-purple-900/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                           <div className="p-3 relative z-10">
                             <div className="text-sm font-medium truncate text-white">{project.name}</div>

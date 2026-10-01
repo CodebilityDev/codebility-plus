@@ -1,5 +1,3 @@
-"use server";
-
 import Navigation from "@/components/global/marketing/MarketingNavigation";
 import type { ApplicantLayoutProps } from "@/types/applicant/applicant";
 

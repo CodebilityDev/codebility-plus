@@ -43,7 +43,8 @@ export async function applicantTakeTest({
             return undefined;
         }
 
-        /*         revalidatePath("/applicant/waiting"); */
+        revalidatePath("/applicant/waiting");
+        revalidatePath("/home/applicants");
     } catch (error) {
         console.error("Error taking test:", error);
     }
@@ -71,6 +72,7 @@ export async function applicantMoveToOnboard({
         }
 
         revalidatePath("/applicant/waiting");
+        revalidatePath("/home/applicants");
     } catch (error) {
         console.error("Error taking test:", error);
     }
@@ -100,6 +102,7 @@ export async function applicantSubmitTest({
         }
 
         revalidatePath("/applicant/waiting");
+        revalidatePath("/home/applicants");
     } catch (error) {
         console.error("Error submitting test:", error);
     }
@@ -129,6 +132,7 @@ export async function applicantUpdateTestSubmission({
         }
 
         revalidatePath("/applicant/waiting");
+        revalidatePath("/home/applicants");
     } catch (error) {
         console.error("Error updating test submission:", error);
     }
@@ -173,6 +177,7 @@ export async function applicantUpdateJoinedStatus({
         }
 
         revalidatePath("/applicant/waiting");
+        revalidatePath("/home/applicants");
     } catch (error) {
         console.error("Error updating joined status:", error);
     }

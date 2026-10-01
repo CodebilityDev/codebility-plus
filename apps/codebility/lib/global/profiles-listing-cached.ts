@@ -4,6 +4,7 @@ import type { Codev } from "@/types/global/codev";
 import type { ProfilesListingPage } from "@/types/global/profiles-listing";
 import { getQualifiedCodevs } from "@/utils/global/codev-qualification";
 import { prioritizeCodevs } from "@/utils/global/codev-priority";
+import { CACHE_TAGS } from "@/lib/global/cache-tags";
 import { createClientAnon } from "@/lib/global/supabase-anon";
 import type { ProfilesListingRow } from "@/types/global/lib";
 
@@ -135,7 +136,7 @@ export async function getProfilesListingPage(
 async function getCachedQualifiedProfiles() {
   "use cache";
   cacheLife("hours");
-  cacheTag("profiles-listing");
+  cacheTag(CACHE_TAGS.profilesListing);
   return fetchQualifiedProfiles(createClientAnon());
 }
 
@@ -146,7 +147,7 @@ export async function getCachedProfilesListingPage(
 ) {
   "use cache";
   cacheLife("hours");
-  cacheTag("profiles-listing");
+  cacheTag(CACHE_TAGS.profilesListing);
   const qualified = await getCachedQualifiedProfiles();
   if (!qualified) return null;
   return paginateCodevs(qualified, position, page, limit);
@@ -192,13 +193,13 @@ async function fetchProfileRating(codevId: string) {
 export async function getCachedProfileProjects(codevId: string) {
   "use cache";
   cacheLife("hours");
-  cacheTag("profiles-listing");
+  cacheTag(CACHE_TAGS.profilesListing);
   return fetchProfileProjects(codevId);
 }
 
 export async function getCachedProfileRating(codevId: string) {
   "use cache";
   cacheLife("hours");
-  cacheTag("profiles-listing");
+  cacheTag(CACHE_TAGS.profilesListing);
   return fetchProfileRating(codevId);
 }

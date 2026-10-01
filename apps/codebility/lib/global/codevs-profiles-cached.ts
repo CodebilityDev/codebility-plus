@@ -2,6 +2,7 @@ import { cacheLife, cacheTag } from "next/cache";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Codev } from "@/types/global/codev";
 import type { CodevsProfilesPage } from "@/types/global/codevs-profiles";
+import { CACHE_TAGS } from "@/lib/global/cache-tags";
 import { createClientAnon } from "@/lib/global/supabase-anon";
 import type { CodevsProfileRow } from "@/types/global/lib";
 
@@ -131,13 +132,6 @@ export async function getCodevsProfilesPage(
   };
 }
 
-export async function getCachedCodevsProfilePositions() {
-  "use cache";
-  cacheLife("hours");
-  cacheTag("codevs-profiles");
-  return getCodevsProfilePositions(createClientAnon());
-}
-
 export async function getCachedCodevsProfilesPage(
   position: string,
   page: number,
@@ -145,7 +139,7 @@ export async function getCachedCodevsProfilesPage(
 ) {
   "use cache";
   cacheLife("hours");
-  cacheTag("codevs-profiles");
+  cacheTag(CACHE_TAGS.codevsProfiles);
   return getCodevsProfilesPage(createClientAnon(), {
     position: position || undefined,
     page,

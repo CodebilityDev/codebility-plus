@@ -1,7 +1,9 @@
 "use server";
 
+import { CACHE_TAGS } from "@/lib/global/cache-tags";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import type { UploadImageOptions, NdaUploadResult, UserData } from "@/types/global/actions";
+import { updateTag } from "next/cache";
 
 
 /**
@@ -165,6 +167,7 @@ export async function updateCodevNdaUrls(
       throw error;
     }
 
+    updateTag(CACHE_TAGS.profileDetail);
     return { success: true };
   } catch (error) {
     console.error("Error updating codev NDA URLs:", error);

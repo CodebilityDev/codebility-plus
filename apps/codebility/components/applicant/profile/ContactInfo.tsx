@@ -8,6 +8,7 @@ import { Button } from "@/components/global/ui/button";
 import { IconEdit } from "@/public/assets/svgs/index";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import type { Control } from "react-hook-form";
 import toast from "react-hot-toast";
 
 import { Input } from "@codevs/ui/input";
@@ -122,7 +123,7 @@ const ContactInfo = ({ data, earnedCategories }: ContactInfoProps) => {
         <div className="flex flex-col gap-4 pt-4">
           <InputField
             id="phone_number"
-            control={control}
+            control={control as Control<any>}
             type="phone"
             label="Phone Number"
             placeholder="eg. 9054936302"

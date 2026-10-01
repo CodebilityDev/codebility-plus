@@ -1,6 +1,7 @@
 import { cacheLife, cacheTag } from "next/cache";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Codev } from "@/types/global/codev";
+import { CACHE_TAGS } from "@/lib/global/cache-tags";
 import { createClientAnon } from "@/lib/global/supabase-anon";
 import type { ProfileDetailMeta, ProfileDetailRow } from "@/types/marketing/profiles/profiles";
 
@@ -130,13 +131,13 @@ export async function getProfileDetailMeta(
 export async function getCachedProfileDetail(id: string) {
   "use cache";
   cacheLife("hours");
-  cacheTag("profile-detail");
+  cacheTag(CACHE_TAGS.profileDetail);
   return getProfileDetail(createClientAnon(), id);
 }
 
 export async function getCachedProfileDetailMeta(id: string) {
   "use cache";
   cacheLife("hours");
-  cacheTag("profile-detail");
+  cacheTag(CACHE_TAGS.profileDetail);
   return getProfileDetailMeta(createClientAnon(), id);
 }
