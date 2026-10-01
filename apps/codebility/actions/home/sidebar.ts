@@ -5,7 +5,6 @@ import { createClientServerComponent } from "@/lib/global/supabase-server";
 import type { Sidebar, RolePermissions, PermissionKey } from "@/types/home/home";
 
 
-export const NO_PERMISSIONS: RolePermissions = { dashboard: false, applicants: false };
 const INACTIVE_PERMISSIONS: RolePermissions = { dashboard: true, applicants: false };
 
 export const getSidebarData = async (

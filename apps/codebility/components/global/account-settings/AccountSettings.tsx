@@ -1,9 +1,13 @@
+import { connection } from "next/server";
+
 import H1 from "@/components/global/layout/H1";
 import { AccountSettingsContent } from "@/components/global/account-settings/AccountSettingsContent";
 import { getCurrentCodev } from "@/lib/global/current-codev";
 import { getMfaFactors } from "@/lib/global/mfa-factors";
 
 export default async function AccountSettings() {
+  await connection();
+
   const [user, mfaFactors] = await Promise.all([
     getCurrentCodev(),
     getMfaFactors(),

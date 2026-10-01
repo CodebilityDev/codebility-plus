@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@codevs/ui/button";
 import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
 import { Copy, Check, Info, CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@codevs/ui/tooltip";
 import { checkUsernameAvailability, updateUsername, getUsernameData } from "@/actions/global/account-settings";
-import { useToast } from "@codevs/ui/use-toast";
+import { useToast } from "@/components/global/ui/use-toast";
 import type { AccountSettingsUsernameProps, UsernameRecord } from "@/types/global/account-settings";
 import { useTimeout } from "@/hooks/global/useInterval";
 
@@ -30,12 +30,19 @@ async function loadUsernameRecord(userId: string): Promise<UsernameRecord | null
 export default function AccountSettingsUsername({ userId }: AccountSettingsUsernameProps) {
   const [username, setUsername] = useState("");
   const [usernameRecord, setUsernameRecord] = useState<UsernameRecord | null>(null);
-  const [loadedUserId, setLoadedUserId] = useState<string | null>(null);
 
-  if (userId && loadedUserId !== userId) {
-    setLoadedUserId(userId);
-    void loadUsernameRecord(userId).then(setUsernameRecord);
-  }
+  useEffect(() => {
+    if (!userId) return;
+
+    let active = true;
+    void loadUsernameRecord(userId).then((record) => {
+      if (active) setUsernameRecord(record);
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [userId]);
 
   const currentUsername = usernameRecord?.username ?? "";
   const cooldownDays = usernameRecord?.cooldownDays ?? null;

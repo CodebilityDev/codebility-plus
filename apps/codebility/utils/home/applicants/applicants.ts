@@ -71,6 +71,4 @@ export const newApplicantsSchema = z.object({
         created_at: z.string().datetime({ offset: true }),
         updated_at: z.string().datetime({ offset: true }),
     }).nullable(),
-    created_at: z.string().datetime({ local: true }),
-    updated_at: z.string().datetime({ local: true }),
 })
