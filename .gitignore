@@ -87,7 +87,8 @@ build/**
 !.yarn/sdks
 !.yarn/versions
 
-distapps/bot/.env
+dist
+apps/bot/.env
 .env
 apps/codebility/public/assets/onboardingvideos/*.mp4
 .planning/
