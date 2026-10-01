@@ -1,20 +1,12 @@
-import { getRealProjects, getCodevProfiles } from "@/lib/global/proposal-public";
-import { getSiteDate } from "@/lib/global/site-date";
+import { Suspense } from "react";
 
-import ProposalView from "@/components/global/marketing/ProposalView";
+import { ProposalData } from "@/components/proposal/ProposalData";
+import { ProposalSkeleton } from "@/components/proposal/ProposalSkeleton";
 
-export default async function ProposalPage() {
-  const [projectsResult, codevsResult, { year }] = await Promise.all([
-    getRealProjects(),
-    getCodevProfiles(),
-    getSiteDate(),
-  ]);
-
+export default function ProposalPage() {
   return (
-    <ProposalView
-      realProjects={projectsResult.data ?? []}
-      codevProfiles={codevsResult.data}
-      year={year}
-    />
+    <Suspense fallback={<ProposalSkeleton />}>
+      <ProposalData />
+    </Suspense>
   );
 }

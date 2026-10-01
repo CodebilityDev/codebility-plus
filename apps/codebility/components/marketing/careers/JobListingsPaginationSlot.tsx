@@ -18,6 +18,7 @@ export function JobListingsPaginationSlot({
     <div className="mt-12 flex items-center justify-center">
       <div className="flex items-center gap-1 rounded-lg border border-gray-800 bg-gray-900/30 p-1">
         <button
+          aria-label="Go to previous page"
           onClick={() => onPageChange(Math.max(1, currentPage - 1))}
           disabled={currentPage === 1}
           className="flex h-8 w-8 items-center justify-center rounded text-gray-400 transition-colors hover:bg-gray-800 hover:text-white disabled:pointer-events-none disabled:opacity-50"
@@ -29,6 +30,8 @@ export function JobListingsPaginationSlot({
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
             <button
               key={pageNum}
+              aria-label={`Go to page ${pageNum}`}
+              aria-current={currentPage === pageNum ? "page" : undefined}
               onClick={() => onPageChange(pageNum)}
               className={`h-8 w-8 rounded text-sm font-medium transition-colors ${
                 currentPage === pageNum
@@ -42,6 +45,7 @@ export function JobListingsPaginationSlot({
         </div>
 
         <button
+          aria-label="Go to next page"
           onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
           disabled={currentPage === totalPages}
           className="flex h-8 w-8 items-center justify-center rounded text-gray-400 transition-colors hover:bg-gray-800 hover:text-white disabled:pointer-events-none disabled:opacity-50"

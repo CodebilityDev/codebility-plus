@@ -24,6 +24,7 @@ export function PaginationControls({
       ) : (
         <button
           type="button"
+          aria-label="Go to previous page"
           onClick={() => onPageChange(page - 1)}
           className="pointer-events-auto relative z-[100] inline-flex h-9 w-9 items-center justify-center rounded-full border border-white hover:bg-white/10"
         >
@@ -45,6 +46,7 @@ export function PaginationControls({
       ) : (
         <button
           type="button"
+          aria-label="Go to next page"
           onClick={() => onPageChange(page + 1)}
           className="pointer-events-auto relative z-[100] inline-flex h-9 w-9 items-center justify-center rounded-full border border-white hover:bg-white/10"
         >

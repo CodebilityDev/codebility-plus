@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import type { JobListing } from "@/types/global/job-listings";
 import JobApplicationModal from "@/components/marketing/careers/JobApplicationModal";
 import { JobCard } from "@/components/marketing/careers/JobCard";
 import { JobListingsPaginationSlot } from "@/components/marketing/careers/JobListingsPaginationSlot";
-import { JOB_TYPES, JOB_LEVELS } from "@/constants/marketing/careers/careers";
+import { JobListingsSkeleton } from "@/components/marketing/careers/JobListingsSkeleton";
+import { JOB_TYPES, JOB_LEVELS, PAGE_SIZE } from "@/constants/marketing/careers/careers";
 import type { JobListingsPaginationProps } from "@/types/marketing/careers/careers";
 
 function buildHref(filters: Record<string, string>, page: number): string {
@@ -25,6 +26,9 @@ export default function JobListingsPagination({
   initialData,
 }: JobListingsPaginationProps) {
   const router = useRouter();
+  // The server still does the fetching. This only surfaces the in-flight state
+  // of that navigation so the skeleton shows instead of the stale page.
+  const [isPending, startTransition] = useTransition();
   const [selectedJob, setSelectedJob] = useState<JobListing | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -35,11 +39,15 @@ export default function JobListingsPagination({
   const hasActiveFilters = Boolean(department || type || level);
 
   const navigate = (next: Record<string, string>, nextPage: number) => {
-    router.push(buildHref({ ...filters, ...next }, nextPage), { scroll: false });
+    startTransition(() => {
+      router.push(buildHref({ ...filters, ...next }, nextPage), { scroll: false });
+    });
   };
 
   const onPageChange = (nextPage: number) => {
-    router.push(buildHref(filters, nextPage), { scroll: false });
+    startTransition(() => {
+      router.push(buildHref(filters, nextPage), { scroll: false });
+    });
   };
 
   const onFilterChange = (
@@ -162,7 +170,9 @@ export default function JobListingsPagination({
         </div>
       </div>
 
-      {initialData.jobs.length === 0 ? (
+      {isPending ? (
+        <JobListingsSkeleton count={PAGE_SIZE} />
+      ) : initialData.jobs.length === 0 ? (
         <div className="py-12 text-center">
           <p className="text-gray-400">
             No positions match your current filters. Try adjusting your criteria.

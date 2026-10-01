@@ -10,7 +10,7 @@ export function AdminsSectionSkeleton({
   cardCount,
 }: AdminsSectionSkeletonProps) {
   return (
-    <div aria-hidden="true">
+    <div>
       <h1 className="bg-gradient-to-r from-white via-purple-200 to-cyan-200 bg-clip-text text-center text-3xl font-bold text-transparent">
         {title}
       </h1>
@@ -23,7 +23,10 @@ export function AdminsSectionSkeleton({
             <BlueBg className="h-[300px] w-full max-w-[1200px] lg:top-[45%]" />
           </div>
 
-          <div className="grid grid-cols-2 gap-2 pb-5 pt-20 md:grid-cols-4">
+          <div
+            className="grid grid-cols-2 gap-2 pb-5 pt-20 md:grid-cols-4"
+            aria-hidden="true"
+          >
             {Array.from({ length: cardCount }).map((_, index) => (
               <div key={index} className="relative h-full">
                 <AdminCardSkeleton />

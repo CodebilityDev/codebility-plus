@@ -9,7 +9,11 @@ export default function LandingInternSkeleton({
   showPagination = true,
 }: LandingInternSkeletonProps) {
   return (
-    <div className="flex w-full flex-col items-center gap-6">
+    <div
+      className="flex w-full flex-col items-center gap-6"
+      aria-busy="true"
+      aria-live="polite"
+    >
       <div className="w-full min-h-[300px]">
         <LandingInternCardsSkeleton />
       </div>

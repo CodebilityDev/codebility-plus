@@ -10,7 +10,7 @@ import { ADMIN_CARD_COUNT, MENTOR_CARD_COUNT } from "@/constants/marketing/marke
 
 export function LandingAdminsSkeleton() {
   return (
-    <div aria-hidden="true">
+    <div aria-busy="true" aria-live="polite">
       <AdminsSectionSkeleton
         title={ADMINS_SECTION_COPY.admins.title}
         description={ADMINS_SECTION_COPY.admins.description}
