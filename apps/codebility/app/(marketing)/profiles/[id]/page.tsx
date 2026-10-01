@@ -3,37 +3,14 @@ import { notFound } from "next/navigation";
 import Paragraph from "@/components/global/typography/Paragraph";
 import Logo from "@/components/global/layout/Logo";
 import { getCachedProfileDetail, getCachedProfileDetailMeta } from "@/lib/marketing/profiles/profile-detail-cached";
-import { getCachedLandingAdminsData, getLandingAdminsProfileIds } from "@/lib/global/landing-admins-cached";
-import { getCachedLandingInternsPage } from "@/lib/global/landing-interns-cached";
 import { getSkillCategories } from "@/lib/global/skill-categories-cached";
 
 
 import ProfileCloseButton from "@/components/marketing/profiles/ProfileDetailCloseButton";
 import ProfileContent from "@/components/marketing/profiles/ProfileDetailContent";
-import { LANDING_PAGE_SIZE } from "@/constants/marketing/profiles/profiles";
 import type { ProfilesIdPageProps } from "@/types/marketing/profiles/profiles";
 
-
-export async function generateStaticParams() {
-  const [landing, adminsData] = await Promise.all([
-    getCachedLandingInternsPage(1, LANDING_PAGE_SIZE),
-    getCachedLandingAdminsData(),
-  ]);
-
-  const ids = new Set<string>();
-
-  for (const member of landing?.TEAM_MEMBERS ?? []) {
-    ids.add(member.id);
-  }
-
-  if (adminsData) {
-    for (const id of getLandingAdminsProfileIds(adminsData)) {
-      ids.add(id);
-    }
-  }
-
-  return [...ids].map((id) => ({ id }));
-}
+export const instant = false;
 
 export async function generateMetadata({ params }: ProfilesIdPageProps): Promise<Metadata> {
   const { id } = await params;
