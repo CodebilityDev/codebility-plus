@@ -1,6 +1,9 @@
 {
   "name": "codebility-monorepo",
   "private": true,
+  "engines": {
+    "node": ">=22"
+  },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@codevs/prettier-config": "workspace:^",
