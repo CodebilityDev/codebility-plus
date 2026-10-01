@@ -17,7 +17,9 @@ import { toErrorMessage } from "@/utils/global/feedback";
 
 export default function AccountSettings2FA({ mfaFactors }: AccountSettings2FAProps) {
   const router = useRouter();
-  const [factors] = useState<Factor[]>(mfaFactors as Factor[]);
+  // Read straight from the prop. Copying it into useState captured it once at
+  // mount, so the badge kept showing the old state after router.refresh().
+  const factors = mfaFactors as Factor[];
   const activeFactor =
     factors.find((factor) => factor.status === "verified") ?? null;
 

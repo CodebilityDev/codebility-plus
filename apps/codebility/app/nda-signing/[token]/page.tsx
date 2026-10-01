@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 
 import NdaSigningTokenClient from "@/components/nda-signing/NdaSigningTokenClient";
+import { NdaSigningSkeleton } from "@/components/nda-signing/NdaSigningSkeleton";
 import { getNdaRequestCodevId } from "@/lib/global/nda-requests";
 import { getSiteDate } from "@/lib/global/site-date";
 import type { NdaSigningTokenPageProps } from "@/types/global/nda-signing";
@@ -15,7 +16,7 @@ export default async function NdaSigningTokenPage({ params }: NdaSigningTokenPag
   ]);
 
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<NdaSigningSkeleton />}>
       <NdaSigningTokenClient agreementDate={formatted} codevId={codevId} />
     </Suspense>
   );

@@ -5,17 +5,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useNavStore } from "@/store/home/sidebar-store";
-import { useSidebarData } from "@/hooks/home/use-sidebar-data";
 import { cn } from "@/utils/global/cn";
 import { AnimatePresence, motion } from "framer-motion";
 import type { SidebarSidebarLink as SidebarLink } from "@/types/home/home";
+import type { Sidebar } from "@/types/home/home";
 
 
-const LeftSidebarClient = () => {
+const LeftSidebarClient = ({ sidebarData }: { sidebarData: Sidebar[] }) => {
   const { isToggleOpen, toggleNav } = useNavStore();
-  const { data: sidebarData = [] } = useSidebarData();
   const pathname = usePathname();
-  
+
   // Check if we're in staging environment
   const isStaging = process.env.NEXT_PUBLIC_APP_BASE_URL?.includes('staging');
 

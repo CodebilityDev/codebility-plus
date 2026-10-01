@@ -1,15 +1,19 @@
 "use client";
 
-import { useCurrentUser } from "@/hooks/global/use-current-user";
-import { useSidebarData } from "@/hooks/home/use-sidebar-data";
 import { SheetClose } from "@codevs/ui/sheet";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { CurrentUserProfile } from "@/types/global/current-user";
+import type { Sidebar } from "@/types/home/home";
 
-export const NavContent = () => {
-  const { data: currentUser } = useCurrentUser();
-  const { data: sidebarData = [] } = useSidebarData();
+export const NavContent = ({
+  currentUser,
+  sidebarData,
+}: {
+  currentUser: CurrentUserProfile | null;
+  sidebarData: Sidebar[];
+}) => {
   const pathname = usePathname();
 
   if (currentUser?.application_status !== "passed") return null;

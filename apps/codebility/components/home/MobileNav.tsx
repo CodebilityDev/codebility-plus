@@ -10,9 +10,17 @@ import useHideSidebarOnResize from "@/hooks/home/useHideSidebarOnResize";
 
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@codevs/ui/sheet";
 import { NavContent } from "@/components/home/NavContent";
+import type { CurrentUserProfile } from "@/types/global/current-user";
+import type { Sidebar } from "@/types/home/home";
 
 
-const MobileNav = () => {
+const MobileNav = ({
+  currentUser,
+  sidebarData,
+}: {
+  currentUser: CurrentUserProfile | null;
+  sidebarData: Sidebar[];
+}) => {
   const { isSheetOpen, setIsSheetOpen } = useHideSidebarOnResize();
 
   return (
@@ -51,7 +59,7 @@ const MobileNav = () => {
           <Link
             href="/"
             className="flex items-center gap-1"
-            aria-label="Go to homepage"
+            aria-label="Go to Homepage"
           >
             <Image
               src="/assets/svgs/codebility-violet.svg"
@@ -62,7 +70,7 @@ const MobileNav = () => {
           </Link>
         </div>
         <div>
-          <NavContent />
+          <NavContent currentUser={currentUser} sidebarData={sidebarData} />
         </div>
       </SheetContent>
     </Sheet>

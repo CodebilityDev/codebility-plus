@@ -7,18 +7,23 @@ import Theme from "@/components/home/Theme";
 import { MobileTheme } from "@/components/home/theme-mobile";
 import { defaultAvatar } from "@/public/assets/images/index";
 import { IconDropdown, IconLogout } from "@/public/assets/svgs/index";
-import { useCurrentUser } from "@/hooks/global/use-current-user";
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@codevs/ui/dropdown-menu";
 
 import { signOut } from "@/actions/global/auth-session";
 import MobileNav from "@/components/home/MobileNav";
 import { menuItems } from "@/constants/home/home";
+import type { CurrentUserProfile } from "@/types/global/current-user";
+import type { Sidebar } from "@/types/home/home";
 
 
-const Navbar = () => {
-  const { data: currentUser } = useCurrentUser();
-
+const Navbar = ({
+  currentUser,
+  sidebarData,
+}: {
+  currentUser: CurrentUserProfile | null;
+  sidebarData: Sidebar[];
+}) => {
   if (!currentUser) return null;
 
   const { first_name, last_name, email_address, image_url } = currentUser;
@@ -123,7 +128,7 @@ const Navbar = () => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <MobileNav />
+          <MobileNav currentUser={currentUser} sidebarData={sidebarData} />
         </div>
       </div>
     </nav>

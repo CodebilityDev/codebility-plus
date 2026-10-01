@@ -45,6 +45,12 @@ const config = {
     serverActions: {
       bodySizeLimit: "500mb",
     },
+    // Client Router Cache window for dynamic routes. Without this Next.js
+    // refetches on every revisit, so back/forward re-renders the skeleton even
+    // though nothing changed. This is the Router Cache, not a client fetch.
+    staleTimes: {
+      dynamic: 30,
+    },
   },
   images: {
     remotePatterns: [

@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 
 import { ServicesPageView } from "@/components/marketing/services/ServicesPageView";
+import { ServicesGridSkeleton } from "@/components/marketing/services/ServicesGridSkeleton";
 import type { ServicesPageProps } from "@/types/marketing/services/services";
 
 export const metadata: Metadata = {
@@ -34,7 +35,7 @@ export const metadata: Metadata = {
 
 const ServicesPage = ({ searchParams }: ServicesPageProps) => {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<ServicesGridSkeleton />}>
       <ServicesPageView searchParams={searchParams} />
     </Suspense>
   );

@@ -1,19 +1,11 @@
-"use client";
-
-import { useQuery } from "@tanstack/react-query";
-import { getNewApplicants } from "@/actions/home/applicants/applicants-queries";
 import ApplicantLists from "@/components/home/applicants/applicantLists";
+import type { NewApplicantType } from "@/types/home/applicants/applicants";
 
-export default function ApplicantDataWrapper() {
-  const { data: applicants = [], isPending } = useQuery({
-    queryKey: ["applicants"],
-    queryFn: () => getNewApplicants(),
-  });
-
-  if (isPending) {
-    return null;
-  }
-
+export default function ApplicantDataWrapper({
+  applicants,
+}: {
+  applicants: NewApplicantType[];
+}) {
   if (applicants.length === 0) {
     return (
       <div className="flex min-h-[400px] flex-col items-center justify-center p-8 text-center">

@@ -4,9 +4,11 @@ import type { Metadata } from "next";
 import FeaturedSection from "@/components/global/marketing/CodevsFeaturedSection";
 import CodevsFeaturedProjectsSection from "@/components/global/marketing/CodevsFeaturedProjectsSection";
 import CodevsProfiles from "@/components/global/marketing/CodevsProfiles";
+import { CodevsProfilesSkeleton } from "@/components/global/marketing/CodevsProfilesSkeleton";
 import { CodevHireCodevModal } from "@/components/global/marketing/CodevHireCodevModal";
 import Hero from "@/components/marketing/hire-a-codev/CodevsHero";
 import HiringProcess from "@/components/marketing/hire-a-codev/HiringProcess";
+import { PAGE_SIZE } from "@/constants/global/marketing";
 import type { CodevsProfilesProps } from "@/types/global/marketing";
 
 export const metadata: Metadata = {
@@ -32,7 +34,7 @@ export default function HireACodev({ searchParams }: CodevsProfilesProps) {
         <div className="bg-black-400 relative flex w-full flex-col">
             <Hero />
             <HiringProcess />
-            <Suspense fallback={null}>
+            <Suspense fallback={<CodevsProfilesSkeleton count={PAGE_SIZE} />}>
                 <CodevsProfiles searchParams={searchParams} />
             </Suspense>
             <FeaturedSection />

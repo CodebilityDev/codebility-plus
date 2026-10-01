@@ -269,12 +269,29 @@ Deleted in this phase:
 `getSkillCategories` supplies it, threaded through the grid and card chain from the
 server pages. 25 browser-client uses down to 23.
 
-Remaining browser-client uses are 13 auth SDK mutations, which stay, plus these reads:
+Correction (this list was stale and cost a reader a wasted investigation):
+every remaining browser-client use is an auth SDK **mutation**, and they stay
+client-side:
 
-- `AccountSettings2FA` `listFactors`, a user-specific read needing a server action.
-- `AccountSettingsDelete` and `AccountSettingsDialog`, which read the user before a mutation.
-- `JobApplicationModal`, which uploads to the `codebility` storage bucket and inserts.
-- `NdaSigningTokenClient`, which reads and updates `nda_requests`.
+- `AccountSettings2FA` — `mfa.enroll`, `mfa.challengeAndVerify`, `mfa.unenroll`
+- `AccountSettingsDelete` — `signOut`
+- `AccountSettingsDialog` — `updateUser`
+- `AccountSettingsChangePassword` — `updateUser`
+- `TwoFactorForm` — `mfa.challengeAndVerify`, `signOut`
+
+They cannot move to a server action: `challengeAndVerify` upgrades the session AAL
+and `updateUser`/`signOut` change the session user, so both must land on the
+browser session rather than the server client's cookies.
+
+The reads once listed here are all server-side now:
+
+- `listFactors` became `getMfaFactors` (`lib/global/mfa-factors.ts`), called from
+  the `AccountSettings` server component and passed down as the `mfaFactors` prop.
+- `AccountSettingsDelete` and `AccountSettingsDialog` no longer read the user; they
+  call the `deleteAuthUser` and `updateCodevEmail` server actions.
+- `JobApplicationModal` submits through the `submitJobApplication` server action.
+- `NdaSigningTokenClient` calls the `completeNdaRequest` and `completeNdaSigning`
+  server actions.
 
 
 ### Phase 6 complete

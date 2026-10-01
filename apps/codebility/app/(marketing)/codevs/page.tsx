@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import type { Metadata } from "next";
 
 import FeaturedSection from "@/components/global/marketing/CodevsFeaturedSection";
@@ -32,9 +31,7 @@ export default function Codevs({ searchParams }: CodevsProfilesProps) {
     return (
         <div className="bg-black-400 relative flex w-full flex-col">
             <Hero />
-            <Suspense fallback={null}>
-                <CodevsProfiles searchParams={searchParams} />
-            </Suspense>
+            <CodevsProfiles searchParams={searchParams} />
             <FeaturedSection />
             <CodevsFeaturedProjectsSection />
             <CodevsRoadmapStatic />

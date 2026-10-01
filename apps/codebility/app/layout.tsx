@@ -6,7 +6,6 @@ import { Outfit } from "next/font/google";
 import { Toaster } from "@/components/global/ui/toaster";
 import { ThemeProvider } from "@/providers/global/ThemeProvider";
 import ToasterContext from "@/providers/global/ToasterProvider";
-import ReactQueryProvider from "@/providers/global/ReactQueryProvider";
 import { TooltipProvider } from "@codevs/ui/tooltip";
 import JsonLd from "@/components/global/marketing/JsonLd";
 import { organizationSchema, websiteSchema } from "@/constants/global/app";
@@ -87,20 +86,18 @@ export default function RootLayout({
             <body suppressHydrationWarning>
                 <JsonLd data={organizationSchema} />
                 <JsonLd data={websiteSchema} />
-                <ReactQueryProvider>
-                    <ThemeProvider
-                        attribute="class"
-                        defaultTheme="system"
-                        enableSystem
-                        disableTransitionOnChange
-                    >
-                        <TooltipProvider>
-                            <Toaster />
-                            <ToasterContext />
-                            {children}
-                        </TooltipProvider>
-                    </ThemeProvider>
-                </ReactQueryProvider>
+                <ThemeProvider
+                    attribute="class"
+                    defaultTheme="system"
+                    enableSystem
+                    disableTransitionOnChange
+                >
+                    <TooltipProvider>
+                        <Toaster />
+                        <ToasterContext />
+                        {children}
+                    </TooltipProvider>
+                </ThemeProvider>
             </body>
         </html>
     );

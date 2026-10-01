@@ -1,27 +1,18 @@
-import AsyncErrorBoundary from "@/components/global/feedback/AsyncErrorBoundary";
+import { connection } from "next/server";
 
 import NewApplicantFetchComp from "@/components/home/applicants/applicantFetchComp";
+import { getNewApplicants } from "@/actions/home/applicants/applicants-queries";
 
 export const instant = false;
 
-export default function NewApplicants() {
+export default async function NewApplicants() {
+  await connection();
+  const applicants = await getNewApplicants();
+
   return (
     <div className="mx-auto max-w-screen-xl">
       <div className="flex flex-col gap-4 pt-4">
-        <AsyncErrorBoundary
-          fallback={
-            <div className="flex min-h-[400px] flex-col items-center justify-center p-8 text-center">
-              <div className="mb-4 text-4xl">📋</div>
-              <h2 className="mb-2 text-xl font-semibold">Failed to load applicants</h2>
-              <p className="text-gray-600 dark:text-gray-400">
-                We couldn't load the applicants data. Please try refreshing the page.
-              </p>
-            </div>
-          }
-        >
-            <NewApplicantFetchComp />
-
-        </AsyncErrorBoundary>
+        <NewApplicantFetchComp applicants={applicants} />
       </div>
     </div>
   );
