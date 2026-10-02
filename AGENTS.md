@@ -108,6 +108,8 @@ pnpm codebility:build
 
 CI runs both on every push and pull request to `dev`. The build type-checks the app, so a type error fails it. Lint fails on errors, including folder-layout violations. `pnpm --filter codebility typecheck` also works once `next-env.d.ts` exists, which the first `dev` or `build` run creates.
 
+AI agents must also read `.cursor/skills/codebility-contribution-rules/SKILL.md`. It holds the rules a machine does not infer from this file, chiefly: write no comments, and reuse what already exists before adding a file.
+
 For changes to auth, proxy or applicant approval, also click through in `pnpm codebility`: sign up, sign in, the applicant pages, and accepting or denying a test applicant at `/home/applicants`.
 
 ## Known exceptions

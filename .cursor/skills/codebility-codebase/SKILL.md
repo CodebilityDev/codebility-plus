@@ -16,4 +16,9 @@ Read `AGENTS.md` at the repo root. It is the single source for:
 - the steps for adding or removing a private `/home` page
 - the checks to run before pushing
 
-For marketing pages, also use the `nextjs-static-public-data` and `landing-scroll-motion` skills in this folder.
+Read `codebility-contribution-rules` before writing anything. It is the gate:
+no comments, folder boundaries, reuse before you write, and the checks that fail a
+change.
+
+For marketing pages, also use the `nextjs-static-public-data` and
+`landing-scroll-motion` skills in this folder.
