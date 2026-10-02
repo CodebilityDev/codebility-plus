@@ -1,8 +1,9 @@
-import { Suspense } from "react";
 import type { Metadata } from "next";
 
-import { ServicesPageView } from "@/components/marketing/services/ServicesPageView";
-import { ServicesGridSkeleton } from "@/components/marketing/services/ServicesGridSkeleton";
+import Calendly from "@/components/global/marketing/MarketingCalendly";
+import { ClientTechyBackground } from "@/components/marketing/services/ClientTechyBackground";
+import { ServicesProjectsBlock } from "@/components/marketing/services/ServicesProjectsBlock";
+import { Hero as ServicesHero } from "@/components/marketing/services/ServicesHero";
 import type { ServicesPageProps } from "@/types/marketing/services/services";
 
 export const metadata: Metadata = {
@@ -35,9 +36,14 @@ export const metadata: Metadata = {
 
 const ServicesPage = ({ searchParams }: ServicesPageProps) => {
   return (
-    <Suspense fallback={<ServicesGridSkeleton />}>
-      <ServicesPageView searchParams={searchParams} />
-    </Suspense>
+    <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden overflow-y-hidden bg-[#030303]">
+      <ClientTechyBackground />
+      <div className="relative z-10">
+        <ServicesHero />
+        <ServicesProjectsBlock searchParams={searchParams} />
+        <Calendly />
+      </div>
+    </div>
   );
 };
 

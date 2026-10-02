@@ -93,6 +93,16 @@ export interface CodevsPaginationSlotProps {
 
 export interface CodevsProfilesSkeletonProps { count?: number }
 
+export interface CodevsProfilesFilterProps {
+  positions: string[];
+  selectedPosition: string;
+  onSelect?: (position: string) => void;
+}
+
+export interface CodevsProfilesFallbackProps {
+  positions: string[];
+}
+
 // CBP-135 follow-up: shared JSON-LD renderer.
 // Usage: <JsonLd data={someSchemaObject} />
 export interface JsonLdProps { data: Record<string, unknown> }

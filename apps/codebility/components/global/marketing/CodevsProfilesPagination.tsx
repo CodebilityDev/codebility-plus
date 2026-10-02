@@ -3,8 +3,8 @@
 import { useTransition } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
-import CodevListFilter from "@/components/global/marketing/CodevListFilter";
 import { CodevsGrid } from "@/components/global/marketing/CodevsGrid";
+import { CodevsProfilesFilter } from "@/components/global/marketing/CodevsProfilesFilter";
 import { CodevsPaginationSlot } from "@/components/global/marketing/CodevsPaginationSlot";
 import { CodevsProfilesSkeleton } from "@/components/global/marketing/CodevsProfilesSkeleton";
 import type { CodevsProfilesPaginationProps } from "@/types/global/marketing";
@@ -41,11 +41,10 @@ export default function CodevsProfilesPagination({
 
   return (
     <div className="m-auto h-full w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-      <CodevListFilter
-        selectedPosition={position}
-        setSelectedPosition={(next) => navigate(next, 1)}
-        users={initialData.codevs}
+      <CodevsProfilesFilter
         positions={initialData.positions}
+        selectedPosition={position}
+        onSelect={(next) => navigate(next, 1)}
       />
 
       {isPending ? (

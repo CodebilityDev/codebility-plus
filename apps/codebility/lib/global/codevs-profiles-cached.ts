@@ -132,6 +132,13 @@ export async function getCodevsProfilesPage(
   };
 }
 
+export async function getCachedCodevsProfilePositions() {
+  "use cache";
+  cacheLife("hours");
+  cacheTag(CACHE_TAGS.codevsProfiles);
+  return getCodevsProfilePositions(createClientAnon());
+}
+
 export async function getCachedCodevsProfilesPage(
   position: string,
   page: number,

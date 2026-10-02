@@ -13,12 +13,6 @@ export interface ServicesPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
-export interface ServicesPageContentProps {
-  initialData: ServicesProjectsPage;
-  pageSize: number;
-  projectId: string | null;
-}
-
 export type ServiceProject = ServicesProjectCard;
 
 export interface ServicesServiceCardProps {
@@ -29,7 +23,11 @@ export interface ServicesServiceCardProps {
 export interface ServicesTabProps {
   initialData: ServicesProjectsPage;
   category: ServicesCategorySlug;
-  pageSize: number;
+}
+
+export interface ServicesTabBarProps {
+  active: ServicesCategorySlug | null;
+  onSelect?: (category: ServicesCategorySlug) => void;
 }
 
 export interface IconFigmaProps { className?: string }
