@@ -22,9 +22,6 @@ export function ServicesTabBar({ active, onSelect }: ServicesTabBarProps) {
             href={href}
             scroll={false}
             onClick={(event) => {
-              // Keep the Link for its href and prefetch, but route the
-              // navigation through a transition so the grid shows its
-              // skeleton while the new category is fetched.
               if (!onSelect) return;
               event.preventDefault();
               onSelect(tab.slug);

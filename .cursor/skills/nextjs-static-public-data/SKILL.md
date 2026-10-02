@@ -1,275 +1,297 @@
-# Next.js static public data (this codebase)
+---
+name: nextjs-static-public-data
+description: >-
+  The static shell plus streamed data pattern for marketing pages in apps/codebility.
+  Use when a heading, filter, tab bar or skeleton vanishes during loading, when adding
+  a filter or pagination to a public list page, when a public route needs a real 404,
+  or when a page in this app still uses "use cache", Suspense and searchParams wrong.
+---
 
-**Always read this skill first** before implementing or refactoring marketing /
-landing public data, pagination, nav auth on marketing layouts, or anything that
-could dynamize `/`. Do not invent a new architecture.
+# Marketing static shell plus streamed data (this codebase)
 
-Read [pitfalls.md](pitfalls.md) before changing fetch / loading / pagination.
+Read this before touching a public list page: `/services`, `/codevs`,
+`/hire-a-codev`, `/careers`, `/profiles`, `/profiles/[id]`.
+
+`apps/codebility/next.config.mjs` sets `cacheComponents: true`. Partial
+Prerendering is the default, so every dynamic route prerenders a static shell and
+streams the rest into Suspense fallbacks. `/services`, `/codevs` and
+`/careers` all use the pattern below. Copy it instead of inventing another.
+
+Read [pitfalls.md](pitfalls.md) before changing a boundary, a fetch or a skeleton.
 
 ## Editing rule (mandatory)
 
-**Do not put any comments when editing files.** No `//`, no `/* */`, no JSX
-`{/* */}`, no explanatory comment blocks in new or changed code. Prefer clear
-names and structure over comments.
+No comments in new or changed code. No `//`, no `/* */`, no JSX `{/* */}`, no
+explanatory blocks. Names and structure carry the meaning, and anything this
+pattern needs to explain is in this file instead.
 
-## Goal
+## The one rule
 
-- Landing `/` stays **static / ISR** (HTML at `next build` for page composition).
-- Public data is fetched **on the server** where SEO matters (especially page 1).
-- Auth chrome must **not** call `cookies()` / server session in the page tree.
-- Pagination for page 2+ must **not** await `searchParams` on `page.tsx`.
-- Pager must **not** use Next `<Link href="?page=N">` **or**
-  `history.pushState` / `replaceState` with `?page=` — App Router patches
-  history and soft-navigates RSC (`text/x-component`, remounts section with
-  page-1 SSR data). Keep **list page index in React state only**.
-- Filters / tabs / shareable detail IDs may use **URL search params read on
-  the client** (`useSearchParams` inside `Suspense`). **Never**
-  `await searchParams` on the marketing `page.tsx`.
-- Client JS is for **interaction / motion / page 2+ / non-default tabs /
-  detail**, not for replacing default page-1 public HTML.
-- **Server Actions are for mutations**, not public reads.
+Everything outside a `<Suspense>` boundary is the static shell.
 
-## Hard rules
+A boundary wrapped around the whole page body therefore makes the fallback the
+entire shell. That was the original bug on all three pages: the heading, the
+filter and the closing section were inside one boundary and vanished for the
+length of the fetch.
 
-1. **Do not** put `cookies()`, `headers()`, or `createClientServerComponent()`
-   in the marketing page tree. That dynamizes `/`.
-2. **Do not** `await searchParams` (or otherwise read request-time search params)
-   in marketing `page.tsx` (landing `/`, `/services`, etc.). That dynamizes the route.
-3. **Do not** fetch public marketing data with the **browser** Supabase client
-   for sections that should be in build HTML / share `unstable_cache`.
-4. **Do not** use `useEffect` for this data. Use Server Component `await`, or
-   client **`React.use(promise)`** with a module-level stable promise.
-5. **Do not** inline `supabase.from(...)` inside a default export. Extract a
-   named fetch function; await it in an async Server Component (or call it from
-   a thin API route used by the client pager).
-6. Public DB reads use **`createClientAnon()`** from
-   `apps/codebility/lib/global/supabase-anon.ts` only. Singleton. Do not invent a
-   second anon factory in landing files.
-7. Keep **`anon.ts` usage scoped** until the user asks to migrate other call
-   sites. Do not mass-replace every `createClient` in the repo.
-8. **Do not** wrap `Suspense` around a child that the **same** parent already
-   awaited if you expect the fallback to show for that parent’s work.
-9. **Do not** put any comments when editing files (see Editing rule).
-10. Prefer fewest files. One server module may hold query + `unstable_cache`
-    wrapper (see Interns reference). Reuse `fetchApiJson` from
-    `apps/codebility/utils/global/api-fetch.ts` for client → API HTTP JSON.
-11. **Do not** SSR self-fetch `/api/...` via `fetchApiJson` for page 1 on static
-    `/`. Preview builds resolve `NEXT_PUBLIC_APP_BASE_URL` to **production**, so
-    the SC misses the preview API / empty section. Call the shared
-    `unstable_cache` helper **directly** from the Server Component.
-12. **Do not** use Server Actions for public list reads. Mutations only.
-13. Client may `import type` from a `lib/global/...` module; do **not**
-    value-import `unstable_cache` / anon helpers into `"use client"` files.
-    Put client-safe constants (tab slugs, href builders) in a separate module
-    (e.g. `services/_lib/services-categories.ts`), not in the cached server
-    file.
-14. Do **not** put marketing `Footer` in page content when
-    `app/(marketing)/layout.tsx` already renders it.
+Two things force a boundary:
 
-## Three canonical patterns
+- `await searchParams`
+- an uncached data fetch
 
-### A — Fixed public section (no pagination): LandingAdmins
+Data behind `"use cache"` does not need one. It belongs in the shell.
 
-```
-page.tsx (SC, no fetch, no cookies, no searchParams)
-└── <Admins />  (sync shell — Section)
-    └── <LandingAdminsContent />  (async SC)
-          await getLandingAdmins()   // unstable_cache + createClientAnon
-          └── <AnimatedAdminsSection />  ("use client", motion only)
-```
+## File shape
 
-Checklist:
+Five roles, named the same way on all three pages.
 
-```
-- [ ] No cookies/session in tree
-- [ ] Named fetch + createClientAnon
-- [ ] unstable_cache({ revalidate, tags })
-- [ ] Async SC awaits it; client child gets props
-- [ ] revalidateTag on admin edits
-- [ ] No useEffect; no comments added
-```
+| Role | services | codevs | careers |
+| --- | --- | --- | --- |
+| page shell | `app/(marketing)/services/page.tsx` | `app/(marketing)/codevs/page.tsx` | `app/(marketing)/careers/page.tsx` |
+| Block: section, container, boundary | `ServicesProjectsBlock.tsx` | `CodevsProfiles.tsx` | `JobListingsBlock.tsx` |
+| Section: awaits params, fetches | `ServicesProjectsSection.tsx` | `CodevsProfilesData.tsx` | `JobListingsSection.tsx` |
+| Fallback: static parts plus skeleton | `ServicesProjectsFallback.tsx` | `CodevsProfilesFallback.tsx` | `JobListingsFallback.tsx` |
+| Body: client controls and results | `ServicesTab.tsx` | `CodevsProfilesPagination.tsx` | `JobListingsPagination.tsx` |
+| Shared control | `ServicesTabBar.tsx` | `CodevsProfilesFilter.tsx` | `JobListingsFilter.tsx` |
+| Cached loaders | `lib/global/services-projects-cached.ts` | `lib/global/codevs-profiles-cached.ts` | `lib/global/careers-job-listings-cached.ts` |
 
-### B — Paginated public list: Landing Interns / CoDevs
+`app/(marketing)/profiles/[id]/page.tsx` uses the same split with
+`ProfileDetailSection.tsx` and `ProfileDetailSkeleton.tsx`.
 
-Nested RSCs **cannot** read `searchParams`. True server pagination for `?page=`
-without dynamizing `/` needs parallel routes or path segments — both rejected
-for this landing. Accepted pattern:
+Flow:
 
-```
-page.tsx (static — never awaits searchParams)
-└── InternSectionContainer (sync shell, Section + copy)
-    └── LandingIntern (async SC)
-          await getCachedLandingInternsPage(1, PAGE_SIZE)
-          └── <Suspense>
-                <LandingInternPagination initialData={page1} />  ("use client")
-                  useState(page) only — no URL ?page=
-                  use(loadPage(page))  // module Map of promises
-                  buttons → setPage(n)
-                  page 2+ → fetchApiJson("/api/landing-interns?…")
-```
+    page.tsx (sync, no await)
+    └── Block (async, awaits cached data only)
+        ├── static heading and page chrome
+        ├── shared control rendered directly, when it needs no data
+        └── Suspense fallback={<Fallback />}
+            └── Section (async: await searchParams, fetch)
+                └── Body (client: control bound to its transition, results, pager)
 
-Shared server module
-`apps/codebility/lib/global/landing-interns-cached.ts`:
+The Section does the only awaiting that can suspend. The Block awaits cached data,
+which does not.
 
-- `getLandingInternsPage(supabase, { page, limit })` — DB `.range()` + count.
-- `getCachedLandingInternsPage = unstable_cache(…)` — **same** helper for SC
-  page 1 and the API. Args `(page, limit)` are the per-page cache key.
-  `revalidate: 3600`, tag `landing-interns`.
+## The shared control
 
-API route `app/api/landing-interns/route.ts`:
+One component, rendered twice: once in the Fallback, once in the Body.
 
-- Thin wrapper: parse query → `getCachedLandingInternsPage(page, limit)`.
-- No cookies. Shares Data Cache with the SC (not a second source of truth).
-- Successful GET: `Cache-Control: public, max-age=3600, s-maxage=3600,
-  stale-while-revalidate=86400` (`max-age` = browser; `s-maxage` = CDN/shared).
-  Errors: `no-store`.
-- Optional ranking via `landing_rank_score` only after migration is live.
+Props are the option list, the selected value, and an optional `onSelect`.
 
-Client pager:
+- The Body passes `onSelect` wired to its own `startTransition`. That is what
+  keeps the skeleton working on a soft navigation.
+- The Fallback omits `onSelect`. The control then navigates itself with its own
+  `useTransition`, so it still works before the data lands.
 
-- Module-level `Map` holds **stable promises for `use()` identity** (session).
-  Cleared on full reload — expected. After reload, fetch again; browser HTTP
-  cache and/or server `unstable_cache` should serve without a cold DB hit.
-- Browser `fetch` relative `/api/...` with `{ cache: "force-cache" }`.
-- Page matching `initialData.pagination.page` → `Promise.resolve(initialData)`.
-- **No `useEffect`.** **No `?page=` in the address bar.**
-- DevTools: `(disk cache)` = browser HTTP only. `unstable_cache` is server-side
-  and still appears as a network row (often faster, e.g. ~50–100ms) when HTTP
-  cache misses. Uncheck “Disable cache” when testing. `next dev` may not mirror
-  production Data Cache.
+See `ServicesTabBar.tsx`, `CodevsProfilesFilter.tsx` and
+`JobListingsFilter.tsx`.
 
-Checklist:
+## Unknown selection in the shell
 
-```
-- [ ] page.tsx still static (no searchParams)
-- [ ] Page 1: SC awaits getCachedLandingInternsPage(1, n) — build HTML
-- [ ] API + SC share one unstable_cache helper (per page/limit key)
-- [ ] Client pager: use() + module promise Map + useState (no Link / pushState)
-- [ ] Suspense fallback = layout-matched skeleton for suspend on page change
-- [ ] revalidateTag("landing-interns") on mutations that change the list
-- [ ] No useEffect; no comments added
-```
+The shell cannot know `?category=`, `?position=` or `?department=`. Render no
+active control rather than a wrong one.
 
-### C — Tabbed / filterable list + shareable detail: Services
+- `ServicesTabBar`: `active={null}`
+- `CodevsProfilesFilter`: `selectedPosition=""`, so the Radix select shows its
+  placeholder
+- `JobListingsFilter`: `department`, `type` and `level` are
+  `string | null`, and `null` means no button is active
 
-Same cache/API/`use()` rules as Interns, plus **client** search params for
-**category** and **project** (not for list page index).
+Do not default to `"All"`. On `/careers?department=General` that highlights
+the wrong button until the data lands.
 
-```
-services/page.tsx (static — never awaits searchParams)
-└── ServicesPageView (async SC)
-      await getCachedServicesProjectsPage("all", 1, PAGE_SIZE)
-      └── ServicesPageContent ("use client")
-            Suspense + useSearchParams → category, project
-            tabs: <Link href="/services?category=…">
-            pager: useState(page) only — totalPages from CURRENT fetch
-            card click → router.replace(?project=id) → modal
-            modal: use(loadDetail) → GET /api/services-projects?id=
-```
+## Cached loaders
 
-Shared server module `lib/global/services-projects-cached.ts`:
+Data the shell needs that does not depend on `searchParams` gets its own cached
+loader.
 
-- **List** — lean card fields; DB `.range()` + count; key `(category, page, limit)`.
-- **Detail** — full payload + members; key `(projectId)`; tag `services-projects`.
-- One API route `app/api/services-projects/route.ts` for list + `?id=` detail.
+    export async function getCachedCareersJobDepartments() {
+      "use cache";
+      cacheLife("hours");
+      cacheTag(CACHE_TAGS.careersJobListings);
+      return getCareersJobDepartments(createClientAnon());
+    }
 
-Client rules:
+The cache key is the arguments, so
+`getCachedCareersJobListingsPage(department, type, level, page, limit)` stores one
+entry per filter combination. Confirmed with `NEXT_PRIVATE_DEBUG_CACHE=1`:
 
-- `totalPages` from the **active category's** fetch — not SSR `initialData` (`all`).
-- Remount tab with `key={category}`.
-- Close modal clears `project` via `router.replace`.
+    DefaultCacheHandler: get [... ["General","Full-time","Senior",1,4]] not found
+    DefaultCacheHandler: set [... ["General","Full-time","Senior",1,4]] start
+    DefaultCacheHandler: get [... ["General","Full-time","Senior",1,4]] found { tags: [ 'careers-job-listings' ] }
 
-Checklist:
+Same function plus same arguments means one entry, no matter how many components
+call it. `getCachedCareersJobDepartments()` is called from both the Block and the
+Section and resolves to a single entry.
 
-```
-- [ ] page.tsx never awaits searchParams; SSR awaits all/page 1 only
-- [ ] List lean; detail on demand + cached
-- [ ] Client: useSearchParams for category/project; useState for page
-- [ ] revalidateTag("services-projects") on project mutations
-```
+Nothing invalidates `CACHE_TAGS.careersJobListings` today. A new job posting will
+not appear on `/careers` until the `hours` window rolls over. Add
+`updateTag(CACHE_TAGS.careersJobListings)` to the action that writes
+`job_listings`.
 
-### Nav (auth island — same static-page rule)
+## MarketingProgressiveSection hides its children
 
-```
-<Navigation />  ("use client" chrome)
-  dynamic(..., { ssr: false }) UserMenu / DrawerAuth
-  use(getNavUserPromise()) + localStorage for instant paint
-```
+`MarketingProgressiveSection` renders its content inside
+`[data-landing-content]`, and `styles/global/globals.css` sets that to
+`visibility: hidden` until hydration sets `data-landing-motion="ready"`.
 
-- `dynamic` + `ssr: false` = **load** strategy (keep auth off SSR HTML).
-- `use()` + module promise (+ localStorage) = **data** strategy.
-- `dynamic` alone does **not** cache or replace `use()`.
-- Do **not** use `dynamic(ssr: false)` for public CoDev cards if you want
-  build-time HTML for page 1.
-- Logout: `signOut()` may `redirect()` (throw) → clear localStorage in `finally`.
+Anything that must be visible before hydration goes outside it. A heading can stay
+inside, because its skeleton is what shows instead. A filter or a results skeleton
+cannot.
 
-## When is an `/api/...` route OK?
+`JobListingsBlock.tsx` shows the split: the heading is inside, the Suspense
+boundary is outside.
 
-| Use | OK? |
-|-----|-----|
-| Paginated / filtered public list; SC awaits default page 1 via shared helper; client loads other pages/tabs/detail via API calling **same** helpers | **Yes** (Interns / Services) |
-| Replace a fixed public section’s RSC + `unstable_cache` “for caching” | **No** (Admins lesson) |
-| Client-only fetch with no SC page-1 await (no build HTML for list) | **No** for SEO sections |
-| SSR `fetchApiJson("/api/...")` for page 1 on static `/` (self-fetch) | **No** on preview (wrong base URL) |
-| Server Action for public read / pagination | **No** (mutations only) |
+## Soft navigation needs isPending
 
-## `fetchApiJson`
+App Router holds the current UI while it fetches the next route, so a Suspense
+fallback does not paint on a soft navigation. The client Body owns a
+`useTransition` and swaps in the skeleton itself.
 
-File: `apps/codebility/utils/global/api-fetch.ts`
+    const [isPending, startTransition] = useTransition();
+    ...
+    {isPending ? <JobListingsSkeleton count={PAGE_SIZE} /> : <Results />}
 
-- Keep for HTTP JSON (client pager, other APIs). Do **not** use it for SC
-  page-1 landing lists (self-fetch / env pitfall).
-- Server: turns `/api/...` into an absolute URL via
-  `NEXT_PUBLIC_APP_BASE_URL` / `APP_URL` / `VERCEL_URL` / localhost.
-- Returns `{ ok: true, data } | { ok: false, error }`.
-- Client pager: relative `/api/...` (browser). Optional HTTP cache via API
-  `Cache-Control`.
+Keep the control and the results in the same client component so they share that
+state. The Fallback's copy of the control is separate and does not need it.
 
-## Build time vs request time
+## Detail routes: a real 404 needs the proxy
 
-| Setup | Build-time HTML for that data? |
-|-------|--------------------------------|
-| RSC `await getCached…("all"\|1, n)` + static page | **Yes** (default page 1) |
-| First client hit `/api/…?page=2` → fills `unstable_cache` for `(2,n)` | **Runtime**, then reused 1h |
-| Client `use()` + module promise Map | Session identity only; not Data Cache |
-| `await searchParams` on `page.tsx` | Route becomes **dynamic** — avoid |
-| Anything calling `cookies()` in the tree | Route becomes **dynamic** — avoid |
+Under Cache Components the shell is sent before the id is known, so `notFound()`
+inside a boundary can only answer 200 with a `noindex` tag. The Next docs say to
+check in `proxy` instead, and `apps/codebility/proxy.ts` does that for
+`/profiles/<id>`:
 
-## Skeleton / Suspense
+- a UUID shape check, which rejects malformed ids with no database call
+- one `codev` lookup by primary key, selecting only `id`
+- a rewrite to `/not-found` with status 404
+- fail open on any lookup error, so an outage cannot 404 a real profile
+- a per-process TTL map, 30 minutes, capped at 5000 entries, because link
+  prefetching fires a request per visible card
 
-- Static page 1: data is in HTML after build; Suspense around the **already
-  awaited** SC does not “load” at runtime.
-- Client pager: Suspense **does** show while `use()` suspends on a new page
-  promise — use a layout-matched skeleton (`LandingInternSkeleton`).
-- Do not fake skeletons by switching the whole section to `dynamic(ssr: false)`.
+Keep this check cheap. Never fetch the full record there.
+
+## Folder rules
+
+Shared by two or more routes means `components/global/` or `lib/global/`.
+`codebility/route-scope` in `apps/codebility/eslint.config.js` resolves any
+`components/global/` file to route `""`, so every route may import it. A file in
+`components/marketing/careers/` can only be imported by `/careers`.
+
+That is why `CodevsProfiles*` lives in `components/global/marketing/`:
+`/codevs` and `/hire-a-codev` both render it.
+
+`app/` holds routing files only. A `page.tsx` may render components, and that is
+where a short shell belongs.
+
+## Verification
+
+Build, never `next dev`. Dev does not prerender the same way.
+
+    pnpm.cmd --filter codebility lint
+    pnpm.cmd codebility:build
+    $env:PORT='3311'; pnpm.cmd --filter codebility start
+
+`pnpm` and `npx` fail under this execution policy. Use `pnpm.cmd` and
+`npx.cmd`.
+
+Restart `next start` after every build, because it loads its manifests at boot.
+Confirm your server owns the port before trusting a result:
+
+    Get-NetTCPConnection -LocalPort 3311 -State Listen | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }
+
+### Is the shell still right?
+
+The build route table must still show `◐` for the route, not `ƒ`.
+
+`apps/codebility/.next/server/app/<route>.html` is the prerendered shell. It must
+contain the static parts and none of the data. For `/services` that is the hero,
+the tab bar, the Calendly heading and the grid skeleton, with no project cards.
+
+`apps/codebility/.next/prerender-manifest.json` must have `experimentalPPR:
+true` for the route.
+
+At runtime the headers confirm it:
+
+    x-nextjs-prerender: 1
+    x-nextjs-postponed: 1
+
+The served bytes must start with the build artifact, and the first flush must be
+identical for `/services` and `/services?category=cms`. A shell that changes
+with `searchParams` is not a static shell.
+
+### Where does the data land in the stream?
+
+Read the response chunk by chunk and record the byte offset of each marker. This is
+the most reliable check, because it cannot race the browser.
+
+Measured on the production build:
+
+| Route | Static markers arrive | Data arrives | Full document |
+| --- | --- | --- | --- |
+| `/services` | 16,380 bytes at 226ms | streamed after | 146,228 bytes at 1,176ms |
+| `/codevs` | 32,766 bytes at 65ms | streamed after | 243,782 bytes at 976ms |
+| `/profiles/[id]` | 16,383 bytes at 24ms | `Skills` at byte 51,913, `About` at 54,529 | 79,048 bytes at 447ms |
+
+### Pre-hydration state
+
+`MarketingProgressiveSection` hides its content until hydration, so an ordinary
+Playwright run can look correct while the shell is empty. Load the page with
+JavaScript disabled to see what the shell actually paints:
+
+    const ctx = await browser.newContext({ javaScriptEnabled: false });
+
+Expected on all three pages: the control is visible and the results skeleton is
+visible. If either is missing, something sits inside
+`MarketingProgressiveSection` that should not.
+
+### Skeleton detection
+
+    Array.from(document.querySelectorAll('[aria-busy="true"]'))
+      .filter(e => !e.closest('[aria-hidden="true"]') && e.getBoundingClientRect().height > 0)
+      .length
+
+The visibility filter matters. `MarketingProgressiveSection` keeps its skeleton in
+the DOM permanently inside an `aria-hidden` slot.
+
+### Cache hits and misses
+
+    $env:NEXT_PRIVATE_DEBUG_CACHE='1'; pnpm.cmd --filter codebility start
+
+Then look for `DefaultCacheHandler: get [...] not found` followed by `set`, and
+`found` with `tags: [...]` on the repeat.
+
+### Playwright
+
+Global install, not a project dependency:
+
+    $env:NODE_PATH='C:\Users\Dev\AppData\Roaming\npm\node_modules'
+    node "$env:TEMP\your-script.cjs"
+
+Delete the script and any screenshots when done.
 
 ## Reference files
 
-- Admins: `components/marketing/LandingAdmins.tsx`
-- Interns section: `components/marketing/LandingInternSection.tsx`
-- Interns pager: `components/marketing/LandingIntern-CodevPagination.tsx`
-- Interns data + cache: `lib/global/landing-interns-cached.ts`
-- Interns API: `app/api/landing-interns/route.ts`
-- Services page: `app/(marketing)/services/page.tsx`
-- Services view: `components/marketing/services/ServicesPageView.tsx`
-- Services tabs: `components/marketing/services/ServicesTab.tsx`
-- Services categories: `constants/global/services-categories.ts` and `utils/global/services-categories.ts`
-- Services cache: `lib/global/services-projects-cached.ts`
-- Services API: `app/api/services-projects/route.ts`
-- Marketing layout (Footer once): `app/(marketing)/layout.tsx`
-- Fetch helper: `utils/global/api-fetch.ts`
-- Anon client: `lib/global/supabase-anon.ts`
-- Nav: `components/global/marketing/MarketingNavigation.tsx`
-- Nav `use()`: `components/global/marketing/MarketingNavigationSubComponents.tsx`
-- Landing composition: `app/(marketing)/page.tsx`
+Converted:
 
-## Invalidate on edit
+- `/services`: `ServicesProjectsBlock.tsx`, `ServicesProjectsSection.tsx`,
+  `ServicesProjectsFallback.tsx`, `ServicesTabBar.tsx`, `ServicesTab.tsx`,
+  `lib/global/services-projects-cached.ts`
+- `/codevs` and `/hire-a-codev`: `CodevsProfiles.tsx`,
+  `CodevsProfilesData.tsx`, `CodevsProfilesFallback.tsx`,
+  `CodevsProfilesFilter.tsx`, `CodevsProfilesPagination.tsx`,
+  `lib/global/codevs-profiles-cached.ts`
+- `/careers`: `JobListingsBlock.tsx`, `JobListingsSection.tsx`,
+  `JobListingsFallback.tsx`, `JobListingsFilter.tsx`,
+  `JobListingsPagination.tsx`, `lib/global/careers-job-listings-cached.ts`,
+  `utils/marketing/careers/careers.ts`
+- `/profiles/[id]`: `app/(marketing)/profiles/[id]/page.tsx`,
+  `ProfileDetailSection.tsx`, `ProfileDetailSkeleton.tsx`
+- proxy 404: `apps/codebility/proxy.ts`
 
-```ts
-import { revalidateTag } from "next/cache";
-revalidateTag("landing-admins");
-revalidateTag("landing-interns");
-revalidateTag("services-projects");
-```
+Same bug class, not converted yet:
 
-Invalidation is **server-side**. Browser cannot tag-revalidate the Data Cache.
+- `/profiles`: `ProfilesListPagination.tsx` renders `CodevListFilter` inside the
+  suspended `ProfilesListBody`, so the filter vanishes on load.
+  `CodevsProfilesFilter` is already shaped to be shared.
+- `/`: `LandingInternSection.tsx` wraps `LandingIntern` in a Suspense whose
+  fallback is a bare skeleton.

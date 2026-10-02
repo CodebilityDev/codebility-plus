@@ -1,108 +1,100 @@
-# How we got here (do not repeat)
+# Traps and rejected paths
 
-Decision log for marketing static public data. If a “clever” idea is listed
-here, it already failed or was rejected in this repo.
+Every item here cost real time or was tried and rejected. Check the list before
+proposing a fix.
 
-## Starting problem
+## 1. A Suspense boundary around the whole page body
 
-Marketing `/` was slow / dynamic because:
+The fallback becomes the entire static shell, so everything else streams in after
+the fetch. This was the original state of `/services`, `/codevs`,
+`/hire-a-codev` and `/careers`.
 
-- Nav (or a child) called **server session / `cookies()`**.
-- Next 15.3: one `cookies()` in the tree dynamizes the **whole route**.
-- Public sections used **server auth Supabase** → GoTrue refresh on expired
-  sessions → `refresh_token_not_found`.
-- Interns: client `useEffect` → huge API → in-memory prioritize → late paint.
+`/hire-a-codev` had it twice: its own `<Suspense>` around `CodevsProfiles`,
+which already had one. The outer fallback was a bare skeleton, so the section
+heading disappeared as well.
 
-## What actually fixed static `/` (current Interns / CoDevs)
+## 2. The fallback inside MarketingProgressiveSection
 
-- Nav: **client** chrome. Logged-in UI via `dynamic(..., { ssr: false })`.
-- Profile: **localStorage** + `use(getNavUserPromise())` (no `useEffect`).
-- Logout: `signOut()` **redirects (throws)** → clear storage in `finally`.
-- Public reads: **`createClientAnon()`** only.
-- Admins: RSC + `unstable_cache` + motion client child.
-- Interns: **one** `lib/global/landing-interns-cached.ts` (query +
-  `getCachedLandingInternsPage`). Page 1 SC awaits cache directly. Page 2+
-  client `fetch` → `/api/landing-interns` → **same** cache. Pager =
-  `useState` + `use()` + module promise Map (**no URL `?page=`**).
-- `page.tsx` never awaits `searchParams`.
+`[data-landing-content]` is `visibility: hidden` until hydration. A fallback
+placed inside it is invisible in the static shell, which is worse than before the
+change. Caught by loading the page with JavaScript disabled.
 
-## What fixed `/services` (Pattern C)
+## 3. export const instant = false
 
-- SC always awaits **`all` page 1** via `getCachedServicesProjectsPage`.
-- Category tabs + shareable project: client `useSearchParams` (`?category=`, `?project=`).
-- List **page** stays `useState` — never `?page=`.
-- List lean; detail via `GET /api/services-projects?id=`.
-- `totalPages` from active category fetch; `key={category}` on tab remount.
-- No duplicate Footer (marketing layout owns it).
+`/profiles/[id]` had it. The route blocked until the full server render finished,
+so a card click waited about a second with a blank page and no skeleton. The
+prerendered shell for that route was 0 bytes.
 
-## Failed / rejected paths
+It does not disable prerendering. It disables instant-navigation validation and
+makes the navigation block.
 
-### 1. Client Supabase fetch for public sections
+## 4. notFound() after streaming
 
-Next Data Cache never sees browser Supabase. No shared `unstable_cache` with
-page 1. No build-time HTML for SEO lists.
+Once the shell is flushed the status is already 200. Next adds
+`<meta name="robots" content="noindex">`, which keeps the page out of search
+results, but the status is gone. For a real 404, check in `proxy` before the
+response starts.
 
-### 2. API route as a drop-in “cache” for fixed sections (admins)
+## 5. useSearchParams() outside Suspense
 
-- Tried `/api/landing-admins` + client `use` + `dynamic(ssr: false)`.
-- Rejected for admins: not the same as RSC prerender of the section.
-- **Interns nuance:** thin `/api/landing-interns` **is** OK for **page 2+**
-  when it calls the **same** `getCachedLandingInternsPage` the SC uses for
-  page 1.
+An instant-navigation validation error under Cache Components. Push the read down
+into a leaf inside its own boundary.
 
-### 3. `await searchParams` on marketing `page.tsx`
+## 6. A data-dependent early return above the controls
 
-Dynamizes the route (landing `/` or `/services`). Never do this.
+`JobListingsBody` returned the empty message before reaching
+`JobListingsPagination`, so a filter with no matches dropped the filter and left
+no way to change it. Keep controls outside the branch.
 
-### 6. Path segments for category tabs (`/services/[category]`)
+## 7. Judging the data fetch by TTFB
 
-Rejected in favor of client `?category=` search params (page stays static).
+With Partial Prerendering the shell is sent first, so TTFB measures the shell. The
+listings stream later in the same response. Read the full body, or watch the byte
+offsets.
 
-### 15. Next `<Link href="?page=N">` for list pager
+The shell only waits on the cached loaders. On `/careers` that is
+`getCachedCareersJobDepartments()`, which is why the first request after a
+restart is slow and the rest are not.
 
-Same bug class for landing and services — soft-nav remounts with page-1 SSR data.
+## 8. Testing in next dev
 
-### 16. `history.pushState` / `replaceState` with `?page=`
+Dev does not prerender the same way, and a blocking route behaves differently.
+Build and run `next start`.
 
-Keep list page in React state only. `router.replace` for `?category=` / `?project=` is OK.
+## 9. A stale next start holding the port
 
-### 20. Value-importing `lib/global/*-cached.ts` into `"use client"`
+The new server dies with `EADDRINUSE`, the browser then talks to the old one
+whose `.next` was deleted underneath it, and every route returns phantom 500s.
+Confirm the port owner first.
 
-**`import type` only.** Client constants in `services/_lib/services-categories.ts`.
+## 10. pnpm and npx
 
-### 21. Using SSR `initialData.pagination.totalPages` after tab change
+Their `.ps1` shims are blocked by execution policy. Use `pnpm.cmd` and
+`npx.cmd`.
 
-SSR data is always default tab (`all`). Use current category response.
+## 11. Counting skeletons naively
 
-### 22. Duplicate marketing Footer in page content
+`MarketingProgressiveSection` keeps its skeleton in the DOM permanently, inside
+an `aria-hidden` slot. Filter by visibility and height, or you will measure a
+skeleton that never ends. A naive count once reported 32.8s for a navigation that
+took 530ms.
 
-Layout already renders Footer.
+## 12. eval() for page instrumentation
 
-### 23. Splitting query and `unstable_cache` without need
+The site's CSP blocks it, which produces a wall of phantom page errors. Pass a real
+function to `page.evaluate`.
 
-Prefer one server module per feature (Interns / Services).
+## Rejected along the way
 
-## Correct mental model
-
-```
-Static page     = no cookies() and no searchParams await on marketing page.tsx
-Default page 1  = await getCached…(defaultKey, 1, n) at prerender
-Other pages/tabs/detail = client use() → /api → same getCached…
-List page index = useState only (never ?page=)
-Tab / share id  = client useSearchParams (?category= / ?project=) OK
-Auth UI         = client island (dynamic ssr:false + use + localStorage)
-Cache bust      = revalidateTag after DB write
-```
-
-## User quotes to honor
-
-- Isolated fetch function, then await it traditionally in the component.
-- Native Next cache; no TanStack for this.
-- No `useEffect` for this data.
-- Anon helper must not leak memory (singleton).
-- Do not “fix skeleton” by changing the data architecture.
-- Invalidation is **server** (`revalidateTag`).
-- Every refactor / implement of this area: **refer to this skill**.
-- Do not put any comments when editing files.
-- Server Actions are for mutations, not public list reads.
-- Prefer one file for Interns query + `unstable_cache` when asked.
+- **`generateStaticParams` plus `dynamicParams = false`** for a real 404. The
+  `codev` table has 1,398 rows, and the list would go stale for every new
+  profile. The proxy check replaced it.
+- **Defaulting the shell's control to `"All"`.** Shows a wrong selection on a
+  filtered URL.
+- **A long TTL for negative results in the proxy.** Kept at 30 minutes with a size
+  cap, so a deleted profile still ends in the streamed not-found page.
+- **The previous version of this skill.** It documented `unstable_cache`,
+  `/api/landing-interns`, `/api/services-projects` and `fetchApiJson`, and
+  told you never to await `searchParams` on a marketing `page.tsx`. None of
+  those routes exist now, and the current pattern awaits `searchParams` inside a
+  boundary. Deleted rather than kept alongside this file.

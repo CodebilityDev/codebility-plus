@@ -15,8 +15,6 @@ import type { ServicesTabProps } from "@/types/marketing/services/services";
 
 export const ServicesTab = ({ initialData, category }: ServicesTabProps) => {
   const router = useRouter();
-  // The server still does the fetching. This only surfaces the in-flight state
-  // of that navigation so the skeleton shows instead of the stale page.
   const [isPending, startTransition] = useTransition();
 
   const { pagination } = initialData;

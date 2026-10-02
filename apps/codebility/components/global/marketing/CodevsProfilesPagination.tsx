@@ -25,9 +25,6 @@ export default function CodevsProfilesPagination({
 }: CodevsProfilesPaginationProps) {
   const router = useRouter();
   const pathname = usePathname();
-  // The server still does the fetching. This only surfaces the in-flight state
-  // of that navigation, which App Router would otherwise hide behind the
-  // current page until the new RSC payload lands.
   const [isPending, startTransition] = useTransition();
 
   const { position, pagination } = initialData;

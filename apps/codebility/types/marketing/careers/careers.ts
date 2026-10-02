@@ -52,7 +52,6 @@ export type JobListingsFilterKey = "department" | "type" | "level";
 
 export interface JobListingsFilterProps {
   departments: string[];
-  /** null means the value is not known yet, so no button renders as active. */
   department: string | null;
   type: string | null;
   level: string | null;

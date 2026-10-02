@@ -36,7 +36,7 @@ export type PrevButtonPropType = ComponentPropsWithRef<"button">;
 export interface FeaturedCardProps {
   title: string;
   description: string;
-  url?: string; // Optional, defaults to "#"
+  url?: string;
   src: string;
   alt: string;
 }
@@ -58,8 +58,8 @@ export interface CodevsProfilesPaginationProps {
 
 export interface SectionProps {
   children: ReactNode;
-  className?: string; // Optional className prop
-  id?: string; // Optional id prop
+  className?: string;
+  id?: string;
 }
 
 export interface MarketingProgressiveSectionProps {
@@ -75,7 +75,6 @@ export interface ProgressiveMotionProps {
   duration?: number;
   amount?: number | "some" | "all";
   staggerChildren?: number;
-  /** Play enter animation immediately on mount (paginated lists). */
   playOnMount?: boolean;
 }
 
@@ -103,8 +102,6 @@ export interface CodevsProfilesFallbackProps {
   positions: string[];
 }
 
-// CBP-135 follow-up: shared JSON-LD renderer.
-// Usage: <JsonLd data={someSchemaObject} />
 export interface JsonLdProps { data: Record<string, unknown> }
 
 export interface ContainerProps {
