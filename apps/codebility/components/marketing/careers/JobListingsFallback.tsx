@@ -1,12 +1,18 @@
+import { JobListingsFilter } from "@/components/marketing/careers/JobListingsFilter";
 import { JobListingsSkeleton } from "@/components/marketing/careers/JobListingsSkeleton";
 import { PAGE_SIZE } from "@/constants/marketing/careers/careers";
+import type { JobListingsFallbackProps } from "@/types/marketing/careers/careers";
 
-export function JobListingsFallback() {
+export function JobListingsFallback({ departments }: JobListingsFallbackProps) {
   return (
-    <section id="open-positions" className="relative border-y border-gray-800 py-20">
-      <div className="mx-auto max-w-7xl px-6">
-        <JobListingsSkeleton count={PAGE_SIZE} />
-      </div>
-    </section>
+    <>
+      <JobListingsFilter
+        departments={departments}
+        department={null}
+        type={null}
+        level={null}
+      />
+      <JobListingsSkeleton count={PAGE_SIZE} />
+    </>
   );
 }

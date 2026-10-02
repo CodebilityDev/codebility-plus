@@ -1,16 +1,14 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+
 import Paragraph from "@/components/global/typography/Paragraph";
 import Logo from "@/components/global/layout/Logo";
-import { getCachedProfileDetail, getCachedProfileDetailMeta } from "@/lib/marketing/profiles/profile-detail-cached";
-import { getSkillCategories } from "@/lib/global/skill-categories-cached";
-
+import { getCachedProfileDetailMeta } from "@/lib/marketing/profiles/profile-detail-cached";
 
 import ProfileCloseButton from "@/components/marketing/profiles/ProfileDetailCloseButton";
-import ProfileContent from "@/components/marketing/profiles/ProfileDetailContent";
+import { ProfileDetailSection } from "@/components/marketing/profiles/ProfileDetailSection";
+import { ProfileDetailSkeleton } from "@/components/marketing/profiles/ProfileDetailSkeleton";
 import type { ProfilesIdPageProps } from "@/types/marketing/profiles/profiles";
-
-export const instant = false;
 
 export async function generateMetadata({ params }: ProfilesIdPageProps): Promise<Metadata> {
   const { id } = await params;
@@ -47,19 +45,7 @@ export async function generateMetadata({ params }: ProfilesIdPageProps): Promise
   };
 }
 
-export default async function CodevBioPage(props: ProfilesIdPageProps) {
-  const { id } = await props.params;
-  const [codev, skillCategories] = await Promise.all([
-    getCachedProfileDetail(id),
-    getSkillCategories(),
-  ]);
-
-  if (!codev) {
-    notFound();
-  }
-
-  const availableSchedule = codev.work_schedules?.[0] ?? null;
-
+export default function CodevBioPage(props: ProfilesIdPageProps) {
   return (
     <section className="from-black-500 to-black-100 relative flex min-h-screen flex-col bg-gradient-to-l">
       <div className="bg-section-wrapper absolute inset-0 bg-fixed bg-repeat opacity-20"></div>
@@ -67,11 +53,9 @@ export default async function CodevBioPage(props: ProfilesIdPageProps) {
         <div className="float-end">
           <ProfileCloseButton />
         </div>
-        <ProfileContent
-          codev={codev}
-          availableSchedule={availableSchedule}
-          skillCategories={skillCategories}
-        />
+        <Suspense fallback={<ProfileDetailSkeleton />}>
+          <ProfileDetailSection params={props.params} />
+        </Suspense>
       </div>
       <div className="relative flex flex-col items-center gap-4 pb-10">
         <Logo />

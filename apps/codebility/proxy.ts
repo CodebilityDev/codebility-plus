@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import { createClientAnon } from "@/lib/global/supabase-anon";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 
 
@@ -26,6 +27,59 @@ const PUBLIC_ROUTES = [
 
 // Routes that should be public with wildcard support (e.g., /profiles/*)
 const PUBLIC_ROUTE_PREFIXES = ["/profiles/", "/nda-signing/"] as const;
+
+const PROFILE_DETAIL_PREFIX = "/profiles/";
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// Profile existence is checked here rather than in the page. Under Cache
+// Components the page streams its static shell before it can read the id, so a
+// notFound() there can only ever answer 200 with a noindex tag. Proxy runs
+// before the response starts, so it can still set the status.
+//
+// Link prefetching fires a request per visible card, so results are memoised.
+// The window only delays propagating a deleted profile, and a stale "exists"
+// still ends in the streamed not-found page, so it can be generous.
+// ponytail: per-process TTL map with a crude size cap. Move to a shared cache
+// if the number of server instances starts to matter.
+const PROFILE_EXISTS_TTL_MS = 30 * 60_000;
+const PROFILE_EXISTS_MAX_ENTRIES = 5_000;
+const profileExistsCache = new Map<
+  string,
+  { exists: boolean; expiresAt: number }
+>();
+
+async function profileExists(id: string): Promise<boolean> {
+  const cached = profileExistsCache.get(id);
+  if (cached && cached.expiresAt > Date.now()) return cached.exists;
+
+  let exists = true;
+  try {
+    const { data, error } = await createClientAnon()
+      .from("codev")
+      .select("id")
+      .eq("id", id)
+      .limit(1);
+    // Fail open: a lookup error must not 404 a profile that exists.
+    if (error) {
+      console.error("Proxy profile lookup failed:", error);
+    } else {
+      exists = data.length > 0;
+    }
+  } catch (error) {
+    console.error("Proxy profile lookup failed:", error);
+  }
+
+  // Bounds memory against a caller walking made-up (but well-formed) ids.
+  if (profileExistsCache.size >= PROFILE_EXISTS_MAX_ENTRIES) {
+    profileExistsCache.clear();
+  }
+  profileExistsCache.set(id, {
+    exists,
+    expiresAt: Date.now() + PROFILE_EXISTS_TTL_MS,
+  });
+  return exists;
+}
 
 const AUTH_ROUTES = ["/auth/sign-in", "/auth/sign-up", "/auth/onboarding"] as const;
 
@@ -64,6 +118,15 @@ export async function proxy(req: NextRequest) {
     );
 
     if (isPublicPrefix) {
+      if (pathname.startsWith(PROFILE_DETAIL_PREFIX)) {
+        const id = pathname.slice(PROFILE_DETAIL_PREFIX.length).split("/").shift() ?? "";
+        if (!UUID_PATTERN.test(id) || !(await profileExists(id))) {
+          const url = req.nextUrl.clone();
+          url.pathname = "/not-found";
+          url.search = "";
+          return NextResponse.rewrite(url, { status: 404 });
+        }
+      }
       return NextResponse.next();
     }
 

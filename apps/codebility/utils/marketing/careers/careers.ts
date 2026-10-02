@@ -21,6 +21,19 @@ export const applicationSchema = z.object({
   resume: z.any().optional(),
 });
 
+export function careersHref(
+  filters: { department?: string; type?: string; level?: string },
+  page = 1,
+): string {
+  const params = new URLSearchParams();
+  if (filters.department) params.set("department", filters.department);
+  if (filters.type) params.set("type", filters.type);
+  if (filters.level) params.set("level", filters.level);
+  if (page > 1) params.set("page", String(page));
+  const query = params.toString();
+  return query ? `/careers?${query}` : "/careers";
+}
+
 export function pageCacheKey(
   department: string,
   type: string,

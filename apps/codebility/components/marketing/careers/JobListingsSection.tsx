@@ -3,7 +3,7 @@ import { parsePageParam, parseStringParam } from "@/utils/global/page-param";
 import type { CareersJobListingsInitial } from "@/types/global/careers-job-listings";
 import type { JobListingsSectionProps } from "@/types/marketing/careers/careers";
 
-import JobListingsShell from "@/components/marketing/careers/JobListingsShell";
+import { JobListingsBody } from "@/components/marketing/careers/JobListingsBody";
 import { PAGE_SIZE } from "@/constants/marketing/careers/careers";
 
 export default async function JobListingsSection({ searchParams }: JobListingsSectionProps) {
@@ -21,5 +21,5 @@ export default async function JobListingsSection({ searchParams }: JobListingsSe
   const initialData: CareersJobListingsInitial | null =
     pageData && departments ? { ...pageData, departments } : null;
 
-  return <JobListingsShell initialData={initialData} pageSize={PAGE_SIZE} />;
+  return <JobListingsBody initialData={initialData} pageSize={PAGE_SIZE} />;
 }

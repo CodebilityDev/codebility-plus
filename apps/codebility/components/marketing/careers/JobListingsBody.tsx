@@ -1,19 +1,11 @@
 import JobListingsPagination from "@/components/marketing/careers/JobListingsPagination";
-import type { JobListingsShellProps } from "@/types/marketing/careers/careers";
+import type { JobListingsBodyProps } from "@/types/marketing/careers/careers";
 
-export function JobListingsBody({ initialData, pageSize }: JobListingsShellProps) {
+export function JobListingsBody({ initialData, pageSize }: JobListingsBodyProps) {
   if (!initialData) {
     return (
       <p className="py-12 text-center text-red-400">
         Failed to load job listings. Please try again later.
-      </p>
-    );
-  }
-
-  if (initialData.jobs.length === 0 && initialData.pagination.total === 0) {
-    return (
-      <p className="py-12 text-center text-gray-400">
-        No open positions at the moment. Please check back later.
       </p>
     );
   }
