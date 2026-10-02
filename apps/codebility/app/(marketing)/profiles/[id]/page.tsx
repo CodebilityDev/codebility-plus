@@ -1,49 +1,16 @@
-import { Metadata } from "next";
-import { notFound } from "next/navigation";
-import { Paragraph } from "@/components/shared/home";
-import Logo from "@/components/shared/Logo";
-import {
-  getCachedProfileDetail,
-  getCachedProfileDetailMeta,
-} from "@/lib/server/profile-detail-cached";
-import {
-  getCachedLandingAdminsData,
-  getLandingAdminsProfileIds,
-} from "@/lib/server/landing-admins-cached";
-import { getCachedLandingInternsPage } from "@/lib/server/landing-interns-cached";
+import { Suspense } from "react";
+import type { Metadata } from "next";
 
-import JsonLd from "../../_components/JsonLd";
-import ProfileCloseButton from "./_components/ProfileCloseButton";
-import ProfileContent from "./_components/ProfileContent";
+import Paragraph from "@/components/global/typography/Paragraph";
+import Logo from "@/components/global/layout/Logo";
+import { getCachedProfileDetailMeta } from "@/lib/marketing/profiles/profile-detail-cached";
 
-interface Props {
-  params: Promise<{ id: string }>;
-}
+import ProfileCloseButton from "@/components/marketing/profiles/ProfileDetailCloseButton";
+import { ProfileDetailSection } from "@/components/marketing/profiles/ProfileDetailSection";
+import { ProfileDetailSkeleton } from "@/components/marketing/profiles/ProfileDetailSkeleton";
+import type { ProfilesIdPageProps } from "@/types/marketing/profiles/profiles";
 
-const LANDING_PAGE_SIZE = 10;
-
-export async function generateStaticParams() {
-  const [landing, adminsData] = await Promise.all([
-    getCachedLandingInternsPage(1, LANDING_PAGE_SIZE),
-    getCachedLandingAdminsData(),
-  ]);
-
-  const ids = new Set<string>();
-
-  for (const member of landing?.TEAM_MEMBERS ?? []) {
-    ids.add(member.id);
-  }
-
-  if (adminsData) {
-    for (const id of getLandingAdminsProfileIds(adminsData)) {
-      ids.add(id);
-    }
-  }
-
-  return [...ids].map((id) => ({ id }));
-}
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({ params }: ProfilesIdPageProps): Promise<Metadata> {
   const { id } = await params;
   const profile = await getCachedProfileDetailMeta(id);
 
@@ -55,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const name = `${profile.first_name} ${profile.last_name}`.trim();
-  const image = profile.image_url || "/og-image.jpg";
+  const image = profile.image_url ?? "/og-image.jpg";
 
   return {
     title: `${name} — Developer Profile | Codebility`,
@@ -78,16 +45,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function CodevBioPage(props: Props) {
-  const { id } = await props.params;
-  const codev = await getCachedProfileDetail(id);
-
-  if (!codev) {
-    notFound();
-  }
-
-  const availableSchedule = codev.work_schedules?.[0] ?? null;
-
+export default function CodevBioPage(props: ProfilesIdPageProps) {
   return (
     <section className="from-black-500 to-black-100 relative flex min-h-screen flex-col bg-gradient-to-l">
       <div className="bg-section-wrapper absolute inset-0 bg-fixed bg-repeat opacity-20"></div>
@@ -95,10 +53,9 @@ export default async function CodevBioPage(props: Props) {
         <div className="float-end">
           <ProfileCloseButton />
         </div>
-        <ProfileContent
-          codev={codev}
-          availableSchedule={availableSchedule}
-        />
+        <Suspense fallback={<ProfileDetailSkeleton />}>
+          <ProfileDetailSection params={props.params} />
+        </Suspense>
       </div>
       <div className="relative flex flex-col items-center gap-4 pb-10">
         <Logo />

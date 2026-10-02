@@ -1,11 +1,12 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 
-import FeaturedSection from "../_shared/CodevsFeaturedCection";
-import CodevsFeaturedProjectsSection from "../_shared/CodevsFeaturedProjectsSection";
-import CodevsProfiles from "../_shared/CodevsProfiles";
-import { CodevHireCodevModal } from "../profiles/_components/CodevHireCodevModal";
-import Hero from "./_components/CodevsHero";
-import HiringProcess from "./_components/HiringProcess";
+import FeaturedSection from "@/components/global/marketing/CodevsFeaturedSection";
+import CodevsFeaturedProjectsSection from "@/components/global/marketing/CodevsFeaturedProjectsSection";
+import CodevsProfiles from "@/components/global/marketing/CodevsProfiles";
+import { CodevHireCodevModal } from "@/components/global/marketing/CodevHireCodevModal";
+import Hero from "@/components/marketing/hire-a-codev/CodevsHero";
+import HiringProcess from "@/components/marketing/hire-a-codev/HiringProcess";
+import type { CodevsProfilesProps } from "@/types/global/marketing";
 
 export const metadata: Metadata = {
     title: "Hire a Developer — Vetted Filipino Tech Talent | Codebility",
@@ -25,12 +26,12 @@ export const metadata: Metadata = {
     },
 };
 
-export default function HireACodev() {
+export default function HireACodev({ searchParams }: CodevsProfilesProps) {
     return (
         <div className="bg-black-400 relative flex w-full flex-col">
             <Hero />
             <HiringProcess />
-            <CodevsProfiles />
+            <CodevsProfiles searchParams={searchParams} />
             <FeaturedSection />
             <CodevsFeaturedProjectsSection />
             <CodevHireCodevModal />

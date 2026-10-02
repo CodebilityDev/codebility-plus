@@ -1,14 +1,13 @@
-import { MetadataRoute } from "next";
+import type { MetadataRoute } from "next";
 import { createClient } from "@supabase/supabase-js";
+import { BASE_URL } from "@/constants/global/app";
+import { ensureSupabaseEnv } from "@/lib/global/supabase-ensure-env";
 
-const BASE_URL = "https://www.codebility.tech";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Use anon client — public data, no auth required
-    const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    );
+    const { url, anonKey } = ensureSupabaseEnv();
+    const supabase = createClient(url, anonKey);
 
     // Fetch all public codev IDs for dynamic profile routes
     const { data: codevs } = await supabase
@@ -33,7 +32,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Dynamic profile pages — one entry per codev
     const profileRoutes: MetadataRoute.Sitemap = (codevs ?? []).map((codev) => ({
         url: `${BASE_URL}/profiles/${codev.id}`,
-        lastModified: codev.updated_at ? new Date(codev.updated_at) : new Date(),
+        lastModified: codev.updated_at ? new Date(codev.updated_at as string) : new Date(),
         changeFrequency: "monthly" as const,
         priority: 0.5,
     }));

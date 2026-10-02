@@ -1,11 +1,12 @@
-import React from "react";
-import Navigation from "@/app/(marketing)/_components/MarketingNavigation";
+
+import Navigation from "@/components/global/marketing/MarketingNavigation";
+import type { AuthWaitingLayoutProps } from "@/types/auth/waiting/waiting";
+
+export const instant = false;
 
 export default function AuthWaitingLayout({
   children,
-}: {
-  children: React.ReactNode;
-}) {
+}: AuthWaitingLayoutProps) {
   return (
     <div>
       <Navigation />

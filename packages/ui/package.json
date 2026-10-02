@@ -76,8 +76,9 @@
     "@codevs/tailwind-config": "workspace:*",
     "@codevs/tsconfig": "workspace:*",
     "@types/node": "^20.14.0",
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "eslint": "^9.39.5",
     "prettier": "^3.3.3",
     "rimraf": "^6.0.1",
     "tailwindcss": "^3.4.10",
@@ -122,9 +123,9 @@
     "embla-carousel-react": "^8.0.0",
     "input-otp": "^1.2.4",
     "lucide-react": "^0.427.0",
-    "react": "^18.3.1",
+    "react": "^19.3.0",
     "react-day-picker": "8.10.1",
-    "react-dom": "^18.3.1",
+    "react-dom": "^19.3.0",
     "react-hook-form": "^7.56.4",
     "react-resizable-panels": "^2.1.2",
     "sonner": "^1.5.0",
@@ -134,15 +135,8 @@
     "zod": "^3.23.8"
   },
   "peerDependencies": {
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0"
-  },
-  "eslintConfig": {
-    "root": true,
-    "extends": [
-      "@codevs/eslint-config/base",
-      "@codevs/eslint-config/react"
-    ]
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0"
   },
   "prettier": "@codevs/prettier-config"
 }

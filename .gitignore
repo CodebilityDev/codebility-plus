@@ -87,10 +87,15 @@ build/**
 !.yarn/sdks
 !.yarn/versions
 
-distapps/bot/.env
+dist
+apps/bot/.env
 .env
 apps/codebility/public/assets/onboardingvideos/*.mp4
 .planning/
 .cursor/
 docs/agents
 skills-lock.json
+# Local scratch output
+*.patch
+lint_output.txt
+ts_errors.txt

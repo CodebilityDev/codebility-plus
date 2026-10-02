@@ -1,15 +1,13 @@
-import React, { Suspense } from "react";
+import React from "react";
 
-import ApplicantFetchComp from "./_components/applicantFetchComp";
-import Loading from "./loading";
+import ApplicantFetchComp from "@/components/applicant/waiting/applicantFetchComp";
 
-export const dynamic = "force-dynamic";
-export default async function ApplicantWaitingPage() {
+export const instant = false;
+
+export default function ApplicantWaitingPage() {
   return (
     <div>
-      <Suspense fallback={<Loading />}>
         <ApplicantFetchComp />
-      </Suspense>
     </div>
   );
 }

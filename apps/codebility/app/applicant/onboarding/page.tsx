@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
-import { createClientServerComponent } from "@/utils/supabase/server";
-import OnboardingClient from "./_components/OnboardingClient";
+import { createClientServerComponent } from "@/lib/global/supabase-server";
+import OnboardingClient from "@/components/applicant/onboarding/OnboardingClient";
+
+export const instant = false;
 
 export default async function OnboardingPage() {
   const supabase = await createClientServerComponent();
@@ -16,11 +18,11 @@ export default async function OnboardingPage() {
   // Fetch user's codev data
   const { data: codevData, error: codevError } = await supabase
     .from("codev")
-    .select("*")
+    .select("id, first_name, last_name, application_status")
     .eq("id", user.id)
     .single();
 
-  if (codevError || !codevData) {
+  if (codevError) {
     console.error("Error fetching codev data:", codevError);
     redirect("/applicant/waiting");
   }
@@ -33,11 +35,13 @@ export default async function OnboardingPage() {
   // Fetch applicant data
   const { data: applicantData, error: applicantError } = await supabase
     .from("applicant")
-    .select("*")
+    .select(
+      "id, quiz_passed, quiz_score, quiz_total, quiz_completed_at, commitment_signed_at",
+    )
     .eq("codev_id", user.id)
     .single();
 
-  if (applicantError || !applicantData) {
+  if (applicantError) {
     console.error("Error fetching applicant data:", applicantError);
     redirect("/applicant/waiting");
   }
