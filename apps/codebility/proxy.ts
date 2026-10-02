@@ -1,38 +1,128 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { createClientAnon } from "@/lib/global/supabase-anon";
-import { createClientServerComponent } from "@/lib/global/supabase-server";
 
+import {
+  createProxyClient,
+  passThrough,
+  redirectTo,
+} from "@/lib/global/proxy-session";
+import type { ProxyClient } from "@/lib/global/proxy-session";
+import { createClientAnon } from "@/lib/global/supabase-anon";
 
 export const config = {
   matcher: ["/((?!api|_next/static|.*\\..*|_next/image|favicon.ico).*)"],
 };
 
-const PUBLIC_ROUTES = [
+const SIGN_IN = "/auth/sign-in";
+const HOME = "/home";
+const TWO_FACTOR = "/auth/2fa-challenge";
+const EMAIL_VERIFICATION = "/auth/verify";
+const DECLINED = "/auth/declined";
+const WAITING_APPROVAL = "/auth/waiting";
+const APPLICANT = "/applicant";
+const PROFILE_PREFIX = "/profiles/";
+
+const PUBLIC_PATHS = new Set([
+  "/",
   "/privacy-policy",
-  "/standalone",
-  "/terms",
-  "/auth/password-reset",
+  "/contact",
   "/codevs",
   "/hire-a-codev",
   "/bookacall",
   "/services",
-  "/",
   "/careers",
-  "/nda-signing/public",
   "/ai-integration",
+  "/profiles",
+  "/nda-signing/public",
   "/auth/callback",
+  "/auth/password-reset",
+  EMAIL_VERIFICATION,
+]);
 
-] as const;
+const PUBLIC_PREFIXES = [PROFILE_PREFIX, "/nda-signing/"];
 
-const PUBLIC_ROUTE_PREFIXES = ["/profiles/", "/nda-signing/"] as const;
+const AUTH_ENTRY_PATHS = new Set([SIGN_IN, "/auth/sign-up", "/auth/onboarding"]);
 
-const PROFILE_DETAIL_PREFIX = "/profiles/";
-const UUID_PATTERN =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const STATUS_EXEMPT_PATHS = new Set([TWO_FACTOR]);
+
+const PASSED_BLOCKED_PATHS = new Set([
+  WAITING_APPROVAL,
+  DECLINED,
+  APPLICANT,
+  "/applicant/waiting",
+  "/applicant/profile",
+  "/applicant/account-settings",
+]);
+
+const APPLICANT_STATUSES = new Set([
+  "applying",
+  "pending",
+  "testing",
+  "onboarding",
+  "waitlist",
+]);
+
+const routePermissionMap = {
+  "/home/applicants": "applicants",
+} as const;
+
+type PermissionKey = (typeof routePermissionMap)[keyof typeof routePermissionMap];
+
+const PERMISSION_COLUMNS = [
+  ...new Set(Object.values(routePermissionMap)),
+].join(", ");
+
+const PERMISSION_PREFIXES = (
+  Object.keys(routePermissionMap) as (keyof typeof routePermissionMap)[]
+).sort((a, b) => b.length - a.length);
+
+type Access = "public" | "auth-entry" | "protected";
+
+interface Account {
+  application_status: string | null;
+  roles?: Record<string, boolean> | null;
+}
+
+function accessFor(pathname: string): Access {
+  if (PUBLIC_PATHS.has(pathname)) return "public";
+  if (PUBLIC_PREFIXES.some((prefix) => pathname.startsWith(prefix))) {
+    return "public";
+  }
+  if (AUTH_ENTRY_PATHS.has(pathname)) return "auth-entry";
+  return "protected";
+}
+
+function permissionFor(pathname: string): PermissionKey | null {
+  const match = PERMISSION_PREFIXES.find((prefix) =>
+    pathname.startsWith(prefix),
+  );
+  return match ? routePermissionMap[match] : null;
+}
+
+function statusRedirect(status: string | null, pathname: string): string | null {
+  if (status === "passed") {
+    return PASSED_BLOCKED_PATHS.has(pathname) ? HOME : null;
+  }
+
+  if (status === "failed" || status === "denied") {
+    const allowed =
+      pathname.includes(DECLINED) || pathname.includes(APPLICANT);
+    return allowed ? null : DECLINED;
+  }
+
+  if (status && APPLICANT_STATUSES.has(status)) {
+    const allowed =
+      pathname.includes(WAITING_APPROVAL) || pathname.includes(APPLICANT);
+    return allowed ? null : "/applicant/waiting";
+  }
+
+  return null;
+}
 
 const PROFILE_EXISTS_TTL_MS = 30 * 60_000;
 const PROFILE_EXISTS_MAX_ENTRIES = 5_000;
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const profileExistsCache = new Map<
   string,
   { exists: boolean; expiresAt: number }
@@ -68,201 +158,112 @@ async function profileExists(id: string): Promise<boolean> {
   return exists;
 }
 
-const AUTH_ROUTES = ["/auth/sign-in", "/auth/sign-up", "/auth/onboarding"] as const;
+async function fetchAccount(
+  client: ProxyClient,
+  userId: string,
+  withPermissions: boolean,
+): Promise<Account | null> {
+  const columns = withPermissions
+    ? `id, application_status, roles(${PERMISSION_COLUMNS})`
+    : "id, application_status";
 
-const EMAIL_VERIFICATION_ROUTE = "/auth/verify";
-const WAITING_APPROVAL_ROUTE = "/auth/waiting";
-const APPLICATION_DECLINED_ROUTE = "/auth/declined";
-const APPLICANT_ROUTE = "/applicant";
-const TWO_FACTOR_ROUTE = "/auth/2fa-challenge";
+  const { data, error } = await client.supabase
+    .from("codev")
+    .select(columns)
+    .eq("id", userId)
+    .single();
 
-const AUTH_STATUS_ROUTES = [APPLICATION_DECLINED_ROUTE, EMAIL_VERIFICATION_ROUTE, TWO_FACTOR_ROUTE] as const;
+  if (error) {
+    console.error("Proxy account lookup failed:", error);
+    return null;
+  }
 
-const routePermissionMap = {
-  "/home/applicants": "applicants",
-} as const;
+  return data as unknown as Account;
+}
 
-type Permission = (typeof routePermissionMap)[keyof typeof routePermissionMap];
-const PERMISSION_COLUMNS = [...new Set(Object.values(routePermissionMap))].join(", ");
+function notFound(request: NextRequest) {
+  const url = request.nextUrl.clone();
+  url.pathname = "/not-found";
+  url.search = "";
+  return NextResponse.rewrite(url, { status: 404 });
+}
 
-export async function proxy(req: NextRequest) {
+function toSignIn(client: ProxyClient, request: NextRequest, pathname: string) {
+  const from = pathname.startsWith("/auth/") ? undefined : pathname;
+  return redirectTo(client, request, SIGN_IN, from);
+}
+
+export async function proxy(request: NextRequest) {
   try {
-    const { pathname } = req.nextUrl;
+    const { pathname } = request.nextUrl;
+    const access = accessFor(pathname);
 
-
-    if (PUBLIC_ROUTES.includes(pathname)) {
-      return NextResponse.next();
-    }
-
-    const isPublicPrefix = PUBLIC_ROUTE_PREFIXES.some((prefix) =>
-      pathname.startsWith(prefix),
-    );
-
-    if (isPublicPrefix) {
-      if (pathname.startsWith(PROFILE_DETAIL_PREFIX)) {
-        const id = pathname.slice(PROFILE_DETAIL_PREFIX.length).split("/").shift() ?? "";
+    if (access === "public") {
+      if (pathname.startsWith(PROFILE_PREFIX)) {
+        const id = pathname.slice(PROFILE_PREFIX.length).split("/").shift() ?? "";
         if (!UUID_PATTERN.test(id) || !(await profileExists(id))) {
-          const url = req.nextUrl.clone();
-          url.pathname = "/not-found";
-          url.search = "";
-          return NextResponse.rewrite(url, { status: 404 });
+          return notFound(request);
         }
       }
       return NextResponse.next();
     }
 
-    if (AUTH_ROUTES.includes(pathname)) {
-      const supabase = await createClientServerComponent();
+    const client = createProxyClient(request);
+
+    if (access === "auth-entry") {
       const {
         data: { user },
-      } = await supabase.auth.getUser();
+      } = await client.supabase.auth.getUser();
 
-      if (user) {
-        return redirectTo(req, "/home");
-      }
-
-      return NextResponse.next();
+      return user
+        ? redirectTo(client, request, HOME)
+        : passThrough(client);
     }
 
-    const supabase = await createClientServerComponent();
     const {
       data: { user },
       error: authError,
-    } = await supabase.auth.getUser();
+    } = await client.supabase.auth.getUser();
 
-    if (pathname === EMAIL_VERIFICATION_ROUTE) {
-      return NextResponse.next();
-    }
+    if (authError || !user) return toSignIn(client, request, pathname);
 
-    if (authError || !user) {
-      return redirectToLogin(req);
-    }
+    const { data: assurance } =
+      await client.supabase.auth.mfa.getAuthenticatorAssuranceLevel();
 
-    const { data: mfaData } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-    if (mfaData) {
-      const { currentLevel, nextLevel } = mfaData;
-      if (nextLevel === "aal2" && currentLevel === "aal1") {
-        if (pathname !== TWO_FACTOR_ROUTE) {
-          return redirectTo(req, TWO_FACTOR_ROUTE);
-        }
-      } else if (currentLevel === "aal2" && pathname === TWO_FACTOR_ROUTE) {
-        return redirectTo(req, "/home");
-      }
-    }
-
-    if (AUTH_STATUS_ROUTES.includes(pathname)) {
-      return NextResponse.next();
-    }
-
-    const {
-      data: { user: authUser },
-    } = await supabase.auth.getUser();
-
-    if (
-      !authUser?.email_confirmed_at &&
-      pathname !== EMAIL_VERIFICATION_ROUTE
-    ) {
-      return redirectTo(req, EMAIL_VERIFICATION_ROUTE);
-    }
-
-    const { data: userData, error: userError } = await supabase
-      .from("codev")
-      .select("id, application_status, role_id")
-      .eq("id", user.id)
-      .single();
-
-    if (userError) {
-      console.error("Failed to fetch user data:", userError);
-      return redirectToLogin(req);
-    }
-
-    const { application_status, role_id } = userData;
-
-    if (application_status === "passed") {
+    if (assurance) {
+      const { currentLevel, nextLevel } = assurance;
       if (
-        [
-          WAITING_APPROVAL_ROUTE,
-          APPLICATION_DECLINED_ROUTE,
-          EMAIL_VERIFICATION_ROUTE,
-          APPLICANT_ROUTE,
-          "/applicant/waiting",
-          "/applicant/profile",
-          "/applicant/account-settings"
-        ].includes(pathname)
+        nextLevel === "aal2" &&
+        currentLevel === "aal1" &&
+        pathname !== TWO_FACTOR
       ) {
-        return redirectTo(req, "/home");
+        return redirectTo(client, request, TWO_FACTOR);
       }
-    } else if (application_status === "failed" || application_status === "denied") {
-      if (pathname.includes(APPLICATION_DECLINED_ROUTE) || pathname.includes(APPLICANT_ROUTE)) {
-        return NextResponse.next();
-      } else {
-        return redirectTo(req, APPLICATION_DECLINED_ROUTE);
-      }
-    } else if (
-      application_status === "applying" ||
-      application_status === "pending" ||
-      application_status === "testing" ||
-      application_status === "onboarding" ||
-      application_status === "waitlist"
-    ) {
-      if (pathname.includes(WAITING_APPROVAL_ROUTE) || pathname.includes(APPLICANT_ROUTE)) {
-        return NextResponse.next();
-      } else {
-        return redirectTo(req, '/applicant/waiting');
+      if (currentLevel === "aal2" && pathname === TWO_FACTOR) {
+        return redirectTo(client, request, HOME);
       }
     }
 
+    if (STATUS_EXEMPT_PATHS.has(pathname)) return passThrough(client);
 
-    const sortedRouteKeys = Object.keys(routePermissionMap).sort(
-      (a, b) => b.length - a.length,
-    );
-    const matchedRoute = sortedRouteKeys.find((routePrefix) =>
-      pathname.startsWith(routePrefix),
-    ) as keyof typeof routePermissionMap | undefined;
-
-    if (matchedRoute && role_id) {
-      const requiredPermission = routePermissionMap[matchedRoute];
-
-      const { data: rolePermissions, error: roleError } = await supabase
-        .from("roles")
-        .select(PERMISSION_COLUMNS)
-        .eq("id", role_id)
-        .single();
-
-      if (roleError) {
-        console.error("Failed to fetch role permissions:", roleError);
-        return redirectToLogin(req);
-      }
-
-      const permissions = rolePermissions as unknown as Record<Permission, boolean>;
-      if (!permissions[requiredPermission]) {
-        return redirectTo(req, "/home");
-      }
+    if (!user.email_confirmed_at) {
+      return redirectTo(client, request, EMAIL_VERIFICATION);
     }
 
+    const permission = permissionFor(pathname);
+    const account = await fetchAccount(client, user.id, permission !== null);
+    if (!account) return toSignIn(client, request, pathname);
 
-    return NextResponse.next();
+    const target = statusRedirect(account.application_status, pathname);
+    if (target) return redirectTo(client, request, target);
+
+    if (permission && !account.roles?.[permission]) {
+      return redirectTo(client, request, HOME);
+    }
+
+    return passThrough(client);
   } catch (error) {
     console.error("Proxy error:", error);
-    return redirectToLogin(req);
+    return NextResponse.redirect(new URL(SIGN_IN, request.url));
   }
-}
-
-function redirectToLogin(req: NextRequest) {
-  const isAuthPage = req.nextUrl.pathname.startsWith("/auth/");
-  const redirectUrl = new URL("/auth/sign-in", req.url);
-
-  if (!isAuthPage) {
-    const returnPath = req.nextUrl.pathname;
-    if (returnPath !== "/auth/sign-in") {
-      redirectUrl.searchParams.set("from", returnPath);
-    }
-  }
-
-  return NextResponse.redirect(redirectUrl);
-}
-
-function redirectTo(req: NextRequest, path: string) {
-  const redirectUrl = new URL(path, req.url);
-  return NextResponse.redirect(redirectUrl);
 }

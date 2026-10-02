@@ -7,7 +7,7 @@ export const aboutLinks = [
 ];
 
 export const siteLinks = [
-  { label: "Contact Us", url: "/contact-us" },
+  { label: "Contact Us", url: "/contact" },
   { label: "Privacy Policy", url: "#privacy-policy" },
   { label: "Terms of Service", url: "#terms-of-service" },
 ];
