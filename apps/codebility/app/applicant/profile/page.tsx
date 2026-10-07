@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import H1 from "@/components/global/layout/H1";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import { getPositions } from "@/actions/applicant/profile/applicant-profile";
@@ -15,6 +16,7 @@ import Skills from "@/components/applicant/profile/Skills";
 import TimeSchedule from "@/components/applicant/profile/TimeSchedule";
 import { ProfilePointsGate } from "@/components/applicant/profile/ProfilePointsGate";
 import ProfileCompletionGuide from "@/components/applicant/profile/ProfileCompletionGuide";
+import ProfileSkeleton from "@/components/applicant/profile/ProfileSkeleton";
 
 export const instant = false;
 
@@ -26,7 +28,11 @@ function earnedCategories(points: { points: { category: string; points: number }
 }
 
 export default function ApplicantProfilePage() {
-  return <ProfileComponent />;
+  return (
+    <Suspense fallback={<ProfileSkeleton />}>
+      <ProfileComponent />
+    </Suspense>
+  );
 }
 
 async function ProfileComponent() {

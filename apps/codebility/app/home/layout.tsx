@@ -1,4 +1,4 @@
-import { Suspense, cache } from "react";
+import { Suspense } from "react";
 
 import AsyncErrorBoundary from "@/components/global/feedback/AsyncErrorBoundary";
 import ErrorBoundary from "@/components/global/feedback/ErrorBoundary";
@@ -7,25 +7,15 @@ import { ThemeProvider } from "@/providers/global/ThemeProvider";
 import { Toaster } from "sonner";
 
 import ToastNotification from "@/components/home/HomeToastNotification";
-import LeftSidebarClient from "@/components/home/LeftSidebarClient";
-import Navbar from "@/components/home/Navbar";
 import ConditionalMainWrapper from "@/components/home/ConditionalMainWrapper";
 import DynamicMainContent from "@/components/home/DynamicMainContent";
-import { getSidebarData } from "@/actions/home/sidebar";
-import { getCurrentCodev } from "@/lib/global/current-codev";
-import { getSidebarRoleId } from "@/utils/home/home";
+import HomeNavbar from "@/components/home/HomeNavbar";
+import HomeSidebar from "@/components/home/HomeSidebar";
 import type { HomeLayoutProps } from "@/types/home/home";
-
-const getCachedSidebarData = cache(getSidebarData);
 
 export const instant = false;
 
-export default async function HomeLayout({ children }: HomeLayoutProps) {
-  const currentUser = await getCurrentCodev();
-  const sidebarData = await getCachedSidebarData(
-    getSidebarRoleId(currentUser),
-  );
-
+export default function HomeLayout({ children }: HomeLayoutProps) {
   return (
     <ErrorBoundary>
       <ThemeProvider>
@@ -47,7 +37,7 @@ export default async function HomeLayout({ children }: HomeLayoutProps) {
             }
           >
             <Suspense fallback={<div className="h-[60px]" />}>
-              <Navbar currentUser={currentUser} sidebarData={sidebarData} />
+              <HomeNavbar />
             </Suspense>
           </ErrorBoundary>
           <div className="flex flex-1 overflow-hidden">
@@ -61,7 +51,7 @@ export default async function HomeLayout({ children }: HomeLayoutProps) {
                   <div className="w-16 bg-gray-100 dark:bg-gray-800 flex-shrink-0" />
                 }
               >
-                <LeftSidebarClient sidebarData={sidebarData} />
+                <HomeSidebar />
               </Suspense>
             </ErrorBoundary>
             <DynamicMainContent>

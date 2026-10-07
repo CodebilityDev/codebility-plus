@@ -12,7 +12,7 @@ export default function DynamicMainContent({ children }: DynamicMainContentProps
 
   return (
     <main
-      className={`background-lightsection_darksection flex-1 pt-[60px] overflow-y-auto overflow-x-hidden h-full ${marginClass} transition-all duration-300 ease-in-out`}
+      className={`background-lightsection_darksection flex-1 pt-[60px] overflow-y-auto overflow-x-hidden ${marginClass} transition-all duration-300 ease-in-out`}
     >
       {children}
     </main>

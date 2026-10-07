@@ -92,7 +92,9 @@ apps/bot/.env
 .env
 apps/codebility/public/assets/onboardingvideos/*.mp4
 .planning/
-.cursor/
+.cursor/*
+!.cursor/skills/
+!.cursor/skills/**
 docs/agents
 skills-lock.json
 # Local scratch output

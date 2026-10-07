@@ -1,10 +1,13 @@
 import type { MetadataRoute } from "next";
+import { cacheLife } from "next/cache";
 import { createClient } from "@supabase/supabase-js";
 import { BASE_URL } from "@/constants/global/app";
 import { ensureSupabaseEnv } from "@/lib/global/supabase-ensure-env";
 
-
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+    "use cache";
+    cacheLife("hours");
+
     // Use anon client — public data, no auth required
     const { url, anonKey } = ensureSupabaseEnv();
     const supabase = createClient(url, anonKey);

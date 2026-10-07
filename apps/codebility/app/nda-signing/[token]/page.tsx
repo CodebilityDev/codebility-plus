@@ -8,16 +8,20 @@ import type { NdaSigningTokenPageProps } from "@/types/global/nda-signing";
 
 export const instant = false;
 
-export default async function NdaSigningTokenPage({ params }: NdaSigningTokenPageProps) {
+export default function NdaSigningTokenPage({ params }: NdaSigningTokenPageProps) {
+  return (
+    <Suspense fallback={<NdaSigningSkeleton />}>
+      <NdaSigningTokenContent params={params} />
+    </Suspense>
+  );
+}
+
+async function NdaSigningTokenContent({ params }: NdaSigningTokenPageProps) {
   const { token } = await params;
   const [{ formatted }, codevId] = await Promise.all([
     getSiteDate(),
     getNdaRequestCodevId(token),
   ]);
 
-  return (
-    <Suspense fallback={<NdaSigningSkeleton />}>
-      <NdaSigningTokenClient agreementDate={formatted} codevId={codevId} />
-    </Suspense>
-  );
+  return <NdaSigningTokenClient agreementDate={formatted} codevId={codevId} />;
 }

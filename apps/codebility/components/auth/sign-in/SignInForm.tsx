@@ -53,10 +53,7 @@ const SignInForm = () => {
             toast.success("Welcome back!");
             break;
         }
-        // Delay navigation slightly so the toast can be seen
-        setTimeout(() => {
-          router.replace(response.redirectTo);
-        }, 500);
+        router.replace(response.redirectTo);
       }
     } catch (error) {
       console.error("Sign in error:", error);

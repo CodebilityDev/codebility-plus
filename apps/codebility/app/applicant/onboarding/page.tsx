@@ -1,10 +1,20 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import OnboardingClient from "@/components/applicant/onboarding/OnboardingClient";
+import OnboardingSkeleton from "@/components/applicant/onboarding/OnboardingSkeleton";
 
 export const instant = false;
 
-export default async function OnboardingPage() {
+export default function OnboardingPage() {
+  return (
+    <Suspense fallback={<OnboardingSkeleton />}>
+      <OnboardingGate />
+    </Suspense>
+  );
+}
+
+async function OnboardingGate() {
   const supabase = await createClientServerComponent();
 
   const {
@@ -15,7 +25,6 @@ export default async function OnboardingPage() {
     redirect("/login");
   }
 
-  // Fetch user's codev data
   const { data: codevData, error: codevError } = await supabase
     .from("codev")
     .select("id, first_name, last_name, application_status")
@@ -27,12 +36,10 @@ export default async function OnboardingPage() {
     redirect("/applicant/waiting");
   }
 
-  // Check if user is in onboarding status
   if (codevData.application_status !== "onboarding") {
     redirect("/applicant/waiting");
   }
 
-  // Fetch applicant data
   const { data: applicantData, error: applicantError } = await supabase
     .from("applicant")
     .select(

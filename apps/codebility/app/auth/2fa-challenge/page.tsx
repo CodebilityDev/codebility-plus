@@ -9,7 +9,7 @@ import { createClientServerComponent } from "@/lib/global/supabase-server";
 export const instant = false;
 
 
-export default async function TwoFactorChallengePage() {
+async function TwoFactorGate() {
   const supabase = await createClientServerComponent();
   const { data } = await supabase.auth.mfa.listFactors();
   const verifiedFactor = data?.totp.find(
@@ -18,6 +18,10 @@ export default async function TwoFactorChallengePage() {
 
   if (!verifiedFactor) redirect("/auth/sign-in");
 
+  return <TwoFactorForm factorId={verifiedFactor.id} />;
+}
+
+export default function TwoFactorChallengePage() {
   return (
     <>
       <Toaster />
@@ -34,7 +38,7 @@ export default async function TwoFactorChallengePage() {
           </div>
 
           <Suspense fallback={<div className="text-center py-8 text-sm text-gray">Loading authentication form...</div>}>
-            <TwoFactorForm factorId={verifiedFactor.id} />
+            <TwoFactorGate />
           </Suspense>
         </div>
         <div className="bg-login hidden w-full flex-1 bg-cover bg-center lg:flex" />

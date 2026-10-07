@@ -1,5 +1,7 @@
 "use server";
 
+import { unstable_rethrow } from "next/navigation";
+
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import type { NewApplicantType } from "@/types/home/applicants/applicants";
 import { newApplicantsSchema } from "@/utils/home/applicants/applicants";
@@ -30,6 +32,7 @@ export async function getNewApplicants(): Promise<NewApplicantType[]> {
 
     return parsedNewApplicants.data;
   } catch (error) {
+    unstable_rethrow(error);
     console.error("Error fetching new applicants:", error);
     return [];
   }
