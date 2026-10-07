@@ -5,7 +5,11 @@ import { createClientServerComponent } from "@/lib/global/supabase-server";
 import type { Sidebar, RolePermissions, PermissionKey } from "@/types/home/home";
 
 
-const INACTIVE_PERMISSIONS: RolePermissions = { dashboard: true, applicants: false };
+const INACTIVE_PERMISSIONS: RolePermissions = {
+  dashboard: true,
+  applicants: false,
+  kanban: false,
+};
 
 export const getSidebarData = async (
   roleId: number | null,
@@ -21,7 +25,7 @@ export const getSidebarData = async (
     const supabase = await createClientServerComponent();
     const { data, error } = await supabase
       .from("roles")
-      .select("dashboard, applicants")
+      .select("dashboard, applicants, kanban")
       .eq("id", roleId)
       .single();
 
@@ -31,6 +35,7 @@ export const getSidebarData = async (
     rolePermissions = {
       dashboard: data?.dashboard ?? false,
       applicants: data?.applicants ?? false,
+      kanban: data?.kanban ?? false,
     };
   }
 
@@ -56,6 +61,12 @@ export const getSidebarData = async (
           imgURL: "/assets/svgs/icon-applicant.svg",
           label: "Applicants",
           permission: "applicants" as PermissionKey,
+        },
+        {
+          route: pathsConfig.app.kanban,
+          imgURL: "/assets/svgs/icon-kanban.svg",
+          label: "Kanban",
+          permission: "kanban" as PermissionKey,
         },
       ],
     },

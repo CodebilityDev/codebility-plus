@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import { cache } from "react";
 import type { CurrentUserProfile } from "@/types/global/current-user";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
@@ -11,6 +12,8 @@ import { createClientServerComponent } from "@/lib/global/supabase-server";
  */
 export const getCurrentCodev = cache(
   async (): Promise<CurrentUserProfile | null> => {
+  await connection();
+
   const supabase = await createClientServerComponent();
 
   const {

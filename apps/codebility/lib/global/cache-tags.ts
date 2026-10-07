@@ -4,6 +4,7 @@ export const CACHE_TAGS = {
   careersJobListings: "careers-job-listings",
   codevsFeaturedProjects: "codevs-featured-projects",
   codevsProfiles: "codevs-profiles",
+  kanbanBoard: "kanban-board",
   landingAdmins: "landing-admins",
   landingInterns: "landing-interns",
   onboardingTeam: "onboarding-team",

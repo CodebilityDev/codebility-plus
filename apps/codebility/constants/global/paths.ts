@@ -11,6 +11,7 @@ const PathsSchema = z.object({
   app: z.object({
     home: z.string().min(1),
     applicants: z.string().min(1),
+    kanban: z.string().min(1),
   }),
 });
 
@@ -25,6 +26,7 @@ const pathsConfig = PathsSchema.parse({
   app: {
     home: "/home",
     applicants: "/home/applicants",
+    kanban: "/home/kanban",
   },
 } satisfies z.infer<typeof PathsSchema>);
 

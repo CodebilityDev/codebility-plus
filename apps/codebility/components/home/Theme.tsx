@@ -19,12 +19,10 @@ const Theme = () => {
     <div className="flex gap-4">
       <div
         onClick={toggleTheme}
-        className={`w-18 flex h-8 cursor-pointer items-center gap-4 rounded-full border-black bg-zinc-200 p-2 dark:bg-customBlue-100 ${
-          theme === "dark" ? "justify-end" : "justify-start"
-        }`}
+        className="w-18 flex h-8 cursor-pointer items-center gap-4 rounded-full border-black bg-zinc-200 p-2 justify-start dark:justify-end dark:bg-customBlue-100"
       >
         <motion.div
-          className={`absolute h-5 w-5 rounded-full  ${theme === "dark" ? "bg-light-800" : "bg-dark-200"}`}
+          className="absolute h-5 w-5 rounded-full bg-dark-200 dark:bg-light-800"
           layout
           transition={{
             type: "spring",
@@ -44,7 +42,7 @@ const Theme = () => {
           alt="Sun"
           width={20}
           height={20}
-          className={`active p-0.5 ${theme === "dark" ? "none" : "invert"} `}
+          className="active p-0.5 invert dark:invert-0"
         />
       </div>
     </div>

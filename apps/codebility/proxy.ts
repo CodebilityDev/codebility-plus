@@ -64,6 +64,7 @@ const APPLICANT_STATUSES = new Set([
 
 const routePermissionMap = {
   "/home/applicants": "applicants",
+  "/home/kanban": "kanban",
 } as const;
 
 type PermissionKey = (typeof routePermissionMap)[keyof typeof routePermissionMap];

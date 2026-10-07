@@ -50,6 +50,7 @@ export interface Sidebar {
 export interface RolePermissions {
   dashboard: boolean;
   applicants: boolean;
+  kanban: boolean;
 }
 
 export type PermissionKey = keyof RolePermissions;
