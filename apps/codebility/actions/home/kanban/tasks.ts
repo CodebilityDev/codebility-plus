@@ -18,6 +18,10 @@ const moveTaskInput = z.object({
   afterTaskId: z.string().min(1).nullable(),
 });
 
+const syncTaskMovesInput = z.object({
+  moves: z.array(moveTaskInput).min(1).max(100),
+});
+
 const createTaskInput = z.object({
   columnId: z.string().min(1),
   title: z.string().trim().min(1),
@@ -34,66 +38,148 @@ const updateTaskInput = z.object({
 
 const taskIdSchema = z.string().min(1);
 
-export async function moveTask(input: {
-  taskId: string;
-  toColumnId: string;
-  beforeTaskId: string | null;
-  afterTaskId: string | null;
+export async function syncTaskMoves(input: {
+  moves: {
+    taskId: string;
+    toColumnId: string;
+    beforeTaskId: string | null;
+    afterTaskId: string | null;
+  }[];
 }): Promise<void> {
-  const { taskId, toColumnId, beforeTaskId, afterTaskId } =
-    moveTaskInput.parse(input);
+  const { moves } = syncTaskMovesInput.parse(input);
 
   const supabase = await createClientServerComponent();
-
-  const { data, error } = await supabase
-    .from("tasks")
-    .select(TASK_COLUMNS)
-    .eq("kanban_column_id", toColumnId)
-    .eq("is_archive", false)
-    .neq("id", taskId)
-    .order("position", { ascending: true });
-
-  if (error) throw error;
-
-  const ids = data.map((task) => task.id);
-  const targetIndex = resolveIndex(ids, beforeTaskId, afterTaskId);
-
-  const plan = resolvePosition(
-    data[targetIndex - 1]?.position ?? null,
-    data[targetIndex]?.position ?? null,
-  );
   const updatedAt = new Date().toISOString();
 
-  if (plan.renumber) {
-    const orderedIds = data.map((task) => task.id);
-    orderedIds.splice(targetIndex, 0, taskId);
+  const movedIds = moves.map((move) => move.taskId);
 
-    const results = await Promise.all(
-      assignPositions(orderedIds).map((row) =>
-        supabase
-          .from("tasks")
-          .update({
-            kanban_column_id: toColumnId,
-            position: row.position,
-            updated_at: updatedAt,
-          })
-          .eq("id", row.id),
+  const { data: located, error: locateError } = await supabase
+    .from("tasks")
+    .select("id, title, kanban_column_id, position")
+    .in("id", movedIds)
+    .eq("is_archive", false);
+
+  if (locateError) throw locateError;
+
+  const affectedColumnIds = [
+    ...new Set([
+      ...moves.map((move) => move.toColumnId),
+      ...located.flatMap((task) =>
+        task.kanban_column_id ? [task.kanban_column_id] : [],
       ),
+    ]),
+  ];
+
+  const { data: columnTasks, error: columnError } = await supabase
+    .from("tasks")
+    .select(TASK_COLUMNS)
+    .in("kanban_column_id", affectedColumnIds)
+    .eq("is_archive", false)
+    .order("position", { ascending: true });
+
+  if (columnError) throw columnError;
+
+  const locatedIds = new Set(located.map((task) => task.id));
+  const titleById = new Map<string, string>();
+  const columns = new Map<string, { id: string; position: number }[]>();
+  const columnIdByTaskId = new Map<string, string>();
+
+  for (const columnId of affectedColumnIds) columns.set(columnId, []);
+
+  for (const task of located) titleById.set(task.id, task.title);
+
+  for (const task of columnTasks) {
+    const columnId = task.kanban_column_id;
+
+    if (!columnId) continue;
+
+    const column = columns.get(columnId);
+
+    if (!column) continue;
+
+    titleById.set(task.id, task.title);
+    columnIdByTaskId.set(task.id, columnId);
+    column.push({ id: task.id, position: task.position });
+  }
+
+  const changes = new Map<string, { columnId: string; position: number }>();
+
+  for (const move of moves) {
+    const { taskId, toColumnId, beforeTaskId, afterTaskId } = move;
+
+    if (!locatedIds.has(taskId)) continue;
+
+    const sourceColumnId = columnIdByTaskId.get(taskId);
+
+    if (sourceColumnId) {
+      const source = columns.get(sourceColumnId);
+
+      if (source) {
+        const sourceIndex = source.findIndex((row) => row.id === taskId);
+
+        if (sourceIndex !== -1) source.splice(sourceIndex, 1);
+      }
+
+      columnIdByTaskId.delete(taskId);
+    }
+
+    const destination = columns.get(toColumnId);
+
+    if (!destination) continue;
+
+    const targetIndex = resolveIndex(
+      destination.map((row) => row.id),
+      beforeTaskId,
+      afterTaskId,
     );
 
-    const failure = results.find((result) => result.error);
-    if (failure?.error) throw failure.error;
-  } else {
-    const { error: moveError } = await supabase
-      .from("tasks")
-      .update({
-        kanban_column_id: toColumnId,
-        position: plan.position,
-        updated_at: updatedAt,
-      })
-      .eq("id", taskId);
+    const plan = resolvePosition(
+      destination[targetIndex - 1]?.position ?? null,
+      destination[targetIndex]?.position ?? null,
+    );
 
-    if (moveError) throw moveError;
+    if (plan.renumber) {
+      const orderedIds = destination.map((row) => row.id);
+      orderedIds.splice(targetIndex, 0, taskId);
+
+      const positions = assignPositions(orderedIds);
+
+      columns.set(toColumnId, positions);
+
+      for (const row of positions) {
+        columnIdByTaskId.set(row.id, toColumnId);
+        changes.set(row.id, { columnId: toColumnId, position: row.position });
+      }
+    } else {
+      destination.splice(targetIndex, 0, {
+        id: taskId,
+        position: plan.position,
+      });
+      columnIdByTaskId.set(taskId, toColumnId);
+      changes.set(taskId, { columnId: toColumnId, position: plan.position });
+    }
+  }
+
+  const rows = [...changes].flatMap(([id, change]) => {
+    const title = titleById.get(id);
+
+    if (title === undefined) return [];
+
+    return [
+      {
+        id,
+        title,
+        kanban_column_id: change.columnId,
+        position: change.position,
+        updated_at: updatedAt,
+      },
+    ];
+  });
+
+  if (rows.length > 0) {
+    const { error: upsertError } = await supabase.from("tasks").upsert(rows);
+
+    if (upsertError) throw upsertError;
   }
 
   updateTag(CACHE_TAGS.kanbanBoard);

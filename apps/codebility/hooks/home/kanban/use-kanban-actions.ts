@@ -5,12 +5,12 @@ import { useEffect, useState } from "react";
 import {
   createTask,
   deleteTask,
-  moveTask,
+  syncTaskMoves,
   updateTask,
 } from "@/actions/home/kanban/tasks";
 import type { KanbanStoreApi } from "@/store/home/kanban/kanban-store";
 
-const MOVE_DEBOUNCE_MS = 300;
+const MOVE_DEBOUNCE_MS = 500;
 
 interface MoveInput {
   taskId: string;
@@ -18,12 +18,6 @@ interface MoveInput {
   targetIndex: number;
   beforeTaskId: string | null;
   afterTaskId: string | null;
-}
-
-interface MoveEntry {
-  queued: MoveInput | null;
-  timer: ReturnType<typeof setTimeout> | null;
-  inFlight: boolean;
 }
 
 async function withPending(
@@ -41,66 +35,58 @@ async function withPending(
 }
 
 function createMoveQueue(store: KanbanStoreApi) {
-  const entries = new Map<string, MoveEntry>();
+  const waiting = new Map<string, MoveInput>();
+  let timer: ReturnType<typeof setTimeout> | null = null;
+  let inFlight = false;
+  let sendOwed = false;
 
-  const send = async (taskId: string, entry: MoveEntry, input: MoveInput) => {
-    entry.inFlight = true;
+  const send = async () => {
+    if (waiting.size === 0) return;
+
+    const batch = [...waiting.values()];
+    waiting.clear();
+    inFlight = true;
 
     try {
-      await moveTask({
-        taskId,
-        toColumnId: input.toColumnId,
-        beforeTaskId: input.beforeTaskId,
-        afterTaskId: input.afterTaskId,
+      await syncTaskMoves({
+        moves: batch.map(
+          ({ taskId, toColumnId, beforeTaskId, afterTaskId }) => ({
+            taskId,
+            toColumnId,
+            beforeTaskId,
+            afterTaskId,
+          }),
+        ),
       });
     } catch (error) {
-      entry.inFlight = false;
-      entry.queued = null;
-
-      if (entry.timer !== null) {
-        clearTimeout(entry.timer);
-        entry.timer = null;
+      for (const { taskId } of batch) {
+        store.getState().restoreMove(taskId);
       }
 
-      entries.delete(taskId);
-      store.getState().restoreMove(taskId);
-      store.getState().setPending(taskId, false);
       console.error(error);
-
-      return;
     }
 
-    entry.inFlight = false;
+    inFlight = false;
 
-    const next = entry.queued;
-
-    if (next) {
-      entry.queued = null;
-      await send(taskId, entry, next);
-      return;
+    for (const { taskId } of batch) {
+      if (!waiting.has(taskId)) store.getState().setPending(taskId, false);
     }
 
-    if (entry.timer !== null) {
-      clearTimeout(entry.timer);
-      entry.timer = null;
+    if (sendOwed) {
+      sendOwed = false;
+      await send();
     }
-
-    entries.delete(taskId);
-    store.getState().setPending(taskId, false);
   };
 
-  const flush = (taskId: string, entry: MoveEntry) => {
-    if (entry.timer !== null) {
-      clearTimeout(entry.timer);
-      entry.timer = null;
+  const onTimer = () => {
+    timer = null;
+
+    if (inFlight) {
+      sendOwed = true;
+      return;
     }
 
-    const input = entry.queued;
-
-    if (entry.inFlight || !input) return;
-
-    entry.queued = null;
-    void send(taskId, entry, input);
+    void send();
   };
 
   const move = (input: MoveInput) => {
@@ -117,28 +103,23 @@ function createMoveQueue(store: KanbanStoreApi) {
       afterTaskId: input.afterTaskId,
     });
 
-    const entry: MoveEntry = entries.get(taskId) ?? {
-      queued: null,
-      timer: null,
-      inFlight: false,
-    };
+    waiting.set(taskId, input);
 
-    entries.set(taskId, entry);
+    if (timer !== null) clearTimeout(timer);
 
-    if (entry.timer !== null) clearTimeout(entry.timer);
-
-    entry.queued = input;
-    entry.timer = setTimeout(() => {
-      entry.timer = null;
-      flush(taskId, entry);
-    }, MOVE_DEBOUNCE_MS);
+    timer = setTimeout(onTimer, MOVE_DEBOUNCE_MS);
   };
 
-  const flushAll = () => {
-    for (const [taskId, entry] of entries) flush(taskId, entry);
+  const flush = () => {
+    if (timer !== null) {
+      clearTimeout(timer);
+      timer = null;
+    }
+
+    onTimer();
   };
 
-  return { move, flushAll };
+  return { move, flush };
 }
 
 export function useKanbanActions(store: KanbanStoreApi) {
@@ -146,15 +127,15 @@ export function useKanbanActions(store: KanbanStoreApi) {
 
   useEffect(() => {
     const flushWhenHidden = () => {
-      if (document.visibilityState === "hidden") queue.flushAll();
+      if (document.visibilityState === "hidden") queue.flush();
     };
 
     document.addEventListener("visibilitychange", flushWhenHidden);
-    window.addEventListener("pagehide", queue.flushAll);
+    window.addEventListener("pagehide", queue.flush);
 
     return () => {
       document.removeEventListener("visibilitychange", flushWhenHidden);
-      window.removeEventListener("pagehide", queue.flushAll);
+      window.removeEventListener("pagehide", queue.flush);
     };
   }, [queue]);
 
