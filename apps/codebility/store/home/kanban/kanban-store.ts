@@ -7,6 +7,7 @@ import type {
   KanbanState,
   KanbanTask,
 } from "@/types/home/kanban/kanban";
+import { assignPositions, resolvePosition } from "@/utils/home/kanban/position";
 
 export interface KanbanMoveBroadcast {
   taskId: string;
@@ -24,7 +25,7 @@ type MoveState = Pick<KanbanState, "tasksById" | "taskIdsByColumn">;
 
 interface MoveOrigin {
   columnId: string;
-  index: number;
+  position: number;
 }
 
 interface KanbanActions {
@@ -83,12 +84,46 @@ function sameTask(previous: KanbanTask, next: KanbanTask): boolean {
   );
 }
 
+function tasksInColumn(
+  tasksById: Record<string, KanbanTask>,
+  columnId: string,
+): KanbanTask[] {
+  return Object.values(tasksById)
+    .filter((task) => task.columnId === columnId)
+    .sort(byPosition);
+}
+
+function deriveTaskIdsByColumn(
+  tasksById: Record<string, KanbanTask>,
+  previous?: Record<string, string[]>,
+): Record<string, string[]> {
+  const columnIds = [
+    ...new Set(Object.values(tasksById).map((task) => task.columnId)),
+  ];
+  const derived: Record<string, string[]> = {};
+  let same =
+    previous !== undefined && Object.keys(previous).length === columnIds.length;
+
+  for (const columnId of columnIds) {
+    const ids = tasksInColumn(tasksById, columnId).map((task) => task.id);
+    const before = previous?.[columnId];
+
+    derived[columnId] = before && sameIds(before, ids) ? before : ids;
+    same = same && derived[columnId] === before;
+  }
+
+  return same && previous ? previous : derived;
+}
+
 function buildBoardState(
   snapshot: KanbanBoardSnapshot,
   previous?: BoardState,
 ): BoardState {
   const columnsById: Record<string, KanbanColumn> = {};
   const columnOrder: string[] = [];
+  let sameColumns =
+    previous !== undefined &&
+    Object.keys(previous.columnsById).length === snapshot.columns.length;
 
   for (const column of [...snapshot.columns].sort(byPosition)) {
     const before = previous?.columnsById[column.id];
@@ -97,6 +132,7 @@ function buildBoardState(
         ? before
         : column;
     columnOrder.push(column.id);
+    sameColumns = sameColumns && columnsById[column.id] === before;
   }
 
   const tasksById: Record<string, KanbanTask> = {};
@@ -106,34 +142,18 @@ function buildBoardState(
     tasksById[task.id] = before && sameTask(before, task) ? before : task;
   }
 
-  const taskIdsByColumn: Record<string, string[]> = {};
-
-  for (const columnId of columnOrder) {
-    const next = snapshot.tasks
-      .filter((task) => task.columnId === columnId)
-      .sort(byPosition)
-      .map((task) => task.id);
-    const before = previous?.taskIdsByColumn[columnId];
-
-    taskIdsByColumn[columnId] = before && sameIds(before, next) ? before : next;
-  }
-
-  return { columnsById, columnOrder, tasksById, taskIdsByColumn };
-}
-
-function withTaskInserted(
-  ids: string[],
-  tasksById: Record<string, KanbanTask>,
-  task: KanbanTask,
-): string[] {
-  const rest = ids.filter((id) => id !== task.id);
-  const index = rest.findIndex(
-    (id) => (tasksById[id]?.position ?? 0) > task.position,
-  );
-
-  return index < 0
-    ? [...rest, task.id]
-    : [...rest.slice(0, index), task.id, ...rest.slice(index)];
+  return {
+    columnsById: sameColumns && previous ? previous.columnsById : columnsById,
+    columnOrder:
+      previous && sameIds(previous.columnOrder, columnOrder)
+        ? previous.columnOrder
+        : columnOrder,
+    tasksById,
+    taskIdsByColumn: deriveTaskIdsByColumn(
+      tasksById,
+      previous?.taskIdsByColumn,
+    ),
+  };
 }
 
 function moveLocally(
@@ -146,37 +166,48 @@ function moveLocally(
 
   if (!task) return null;
 
-  const fromColumnId = task.columnId;
-  const source = state.taskIdsByColumn[fromColumnId] ?? [];
+  const column = tasksInColumn(state.tasksById, toColumnId);
+  const destination = column.filter((entry) => entry.id !== taskId);
+  const index = Math.min(Math.max(targetIndex, 0), destination.length);
 
-  if (fromColumnId === toColumnId && source.indexOf(taskId) === targetIndex) {
+  if (task.columnId === toColumnId && column.indexOf(task) === index) {
     return null;
   }
 
-  const rest = source.filter((id) => id !== taskId);
-  const destination =
-    fromColumnId === toColumnId
-      ? rest
-      : (state.taskIdsByColumn[toColumnId] ?? []).filter((id) => id !== taskId);
-  const index = Math.min(Math.max(targetIndex, 0), destination.length);
-  const taskIdsByColumn = { ...state.taskIdsByColumn };
+  const plan = resolvePosition(
+    destination[index - 1]?.position ?? null,
+    destination[index]?.position ?? null,
+  );
 
-  taskIdsByColumn[toColumnId] = [
-    ...destination.slice(0, index),
-    taskId,
-    ...destination.slice(index),
-  ];
+  const tasksById = { ...state.tasksById };
 
-  if (fromColumnId !== toColumnId) {
-    taskIdsByColumn[fromColumnId] = rest;
+  if (plan.renumber) {
+    const orderedIds = destination.map((entry) => entry.id);
+
+    orderedIds.splice(index, 0, taskId);
+
+    for (const row of assignPositions(orderedIds)) {
+      const entry = tasksById[row.id];
+
+      if (!entry) continue;
+
+      tasksById[row.id] = {
+        ...entry,
+        columnId: toColumnId,
+        position: row.position,
+      };
+    }
+  } else {
+    tasksById[taskId] = {
+      ...task,
+      columnId: toColumnId,
+      position: plan.position,
+    };
   }
 
   return {
-    tasksById: {
-      ...state.tasksById,
-      [taskId]: { ...task, columnId: toColumnId },
-    },
-    taskIdsByColumn,
+    tasksById,
+    taskIdsByColumn: deriveTaskIdsByColumn(tasksById, state.taskIdsByColumn),
   };
 }
 
@@ -213,67 +244,24 @@ export function createKanbanStore(
           return state;
         }
 
+        if (previous && sameTask(previous, task)) return state;
+
         origins.delete(task.id);
 
         const tasksById = { ...state.tasksById, [task.id]: task };
 
-        if (!previous) {
-          return {
-            tasksById,
-            taskIdsByColumn: {
-              ...state.taskIdsByColumn,
-              [task.columnId]: withTaskInserted(
-                state.taskIdsByColumn[task.columnId] ?? [],
-                tasksById,
-                task,
-              ),
-            },
-          };
-        }
-
-        if (state.connection === "live") {
-          return sameTask(previous, task) ? state : { tasksById };
-        }
-
-        if (previous.columnId === task.columnId) {
-          if (previous.position === task.position) {
-            return { tasksById };
-          }
-
-          return {
-            tasksById,
-            taskIdsByColumn: {
-              ...state.taskIdsByColumn,
-              [task.columnId]: withTaskInserted(
-                state.taskIdsByColumn[task.columnId] ?? [],
-                tasksById,
-                task,
-              ),
-            },
-          };
-        }
-
         return {
           tasksById,
-          taskIdsByColumn: {
-            ...state.taskIdsByColumn,
-            [previous.columnId]: (
-              state.taskIdsByColumn[previous.columnId] ?? []
-            ).filter((id) => id !== task.id),
-            [task.columnId]: withTaskInserted(
-              state.taskIdsByColumn[task.columnId] ?? [],
-              tasksById,
-              task,
-            ),
-          },
+          taskIdsByColumn: deriveTaskIdsByColumn(
+            tasksById,
+            state.taskIdsByColumn,
+          ),
         };
       }),
 
     removeTask: (taskId) =>
       set((state) => {
-        const task = state.tasksById[taskId];
-
-        if (!task) return state;
+        if (!state.tasksById[taskId]) return state;
 
         origins.delete(taskId);
 
@@ -286,12 +274,10 @@ export function createKanbanStore(
         return {
           tasksById,
           pending,
-          taskIdsByColumn: {
-            ...state.taskIdsByColumn,
-            [task.columnId]: (
-              state.taskIdsByColumn[task.columnId] ?? []
-            ).filter((id) => id !== taskId),
-          },
+          taskIdsByColumn: deriveTaskIdsByColumn(
+            tasksById,
+            state.taskIdsByColumn,
+          ),
           activeTaskId:
             state.activeTaskId === taskId ? null : state.activeTaskId,
         };
@@ -306,7 +292,7 @@ export function createKanbanStore(
         if (!origins.has(taskId)) {
           origins.set(taskId, {
             columnId: task.columnId,
-            index: (state.taskIdsByColumn[task.columnId] ?? []).indexOf(taskId),
+            position: task.position,
           });
         }
 
@@ -321,9 +307,33 @@ export function createKanbanStore(
 
         if (!origin) return state;
 
-        return (
-          moveLocally(state, taskId, origin.columnId, origin.index) ?? state
-        );
+        const task = state.tasksById[taskId];
+
+        if (!task) return state;
+
+        if (
+          task.columnId === origin.columnId &&
+          task.position === origin.position
+        ) {
+          return state;
+        }
+
+        const tasksById = {
+          ...state.tasksById,
+          [taskId]: {
+            ...task,
+            columnId: origin.columnId,
+            position: origin.position,
+          },
+        };
+
+        return {
+          tasksById,
+          taskIdsByColumn: deriveTaskIdsByColumn(
+            tasksById,
+            state.taskIdsByColumn,
+          ),
+        };
       }),
 
     setActiveTask: (taskId) => set({ activeTaskId: taskId }),

@@ -8,7 +8,7 @@ import KanbanConnectionBadge from "@/components/home/kanban/KanbanConnectionBadg
 import KanbanEmptyState from "@/components/home/kanban/KanbanEmptyState";
 import KanbanRealtimeBridge from "@/components/home/kanban/KanbanRealtimeBridge";
 import pathsConfig from "@/constants/global/paths";
-import { getCachedBoard } from "@/lib/home/kanban/kanban-cached";
+import { getBoard } from "@/lib/home/kanban/kanban-cached";
 import { KanbanStoreProvider } from "@/providers/home/kanban/KanbanStoreProvider";
 import type { KanbanBoardPageProps } from "@/types/home/kanban/kanban";
 
@@ -24,7 +24,7 @@ export default function KanbanBoardPage({ params }: KanbanBoardPageProps) {
 
 async function KanbanBoardContent({ params }: KanbanBoardPageProps) {
   const { projectId, sprintId } = await params;
-  const board = await getCachedBoard(sprintId);
+  const board = await getBoard(sprintId);
 
   if (!board) {
     return (

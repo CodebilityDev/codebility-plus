@@ -286,7 +286,11 @@ export const signupUser = async (formData: FormData) => {
   }
 };
 
-export const signinUser = async (email: string, password: string) => {
+export const signinUser = async (input: {
+  email: string;
+  password: string;
+}) => {
+  const { email, password } = input;
   const supabase = await createClientServerComponent();
 
   // Standardize the email for comparison (assuming emails are stored in lowercase)

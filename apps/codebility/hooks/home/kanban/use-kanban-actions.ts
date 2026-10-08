@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { z } from "zod";
 
 import {
@@ -66,6 +66,7 @@ function createMoveQueue(store: KanbanStoreApi) {
   let timer: ReturnType<typeof setTimeout> | null = null;
   let inFlight = false;
   let sendOwed = false;
+  let restored = false;
 
   const persist = () => {
     const durable = new Map(awaitingAck);
@@ -185,6 +186,10 @@ function createMoveQueue(store: KanbanStoreApi) {
   };
 
   const restore = () => {
+    if (restored) return;
+
+    restored = true;
+
     for (const entry of readOutbox()) {
       const state = store.getState();
 
@@ -209,8 +214,24 @@ function createMoveQueue(store: KanbanStoreApi) {
   return { move, flush, restore };
 }
 
+type MoveQueue = ReturnType<typeof createMoveQueue>;
+
+const queues = new WeakMap<KanbanStoreApi, MoveQueue>();
+
+function getMoveQueue(store: KanbanStoreApi) {
+  const existing = queues.get(store);
+
+  if (existing) return existing;
+
+  const queue = createMoveQueue(store);
+
+  queues.set(store, queue);
+
+  return queue;
+}
+
 export function useKanbanActions(store: KanbanStoreApi) {
-  const [queue] = useState(() => createMoveQueue(store));
+  const queue = getMoveQueue(store);
 
   useEffect(() => {
     queue.restore();

@@ -34,7 +34,10 @@ const SignInForm = () => {
     try {
       // Normalize email (if your signup stored lowercase emails)
       const normalizedEmail = values.email_address.toLowerCase();
-      const response = await signinUser(normalizedEmail, values.password);
+      const response = await signinUser({
+        email: normalizedEmail,
+        password: values.password,
+      });
 
       // If the response indicates failure, log and show the error toast
       if (!response.success) {
