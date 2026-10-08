@@ -25,7 +25,8 @@ export default function KanbanConnectionBadge() {
   const pending = useKanbanStore(
     (state) => Object.keys(state.pending).length > 0,
   );
-  const syncing = connection === "live" && pending;
+  const syncing = useKanbanStore((state) => state.syncing);
+  const showPending = !syncing && pending && connection === "live";
 
   return (
     <Badge
@@ -38,10 +39,13 @@ export default function KanbanConnectionBadge() {
       ) : (
         <span
           aria-hidden="true"
-          className={cn("h-2 w-2 rounded-full", DOT_CLASSES[connection])}
+          className={cn(
+            "h-2 w-2 rounded-full",
+            showPending ? "bg-amber-500" : DOT_CLASSES[connection],
+          )}
         />
       )}
-      {syncing ? "Syncing" : LABELS[connection]}
+      {syncing ? "Syncing" : showPending ? "Pending" : LABELS[connection]}
     </Badge>
   );
 }

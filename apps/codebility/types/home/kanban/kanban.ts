@@ -63,4 +63,5 @@ export interface KanbanState {
   activeTaskId: string | null;
   pending: Record<string, boolean>;
   connection: KanbanConnection;
+  syncing: boolean;
 }

@@ -39,6 +39,7 @@ interface KanbanActions {
   restoreMove: (taskId: string) => void;
   setActiveTask: (taskId: string | null) => void;
   setConnection: (connection: KanbanState["connection"]) => void;
+  setSyncing: (syncing: boolean) => void;
   setPending: (taskId: string, pending: boolean) => void;
   broadcastMove: (move: KanbanMoveBroadcast) => void;
   setBroadcastMove: (
@@ -193,6 +194,7 @@ export function createKanbanStore(
     activeTaskId: null,
     pending: {},
     connection: "connecting",
+    syncing: false,
 
     applySnapshot: (next) =>
       set((state) => {
@@ -330,6 +332,9 @@ export function createKanbanStore(
       set((state) =>
         state.connection === connection ? state : { connection },
       ),
+
+    setSyncing: (syncing) =>
+      set((state) => (state.syncing === syncing ? state : { syncing })),
 
     setPending: (taskId, pending) =>
       set((state) => {
