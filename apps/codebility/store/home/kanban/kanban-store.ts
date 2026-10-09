@@ -30,6 +30,8 @@ interface MoveOrigin {
 
 interface KanbanActions {
   applySnapshot: (snapshot: KanbanBoardSnapshot) => void;
+  upsertColumn: (column: KanbanColumn) => void;
+  removeColumn: (columnId: string) => void;
   upsertTask: (task: KanbanTask) => void;
   removeTask: (taskId: string) => void;
   moveTaskLocally: (
@@ -232,6 +234,40 @@ export function createKanbanStore(
         origins.clear();
 
         return buildBoardState(next, state);
+      }),
+
+    upsertColumn: (column) =>
+      set((state) => {
+        const previous = state.columnsById[column.id];
+
+        if (
+          previous?.name === column.name &&
+          previous.position === column.position
+        ) {
+          return state;
+        }
+
+        const columnsById = { ...state.columnsById, [column.id]: column };
+
+        return {
+          columnsById,
+          columnOrder: Object.values(columnsById)
+            .sort(byPosition)
+            .map((entry) => entry.id),
+        };
+      }),
+
+    removeColumn: (columnId) =>
+      set((state) => {
+        if (!state.columnsById[columnId]) return state;
+
+        const columnsById = { ...state.columnsById };
+        delete columnsById[columnId];
+
+        return {
+          columnsById,
+          columnOrder: state.columnOrder.filter((id) => id !== columnId),
+        };
       }),
 
     upsertTask: (task) =>

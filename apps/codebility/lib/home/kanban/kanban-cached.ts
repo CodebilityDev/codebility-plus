@@ -68,6 +68,10 @@ export async function getCachedSprints(
 export async function getBoard(
   sprintId: string,
 ): Promise<KanbanBoardSnapshot | null> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag(CACHE_TAGS.kanbanBoard);
+
   return loadBoardSnapshot(createClientAnon(), sprintId);
 }
 

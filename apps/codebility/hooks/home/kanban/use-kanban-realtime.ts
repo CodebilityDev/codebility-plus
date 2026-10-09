@@ -4,7 +4,6 @@ import { useEffect } from "react";
 import { REALTIME_SUBSCRIBE_STATES } from "@supabase/supabase-js";
 import { z } from "zod";
 
-import { getBoardSnapshot } from "@/actions/home/kanban/board";
 import { createClientClientComponent } from "@/lib/global/supabase-client";
 import { resolveIndex } from "@/utils/home/kanban/position";
 import type { KanbanStoreApi } from "@/store/home/kanban/kanban-store";
@@ -59,12 +58,6 @@ export function useKanbanRealtime({
     const isBoardColumn = (columnId: string) =>
       columnId in store.getState().columnsById;
 
-    const resync = async () => {
-      const snapshot = await getBoardSnapshot(sprintId);
-
-      if (snapshot) store.getState().applySnapshot(snapshot);
-    };
-
     store.getState().setConnection("connecting");
 
     const channel = supabase
@@ -77,8 +70,20 @@ export function useKanbanRealtime({
           table: "kanban_columns",
           filter: `board_id=eq.${boardId}`,
         },
-        () => {
-          resync().catch(() => store.getState().setConnection("offline"));
+        (payload) => {
+          if (payload.eventType === "DELETE") {
+            if (typeof payload.old.id === "string") {
+              store.getState().removeColumn(payload.old.id);
+            }
+
+            return;
+          }
+
+          store.getState().upsertColumn({
+            id: payload.new.id,
+            name: payload.new.name,
+            position: payload.new.position,
+          });
         },
       )
       .on<TaskRow>(
@@ -133,7 +138,6 @@ export function useKanbanRealtime({
         store.getState().setBroadcastMove((move) => {
           void channel.send({ type: "broadcast", event: "move", payload: move });
         });
-        resync().catch(() => store.getState().setConnection("offline"));
       });
 
     return () => {

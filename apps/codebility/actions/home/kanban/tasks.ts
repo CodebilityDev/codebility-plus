@@ -1,6 +1,8 @@
 "use server";
 
+import { updateTag } from "next/cache";
 import { TASK_COLUMNS } from "@/constants/home/kanban/kanban";
+import { CACHE_TAGS } from "@/lib/global/cache-tags";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import {
   assignPositions,
@@ -178,6 +180,8 @@ export async function syncTaskMoves(input: {
     const { error: upsertError } = await supabase.from("tasks").upsert(rows);
 
     if (upsertError) throw upsertError;
+
+    updateTag(CACHE_TAGS.kanbanBoard);
   }
 }
 
@@ -212,6 +216,8 @@ export async function createTask(input: {
   });
 
   if (insertError) throw insertError;
+
+  updateTag(CACHE_TAGS.kanbanBoard);
 }
 
 export async function updateTask(input: {
@@ -243,6 +249,8 @@ export async function updateTask(input: {
     .eq("id", taskId);
 
   if (error) throw error;
+
+  updateTag(CACHE_TAGS.kanbanBoard);
 }
 
 export async function deleteTask(taskId: string): Promise<void> {
@@ -253,4 +261,6 @@ export async function deleteTask(taskId: string): Promise<void> {
   const { error } = await supabase.from("tasks").delete().eq("id", id);
 
   if (error) throw error;
+
+  updateTag(CACHE_TAGS.kanbanBoard);
 }
