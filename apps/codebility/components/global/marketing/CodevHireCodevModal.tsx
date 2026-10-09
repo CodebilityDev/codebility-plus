@@ -1,0 +1,149 @@
+"use client";
+
+import { Button } from "@/components/global/ui/button";
+import { Dialog, DialogHeader, DialogContent, DialogTitle, DialogFooter } from "@/components/global/ui/dialog";
+import { useModal } from "@/hooks/global/use-modal";
+// Removed form imports to fix version conflict
+import { Input } from "@codevs/ui/input";
+import { Textarea } from "@codevs/ui/textarea";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { getCodev } from "@/actions/global/marketing-profiles";
+import { toast } from "@/components/global/ui/use-toast";
+import { toErrorMessage } from "@/utils/global/feedback";
+import { useAsyncValue } from "@/hooks/global/useAsyncValue";
+import { sentHireCodevEmail } from "@/actions/global/profiles-email";
+import type {HireCodevEmail} from "@/types/global/hire-codev-email";
+import { hireCodevEmailSchema } from "@/utils/global/hire-codev-email";
+
+
+export function CodevHireCodevModal() {
+	const { isOpen, onClose, type, data: codevId } = useModal() as { isOpen: boolean; onClose: () => void; type: string; data: string };
+	const isModalOpen = isOpen && type === "marketingCodevHireCodevModal";
+
+	const codev = useAsyncValue(
+		() => (isModalOpen && codevId ? getCodev(codevId) : Promise.resolve(null)),
+		null,
+		[codevId, isModalOpen],
+	);
+
+	const form = useForm<HireCodevEmail>({
+		resolver: zodResolver(hireCodevEmailSchema),
+		defaultValues: {
+			name: "",
+			email: "",
+			message: "",
+		},
+	});
+
+	const onSubmit = async (values: HireCodevEmail) => {
+		if (!codev) {
+			toast({ title: "Codev data not available", variant: "destructive" });
+			return;
+		}
+
+		try {
+			// Prepare template parameters
+			await sentHireCodevEmail({
+				name: values.name,
+				email: values.email,
+				message: values.message,
+				codev: codev,
+			});
+
+
+			toast({
+					title: "Email sent successfully",
+					description: "We'll get back to you soon!",
+					duration: 4000,
+				});
+
+			// Reset form and close modal
+			form.reset();
+			handleClose();
+
+		} catch (error) {
+			toast({
+				title: "Email failed to send",
+				description: toErrorMessage(
+					error,
+					"An error occurred while sending the email.",
+				),
+				variant: "destructive",
+			});
+		}
+	};
+
+	const handleClose = () => {
+		form.reset();
+		onClose();
+	};
+
+	return (
+		<Dialog open={isModalOpen} onOpenChange={handleClose}>
+			<DialogContent>
+				<DialogHeader>
+					<DialogTitle>Hire Codev</DialogTitle>
+				</DialogHeader>
+
+				<form
+					onSubmit={form.handleSubmit(onSubmit)}
+					className="flex flex-col gap-4"
+					autoComplete="off"
+				>
+					<div className="space-y-2">
+						<Input
+							label="Name"
+							placeholder="Your name"
+							{...form.register("name")}
+						/>
+						{form.formState.errors.name && (
+							<p className="text-sm text-red-500">{form.formState.errors.name.message}</p>
+						)}
+					</div>
+					<div className="space-y-2">
+						<Input
+							label="Email"
+							placeholder="your@email.com"
+							{...form.register("email")}
+						/>
+						{form.formState.errors.email && (
+							<p className="text-sm text-red-500">{form.formState.errors.email.message}</p>
+						)}
+					</div>
+					<div className="space-y-2">
+						<Textarea
+							label="Message"
+							rows={4}
+							placeholder="Your message"
+							className="bg-muted/50"
+							{...form.register("message")}
+						/>
+						{form.formState.errors.message && (
+							<p className="text-sm text-red-500">{form.formState.errors.message.message}</p>
+						)}
+					</div>
+						<DialogFooter className="flex flex-col gap-2 lg:flex-row">
+							<Button
+								type="button"
+								variant="hollow"
+								className="order-2 w-full sm:order-1 sm:w-[130px]"
+								onClick={handleClose}
+								disabled={form.formState.isSubmitting}
+							>
+								Cancel
+							</Button>
+							<Button
+								type="submit"
+								variant="default"
+								className="order-1 w-full sm:order-2 sm:w-[130px]"
+								disabled={form.formState.isSubmitting}
+							>
+								{form.formState.isSubmitting ? "Sending..." : "Send Email"}
+							</Button>
+						</DialogFooter>
+				</form>
+			</DialogContent>
+		</Dialog>
+	)
+}

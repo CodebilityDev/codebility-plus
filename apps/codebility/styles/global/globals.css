@@ -1,0 +1,908 @@
+@import url("./theme.css");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .flex-center {
+    @apply flex items-center justify-center;
+  }
+
+  .flex-between {
+    @apply flex items-center justify-between;
+  }
+
+  .flex-start {
+    @apply flex items-center justify-start;
+  }
+
+  @media (min-width: 1441px) {
+    .mask-fade-x {
+      -webkit-mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        #000 14%,
+        #000 86%,
+        transparent 100%
+      );
+      mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        #000 14%,
+        #000 86%,
+        transparent 100%
+      );
+    }
+  }
+
+  .no-horizontal-scroll {
+    overflow-x: hidden;
+  }
+
+  /* 3D perspective utilities */
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+
+  .transform-gpu {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+
+  .card-wrapper {
+    @apply dark:dark-gradient bg-light-900 shadow-light-100 dark:shadow-dark-100;
+  }
+
+  .btn {
+    @apply bg-light-800 dark:bg-dark-300 !important;
+  }
+
+  .btn-secondary {
+    @apply bg-light-800 dark:bg-dark-400 !important;
+  }
+
+  .btn-tertiary {
+    @apply bg-light-700 dark:bg-dark-300 !important;
+  }
+
+  .markdown {
+    @apply prose dark:prose-p:text-light-700 dark:prose-ol:text-light-700 dark:prose-ul:text-light-500 dark:prose-strong:text-white dark:prose-headings:text-white prose-headings:text-dark-400 prose-h1:text-dark-300 prose-h2:text-dark-300 prose-p:text-dark-500 prose-ul:text-dark-500 prose-ol:text-dark-500 max-w-full;
+  }
+
+  .primary-gradient {
+    background: linear-gradient(129deg, #2986ff 0%, #6babff 100%);
+  }
+
+  .default-color {
+    background-color: #1f1f1f;
+  }
+
+  .tab-gradient {
+    background: linear-gradient(
+      129deg,
+      var(--violet-color) 0%,
+      var(--teal-color) 100%
+    );
+  }
+
+  .dark-gradient {
+    background: linear-gradient(
+      232deg,
+      rgba(23, 28, 35, 0.41) 0%,
+      rgba(19, 22, 28, 0.7) 100%
+    );
+  }
+
+  /* .tab {
+    @apply data-[state=active]:bg-primary-100 data-[state=active]:text-primary-500 min-h-full bg-light-800 text-light-500 dark:bg-dark-400 dark:data-[state=active]:bg-dark-300 !important;
+  } */
+
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+
+    /* ✅ Fix primary - use proper HSL. Based on your teal/cyan brand color */
+    --primary: 174 100% 50%;            /* was: 2, 255, 226, 100% (broken RGBA) */
+    --primary-foreground: 174 100% 10%;
+
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 174 100% 36%;
+    --radius: 0.5rem;
+
+    /* Custom text colors - keep as is, these are fine */
+    --text-color-2: 234, 84%, 68%;
+    --text-color-3: 285, 99%, 51%;
+    --text-color-4: 266, 100%, 64%;
+
+    /* ✅ Add these missing light-mode specific vars */
+    --kanban-column-title: 240 10% 10%;     /* dark text for column headers */
+    --kanban-column-bg: 240 5% 96%;         /* light gray column background */
+    --sidebar-icon: 240 10% 25%;            /* visible dark icons in light mode */
+    --drag-handle: 240 5% 60%;              /* drag grip icon */
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.1);
+
+    --muted-figma: 252, 252, 252, 100%;
+    --card-clients: 246, 246, 246, 100%;
+    --violet-color: theme("colors.violet.500");
+    --teal-color: theme("colors.customTeal");
+    --blue-500: theme("colors.blue.500");
+    --blue-100: theme("colors.blue.100");
+    --white: theme("colors.white");
+
+    --chart-1: 221.2 83.2% 53.3%;
+    --chart-2: 212 95% 68%;
+    --chart-3: 216 92% 60%;
+    --chart-4: 210 98% 78%;
+    --chart-5: 212 97% 87%;
+  }
+
+  .dark {
+    --background: 20 14.3% 4.1%;
+    --foreground: 0 0% 95%;
+    --card: 24 9.8% 10%;
+    --card-foreground: 0 0% 95%;
+    --popover: 0 0% 9%;
+    --popover-foreground: 0 0% 95%;
+
+    /* ✅ Same fix for dark mode primary */
+    --primary: 174 100% 50%;
+    --primary-foreground: 174 100% 10%;
+
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 12 6.5% 15.1%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 85.7% 97.3%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 174 71.8% 29.2%;
+
+    --text-color-2: 234, 84%, 68%;
+    --text-color-3: 285, 99%, 51%;
+    --text-color-4: 266, 100%, 64%;
+
+    /* ✅ Dark mode counterparts */
+    --kanban-column-title: 0 0% 95%;
+    --kanban-column-bg: 240 3.7% 12%;
+    --sidebar-icon: 0 0% 90%;
+    --drag-handle: 0 0% 60%;
+
+    --muted-figma: 24, 24, 24, 25%;
+    --card-clients: 19, 19, 19, 100%;
+
+    --chart-1: 221.2 83.2% 53.3%;
+    --chart-2: 212 95% 68%;
+    --chart-3: 216 92% 60%;
+    --chart-4: 210 98% 78%;
+    --chart-5: 212 97% 87%;
+  }
+}
+
+@layer components {
+  /* Left side bar toggle */
+
+  .close-nav {
+    transform: rotateY(180deg);
+  }
+
+  .toggle-logo-btn {
+    @apply h-[40px] w-[30px] cursor-pointer transition-all;
+  }
+  /* End: Left side bar toggle */
+}
+
+.primary-gradient {
+  background: linear-gradient(
+    129deg,
+    #0a0b1e 0%,
+    #1a0b2e 35%,
+    #2d1b3d 100%
+  );
+}
+
+html {
+  overflow-x: hidden;
+}
+
+body {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+/* Scroll bar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  border-radius: 10px;
+  padding: 2px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: var(--violet-color);
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: var(--teal-color);
+}
+
+/* Spinner Loaders */
+.spinner {
+  width: 24px;
+  height: 24px;
+  animation: spinner-y0fdc1 2.4s infinite ease;
+  transform-style: preserve-3d;
+}
+
+.spinner > div {
+  background-color: rgba(193, 8, 254, 0.2);
+  height: 100%;
+  position: absolute;
+  width: 100%;
+  border: 1.6px solid var(--violet-color);
+}
+
+.spinner div:nth-of-type(1) {
+  transform: translateZ(-16px) rotateY(180deg);
+}
+
+.spinner div:nth-of-type(2) {
+  transform: rotateY(-270deg) translateX(50%);
+  transform-origin: top right;
+}
+
+.spinner div:nth-of-type(3) {
+  transform: rotateY(270deg) translateX(-50%);
+  transform-origin: center left;
+}
+
+.spinner div:nth-of-type(4) {
+  transform: rotateX(90deg) translateY(-50%);
+  transform-origin: top center;
+}
+
+.spinner div:nth-of-type(5) {
+  transform: rotateX(-90deg) translateY(50%);
+  transform-origin: bottom center;
+}
+
+.spinner div:nth-of-type(6) {
+  transform: translateZ(16px);
+}
+
+@keyframes spinner-y0fdc1 {
+  0% {
+    transform: rotate(45deg) rotateX(-25deg) rotateY(25deg);
+  }
+
+  50% {
+    transform: rotate(45deg) rotateX(-385deg) rotateY(25deg);
+  }
+
+  100% {
+    transform: rotate(45deg) rotateX(-385deg) rotateY(385deg);
+  }
+}
+
+/* Dot Dot Dot (...) Loaders */
+.dots {
+  width: 5.8px;
+  height: 5.8px;
+  background: #ffffff;
+  color: #ffffff;
+  border-radius: 50%;
+  box-shadow:
+    9.6px 0,
+    -9.6px 0;
+  animation: dots-u8fzftmn 1.4s infinite linear alternate;
+}
+
+@keyframes dots-u8fzftmn {
+  0% {
+    box-shadow:
+      9.6px 0,
+      -9.6px 0;
+    background: "";
+  }
+
+  33% {
+    box-shadow:
+      9.6px 0,
+      -9.6px 0 rgba(255, 255, 255, 0.13);
+    background: rgba(255, 255, 255, 0.13);
+  }
+
+  66% {
+    box-shadow:
+      9.6px 0 rgba(255, 255, 255, 0.13),
+      -9.6px 0;
+    background: rgba(255, 255, 255, 0.13);
+  }
+}
+
+/* CoDevs Spinner loading */
+.CodevsSpinner {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: conic-gradient(#0000 10%, var(--violet-color));
+  -webkit-mask: radial-gradient(farthest-side, #0000 calc(100% - 9px), #000 0);
+  animation: spinner-zp9dbg 1s infinite linear;
+}
+
+@keyframes spinner-zp9dbg {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+.hero-bubble div {
+  height: 60px;
+  width: 60px;
+  border-radius: 50px;
+  position: absolute;
+  top: 10%;
+  left: 10%;
+  animation: 3s ease infinite;
+}
+
+.hero-bubble div:nth-child(1) {
+  box-shadow: inset 0 0 10px 1px #02ffe2;
+
+  top: 20%;
+  left: 20%;
+  animation: animate 8s ease infinite;
+}
+
+.hero-bubble div:nth-child(2) {
+  box-shadow: inset 0 0 10px 1px #c108fe;
+  top: 60%;
+  left: 80%;
+  animation: animate 10s linear infinite;
+}
+
+.hero-bubble div:nth-child(3) {
+  box-shadow: inset 0 0 10px 1px #6a78f2;
+  top: 40%;
+  left: 40%;
+  animation: animate 3s ease infinite;
+}
+
+.hero-bubble div:nth-child(4) {
+  box-shadow: inset 0 0 10px 1px #d9d9d9;
+  top: 66%;
+  left: 30%;
+  animation: animate 7s linear infinite;
+}
+
+.hero-bubble div:nth-child(5) {
+  box-shadow: inset 0 0 10px 1px #02ffe2;
+  top: 90%;
+  left: 10%;
+  animation: animate 9s ease infinite;
+}
+
+.hero-bubble div:nth-child(6) {
+  box-shadow: inset 0 0 10px 1px #6a78f2;
+  top: 30%;
+  left: 60%;
+  animation: animate 5s linear infinite;
+}
+
+.hero-bubble div:nth-child(7) {
+  box-shadow: inset 0 0 10px 1px #c108fe;
+  top: 70%;
+  left: 20%;
+  animation: animate 8s ease infinite;
+}
+
+.hero-bubble div:nth-child(8) {
+  box-shadow: inset 0 0 10px 1px #d9d9d9;
+  top: 75%;
+  left: 60%;
+  animation: animate 10s linear infinite;
+}
+
+@keyframes animate {
+  0% {
+    transform: scale(0) translateY(0) rotate(70deg);
+  }
+
+  100% {
+    transform: scale(1.3) translateY(-100px) rotate(360deg);
+  }
+}
+
+/* Gradient for Hero */
+.hero-gradient {
+  background: hsla(285, 99%, 51%, 1);
+
+  background: radial-gradient(
+    circle,
+    hsla(285, 99%, 51%, 1) 0%,
+    hsla(229, 84%, 5%, 1) 100%
+  );
+
+  background: -moz-radial-gradient(
+    circle,
+    hsla(285, 99%, 51%, 1) 0%,
+    hsla(229, 84%, 5%, 1) 100%
+  );
+
+  background: -webkit-radial-gradient(
+    circle,
+    hsla(285, 99%, 51%, 1) 0%,
+    hsla(229, 84%, 5%, 1) 100%
+  );
+
+  filter: progid: DXImageTransform.Microsoft.gradient(startColorstr="#C108FE", endColorstr="#020617", GradientType=1);
+}
+/* End: Gradient for Hero */
+
+/* Hero */
+.hero-card:hover .hero-change-bg-button {
+  background-color: #9747ff;
+}
+
+.feature-card:hover .feature-change-bg-button {
+  background-color: #02ffe2;
+}
+
+/* End: Hero */
+
+/* Calendly */
+
+.calendly-inline-widget {
+  height: 700px !important;
+}
+
+@media (width > 534px) {
+  .calendly-inline-widget {
+    height: 850px !important;
+  }
+}
+@media (width > 1000px) {
+  .calendly-inline-widget {
+    height: 900px !important;
+  }
+}
+/* Calendly: End */
+
+@layer components {
+  .text-edit {
+    text-shadow:
+      -1px -1px 0 #ffffff,
+      1px -1px 0 #ffffff,
+      -1px 1px 0 #ffffff,
+      1px 1px 0 #ffffff;
+  }
+}
+
+html body[data-scroll-locked] {
+  overflow: visible !important;
+  margin-right: 0 !important;
+}
+
+/* ============================================
+   TIPTAP EDITOR STYLES (Editing Mode)
+   ============================================ */
+
+.tiptap-editor .ProseMirror {
+  outline: none;
+  color: white;
+  background-color: transparent !important;
+}
+
+/* Force all text to white in EDITOR */
+.tiptap-editor .ProseMirror * {
+  color: white;
+}
+
+/* Headings in EDITOR */
+.tiptap-editor .ProseMirror h1 {
+  font-size: 2em;
+  font-weight: bold;
+  margin: 0.67em 0;
+  line-height: 1.2;
+  color: white;
+}
+
+.tiptap-editor .ProseMirror h2 {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin: 0.75em 0;
+  line-height: 1.3;
+  color: white;
+}
+
+.tiptap-editor .ProseMirror h3 {
+  font-size: 1.17em;
+  font-weight: bold;
+  margin: 0.83em 0;
+  line-height: 1.4;
+  color: white;
+}
+
+/* Text styling in EDITOR */
+.tiptap-editor .ProseMirror strong {
+  font-weight: bold;
+}
+
+.tiptap-editor .ProseMirror em {
+  font-style: italic;
+}
+
+.tiptap-editor .ProseMirror s {
+  text-decoration: line-through;
+}
+
+/* Lists in EDITOR */
+.tiptap-editor .ProseMirror ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin: 0.5rem 0;
+}
+
+.tiptap-editor .ProseMirror ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin: 0.5rem 0;
+}
+
+.tiptap-editor .ProseMirror li {
+  margin: 0.25rem 0;
+  color: white;
+}
+
+/* Paragraphs in EDITOR */
+.tiptap-editor .ProseMirror p {
+  margin: 0.5rem 0;
+  color: white;
+}
+
+.tiptap-editor .ProseMirror p:first-child {
+  margin-top: 0;
+}
+
+.tiptap-editor .ProseMirror p:last-child {
+  margin-bottom: 0;
+}
+
+/* Empty paragraphs in EDITOR (for spacing) */
+.tiptap-editor .ProseMirror p:empty {
+  min-height: 1.5em;
+}
+
+.tiptap-editor .ProseMirror p:empty::before {
+  content: "\00a0";
+  color: transparent;
+}
+
+/* Highlight in EDITOR */
+.tiptap-editor .ProseMirror mark {
+  background-color: #fef08a;
+  color: #000;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.125rem;
+}
+
+/* Images in EDITOR */
+.tiptap-editor .ProseMirror img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.375rem;
+  margin: 0.5rem 0;
+}
+
+/* Text alignment in EDITOR */
+.tiptap-editor .ProseMirror [style*="text-align: left"] {
+  text-align: left !important;
+}
+
+.tiptap-editor .ProseMirror [style*="text-align: center"] {
+  text-align: center !important;
+}
+
+.tiptap-editor .ProseMirror [style*="text-align: right"] {
+  text-align: right !important;
+}
+
+/* Hard breaks in EDITOR */
+.tiptap-editor .ProseMirror br {
+  display: block;
+  content: " ";
+  margin-top: 0.5em;
+}
+
+.tiptap-editor .ProseMirror br::after {
+  content: "\A";
+  white-space: pre;
+}
+
+/* ============================================
+   TIPTAP DISPLAY STYLES (View Mode)
+   ============================================ */
+
+/* Force all text to white */
+.tiptap-display,
+.tiptap-display *,
+.tiptap-display h1,
+.tiptap-display h2,
+.tiptap-display h3,
+.tiptap-display p,
+.tiptap-display li,
+.tiptap-display strong,
+.tiptap-display em,
+.tiptap-display s {
+  color: white !important;
+}
+
+/* Headings in DISPLAY */
+.tiptap-display h1 {
+  font-size: 2em;
+  font-weight: bold;
+  margin: 0.67em 0;
+  line-height: 1.2;
+}
+
+.tiptap-display h2 {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin: 0.75em 0;
+  line-height: 1.3;
+}
+
+.tiptap-display h3 {
+  font-size: 1.17em;
+  font-weight: bold;
+  margin: 0.83em 0;
+  line-height: 1.4;
+}
+
+/* Text styling in DISPLAY */
+.tiptap-display strong {
+  font-weight: bold;
+}
+
+.tiptap-display em {
+  font-style: italic;
+}
+
+.tiptap-display s {
+  text-decoration: line-through;
+}
+
+/* Lists in DISPLAY */
+.tiptap-display ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin: 0.5rem 0;
+}
+
+.tiptap-display ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin: 0.5rem 0;
+}
+
+.tiptap-display li {
+  margin: 0.25rem 0;
+}
+
+/* Paragraphs in DISPLAY */
+.tiptap-display p {
+  margin: 0.5rem 0;
+}
+
+.tiptap-display p:first-child {
+  margin-top: 0;
+}
+
+.tiptap-display p:last-child {
+  margin-bottom: 0;
+}
+
+/* Empty paragraphs in DISPLAY (for spacing) */
+.tiptap-display p:empty {
+  min-height: 1.5em;
+}
+
+.tiptap-display p:empty::before {
+  content: "\00a0";
+  color: transparent;
+}
+
+/* Highlight in DISPLAY - keep background but white text */
+.tiptap-display mark {
+  background-color: #fef08a;
+  color: white !important;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.125rem;
+}
+
+/* Images in DISPLAY */
+.tiptap-display img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.375rem;
+  margin: 0.5rem 0;
+}
+
+/* Text alignment in DISPLAY */
+.tiptap-display [style*="text-align: left"] {
+  text-align: left !important;
+}
+
+.tiptap-display [style*="text-align: center"] {
+  text-align: center !important;
+}
+
+.tiptap-display [style*="text-align: right"] {
+  text-align: right !important;
+}
+
+/* Hard breaks in DISPLAY */
+.tiptap-display br {
+  display: block;
+  content: " ";
+  margin-top: 0.5em;
+}
+
+.tiptap-display br::after {
+  content: "\A";
+  white-space: pre;
+}
+
+/* ============================================
+   ADDITIONAL SPACING & FORMATTING
+   ============================================ */
+
+/* Ensure proper spacing between different elements */
+.tiptap-editor .ProseMirror > * + *,
+.tiptap-display > * + * {
+  margin-top: 0.5em;
+}
+
+/* Nested lists */
+.tiptap-editor .ProseMirror ul ul,
+.tiptap-editor .ProseMirror ol ol,
+.tiptap-editor .ProseMirror ul ol,
+.tiptap-editor .ProseMirror ol ul,
+.tiptap-display ul ul,
+.tiptap-display ol ol,
+.tiptap-display ul ol,
+.tiptap-display ol ul {
+  margin: 0.25rem 0;
+}
+
+/* Code blocks (if needed in future) */
+.tiptap-editor .ProseMirror code,
+.tiptap-display code {
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-family: 'Courier New', monospace;
+  color: white;
+}
+
+.tiptap-editor .ProseMirror pre,
+.tiptap-display pre {
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 0.75rem;
+  border-radius: 0.375rem;
+  overflow-x: auto;
+  color: white;
+}
+
+.tiptap-editor .ProseMirror pre code,
+.tiptap-display pre code {
+  background-color: transparent;
+  padding: 0;
+}
+
+/* Blockquotes (if needed in future) */
+.tiptap-editor .ProseMirror blockquote,
+.tiptap-display blockquote {
+  border-left: 3px solid rgba(255, 255, 255, 0.3);
+  padding-left: 1rem;
+  margin: 1rem 0;
+  color: rgba(255, 255, 255, 0.8);
+  font-style: italic;
+}
+
+/* Horizontal rules (if needed in future) */
+.tiptap-editor .ProseMirror hr,
+.tiptap-display hr {
+  border: none;
+  border-top: 2px solid rgba(255, 255, 255, 0.2);
+  margin: 1.5rem 0;
+}
+
+/* Services grid hover animation */
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+[data-landing-section] {
+  position: relative;
+  width: 100%;
+}
+
+[data-landing-content] {
+  width: 100%;
+}
+
+html:not([data-landing-motion="ready"]) [data-landing-skeleton] {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+html[data-landing-motion="ready"] [data-landing-skeleton] {
+  display: none !important;
+}
+
+html:not([data-landing-motion="ready"]) [data-landing-content] {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+html[data-landing-motion="ready"]
+  [data-progressive-root]:not([data-progressive-ready])
+  [data-progressive-child] {
+  opacity: 0;
+  transform: translateY(var(--progressive-y, 30px));
+}
+
+html[data-landing-motion="ready"] [data-landing-content] {
+  visibility: visible;
+  pointer-events: auto;
+}

@@ -1,5 +1,6 @@
 import * as React from "react";
-import { cva, VariantProps } from "class-variance-authority";
+import type { VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 
 import { cn } from "@codevs/ui";
 
@@ -32,6 +33,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
       <div>
         <label htmlFor={id}>{label}</label>
         <textarea
+          id={id}
           className={cn(TextareaVariants({ variant, className }))}
           ref={ref}
           {...props}

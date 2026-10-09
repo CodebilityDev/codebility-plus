@@ -1,13 +1,14 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 
-import Admins from "./_components/landing/LandingAdmins";
-import Features from "./_components/landing/LandingFeatures";
-import Hero from "./_components/landing/LandingHero";
-import InternSectionContainer from "./_components/landing/LandingInternSection";
-import Partners from "./_components/landing/LandingPartners";
-import WhyChooseUs from "./_components/landing/LandingWhyChoose-us";
-import WorkWithUs from "./_components/landing/LandingWorkWithUs";
-import Calendly from "./_components/MarketingCalendly";
+import Admins from "@/components/marketing/LandingAdmins";
+import Features from "@/components/marketing/LandingFeatures";
+import Hero from "@/components/marketing/LandingHero";
+import InternSectionContainer from "@/components/marketing/LandingInternSection";
+import Partners from "@/components/marketing/LandingPartners";
+import WhyChooseUs from "@/components/marketing/LandingWhyChoose-us";
+import WorkWithUs from "@/components/marketing/LandingWorkWithUs";
+import Calendly from "@/components/global/marketing/MarketingCalendly";
+import type { LandingInternProps } from "@/types/marketing/marketing";
 
 export const metadata: Metadata = {
   title: "Codebility — Hire Skilled Filipino Developers",
@@ -32,7 +33,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function Index() {
+export default function Index({ searchParams }: LandingInternProps) {
   return (
     <>
       <Hero />
@@ -40,7 +41,7 @@ export default function Index() {
       <WhyChooseUs />
       <WorkWithUs />
       <Admins />
-      <InternSectionContainer />
+      <InternSectionContainer searchParams={searchParams} />
       <Partners />
       <Calendly />
     </>

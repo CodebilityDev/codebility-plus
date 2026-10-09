@@ -24,11 +24,5 @@
     "tailwindcss": "^3.4.9",
     "typescript": "^5.5.4"
   },
-  "eslintConfig": {
-    "root": true,
-    "extends": [
-      "@codevs/eslint-config/base"
-    ]
-  },
   "prettier": "@codevs/prettier-config"
 }
