@@ -6,6 +6,7 @@ import type { NewApplicantType } from "@/types/home/applicants/applicants";
 import { createAdminClient } from "@/lib/home/applicants/supabase-admin";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import { expireCodevCaches } from "@/lib/global/cache-tags";
+import { requireFullAccess } from "@/lib/global/permissions";
 
 // Helper function to revalidate the applicants page
 function revalidateApplicants(): Promise<void> {
@@ -16,6 +17,7 @@ function revalidateApplicants(): Promise<void> {
 export async function deleteApplicantAction(
   applicant: { id: string; application_status: string | null },
 ) {
+    await requireFullAccess();
     try {
         const supabase = await createAdminClient();
 
@@ -56,6 +58,7 @@ export async function deleteApplicantAction(
 }
 
 export async function multipleDeleteApplicantAction(applicant: NewApplicantType[]) {
+    await requireFullAccess();
     try {
         const supabase = await createAdminClient();
 
@@ -106,6 +109,7 @@ export async function multipleDeleteApplicantAction(applicant: NewApplicantType[
 }
 
 export async function passApplicantTestAction(applicantId: string) {
+    await requireFullAccess();
     try {
         const supabase = await createClientServerComponent();
 
@@ -134,6 +138,7 @@ export async function passApplicantTestAction(applicantId: string) {
 }
 
 export async function denyApplicantAction(applicantId: string) {
+    await requireFullAccess();
     try {
         const supabase = await createClientServerComponent();
 
@@ -184,6 +189,7 @@ export async function denyApplicantAction(applicantId: string) {
 }
 
 export async function multiplePassApplicantTestAction(applicantIds: string[]) {
+    await requireFullAccess();
     try {
         const supabase = await createClientServerComponent();
 
@@ -212,6 +218,7 @@ export async function multiplePassApplicantTestAction(applicantIds: string[]) {
 }
 
 export async function multipleDenyApplicantAction(applicantIds: string[]) {
+    await requireFullAccess();
     try {
         const supabase = await createClientServerComponent();
 
@@ -270,6 +277,7 @@ export async function multipleDenyApplicantAction(applicantIds: string[]) {
 }
 
 export async function acceptApplicantAction(applicantId: string) {
+    await requireFullAccess();
     try {
         const supabase = await createClientServerComponent();
 
@@ -301,6 +309,7 @@ export async function acceptApplicantAction(applicantId: string) {
 }
 
 export async function multipleAcceptApplicantAction(applicantIds: string[]) {
+    await requireFullAccess();
     try {
         const supabase = await createClientServerComponent();
 
@@ -332,6 +341,7 @@ export async function multipleAcceptApplicantAction(applicantIds: string[]) {
 }
 
 export async function moveApplicantToApplyingAction(applicantId: string) {
+    await requireFullAccess();
     try {
         const supabase = await createClientServerComponent();
         const updateTime = new Date().toISOString();
@@ -377,6 +387,7 @@ export async function moveApplicantToApplyingAction(applicantId: string) {
 }
 
 export async function multipleMoveApplicantToApplyingAction(applicantIds: string[]) {
+    await requireFullAccess();
     try {
         const supabase = await createClientServerComponent();
 
@@ -419,6 +430,7 @@ export async function multipleMoveApplicantToApplyingAction(applicantIds: string
 }
 
 export async function moveApplicantToTestingAction(applicantId: string) {
+    await requireFullAccess();
     try {
         const supabase = await createClientServerComponent();
         const updateTime = new Date().toISOString();
@@ -464,6 +476,7 @@ export async function moveApplicantToTestingAction(applicantId: string) {
 }
 
 export async function multipleMoveApplicantToTestingAction(applicantIds: string[]) {
+    await requireFullAccess();
     try {
         const supabase = await createClientServerComponent();;
 
@@ -506,6 +519,7 @@ export async function multipleMoveApplicantToTestingAction(applicantIds: string[
 }
 
 export async function moveApplicantToOnboardingAction(applicantId: string) {
+    await requireFullAccess();
     try {
         const supabase = await createClientServerComponent();
 
@@ -534,6 +548,7 @@ export async function moveApplicantToOnboardingAction(applicantId: string) {
 }
 
 export async function multipleMoveApplicantToOnboardingAction(applicantIds: string[]) {
+    await requireFullAccess();
     try {
         const supabase = await createClientServerComponent();
 
@@ -562,6 +577,7 @@ export async function multipleMoveApplicantToOnboardingAction(applicantIds: stri
 }
 
 export async function updateReminderCountAction(applicantId: string) {
+    await requireFullAccess();
     try {
         const supabase = await createClientServerComponent();
 
@@ -622,6 +638,7 @@ export async function updateReminderCountAction(applicantId: string) {
 }
 
 export async function updateMultipleReminderCountAction(applicantIds: string[]) {
+    await requireFullAccess();
     try {
         const supabase = await createClientServerComponent();
 
@@ -663,6 +680,7 @@ export async function updateMultipleReminderCountAction(applicantIds: string[]) 
 }
 
 export async function resetReminderDataAction(applicantId: string) {
+    await requireFullAccess();
     try {
         const supabase = await createClientServerComponent();
 
@@ -689,6 +707,7 @@ export async function resetReminderDataAction(applicantId: string) {
 }
 
 export async function resetMultipleReminderDataAction(applicantIds: string[]) {
+    await requireFullAccess();
     try {
         const supabase = await createClientServerComponent();
 
@@ -716,6 +735,7 @@ export async function resetMultipleReminderDataAction(applicantIds: string[]) {
 
 // Wrapper function for deleteApplicantAction to work with config system
 export async function deleteApplicantById(applicantId: string) {
+    await requireFullAccess();
     try {
         const supabase = await createClientServerComponent();
 

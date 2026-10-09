@@ -8,6 +8,13 @@ import {
 } from "@/lib/global/proxy-session";
 import type { ProxyClient } from "@/lib/global/proxy-session";
 import { createClientAnon } from "@/lib/global/supabase-anon";
+import {
+  PERMISSION_COLUMNS,
+  ROUTE_PERMISSION_MAP,
+  isFullAccess,
+  requiresFullAccess,
+} from "@/constants/global/permissions";
+import type { PermissionKey } from "@/types/global/permissions";
 
 export const config = {
   matcher: ["/((?!api|_next/static|.*\\..*|_next/image|favicon.ico).*)"],
@@ -62,24 +69,14 @@ const APPLICANT_STATUSES = new Set([
   "waitlist",
 ]);
 
-const routePermissionMap = {
-  "/home/applicants": "applicants",
-  "/home/kanban": "kanban",
-} as const;
-
-type PermissionKey = (typeof routePermissionMap)[keyof typeof routePermissionMap];
-
-const PERMISSION_COLUMNS = [
-  ...new Set(Object.values(routePermissionMap)),
-].join(", ");
-
-const PERMISSION_PREFIXES = (
-  Object.keys(routePermissionMap) as (keyof typeof routePermissionMap)[]
-).sort((a, b) => b.length - a.length);
+const PERMISSION_PREFIXES = Object.keys(ROUTE_PERMISSION_MAP).sort(
+  (a, b) => b.length - a.length,
+);
 
 type Access = "public" | "auth-entry" | "protected";
 
 interface Account {
+  role_id: number | null;
   application_status: string | null;
   roles?: Record<string, boolean> | null;
 }
@@ -97,7 +94,7 @@ function permissionFor(pathname: string): PermissionKey | null {
   const match = PERMISSION_PREFIXES.find((prefix) =>
     pathname.startsWith(prefix),
   );
-  return match ? routePermissionMap[match] : null;
+  return (match ? ROUTE_PERMISSION_MAP[match] : null) ?? null;
 }
 
 function statusRedirect(status: string | null, pathname: string): string | null {
@@ -165,8 +162,8 @@ async function fetchAccount(
   withPermissions: boolean,
 ): Promise<Account | null> {
   const columns = withPermissions
-    ? `id, application_status, roles(${PERMISSION_COLUMNS})`
-    : "id, application_status";
+    ? `id, role_id, application_status, roles(${PERMISSION_COLUMNS})`
+    : "id, role_id, application_status";
 
   const { data, error } = await client.supabase
     .from("codev")
@@ -258,8 +255,11 @@ export async function proxy(request: NextRequest) {
     const target = statusRedirect(account.application_status, pathname);
     if (target) return redirectTo(client, request, target);
 
-    if (permission && !account.roles?.[permission]) {
-      return redirectTo(client, request, HOME);
+    if (permission) {
+      const allowed = requiresFullAccess(pathname)
+        ? isFullAccess(account.role_id)
+        : Boolean(account.roles?.[permission]);
+      if (!allowed) return redirectTo(client, request, HOME);
     }
 
     return passThrough(client);

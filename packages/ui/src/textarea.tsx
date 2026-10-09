@@ -33,6 +33,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
       <div>
         <label htmlFor={id}>{label}</label>
         <textarea
+          id={id}
           className={cn(TextareaVariants({ variant, className }))}
           ref={ref}
           {...props}

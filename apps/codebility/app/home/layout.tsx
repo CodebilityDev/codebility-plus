@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import AsyncErrorBoundary from "@/components/global/feedback/AsyncErrorBoundary";
 import ErrorBoundary from "@/components/global/feedback/ErrorBoundary";
 import { ModalProviderHome } from "@/providers/home/ModalProviderHome";
+import { PermissionsProvider } from "@/providers/global/PermissionsProvider";
 import { ThemeProvider } from "@/providers/global/ThemeProvider";
 import { Toaster } from "sonner";
 
@@ -56,7 +57,9 @@ export default function HomeLayout({ children }: HomeLayoutProps) {
             </ErrorBoundary>
             <DynamicMainContent>
               <ConditionalMainWrapper>
-                <AsyncErrorBoundary>{children}</AsyncErrorBoundary>
+                <AsyncErrorBoundary>
+                  <PermissionsProvider>{children}</PermissionsProvider>
+                </AsyncErrorBoundary>
               </ConditionalMainWrapper>
             </DynamicMainContent>
           </div>

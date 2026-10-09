@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-export default function KanbanEmptyState({
+export default function EmptyState({
   title,
   description,
   children,

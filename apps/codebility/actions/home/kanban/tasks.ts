@@ -3,6 +3,10 @@
 import { updateTag } from "next/cache";
 import { TASK_COLUMNS } from "@/constants/home/kanban/kanban";
 import { CACHE_TAGS } from "@/lib/global/cache-tags";
+import {
+  requirePermission,
+  requireProjectAccessForEntities,
+} from "@/lib/global/permissions";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import {
   assignPositions,
@@ -47,6 +51,12 @@ export async function syncTaskMoves(input: {
   }[];
 }): Promise<void> {
   const { moves } = syncTaskMovesInput.parse(input);
+
+  await requirePermission("kanban");
+  await requireProjectAccessForEntities({
+    taskIds: moves.map((move) => move.taskId),
+    columnIds: moves.map((move) => move.toColumnId),
+  });
 
   const supabase = await createClientServerComponent();
   const updatedAt = new Date().toISOString();
@@ -194,6 +204,9 @@ export async function createTask(input: {
   const { columnId, title, description, priority } =
     createTaskInput.parse(input);
 
+  await requirePermission("kanban");
+  await requireProjectAccessForEntities({ columnIds: [columnId] });
+
   const supabase = await createClientServerComponent();
 
   const { data: lastTasks, error } = await supabase
@@ -228,6 +241,9 @@ export async function updateTask(input: {
 }): Promise<void> {
   const { taskId, title, description, priority } = updateTaskInput.parse(input);
 
+  await requirePermission("kanban");
+  await requireProjectAccessForEntities({ taskIds: [taskId] });
+
   if (
     title === undefined &&
     description === undefined &&
@@ -255,6 +271,9 @@ export async function updateTask(input: {
 
 export async function deleteTask(taskId: string): Promise<void> {
   const id = taskIdSchema.parse(taskId);
+
+  await requirePermission("kanban");
+  await requireProjectAccessForEntities({ taskIds: [id] });
 
   const supabase = await createClientServerComponent();
 

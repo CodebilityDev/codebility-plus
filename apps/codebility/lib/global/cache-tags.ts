@@ -10,6 +10,8 @@ export const CACHE_TAGS = {
   onboardingTeam: "onboarding-team",
   profileDetail: "profile-detail",
   profilesListing: "profiles-listing",
+  projectDetail: "project-detail",
+  projectsList: "projects-list",
   proposalCodevs: "proposal-codevs",
   proposalProjects: "proposal-projects",
   servicesProjects: "services-projects",

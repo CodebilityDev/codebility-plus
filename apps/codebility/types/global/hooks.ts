@@ -16,7 +16,10 @@ export type ModalType =
   | "deleteWarningModal"
   | "dashboardCurrentProjectModal"
   | "marketingCodevHireCodevModal"
-  | "surveyModal";
+  | "surveyModal"
+  | "projectContributorPicker"
+  | "projectCreateDrawer"
+  | "sprintCreateDrawer";
 
 export interface ModalStore {
   type: ModalType | null;

@@ -1,13 +1,19 @@
 import { Suspense } from "react";
 
+import { redirect } from "next/navigation";
+
+import EmptyState from "@/components/global/feedback/EmptyState";
 import H1 from "@/components/global/layout/H1";
 import KanbanBoard from "@/components/home/kanban/KanbanBoard";
 import KanbanBoardSkeleton from "@/components/home/kanban/KanbanBoardSkeleton";
 import KanbanBreadcrumb from "@/components/home/kanban/KanbanBreadcrumb";
 import KanbanConnectionBadge from "@/components/home/kanban/KanbanConnectionBadge";
-import KanbanEmptyState from "@/components/home/kanban/KanbanEmptyState";
 import KanbanRealtimeBridge from "@/components/home/kanban/KanbanRealtimeBridge";
 import pathsConfig from "@/constants/global/paths";
+import {
+  getAccessibleProjectIds,
+  getAccess,
+} from "@/lib/global/permissions";
 import { getBoard } from "@/lib/home/kanban/kanban-cached";
 import { KanbanStoreProvider } from "@/providers/home/kanban/KanbanStoreProvider";
 import type { KanbanBoardPageProps } from "@/types/home/kanban/kanban";
@@ -35,7 +41,7 @@ async function KanbanBoardContent({ params }: KanbanBoardPageProps) {
             { label: "Project", href: pathsConfig.app.kanban + "/" + projectId },
           ]}
         />
-        <KanbanEmptyState
+        <EmptyState
           title="This sprint has no board"
           description="Open the sprint from the sprints list to provision one."
         />
@@ -44,6 +50,15 @@ async function KanbanBoardContent({ params }: KanbanBoardPageProps) {
   }
 
   const base = pathsConfig.app.kanban;
+
+  const [accessibleProjectIds, { hasFullAccess }] = await Promise.all([
+    getAccessibleProjectIds(),
+    getAccess(),
+  ]);
+
+  if (!hasFullAccess && !accessibleProjectIds?.includes(board.projectId)) {
+    redirect(pathsConfig.app.home);
+  }
 
   return (
     <KanbanStoreProvider snapshot={board}>
@@ -67,7 +82,7 @@ async function KanbanBoardContent({ params }: KanbanBoardPageProps) {
         </div>
         {board.columns.length === 0 ? (
           <div className="px-4">
-            <KanbanEmptyState
+            <EmptyState
               title="This board has no columns"
               description="Add a column to start tracking tasks."
             />

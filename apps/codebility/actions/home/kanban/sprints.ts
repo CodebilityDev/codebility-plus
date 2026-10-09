@@ -3,6 +3,10 @@
 import { updateTag } from "next/cache";
 import { ensureBoardForSprint } from "@/actions/home/kanban/board";
 import { CACHE_TAGS } from "@/lib/global/cache-tags";
+import {
+  requirePermission,
+  requireProjectAccess,
+} from "@/lib/global/permissions";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import { z } from "zod";
 
@@ -20,6 +24,9 @@ export async function createSprint(input: {
   endAt: string;
 }): Promise<{ sprintId: string }> {
   const { projectId, name, startAt, endAt } = createSprintInput.parse(input);
+
+  await requirePermission("kanban");
+  await requireProjectAccess(projectId, "team_leader");
 
   const supabase = await createClientServerComponent();
 

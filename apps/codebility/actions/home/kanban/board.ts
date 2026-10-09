@@ -7,6 +7,10 @@ import {
   SPRINT_COLUMNS,
 } from "@/constants/home/kanban/kanban";
 import { CACHE_TAGS } from "@/lib/global/cache-tags";
+import {
+  requirePermission,
+  requireProjectAccessForEntities,
+} from "@/lib/global/permissions";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import { loadBoardSnapshot } from "@/lib/home/kanban/kanban-cached";
 import { POSITION_GAP } from "@/utils/home/kanban/position";
@@ -19,6 +23,9 @@ export async function getBoardSnapshot(
 ): Promise<KanbanBoardSnapshot | null> {
   const id = sprintIdSchema.parse(sprintId);
 
+  await requirePermission("kanban");
+  await requireProjectAccessForEntities({ sprintId: id });
+
   const supabase = await createClientServerComponent();
 
   return loadBoardSnapshot(supabase, id);
@@ -28,6 +35,9 @@ export async function ensureBoardForSprint(
   sprintId: string,
 ): Promise<{ boardId: string }> {
   const id = sprintIdSchema.parse(sprintId);
+
+  await requirePermission("kanban");
+  await requireProjectAccessForEntities({ sprintId: id });
 
   const supabase = await createClientServerComponent();
 

@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import type React from "react";
 
+import type { PermissionKey } from "@/types/global/permissions";
+
 
 export interface ConditionalMainWrapperProps {
   children: ReactNode;
@@ -44,16 +46,6 @@ export interface Sidebar {
   title: string;
   links: SidebarSidebarLink[];
 }
-
-// Each key is a boolean column on the `roles` table. Add a key here, in the
-// select below, and in proxy.ts when a new private page gets a permission.
-export interface RolePermissions {
-  dashboard: boolean;
-  applicants: boolean;
-  kanban: boolean;
-}
-
-export type PermissionKey = keyof RolePermissions;
 
 export interface HomeLayoutProps {
   children: React.ReactNode;

@@ -5,8 +5,10 @@ import { unstable_rethrow } from "next/navigation";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import type { NewApplicantType } from "@/types/home/applicants/applicants";
 import { newApplicantsSchema } from "@/utils/home/applicants/applicants";
+import { requireFullAccess } from "@/lib/global/permissions";
 
 export async function getNewApplicants(): Promise<NewApplicantType[]> {
+  await requireFullAccess();
   try {
     const supabase = await createClientServerComponent();
 
