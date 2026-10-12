@@ -54,6 +54,11 @@ export interface ContributorCandidate {
   roleName: string | null;
 }
 
+export interface ContributorCandidatePage {
+  rows: ContributorCandidate[];
+  hasMore: boolean;
+}
+
 export interface ProjectFormInput {
   name: string;
   description?: string;

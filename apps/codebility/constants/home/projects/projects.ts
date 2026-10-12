@@ -9,3 +9,5 @@ export const CONTRIBUTOR_COLUMNS =
 
 export const CANDIDATE_COLUMNS =
   "id, first_name, last_name, image_url, display_position, username, roles(name)";
+
+export const CANDIDATE_PAGE_SIZE = 20;

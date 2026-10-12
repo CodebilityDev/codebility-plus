@@ -57,7 +57,15 @@ export default function ProjectDetailContributors({
     <Card>
       <CardHeader className="flex flex-row items-center justify-between gap-4 pb-2">
         <CardTitle className="text-lg">Contributors</CardTitle>
-        {canManage && <OverlayTrigger type="projectContributorPicker" data={{ projectId }}>Add contributors</OverlayTrigger>}
+        {canManage && (
+          <OverlayTrigger
+            type="projectContributorPicker"
+            data={{ projectId }}
+            dataObject={{ currentContributorIds: contributors.map((c) => c.codevId) }}
+          >
+            Add contributors
+          </OverlayTrigger>
+        )}
       </CardHeader>
       <CardContent className="flex flex-col gap-3 text-sm">
         {error && (

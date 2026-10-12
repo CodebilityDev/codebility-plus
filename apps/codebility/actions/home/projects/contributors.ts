@@ -1,11 +1,11 @@
 "use server";
 
 import { updateTag } from "next/cache";
-import { CANDIDATE_COLUMNS } from "@/constants/home/projects/projects";
+import { CANDIDATE_COLUMNS, CANDIDATE_PAGE_SIZE } from "@/constants/home/projects/projects";
 import { CACHE_TAGS } from "@/lib/global/cache-tags";
 import { requireFullAccess } from "@/lib/global/permissions";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
-import type { ContributorCandidate } from "@/types/home/projects/projects";
+import type { ContributorCandidatePage } from "@/types/home/projects/projects";
 import { z } from "zod";
 
 type ServerClient = Awaited<ReturnType<typeof createClientServerComponent>>;
@@ -28,8 +28,10 @@ const selectableContributorQuery = <Columns extends string>(
 
 export async function searchContributorCandidates(
   query: string,
-): Promise<ContributorCandidate[]> {
+  page: number,
+): Promise<ContributorCandidatePage> {
   const term = searchQuerySchema.parse(query).trim();
+  const pageNumber = z.number().int().min(0).parse(page);
 
   await requireFullAccess();
 
@@ -45,13 +47,18 @@ export async function searchContributorCandidates(
     );
   }
 
+  const from = pageNumber * CANDIDATE_PAGE_SIZE;
+
   const { data, error } = await candidateQuery
     .order("first_name", { ascending: true })
-    .limit(20);
+    .order("id", { ascending: true })
+    .range(from, from + CANDIDATE_PAGE_SIZE);
 
   if (error) throw error;
 
-  return data.flatMap((row) =>
+  const hasMore = data.length > CANDIDATE_PAGE_SIZE;
+
+  const rows = data.slice(0, CANDIDATE_PAGE_SIZE).flatMap((row) =>
     row.roles
       ? [
           {
@@ -66,6 +73,8 @@ export async function searchContributorCandidates(
         ]
       : [],
   );
+
+  return { rows, hasMore };
 }
 
 export async function addContributors(

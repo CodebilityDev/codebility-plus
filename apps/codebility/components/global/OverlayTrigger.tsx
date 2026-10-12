@@ -9,18 +9,20 @@ import type { ModalType } from "@/types/global/hooks";
 export default function OverlayTrigger({
   type,
   data,
+  dataObject,
   className,
   children,
 }: {
   type: ModalType;
   data?: unknown;
+  dataObject?: unknown;
   className?: string;
   children: ReactNode;
 }) {
   const { onOpen } = useModal();
 
   return (
-    <Button type="button" className={className ?? "w-auto"} onClick={() => onOpen(type, data)}>
+    <Button type="button" className={className ?? "w-auto"} onClick={() => onOpen(type, data, dataObject)}>
       {children}
     </Button>
   );

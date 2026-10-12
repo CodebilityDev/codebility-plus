@@ -1,6 +1,6 @@
 "use client";
 
-import { memo } from "react";
+import { memo, useCallback } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { cn } from "@codevs/ui";
@@ -75,12 +75,16 @@ interface KanbanTaskCardProps {
   taskId: string;
   columnId: string;
   index: number;
+  start: number;
+  measureRef: (node: Element | null) => void;
 }
 
 const KanbanTaskCard = memo(function KanbanTaskCard({
   taskId,
   columnId,
   index,
+  start,
+  measureRef,
 }: KanbanTaskCardProps) {
   const task = useKanbanStore((state) => state.tasksById[taskId]);
   const pending = useKanbanStore((state) => state.pending[taskId] ?? false);
@@ -93,14 +97,27 @@ const KanbanTaskCard = memo(function KanbanTaskCard({
     isDragging,
   } = useSortable({ id: taskId, data: { type: "task", columnId, index } });
 
+  const setRefs = useCallback(
+    (node: HTMLLIElement | null) => {
+      setNodeRef(node);
+      measureRef(node);
+    },
+    [setNodeRef, measureRef],
+  );
+
   if (!task) {
     return null;
   }
 
   return (
     <li
-      ref={setNodeRef}
+      ref={setRefs}
+      data-index={index}
       style={{
+        position: "absolute",
+        top: start,
+        left: 0,
+        right: 0,
         transform: CSS.Transform.toString(transform),
         transition,
         touchAction: "manipulation",

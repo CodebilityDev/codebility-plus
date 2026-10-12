@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import {
   DndContext,
   KeyboardSensor,
@@ -21,6 +21,11 @@ import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 
 import KanbanColumn from "@/components/home/kanban/KanbanColumn";
 import KanbanDragOverlay from "@/components/home/kanban/KanbanDragOverlay";
+import {
+  COLUMN_GAP,
+  COLUMN_STRIDE,
+  useKanbanColumnVirtualizer,
+} from "@/hooks/home/kanban/use-kanban-column-virtualizer";
 import { useKanbanActions } from "@/hooks/home/kanban/use-kanban-actions";
 import {
   useKanbanStore,
@@ -47,6 +52,24 @@ export default function KanbanBoard() {
   const store = useKanbanStoreApi();
   const { moveTask } = useKanbanActions(store);
   const preview = useRef<string | null>(null);
+  const [dragColumns, setDragColumns] = useState<{
+    active: string | null;
+    over: string | null;
+  }>({ active: null, over: null });
+
+  const keepMountedIds = useMemo(() => {
+    const ids = new Set<string>();
+    if (dragColumns.active) {
+      ids.add(dragColumns.active);
+    }
+    if (dragColumns.over) {
+      ids.add(dragColumns.over);
+    }
+    return ids;
+  }, [dragColumns]);
+
+  const { scrollRef, stripRef, totalSize, stripHeight, indexes } =
+    useKanbanColumnVirtualizer({ columnOrder, keepMountedIds });
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -60,13 +83,26 @@ export default function KanbanBoard() {
 
   function handleDragStart(event: DragStartEvent) {
     preview.current = null;
+    const columnId: unknown = event.active.data.current?.columnId;
+    setDragColumns({
+      active: typeof columnId === "string" ? columnId : null,
+      over: null,
+    });
     setActiveTask(String(event.active.id));
   }
 
   function handleDragOver(event: DragOverEvent) {
     const target = resolveTarget(event.over);
     const sourceColumnId: unknown = event.active.data.current?.columnId;
-    if (!target || target.columnId === sourceColumnId) {
+    if (!target) {
+      return;
+    }
+    setDragColumns((current) =>
+      current.over === target.columnId
+        ? current
+        : { ...current, over: target.columnId },
+    );
+    if (target.columnId === sourceColumnId) {
       return;
     }
     const taskId = String(event.active.id);
@@ -82,6 +118,7 @@ export default function KanbanBoard() {
     const taskId = String(event.active.id);
     const target = resolveTarget(event.over);
     preview.current = null;
+    setDragColumns({ active: null, over: null });
     setActiveTask(null);
     if (!target) {
       return;
@@ -101,6 +138,7 @@ export default function KanbanBoard() {
 
   function handleDragCancel() {
     preview.current = null;
+    setDragColumns({ active: null, over: null });
     setActiveTask(null);
   }
 
@@ -116,12 +154,34 @@ export default function KanbanBoard() {
       onDragCancel={handleDragCancel}
     >
       <div
-        className="flex w-full items-start gap-4 overflow-x-auto pb-4"
+        ref={scrollRef}
+        className="flex w-full items-start overflow-x-auto pb-4"
         aria-label="Kanban board"
       >
-        {columnOrder.map((columnId) => (
-          <KanbanColumn key={columnId} columnId={columnId} />
-        ))}
+        <div
+          ref={stripRef}
+          className="relative shrink-0"
+          style={{
+            width: Math.max(totalSize - COLUMN_GAP, 0),
+            height: stripHeight,
+          }}
+        >
+          {indexes.map((index) => {
+            const columnId = columnOrder[index];
+            if (!columnId) {
+              return null;
+            }
+            return (
+              <div
+                key={columnId}
+                className="absolute top-0 w-72"
+                style={{ left: index * COLUMN_STRIDE }}
+              >
+                <KanbanColumn columnId={columnId} />
+              </div>
+            );
+          })}
+        </div>
       </div>
       <KanbanDragOverlay />
     </DndContext>
