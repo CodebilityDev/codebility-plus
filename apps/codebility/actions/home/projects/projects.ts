@@ -4,9 +4,11 @@ import { updateTag } from "next/cache";
 import { CACHE_TAGS } from "@/lib/global/cache-tags";
 import { requireFullAccess } from "@/lib/global/permissions";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
+import { getCurrentCodev } from "@/lib/global/current-codev";
 import type { Database } from "@/types/global/supabase";
 import type { ProjectFormInput } from "@/types/home/projects/projects";
 import { z } from "zod";
+import { canMarkProjectDone } from "@/constants/global/permissions";
 
 type ProjectUpdate = Database["public"]["Tables"]["projects"]["Update"];
 
@@ -24,6 +26,7 @@ const projectFormSchema = z.object({
   meetingLink: z.string().optional(),
   techStack: z.array(z.string()).optional(),
   keyFeatures: z.array(z.string()).optional(),
+  mainImage: z.string().url().optional(),
 });
 
 const projectIdSchema = z.string().min(1);
@@ -42,6 +45,7 @@ const FIELD_MAP = {
   meetingLink: "meeting_link",
   techStack: "tech_stack",
   keyFeatures: "key_features",
+  mainImage: "main_image",
 } as const satisfies Record<keyof ProjectFormInput, string>;
 
 function buildProjectRow(input: Partial<ProjectFormInput>): ProjectUpdate {
@@ -180,6 +184,84 @@ export async function deleteProject(projectId: string): Promise<void> {
     .eq("id", id);
 
   if (projectError) throw projectError;
+
+  updateTag(CACHE_TAGS.projectsList);
+  updateTag(CACHE_TAGS.kanbanBoard);
+  updateTag(`${CACHE_TAGS.projectDetail}-${id}`);
+}
+
+export async function markProjectDone(projectId: string): Promise<void> {
+  const id = projectIdSchema.parse(projectId);
+
+  const codev = await getCurrentCodev();
+  if (!canMarkProjectDone(codev?.role_id ?? null)) {
+    throw new Error("Forbidden: insufficient permissions to mark project as done");
+  }
+
+  const supabase = await createClientServerComponent();
+
+  const { error: projectError } = await supabase
+    .from("projects")
+    .update({
+      status: "completed",
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", id);
+
+  if (projectError) throw projectError;
+
+  const { data: boards, error: boardsError } = await supabase
+    .from("kanban_boards")
+    .select("id")
+    .eq("project_id", id);
+
+  if (boardsError) throw boardsError;
+
+  let columnIds: string[] = [];
+
+  if (boards.length > 0) {
+    const { data: columns, error: columnsError } = await supabase
+      .from("kanban_columns")
+      .select("id")
+      .in(
+        "board_id",
+        boards.map((board) => board.id),
+      );
+
+    if (columnsError) throw columnsError;
+
+    columnIds = columns.map((column) => column.id);
+  }
+
+  if (columnIds.length > 0) {
+    const { error: tasksError } = await supabase
+      .from("tasks")
+      .delete()
+      .in("kanban_column_id", columnIds);
+
+    if (tasksError) throw tasksError;
+
+    const { error: deleteColumnsError } = await supabase
+      .from("kanban_columns")
+      .delete()
+      .in("id", columnIds);
+
+    if (deleteColumnsError) throw deleteColumnsError;
+  }
+
+  const { error: sprintsError } = await supabase
+    .from("kanban_sprints")
+    .delete()
+    .eq("project_id", id);
+
+  if (sprintsError) throw sprintsError;
+
+  const { error: deleteBoardsError } = await supabase
+    .from("kanban_boards")
+    .delete()
+    .eq("project_id", id);
+
+  if (deleteBoardsError) throw deleteBoardsError;
 
   updateTag(CACHE_TAGS.projectsList);
   updateTag(CACHE_TAGS.kanbanBoard);

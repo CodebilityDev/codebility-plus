@@ -16,10 +16,11 @@ import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
 import { Textarea } from "@codevs/ui/textarea";
 
-import { deleteProject, updateProject } from "@/actions/home/projects/projects";
+import { deleteProject, markProjectDone, updateProject } from "@/actions/home/projects/projects";
 import H1 from "@/components/global/layout/H1";
 import pathsConfig from "@/constants/global/paths";
 import type { ProjectDetail } from "@/types/home/projects/projects";
+import { canMarkProjectDone } from "@/constants/global/permissions";
 
 function readField(data: FormData, field: string) {
   const value = data.get(field);
@@ -45,9 +46,11 @@ function formatDateRange(start: string | null, end: string | null) {
 export default function ProjectDetailHeader({
   project,
   canManage,
+  roleId,
 }: {
   project: ProjectDetail;
   canManage: boolean;
+  roleId: number | null;
 }) {
   const router = useRouter();
   const [editOpen, setEditOpen] = useState(false);
@@ -55,8 +58,11 @@ export default function ProjectDetailHeader({
   const [saveError, setSaveError] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [markingDone, setMarkingDone] = useState(false);
+  const [markDoneError, setMarkDoneError] = useState<string | null>(null);
 
   const dateRange = formatDateRange(project.startDate, project.endDate);
+  const showMarkDone = canManage && canMarkProjectDone(roleId) && project.status !== "completed";
 
   async function handleEdit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -129,6 +135,24 @@ export default function ProjectDetailHeader({
       );
     } finally {
       setDeleting(false);
+    }
+  }
+
+  async function handleMarkDone() {
+    setMarkingDone(true);
+    setMarkDoneError(null);
+
+    try {
+      await markProjectDone(project.id);
+      router.refresh();
+    } catch (caught) {
+      setMarkDoneError(
+        caught instanceof Error
+          ? caught.message
+          : "Could not mark project as completed.",
+      );
+    } finally {
+      setMarkingDone(false);
     }
   }
 
@@ -341,9 +365,43 @@ export default function ProjectDetailHeader({
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
+            {showMarkDone && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button type="button" variant="default" className="bg-blue-600 hover:bg-blue-700 text-white">
+                    Mark as Completed
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Mark project as completed?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will set the project status to Completed, remove all sprints and tasks,
+                      and cannot be undone. Developer points earned from tasks will be preserved.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel type="button">Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      type="button"
+                      onClick={handleMarkDone}
+                      disabled={markingDone}
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      {markingDone ? "Marking..." : "Mark as Completed"}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
             {deleteError && (
               <p role="alert" className="w-full text-sm text-destructive">
                 {deleteError}
+              </p>
+            )}
+            {markDoneError && (
+              <p role="alert" className="w-full text-sm text-destructive">
+                {markDoneError}
               </p>
             )}
           </div>

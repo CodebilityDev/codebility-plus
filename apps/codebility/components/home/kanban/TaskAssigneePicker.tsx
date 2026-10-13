@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Check, Plus, X } from "lucide-react";
 
+import { getAssigneesByIds } from "@/actions/home/kanban/assignees";
 import { useAssigneeCandidates } from "@/hooks/home/kanban/use-assignee-candidates";
 import type { AssigneeOption } from "@/types/home/kanban/kanban";
 
@@ -20,63 +21,120 @@ function initials(candidate: AssigneeOption) {
   return `${candidate.firstName.charAt(0)}${candidate.lastName.charAt(0)}`;
 }
 
+const assigneeCache = new Map<string, AssigneeOption>();
+
 export default function TaskAssigneePicker({
   label,
   multiple,
+  projectId,
   disabledIds = [],
+  value,
   onChange,
 }: {
   label: string;
   multiple: boolean;
+  projectId: string;
   disabledIds?: string[];
+  value: string[];
   onChange: (ids: string[]) => void;
 }) {
-  const [selected, setSelected] = useState<AssigneeOption[]>([]);
+  const [options, setOptions] = useState<Record<string, AssigneeOption>>(() => {
+    const initial: Record<string, AssigneeOption> = {};
+
+    for (const id of value) {
+      const cached = assigneeCache.get(id);
+
+      if (cached) initial[id] = cached;
+    }
+
+    return initial;
+  });
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const { candidates, isLoading, error } = useAssigneeCandidates(query);
+  const { candidates, isLoading, error } = useAssigneeCandidates(
+    query,
+    projectId,
+  );
+  const valueKey = value.join(",");
 
-  function toggle(candidate: AssigneeOption) {
-    const exists = selected.some((entry) => entry.id === candidate.id);
-    const next = exists
-      ? selected.filter((entry) => entry.id !== candidate.id)
-      : multiple
-        ? [...selected, candidate]
-        : [candidate];
+  useEffect(() => {
+    const ids = valueKey ? valueKey.split(",") : [];
+    const unknown = ids.filter((id) => !options[id] && !assigneeCache.has(id));
 
-    setSelected(next);
-    onChange(next.map((entry) => entry.id));
+    if (unknown.length === 0) return;
+
+    let active = true;
+
+    getAssigneesByIds(unknown)
+      .then((rows) => {
+        if (rows.length === 0) return;
+
+        for (const row of rows) assigneeCache.set(row.id, row);
+
+        if (!active) return;
+
+        setOptions((previous) => {
+          const next = { ...previous };
+
+          for (const row of rows) next[row.id] = row;
+
+          return next;
+        });
+      })
+      .catch(() => undefined);
+
+    return () => {
+      active = false;
+    };
+  }, [valueKey, options]);
+
+  function lookup(id: string) {
+    return options[id] ?? candidates.find((entry) => entry.id === id);
   }
 
-  function remove(candidate: AssigneeOption) {
-    const next = selected.filter((entry) => entry.id !== candidate.id);
+  function toggle(candidate: AssigneeOption) {
+    const exists = value.includes(candidate.id);
+    const next = exists
+      ? value.filter((id) => id !== candidate.id)
+      : multiple
+        ? [...value, candidate.id]
+        : [candidate.id];
 
-    setSelected(next);
-    onChange(next.map((entry) => entry.id));
+    onChange(next);
+  }
+
+  function remove(id: string) {
+    onChange(value.filter((entry) => entry !== id));
   }
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      {selected.map((member) => (
-        <button
-          key={member.id}
-          type="button"
-          onClick={() => remove(member)}
-          aria-label={`Remove ${member.firstName} ${member.lastName}`}
-          className="group relative h-9 w-9 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-customBlue-100"
-        >
-          <Avatar className="h-9 w-9">
-            <AvatarImage
-              src={member.imageUrl ?? undefined}
-              alt={`${member.firstName} ${member.lastName}`}
-            />
-            <AvatarFallback>{initials(member)}</AvatarFallback>
-          </Avatar>
-          <span className="absolute inset-0 hidden items-center justify-center rounded-full bg-black/50 group-hover:flex">
-            <X aria-hidden="true" className="h-4 w-4 text-white" />
-          </span>
-        </button>
-      ))}
+      {value.map((id) => {
+        const member = lookup(id);
+
+        if (!member) return null;
+
+        return (
+          <button
+            key={id}
+            type="button"
+            onClick={() => remove(id)}
+            aria-label={`Remove ${member.firstName} ${member.lastName}`}
+            className="group relative h-9 w-9 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-customBlue-100"
+          >
+            <Avatar className="h-9 w-9">
+              <AvatarImage
+                src={member.imageUrl ?? undefined}
+                alt={`${member.firstName} ${member.lastName}`}
+              />
+              <AvatarFallback>{initials(member)}</AvatarFallback>
+            </Avatar>
+            <span className="absolute inset-0 hidden items-center justify-center rounded-full bg-black/50 group-hover:flex">
+              <X aria-hidden="true" className="h-4 w-4 text-white" />
+            </span>
+          </button>
+        );
+      })}
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
@@ -109,9 +167,7 @@ export default function TaskAssigneePicker({
             ) : (
               <ul className="flex flex-col">
                 {candidates.map((candidate) => {
-                  const isSelected = selected.some(
-                    (entry) => entry.id === candidate.id,
-                  );
+                  const isSelected = value.includes(candidate.id);
                   const isDisabled =
                     !isSelected && disabledIds.includes(candidate.id);
 

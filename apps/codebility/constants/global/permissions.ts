@@ -37,6 +37,12 @@ export function isFullAccess(roleId: number | null | undefined): boolean {
 
 export const PROJECT_ROLES = ["team_leader", "member"] as const;
 
+export const ALLOWED_DONE_ROLE_IDS = [1, 2, 3, 5] as const;
+
+export function canMarkProjectDone(roleId: number | null | undefined): boolean {
+  return typeof roleId === "number" && (ALLOWED_DONE_ROLE_IDS as readonly number[]).includes(roleId);
+}
+
 export function normalizeProjectRole(role: string | null): ProjectRole {
   return role === "team_leader" ? "team_leader" : "member";
 }

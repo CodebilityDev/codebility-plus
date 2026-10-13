@@ -1,7 +1,7 @@
 "use client";
 
 import type { ChangeEvent, ReactNode } from "react";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
@@ -78,6 +78,14 @@ export default function KanbanRichTextEditor({
     },
     onUpdate: ({ editor: instance }) => onChange(instance.getHTML()),
   });
+
+  useEffect(() => {
+    if (!editor) return;
+
+    if (editor.getHTML() !== value) {
+      editor.commands.setContent(value || "");
+    }
+  }, [editor, value]);
 
   if (!editor) {
     return (

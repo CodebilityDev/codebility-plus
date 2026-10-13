@@ -18,7 +18,7 @@ export interface KanbanMoveBroadcast {
 
 type BoardState = Pick<
   KanbanState,
-  "columnsById" | "columnOrder" | "tasksById" | "taskIdsByColumn"
+  "projectId" | "columnsById" | "columnOrder" | "tasksById" | "taskIdsByColumn"
 >;
 
 type MoveState = Pick<KanbanState, "tasksById" | "taskIdsByColumn">;
@@ -151,6 +151,7 @@ function buildBoardState(
   }
 
   return {
+    projectId: snapshot.projectId,
     columnsById: sameColumns && previous ? previous.columnsById : columnsById,
     columnOrder:
       previous && sameIds(previous.columnOrder, columnOrder)
@@ -224,7 +225,13 @@ export function createKanbanStore(
 ): KanbanStoreApi {
   const initial: BoardState = snapshot
     ? buildBoardState(snapshot)
-    : { columnsById: {}, columnOrder: [], tasksById: {}, taskIdsByColumn: {} };
+    : {
+        projectId: null,
+        columnsById: {},
+        columnOrder: [],
+        tasksById: {},
+        taskIdsByColumn: {},
+      };
   const origins = new Map<string, MoveOrigin>();
   let broadcast: ((move: KanbanMoveBroadcast) => void) | null = null;
 

@@ -73,4 +73,5 @@ export interface ProjectFormInput {
   meetingLink?: string;
   techStack?: string[];
   keyFeatures?: string[];
+  mainImage?: string;
 }

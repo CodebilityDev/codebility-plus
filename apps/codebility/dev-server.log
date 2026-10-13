@@ -1,0 +1,814 @@
+
+> codebility@0.1.0 dev C:\Users\Dev\Desktop\Dev\codebility-plus\apps\codebility
+> cross-env FORCE_COLOR=1 next dev
+
+[1m[38;2;173;127;168m▲ Next.js 16.3.7[39m[22m (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.1.11:3000
+- Environments: .env
+[32m[1m✓[22m[39m Ready in 1155ms
+[32m[1m✓[22m[39m Running next.config.mjs took 56ms
+- Cache Components enabled
+- Experiments (use with caution):
+  · serverActions
+  · staleTimes
+
+(node:4380) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/Dev/Desktop/Dev/codebility-plus/tooling/tailwind/web.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to \\?\C:\Users\Dev\Desktop\Dev\codebility-plus\tooling\tailwind\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:15028) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/Dev/Desktop/Dev/codebility-plus/tooling/tailwind/web.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to \\?\C:\Users\Dev\Desktop\Dev\codebility-plus\tooling\tailwind\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[1m[33mwarn[39m[22m - The class `data-[state=closed]:slide-out-to-top-[48%]` is ambiguous and matches multiple utilities.
+[1m[33mwarn[39m[22m - If this is content and not a class, replace it with `data-&lsqb;state=closed&rsqb;:slide-out-to-top-[48%]` to silence this warning.
+
+[1m[33mwarn[39m[22m - The class `data-[state=open]:slide-in-from-top-[48%]` is ambiguous and matches multiple utilities.
+[1m[33mwarn[39m[22m - If this is content and not a class, replace it with `data-&lsqb;state=open&rsqb;:slide-in-from-top-[48%]` to silence this warning.
+ GET /auth/sign-in [32m200[39m in 1137ms[2m (next.js: 234ms, proxy.ts: 295ms, application-code: 609ms)[22m
+ GET / [32m200[39m in 2.8s[2m (next.js: 209ms, proxy.ts: 26ms, application-code: 2.5s)[22m
+ GET /home/kanban [32m200[39m in 3.0s[2m (next.js: 140ms, proxy.ts: 1099ms, application-code: 1777ms)[22m
+[36m[browser][39m [33mImage with src "http://localhost:3000/assets/svgs/codebility-white.svg" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio.[39m
+ POST /home/kanban [32m200[39m in 1747ms[2m (next.js: 34ms, proxy.ts: 1131ms, application-code: 581ms)[22m
+  └─ ƒ getPermissionsAction() in 530ms [2mactions/global/permissions.ts[22m
+ POST /home/kanban [32m200[39m in 831ms[2m (next.js: 5ms, proxy.ts: 356ms, application-code: 470ms)[22m
+  └─ ƒ getPermissionsAction() in 458ms [2mactions/global/permissions.ts[22m
+ GET /home/kanban/873ff893-9f5e-4102-bbcb-8b8a43c025f1 [32m200[39m in 2.7s[2m (next.js: 151ms, proxy.ts: 334ms, generate-params: 950ms, application-code: 1253ms)[22m
+[32m[1m✓[22m[39m Compiled in 728ms
+ GET /home/kanban [32m200[39m in 4.8s[2m (next.js: 15ms, proxy.ts: 3.2s, application-code: 1625ms)[22m
+[36m[browser][39m [33mImage with src "http://localhost:3000/assets/svgs/codebility-white.svg" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio.[39m
+ POST /home/kanban [32m200[39m in 1666ms[2m (next.js: 41ms, proxy.ts: 1036ms, application-code: 589ms)[22m
+  └─ ƒ getPermissionsAction() in 573ms [2mactions/global/permissions.ts[22m
+ POST /home/kanban [32m200[39m in 914ms[2m (next.js: 19ms, proxy.ts: 357ms, application-code: 538ms)[22m
+  └─ ƒ getPermissionsAction() in 526ms [2mactions/global/permissions.ts[22m
+[36m[browser][39m [33mImage with src "http://localhost:3000/assets/svgs/codebility-white.svg" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio.[39m
+[36m[browser][39m [33mImage with src "/assets/svgs/codebility-white.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading[39m
+ GET /home/kanban/873ff893-9f5e-4102-bbcb-8b8a43c025f1 [32m200[39m in 1967ms[2m (next.js: 17ms, proxy.ts: 308ms, generate-params: 11ms, application-code: 1631ms)[22m
+ POST /home/kanban/873ff893-9f5e-4102-bbcb-8b8a43c025f1 [32m200[39m in 1830ms[2m (next.js: 14ms, proxy.ts: 1130ms, generate-params: 12ms, application-code: 674ms)[22m
+  └─ ƒ getPermissionsAction() in 636ms [2mactions/global/permissions.ts[22m
+ POST /home/kanban/873ff893-9f5e-4102-bbcb-8b8a43c025f1 [32m200[39m in 828ms[2m (next.js: 39ms, proxy.ts: 316ms, generate-params: 0.1ms, application-code: 473ms)[22m
+  └─ ƒ getPermissionsAction() in 449ms [2mactions/global/permissions.ts[22m
+ GET /home/kanban [32m200[39m in 3.4s[2m (next.js: 14ms, proxy.ts: 1161ms, application-code: 2.2s)[22m
+[36m[browser][39m [33mImage with src "http://localhost:3000/assets/svgs/codebility-white.svg" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio.[39m
+ POST /home/kanban [32m200[39m in 821ms[2m (next.js: 5ms, proxy.ts: 294ms, application-code: 522ms)[22m
+  └─ ƒ getPermissionsAction() in 491ms [2mactions/global/permissions.ts[22m
+ POST /home/kanban [32m200[39m in 852ms[2m (next.js: 7ms, proxy.ts: 325ms, application-code: 520ms)[22m
+  └─ ƒ getPermissionsAction() in 504ms [2mactions/global/permissions.ts[22m
+ GET /home/kanban [32m200[39m in 3.4s[2m (next.js: 3ms, proxy.ts: 2.1s, application-code: 1304ms)[22m
+[36m[browser][39m [33mImage with src "http://localhost:3000/assets/svgs/codebility-white.svg" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio.[39m
+ POST /home/kanban [32m200[39m in 1510ms[2m (next.js: 58ms, proxy.ts: 858ms, application-code: 594ms)[22m
+  └─ ƒ getPermissionsAction() in 552ms [2mactions/global/permissions.ts[22m
+ POST /home/kanban [32m200[39m in 819ms[2m (next.js: 5ms, proxy.ts: 293ms, application-code: 521ms)[22m
+  └─ ƒ getPermissionsAction() in 496ms [2mactions/global/permissions.ts[22m
+[36m[browser][39m [33mImage with src "http://localhost:3000/assets/svgs/codebility-white.svg" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio.[39m
+ GET /home/kanban/873ff893-9f5e-4102-bbcb-8b8a43c025f1 [32m200[39m in 1921ms[2m (next.js: 16ms, proxy.ts: 297ms, generate-params: 9ms, application-code: 1599ms)[22m
+ POST /home/kanban/873ff893-9f5e-4102-bbcb-8b8a43c025f1 [32m200[39m in 1543ms[2m (next.js: 9ms, proxy.ts: 1087ms, generate-params: 8ms, application-code: 439ms)[22m
+  └─ ƒ getPermissionsAction() in 422ms [2mactions/global/permissions.ts[22m
+ POST /home/kanban/873ff893-9f5e-4102-bbcb-8b8a43c025f1 [32m200[39m in 756ms[2m (next.js: 20ms, proxy.ts: 312ms, generate-params: 0.1ms, application-code: 424ms)[22m
+  └─ ƒ getPermissionsAction() in 390ms [2mactions/global/permissions.ts[22m
+ GET /home/kanban/873ff893-9f5e-4102-bbcb-8b8a43c025f1 [32m200[39m in 631ms[2m (next.js: 9ms, proxy.ts: 388ms, generate-params: 12ms, application-code: 222ms)[22m
+ GET /home/kanban [32m200[39m in 3.5s[2m (next.js: 10ms, proxy.ts: 1967ms, application-code: 1570ms)[22m
+[36m[browser][39m [33mImage with src "http://localhost:3000/assets/svgs/codebility-white.svg" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio.[39m
+ POST /home/kanban [32m200[39m in 1488ms[2m (next.js: 14ms, proxy.ts: 981ms, application-code: 493ms)[22m
+  └─ ƒ getPermissionsAction() in 441ms [2mactions/global/permissions.ts[22m
+ POST /home/kanban [32m200[39m in 703ms[2m (next.js: 6ms, proxy.ts: 289ms, application-code: 407ms)[22m
+  └─ ƒ getPermissionsAction() in 391ms [2mactions/global/permissions.ts[22m
+[36m[browser][39m [33mImage with src "http://localhost:3000/assets/svgs/codebility-white.svg" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio.[39m
+ GET /home/kanban/e0124447-1978-400f-bfc7-7ea2f974d100 [32m200[39m in 1962ms[2m (next.js: 11ms, proxy.ts: 296ms, generate-params: 10ms, application-code: 1645ms)[22m
+ POST /home/kanban/e0124447-1978-400f-bfc7-7ea2f974d100 [32m200[39m in 1640ms[2m (next.js: 22ms, proxy.ts: 1082ms, generate-params: 14ms, application-code: 522ms)[22m
+  └─ ƒ getPermissionsAction() in 483ms [2mactions/global/permissions.ts[22m
+ POST /home/kanban/e0124447-1978-400f-bfc7-7ea2f974d100 [32m200[39m in 1341ms[2m (next.js: 486ms, proxy.ts: 334ms, generate-params: 0.1ms, application-code: 522ms)[22m
+  └─ ƒ getPermissionsAction() in 499ms [2mactions/global/permissions.ts[22m
+ GET /home/kanban/e0124447-1978-400f-bfc7-7ea2f974d100 [32m200[39m in 782ms[2m (next.js: 17ms, proxy.ts: 281ms, generate-params: 9ms, application-code: 475ms)[22m
+[36m[browser][39m [33mImage with src "http://localhost:3000/assets/svgs/codebility-white.svg" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio.[39m
+ GET /home/kanban/e0124447-1978-400f-bfc7-7ea2f974d100/a3c91d2e-2122-40f7-bc42-0cdb5e8e1784 [32m200[39m in 3.2s[2m (next.js: 52ms, proxy.ts: 286ms, generate-params: 1266ms, application-code: 1636ms)[22m
+ POST /home/kanban/e0124447-1978-400f-bfc7-7ea2f974d100/a3c91d2e-2122-40f7-bc42-0cdb5e8e1784 [32m200[39m in 1428ms[2m (next.js: 18ms, proxy.ts: 498ms, generate-params: 11ms, application-code: 900ms)[22m
+  └─ ƒ getPermissionsAction() in 881ms [2mactions/global/permissions.ts[22m
+ POST /home/kanban/e0124447-1978-400f-bfc7-7ea2f974d100/a3c91d2e-2122-40f7-bc42-0cdb5e8e1784 [32m200[39m in 907ms[2m (next.js: 10ms, proxy.ts: 321ms, generate-params: 13ms, application-code: 563ms)[22m
+  └─ ƒ getPermissionsAction() in 480ms [2mactions/global/permissions.ts[22m
+ GET /home/kanban [31m500[39m in 1834ms[2m (next.js: 425ms, proxy.ts: 1094ms, application-code: 315ms)[22m
+[36m[browser][39m ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx:8:1
+Error: Export getTaskDetail doesn't exist in target module
+   6 | import { useRouter } from "next/navigation";
+   7 |
+>  8 | import {
+     | ^^^^^^^
+>  9 |   createTask,
+     | ^^^^^^^^^^^^^
+> 10 |   getTaskDetail,
+     | ^^^^^^^^^^^^^^^^
+> 11 |   updateTask,
+     | ^^^^^^^^^^^^^
+> 12 | } from "@/actions/home/kanban/tasks";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  13 | import { getTaskSkillCategories } from "@/actions/home/kanban/skill-categories";
+  14 | import { Button } from "@/components/global/ui/button";
+  15 | import KanbanRichTextEditor from "@/components/home/kanban/KanbanRichTextEditor";
+
+The export getTaskDetail was not found in module [project]/apps/codebility/actions/home/kanban/tasks.ts [app-client] (ecmascript).
+Did you mean to import createTask?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/page.tsx [Server Component] 
+[36m[browser][39m ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx:8:1
+Error: Export getTaskDetail doesn't exist in target module
+   6 | import { useRouter } from "next/navigation";
+   7 |
+>  8 | import {
+     | ^^^^^^^
+>  9 |   createTask,
+     | ^^^^^^^^^^^^^
+> 10 |   getTaskDetail,
+     | ^^^^^^^^^^^^^^^^
+> 11 |   updateTask,
+     | ^^^^^^^^^^^^^
+> 12 | } from "@/actions/home/kanban/tasks";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  13 | import { getTaskSkillCategories } from "@/actions/home/kanban/skill-categories";
+  14 | import { Button } from "@/components/global/ui/button";
+  15 | import KanbanRichTextEditor from "@/components/home/kanban/KanbanRichTextEditor";
+
+The export getTaskDetail was not found in module [project]/apps/codebility/actions/home/kanban/tasks.ts [app-ssr] (ecmascript).
+Did you mean to import createTask?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/page.tsx [Server Component] 
+[36m[browser][39m ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx:8:1
+Error: Export getTaskDetail doesn't exist in target module
+   6 | import { useRouter } from "next/navigation";
+   7 |
+>  8 | import {
+     | ^^^^^^^
+>  9 |   createTask,
+     | ^^^^^^^^^^^^^
+> 10 |   getTaskDetail,
+     | ^^^^^^^^^^^^^^^^
+> 11 |   updateTask,
+     | ^^^^^^^^^^^^^
+> 12 | } from "@/actions/home/kanban/tasks";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  13 | import { getTaskSkillCategories } from "@/actions/home/kanban/skill-categories";
+  14 | import { Button } from "@/components/global/ui/button";
+  15 | import KanbanRichTextEditor from "@/components/home/kanban/KanbanRichTextEditor";
+
+The export getTaskDetail was not found in module [project]/apps/codebility/actions/home/kanban/tasks.ts [app-client] (ecmascript).
+Did you mean to import createTask?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/[sprintId]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/[sprintId]/page.tsx [Server Component] 
+[36m[browser][39m ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx:8:1
+Error: Export getTaskDetail doesn't exist in target module
+   6 | import { useRouter } from "next/navigation";
+   7 |
+>  8 | import {
+     | ^^^^^^^
+>  9 |   createTask,
+     | ^^^^^^^^^^^^^
+> 10 |   getTaskDetail,
+     | ^^^^^^^^^^^^^^^^
+> 11 |   updateTask,
+     | ^^^^^^^^^^^^^
+> 12 | } from "@/actions/home/kanban/tasks";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  13 | import { getTaskSkillCategories } from "@/actions/home/kanban/skill-categories";
+  14 | import { Button } from "@/components/global/ui/button";
+  15 | import KanbanRichTextEditor from "@/components/home/kanban/KanbanRichTextEditor";
+
+The export getTaskDetail was not found in module [project]/apps/codebility/actions/home/kanban/tasks.ts [app-ssr] (ecmascript).
+Did you mean to import createTask?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/[sprintId]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/[sprintId]/page.tsx [Server Component] 
+[36m[browser][39m [31mUncaught Error: ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx:8:1
+Error: Export getTaskDetail doesn't exist in target module
+   6 | import { useRouter } from "next/navigation";
+   7 |
+>  8 | import {
+     | ^^^^^^^
+>  9 |   createTask,
+     | ^^^^^^^^^^^^^
+> 10 |   getTaskDetail,
+     | ^^^^^^^^^^^^^^^^
+> 11 |   updateTask,
+     | ^^^^^^^^^^^^^
+> 12 | } from "@/actions/home/kanban/tasks";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  13 | import { getTaskSkillCategories } from "@/actions/home/kanban/skill-categories";
+  14 | import { Button } from "@/components/global/ui/button";
+  15 | import KanbanRichTextEditor from "@/components/home/kanban/KanbanRichTextEditor";
+
+The export getTaskDetail was not found in module [project]/apps/codebility/actions/home/kanban/tasks.ts [app-client] (ecmascript).
+Did you mean to import createTask?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/page.tsx [Server Component]
+
+[39m
+[31m    at <unknown> (Error: ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx:8:1)
+    at <unknown> (Error: (./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx:8:1)[39m
+[36m[browser][39m ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx:8:1
+Error: Export getTaskDetail doesn't exist in target module
+   6 | import { useRouter } from "next/navigation";
+   7 |
+>  8 | import {
+     | ^^^^^^^
+>  9 |   createTask,
+     | ^^^^^^^^^^^^^
+> 10 |   getTaskDetail,
+     | ^^^^^^^^^^^^^^^^
+> 11 |   updateTask,
+     | ^^^^^^^^^^^^^
+> 12 | } from "@/actions/home/kanban/tasks";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  13 | import { getTaskSkillCategories } from "@/actions/home/kanban/skill-categories";
+  14 | import { Button } from "@/components/global/ui/button";
+  15 | import KanbanRichTextEditor from "@/components/home/kanban/KanbanRichTextEditor";
+
+The export getTaskDetail was not found in module [project]/apps/codebility/actions/home/kanban/tasks.ts [app-client] (ecmascript).
+Did you mean to import createTask?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/page.tsx [Server Component] 
+[36m[browser][39m ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx:8:1
+Error: Export getTaskDetail doesn't exist in target module
+   6 | import { useRouter } from "next/navigation";
+   7 |
+>  8 | import {
+     | ^^^^^^^
+>  9 |   createTask,
+     | ^^^^^^^^^^^^^
+> 10 |   getTaskDetail,
+     | ^^^^^^^^^^^^^^^^
+> 11 |   updateTask,
+     | ^^^^^^^^^^^^^
+> 12 | } from "@/actions/home/kanban/tasks";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  13 | import { getTaskSkillCategories } from "@/actions/home/kanban/skill-categories";
+  14 | import { Button } from "@/components/global/ui/button";
+  15 | import KanbanRichTextEditor from "@/components/home/kanban/KanbanRichTextEditor";
+
+The export getTaskDetail was not found in module [project]/apps/codebility/actions/home/kanban/tasks.ts [app-ssr] (ecmascript).
+Did you mean to import createTask?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/page.tsx [Server Component] 
+[31m[1m⨯[22m[39m ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx:8:1
+[1m[31mError[39m: Export [32mgetTaskDetail[39m doesn't exist in target module[22m
+  [90m 6 |[0m [36mimport[0m { useRouter } [36mfrom[0m [32m"next/navigation"[0m;
+  [90m 7 |[0m
+[31m[1m>[0m [90m 8 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m 9 |[0m   createTask,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m10 |[0m   getTaskDetail,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m11 |[0m   updateTask,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m12 |[0m } [36mfrom[0m [32m"@/actions/home/kanban/tasks"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m13 |[0m [36mimport[0m { getTaskSkillCategories } [36mfrom[0m [32m"@/actions/home/kanban/skill-categories"[0m;
+  [90m14 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/global/ui/button"[0m;
+  [90m15 |[0m [36mimport[0m [33mKanbanRichTextEditor[0m [36mfrom[0m [32m"@/components/home/kanban/KanbanRichTextEditor"[0m;
+
+The export [32mgetTaskDetail[39m was not found in module [1m[31m[project]/apps/codebility/actions/home/kanban/tasks.ts [app-client] (ecmascript)[39m[22m.
+Did you mean to import [32mcreateTask[39m?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/[sprintId]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/[sprintId]/page.tsx [Server Component]
+
+
+
+./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx:8:1
+[1m[31mError[39m: Export [32mgetTaskDetail[39m doesn't exist in target module[22m
+  [90m 6 |[0m [36mimport[0m { useRouter } [36mfrom[0m [32m"next/navigation"[0m;
+  [90m 7 |[0m
+[31m[1m>[0m [90m 8 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m 9 |[0m   createTask,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m10 |[0m   getTaskDetail,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m11 |[0m   updateTask,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m12 |[0m } [36mfrom[0m [32m"@/actions/home/kanban/tasks"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m13 |[0m [36mimport[0m { getTaskSkillCategories } [36mfrom[0m [32m"@/actions/home/kanban/skill-categories"[0m;
+  [90m14 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/global/ui/button"[0m;
+  [90m15 |[0m [36mimport[0m [33mKanbanRichTextEditor[0m [36mfrom[0m [32m"@/components/home/kanban/KanbanRichTextEditor"[0m;
+
+The export [32mgetTaskDetail[39m was not found in module [1m[31m[project]/apps/codebility/actions/home/kanban/tasks.ts [app-ssr] (ecmascript)[39m[22m.
+Did you mean to import [32mcreateTask[39m?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/[sprintId]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/[sprintId]/page.tsx [Server Component]
+
+
+[36m[browser][39m ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx:8:1
+Error: Export getTaskDetail doesn't exist in target module
+   6 | import { useRouter } from "next/navigation";
+   7 |
+>  8 | import {
+     | ^^^^^^^
+>  9 |   createTask,
+     | ^^^^^^^^^^^^^
+> 10 |   getTaskDetail,
+     | ^^^^^^^^^^^^^^^^
+> 11 |   updateTask,
+     | ^^^^^^^^^^^^^
+> 12 | } from "@/actions/home/kanban/tasks";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  13 | import { getTaskSkillCategories } from "@/actions/home/kanban/skill-categories";
+  14 | import { Button } from "@/components/global/ui/button";
+  15 | import KanbanRichTextEditor from "@/components/home/kanban/KanbanRichTextEditor";
+
+The export getTaskDetail was not found in module [project]/apps/codebility/actions/home/kanban/tasks.ts [app-client] (ecmascript).
+Did you mean to import createTask?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/page.tsx [Server Component] 
+[36m[browser][39m ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx:8:1
+Error: Export getTaskDetail doesn't exist in target module
+   6 | import { useRouter } from "next/navigation";
+   7 |
+>  8 | import {
+     | ^^^^^^^
+>  9 |   createTask,
+     | ^^^^^^^^^^^^^
+> 10 |   getTaskDetail,
+     | ^^^^^^^^^^^^^^^^
+> 11 |   updateTask,
+     | ^^^^^^^^^^^^^
+> 12 | } from "@/actions/home/kanban/tasks";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  13 | import { getTaskSkillCategories } from "@/actions/home/kanban/skill-categories";
+  14 | import { Button } from "@/components/global/ui/button";
+  15 | import KanbanRichTextEditor from "@/components/home/kanban/KanbanRichTextEditor";
+
+The export getTaskDetail was not found in module [project]/apps/codebility/actions/home/kanban/tasks.ts [app-ssr] (ecmascript).
+Did you mean to import createTask?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/page.tsx [Server Component] 
+ GET /home/kanban/e0124447-1978-400f-bfc7-7ea2f974d100/a3c91d2e-2122-40f7-bc42-0cdb5e8e1784 [31m500[39m in 1655ms[2m (next.js: 82ms, proxy.ts: 1541ms, application-code: 31ms)[22m
+[36m[browser][39m ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx:8:1
+Error: Export getTaskDetail doesn't exist in target module
+   6 | import { useRouter } from "next/navigation";
+   7 |
+>  8 | import {
+     | ^^^^^^^
+>  9 |   createTask,
+     | ^^^^^^^^^^^^^
+> 10 |   getTaskDetail,
+     | ^^^^^^^^^^^^^^^^
+> 11 |   updateTask,
+     | ^^^^^^^^^^^^^
+> 12 | } from "@/actions/home/kanban/tasks";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  13 | import { getTaskSkillCategories } from "@/actions/home/kanban/skill-categories";
+  14 | import { Button } from "@/components/global/ui/button";
+  15 | import KanbanRichTextEditor from "@/components/home/kanban/KanbanRichTextEditor";
+
+The export getTaskDetail was not found in module [project]/apps/codebility/actions/home/kanban/tasks.ts [app-client] (ecmascript).
+Did you mean to import createTask?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/page.tsx [Server Component] 
+[36m[browser][39m ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx:8:1
+Error: Export getTaskDetail doesn't exist in target module
+   6 | import { useRouter } from "next/navigation";
+   7 |
+>  8 | import {
+     | ^^^^^^^
+>  9 |   createTask,
+     | ^^^^^^^^^^^^^
+> 10 |   getTaskDetail,
+     | ^^^^^^^^^^^^^^^^
+> 11 |   updateTask,
+     | ^^^^^^^^^^^^^
+> 12 | } from "@/actions/home/kanban/tasks";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  13 | import { getTaskSkillCategories } from "@/actions/home/kanban/skill-categories";
+  14 | import { Button } from "@/components/global/ui/button";
+  15 | import KanbanRichTextEditor from "@/components/home/kanban/KanbanRichTextEditor";
+
+The export getTaskDetail was not found in module [project]/apps/codebility/actions/home/kanban/tasks.ts [app-ssr] (ecmascript).
+Did you mean to import createTask?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/page.tsx [Server Component] 
+[36m[browser][39m [31mUncaught Error: ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx:8:1
+Error: Export getTaskDetail doesn't exist in target module
+   6 | import { useRouter } from "next/navigation";
+   7 |
+>  8 | import {
+     | ^^^^^^^
+>  9 |   createTask,
+     | ^^^^^^^^^^^^^
+> 10 |   getTaskDetail,
+     | ^^^^^^^^^^^^^^^^
+> 11 |   updateTask,
+     | ^^^^^^^^^^^^^
+> 12 | } from "@/actions/home/kanban/tasks";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  13 | import { getTaskSkillCategories } from "@/actions/home/kanban/skill-categories";
+  14 | import { Button } from "@/components/global/ui/button";
+  15 | import KanbanRichTextEditor from "@/components/home/kanban/KanbanRichTextEditor";
+
+The export getTaskDetail was not found in module [project]/apps/codebility/actions/home/kanban/tasks.ts [app-client] (ecmascript).
+Did you mean to import createTask?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/page.tsx [Server Component]
+
+[39m
+[31m    at <unknown> (Error: ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx:8:1)
+    at <unknown> (Error: (./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx:8:1)[39m
+[36m[browser][39m ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx:8:1
+Error: Export getTaskDetail doesn't exist in target module
+   6 | import { useRouter } from "next/navigation";
+   7 |
+>  8 | import {
+     | ^^^^^^^
+>  9 |   createTask,
+     | ^^^^^^^^^^^^^
+> 10 |   getTaskDetail,
+     | ^^^^^^^^^^^^^^^^
+> 11 |   updateTask,
+     | ^^^^^^^^^^^^^
+> 12 | } from "@/actions/home/kanban/tasks";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  13 | import { getTaskSkillCategories } from "@/actions/home/kanban/skill-categories";
+  14 | import { Button } from "@/components/global/ui/button";
+  15 | import KanbanRichTextEditor from "@/components/home/kanban/KanbanRichTextEditor";
+
+The export getTaskDetail was not found in module [project]/apps/codebility/actions/home/kanban/tasks.ts [app-client] (ecmascript).
+Did you mean to import createTask?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/page.tsx [Server Component] 
+[36m[browser][39m ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx:8:1
+Error: Export getTaskDetail doesn't exist in target module
+   6 | import { useRouter } from "next/navigation";
+   7 |
+>  8 | import {
+     | ^^^^^^^
+>  9 |   createTask,
+     | ^^^^^^^^^^^^^
+> 10 |   getTaskDetail,
+     | ^^^^^^^^^^^^^^^^
+> 11 |   updateTask,
+     | ^^^^^^^^^^^^^
+> 12 | } from "@/actions/home/kanban/tasks";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  13 | import { getTaskSkillCategories } from "@/actions/home/kanban/skill-categories";
+  14 | import { Button } from "@/components/global/ui/button";
+  15 | import KanbanRichTextEditor from "@/components/home/kanban/KanbanRichTextEditor";
+
+The export getTaskDetail was not found in module [project]/apps/codebility/actions/home/kanban/tasks.ts [app-ssr] (ecmascript).
+Did you mean to import createTask?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/page.tsx [Server Component] 
+[36m[browser][39m ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx:8:1
+Error: Export getTaskDetail doesn't exist in target module
+   6 | import { useRouter } from "next/navigation";
+   7 |
+>  8 | import {
+     | ^^^^^^^
+>  9 |   createTask,
+     | ^^^^^^^^^^^^^
+> 10 |   getTaskDetail,
+     | ^^^^^^^^^^^^^^^^
+> 11 |   updateTask,
+     | ^^^^^^^^^^^^^
+> 12 | } from "@/actions/home/kanban/tasks";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  13 | import { getTaskSkillCategories } from "@/actions/home/kanban/skill-categories";
+  14 | import { Button } from "@/components/global/ui/button";
+  15 | import KanbanRichTextEditor from "@/components/home/kanban/KanbanRichTextEditor";
+
+The export getTaskDetail was not found in module [project]/apps/codebility/actions/home/kanban/tasks.ts [app-client] (ecmascript).
+Did you mean to import createTask?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/[sprintId]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/[sprintId]/page.tsx [Server Component] 
+[36m[browser][39m ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx:8:1
+Error: Export getTaskDetail doesn't exist in target module
+   6 | import { useRouter } from "next/navigation";
+   7 |
+>  8 | import {
+     | ^^^^^^^
+>  9 |   createTask,
+     | ^^^^^^^^^^^^^
+> 10 |   getTaskDetail,
+     | ^^^^^^^^^^^^^^^^
+> 11 |   updateTask,
+     | ^^^^^^^^^^^^^
+> 12 | } from "@/actions/home/kanban/tasks";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  13 | import { getTaskSkillCategories } from "@/actions/home/kanban/skill-categories";
+  14 | import { Button } from "@/components/global/ui/button";
+  15 | import KanbanRichTextEditor from "@/components/home/kanban/KanbanRichTextEditor";
+
+The export getTaskDetail was not found in module [project]/apps/codebility/actions/home/kanban/tasks.ts [app-ssr] (ecmascript).
+Did you mean to import createTask?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/[sprintId]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/[sprintId]/page.tsx [Server Component] 
+[36m[browser][39m ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx:8:1
+Error: Export getTaskDetail doesn't exist in target module
+   6 | import { useRouter } from "next/navigation";
+   7 |
+>  8 | import {
+     | ^^^^^^^
+>  9 |   createTask,
+     | ^^^^^^^^^^^^^
+> 10 |   getTaskDetail,
+     | ^^^^^^^^^^^^^^^^
+> 11 |   updateTask,
+     | ^^^^^^^^^^^^^
+> 12 | } from "@/actions/home/kanban/tasks";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  13 | import { getTaskSkillCategories } from "@/actions/home/kanban/skill-categories";
+  14 | import { Button } from "@/components/global/ui/button";
+  15 | import KanbanRichTextEditor from "@/components/home/kanban/KanbanRichTextEditor";
+
+The export getTaskDetail was not found in module [project]/apps/codebility/actions/home/kanban/tasks.ts [app-client] (ecmascript).
+Did you mean to import createTask?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/page.tsx [Server Component] 
+[36m[browser][39m ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx:8:1
+Error: Export getTaskDetail doesn't exist in target module
+   6 | import { useRouter } from "next/navigation";
+   7 |
+>  8 | import {
+     | ^^^^^^^
+>  9 |   createTask,
+     | ^^^^^^^^^^^^^
+> 10 |   getTaskDetail,
+     | ^^^^^^^^^^^^^^^^
+> 11 |   updateTask,
+     | ^^^^^^^^^^^^^
+> 12 | } from "@/actions/home/kanban/tasks";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  13 | import { getTaskSkillCategories } from "@/actions/home/kanban/skill-categories";
+  14 | import { Button } from "@/components/global/ui/button";
+  15 | import KanbanRichTextEditor from "@/components/home/kanban/KanbanRichTextEditor";
+
+The export getTaskDetail was not found in module [project]/apps/codebility/actions/home/kanban/tasks.ts [app-ssr] (ecmascript).
+Did you mean to import createTask?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component Browser]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./apps/codebility/components/home/kanban/TaskCreateDrawer.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Client Component SSR]
+    ./apps/codebility/components/home/kanban/KanbanOverlays.tsx [Server Component]
+    ./apps/codebility/app/home/kanban/[projectId]/page.tsx [Server Component] 
+[31m[1m⨯[22m[39m The directory at "C:\Users\Dev\Desktop\Dev\codebility-plus\apps\codebility\.next\dev" was deleted.
+
+Deleting this directory while Next.js is running can lead to undefined behavior. Restarting the server to recover...
+[1m[38;2;173;127;168m▲ Next.js 16.3.7[39m[22m (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.1.11:3000
+- Environments: .env
+[32m[1m✓[22m[39m Ready in 784ms
+[32m[1m✓[22m[39m Running next.config.mjs took 61ms
+- Cache Components enabled
+- Experiments (use with caution):
+  · serverActions
+  · staleTimes
+
+[37m[1m○[22m[39m Compiling /auth/sign-in ...
+(node:15816) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/Dev/Desktop/Dev/codebility-plus/tooling/tailwind/web.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to \\?\C:\Users\Dev\Desktop\Dev\codebility-plus\tooling\tailwind\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[1m[33mwarn[39m[22m - The class `data-[state=closed]:slide-out-to-top-[48%]` is ambiguous and matches multiple utilities.
+[1m[33mwarn[39m[22m - If this is content and not a class, replace it with `data-&lsqb;state=closed&rsqb;:slide-out-to-top-[48%]` to silence this warning.
+
+[1m[33mwarn[39m[22m - The class `data-[state=open]:slide-in-from-top-[48%]` is ambiguous and matches multiple utilities.
+[1m[33mwarn[39m[22m - If this is content and not a class, replace it with `data-&lsqb;state=open&rsqb;:slide-in-from-top-[48%]` to silence this warning.
+ GET /auth/sign-in?from=%2Fhome%2Fkanban [32m200[39m in 14.6s[2m (next.js: 13.8s, proxy.ts: 17ms, application-code: 778ms)[22m
+[?25h
+ ELIFECYCLE  Command failed with exit code 1.

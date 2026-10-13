@@ -17,7 +17,10 @@ function readFreshCache(term: string): AssigneeOption[] | undefined {
   return entry.rows;
 }
 
-export function useAssigneeCandidates(query: string): {
+export function useAssigneeCandidates(
+  query: string,
+  projectId: string,
+): {
   candidates: AssigneeOption[];
   isLoading: boolean;
   error: string | null;
@@ -29,28 +32,29 @@ export function useAssigneeCandidates(query: string): {
   } | null>(null);
 
   const term = query.trim();
-  const cached = readFreshCache(term);
-  const current = entry?.term === term ? entry : null;
+  const cacheKey = `${projectId}:${term}`;
+  const cached = readFreshCache(cacheKey);
+  const current = entry?.term === cacheKey ? entry : null;
   const candidates = cached ?? current?.rows ?? [];
   const error = current?.error ?? null;
   const isLoading = cached === undefined && current === null;
 
   useEffect(() => {
-    if (readFreshCache(term)) return;
+    if (readFreshCache(cacheKey)) return;
 
     let active = true;
 
     const timer = setTimeout(() => {
-      searchAssignees(term)
+      searchAssignees(term, projectId)
         .then((rows) => {
-          cache.set(term, { rows, at: Date.now() });
+          cache.set(cacheKey, { rows, at: Date.now() });
           if (!active) return;
-          setEntry({ term, rows, error: null });
+          setEntry({ term: cacheKey, rows, error: null });
         })
         .catch((caught) => {
           if (!active) return;
           setEntry({
-            term,
+            term: cacheKey,
             rows: [],
             error:
               caught instanceof Error
@@ -64,7 +68,7 @@ export function useAssigneeCandidates(query: string): {
       active = false;
       clearTimeout(timer);
     };
-  }, [term]);
+  }, [cacheKey, projectId, term]);
 
   return { candidates, isLoading, error };
 }

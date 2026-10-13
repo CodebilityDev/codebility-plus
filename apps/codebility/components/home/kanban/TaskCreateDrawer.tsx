@@ -5,7 +5,11 @@ import { useEffect, useState } from "react";
 
 import { useRouter } from "next/navigation";
 
-import { createTask, updateTask } from "@/actions/home/kanban/tasks";
+import {
+  createTask,
+  getTaskDetail,
+  updateTask,
+} from "@/actions/home/kanban/tasks";
 import { getTaskSkillCategories } from "@/actions/home/kanban/skill-categories";
 import { Button } from "@/components/global/ui/button";
 import KanbanRichTextEditor from "@/components/home/kanban/KanbanRichTextEditor";
@@ -18,7 +22,7 @@ import {
 } from "@/constants/home/kanban/kanban";
 import { useModal } from "@/hooks/global/use-modal";
 import { useKanbanStore } from "@/providers/home/kanban/KanbanStoreProvider";
-import type { SkillCategoryOption } from "@/types/home/kanban/kanban";
+import type { KanbanTask, SkillCategoryOption } from "@/types/home/kanban/kanban";
 
 import { Button as IconButton } from "@codevs/ui/button";
 import {
@@ -56,6 +60,10 @@ function capitalize(value: string) {
   return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
+let skillCategoryCache: { rows: SkillCategoryOption[]; at: number } | null =
+  null;
+const SKILL_CATEGORY_TTL_MS = 5 * 60 * 1000;
+
 export default function TaskCreateDrawer() {
   const router = useRouter();
   const isOpen = useModal((state) => state.isOpen);
@@ -65,6 +73,7 @@ export default function TaskCreateDrawer() {
   const task = useKanbanStore((state) =>
     taskId ? state.tasksById[taskId] : undefined,
   );
+  const projectId = useKanbanStore((state) => state.projectId);
   const resolvedColumnId = task ? task.columnId : columnId;
   const columnName = useKanbanStore((state) =>
     resolvedColumnId ? state.columnsById[resolvedColumnId]?.name : undefined,
@@ -88,15 +97,26 @@ export default function TaskCreateDrawer() {
   const [skillCategories, setSkillCategories] = useState<SkillCategoryOption[]>(
     [],
   );
+  const [detail, setDetail] = useState<KanbanTask | null>(null);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (
+      skillCategoryCache &&
+      Date.now() - skillCategoryCache.at < SKILL_CATEGORY_TTL_MS
+    ) {
+      setSkillCategories(skillCategoryCache.rows);
+      return;
+    }
+
     let active = true;
 
     getTaskSkillCategories()
       .then((rows) => {
-        if (active) setSkillCategories(rows);
+        if (!active) return;
+        skillCategoryCache = { rows, at: Date.now() };
+        setSkillCategories(rows);
       })
       .catch(() => {
         if (active) setSkillCategories([]);
@@ -106,6 +126,41 @@ export default function TaskCreateDrawer() {
       active = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (!taskId) {
+      setDetail(null);
+      return;
+    }
+
+    let active = true;
+
+    getTaskDetail(taskId)
+      .then((row) => {
+        if (active) setDetail(row);
+      })
+      .catch(() => {
+        if (active) setDetail(null);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [taskId]);
+
+  useEffect(() => {
+    if (!detail) return;
+
+    setTitle(detail.title);
+    setPriority(detail.priority ?? "");
+    setDifficulty(detail.difficulty ?? "");
+    setType(detail.type ?? "");
+    setSkillCategoryId(detail.skillCategoryId ?? "");
+    setDeadline(toDateInput(detail.deadline));
+    setCodevId(detail.codevId ?? "");
+    setSidekickIds(detail.sidekickIds);
+    setDescription(detail.description ?? "");
+  }, [detail]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -172,7 +227,7 @@ export default function TaskCreateDrawer() {
     }
   }
 
-  if (!resolvedColumnId) return null;
+  if (!resolvedColumnId || !projectId) return null;
 
   return (
     <Drawer
@@ -325,7 +380,9 @@ export default function TaskCreateDrawer() {
               <TaskAssigneePicker
                 label="primary assignee"
                 multiple={false}
+                projectId={projectId}
                 disabledIds={sidekickIds}
+                value={codevId ? [codevId] : []}
                 onChange={(ids) => setCodevId(ids[0] ?? "")}
               />
             </div>
@@ -339,7 +396,9 @@ export default function TaskCreateDrawer() {
               <TaskAssigneePicker
                 label="sidekick helper"
                 multiple
+                projectId={projectId}
                 disabledIds={codevId ? [codevId] : []}
+                value={sidekickIds}
                 onChange={setSidekickIds}
               />
             </div>

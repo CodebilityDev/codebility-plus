@@ -7,12 +7,20 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { createProject } from "@/actions/home/projects/projects";
+import { uploadProjectImage } from "@/actions/home/projects/upload-image";
+import {
+  COVER_IMAGE_MIN_WIDTH,
+  COVER_IMAGE_MIN_HEIGHT,
+  COVER_IMAGE_MAX_FILE_SIZE,
+  COVER_IMAGE_ALLOWED_TYPES,
+} from "@/constants/home/projects/projects";
 import { Button } from "@/components/global/ui/button";
 import { useModal } from "@/hooks/global/use-modal";
 import type { ProjectFormInput } from "@/types/home/projects/projects";
 
 import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
+import Image from "next/image";
 import {
   Sheet,
   SheetContent,
@@ -41,17 +49,82 @@ function readList(data: FormData, field: string) {
   return items.length > 0 ? items : undefined;
 }
 
+function getImageDimensions(file: File): Promise<{ width: number; height: number }> {
+  return new Promise((resolve, reject) => {
+    const img = document.createElement("img");
+    img.onload = () => {
+      resolve({ width: img.width, height: img.height });
+    };
+    img.onerror = () => {
+      reject(new Error("Failed to load image"));
+    };
+    img.src = URL.createObjectURL(file);
+  });
+}
+
 export default function ProjectCreateDrawer() {
   const router = useRouter();
   const { isOpen, onClose } = useModal();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [coverImage, setCoverImage] = useState<File | null>(null);
+  const [coverImagePreview, setCoverImagePreview] = useState<string | null>(null);
+  const [coverImageError, setCoverImageError] = useState<string | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+
+  async function handleCoverImageChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    setCoverImageError(null);
+
+    if (!file) {
+      setCoverImage(null);
+      setCoverImagePreview(null);
+      return;
+    }
+
+    if (!COVER_IMAGE_ALLOWED_TYPES.includes(file.type as (typeof COVER_IMAGE_ALLOWED_TYPES)[number])) {
+      setCoverImageError("Invalid file type. Only JPEG, PNG, and WebP are allowed.");
+      return;
+    }
+
+    if (file.size > COVER_IMAGE_MAX_FILE_SIZE) {
+      setCoverImageError("File size exceeds 5MB limit.");
+      return;
+    }
+
+    const dimensions = await getImageDimensions(file);
+    if (dimensions.width < COVER_IMAGE_MIN_WIDTH || dimensions.height < COVER_IMAGE_MIN_HEIGHT) {
+      setCoverImageError(
+        `Image must be at least ${COVER_IMAGE_MIN_WIDTH}x${COVER_IMAGE_MIN_HEIGHT} pixels. Current: ${dimensions.width}x${dimensions.height}.`,
+      );
+      return;
+    }
+
+    setCoverImage(file);
+    setCoverImagePreview(URL.createObjectURL(file));
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const form = event.currentTarget;
     const data = new FormData(form);
+
+    let mainImage: string | undefined;
+
+    if (coverImage) {
+      setUploadingImage(true);
+      try {
+        mainImage = await uploadProjectImage(coverImage);
+      } catch (caught) {
+        setUploadingImage(false);
+        setError(
+          caught instanceof Error ? caught.message : "Could not upload cover image.",
+        );
+        return;
+      }
+      setUploadingImage(false);
+    }
 
     const input: ProjectFormInput = {
       name: readField(data, "name").trim(),
@@ -67,6 +140,7 @@ export default function ProjectCreateDrawer() {
       meetingLink: readOptional(data, "meetingLink"),
       techStack: readList(data, "techStack"),
       keyFeatures: readList(data, "keyFeatures"),
+      mainImage,
     };
 
     setPending(true);
@@ -75,6 +149,8 @@ export default function ProjectCreateDrawer() {
     try {
       await createProject(input);
       form.reset();
+      setCoverImage(null);
+      setCoverImagePreview(null);
       onClose();
       router.refresh();
     } catch (caught) {
@@ -158,6 +234,35 @@ export default function ProjectCreateDrawer() {
               placeholder="Auth, Dashboard, API"
             />
           </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="project-cover-image">Cover image</Label>
+            <Input
+              id="project-cover-image"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={handleCoverImageChange}
+              disabled={uploadingImage}
+            />
+            <p className="text-xs text-muted-foreground">
+              Minimum {COVER_IMAGE_MIN_WIDTH}x{COVER_IMAGE_MIN_HEIGHT}px. Max 5MB. JPEG, PNG, WebP.
+            </p>
+            {coverImagePreview && (
+              <div className="relative w-full max-w-xs aspect-video">
+                <Image
+                  src={coverImagePreview}
+                  alt="Cover preview"
+                  fill
+                  className="object-cover rounded-lg"
+                  unoptimized
+                />
+              </div>
+            )}
+            {coverImageError && (
+              <p role="alert" className="text-sm text-destructive">
+                {coverImageError}
+              </p>
+            )}
+          </div>
           {error && (
             <p role="alert" className="text-sm text-destructive">
               {error}
@@ -165,8 +270,8 @@ export default function ProjectCreateDrawer() {
           )}
           <Button
             type="submit"
-            loading={pending}
-            loadingText="Creating project..."
+            loading={pending || uploadingImage}
+            loadingText={uploadingImage ? "Uploading image..." : "Creating project..."}
           >
             Create project
           </Button>

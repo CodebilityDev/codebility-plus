@@ -31,7 +31,7 @@ export default function ProjectDetailPage({
 
 async function ProjectDetailContent({ params }: ProjectDetailPageProps) {
   const { projectId } = await params;
-  const [project, contributors, accessibleProjectIds, { hasFullAccess }] =
+  const [project, contributors, accessibleProjectIds, { hasFullAccess, roleId }] =
     await Promise.all([
       getCachedProject(projectId),
       getCachedContributors(projectId),
@@ -47,7 +47,7 @@ async function ProjectDetailContent({ params }: ProjectDetailPageProps) {
 
   return (
     <div className="flex flex-col gap-6">
-      <ProjectDetailHeader project={project} canManage={hasFullAccess} />
+      <ProjectDetailHeader project={project} canManage={hasFullAccess} roleId={roleId} />
       <ProjectDetailInfo project={project} />
       <ProjectDetailContributors
         projectId={projectId}

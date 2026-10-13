@@ -16,6 +16,7 @@ export const NO_PERMISSIONS: RolePermissions = PERMISSION_KEYS.reduce(
 export const getAccess = cache(
   async (): Promise<{
     roleId: number | null;
+    roleName: string | null;
     hasFullAccess: boolean;
     permissions: RolePermissions;
   }> => {
@@ -24,27 +25,31 @@ export const getAccess = cache(
     const roleId = sidebarRoleId === null || sidebarRoleId === -1 ? null : sidebarRoleId;
 
     if (roleId === null) {
-      return { roleId: null, hasFullAccess: false, permissions: NO_PERMISSIONS };
+      return { roleId: null, roleName: null, hasFullAccess: false, permissions: NO_PERMISSIONS };
     }
 
     const supabase = await createClientServerComponent();
 
-    const { data } = await supabase
+    const { data: roleData } = await supabase
       .from("roles")
-      .select(PERMISSION_COLUMNS)
+      .select(PERMISSION_COLUMNS + ", name")
       .eq("id", roleId)
       .single();
 
-    if (!data) {
-      return { roleId: null, hasFullAccess: false, permissions: NO_PERMISSIONS };
+    if (!roleData) {
+      return { roleId: null, roleName: null, hasFullAccess: false, permissions: NO_PERMISSIONS };
     }
+
+    const roleRecord = roleData as unknown as Record<string, unknown>;
+    const roleName = roleRecord.name as string | null;
 
     return {
       roleId,
+      roleName,
       hasFullAccess: isFullAccess(roleId),
       permissions: PERMISSION_KEYS.reduce(
         (acc, key) => {
-          acc[key] = Boolean(data[key]);
+          acc[key] = Boolean(roleRecord[key]);
           return acc;
         },
         {} as RolePermissions,

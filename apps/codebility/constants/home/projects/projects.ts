@@ -11,3 +11,8 @@ export const CANDIDATE_COLUMNS =
   "id, first_name, last_name, image_url, display_position, username, roles(name)";
 
 export const CANDIDATE_PAGE_SIZE = 20;
+
+export const COVER_IMAGE_MIN_WIDTH = 1200;
+export const COVER_IMAGE_MIN_HEIGHT = 675;
+export const COVER_IMAGE_MAX_FILE_SIZE = 5 * 1024 * 1024;
+export const COVER_IMAGE_ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"] as const;

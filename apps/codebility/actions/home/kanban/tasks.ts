@@ -1,13 +1,17 @@
 "use server";
 
 import { updateTag } from "next/cache";
-import { TASK_COLUMNS } from "@/constants/home/kanban/kanban";
+import {
+  TASK_COLUMNS,
+  TASK_DETAIL_COLUMNS,
+} from "@/constants/home/kanban/kanban";
 import { CACHE_TAGS } from "@/lib/global/cache-tags";
 import {
   requirePermission,
   requireProjectAccessForEntities,
 } from "@/lib/global/permissions";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
+import type { KanbanTask } from "@/types/home/kanban/kanban";
 import {
   assignPositions,
   resolveIndex,
@@ -55,6 +59,44 @@ const updateTaskInput = z.object({
 });
 
 const taskIdSchema = z.string().min(1);
+
+export async function getTaskDetail(taskId: string): Promise<KanbanTask | null> {
+  const id = taskIdSchema.parse(taskId);
+
+  await requirePermission("kanban");
+  await requireProjectAccessForEntities({ taskIds: [id] });
+
+  const supabase = await createClientServerComponent();
+
+  const { data, error } = await supabase
+    .from("tasks")
+    .select(TASK_DETAIL_COLUMNS)
+    .eq("id", id)
+    .eq("is_archive", false)
+    .maybeSingle();
+
+  if (error) throw error;
+
+  if (!data) return null;
+
+  return {
+    id: data.id,
+    title: data.title,
+    description: data.description,
+    columnId: data.kanban_column_id ?? "",
+    position: data.position,
+    priority: data.priority,
+    codevId: data.codev_id,
+    dueDate: data.due_date,
+    updatedAt: data.updated_at,
+    difficulty: data.difficulty,
+    points: data.points,
+    type: data.type,
+    skillCategoryId: data.skill_category_id,
+    deadline: data.deadline,
+    sidekickIds: data.sidekick_ids ?? [],
+  };
+}
 
 export async function syncTaskMoves(input: {
   moves: {
