@@ -1,12 +1,13 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 
-import FeaturedSection from "../_shared/CodevsFeaturedCection";
-import CodevsFeaturedProjectsSection from "../_shared/CodevsFeaturedProjectsSection";
-import CodevsProfiles from "../_shared/CodevsProfiles";
-import CTA from "../_shared/CodevsCta";
-import Hero from "./_components/CodevsHero";
-import CodevsRoadmapStatic from "./_components/CodevsRoadmapStatic";
-import MissionVision from "./_components/CodevsMissionVision";
+import FeaturedSection from "@/components/global/marketing/CodevsFeaturedSection";
+import CodevsFeaturedProjectsSection from "@/components/global/marketing/CodevsFeaturedProjectsSection";
+import CodevsProfiles from "@/components/global/marketing/CodevsProfiles";
+import CTA from "@/components/marketing/codevs/CodevsCta";
+import Hero from "@/components/marketing/codevs/CodevsHero";
+import CodevsRoadmapStatic from "@/components/marketing/codevs/CodevsRoadmapStatic";
+import MissionVision from "@/components/marketing/codevs/CodevsMissionVision";
+import type { CodevsProfilesProps } from "@/types/global/marketing";
 
 export const metadata: Metadata = {
     title: "Our Developers — Meet the Codebility Team",
@@ -26,11 +27,11 @@ export const metadata: Metadata = {
     },
 };
 
-export default function Codevs() {
+export default function Codevs({ searchParams }: CodevsProfilesProps) {
     return (
         <div className="bg-black-400 relative flex w-full flex-col">
             <Hero />
-            <CodevsProfiles />
+            <CodevsProfiles searchParams={searchParams} />
             <FeaturedSection />
             <CodevsFeaturedProjectsSection />
             <CodevsRoadmapStatic />

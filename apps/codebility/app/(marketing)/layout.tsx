@@ -1,19 +1,21 @@
-import { ModalProviderMarketing } from "@/components/providers/modal-provider-marketing";
-import Footer from "./_components/MarketingFooter";
-import Navigation from "./_components/MarketingNavigation";
-import SideNavMenu from "./_components/MarketingSidenavMenu";
+import { ModalProviderMarketing } from "@/providers/marketing/ModalProviderMarketing";
+import Footer from "@/components/marketing/MarketingFooter";
+import Navigation from "@/components/global/marketing/MarketingNavigation";
+import SideNavMenu from "@/components/marketing/MarketingSidenavMenu";
+import { getSiteDate } from "@/lib/global/site-date";
+import type { MarketingLayoutProps } from "@/types/marketing/marketing";
 
 export default async function MarketingLayout({
   children,
-}: {
-  children: React.ReactNode;
-}) {
+}: MarketingLayoutProps) {
+  const { year } = await getSiteDate();
+
   return (
       <main className="bg-black-400 relative w-full overflow-x-hidden">
         <Navigation />
         <SideNavMenu />
         {children}
-        <Footer />
+        <Footer year={year} />
         <ModalProviderMarketing />
       </main>
   );

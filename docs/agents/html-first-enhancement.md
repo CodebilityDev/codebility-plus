@@ -18,6 +18,6 @@ animation mechanics).
 
 **Reference implementations in this repo:**
 
-- `apps/codebility/app/(marketing)/_shared/ProgressiveMotion.tsx`
-- `apps/codebility/app/(marketing)/careers/_components/JobListingsBlock.tsx`
-- `apps/codebility/lib/server/*-cached.ts`
+- `apps/codebility/components/global/marketing/ProgressiveMotion.tsx`
+- `apps/codebility/components/marketing/careers/JobListingsBlock.tsx`
+- `apps/codebility/lib/global/*-cached.ts`

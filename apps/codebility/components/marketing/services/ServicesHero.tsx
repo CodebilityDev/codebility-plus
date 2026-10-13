@@ -1,0 +1,49 @@
+import Container from "@/components/global/marketing/MarketingContainer";
+import MarketingProgressiveSection from "@/components/global/marketing/MarketingProgressiveSection";
+
+export const Hero = () => {
+  const skeleton = (
+    <div className="relative z-10 flex flex-col gap-2 pt-14 text-center 2xl:p-0 lg:pt-0">
+      <h1 className="flex flex-col gap-1 text-3xl font-semibold md:text-5xl">
+        Our Services
+      </h1>
+      <h2 className="text-lg md:text-xl">
+        Partner with Us to Bring Your Vision to Life
+      </h2>
+    </div>
+  );
+
+  return (
+    <div className="relative">
+      <section
+        id="services-hero"
+        className="relative mt-2 flex min-h-[180px] w-full flex-col items-center justify-center overflow-hidden bg-cover bg-no-repeat lg:mt-16"
+      >
+        <Container className="text-white">
+          <MarketingProgressiveSection skeleton={skeleton}>
+            <div className="relative z-10 flex flex-col gap-2 pt-14 text-center 2xl:p-0 lg:pt-0">
+              <h1 className="flex flex-col gap-1 text-3xl font-semibold md:text-5xl">
+                Our Services
+              </h1>
+              <h2 className="text-lg md:text-xl">
+                Partner with Us to Bring Your Vision to Life
+              </h2>
+            </div>
+          </MarketingProgressiveSection>
+        </Container>
+      </section>
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute left-1/2 top-10 -translate-x-1/2 -translate-y-1/2 transform overflow-hidden blur-3xl md:-top-40 lg:top-1/2"
+      >
+        <div
+          style={{
+            clipPath:
+              "polygon(20.7% 28%, 76.2% 29%, 89.8% 59.5%, 87.3% 98%, 70% 100%, 30% 100%, 9.4% 96.8%, 7.3% 64.8%)",
+          }}
+          className="bg-customBlue-200 relative aspect-[855/678] w-[40rem] opacity-30 sm:w-[72.1875rem]"
+        />
+      </div>
+    </div>
+  );
+};

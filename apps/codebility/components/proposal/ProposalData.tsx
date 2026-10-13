@@ -1,0 +1,20 @@
+import { getRealProjects, getCodevProfiles } from "@/lib/global/proposal-public";
+import { getSiteDate } from "@/lib/global/site-date";
+
+import ProposalView from "@/components/global/marketing/ProposalView";
+
+export async function ProposalData() {
+  const [projectsResult, codevsResult, { year }] = await Promise.all([
+    getRealProjects(),
+    getCodevProfiles(),
+    getSiteDate(),
+  ]);
+
+  return (
+    <ProposalView
+      realProjects={projectsResult.data ?? []}
+      codevProfiles={codevsResult.data}
+      year={year}
+    />
+  );
+}

@@ -28,8 +28,6 @@ jobs:
       NEXT_PUBLIC_RESEND_API_KEY: ${{ secrets.NEXT_PUBLIC_RESEND_API_KEY }}
       NEXT_PUBLIC_MESSENGER_WAITLIST: ${{ secrets.NEXT_PUBLIC_MESSENGER_WAITLIST }}
       NEXT_PUBLIC_DISCORD_LINK: ${{ secrets.NEXT_PUBLIC_DISCORD_LINK }}
-      REDIS_URL: ${{ secrets.REDIS_URL }}
-      REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
       DB_SERVICE_ROLE: ${{ secrets.DB_SERVICE_ROLE }}
 
     steps:
@@ -44,7 +42,7 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'pnpm'
 
       # Enhanced caching strategy
@@ -71,6 +69,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Fails on new lint errors and on folder-boundary violations (see AGENTS.md).
+      - name: Lint Codebility
+        run: pnpm --filter codebility lint
+
+      # next build type-checks the app (typescript.ignoreBuildErrors is false).
       - name: Build Codebility
         run: pnpm run codebility:build
 

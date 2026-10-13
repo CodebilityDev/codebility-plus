@@ -1,18 +1,7 @@
-"use client";
-
-import React, { useEffect } from "react";
-import { useUserStore } from "@/store/codev-store";
+import type { ApplicantProfileLayoutProps } from "@/types/applicant/profile/profile";
 
 export default function ApplicantProfileLayout({
   children,
-}: {
-  children: React.ReactNode;
-}) {
-  const { hydrate } = useUserStore();
-
-  useEffect(() => {
-    hydrate();
-  }, [hydrate]);
-
+}: ApplicantProfileLayoutProps) {
   return <div>{children}</div>;
 }

@@ -1,8 +1,20 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
-import { createClientServerComponent } from "@/utils/supabase/server";
-import OnboardingClient from "./_components/OnboardingClient";
+import { createClientServerComponent } from "@/lib/global/supabase-server";
+import OnboardingClient from "@/components/applicant/onboarding/OnboardingClient";
+import OnboardingSkeleton from "@/components/applicant/onboarding/OnboardingSkeleton";
 
-export default async function OnboardingPage() {
+export const instant = false;
+
+export default function OnboardingPage() {
+  return (
+    <Suspense fallback={<OnboardingSkeleton />}>
+      <OnboardingGate />
+    </Suspense>
+  );
+}
+
+async function OnboardingGate() {
   const supabase = await createClientServerComponent();
 
   const {
@@ -13,31 +25,30 @@ export default async function OnboardingPage() {
     redirect("/login");
   }
 
-  // Fetch user's codev data
   const { data: codevData, error: codevError } = await supabase
     .from("codev")
-    .select("*")
+    .select("id, first_name, last_name, application_status")
     .eq("id", user.id)
     .single();
 
-  if (codevError || !codevData) {
+  if (codevError) {
     console.error("Error fetching codev data:", codevError);
     redirect("/applicant/waiting");
   }
 
-  // Check if user is in onboarding status
   if (codevData.application_status !== "onboarding") {
     redirect("/applicant/waiting");
   }
 
-  // Fetch applicant data
   const { data: applicantData, error: applicantError } = await supabase
     .from("applicant")
-    .select("*")
+    .select(
+      "id, quiz_passed, quiz_score, quiz_total, quiz_completed_at, commitment_signed_at",
+    )
     .eq("codev_id", user.id)
     .single();
 
-  if (applicantError || !applicantData) {
+  if (applicantError) {
     console.error("Error fetching applicant data:", applicantError);
     redirect("/applicant/waiting");
   }

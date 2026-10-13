@@ -1,0 +1,64 @@
+"use client";
+
+import { useTransition } from "react";
+import { usePathname, useRouter } from "next/navigation";
+
+import { CodevsGrid } from "@/components/global/marketing/CodevsGrid";
+import { CodevsProfilesFilter } from "@/components/global/marketing/CodevsProfilesFilter";
+import { CodevsPaginationSlot } from "@/components/global/marketing/CodevsPaginationSlot";
+import { CodevsProfilesSkeleton } from "@/components/global/marketing/CodevsProfilesSkeleton";
+import type { CodevsProfilesPaginationProps } from "@/types/global/marketing";
+
+function buildHref(pathname: string, position: string, page: number): string {
+  const params = new URLSearchParams();
+  if (position) params.set("position", position);
+  if (page > 1) params.set("page", String(page));
+
+  const query = params.toString();
+  return query ? `${pathname}?${query}` : pathname;
+}
+
+export default function CodevsProfilesPagination({
+  initialData,
+  pageSize,
+  skillCategories,
+}: CodevsProfilesPaginationProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const [isPending, startTransition] = useTransition();
+
+  const { position, pagination } = initialData;
+  const page = pagination.page;
+
+  const navigate = (nextPosition: string, nextPage: number) => {
+    startTransition(() => {
+      router.push(buildHref(pathname, nextPosition, nextPage), { scroll: false });
+    });
+  };
+
+  return (
+    <div className="m-auto h-full w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+      <CodevsProfilesFilter
+        positions={initialData.positions}
+        selectedPosition={position}
+        onSelect={(next) => navigate(next, 1)}
+      />
+
+      {isPending ? (
+        <CodevsProfilesSkeleton count={pageSize} />
+      ) : (
+        <CodevsGrid
+          codevs={initialData.codevs}
+          page={page}
+          skillCategories={skillCategories}
+        />
+      )}
+
+      <CodevsPaginationSlot
+        page={page}
+        totalPages={Math.max(0, pagination.totalPages)}
+        onPageChange={(next) => navigate(position, next)}
+      />
+    </div>
+  );
+}

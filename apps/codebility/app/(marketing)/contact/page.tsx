@@ -1,8 +1,7 @@
-// Server component wrapper — metadata lives here
-// ACTION REQUIRED: Move the original page.tsx content to ./_components/ContactPage.tsx
-// then paste this file as the new page.tsx
-import { Metadata } from "next";
-import ContactPage from "./_components/ContactPage";
+import type { Metadata } from "next";
+import ContactPage from "@/components/marketing/contact/ContactPage";
+
+export const instant = false;
 
 export const metadata: Metadata = {
     title: "Contact Us — Get in Touch with Codebility",
@@ -22,8 +21,6 @@ export const metadata: Metadata = {
     },
 };
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
 
 export default function ContactPageWrapper() {
     return <ContactPage />;

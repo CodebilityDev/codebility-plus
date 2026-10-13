@@ -26,8 +26,8 @@ A YouTube video ID is the part after `watch?v=` or `youtu.be/`. For
 `https://youtu.be/jUQ0cvJnEGg`, the ID is `jUQ0cvJnEGg`.
 
 These env vars are read in
-`apps/codebility/app/applicant/onboarding/_components/OnboardingClient.tsx`
-(`VIDEO_IDS`). The player itself lives in `_components/VideoPlayer.tsx`.
+`apps/codebility/components/applicant/onboarding/OnboardingClient.tsx`
+(`VIDEO_IDS`). The player itself lives in `apps/codebility/components/applicant/onboarding/VideoPlayer.tsx`.
 
 ## How to upload / replace a video
 
