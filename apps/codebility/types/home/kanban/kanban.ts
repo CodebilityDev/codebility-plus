@@ -26,6 +26,12 @@ export interface KanbanTask {
   codevId: string | null;
   dueDate: string | null;
   updatedAt: string | null;
+  difficulty: string | null;
+  points: number | null;
+  type: string | null;
+  skillCategoryId: string | null;
+  deadline: string | null;
+  sidekickIds: string[];
 }
 
 export interface KanbanColumn {
@@ -51,6 +57,20 @@ export interface KanbanSprintsPageProps {
 
 export interface KanbanBoardPageProps {
   params: Promise<{ projectId: string; sprintId: string }>;
+}
+
+export interface AssigneeOption {
+  id: string;
+  firstName: string;
+  lastName: string;
+  imageUrl: string | null;
+  displayPosition: string | null;
+  username: string | null;
+}
+
+export interface SkillCategoryOption {
+  id: string;
+  name: string;
 }
 
 export type KanbanConnection = "connecting" | "live" | "offline";

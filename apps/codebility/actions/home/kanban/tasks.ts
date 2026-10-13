@@ -31,6 +31,13 @@ const createTaskInput = z.object({
   title: z.string().trim().min(1),
   description: z.string().optional(),
   priority: z.string().optional(),
+  difficulty: z.string().optional(),
+  points: z.number().int().min(0).optional(),
+  type: z.string().optional(),
+  skillCategoryId: z.string().min(1).optional(),
+  deadline: z.string().min(1).optional(),
+  codevId: z.string().min(1).optional(),
+  sidekickIds: z.array(z.string().min(1)).optional(),
 });
 
 const updateTaskInput = z.object({
@@ -38,6 +45,13 @@ const updateTaskInput = z.object({
   title: z.string().trim().min(1).optional(),
   description: z.string().optional(),
   priority: z.string().optional(),
+  difficulty: z.string().optional(),
+  points: z.number().int().min(0).optional(),
+  type: z.string().optional(),
+  skillCategoryId: z.string().min(1).optional(),
+  deadline: z.string().min(1).optional(),
+  codevId: z.string().min(1).optional(),
+  sidekickIds: z.array(z.string().min(1)).optional(),
 });
 
 const taskIdSchema = z.string().min(1);
@@ -200,9 +214,27 @@ export async function createTask(input: {
   title: string;
   description?: string;
   priority?: string;
+  difficulty?: string;
+  points?: number;
+  type?: string;
+  skillCategoryId?: string;
+  deadline?: string;
+  codevId?: string;
+  sidekickIds?: string[];
 }): Promise<void> {
-  const { columnId, title, description, priority } =
-    createTaskInput.parse(input);
+  const {
+    columnId,
+    title,
+    description,
+    priority,
+    difficulty,
+    points,
+    type,
+    skillCategoryId,
+    deadline,
+    codevId,
+    sidekickIds,
+  } = createTaskInput.parse(input);
 
   await requirePermission("kanban");
   await requireProjectAccessForEntities({ columnIds: [columnId] });
@@ -225,6 +257,13 @@ export async function createTask(input: {
     title,
     description,
     priority,
+    difficulty,
+    points,
+    type,
+    skill_category_id: skillCategoryId,
+    deadline,
+    codev_id: codevId,
+    sidekick_ids: sidekickIds,
     position: plan.position,
   });
 
@@ -238,8 +277,27 @@ export async function updateTask(input: {
   title?: string;
   description?: string;
   priority?: string;
+  difficulty?: string;
+  points?: number;
+  type?: string;
+  skillCategoryId?: string;
+  deadline?: string;
+  codevId?: string;
+  sidekickIds?: string[];
 }): Promise<void> {
-  const { taskId, title, description, priority } = updateTaskInput.parse(input);
+  const {
+    taskId,
+    title,
+    description,
+    priority,
+    difficulty,
+    points,
+    type,
+    skillCategoryId,
+    deadline,
+    codevId,
+    sidekickIds,
+  } = updateTaskInput.parse(input);
 
   await requirePermission("kanban");
   await requireProjectAccessForEntities({ taskIds: [taskId] });
@@ -247,7 +305,14 @@ export async function updateTask(input: {
   if (
     title === undefined &&
     description === undefined &&
-    priority === undefined
+    priority === undefined &&
+    difficulty === undefined &&
+    points === undefined &&
+    type === undefined &&
+    skillCategoryId === undefined &&
+    deadline === undefined &&
+    codevId === undefined &&
+    sidekickIds === undefined
   ) {
     return;
   }
@@ -260,6 +325,13 @@ export async function updateTask(input: {
       title,
       description,
       priority,
+      difficulty,
+      points,
+      type,
+      skill_category_id: skillCategoryId,
+      deadline,
+      codev_id: codevId,
+      sidekick_ids: sidekickIds,
       updated_at: new Date().toISOString(),
     })
     .eq("id", taskId);

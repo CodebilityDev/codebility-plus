@@ -265,6 +265,32 @@ body {
   background: var(--teal-color);
 }
 
+.kanban-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.2) transparent;
+}
+
+.kanban-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.2);
+  border-radius: 10px;
+}
+
+.kanban-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.55);
+}
+
+.dark .kanban-scrollbar {
+  scrollbar-color: rgba(148, 163, 184, 0.18) transparent;
+}
+
+.dark .kanban-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.18);
+}
+
+.dark .kanban-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(203, 213, 225, 0.55);
+}
+
 /* Spinner Loaders */
 .spinner {
   width: 24px;

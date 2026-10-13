@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 
 export const COLUMN_WIDTH = 288;
@@ -17,7 +17,6 @@ export function useKanbanColumnVirtualizer({
 }) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const stripRef = useRef<HTMLDivElement | null>(null);
-  const [stripHeight, setStripHeight] = useState(0);
 
   const virtualizer = useVirtualizer({
     horizontal: true,
@@ -40,36 +39,11 @@ export function useKanbanColumnVirtualizer({
   }
 
   const indexes = [...renderedIndexes].sort((a, b) => a - b);
-  const renderKey = indexes.join("|");
-
-  useEffect(() => {
-    const node = stripRef.current;
-    if (!node) {
-      return;
-    }
-    const measure = () => {
-      let tallest = 0;
-      for (const child of Array.from(node.children)) {
-        const height = (child as HTMLElement).offsetHeight;
-        if (height > tallest) {
-          tallest = height;
-        }
-      }
-      setStripHeight((current) => (current === tallest ? current : tallest));
-    };
-    measure();
-    const observer = new ResizeObserver(measure);
-    for (const child of Array.from(node.children)) {
-      observer.observe(child);
-    }
-    return () => observer.disconnect();
-  }, [renderKey]);
 
   return {
     scrollRef,
     stripRef,
     totalSize: virtualizer.getTotalSize(),
-    stripHeight,
     indexes,
   };
 }

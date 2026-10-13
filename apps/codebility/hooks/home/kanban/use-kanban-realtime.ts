@@ -39,6 +39,12 @@ function toTask(row: TaskRow): KanbanTask | null {
     codevId: row.codev_id,
     dueDate: row.due_date,
     updatedAt: row.updated_at,
+    difficulty: row.difficulty,
+    points: row.points,
+    type: row.type,
+    skillCategoryId: row.skill_category_id,
+    deadline: row.deadline,
+    sidekickIds: row.sidekick_ids ?? [],
   };
 }
 

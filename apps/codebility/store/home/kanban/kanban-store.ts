@@ -82,7 +82,13 @@ function sameTask(previous: KanbanTask, next: KanbanTask): boolean {
     previous.priority === next.priority &&
     previous.codevId === next.codevId &&
     previous.dueDate === next.dueDate &&
-    previous.updatedAt === next.updatedAt
+    previous.updatedAt === next.updatedAt &&
+    previous.difficulty === next.difficulty &&
+    previous.points === next.points &&
+    previous.type === next.type &&
+    previous.skillCategoryId === next.skillCategoryId &&
+    previous.deadline === next.deadline &&
+    sameIds(previous.sidekickIds, next.sidekickIds)
   );
 }
 

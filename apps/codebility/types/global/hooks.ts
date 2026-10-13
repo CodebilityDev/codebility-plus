@@ -19,7 +19,8 @@ export type ModalType =
   | "surveyModal"
   | "projectContributorPicker"
   | "projectCreateDrawer"
-  | "sprintCreateDrawer";
+  | "sprintCreateDrawer"
+  | "taskCreateDrawer";
 
 export interface ModalStore {
   type: ModalType | null;

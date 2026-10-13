@@ -68,7 +68,7 @@ export default function KanbanBoard() {
     return ids;
   }, [dragColumns]);
 
-  const { scrollRef, stripRef, totalSize, stripHeight, indexes } =
+  const { scrollRef, stripRef, totalSize, indexes } =
     useKanbanColumnVirtualizer({ columnOrder, keepMountedIds });
 
   const sensors = useSensors(
@@ -155,15 +155,14 @@ export default function KanbanBoard() {
     >
       <div
         ref={scrollRef}
-        className="flex w-full items-start overflow-x-auto pb-4"
+        className="kanban-scrollbar flex min-h-0 w-full flex-1 items-stretch overflow-x-auto overflow-y-hidden pb-4"
         aria-label="Kanban board"
       >
         <div
           ref={stripRef}
-          className="relative shrink-0"
+          className="relative h-full shrink-0"
           style={{
             width: Math.max(totalSize - COLUMN_GAP, 0),
-            height: stripHeight,
           }}
         >
           {indexes.map((index) => {
@@ -174,7 +173,7 @@ export default function KanbanBoard() {
             return (
               <div
                 key={columnId}
-                className="absolute top-0 w-72"
+                className="absolute top-0 h-full w-72"
                 style={{ left: index * COLUMN_STRIDE }}
               >
                 <KanbanColumn columnId={columnId} />

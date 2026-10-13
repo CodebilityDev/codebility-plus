@@ -8,6 +8,7 @@ import KanbanBoard from "@/components/home/kanban/KanbanBoard";
 import KanbanBoardSkeleton from "@/components/home/kanban/KanbanBoardSkeleton";
 import KanbanBreadcrumb from "@/components/home/kanban/KanbanBreadcrumb";
 import KanbanConnectionBadge from "@/components/home/kanban/KanbanConnectionBadge";
+import KanbanOverlays from "@/components/home/kanban/KanbanOverlays";
 import KanbanRealtimeBridge from "@/components/home/kanban/KanbanRealtimeBridge";
 import pathsConfig from "@/constants/global/paths";
 import {
@@ -63,6 +64,7 @@ async function KanbanBoardContent({ params }: KanbanBoardPageProps) {
   return (
     <KanbanStoreProvider snapshot={board}>
       <KanbanRealtimeBridge boardId={board.boardId} sprintId={board.sprintId} />
+      <KanbanOverlays />
       <div className="flex h-full min-h-0 flex-col">
         <div className="px-4 pt-6">
           <KanbanBreadcrumb

@@ -154,6 +154,12 @@ export async function loadBoardSnapshot(
               codevId: task.codev_id,
               dueDate: task.due_date,
               updatedAt: task.updated_at,
+              difficulty: task.difficulty,
+              points: task.points,
+              type: task.type,
+              skillCategoryId: task.skill_category_id,
+              deadline: task.deadline,
+              sidekickIds: task.sidekick_ids ?? [],
             },
           ]
         : [],

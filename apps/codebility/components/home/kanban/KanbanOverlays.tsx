@@ -2,11 +2,17 @@
 
 import { ModalSlot } from "@/components/global/modals/ModalSlot";
 import SprintCreateDrawer from "@/components/home/kanban/SprintCreateDrawer";
+import TaskCreateDrawer from "@/components/home/kanban/TaskCreateDrawer";
 
 export default function KanbanOverlays() {
   return (
-    <ModalSlot type="sprintCreateDrawer">
-      <SprintCreateDrawer />
-    </ModalSlot>
+    <>
+      <ModalSlot type="sprintCreateDrawer">
+        <SprintCreateDrawer />
+      </ModalSlot>
+      <ModalSlot type="taskCreateDrawer">
+        <TaskCreateDrawer />
+      </ModalSlot>
+    </>
   );
 }

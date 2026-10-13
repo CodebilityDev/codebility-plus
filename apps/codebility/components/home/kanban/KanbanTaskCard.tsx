@@ -8,6 +8,7 @@ import type { BadgeProps } from "@codevs/ui/badge";
 import { Badge } from "@codevs/ui/badge";
 import { Card } from "@codevs/ui/card";
 
+import { useModal } from "@/hooks/global/use-modal";
 import { useKanbanStore } from "@/providers/home/kanban/KanbanStoreProvider";
 
 const PRIORITY_VARIANTS: Partial<Record<string, BadgeProps["variant"]>> = {
@@ -88,6 +89,7 @@ const KanbanTaskCard = memo(function KanbanTaskCard({
 }: KanbanTaskCardProps) {
   const task = useKanbanStore((state) => state.tasksById[taskId]);
   const pending = useKanbanStore((state) => state.pending[taskId] ?? false);
+  const onOpen = useModal((state) => state.onOpen);
   const {
     attributes,
     listeners,
@@ -96,6 +98,12 @@ const KanbanTaskCard = memo(function KanbanTaskCard({
     transition,
     isDragging,
   } = useSortable({ id: taskId, data: { type: "task", columnId, index } });
+
+  const handleClick = useCallback(() => {
+    if (isDragging) return;
+
+    onOpen("taskCreateDrawer", { taskId });
+  }, [isDragging, onOpen, taskId]);
 
   const setRefs = useCallback(
     (node: HTMLLIElement | null) => {
@@ -123,11 +131,12 @@ const KanbanTaskCard = memo(function KanbanTaskCard({
         touchAction: "manipulation",
       }}
       className={cn(
-        "list-none rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-customBlue-100",
+        "list-none cursor-pointer rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-customBlue-100",
         isDragging && "opacity-40",
       )}
       {...attributes}
       {...listeners}
+      onClick={handleClick}
       aria-label={`Task ${task.title}`}
     >
       <KanbanTaskCardFace
