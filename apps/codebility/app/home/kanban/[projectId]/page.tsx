@@ -5,10 +5,11 @@ import { redirect } from "next/navigation";
 import EmptyState from "@/components/global/feedback/EmptyState";
 import H1 from "@/components/global/layout/H1";
 import KanbanBreadcrumb from "@/components/home/kanban/KanbanBreadcrumb";
-import KanbanListSkeleton from "@/components/home/kanban/KanbanListSkeleton";
+import KanbanSprintsPageSkeleton from "@/components/home/kanban/KanbanSprintsPageSkeleton";
 import KanbanOverlays from "@/components/home/kanban/KanbanOverlays";
 import KanbanSprintCreateButton from "@/components/home/kanban/KanbanSprintCreateButton";
 import KanbanSprintsTable from "@/components/home/kanban/KanbanSprintsTable";
+import { canManageTasks } from "@/constants/global/permissions";
 import pathsConfig from "@/constants/global/paths";
 import {
   getAccessibleProjectIds,
@@ -25,7 +26,7 @@ export const instant = false;
 
 export default function KanbanSprintsPage({ params }: KanbanSprintsPageProps) {
   return (
-    <Suspense fallback={<KanbanListSkeleton />}>
+    <Suspense fallback={<KanbanSprintsPageSkeleton />}>
       <KanbanSprintsContent params={params} />
     </Suspense>
   );
@@ -33,7 +34,7 @@ export default function KanbanSprintsPage({ params }: KanbanSprintsPageProps) {
 
 async function KanbanSprintsContent({ params }: KanbanSprintsPageProps) {
   const { projectId } = await params;
-  const [accessibleProjectIds, { hasFullAccess }] = await Promise.all([
+  const [accessibleProjectIds, { hasFullAccess, roleId }] = await Promise.all([
     getAccessibleProjectIds(),
     getAccess(),
   ]);
@@ -71,7 +72,7 @@ async function KanbanSprintsContent({ params }: KanbanSprintsPageProps) {
       ) : (
         <KanbanSprintsTable projectId={projectId} sprints={sprints} />
       )}
-      <KanbanOverlays />
+      <KanbanOverlays canManage={canManageTasks(roleId)} />
     </div>
   );
 }

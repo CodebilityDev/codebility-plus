@@ -12,9 +12,12 @@ import ConditionalMainWrapper from "@/components/home/ConditionalMainWrapper";
 import DynamicMainContent from "@/components/home/DynamicMainContent";
 import HomeNavbar from "@/components/home/HomeNavbar";
 import HomeSidebar from "@/components/home/HomeSidebar";
+import NavbarSkeleton from "@/components/home/NavbarSkeleton";
+import SidebarSkeleton from "@/components/home/SidebarSkeleton";
 import type { HomeLayoutProps } from "@/types/home/home";
 
 export const instant = false;
+export const prefetch = "partial";
 
 export default function HomeLayout({ children }: HomeLayoutProps) {
   return (
@@ -37,7 +40,7 @@ export default function HomeLayout({ children }: HomeLayoutProps) {
               </div>
             }
           >
-            <Suspense fallback={<div className="h-[60px]" />}>
+            <Suspense fallback={<NavbarSkeleton />}>
               <HomeNavbar />
             </Suspense>
           </ErrorBoundary>
@@ -47,11 +50,7 @@ export default function HomeLayout({ children }: HomeLayoutProps) {
                 <div className="w-16 bg-gray-100 dark:bg-gray-800 flex-shrink-0" />
               }
             >
-              <Suspense
-                fallback={
-                  <div className="w-16 bg-gray-100 dark:bg-gray-800 flex-shrink-0" />
-                }
-              >
+              <Suspense fallback={<SidebarSkeleton />}>
                 <HomeSidebar />
               </Suspense>
             </ErrorBoundary>

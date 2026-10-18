@@ -19,6 +19,7 @@ import type {
 } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 
+import KanbanBoardSkeleton from "@/components/home/kanban/KanbanBoardSkeleton";
 import KanbanColumn from "@/components/home/kanban/KanbanColumn";
 import KanbanDragOverlay from "@/components/home/kanban/KanbanDragOverlay";
 import {
@@ -45,7 +46,7 @@ function resolveTarget(over: Over | null) {
   return { columnId, index };
 }
 
-export default function KanbanBoard() {
+export default function KanbanBoard({ canManage }: { canManage: boolean }) {
   const columnOrder = useKanbanStore((state) => state.columnOrder);
   const setActiveTask = useKanbanStore((state) => state.setActiveTask);
   const moveTaskLocally = useKanbanStore((state) => state.moveTaskLocally);
@@ -68,9 +69,6 @@ export default function KanbanBoard() {
     return ids;
   }, [dragColumns]);
 
-  const { scrollRef, stripRef, totalSize, indexes } =
-    useKanbanColumnVirtualizer({ columnOrder, keepMountedIds });
-
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
     useSensor(TouchSensor, {
@@ -80,6 +78,9 @@ export default function KanbanBoard() {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
   );
+
+  const { scrollRef, stripRef, totalSize, indexes } =
+    useKanbanColumnVirtualizer({ columnOrder, keepMountedIds });
 
   function handleDragStart(event: DragStartEvent) {
     preview.current = null;
@@ -155,7 +156,7 @@ export default function KanbanBoard() {
     >
       <div
         ref={scrollRef}
-        className="kanban-scrollbar flex min-h-0 w-full flex-1 items-stretch overflow-x-auto overflow-y-hidden pb-4"
+        className="kanban-scrollbar flex min-h-0 w-full flex-1 items-stretch overflow-x-auto overflow-y-hidden px-4 pb-4"
         aria-label="Kanban board"
       >
         <div
@@ -165,21 +166,25 @@ export default function KanbanBoard() {
             width: Math.max(totalSize - COLUMN_GAP, 0),
           }}
         >
-          {indexes.map((index) => {
-            const columnId = columnOrder[index];
-            if (!columnId) {
-              return null;
-            }
-            return (
-              <div
-                key={columnId}
-                className="absolute top-0 h-full w-72"
-                style={{ left: index * COLUMN_STRIDE }}
-              >
-                <KanbanColumn columnId={columnId} />
-              </div>
-            );
-          })}
+          {indexes.length === 0 ? (
+            <KanbanBoardSkeleton />
+          ) : (
+            indexes.map((index) => {
+              const columnId = columnOrder[index];
+              if (!columnId) {
+                return null;
+              }
+              return (
+                <div
+                  key={columnId}
+                  className="absolute top-0 h-full w-72"
+                  style={{ left: index * COLUMN_STRIDE }}
+                >
+                  <KanbanColumn columnId={columnId} canManage={canManage} />
+                </div>
+              );
+            })
+          )}
         </div>
       </div>
       <KanbanDragOverlay />

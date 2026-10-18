@@ -2,7 +2,7 @@ import { cache } from "react";
 import { getCurrentCodev } from "@/lib/global/current-codev";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import { getSidebarRoleId } from "@/utils/global/codev";
-import { PERMISSION_COLUMNS, PERMISSION_KEYS, isFullAccess, normalizeProjectRole } from "@/constants/global/permissions";
+import { PERMISSION_COLUMNS, PERMISSION_KEYS, canManageTasks, isFullAccess, normalizeProjectRole } from "@/constants/global/permissions";
 import type { PermissionKey, ProjectAccess, ProjectRole, RolePermissions } from "@/types/global/permissions";
 
 export const NO_PERMISSIONS: RolePermissions = PERMISSION_KEYS.reduce(
@@ -76,6 +76,13 @@ export async function requireFullAccess(): Promise<void> {
   }
 }
 
+export async function requireTaskManager(): Promise<void> {
+  const { roleId } = await getAccess();
+  if (!canManageTasks(roleId)) {
+    throw new Error("Forbidden: task management requires an authorized role");
+  }
+}
+
 export const getProjectAccess = cache(
   async (projectId: string): Promise<ProjectAccess> => {
     const codev = await getCurrentCodev();
@@ -110,6 +117,10 @@ export async function requireProjectAccess(
   projectId: string,
   requiredRole?: ProjectRole,
 ): Promise<void> {
+  const { hasFullAccess } = await getAccess();
+
+  if (hasFullAccess) return;
+
   const access = await getProjectAccess(projectId);
 
   if (!access.isMember) {

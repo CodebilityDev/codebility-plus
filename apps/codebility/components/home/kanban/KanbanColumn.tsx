@@ -24,8 +24,10 @@ const OVERSCAN = 6;
 
 const KanbanColumn = memo(function KanbanColumn({
   columnId,
+  canManage,
 }: {
   columnId: string;
+  canManage: boolean;
 }) {
   const column = useKanbanStore((state) => state.columnsById[columnId]);
   const taskIds = useKanbanStore(
@@ -93,14 +95,16 @@ const KanbanColumn = memo(function KanbanColumn({
             {taskIds.length}
           </span>
         </div>
-        <OverlayTrigger
-          type="taskCreateDrawer"
-          data={{ columnId }}
-          className="h-7 w-7 shrink-0 !p-0 bg-transparent text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-200 dark:hover:bg-gray-800 dark:hover:text-gray-50"
-        >
-          <Plus className="h-4 w-4" />
-          <span className="sr-only">Add a task to this column</span>
-        </OverlayTrigger>
+        {canManage ? (
+          <OverlayTrigger
+            type="taskCreateDrawer"
+            data={{ columnId }}
+            className="h-7 w-7 shrink-0 !p-0 bg-transparent text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-200 dark:hover:bg-gray-800 dark:hover:text-gray-50"
+          >
+            <Plus className="h-4 w-4" />
+            <span className="sr-only">Add a task to this column</span>
+          </OverlayTrigger>
+        ) : null}
       </CardHeader>
       <CardContent
         ref={setCardContentRef}
@@ -132,6 +136,7 @@ const KanbanColumn = memo(function KanbanColumn({
                     index={item.index}
                     start={item.start}
                     measureRef={virtualizer.measureElement}
+                    canManage={canManage}
                   />
                 );
               })}

@@ -6,7 +6,7 @@ import ProjectDetailContributors from "@/components/home/projects/ProjectDetailC
 import ProjectDetailHeader from "@/components/home/projects/ProjectDetailHeader";
 import ProjectDetailInfo from "@/components/home/projects/ProjectDetailInfo";
 import ProjectOverlays from "@/components/home/projects/ProjectOverlays";
-import ProjectsSkeleton from "@/components/home/projects/ProjectsSkeleton";
+import ProjectDetailSkeleton from "@/components/home/projects/ProjectDetailSkeleton";
 import pathsConfig from "@/constants/global/paths";
 import { getAccessibleProjectIds, getAccess } from "@/lib/global/permissions";
 import { getCachedContributors, getCachedProject } from "@/lib/home/projects/projects-cached";
@@ -22,7 +22,7 @@ export default function ProjectDetailPage({
 }: ProjectDetailPageProps) {
   return (
     <div className="mx-auto w-full max-w-screen-xl px-4 py-6">
-      <Suspense fallback={<ProjectsSkeleton />}>
+      <Suspense fallback={<ProjectDetailSkeleton />}>
         <ProjectDetailContent params={params} />
       </Suspense>
     </div>

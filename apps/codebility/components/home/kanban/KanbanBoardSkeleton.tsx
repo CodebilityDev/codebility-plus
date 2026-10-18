@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader } from "@codevs/ui/card";
 import { Skeleton } from "@codevs/ui/skeleton";
 
-const COLUMN_CARDS = [3, 2, 4];
+const COLUMN_CARDS = [3, 2, 4, 1];
 
 export default function KanbanBoardSkeleton() {
   return (
@@ -15,9 +15,12 @@ export default function KanbanBoardSkeleton() {
           key={columnIndex}
           className="flex w-72 shrink-0 flex-col"
         >
-          <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 p-3">
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-4 w-6 rounded-full" />
+          <CardHeader className="flex shrink-0 flex-row items-center justify-between gap-2 space-y-0 p-3">
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-4 w-6 rounded-full" />
+            </div>
+            <Skeleton className="h-7 w-7 rounded-full" />
           </CardHeader>
           <CardContent className="flex flex-col gap-2 p-2">
             {Array.from({ length: cards }, (_, cardIndex) => (

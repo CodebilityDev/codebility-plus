@@ -30,6 +30,7 @@ export default function TaskAssigneePicker({
   disabledIds = [],
   value,
   onChange,
+  disabled = false,
 }: {
   label: string;
   multiple: boolean;
@@ -37,6 +38,7 @@ export default function TaskAssigneePicker({
   disabledIds?: string[];
   value: string[];
   onChange: (ids: string[]) => void;
+  disabled?: boolean;
 }) {
   const [options, setOptions] = useState<Record<string, AssigneeOption>>(() => {
     const initial: Record<string, AssigneeOption> = {};
@@ -119,8 +121,9 @@ export default function TaskAssigneePicker({
             key={id}
             type="button"
             onClick={() => remove(id)}
+            disabled={disabled}
             aria-label={`Remove ${member.firstName} ${member.lastName}`}
-            className="group relative h-9 w-9 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-customBlue-100"
+            className="group relative h-9 w-9 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-customBlue-100 disabled:pointer-events-none disabled:opacity-50"
           >
             <Avatar className="h-9 w-9">
               <AvatarImage
@@ -135,11 +138,17 @@ export default function TaskAssigneePicker({
           </button>
         );
       })}
-      <Popover open={open} onOpenChange={setOpen}>
+      <Popover
+        open={open}
+        onOpenChange={(next) => {
+          if (!disabled) setOpen(next);
+        }}
+      >
         <PopoverTrigger asChild>
           <Button
             type="button"
             size="icon"
+            disabled={disabled}
             aria-label={`Add ${label}`}
             className="h-9 w-9 rounded-full"
           >

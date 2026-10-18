@@ -28,11 +28,13 @@ function ToolbarButton({
   label,
   active,
   onClick,
+  disabled = false,
   children,
 }: {
   label: string;
   active?: boolean;
   onClick: () => void;
+  disabled?: boolean;
   children: ReactNode;
 }) {
   return (
@@ -43,6 +45,7 @@ function ToolbarButton({
       aria-label={label}
       aria-pressed={active ?? false}
       onClick={onClick}
+      disabled={disabled}
       className={cn("h-8 w-8 text-foreground", active && "bg-muted")}
     >
       {children}
@@ -53,15 +56,18 @@ function ToolbarButton({
 export default function KanbanRichTextEditor({
   value,
   onChange,
+  disabled = false,
 }: {
   value: string;
   onChange: (value: string) => void;
+  disabled?: boolean;
 }) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const editor = useEditor({
     immediatelyRender: false,
     shouldRerenderOnTransaction: true,
+    editable: !disabled,
     extensions: [
       StarterKit.configure({
         heading: { levels: [1, 2, 3] },
@@ -86,6 +92,12 @@ export default function KanbanRichTextEditor({
       editor.commands.setContent(value || "");
     }
   }, [editor, value]);
+
+  useEffect(() => {
+    if (!editor) return;
+
+    editor.setEditable(!disabled);
+  }, [editor, disabled]);
 
   if (!editor) {
     return (
@@ -133,9 +145,16 @@ export default function KanbanRichTextEditor({
   }
 
   return (
-    <div className="tiptap-editor overflow-hidden rounded-md border border-gray-300 dark:border-gray-700">
+    <div
+      aria-disabled={disabled}
+      className={cn(
+        "tiptap-editor overflow-hidden rounded-md border border-gray-300 dark:border-gray-700",
+        disabled && "opacity-60",
+      )}
+    >
       <div className="flex flex-wrap items-center gap-0.5 border-b border-gray-200 p-1 dark:border-gray-700">
         <ToolbarButton
+          disabled={disabled}
           label="Heading 1"
           active={editor.isActive("heading", { level: 1 })}
           onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
@@ -143,6 +162,7 @@ export default function KanbanRichTextEditor({
           <Heading1 className="h-4 w-4" />
         </ToolbarButton>
         <ToolbarButton
+          disabled={disabled}
           label="Heading 2"
           active={editor.isActive("heading", { level: 2 })}
           onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
@@ -150,6 +170,7 @@ export default function KanbanRichTextEditor({
           <Heading2 className="h-4 w-4" />
         </ToolbarButton>
         <ToolbarButton
+          disabled={disabled}
           label="Heading 3"
           active={editor.isActive("heading", { level: 3 })}
           onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
@@ -157,6 +178,7 @@ export default function KanbanRichTextEditor({
           <Heading3 className="h-4 w-4" />
         </ToolbarButton>
         <ToolbarButton
+          disabled={disabled}
           label="Bold"
           active={editor.isActive("bold")}
           onClick={() => editor.chain().focus().toggleBold().run()}
@@ -164,6 +186,7 @@ export default function KanbanRichTextEditor({
           <Bold className="h-4 w-4" />
         </ToolbarButton>
         <ToolbarButton
+          disabled={disabled}
           label="Italic"
           active={editor.isActive("italic")}
           onClick={() => editor.chain().focus().toggleItalic().run()}
@@ -171,6 +194,7 @@ export default function KanbanRichTextEditor({
           <Italic className="h-4 w-4" />
         </ToolbarButton>
         <ToolbarButton
+          disabled={disabled}
           label="Strikethrough"
           active={editor.isActive("strike")}
           onClick={() => editor.chain().focus().toggleStrike().run()}
@@ -178,6 +202,7 @@ export default function KanbanRichTextEditor({
           <Strikethrough className="h-4 w-4" />
         </ToolbarButton>
         <ToolbarButton
+          disabled={disabled}
           label="Bullet list"
           active={editor.isActive("bulletList")}
           onClick={() => editor.chain().focus().toggleBulletList().run()}
@@ -185,6 +210,7 @@ export default function KanbanRichTextEditor({
           <List className="h-4 w-4" />
         </ToolbarButton>
         <ToolbarButton
+          disabled={disabled}
           label="Numbered list"
           active={editor.isActive("orderedList")}
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
@@ -192,6 +218,7 @@ export default function KanbanRichTextEditor({
           <ListOrdered className="h-4 w-4" />
         </ToolbarButton>
         <ToolbarButton
+          disabled={disabled}
           label="Link"
           active={editor.isActive("link")}
           onClick={() => setLink(editor)}
@@ -199,6 +226,7 @@ export default function KanbanRichTextEditor({
           <Link2 className="h-4 w-4" />
         </ToolbarButton>
         <ToolbarButton
+          disabled={disabled}
           label="Insert image"
           onClick={() => fileInputRef.current?.click()}
         >

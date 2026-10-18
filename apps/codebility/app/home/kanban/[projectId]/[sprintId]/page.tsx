@@ -5,11 +5,12 @@ import { redirect } from "next/navigation";
 import EmptyState from "@/components/global/feedback/EmptyState";
 import H1 from "@/components/global/layout/H1";
 import KanbanBoard from "@/components/home/kanban/KanbanBoard";
-import KanbanBoardSkeleton from "@/components/home/kanban/KanbanBoardSkeleton";
+import KanbanBoardPageSkeleton from "@/components/home/kanban/KanbanBoardPageSkeleton";
 import KanbanBreadcrumb from "@/components/home/kanban/KanbanBreadcrumb";
 import KanbanConnectionBadge from "@/components/home/kanban/KanbanConnectionBadge";
 import KanbanOverlays from "@/components/home/kanban/KanbanOverlays";
 import KanbanRealtimeBridge from "@/components/home/kanban/KanbanRealtimeBridge";
+import { canManageTasks } from "@/constants/global/permissions";
 import pathsConfig from "@/constants/global/paths";
 import {
   getAccessibleProjectIds,
@@ -23,7 +24,7 @@ export const instant = false;
 
 export default function KanbanBoardPage({ params }: KanbanBoardPageProps) {
   return (
-    <Suspense fallback={<KanbanBoardSkeleton />}>
+    <Suspense fallback={<KanbanBoardPageSkeleton />}>
       <KanbanBoardContent params={params} />
     </Suspense>
   );
@@ -52,7 +53,7 @@ async function KanbanBoardContent({ params }: KanbanBoardPageProps) {
 
   const base = pathsConfig.app.kanban;
 
-  const [accessibleProjectIds, { hasFullAccess }] = await Promise.all([
+  const [accessibleProjectIds, { hasFullAccess, roleId }] = await Promise.all([
     getAccessibleProjectIds(),
     getAccess(),
   ]);
@@ -61,10 +62,12 @@ async function KanbanBoardContent({ params }: KanbanBoardPageProps) {
     redirect(pathsConfig.app.home);
   }
 
+  const canManage = canManageTasks(roleId);
+
   return (
     <KanbanStoreProvider snapshot={board}>
       <KanbanRealtimeBridge boardId={board.boardId} sprintId={board.sprintId} />
-      <KanbanOverlays />
+      <KanbanOverlays canManage={canManage} />
       <div className="flex h-full min-h-0 flex-col">
         <div className="px-4 pt-6">
           <KanbanBreadcrumb
@@ -90,7 +93,7 @@ async function KanbanBoardContent({ params }: KanbanBoardPageProps) {
             />
           </div>
         ) : (
-          <KanbanBoard />
+          <KanbanBoard canManage={canManage} />
         )}
       </div>
     </KanbanStoreProvider>

@@ -42,7 +42,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@codevs/ui/select";
-import { X } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 
 function readId(data: unknown, key: string): string | null {
   if (typeof data !== "object" || data === null) return null;
@@ -64,7 +64,33 @@ let skillCategoryCache: { rows: SkillCategoryOption[]; at: number } | null =
   null;
 const SKILL_CATEGORY_TTL_MS = 5 * 60 * 1000;
 
-export default function TaskCreateDrawer() {
+const taskDetailCache = new Map<string, KanbanTask>();
+
+function getCachedTaskDetail(
+  taskId: string,
+  task: KanbanTask | undefined,
+): KanbanTask | null {
+  const cached = taskDetailCache.get(taskId);
+
+  if (!cached) return null;
+
+  if (
+    task?.updatedAt &&
+    cached.updatedAt &&
+    Date.parse(task.updatedAt) > Date.parse(cached.updatedAt)
+  ) {
+    taskDetailCache.delete(taskId);
+    return null;
+  }
+
+  return cached;
+}
+
+export default function TaskCreateDrawer({
+  canManage,
+}: {
+  canManage: boolean;
+}) {
   const router = useRouter();
   const isOpen = useModal((state) => state.isOpen);
   const onClose = useModal((state) => state.onClose);
@@ -79,25 +105,41 @@ export default function TaskCreateDrawer() {
     resolvedColumnId ? state.columnsById[resolvedColumnId]?.name : undefined,
   );
 
-  const [title, setTitle] = useState(() => task?.title ?? "");
-  const [priority, setPriority] = useState(() => task?.priority ?? "");
-  const [difficulty, setDifficulty] = useState(() => task?.difficulty ?? "");
-  const [type, setType] = useState(() => task?.type ?? "");
+  const [cachedDetail] = useState<KanbanTask | null>(() =>
+    taskId ? getCachedTaskDetail(taskId, task) : null,
+  );
+  const [title, setTitle] = useState(
+    () => (cachedDetail ?? task)?.title ?? "",
+  );
+  const [priority, setPriority] = useState(
+    () => (cachedDetail ?? task)?.priority ?? "",
+  );
+  const [difficulty, setDifficulty] = useState(
+    () => (cachedDetail ?? task)?.difficulty ?? "",
+  );
+  const [type, setType] = useState(() => (cachedDetail ?? task)?.type ?? "");
   const [skillCategoryId, setSkillCategoryId] = useState(
-    () => task?.skillCategoryId ?? "",
+    () => (cachedDetail ?? task)?.skillCategoryId ?? "",
   );
   const [deadline, setDeadline] = useState(() =>
-    toDateInput(task?.deadline ?? null),
+    toDateInput((cachedDetail ?? task)?.deadline ?? null),
   );
-  const [codevId, setCodevId] = useState(() => task?.codevId ?? "");
+  const [codevId, setCodevId] = useState(
+    () => (cachedDetail ?? task)?.codevId ?? "",
+  );
   const [sidekickIds, setSidekickIds] = useState<string[]>(
-    () => task?.sidekickIds ?? [],
+    () => (cachedDetail ?? task)?.sidekickIds ?? [],
   );
-  const [description, setDescription] = useState(() => task?.description ?? "");
+  const [description, setDescription] = useState(
+    () => (cachedDetail ?? task)?.description ?? "",
+  );
   const [skillCategories, setSkillCategories] = useState<SkillCategoryOption[]>(
     [],
   );
-  const [detail, setDetail] = useState<KanbanTask | null>(null);
+  const [detail, setDetail] = useState<KanbanTask | null>(() => cachedDetail);
+  const [loading, setLoading] = useState(
+    () => Boolean(taskId) && !cachedDetail,
+  );
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -130,23 +172,41 @@ export default function TaskCreateDrawer() {
   useEffect(() => {
     if (!taskId) {
       setDetail(null);
+      setLoading(false);
+      return;
+    }
+
+    const cached = getCachedTaskDetail(taskId, task);
+
+    if (cached) {
+      setDetail(cached);
+      setLoading(false);
       return;
     }
 
     let active = true;
 
+    setLoading(true);
+
     getTaskDetail(taskId)
       .then((row) => {
-        if (active) setDetail(row);
+        if (!active) return;
+
+        if (row) taskDetailCache.set(taskId, row);
+
+        setDetail(row);
       })
       .catch(() => {
         if (active) setDetail(null);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
       });
 
     return () => {
       active = false;
     };
-  }, [taskId]);
+  }, [taskId, task]);
 
   useEffect(() => {
     if (!detail) return;
@@ -209,6 +269,7 @@ export default function TaskCreateDrawer() {
     try {
       if (task) {
         await updateTask({ taskId: task.id, ...fields });
+        taskDetailCache.delete(task.id);
       } else if (columnId) {
         await createTask({ columnId, ...fields });
       }
@@ -227,7 +288,7 @@ export default function TaskCreateDrawer() {
     }
   }
 
-  if (!resolvedColumnId || !projectId) return null;
+  if (!resolvedColumnId || !projectId || !canManage) return null;
 
   return (
     <Drawer
@@ -240,9 +301,23 @@ export default function TaskCreateDrawer() {
       <DrawerContent side="right" className="h-full p-0">
         <DrawerHeader className="!flex shrink-0 flex-row items-start justify-between gap-4 border-b px-6 py-5 text-left">
           <div className="flex flex-col gap-1">
-            <DrawerTitle className="text-xl font-bold">
-              {task ? "Edit Task" : "Add New Task"}
-            </DrawerTitle>
+            <div className="flex items-center gap-2">
+              <DrawerTitle className="text-xl font-bold">
+                {task ? "Edit Task" : "Add New Task"}
+              </DrawerTitle>
+              {loading ? (
+                <span
+                  role="status"
+                  aria-live="polite"
+                  aria-label="Loading task"
+                >
+                  <Loader2
+                    aria-hidden="true"
+                    className="h-4 w-4 animate-spin text-muted-foreground"
+                  />
+                </span>
+              ) : null}
+            </div>
             <DrawerDescription className="mt-2 rounded-md bg-customBlue-50 px-3 py-2 text-sm text-customBlue-700 dark:bg-customBlue-500/10 dark:text-customBlue-100">
               {task
                 ? `Editing: ${task.title}`
@@ -263,6 +338,7 @@ export default function TaskCreateDrawer() {
         </DrawerHeader>
         <form
           onSubmit={handleSubmit}
+          aria-busy={loading}
           className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-6 py-5"
         >
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
@@ -275,6 +351,7 @@ export default function TaskCreateDrawer() {
                 value={title}
                 onChange={(event) => setTitle(event.target.value)}
                 placeholder="Enter task title"
+                disabled={loading}
                 autoFocus
               />
             </div>
@@ -292,7 +369,7 @@ export default function TaskCreateDrawer() {
               <Label htmlFor="task-priority">
                 Priority <span className="text-destructive">*</span>
               </Label>
-              <Select value={priority} onValueChange={setPriority}>
+              <Select value={priority} onValueChange={setPriority} disabled={loading}>
                 <SelectTrigger id="task-priority">
                   <SelectValue placeholder="Select priority" />
                 </SelectTrigger>
@@ -309,7 +386,7 @@ export default function TaskCreateDrawer() {
               <Label htmlFor="task-difficulty">
                 Difficulty <span className="text-destructive">*</span>
               </Label>
-              <Select value={difficulty} onValueChange={setDifficulty}>
+              <Select value={difficulty} onValueChange={setDifficulty} disabled={loading}>
                 <SelectTrigger id="task-difficulty">
                   <SelectValue placeholder="Select difficulty" />
                 </SelectTrigger>
@@ -326,7 +403,7 @@ export default function TaskCreateDrawer() {
               <Label htmlFor="task-type">
                 Task Type <span className="text-destructive">*</span>
               </Label>
-              <Select value={type} onValueChange={setType}>
+              <Select value={type} onValueChange={setType} disabled={loading}>
                 <SelectTrigger id="task-type">
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
@@ -346,6 +423,7 @@ export default function TaskCreateDrawer() {
               <Select
                 value={skillCategoryId}
                 onValueChange={setSkillCategoryId}
+                disabled={loading}
               >
                 <SelectTrigger id="task-skill-category">
                   <SelectValue placeholder="Select skill category" />
@@ -366,6 +444,7 @@ export default function TaskCreateDrawer() {
                 type="date"
                 value={deadline}
                 onChange={(event) => setDeadline(event.target.value)}
+                disabled={loading}
               />
             </div>
           </div>
@@ -384,6 +463,7 @@ export default function TaskCreateDrawer() {
                 disabledIds={sidekickIds}
                 value={codevId ? [codevId] : []}
                 onChange={(ids) => setCodevId(ids[0] ?? "")}
+                disabled={loading}
               />
             </div>
             <div className="space-y-2">
@@ -400,12 +480,17 @@ export default function TaskCreateDrawer() {
                 disabledIds={codevId ? [codevId] : []}
                 value={sidekickIds}
                 onChange={setSidekickIds}
+                disabled={loading}
               />
             </div>
           </div>
           <div className="space-y-2">
             <Label>Description</Label>
-            <KanbanRichTextEditor value={description} onChange={setDescription} />
+            <KanbanRichTextEditor
+              value={description}
+              onChange={setDescription}
+              disabled={loading}
+            />
           </div>
           {error ? (
             <p role="alert" className="text-sm text-destructive">
@@ -418,7 +503,7 @@ export default function TaskCreateDrawer() {
               variant="hollow"
               className="w-auto"
               onClick={onClose}
-              disabled={pending}
+              disabled={pending || loading}
             >
               Cancel
             </Button>
@@ -426,6 +511,7 @@ export default function TaskCreateDrawer() {
               type="submit"
               className="w-auto"
               loading={pending}
+              disabled={pending || loading}
               loadingText={task ? "Saving..." : "Creating task..."}
             >
               {task ? "Save" : "Create Task"}

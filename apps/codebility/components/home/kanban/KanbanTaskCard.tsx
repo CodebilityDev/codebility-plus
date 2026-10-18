@@ -78,6 +78,7 @@ interface KanbanTaskCardProps {
   index: number;
   start: number;
   measureRef: (node: Element | null) => void;
+  canManage: boolean;
 }
 
 const KanbanTaskCard = memo(function KanbanTaskCard({
@@ -86,6 +87,7 @@ const KanbanTaskCard = memo(function KanbanTaskCard({
   index,
   start,
   measureRef,
+  canManage,
 }: KanbanTaskCardProps) {
   const task = useKanbanStore((state) => state.tasksById[taskId]);
   const pending = useKanbanStore((state) => state.pending[taskId] ?? false);
@@ -97,13 +99,17 @@ const KanbanTaskCard = memo(function KanbanTaskCard({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: taskId, data: { type: "task", columnId, index } });
+  } = useSortable({
+    id: taskId,
+    data: { type: "task", columnId, index },
+    disabled: !canManage,
+  });
 
   const handleClick = useCallback(() => {
-    if (isDragging) return;
+    if (!canManage || isDragging) return;
 
     onOpen("taskCreateDrawer", { taskId });
-  }, [isDragging, onOpen, taskId]);
+  }, [canManage, isDragging, onOpen, taskId]);
 
   const setRefs = useCallback(
     (node: HTMLLIElement | null) => {
@@ -131,7 +137,8 @@ const KanbanTaskCard = memo(function KanbanTaskCard({
         touchAction: "manipulation",
       }}
       className={cn(
-        "list-none cursor-pointer rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-customBlue-100",
+        "list-none rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-customBlue-100",
+        canManage && "cursor-pointer",
         isDragging && "opacity-40",
       )}
       {...attributes}

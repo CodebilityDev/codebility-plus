@@ -5,6 +5,8 @@ import SideNavMenu from "@/components/marketing/MarketingSidenavMenu";
 import { getSiteDate } from "@/lib/global/site-date";
 import type { MarketingLayoutProps } from "@/types/marketing/marketing";
 
+export const prefetch = "partial";
+
 export default async function MarketingLayout({
   children,
 }: MarketingLayoutProps) {
