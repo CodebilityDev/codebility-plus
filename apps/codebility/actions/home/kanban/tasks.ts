@@ -13,6 +13,7 @@ import {
 } from "@/lib/global/permissions";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import type { KanbanTask } from "@/types/home/kanban/kanban";
+import { toKanbanTask } from "@/utils/home/kanban/task";
 import {
   assignPositions,
   resolveIndex,
@@ -265,7 +266,7 @@ export async function createTask(input: {
   deadline?: string;
   codevId?: string;
   sidekickIds?: string[];
-}): Promise<void> {
+}): Promise<KanbanTask> {
   const {
     columnId,
     title,
@@ -297,24 +298,34 @@ export async function createTask(input: {
 
   const plan = resolvePosition(lastTasks[0]?.position ?? null, null);
 
-  const { error: insertError } = await supabase.from("tasks").insert({
-    kanban_column_id: columnId,
-    title,
-    description,
-    priority,
-    difficulty,
-    points,
-    type,
-    skill_category_id: skillCategoryId,
-    deadline,
-    codev_id: codevId,
-    sidekick_ids: sidekickIds,
-    position: plan.position,
-  });
+  const { data: created, error: insertError } = await supabase
+    .from("tasks")
+    .insert({
+      kanban_column_id: columnId,
+      title,
+      description,
+      priority,
+      difficulty,
+      points,
+      type,
+      skill_category_id: skillCategoryId,
+      deadline,
+      codev_id: codevId,
+      sidekick_ids: sidekickIds,
+      position: plan.position,
+    })
+    .select("*")
+    .single();
 
   if (insertError) throw insertError;
 
+  const task = toKanbanTask(created);
+
+  if (!task) throw new Error("Could not create the task.");
+
   updateTag(CACHE_TAGS.kanbanBoard);
+
+  return task;
 }
 
 export async function updateTask(input: {

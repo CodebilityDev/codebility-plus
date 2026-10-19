@@ -21,6 +21,7 @@ import type {
 } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 
+import EmptyState from "@/components/global/feedback/EmptyState";
 import KanbanBoardSkeleton from "@/components/home/kanban/KanbanBoardSkeleton";
 import KanbanColumn from "@/components/home/kanban/KanbanColumn";
 import KanbanDragOverlay from "@/components/home/kanban/KanbanDragOverlay";
@@ -172,6 +173,17 @@ export default function KanbanBoard({ canManage }: { canManage: boolean }) {
     preview.current = null;
     setDragColumns({ active: null, over: null });
     setActiveTask(null);
+  }
+
+  if (columnOrder.length === 0) {
+    return (
+      <div className="px-4">
+        <EmptyState
+          title="This board has no columns"
+          description="Add a column to start tracking tasks."
+        />
+      </div>
+    );
   }
 
   return (

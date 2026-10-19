@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 
 import EmptyState from "@/components/global/feedback/EmptyState";
 import H1 from "@/components/global/layout/H1";
+import OverlayTrigger from "@/components/global/OverlayTrigger";
 import KanbanBoard from "@/components/home/kanban/KanbanBoard";
 import KanbanBoardPageSkeleton from "@/components/home/kanban/KanbanBoardPageSkeleton";
 import KanbanBreadcrumb from "@/components/home/kanban/KanbanBreadcrumb";
@@ -82,19 +83,20 @@ async function KanbanBoardContent({ params }: KanbanBoardPageProps) {
           />
           <div className="flex flex-wrap items-center justify-between gap-3">
             <H1>{board.sprintName ?? board.boardName}</H1>
-            <KanbanConnectionBadge />
+            <div className="flex items-center gap-2">
+              <KanbanConnectionBadge />
+              {canManage && (
+                <OverlayTrigger
+                  type="columnCreateDrawer"
+                  data={{ boardId: board.boardId }}
+                >
+                  Add column
+                </OverlayTrigger>
+              )}
+            </div>
           </div>
         </div>
-        {board.columns.length === 0 ? (
-          <div className="px-4">
-            <EmptyState
-              title="This board has no columns"
-              description="Add a column to start tracking tasks."
-            />
-          </div>
-        ) : (
-          <KanbanBoard canManage={canManage} />
-        )}
+        <KanbanBoard canManage={canManage} />
       </div>
     </KanbanStoreProvider>
   );

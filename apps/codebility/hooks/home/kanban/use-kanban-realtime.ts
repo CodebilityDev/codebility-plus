@@ -8,7 +8,7 @@ import { createClientClientComponent } from "@/lib/global/supabase-client";
 import { resolveIndex } from "@/utils/home/kanban/position";
 import type { KanbanStoreApi } from "@/store/home/kanban/kanban-store";
 import type { Database } from "@/types/global/supabase";
-import type { KanbanTask } from "@/types/home/kanban/kanban";
+import { toKanbanTask } from "@/utils/home/kanban/task";
 
 type TaskRow = Database["public"]["Tables"]["tasks"]["Row"];
 type ColumnRow = Database["public"]["Tables"]["kanban_columns"]["Row"];
@@ -25,28 +25,6 @@ const moveBroadcast = z.object({
   beforeTaskId: z.string().min(1).nullable(),
   afterTaskId: z.string().min(1).nullable(),
 });
-
-function toTask(row: TaskRow): KanbanTask | null {
-  if (!row.kanban_column_id || row.is_archive) return null;
-
-  return {
-    id: row.id,
-    title: row.title,
-    description: row.description,
-    columnId: row.kanban_column_id,
-    position: row.position,
-    priority: row.priority,
-    codevId: row.codev_id,
-    dueDate: row.due_date,
-    updatedAt: row.updated_at,
-    difficulty: row.difficulty,
-    points: row.points,
-    type: row.type,
-    skillCategoryId: row.skill_category_id,
-    deadline: row.deadline,
-    sidekickIds: row.sidekick_ids ?? [],
-  };
-}
 
 export function useKanbanRealtime({
   store,
@@ -107,7 +85,7 @@ export function useKanbanRealtime({
             return;
           }
 
-          const task = toTask(payload.new);
+          const task = toKanbanTask(payload.new);
 
           if (task && isBoardColumn(task.columnId)) {
             store.getState().upsertTask(task);

@@ -3,10 +3,11 @@
 import type { FormEvent } from "react";
 import { useEffect, useState } from "react";
 
-import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 import {
   createTask,
+  deleteTask,
   getTaskDetail,
   updateTask,
 } from "@/actions/home/kanban/tasks";
@@ -21,8 +22,12 @@ import {
   TASK_TYPES,
 } from "@/constants/home/kanban/kanban";
 import { useModal } from "@/hooks/global/use-modal";
-import { useKanbanStore } from "@/providers/home/kanban/KanbanStoreProvider";
+import {
+  useKanbanStore,
+  useKanbanStoreApi,
+} from "@/providers/home/kanban/KanbanStoreProvider";
 import type { KanbanTask, SkillCategoryOption } from "@/types/home/kanban/kanban";
+import { POSITION_GAP } from "@/utils/home/kanban/position";
 
 import { Button as IconButton } from "@codevs/ui/button";
 import {
@@ -91,9 +96,10 @@ export default function TaskCreateDrawer({
 }: {
   canManage: boolean;
 }) {
-  const router = useRouter();
   const isOpen = useModal((state) => state.isOpen);
   const onClose = useModal((state) => state.onClose);
+  const onOpen = useModal((state) => state.onOpen);
+  const store = useKanbanStoreApi();
   const columnId = useModal((state) => readId(state.data, "columnId"));
   const taskId = useModal((state) => readId(state.data, "taskId"));
   const task = useKanbanStore((state) =>
@@ -134,13 +140,11 @@ export default function TaskCreateDrawer({
     () => (cachedDetail ?? task)?.description ?? "",
   );
   const [skillCategories, setSkillCategories] = useState<SkillCategoryOption[]>(
-    [],
+    () => skillCategoryCache?.rows ?? [],
   );
-  const [detail, setDetail] = useState<KanbanTask | null>(() => cachedDetail);
   const [loading, setLoading] = useState(
     () => Boolean(taskId) && !cachedDetail,
   );
-  const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -148,7 +152,6 @@ export default function TaskCreateDrawer({
       skillCategoryCache &&
       Date.now() - skillCategoryCache.at < SKILL_CATEGORY_TTL_MS
     ) {
-      setSkillCategories(skillCategoryCache.rows);
       return;
     }
 
@@ -170,23 +173,9 @@ export default function TaskCreateDrawer({
   }, []);
 
   useEffect(() => {
-    if (!taskId) {
-      setDetail(null);
-      setLoading(false);
-      return;
-    }
-
-    const cached = getCachedTaskDetail(taskId, task);
-
-    if (cached) {
-      setDetail(cached);
-      setLoading(false);
-      return;
-    }
+    if (!taskId || cachedDetail) return;
 
     let active = true;
-
-    setLoading(true);
 
     getTaskDetail(taskId)
       .then((row) => {
@@ -194,11 +183,19 @@ export default function TaskCreateDrawer({
 
         if (row) taskDetailCache.set(taskId, row);
 
-        setDetail(row);
+        if (row) {
+          setTitle(row.title);
+          setPriority(row.priority ?? "");
+          setDifficulty(row.difficulty ?? "");
+          setType(row.type ?? "");
+          setSkillCategoryId(row.skillCategoryId ?? "");
+          setDeadline(toDateInput(row.deadline));
+          setCodevId(row.codevId ?? "");
+          setSidekickIds(row.sidekickIds);
+          setDescription(row.description ?? "");
+        }
       })
-      .catch(() => {
-        if (active) setDetail(null);
-      })
+      .catch(() => undefined)
       .finally(() => {
         if (active) setLoading(false);
       });
@@ -206,21 +203,7 @@ export default function TaskCreateDrawer({
     return () => {
       active = false;
     };
-  }, [taskId, task]);
-
-  useEffect(() => {
-    if (!detail) return;
-
-    setTitle(detail.title);
-    setPriority(detail.priority ?? "");
-    setDifficulty(detail.difficulty ?? "");
-    setType(detail.type ?? "");
-    setSkillCategoryId(detail.skillCategoryId ?? "");
-    setDeadline(toDateInput(detail.deadline));
-    setCodevId(detail.codevId ?? "");
-    setSidekickIds(detail.sidekickIds);
-    setDescription(detail.description ?? "");
-  }, [detail]);
+  }, [taskId, cachedDetail]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -250,8 +233,7 @@ export default function TaskCreateDrawer({
 
     if (!task && !columnId) return;
 
-    setPending(true);
-    setError(null);
+    onClose();
 
     const fields = {
       title: trimmed,
@@ -266,26 +248,113 @@ export default function TaskCreateDrawer({
       sidekickIds: sidekickIds.length > 0 ? sidekickIds : undefined,
     };
 
-    try {
-      if (task) {
-        await updateTask({ taskId: task.id, ...fields });
-        taskDetailCache.delete(task.id);
-      } else if (columnId) {
-        await createTask({ columnId, ...fields });
+    if (task) {
+      const taskId = task.id;
+      const previous = store.getState().tasksById[taskId];
+
+      if (previous) {
+        store.getState().upsertTask({
+          ...previous,
+          title: trimmed,
+          description: description || null,
+          priority,
+          difficulty,
+          points: DIFFICULTY_POINTS[difficulty] ?? 0,
+          type,
+          skillCategoryId,
+          deadline: deadline || null,
+          codevId: codevId || null,
+          sidekickIds,
+        });
       }
-      onClose();
-      router.refresh();
-    } catch (caught) {
-      setError(
-        caught instanceof Error
-          ? caught.message
-          : task
-            ? "Could not save the task."
-            : "Could not create the task.",
-      );
-    } finally {
-      setPending(false);
+
+      store.getState().setPending(taskId, true);
+
+      try {
+        await updateTask({ taskId, ...fields });
+        taskDetailCache.delete(taskId);
+        store.getState().setPending(taskId, false);
+      } catch (caught) {
+        store.getState().setPending(taskId, false);
+        if (previous) {
+          store.getState().upsertTask(previous);
+        }
+        toast.error(
+          caught instanceof Error ? caught.message : "Could not save the task.",
+        );
+      }
+      return;
     }
+
+    if (!columnId) return;
+
+    const tempId = `optimistic-${crypto.randomUUID()}`;
+    const position =
+      Object.values(store.getState().tasksById).reduce(
+        (highest, existing) =>
+          existing.columnId === columnId
+            ? Math.max(highest, existing.position)
+            : highest,
+        0,
+      ) + POSITION_GAP;
+
+    store.getState().upsertTask({
+      id: tempId,
+      columnId,
+      position,
+      title: trimmed,
+      description: description || null,
+      priority,
+      difficulty,
+      points: DIFFICULTY_POINTS[difficulty] ?? 0,
+      type,
+      skillCategoryId,
+      deadline: deadline || null,
+      codevId: codevId || null,
+      sidekickIds,
+      dueDate: null,
+      updatedAt: null,
+    });
+
+    try {
+      const created = await createTask({ columnId, ...fields });
+      const next = store.getState();
+      next.removeTask(tempId);
+      next.upsertTask(created);
+    } catch (caught) {
+      store.getState().removeTask(tempId);
+      toast.error(
+        caught instanceof Error ? caught.message : "Could not create the task.",
+      );
+    }
+  }
+
+  function handleDelete() {
+    if (!task) return;
+
+    const taskId = task.id;
+
+    onOpen("deleteWarningModal", undefined, undefined, () => {
+      void (async () => {
+        const previous = store.getState().tasksById[taskId];
+
+        store.getState().removeTask(taskId);
+        store.getState().setPending(taskId, true);
+
+        try {
+          await deleteTask(taskId);
+          store.getState().setPending(taskId, false);
+        } catch (caught) {
+          store.getState().setPending(taskId, false);
+          if (previous) store.getState().upsertTask(previous);
+          toast.error(
+            caught instanceof Error
+              ? caught.message
+              : "Could not delete the task.",
+          );
+        }
+      })();
+    });
   }
 
   if (!resolvedColumnId || !projectId || !canManage) return null;
@@ -444,6 +513,17 @@ export default function TaskCreateDrawer({
                 type="date"
                 value={deadline}
                 onChange={(event) => setDeadline(event.target.value)}
+                onPointerUp={(event) => {
+                  const input = event.currentTarget;
+
+                  if (input.disabled || input.readOnly) return;
+
+                  try {
+                    input.showPicker();
+                  } catch {
+                    return;
+                  }
+                }}
                 disabled={loading}
               />
             </div>
@@ -498,21 +578,30 @@ export default function TaskCreateDrawer({
             </p>
           ) : null}
           <div className="flex justify-end gap-2">
+            {task ? (
+              <Button
+                type="button"
+                variant="destructive"
+                className="w-auto"
+                onClick={handleDelete}
+                disabled={loading}
+              >
+                Delete task
+              </Button>
+            ) : null}
             <Button
               type="button"
               variant="hollow"
               className="w-auto"
               onClick={onClose}
-              disabled={pending || loading}
+              disabled={loading}
             >
               Cancel
             </Button>
             <Button
               type="submit"
               className="w-auto"
-              loading={pending}
-              disabled={pending || loading}
-              loadingText={task ? "Saving..." : "Creating task..."}
+              disabled={loading}
             >
               {task ? "Save" : "Create Task"}
             </Button>

@@ -33,6 +33,7 @@ const Navbar = ({
       <nav
         className="fixed top-0 z-20 w-full bg-white/80 dark:bg-gray-950/80 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-800/50 shadow-sm"
         role="banner"
+        suppressHydrationWarning
       >
       <div className="flex w-full min-w-full items-center justify-end px-8 py-2">
         <div

@@ -20,7 +20,8 @@ export type ModalType =
   | "projectContributorPicker"
   | "projectCreateDrawer"
   | "sprintCreateDrawer"
-  | "taskCreateDrawer";
+  | "taskCreateDrawer"
+  | "columnCreateDrawer";
 
 export interface ModalStore {
   type: ModalType | null;
