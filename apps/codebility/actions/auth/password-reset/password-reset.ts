@@ -11,6 +11,9 @@ export const resetUserPassword = async (email: string) => {
         const headersList = await headers();
         const origin =
             headersList.get("origin") ??
+            (process.env.VERCEL_URL
+                ? `https://${process.env.VERCEL_URL}`
+                : undefined) ??
             process.env.NEXT_PUBLIC_APP_BASE_URL ??
             "http://localhost:3000";
 
