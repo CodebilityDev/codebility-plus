@@ -18,6 +18,11 @@ interface MemberSelectionProps {
   selectedMembers: Codev[];
   onMemberAdd: (member: Codev) => void;
   onMemberRemove: (memberId: string) => void;
+  searchQuery?: string;
+  onSearchQueryChange?: (query: string) => void;
+  isSearching?: boolean;
+  searchError?: string | null;
+  currentMembers?: Codev[];
   excludeMembers?: string[]; // IDs of members to exclude (e.g., team leader)
   // Added: allow callers to hide the built-in "Team Members" label when they
   // already provide their own heading. Defaults to true (existing behavior).
@@ -29,12 +34,18 @@ export const MemberSelection = ({
   selectedMembers,
   onMemberAdd,
   onMemberRemove,
+  searchQuery,
+  onSearchQueryChange,
+  isSearching = false,
+  searchError = null,
+  currentMembers = [],
   excludeMembers = [],
   showLabel = true, // default true — no change to existing callers
 }: MemberSelectionProps) => {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [internalSearchQuery, setInternalSearchQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const currentSearchQuery = searchQuery ?? internalSearchQuery;
 
   useEffect(() => {
     if (isOpen && searchInputRef.current) {
@@ -50,11 +61,48 @@ export const MemberSelection = ({
       !excludeMembers.includes(user.id),
   );
 
-  const filteredMembers = availableMembers.filter((user) =>
-    `${user.first_name} ${user.last_name}`
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase()),
+  const searchText = currentSearchQuery.trim().toLowerCase().replace(/\s+/g, " ");
+  const matchesName = (user: Codev) => {
+    const firstName = user.first_name.toLowerCase();
+    const lastName = user.last_name.toLowerCase();
+    const fullName = `${firstName} ${lastName}`;
+
+    return (
+      firstName.includes(searchText) ||
+      lastName.includes(searchText) ||
+      fullName.includes(searchText)
+    );
+  };
+  const selectedMemberIds = new Set(selectedMembers.map(({ id }) => id));
+  const currentMemberResults =
+    onSearchQueryChange && searchText
+      ? currentMembers.filter(
+          (member) =>
+            !excludeMembers.includes(member.id) && matchesName(member),
+        )
+      : [];
+  const currentMemberIds = new Set(currentMemberResults.map(({ id }) => id));
+  const remoteMemberResults = users.filter(
+    (user) =>
+      !excludeMembers.includes(user.id) &&
+      !selectedMemberIds.has(user.id) &&
+      matchesName(user) &&
+      !currentMemberIds.has(user.id),
   );
+  const filteredMembers = onSearchQueryChange
+    ? Array.from(
+        new Map(
+          [...currentMemberResults, ...remoteMemberResults].map((member) => [
+            member.id,
+            member,
+          ]),
+        ).values(),
+      )
+    : availableMembers.filter((user) =>
+        `${user.first_name} ${user.last_name}`
+          .toLowerCase()
+          .includes(currentSearchQuery.toLowerCase()),
+      );
 
   return (
     <div className="space-y-2">
@@ -109,8 +157,14 @@ export const MemberSelection = ({
               <input
                 ref={searchInputRef}
                 type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                value={currentSearchQuery}
+                onChange={(e) => {
+                  if (onSearchQueryChange) {
+                    onSearchQueryChange(e.target.value);
+                  } else {
+                    setInternalSearchQuery(e.target.value);
+                  }
+                }}
                 onPointerDown={(e) => e.stopPropagation()}
                 onFocus={(e) => e.stopPropagation()}
                 onKeyDown={(e) => e.stopPropagation()}
@@ -126,14 +180,34 @@ export const MemberSelection = ({
 
               {filteredMembers.length === 0 ? (
                 <div className="px-4 py-8 text-sm text-gray-500 text-center">
-                  {searchQuery ? 'No members found matching your search' : 'No members available'}
+                  {isSearching
+                    ? "Searching members..."
+                    : searchError
+                      ? "Unable to search members"
+                      : currentSearchQuery
+                        ? "No members found matching your search"
+                        : "No members available"}
                 </div>
               ) : (
                 filteredMembers.map((user) => (
                 <DropdownMenuItem
                   key={user.id}
-                  onClick={() => onMemberAdd(user)}
-                  className="dark:hover:bg-dark-200 flex cursor-pointer items-center justify-between px-4 py-2 hover:bg-gray-100"
+                  onClick={() => {
+                    if (currentMemberIds.has(user.id)) {
+                      if (selectedMemberIds.has(user.id)) {
+                        onMemberRemove(user.id);
+                      } else {
+                        onMemberAdd(user);
+                      }
+                      return;
+                    }
+                    onMemberAdd(user);
+                  }}
+                  className={`dark:hover:bg-dark-200 flex cursor-pointer items-center justify-between px-4 py-2 hover:bg-gray-100 ${
+                    currentMemberIds.has(user.id)
+                      ? "border-l-2 border-green-500 bg-green-50/50 dark:bg-green-900/10"
+                      : ""
+                  }`}
                 >
                   <div className="flex items-center gap-2">
                     {user.image_url ? (
@@ -147,8 +221,29 @@ export const MemberSelection = ({
                     )}
                     <span className="capitalize">
                       {user.first_name} {user.last_name}
+                      {currentMemberIds.has(user.id) && (
+                        <span className="ml-2 text-xs text-green-600 dark:text-green-400">
+                          (Current)
+                        </span>
+                      )}
                     </span>
                   </div>
+                  {currentMemberIds.has(user.id) && (
+                    <span
+                      aria-label={
+                        selectedMemberIds.has(user.id)
+                          ? "Selected"
+                          : "Not selected"
+                      }
+                      className={`flex h-5 w-5 items-center justify-center rounded border text-xs ${
+                        selectedMemberIds.has(user.id)
+                          ? "border-green-600 bg-green-600 text-white"
+                          : "border-gray-400"
+                      }`}
+                    >
+                      {selectedMemberIds.has(user.id) ? "✓" : ""}
+                    </span>
+                  )}
                 </DropdownMenuItem>
               ))
             )}
