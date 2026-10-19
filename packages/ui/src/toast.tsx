@@ -7,7 +7,6 @@ import { cva } from "class-variance-authority";
 import { X } from "lucide-react";
 
 import { cn } from "@codevs/ui";
-import { useToast } from "./use-toast"; // We'll create this hook
 
 const ToastProvider = ToastPrimitives.Provider;
 
@@ -118,19 +117,6 @@ type ToastProps = React.ComponentPropsWithoutRef<typeof Toast>;
 
 type ToastActionElement = React.ReactElement<typeof ToastAction>;
 
-// Add a toast function for easier usage
-interface ToastOptions {
-  title?: string;
-  description?: string;
-  action?: ToastActionElement;
-  variant?: "default" | "destructive";
-}
-
-const toast = (options: ToastOptions) => {
-  const { toast: showToast } = useToast();
-  showToast(options);
-};
-
 export {
   type ToastProps,
   type ToastActionElement,
@@ -141,5 +127,4 @@ export {
   ToastDescription,
   ToastClose,
   ToastAction,
-  toast, // Export the toast function
 };

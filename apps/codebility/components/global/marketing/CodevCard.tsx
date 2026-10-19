@@ -1,0 +1,219 @@
+"use client";
+
+import type React from "react";
+import { useMemo, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import CodevBadge from "@/components/global/codev/CodevBadge";
+import { item } from "@/constants/global/animation";
+import { AnimatePresence, motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { BookOpenIcon } from "lucide-react";
+
+import { cn } from "@codevs/ui";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@codevs/ui/tooltip";
+
+import { CodevHireCodevButton } from "@/components/global/marketing/CodevHireCodevButton";
+import { STATUS_CONFIG } from "@/constants/global/marketing";
+import type { CodevCardProps } from "@/types/global/marketing";
+
+
+const CodevCard = ({
+  codev,
+  color,
+  animateEntrance = true,
+  skillCategories,
+}: CodevCardProps) => {
+  const [hovered, setHovered] = useState(false);
+  const springConfig = { stiffness: 100, damping: 5 };
+  const x = useMotionValue(0);
+  const rotate = useSpring(
+    useTransform(x, [-100, 100], [-45, 45]),
+    springConfig,
+  );
+  const translateX = useSpring(
+    useTransform(x, [-100, 100], [-50, 50]),
+    springConfig,
+  );
+
+  const handleMouseMove = (event: React.MouseEvent) => {
+    const halfWidth = (event.target as HTMLElement).offsetWidth / 2;
+    x.set(event.nativeEvent.offsetX - halfWidth);
+  };
+
+  const internalStatus = typeof codev.internal_status === "string" ? codev.internal_status : "MENTOR";
+  const statusConfig = (STATUS_CONFIG[internalStatus] ?? STATUS_CONFIG.MENTOR) as { className: string; label: string };
+
+  const filteredLevel = useMemo(() => {
+    return codev.level &&
+      codev.codev_points &&
+      Array.isArray(codev.codev_points)
+      ? Object.fromEntries(
+          Object.entries(codev.level)
+            .filter(([skillCategoryId, levelValue]) => {
+              return (
+                levelValue > 0 &&
+                codev.codev_points?.some(
+                  (point) => point.skill_category_id === skillCategoryId,
+                )
+              );
+            })
+            .sort(([skillCategoryIdA], [skillCategoryIdB]) => {
+              const pointsA =
+                codev.codev_points?.find(
+                  (point) => point.skill_category_id === skillCategoryIdA,
+                )?.points ?? 0;
+              const pointsB =
+                codev.codev_points?.find(
+                  (point) => point.skill_category_id === skillCategoryIdB,
+                )?.points ?? 0;
+              return pointsB - pointsA;
+            }),
+        )
+      : {};
+  }, [codev.level, codev.codev_points]);
+
+  const cardBody = (
+      <Link
+        href={`/profiles/${codev.id}`}
+        prefetch
+        className="group relative flex h-full w-full flex-col items-center justify-between rounded-lg border border-white/20 bg-white/10 p-6 shadow-2xl backdrop-blur-md transition-all duration-300 ease-out cursor-pointer hover:bg-white/20 hover:scale-[1.02] dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10"
+      >
+        {/* Background decoration */}
+        <div className="from-customBlue-50/30 dark:from-customBlue-950/10 absolute inset-0 bg-gradient-to-br to-purple-50/30 opacity-0 transition-opacity duration-300 group-hover:opacity-100 dark:to-purple-950/10" />
+        <div className="absolute -right-4 -top-4 h-32 w-32 rounded-full bg-gradient-to-br from-yellow-400/10 to-orange-400/10 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100" />
+
+        <div className="grid w-full grid-cols-4 gap-2">
+          <div className="col-span-1" />
+          <div className="relative col-span-2 flex justify-center">
+            <Image
+              alt={`${codev.first_name} Avatar`}
+              src={
+                codev.image_url &&
+                (codev.image_url.startsWith("http") ||
+                  codev.image_url.startsWith("/"))
+                  ? codev.image_url
+                  : "/assets/svgs/icon-codebility-black.svg"
+              }
+              width={96}
+              height={96}
+              className={`${color} h-24 w-24 rounded-full bg-cover object-cover p-0.5 transition-transform duration-300 group-hover:scale-105`}
+              onMouseMove={handleMouseMove}
+              onError={(e) => {
+                console.error(
+                  `Failed to load image for ${codev.first_name}: ${codev.image_url}`,
+                );
+                e.currentTarget.src = "/assets/svgs/icon-codebility-black.svg";
+              }}
+            />
+            <AnimatePresence>
+              {hovered && internalStatus && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20, scale: 0.6 }}
+                  animate={{
+                    opacity: 1,
+                    y: 0,
+                    scale: 1,
+                    transition: {
+                      type: "spring",
+                      stiffness: 260,
+                      damping: 10,
+                    },
+                  }}
+                  exit={{ opacity: 0, y: 20, scale: 0.6 }}
+                  style={{
+                    translateX: translateX,
+                    rotate: rotate,
+                    whiteSpace: "nowrap",
+                  }}
+                  className={cn(
+                    "absolute -top-8 right-1/2 z-50 flex -translate-x-1/2 transform flex-col items-center justify-center rounded-lg px-4 py-2 shadow-xl",
+                    statusConfig.className,
+                  )}
+                >
+                  <div className="relative z-30 text-base">
+                    {statusConfig.label}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+            <div className="absolute bottom-[1px] right-[1px]">
+              <p
+                className={cn(
+                  "rounded-full border-2 p-2.5 text-[9px]",
+                  codev.availability_status
+                    ? "border-green-600 bg-green-500"
+                    : "border-red-600 bg-red-500",
+                )}
+              ></p>
+            </div>
+          </div>
+          <div className="col-span-1 flex justify-end">
+            <TooltipProvider>
+              <Tooltip delayDuration={100}>
+                <TooltipTrigger asChild>
+                  <span className="relative z-10 inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/30 bg-white/20 backdrop-blur-sm dark:border-white/20 dark:bg-white/10">
+                    <BookOpenIcon className="h-4 w-4" />
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent className="border border-white/20 bg-white/10 px-2 py-1 text-xs text-white backdrop-blur-md dark:border-white/10 dark:bg-white/5">
+                  Read Bio
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+        </div>
+        <div className="flex flex-col items-center gap-0.5">
+          <div className="flex flex-col gap-1 text-center">
+            <p className="relative z-10 text-base capitalize text-white dark:text-white lg:text-lg">
+              {codev.first_name} {codev.last_name}
+            </p>
+            {codev.display_position ? (
+              <p className="relative z-10 text-sm text-gray-200 dark:text-gray-300 lg:text-base">
+                {codev.display_position}
+              </p>
+            ) : (
+              <div className="relative z-10 text-sm lg:text-base">&nbsp;</div>
+            )}
+          </div>
+        </div>
+        <div className="flex min-h-[24px] items-center justify-center">
+          {Object.keys(filteredLevel).length > 0 ? (
+            <CodevBadge
+              level={filteredLevel}
+              skillCategories={skillCategories}
+              className="transition-transform group-hover:scale-100"
+            />
+          ) : null}
+        </div>
+        <div className="relative z-10">
+          <CodevHireCodevButton />
+        </div>
+      </Link>
+  );
+
+  if (!animateEntrance) {
+    return (
+      <div
+        className="h-80"
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      >
+        {cardBody}
+      </div>
+    );
+  }
+
+  return (
+    <motion.div
+      variants={item}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      className="h-80"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {cardBody}
+    </motion.div>
+  );
+};
+
+export default CodevCard;

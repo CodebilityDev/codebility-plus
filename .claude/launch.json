@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "codebility",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["codebility"],
+      "port": 3000
+    }
+  ]
+}

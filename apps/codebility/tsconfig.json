@@ -32,13 +32,12 @@
     }
   },
   "include": [
+    "svgr.d.ts",
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
     "**/*.mjs",
-    ".next/types/**/*.ts",
-    "public/assets/svgs/index.js",
-    "svgr.d.ts"
+    ".next/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",

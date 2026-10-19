@@ -1,39 +1,24 @@
-import "@/app/globals.css";
+import "@/styles/global/globals.css";
 
-import React from "react";
-import { Metadata } from "next";
+
+import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
-import { Toaster } from "@/components/ui/toaster";
-import { ThemeProvider } from "@/store/providers/ThemeProvider";
-import ToasterContext from "@/store/providers/ToasterProvider";
-import ReactQueryProvider from "@/hooks/query/reactQuery";
+import { Toaster } from "@/components/global/ui/toaster";
+import { ThemeProvider } from "@/providers/global/ThemeProvider";
+import ToasterContext from "@/providers/global/ToasterProvider";
 import { TooltipProvider } from "@codevs/ui/tooltip";
-import JsonLd from "@/app/(marketing)/_components/JsonLd";
+import JsonLd from "@/components/global/marketing/JsonLd";
+import { organizationSchema, websiteSchema } from "@/constants/global/app";
+import type { RootLayoutProps } from "@/types/global/app";
+
+
 
 const outfit = Outfit({
     subsets: ["latin"],
     preload: false,
 });
 
-// CBP-135 follow-up: sitewide Organization + WebSite JSON-LD.
-// Static schema — no data dependency, safe to render on every page.
-const organizationSchema = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    name: "Codebility",
-    url: "https://www.codebility.tech",
-    logo: "https://www.codebility.tech/assets/images/logo.png",
-    description: "Everyone has the ability to code",
-};
-
-const websiteSchema = {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    name: "Codebility",
-    url: "https://www.codebility.tech",
-};
-
-export async function generateMetadata(): Promise<Metadata> {
+export function generateMetadata(): Metadata {
     return {
         // CBP-135 follow-up fix: metadataBase was missing on dev, confirmed via
         // pasted layout.tsx. Required so relative OG image paths (/og-image.jpg)
@@ -73,9 +58,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default function RootLayout({
     children,
-}: {
-    children: React.ReactNode;
-}) {
+}: RootLayoutProps) {
     return (
         <html lang="en" className={outfit.className} suppressHydrationWarning>
             <head>
@@ -103,20 +86,18 @@ export default function RootLayout({
             <body suppressHydrationWarning>
                 <JsonLd data={organizationSchema} />
                 <JsonLd data={websiteSchema} />
-                <ReactQueryProvider>
-                    <ThemeProvider
-                        attribute="class"
-                        defaultTheme="system"
-                        enableSystem
-                        disableTransitionOnChange
-                    >
-                        <TooltipProvider>
-                            <Toaster />
-                            <ToasterContext />
-                            {children}
-                        </TooltipProvider>
-                    </ThemeProvider>
-                </ReactQueryProvider>
+                <ThemeProvider
+                    attribute="class"
+                    defaultTheme="system"
+                    enableSystem
+                    disableTransitionOnChange
+                >
+                    <TooltipProvider>
+                        <Toaster />
+                        <ToasterContext />
+                        {children}
+                    </TooltipProvider>
+                </ThemeProvider>
             </body>
         </html>
     );

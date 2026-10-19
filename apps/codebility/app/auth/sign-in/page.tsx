@@ -1,9 +1,11 @@
 import Link from "next/link";
-import Logo from "@/components/shared/Logo";
-import { Toaster } from "@/components/ui/toaster";
-import pathsConfig from "@/types/zod/paths.config";
+import Logo from "@/components/global/layout/Logo";
+import { Toaster } from "@/components/global/ui/toaster";
+import pathsConfig from "@/constants/global/paths";
 
-import AuthForm from "./_components/SignInForm";
+import AuthForm from "@/components/auth/sign-in/SignInForm";
+
+export const instant = false;
 
 const SignIn = () => {
   return (

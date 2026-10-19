@@ -1,0 +1,21 @@
+
+> codebility@0.1.0 dev C:\Users\Dev\Desktop\Dev\codebility-plus\apps\codebility
+> cross-env FORCE_COLOR=1 next dev "-p" "3002"
+
+[1m[38;2;173;127;168m▲ Next.js 16.3.7[39m[22m (Turbopack)
+- Local:         http://localhost:3002
+- Network:       http://192.168.1.11:3002
+- Environments: .env
+[32m[1m✓[22m[39m Ready in 1267ms
+[32m[1m✓[22m[39m Running next.config.mjs took 58ms
+[31m[1m⨯[22m[39m Another [36mnext dev[39m server is already running.
+
+- Local:        [36mhttp://localhost:3020[39m
+- PID:          23276
+- Dir:          C:\Users\Dev\Desktop\Dev\codebility-plus\apps\codebility
+- Log:          .next\dev\logs\next-development.log
+
+You can access the existing server at [36mhttp://localhost:3020[39m,
+or run [36mtaskkill /PID 23276 /F[39m to stop it and start a new one.
+[?25h
+ ELIFECYCLE  Command failed with exit code 1.

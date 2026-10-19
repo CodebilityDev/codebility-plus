@@ -1,0 +1,103 @@
+import { Suspense } from "react";
+
+import { redirect } from "next/navigation";
+
+import EmptyState from "@/components/global/feedback/EmptyState";
+import H1 from "@/components/global/layout/H1";
+import OverlayTrigger from "@/components/global/OverlayTrigger";
+import KanbanBoard from "@/components/home/kanban/KanbanBoard";
+import KanbanBoardPageSkeleton from "@/components/home/kanban/KanbanBoardPageSkeleton";
+import KanbanBreadcrumb from "@/components/home/kanban/KanbanBreadcrumb";
+import KanbanConnectionBadge from "@/components/home/kanban/KanbanConnectionBadge";
+import KanbanOverlays from "@/components/home/kanban/KanbanOverlays";
+import KanbanRealtimeBridge from "@/components/home/kanban/KanbanRealtimeBridge";
+import { canManageTasks } from "@/constants/global/permissions";
+import pathsConfig from "@/constants/global/paths";
+import {
+  getAccessibleProjectIds,
+  getAccess,
+} from "@/lib/global/permissions";
+import { getBoard } from "@/lib/home/kanban/kanban-cached";
+import { KanbanStoreProvider } from "@/providers/home/kanban/KanbanStoreProvider";
+import type { KanbanBoardPageProps } from "@/types/home/kanban/kanban";
+
+export const instant = false;
+
+export default function KanbanBoardPage({ params }: KanbanBoardPageProps) {
+  return (
+    <Suspense fallback={<KanbanBoardPageSkeleton />}>
+      <KanbanBoardContent params={params} />
+    </Suspense>
+  );
+}
+
+async function KanbanBoardContent({ params }: KanbanBoardPageProps) {
+  const { projectId, sprintId } = await params;
+  const board = await getBoard(sprintId);
+
+  if (!board) {
+    return (
+      <div className="mx-auto w-full max-w-screen-xl px-4 py-6">
+        <KanbanBreadcrumb
+          items={[
+            { label: "Kanban", href: pathsConfig.app.kanban },
+            { label: "Project", href: pathsConfig.app.kanban + "/" + projectId },
+          ]}
+        />
+        <EmptyState
+          title="This sprint has no board"
+          description="Open the sprint from the sprints list to provision one."
+        />
+      </div>
+    );
+  }
+
+  const base = pathsConfig.app.kanban;
+
+  const [accessibleProjectIds, { hasFullAccess, roleId }] = await Promise.all([
+    getAccessibleProjectIds(),
+    getAccess(),
+  ]);
+
+  if (!hasFullAccess && !accessibleProjectIds?.includes(board.projectId)) {
+    redirect(pathsConfig.app.home);
+  }
+
+  const canManage = canManageTasks(roleId);
+
+  return (
+    <KanbanStoreProvider snapshot={board}>
+      <KanbanRealtimeBridge boardId={board.boardId} sprintId={board.sprintId} />
+      <KanbanOverlays canManage={canManage} />
+      <div className="flex h-full min-h-0 flex-col">
+        <div className="px-4 pt-6">
+          <KanbanBreadcrumb
+            items={[
+              { label: "Kanban", href: base },
+              { label: board.projectName, href: base + "/" + projectId },
+              {
+                label: board.sprintName ?? "Sprint",
+                href: base + "/" + projectId + "/" + sprintId,
+              },
+            ]}
+          />
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <H1>{board.sprintName ?? board.boardName}</H1>
+            <div className="flex items-center gap-2">
+              <KanbanConnectionBadge />
+              {canManage && (
+                <OverlayTrigger
+                  type="columnCreateDrawer"
+                  data={{ boardId: board.boardId }}
+                >
+                  Add column
+                </OverlayTrigger>
+              )}
+            </div>
+          </div>
+        </div>
+        <KanbanBoard canManage={canManage} />
+      </div>
+    </KanbanStoreProvider>
+  );
+}

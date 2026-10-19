@@ -1,10 +1,8 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
-import Logo from "@/components/shared/Logo";
-import { Button } from "@/components/ui/button";
+
+export const instant = false;
 
 // Add this line to prevent static generation
-export const dynamic = "force-dynamic";
 
 const WaitingPage = () => {
   /* redirect to new page*/

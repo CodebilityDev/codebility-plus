@@ -1,0 +1,149 @@
+"use client";
+
+import type { StaticImageData } from "next/image";
+import React, { useState } from "react";
+import Image from "next/image";
+import Box from "@/components/global/layout/Box";
+import Paragraph from "@/components/global/typography/Paragraph";
+import { useModal } from "@/hooks/global/use-modal";
+import { defaultAvatar } from "@/public/assets/images/index";
+import { deleteImage, getImagePath } from "@/actions/applicant/profile/upload-image";
+import toast from "react-hot-toast";
+
+import { Button } from "@codevs/ui/button";
+
+import { updateCodev } from "@/actions/applicant/profile/applicant-profile";
+import UploadPhotoModal from "@/components/applicant/profile/UploadPhotoModal";
+import type { PhotoProps } from "@/types/applicant/profile/profile";
+
+
+const Photo = ({ data, earnedCategories }: PhotoProps) => {
+  const [uploadedAvatar, setUploadedAvatar] = useState<string | StaticImageData | null>(null);
+  const { onOpen } = useModal();
+  const hasImagePoints = earnedCategories.some((category) => ["image_url"].includes(category));
+
+  const [croppedAvatar, setCroppedAvatar] = useState<string | null>(null);
+  const [openUploadModal, setOpenUploadModal] = useState(false);
+
+  const avatar = uploadedAvatar ?? data.image_url ?? defaultAvatar;
+
+  // Check if user has earned points for uploading a photo
+
+  const handleUploadAvatar = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    try {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      setCroppedAvatar(URL.createObjectURL(file));
+      setOpenUploadModal(true);
+    } catch (error) {
+      console.error("Error uploading avatar:", error);
+    }
+  };
+
+  const handleRemoveAvatar = async () => {
+    if (avatar === defaultAvatar) return;
+
+    const toastId = toast.loading("Removing your avatar...");
+    try {
+      const filePath = await getImagePath(avatar as string);
+      if (filePath) {
+        await deleteImage(filePath);
+      }
+
+      await updateCodev({ image_url: null });
+
+      setUploadedAvatar(null);
+      toast.success("Avatar removed successfully!", { id: toastId });
+    } catch (error) {
+      console.error("Error removing avatar:", error);
+      toast.error("Failed to remove avatar", { id: toastId });
+    }
+  };
+
+  const handleDeleteWarning = () => {
+    onOpen("deleteWarningModal", {}, {}, () => { void handleRemoveAvatar(); });
+  };
+
+  // Show message only if: no image_url AND hasn't earned points yet
+  const shouldShowMessage = !data.image_url && !hasImagePoints;
+
+  return (
+    <Box className="bg-light-900 dark:bg-dark-100 relative flex flex-col gap-2">
+      <div className="flex items-center justify-between">
+        <p className="text-lg">Your Photo</p>
+        
+        {shouldShowMessage && (
+          <span className="text-xs text-green-600 flex items-center gap-1">
+              <svg 
+                className="h-3 w-3" 
+                fill="currentColor" 
+                viewBox="0 0 20 20"
+              >
+                <path 
+                  fillRule="evenodd" 
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" 
+                  clipRule="evenodd" 
+                />
+              </svg>
+              Upload your Photo to earn points
+            </span>
+        )}
+      </div>
+
+      <Paragraph className="py-4">
+        Upload your photo to make your profile stand out. We recommend an image
+        of 200x200 pixels in JPG or PNG format.
+      </Paragraph>
+      <div className="flex gap-4">
+        <div className="relative size-[80px]">
+          <Image
+            src={avatar}
+            alt="Avatar"
+            fill
+            sizes="80px"
+            className="from-customViolet-100 h-auto w-auto rounded-lg bg-gradient-to-b to-customBlue-500 bg-cover object-cover"
+          />
+        </div>
+        <div className="flex flex-col justify-center gap-2">
+          <div className="flex flex-col justify-start gap-2">
+            {avatar === defaultAvatar ? (
+              <label htmlFor="image" className="cursor-pointer">
+                <p className="transition duration-300 hover:text-customBlue-100">
+                  "Upload Image"
+                </p>
+                <input
+                  id="image"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleUploadAvatar}
+                  className="hidden"
+                />
+              </label>
+            ) : (
+              <Button
+                variant="link"
+                onClick={handleDeleteWarning}
+                className="cursor-pointer transition duration-300 hover:text-customBlue-100 hover:no-underline dark:text-white"
+              >
+                Remove Image
+              </Button>
+            )}
+          </div>
+        </div>
+
+        <UploadPhotoModal
+          open={openUploadModal}
+          setOpen={setOpenUploadModal}
+          image={croppedAvatar ?? ""}
+          setImage={setCroppedAvatar}
+          setAvatar={setUploadedAvatar}
+        />
+      </div>
+    </Box>
+  );
+};
+
+export default Photo;

@@ -17,7 +17,7 @@
     "skipLibCheck": true,
     "noEmit": false,
     "strict": false,
-    "strictNullChecks": false,
+    "strictNullChecks": true,
     "noUncheckedIndexedAccess": false,
     "forceConsistentCasingInFileNames": true,
     "allowImportingTsExtensions": false,
