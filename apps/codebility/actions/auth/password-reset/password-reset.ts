@@ -35,7 +35,7 @@ export const resetUserPassword = async (email: string) => {
         const isPassed = data.application_status === "passed";
         const url = isPassed 
             ? `${origin}/auth/callback?redirect_to=/home/account-settings` 
-            : `${origin}/auth/callback?redirect_to=/applicant/waiting`;
+            : `${origin}/auth/callback?redirect_to=/applicant/account-settings`;
 
         // Send password reset email using Supabase Auth
         const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {

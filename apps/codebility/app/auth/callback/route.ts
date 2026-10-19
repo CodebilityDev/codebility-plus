@@ -28,6 +28,29 @@ export async function GET(request: Request) {
     if (redirectTo) {
       return NextResponse.redirect(`${origin}${redirectTo}`);
     }
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (user) {
+      const { data: codev } = await supabase
+        .from("codev")
+        .select("application_status")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      return NextResponse.redirect(
+        new URL(
+          codev?.application_status === "passed"
+            ? "/home/account-settings"
+            : "/applicant/account-settings",
+          origin,
+        ),
+      );
+    }
+
+    return NextResponse.redirect(new URL("/auth/sign-in", origin));
   }
 
   if (code) {
