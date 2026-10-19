@@ -8,7 +8,7 @@ import { CareersSignIn } from "@/components/global/marketing/CareersSignIn";
 import { MobileDrawer } from "@/components/global/marketing/MobileDrawer";
 import dynamic from "next/dynamic";
 import { signOut } from "@/actions/global/auth-session";
-import { removeLocalStorageValue } from "@/hooks/global/useLocalStorageValue";
+import { clearNavUser } from "@/lib/global/nav-user-loader";
 
 
 const UserMenu = dynamic(
@@ -35,13 +35,13 @@ const Navigation = () => {
   const { color } = useChangeBgNavigation();
   const [openSheet, setOpenSheet] = useState(false);
 
-  const handleLogout = async () => { 
+  const handleLogout = async () => {
     try {
       await signOut();
     } finally {
-      removeLocalStorageValue("user_profile")
+      clearNavUser();
     }
-  }
+  };
 
   return (
     <div

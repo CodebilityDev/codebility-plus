@@ -13,6 +13,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { signOut } from "@/actions/global/auth-session";
 import MobileNav from "@/components/home/MobileNav";
 import { menuItems } from "@/constants/home/home";
+import { clearNavUser } from "@/lib/global/nav-user-loader";
 import type { CurrentUserProfile } from "@/types/global/current-user";
 import type { Sidebar } from "@/types/home/home";
 
@@ -111,7 +112,12 @@ const Navbar = ({
               <DropdownMenuItem
                 onClick={async (e) => {
                   e.stopPropagation();
-                  await signOut();
+
+                  try {
+                    await signOut();
+                  } finally {
+                    clearNavUser();
+                  }
                 }}
                 className="flex cursor-pointer items-center gap-6 p-3 px-5"
                 role="menuitem"
