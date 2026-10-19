@@ -8,10 +8,12 @@ import {
   PointerSensor,
   TouchSensor,
   closestCorners,
+  pointerWithin,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
 import type {
+  CollisionDetection,
   DragEndEvent,
   DragOverEvent,
   DragStartEvent,
@@ -46,6 +48,21 @@ function resolveTarget(over: Over | null) {
   return { columnId, index };
 }
 
+function createCollisionDetection(
+  columnIds: Set<string>,
+): CollisionDetection {
+  return (args) => {
+    const collisions = pointerWithin(args);
+    if (collisions.length === 0) {
+      return closestCorners(args);
+    }
+    const tasks = collisions.filter(
+      (collision) => !columnIds.has(String(collision.id)),
+    );
+    return tasks.length > 0 ? tasks : collisions;
+  };
+}
+
 export default function KanbanBoard({ canManage }: { canManage: boolean }) {
   const columnOrder = useKanbanStore((state) => state.columnOrder);
   const setActiveTask = useKanbanStore((state) => state.setActiveTask);
@@ -68,6 +85,11 @@ export default function KanbanBoard({ canManage }: { canManage: boolean }) {
     }
     return ids;
   }, [dragColumns]);
+
+  const collisionDetection = useMemo(
+    () => createCollisionDetection(new Set(columnOrder)),
+    [columnOrder],
+  );
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -107,6 +129,15 @@ export default function KanbanBoard({ canManage }: { canManage: boolean }) {
       return;
     }
     const taskId = String(event.active.id);
+    const state = store.getState();
+    const targetIds = state.taskIdsByColumn[target.columnId] ?? [];
+    const currentColumnId = state.tasksById[taskId]?.columnId;
+    if (
+      currentColumnId === target.columnId &&
+      targetIds.indexOf(taskId) === target.index
+    ) {
+      return;
+    }
     const key = `${taskId}:${target.columnId}:${target.index}`;
     if (preview.current === key) {
       return;
@@ -147,7 +178,7 @@ export default function KanbanBoard({ canManage }: { canManage: boolean }) {
     <DndContext
       id="kanban-board"
       sensors={sensors}
-      collisionDetection={closestCorners}
+      collisionDetection={collisionDetection}
       measuring={{ droppable: { strategy: MeasuringStrategy.Always } }}
       onDragStart={handleDragStart}
       onDragOver={handleDragOver}
@@ -156,7 +187,7 @@ export default function KanbanBoard({ canManage }: { canManage: boolean }) {
     >
       <div
         ref={scrollRef}
-        className="kanban-scrollbar flex min-h-0 w-full flex-1 items-stretch overflow-x-auto overflow-y-hidden px-4 pb-4"
+        className="kanban-scrollbar relative flex min-h-0 w-full flex-1 items-stretch overflow-x-auto overflow-y-hidden px-4 pb-4"
         aria-label="Kanban board"
       >
         <div
@@ -166,26 +197,27 @@ export default function KanbanBoard({ canManage }: { canManage: boolean }) {
             width: Math.max(totalSize - COLUMN_GAP, 0),
           }}
         >
-          {indexes.length === 0 ? (
-            <KanbanBoardSkeleton />
-          ) : (
-            indexes.map((index) => {
-              const columnId = columnOrder[index];
-              if (!columnId) {
-                return null;
-              }
-              return (
-                <div
-                  key={columnId}
-                  className="absolute top-0 h-full w-72"
-                  style={{ left: index * COLUMN_STRIDE }}
-                >
-                  <KanbanColumn columnId={columnId} canManage={canManage} />
-                </div>
-              );
-            })
-          )}
+          {indexes.map((index) => {
+            const columnId = columnOrder[index];
+            if (!columnId) {
+              return null;
+            }
+            return (
+              <div
+                key={columnId}
+                className="absolute top-0 h-full w-72"
+                style={{ left: index * COLUMN_STRIDE }}
+              >
+                <KanbanColumn columnId={columnId} canManage={canManage} />
+              </div>
+            );
+          })}
         </div>
+        {indexes.length === 0 ? (
+          <div className="absolute inset-0 px-4 pb-4">
+            <KanbanBoardSkeleton />
+          </div>
+        ) : null}
       </div>
       <KanbanDragOverlay />
     </DndContext>
