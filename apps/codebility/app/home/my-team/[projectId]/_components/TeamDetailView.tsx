@@ -22,6 +22,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
+import { useUserStore } from "@/store/codev-store";
 
 import ChecklistManageModal from "../../_components/ChecklistManageModal";
 import AddMembersModal from "../../AddMembersModal";
@@ -77,6 +78,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
     presentDays: number;
   }>({ totalPoints: 0, presentDays: 0 });
   const attendanceGridRef = useRef<any>(null);
+  const user = useUserStore((state) => state.user);
 
   const { project: projectInfo, teamLead, members, subLead, currentUserId } = project;
   const totalMembers = (members?.data?.length || 0) + (teamLead?.data ? 1 : 0);
@@ -84,6 +86,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
   const isCurrentUserTeamLead = teamLead?.data?.id
     ? currentUserId === teamLead.data.id
     : false;
+  const canManageProjectMembers = isCurrentUserTeamLead || user?.role_id === 5;
 
   useEffect(() => {
     const loadSchedule = async () => {
@@ -267,7 +270,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
             <span className="text-xs">Kanban</span>
           </Button>
 
-          {viewMode === "team" && isCurrentUserTeamLead && (
+          {viewMode === "team" && canManageProjectMembers && (
             <Button
               onClick={handleOpenAddModal}
               disabled={isLoadingMembers}
