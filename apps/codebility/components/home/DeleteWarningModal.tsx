@@ -13,10 +13,25 @@ import {
   DialogTitle,
 } from "@codevs/ui/dialog";
 
+function readOptionalString(data: unknown, key: string): string | null {
+  if (typeof data !== "object" || data === null) return null;
+
+  const value = (data as Record<string, unknown>)[key];
+
+  return typeof value === "string" && value.length > 0 ? value : null;
+}
+
 export default function DeleteWarningModal() {
-  const { isOpen, onClose, type, callback } = useModal();
+  const modal = useModal();
+  const { isOpen, onClose, type, callback } = modal;
   const isModalOpen = isOpen && type === "deleteWarningModal";
   const handleDelete = callback;
+  const title = readOptionalString(modal.data, "title") ?? "Confirm Deletion";
+  const description =
+    readOptionalString(modal.data, "description") ??
+    "Are you sure you want to delete this? This action cannot be undone.";
+  const confirmLabel =
+    readOptionalString(modal.data, "confirmLabel") ?? "Delete";
 
   function handleConfirmDelete() {
     handleDelete?.();
@@ -34,14 +49,10 @@ export default function DeleteWarningModal() {
         aria-labelledby="delete-warning-title"
       >
         <DialogHeader>
-          <DialogTitle id="delete-warning-title">
-            Confirm Deletion
-          </DialogTitle>
+          <DialogTitle id="delete-warning-title">{title}</DialogTitle>
         </DialogHeader>
         <div className="my-4 flex flex-col">
-          <p id="delete-warning-description">
-            Are you sure you want to delete this? This action cannot be undone.
-          </p>
+          <p id="delete-warning-description">{description}</p>
           <div className="sr-only" aria-live="polite" role="status">
             Deletion confirmation dialog is open. Use Tab to navigate between Cancel and Delete buttons.
           </div>
@@ -64,7 +75,7 @@ export default function DeleteWarningModal() {
             aria-label="Confirm deletion - this action cannot be undone"
             autoFocus
           >
-            Delete
+            {confirmLabel}
             <span className="sr-only"> - Permanently delete this item</span>
           </Button>
         </DialogFooter>

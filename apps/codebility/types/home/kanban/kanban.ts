@@ -77,6 +77,7 @@ export type KanbanConnection = "connecting" | "live" | "offline";
 
 export interface KanbanState {
   projectId: string | null;
+  boardId: string | null;
   columnsById: Record<string, KanbanColumn>;
   columnOrder: string[];
   tasksById: Record<string, KanbanTask>;

@@ -18,7 +18,12 @@ export interface KanbanMoveBroadcast {
 
 type BoardState = Pick<
   KanbanState,
-  "projectId" | "columnsById" | "columnOrder" | "tasksById" | "taskIdsByColumn"
+  | "projectId"
+  | "boardId"
+  | "columnsById"
+  | "columnOrder"
+  | "tasksById"
+  | "taskIdsByColumn"
 >;
 
 type MoveState = Pick<KanbanState, "tasksById" | "taskIdsByColumn">;
@@ -152,6 +157,7 @@ function buildBoardState(
 
   return {
     projectId: snapshot.projectId,
+    boardId: snapshot.boardId,
     columnsById: sameColumns && previous ? previous.columnsById : columnsById,
     columnOrder:
       previous && sameIds(previous.columnOrder, columnOrder)
@@ -227,6 +233,7 @@ export function createKanbanStore(
     ? buildBoardState(snapshot)
     : {
         projectId: null,
+        boardId: null,
         columnsById: {},
         columnOrder: [],
         tasksById: {},
@@ -277,9 +284,25 @@ export function createKanbanStore(
         const columnsById = { ...state.columnsById };
         delete columnsById[columnId];
 
+        const tasksById = { ...state.tasksById };
+        const pending = { ...state.pending };
+
+        for (const task of Object.values(state.tasksById)) {
+          if (task.columnId !== columnId) continue;
+
+          delete tasksById[task.id];
+          delete pending[task.id];
+        }
+
+        const taskIdsByColumn = { ...state.taskIdsByColumn };
+        delete taskIdsByColumn[columnId];
+
         return {
           columnsById,
           columnOrder: state.columnOrder.filter((id) => id !== columnId),
+          tasksById,
+          pending,
+          taskIdsByColumn,
         };
       }),
 

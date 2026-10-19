@@ -5272,6 +5272,21 @@ export interface Database {
         }
         Returns: undefined
       }
+      create_kanban_column: {
+        Args: {
+          p_board_id: string
+          p_gap: number
+          p_name: string
+        }
+        Returns: {
+          board_id: string | null
+          created_at: string | null
+          id: string
+          name: string
+          position: number
+          updated_at: string | null
+        }[]
+      }
       create_notification: {
         Args: {
           p_action_url?: string
@@ -5292,6 +5307,10 @@ export interface Database {
         Returns: undefined
       }
       decrement_post_likes: { Args: { post_id: number }; Returns: undefined }
+      delete_kanban_column: {
+        Args: { p_column_id: string }
+        Returns: undefined
+      }
       get_project_leaderboard: {
         Args: { result_limit?: number; time_filter?: string }
         Returns: {

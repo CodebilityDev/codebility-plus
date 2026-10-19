@@ -7,7 +7,11 @@ import { toast } from "sonner";
 import { createColumn } from "@/actions/home/kanban/columns";
 import { Button } from "@/components/global/ui/button";
 import { useModal } from "@/hooks/global/use-modal";
-import { useKanbanStoreApi } from "@/providers/home/kanban/KanbanStoreProvider";
+import { useColumnActions } from "@/hooks/home/kanban/use-column-actions";
+import {
+  useKanbanStore,
+  useKanbanStoreApi,
+} from "@/providers/home/kanban/KanbanStoreProvider";
 import { POSITION_GAP } from "@/utils/home/kanban/position";
 
 import { Input } from "@codevs/ui/input";
@@ -19,11 +23,12 @@ import {
   SheetTitle,
 } from "@codevs/ui/sheet";
 
-function readBoardId(data: unknown): string | null {
+function readId(data: unknown, key: string): string | null {
   if (typeof data !== "object" || data === null) return null;
-  const { boardId } = data as Record<string, unknown>;
-  if (typeof boardId !== "string" || boardId.length === 0) return null;
-  return boardId;
+
+  const value = (data as Record<string, unknown>)[key];
+
+  return typeof value === "string" && value.length > 0 ? value : null;
 }
 
 function readField(data: FormData, field: string) {
@@ -34,8 +39,13 @@ function readField(data: FormData, field: string) {
 export default function ColumnCreateDrawer() {
   const modal = useModal();
   const store = useKanbanStoreApi();
+  const { renameColumn, confirmDeleteColumn } = useColumnActions();
 
-  const boardId = readBoardId(modal.data);
+  const boardId = readId(modal.data, "boardId");
+  const columnId = readId(modal.data, "columnId");
+  const column = useKanbanStore((state) =>
+    columnId ? state.columnsById[columnId] : undefined,
+  );
 
   if (boardId === null) return null;
 
@@ -49,6 +59,11 @@ export default function ColumnCreateDrawer() {
 
     form.reset();
     modal.onClose();
+
+    if (columnId) {
+      await renameColumn(columnId, name);
+      return;
+    }
 
     const tempId = `optimistic-${crypto.randomUUID()}`;
     const { columnsById, upsertColumn } = store.getState();
@@ -76,6 +91,12 @@ export default function ColumnCreateDrawer() {
     }
   }
 
+  function handleDelete() {
+    if (!columnId) return;
+
+    confirmDeleteColumn(columnId);
+  }
+
   return (
     <Sheet
       open={modal.isOpen}
@@ -85,14 +106,26 @@ export default function ColumnCreateDrawer() {
     >
       <SheetContent side="right" className="flex flex-col gap-4">
         <SheetHeader>
-          <SheetTitle>New column</SheetTitle>
+          <SheetTitle>{columnId ? "Edit column" : "New column"}</SheetTitle>
         </SheetHeader>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
             <Label htmlFor="column-name">Name</Label>
-            <Input id="column-name" name="name" required />
+            <Input
+              id="column-name"
+              name="name"
+              defaultValue={column?.name ?? ""}
+              required
+            />
           </div>
-          <Button type="submit">Create column</Button>
+          {columnId ? (
+            <Button type="button" variant="destructive" onClick={handleDelete}>
+              Delete column
+            </Button>
+          ) : null}
+          <Button type="submit">
+            {columnId ? "Save column" : "Create column"}
+          </Button>
         </form>
       </SheetContent>
     </Sheet>

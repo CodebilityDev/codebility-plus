@@ -8,13 +8,22 @@ import {
 } from "@dnd-kit/sortable";
 import { defaultRangeExtractor, useVirtualizer } from "@tanstack/react-virtual";
 import type { Range } from "@tanstack/react-virtual";
-import { Plus } from "lucide-react";
+import { MoreVertical, Plus } from "lucide-react";
 
 import { cn } from "@codevs/ui";
 import { Card, CardContent, CardHeader, CardTitle } from "@codevs/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@codevs/ui/dropdown-menu";
 
+import { Button } from "@/components/global/ui/button";
 import OverlayTrigger from "@/components/global/OverlayTrigger";
 import KanbanTaskCard from "@/components/home/kanban/KanbanTaskCard";
+import { useModal } from "@/hooks/global/use-modal";
+import { useColumnActions } from "@/hooks/home/kanban/use-column-actions";
 import { useKanbanStore } from "@/providers/home/kanban/KanbanStoreProvider";
 
 const NO_TASKS: string[] = [];
@@ -34,6 +43,9 @@ const KanbanColumn = memo(function KanbanColumn({
     (state) => state.taskIdsByColumn[columnId] ?? NO_TASKS,
   );
   const activeTaskId = useKanbanStore((state) => state.activeTaskId);
+  const boardId = useKanbanStore((state) => state.boardId);
+  const onOpen = useModal((state) => state.onOpen);
+  const { confirmDeleteColumn } = useColumnActions();
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const { setNodeRef, isOver } = useDroppable({
     id: columnId,
@@ -96,14 +108,41 @@ const KanbanColumn = memo(function KanbanColumn({
           </span>
         </div>
         {canManage ? (
-          <OverlayTrigger
-            type="taskCreateDrawer"
-            data={{ columnId }}
-            className="h-7 w-7 shrink-0 !p-0 bg-transparent text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-200 dark:hover:bg-gray-800 dark:hover:text-gray-50"
-          >
-            <Plus className="h-4 w-4" />
-            <span className="sr-only">Add a task to this column</span>
-          </OverlayTrigger>
+          <div className="flex shrink-0 items-center gap-1">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  aria-label="Column options"
+                  className="h-7 w-7 !p-0"
+                >
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onSelect={() =>
+                    onOpen("columnCreateDrawer", { boardId, columnId })
+                  }
+                >
+                  Edit column
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => confirmDeleteColumn(columnId)}>
+                  Delete column
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <OverlayTrigger
+              type="taskCreateDrawer"
+              data={{ columnId }}
+              className="h-7 w-7 shrink-0 !p-0 bg-transparent text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-200 dark:hover:bg-gray-800 dark:hover:text-gray-50"
+            >
+              <Plus className="h-4 w-4" />
+              <span className="sr-only">Add a task to this column</span>
+            </OverlayTrigger>
+          </div>
         ) : null}
       </CardHeader>
       <CardContent
