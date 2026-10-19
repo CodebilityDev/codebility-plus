@@ -61,21 +61,23 @@ export const MemberSelection = ({
       !excludeMembers.includes(user.id),
   );
 
-  const searchText = currentSearchQuery.trim().toLowerCase().replace(/\s+/g, " ");
+  const searchTerms = currentSearchQuery
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .split(" ")
+    .filter(Boolean);
   const matchesName = (user: Codev) => {
-    const firstName = user.first_name.toLowerCase();
-    const lastName = user.last_name.toLowerCase();
-    const fullName = `${firstName} ${lastName}`;
+    const firstName = user.first_name.trim().toLowerCase();
+    const lastName = user.last_name.trim().toLowerCase();
 
-    return (
-      firstName.includes(searchText) ||
-      lastName.includes(searchText) ||
-      fullName.includes(searchText)
+    return searchTerms.every(
+      (term) => firstName.includes(term) || lastName.includes(term),
     );
   };
   const selectedMemberIds = new Set(selectedMembers.map(({ id }) => id));
   const currentMemberResults =
-    onSearchQueryChange && searchText
+    onSearchQueryChange && searchTerms.length > 0
       ? currentMembers.filter(
           (member) =>
             !excludeMembers.includes(member.id) && matchesName(member),

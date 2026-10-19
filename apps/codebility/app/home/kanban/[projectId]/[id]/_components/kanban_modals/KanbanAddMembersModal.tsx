@@ -48,6 +48,16 @@ const buildMemberSearchFilter = (query: string) => {
     ...new Set(query.toLowerCase().split(/\s+/).filter(Boolean)),
   ];
 
+  if (searchTerms.length > 1) {
+    return `and(${searchTerms
+      .map((term) => {
+        const searchValue = toPostgrestIlikeSubstring(term);
+
+        return `or(first_name.ilike.${searchValue},last_name.ilike.${searchValue})`;
+      })
+      .join(",")})`;
+  }
+
   return searchTerms
     .flatMap((term) => {
       const searchValue = toPostgrestIlikeSubstring(term);
@@ -73,15 +83,14 @@ const mergeMembersById = (...memberGroups: Codev[][]) =>
   ).slice(0, 50);
 
 const matchesMemberName = (member: Codev, query: string) => {
-  const searchText = normalizeMemberSearchQuery(query);
-  const firstName = member.first_name.toLowerCase();
-  const lastName = member.last_name.toLowerCase();
-  const fullName = `${firstName} ${lastName}`;
+  const searchTerms = normalizeMemberSearchQuery(query)
+    .split(" ")
+    .filter(Boolean);
+  const firstName = member.first_name.trim().toLowerCase();
+  const lastName = member.last_name.trim().toLowerCase();
 
-  return (
-    firstName.includes(searchText) ||
-    lastName.includes(searchText) ||
-    fullName.includes(searchText)
+  return searchTerms.every(
+    (term) => firstName.includes(term) || lastName.includes(term),
   );
 };
 
