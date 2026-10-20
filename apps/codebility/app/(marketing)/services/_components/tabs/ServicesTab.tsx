@@ -296,7 +296,7 @@ export const ServicesTab = ({
 
   return (
     <Section id="services-projects" className="relative !pt-0">
-      <Container className="relative z-0 !max-w-full px-4 sm:px-8 xl:min-w-[1260px] 2xl:min-w-[1560px]">
+      <Container className="relative z-0 max-w-screen-2xl px-4 sm:px-8">
         <div className="flex flex-col gap-4">
           <div
             id="services-categories"

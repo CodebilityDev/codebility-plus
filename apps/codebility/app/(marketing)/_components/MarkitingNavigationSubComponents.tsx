@@ -259,14 +259,14 @@ export const UserMenu = ({handleLogout}: {handleLogout: () => void}) => {
           </p>
           <p className="text-white text-sm">{email}</p>
         </div>
-        <div className="from-customViolet-300 relative overflow-hidden rounded-full bg-gradient-to-b to-customBlue-500 lg:h-[44px] lg:w-[52px]">
+        <div className="from-customViolet-300 relative size-11 overflow-hidden rounded-full bg-gradient-to-b to-customBlue-500">
           <Image
             alt="Avatar"
             src={image_url || defaultAvatar}
             fill
             sizes="52px"
             title={`${first_name}'s Avatar`}
-            className="rounded-full"
+            className="rounded-full object-cover"
           />
         </div>
 
