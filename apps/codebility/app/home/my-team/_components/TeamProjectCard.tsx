@@ -7,6 +7,7 @@ import { SimpleMemberData } from "@/actions/projects/actions";
 import { Users, UserPlus, ArrowRight, Crown, Calendar } from "lucide-react";
 import DefaultAvatar from "@/components/DefaultAvatar";
 import { memo } from "react";
+import { useUserStore } from "@/store/codev-store";
 
 interface ProjectData {
   project: {
@@ -68,9 +69,10 @@ const MemberAvatar = memo(({ member, size = 40, showBorder = true }: { member: S
 MemberAvatar.displayName = 'MemberAvatar';
 
 const TeamProjectCard = memo(({ project, userRole, onAddMembers, isLoading }: TeamProjectCardProps) => {
+  const user = useUserStore((state) => state.user);
   const { project: projectInfo, teamLead, members } = project;
   const totalMembers = (members.data?.length ?? 0) + (teamLead.data ? 1 : 0);
-  const isPrivileged = userRole === "team_leader" || userRole === "admin";
+  const isPrivileged = userRole === "team_leader" || userRole === "admin" || user?.role_id === 5;
 
   return (
     <div className="group relative overflow-hidden rounded-2xl bg-white/20 backdrop-blur-md dark:bg-white/10 border border-white/30 dark:border-white/20 shadow-lg transition-all duration-500 hover:shadow-2xl hover:shadow-customBlue-500/20 hover:border-white/50 dark:hover:border-white/30 hover:-translate-y-2 hover:bg-white/30 dark:hover:bg-white/15 cursor-pointer">
