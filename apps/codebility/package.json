@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "engines": { "node": "24.x" },
   "scripts": {
     "dev": "cross-env FORCE_COLOR=1 next dev --turbopack",
     "build": "next build",
