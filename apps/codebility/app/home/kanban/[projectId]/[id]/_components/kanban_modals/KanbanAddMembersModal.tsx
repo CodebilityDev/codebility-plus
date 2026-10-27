@@ -1,6 +1,12 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import {
+  FormEvent,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { usePathname } from "next/navigation";
 import {
   getAllProjects,
@@ -24,7 +30,69 @@ import { MemberSelection } from "@/components/ui/MemberSelection";
 import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import { useModal } from "@/hooks/modals/use-modal-projects";
 import { Codev } from "@/types/home/codev";
+import { createClientClientComponent } from "@/utils/supabase/client";
 import toast from "react-hot-toast";
+
+const toPostgrestIlikeSubstring = (value: string) => {
+  const escapedValue = value
+    .replace(/\\/g, "\\\\")
+    .replace(/%/g, "\\%")
+    .replace(/_/g, "\\_")
+    .replace(/"/g, '\\"');
+
+  return `"%${escapedValue}%"`;
+};
+
+const buildMemberSearchFilter = (query: string) => {
+  const searchTerms = [
+    ...new Set(query.toLowerCase().split(/\s+/).filter(Boolean)),
+  ];
+
+  if (searchTerms.length > 1) {
+    return `and(${searchTerms
+      .map((term) => {
+        const searchValue = toPostgrestIlikeSubstring(term);
+
+        return `or(first_name.ilike.${searchValue},last_name.ilike.${searchValue})`;
+      })
+      .join(",")})`;
+  }
+
+  return searchTerms
+    .flatMap((term) => {
+      const searchValue = toPostgrestIlikeSubstring(term);
+      return [
+        `first_name.ilike.${searchValue}`,
+        `last_name.ilike.${searchValue}`,
+      ];
+    })
+    .join(",");
+};
+
+const normalizeMemberSearchQuery = (query: string) =>
+  query.trim().toLowerCase().replace(/\s+/g, " ");
+
+const hasMultipleSearchTerms = (query: string) =>
+  normalizeMemberSearchQuery(query).split(" ").filter(Boolean).length > 1;
+
+const mergeMembersById = (...memberGroups: Codev[][]) =>
+  Array.from(
+    new Map(
+      memberGroups.flat().map((member) => [member.id, member]),
+    ).values(),
+  ).slice(0, 50);
+
+const matchesMemberName = (member: Codev, query: string) => {
+  const searchTerms = normalizeMemberSearchQuery(query)
+    .split(" ")
+    .filter(Boolean);
+  const firstName = member.first_name.trim().toLowerCase();
+  const lastName = member.last_name.trim().toLowerCase();
+
+  return searchTerms.every(
+    (term) => firstName.includes(term) || lastName.includes(term),
+  );
+};
 
 export default function KanbanAddMembersModal() {
   const { isOpen, onClose, type, data } = useModal();
@@ -33,8 +101,25 @@ export default function KanbanAddMembersModal() {
   const [projects, setProjects] = useState<any[]>([]);
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const [selectedMembers, setSelectedMembers] = useState<Codev[]>([]);
+  const [currentMembers, setCurrentMembers] = useState<Codev[]>([]);
   const [teamLead, setTeamLead] = useState<SimpleMemberData | null>(null);
+  const initialUsersRef = useRef<Codev[]>([]);
   const [allUsers, setAllUsers] = useState<Codev[]>([]);
+  const [memberSearchQuery, setMemberSearchQuery] = useState("");
+  const [isSearchingMembers, setIsSearchingMembers] = useState(false);
+  const [memberSearchError, setMemberSearchError] = useState<string | null>(
+    null,
+  );
+  const searchQueryRef = useRef("");
+  const searchRequestId = useRef(0);
+  const supabase = useMemo(() => {
+    try {
+      return createClientClientComponent();
+    } catch (error) {
+      console.error("Failed to initialize Supabase client:", error);
+      return null;
+    }
+  }, []);
   const pathname = usePathname();
   const projectIdFromUrl = pathname?.split("/").slice(-2, -1)[0] || null;
   const kanbanBoardIdFromUrl = pathname?.split("/").pop() || null;
@@ -43,6 +128,10 @@ export default function KanbanAddMembersModal() {
     if (!isModalOpen) return;
 
     setIsLoading(true);
+    searchQueryRef.current = "";
+    setMemberSearchQuery("");
+    initialUsersRef.current = [];
+    setAllUsers([]);
 
     setSelectedProject(projectIdFromUrl);
 
@@ -64,17 +153,45 @@ export default function KanbanAddMembersModal() {
           getProjectCodevs(),
           getTeamLead(targetProjectId),
         ]);
-        setSelectedMembers(
-          Array.isArray(membersResult?.data)
-            ? membersResult.data.map((m: any) => ({
-                ...m,
-                positions: m.positions ?? [],
-                tech_stacks: m.tech_stacks ?? [],
-              }))
-            : [],
-        );
+        const projectMembers = (membersResult?.data ?? []).map((member) => ({
+          id: member.id,
+          first_name: member.first_name,
+          last_name: member.last_name,
+          username: null,
+          username_updated_at: null,
+          email_address: member.email_address,
+          image_url: member.image_url,
+          display_position: member.display_position ?? undefined,
+          positions: [],
+          tech_stacks: [],
+        }));
+        setCurrentMembers(projectMembers);
+        setSelectedMembers(projectMembers);
 
-        setAllUsers(users || []);
+        const originalUsers = users || [];
+        initialUsersRef.current = originalUsers;
+        const activeQuery = normalizeMemberSearchQuery(searchQueryRef.current);
+
+        if (!activeQuery) {
+          setAllUsers(originalUsers);
+        } else if (hasMultipleSearchTerms(activeQuery)) {
+          setAllUsers((currentUsers) => {
+            const latestQuery = normalizeMemberSearchQuery(searchQueryRef.current);
+
+            if (
+              latestQuery !== activeQuery ||
+              !hasMultipleSearchTerms(latestQuery)
+            ) {
+              return currentUsers;
+            }
+
+            const localFullNameMatches = originalUsers.filter((member) =>
+              matchesMemberName(member, latestQuery),
+            );
+
+            return mergeMembersById(localFullNameMatches, currentUsers);
+          });
+        }
 
         setTeamLead(
           teamLeadResult?.data
@@ -94,10 +211,92 @@ export default function KanbanAddMembersModal() {
     };
 
     fetchData();
-  }, [isModalOpen, selectedProject, kanbanBoardIdFromUrl]);
+  }, [isModalOpen, projectIdFromUrl, kanbanBoardIdFromUrl]);
+
+  useEffect(() => {
+    if (!isModalOpen) return;
+
+    const requestId = ++searchRequestId.current;
+    const query = memberSearchQuery.trim();
+
+    if (!query) {
+      setAllUsers(initialUsersRef.current);
+      setIsSearchingMembers(false);
+      setMemberSearchError(null);
+
+      return () => {
+        if (searchRequestId.current === requestId) {
+          searchRequestId.current += 1;
+        }
+      };
+    }
+
+    setIsSearchingMembers(true);
+    setMemberSearchError(null);
+    setAllUsers([]);
+
+    const timeout = setTimeout(async () => {
+      if (!supabase) {
+        if (searchRequestId.current === requestId) {
+          setAllUsers([]);
+          setIsSearchingMembers(false);
+          setMemberSearchError("Supabase client is unavailable");
+        }
+        return;
+      }
+
+      try {
+        const searchFilter = buildMemberSearchFilter(query);
+        const { data, error } = await supabase
+          .from("codev")
+          .select(
+            "id, first_name, last_name, image_url, username, username_updated_at, email_address, positions, tech_stacks",
+          )
+          .or(searchFilter)
+          .order("first_name", { ascending: true })
+          .limit(50);
+
+        if (error) throw error;
+
+        const localFullNameMatches = hasMultipleSearchTerms(query)
+          ? initialUsersRef.current.filter((member) =>
+              matchesMemberName(member, query),
+            )
+          : [];
+
+        if (searchRequestId.current === requestId) {
+          setAllUsers(mergeMembersById(localFullNameMatches, data || []));
+          setIsSearchingMembers(false);
+        }
+      } catch (error) {
+        console.error("Failed to search members:", error);
+        if (searchRequestId.current === requestId) {
+          setAllUsers([]);
+          setIsSearchingMembers(false);
+          setMemberSearchError("Member search failed");
+        }
+      }
+    }, 300);
+
+    return () => {
+      clearTimeout(timeout);
+      if (searchRequestId.current === requestId) {
+        searchRequestId.current += 1;
+      }
+    };
+  }, [isModalOpen, memberSearchQuery, supabase]);
+
+  const handleMemberSearchQueryChange = (query: string) => {
+    searchQueryRef.current = query;
+    setMemberSearchQuery(query);
+  };
 
   const handleAddMember = (member: Codev) => {
-    setSelectedMembers((prev) => [...prev, member]);
+    setSelectedMembers((prev) =>
+      prev.some((selected) => selected.id === member.id)
+        ? prev
+        : [...prev, member],
+    );
   };
 
   const handleRemoveMember = (memberId: string) => {
@@ -246,6 +445,12 @@ export default function KanbanAddMembersModal() {
                   <MemberSelection
                     users={allUsers}
                     selectedMembers={selectedMembers}
+                    searchQuery={memberSearchQuery}
+                    onSearchQueryChange={handleMemberSearchQueryChange}
+                    isSearching={isSearchingMembers}
+                    searchError={memberSearchError}
+                    currentMembers={currentMembers}
+                    excludeMembers={teamLead ? [teamLead.id] : []}
                     onMemberAdd={handleAddMember}
                     onMemberRemove={handleRemoveMember}
                   />
