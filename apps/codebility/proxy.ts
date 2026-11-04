@@ -10,11 +10,16 @@ import type { ProxyClient } from "@/lib/global/proxy-session";
 import { createClientAnon } from "@/lib/global/supabase-anon";
 import {
   PERMISSION_COLUMNS,
+  PERMISSION_KEYS,
   ROUTE_PERMISSION_MAP,
   isFullAccess,
   requiresFullAccess,
 } from "@/constants/global/permissions";
-import type { PermissionKey } from "@/types/global/permissions";
+import type { PermissionKey, RolePermissions } from "@/types/global/permissions";
+import {
+  PROXY_ACCESS_HEADER,
+  encodeProxyAccess,
+} from "@/lib/global/proxy-access";
 
 export const config = {
   matcher: ["/((?!api|_next/static|.*\\..*|_next/image|favicon.ico).*)"],
@@ -179,6 +184,21 @@ async function fetchAccount(
   return data as unknown as Account;
 }
 
+function accessHeaders(
+  account: Account,
+  hasFullAccess: boolean,
+): Record<string, string> {
+  const permissions = {} as RolePermissions;
+
+  for (const key of PERMISSION_KEYS) {
+    permissions[key] = Boolean(account.roles?.[key]);
+  }
+
+  return {
+    [PROXY_ACCESS_HEADER]: encodeProxyAccess({ permissions, hasFullAccess }),
+  };
+}
+
 function notFound(request: NextRequest) {
   const url = request.nextUrl.clone();
   url.pathname = "/not-found";
@@ -249,20 +269,22 @@ export async function proxy(request: NextRequest) {
     }
 
     const permission = permissionFor(pathname);
-    const account = await fetchAccount(client, user.id, permission !== null);
+    const account = await fetchAccount(client, user.id, true);
     if (!account) return toSignIn(client, request, pathname);
 
     const target = statusRedirect(account.application_status, pathname);
     if (target) return redirectTo(client, request, target);
 
+    const hasFullAccess = isFullAccess(account.role_id);
+
     if (permission) {
       const allowed = requiresFullAccess(pathname)
-        ? isFullAccess(account.role_id)
+        ? hasFullAccess
         : Boolean(account.roles?.[permission]);
       if (!allowed) return redirectTo(client, request, HOME);
     }
 
-    return passThrough(client);
+    return passThrough(client, accessHeaders(account, hasFullAccess));
   } catch (error) {
     console.error("Proxy error:", error);
     return NextResponse.redirect(new URL(SIGN_IN, request.url));

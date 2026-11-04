@@ -4,11 +4,11 @@ import pathsConfig from "@/constants/global/paths";
 import { requiresFullAccess } from "@/constants/global/permissions";
 import { getAccess } from "@/lib/global/permissions";
 import type { Sidebar } from "@/types/home/home";
-import type { PermissionKey } from "@/types/global/permissions";
+import type { PermissionKey, ProxyAccess } from "@/types/global/permissions";
 
 
-export const getSidebarData = async (): Promise<Sidebar[]> => {
-  const { permissions, hasFullAccess } = await getAccess();
+export const getSidebarData = async (access?: ProxyAccess): Promise<Sidebar[]> => {
+  const { permissions, hasFullAccess } = access ?? (await getAccess());
 
   const sidebarData: Sidebar[] = [
     {

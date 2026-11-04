@@ -11,3 +11,8 @@ export interface ProjectAccess {
   role: ProjectRole | null;
   isTeamLeader: boolean;
 }
+
+export interface ProxyAccess {
+  permissions: RolePermissions;
+  hasFullAccess: boolean;
+}

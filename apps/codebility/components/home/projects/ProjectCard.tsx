@@ -15,6 +15,7 @@ export default function ProjectCard({
   return (
     <Link
       href={`${pathsConfig.app.projects}/${project.id}`}
+      prefetch={false}
       className="group block overflow-hidden rounded-lg"
     >
       <Card className="h-full transition-shadow group-hover:shadow-md">
@@ -24,6 +25,7 @@ export default function ProjectCard({
               src={project.mainImage}
               alt={project.name}
               fill
+              sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
               className="object-cover"
             />
           </div>

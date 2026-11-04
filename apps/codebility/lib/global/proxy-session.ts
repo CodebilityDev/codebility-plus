@@ -28,10 +28,29 @@ export function createProxyClient(request: NextRequest) {
     },
   });
 
-  return { supabase, state };
+  return { supabase, state, request };
 }
 
-export function passThrough(client: ProxyClient) {
+export function passThrough(
+  client: ProxyClient,
+  headers: Record<string, string> = {},
+) {
+  const entries = Object.entries(headers);
+  if (entries.length === 0) return client.state.response;
+
+  const requestHeaders = new Headers(client.request.headers);
+  for (const [name, value] of entries) {
+    requestHeaders.set(name, value);
+  }
+
+  const cookies = client.state.response.cookies.getAll();
+  client.state.response = NextResponse.next({
+    request: { headers: requestHeaders },
+  });
+  for (const cookie of cookies) {
+    client.state.response.cookies.set(cookie);
+  }
+
   return client.state.response;
 }
 

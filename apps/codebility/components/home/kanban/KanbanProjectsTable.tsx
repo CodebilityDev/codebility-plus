@@ -46,6 +46,7 @@ export default function KanbanProjectsTable({
               <TableCell>
                 <Link
                   href={`${pathsConfig.app.kanban}/${project.id}`}
+                  prefetch={false}
                   className="font-medium underline-offset-4 after:absolute after:inset-0 after:content-[''] hover:text-customBlue-100 hover:underline"
                 >
                   {project.name}

@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 
 import { getPermissionsAction } from "@/actions/global/permissions";
 import { PERMISSION_KEYS } from "@/constants/global/permissions";
-import type { PermissionKey, RolePermissions } from "@/types/global/permissions";
+import type { PermissionKey, ProxyAccess, RolePermissions } from "@/types/global/permissions";
 
 interface PermissionsContextValue {
   permissions: RolePermissions;
@@ -24,12 +24,22 @@ function createEmptyPermissions(): RolePermissions {
   return permissions;
 }
 
-export function PermissionsProvider({ children }: { children: ReactNode }) {
+export function PermissionsProvider({
+  children,
+  initialAccess,
+}: {
+  children: ReactNode;
+  initialAccess?: ProxyAccess;
+}) {
+  const hasInitialAccess = Boolean(initialAccess);
+
   const [permissions, setPermissions] = useState<RolePermissions>(
-    createEmptyPermissions,
+    () => initialAccess?.permissions ?? createEmptyPermissions(),
   );
 
   useEffect(() => {
+    if (hasInitialAccess) return;
+
     let active = true;
 
     void getPermissionsAction().then((result) => {
@@ -41,7 +51,7 @@ export function PermissionsProvider({ children }: { children: ReactNode }) {
     return () => {
       active = false;
     };
-  }, []);
+  }, [hasInitialAccess]);
 
   const value: PermissionsContextValue = {
     permissions,

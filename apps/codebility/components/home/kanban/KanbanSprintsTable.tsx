@@ -47,6 +47,7 @@ export default function KanbanSprintsTable({
               <TableCell>
                 <Link
                   href={`${pathsConfig.app.kanban}/${projectId}/${sprint.id}`}
+                  prefetch={false}
                   className="font-medium underline-offset-4 after:absolute after:inset-0 after:content-[''] hover:text-customBlue-100 hover:underline"
                 >
                   {sprint.name ?? "Untitled sprint"}

@@ -3,10 +3,12 @@ import type { NewApplicantType } from "@/types/home/applicants/applicants";
 
 export default function ApplicantDataWrapper({
   applicants,
+  deniedCount,
 }: {
   applicants: NewApplicantType[];
+  deniedCount: number;
 }) {
-  if (applicants.length === 0) {
+  if (applicants.length === 0 && deniedCount === 0) {
     return (
       <div className="flex min-h-[400px] flex-col items-center justify-center p-8 text-center">
         <div className="mb-4 text-4xl">📋</div>
@@ -18,5 +20,5 @@ export default function ApplicantDataWrapper({
     );
   }
 
-  return <ApplicantLists applicants={applicants} />;
+  return <ApplicantLists applicants={applicants} deniedCount={deniedCount} />;
 }

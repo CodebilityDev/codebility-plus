@@ -164,6 +164,7 @@ export interface ApplicantFilterHeadersProps {
 
 export interface ApplicantListsProps {
   applicants: NewApplicantType[];
+  deniedCount: number;
 }
 
 export interface ApplicantProcessTimelineProps {

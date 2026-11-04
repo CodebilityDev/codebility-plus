@@ -12,13 +12,50 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@codevs/ui/tabs";
 import { ApplicantDataTable } from "@/components/home/applicants/applicantDataTable";
 import { getApplicantColumns } from "@/utils/home/applicants/applicants";
 import ApplicantFilterHeaders from "@/components/home/applicants/applicantHeaders";
-import type { ApplicantListsProps } from "@/types/home/applicants/applicants";
+import type {
+  ApplicantListsProps,
+  NewApplicantType,
+} from "@/types/home/applicants/applicants";
+import { getDeniedApplicants } from "@/actions/home/applicants/applicants-queries";
 
-function ApplicantLists({
-  applicants,
-}: ApplicantListsProps) {
+function ApplicantLists({ applicants, deniedCount }: ApplicantListsProps) {
   const [filteredApplicants, setFilteredApplicants] = React.useState(applicants);
   const [currentTab, setCurrentTab] = React.useState("applying");
+  const [deniedRows, setDeniedRows] = React.useState<NewApplicantType[] | null>(
+    null,
+  );
+  const interacted = React.useRef(false);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    getDeniedApplicants()
+      .then((rows) => {
+        if (cancelled || rows.length === 0) return;
+        setDeniedRows(rows);
+        if (interacted.current) return;
+        setFilteredApplicants((previous) => {
+          const seen = new Set(previous.map((applicant) => applicant.id));
+          return [...previous, ...rows.filter((row) => !seen.has(row.id))];
+        });
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const allApplicants = React.useMemo(() => {
+    if (!deniedRows) return applicants;
+    const seen = new Set(applicants.map((applicant) => applicant.id));
+    return [...applicants, ...deniedRows.filter((row) => !seen.has(row.id))];
+  }, [applicants, deniedRows]);
+
+  const setApplicantsFromFilters = React.useCallback<
+    React.Dispatch<React.SetStateAction<NewApplicantType[]>>
+  >((value) => {
+    interacted.current = true;
+    setFilteredApplicants(value);
+  }, []);
 
   const applicantsApplying = React.useMemo(
     () =>
@@ -60,11 +97,13 @@ function ApplicantLists({
     [filteredApplicants],
   );
 
+  const deniedBadgeCount = deniedRows ? applicantsDenied.length : deniedCount;
+
   return (
     <div className="mx-auto flex max-w-full flex-col gap-6">
       <ApplicantFilterHeaders
-        applicants={applicants}
-        setApplicants={setFilteredApplicants}
+        applicants={allApplicants}
+        setApplicants={setApplicantsFromFilters}
         setCurrentTab={setCurrentTab}
       />
       <Tabs
@@ -125,9 +164,9 @@ function ApplicantLists({
             className="!flex !h-auto flex-col gap-1 rounded-md px-3 py-3 text-sm font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm md:flex-row md:gap-2 md:px-4 md:py-2 dark:data-[state=active]:bg-gray-900"
           >
             <span className="truncate text-sm font-medium">Denied</span>
-            {applicantsDenied.length > 0 && (
+            {deniedBadgeCount > 0 && (
               <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-2 text-xs font-semibold text-white">
-                {applicantsDenied.length}
+                {deniedBadgeCount}
               </span>
             )}
           </TabsTrigger>

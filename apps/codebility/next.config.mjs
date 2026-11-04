@@ -53,6 +53,7 @@ const config = {
     },
   },
   images: {
+    minimumCacheTTL: 2678400,
     remotePatterns: [
       { hostname: "kdkuljweiqtiveqvqirw.supabase.co" },
       { hostname: "nwpvsxbrftplvebseaas.supabase.co" },
