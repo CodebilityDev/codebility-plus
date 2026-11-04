@@ -291,7 +291,6 @@ export const signinUser = async (input: {
   email: string;
   password: string;
 }) => {
-  await requireIdentity();
   const { email, password } = input;
   const supabase = await createClientServerComponent();
 
