@@ -162,9 +162,19 @@ export interface ApplicantFilterHeadersProps {
   setCurrentTab: React.Dispatch<React.SetStateAction<string>>;
 }
 
+export type ApplicantStatus =
+  | "applying"
+  | "testing"
+  | "onboarding"
+  | "waitlist"
+  | "denied";
+
+export type ApplicantCounts = Record<ApplicantStatus, number>;
+
 export interface ApplicantListsProps {
-  applicants: NewApplicantType[];
-  deniedCount: number;
+  initialStatus: ApplicantStatus;
+  initialApplicants: NewApplicantType[];
+  counts: ApplicantCounts;
 }
 
 export interface ApplicantProcessTimelineProps {

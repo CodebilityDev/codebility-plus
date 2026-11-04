@@ -14,48 +14,45 @@ import { getApplicantColumns } from "@/utils/home/applicants/applicants";
 import ApplicantFilterHeaders from "@/components/home/applicants/applicantHeaders";
 import type {
   ApplicantListsProps,
+  ApplicantStatus,
   NewApplicantType,
 } from "@/types/home/applicants/applicants";
-import { getDeniedApplicants } from "@/actions/home/applicants/applicants-queries";
+import { getApplicantsByStatus } from "@/actions/home/applicants/applicants-queries";
 
-function ApplicantLists({ applicants, deniedCount }: ApplicantListsProps) {
-  const [filteredApplicants, setFilteredApplicants] = React.useState(applicants);
-  const [currentTab, setCurrentTab] = React.useState("applying");
-  const [deniedRows, setDeniedRows] = React.useState<NewApplicantType[] | null>(
+function ApplicantLists({
+  initialStatus,
+  initialApplicants,
+  counts,
+}: ApplicantListsProps) {
+  const [currentTab, setCurrentTab] = React.useState<ApplicantStatus>(initialStatus);
+  const [rowsByStatus, setRowsByStatus] = React.useState<
+    Partial<Record<ApplicantStatus, NewApplicantType[]>>
+  >({ [initialStatus]: initialApplicants });
+  const [filteredApplicants, setFilteredApplicants] =
+    React.useState<NewApplicantType[]>(initialApplicants);
+  const [loadingStatus, setLoadingStatus] = React.useState<ApplicantStatus | null>(
     null,
   );
-  const interacted = React.useRef(false);
+
+  const loadStatus = React.useCallback(
+    async (status: ApplicantStatus) => {
+      if (rowsByStatus[status]) return;
+
+      setLoadingStatus(status);
+      const rows = await getApplicantsByStatus(status);
+      setRowsByStatus((previous) => ({ ...previous, [status]: rows }));
+      setLoadingStatus((current) => (current === status ? null : current));
+    },
+    [rowsByStatus],
+  );
 
   React.useEffect(() => {
-    let cancelled = false;
-    getDeniedApplicants()
-      .then((rows) => {
-        if (cancelled || rows.length === 0) return;
-        setDeniedRows(rows);
-        if (interacted.current) return;
-        setFilteredApplicants((previous) => {
-          const seen = new Set(previous.map((applicant) => applicant.id));
-          return [...previous, ...rows.filter((row) => !seen.has(row.id))];
-        });
-      })
-      .catch(() => undefined);
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+    setFilteredApplicants(rowsByStatus[currentTab] ?? []);
+    void loadStatus(currentTab);
+  }, [currentTab, rowsByStatus, loadStatus]);
 
-  const allApplicants = React.useMemo(() => {
-    if (!deniedRows) return applicants;
-    const seen = new Set(applicants.map((applicant) => applicant.id));
-    return [...applicants, ...deniedRows.filter((row) => !seen.has(row.id))];
-  }, [applicants, deniedRows]);
-
-  const setApplicantsFromFilters = React.useCallback<
-    React.Dispatch<React.SetStateAction<NewApplicantType[]>>
-  >((value) => {
-    interacted.current = true;
-    setFilteredApplicants(value);
-  }, []);
+  const currentRows = rowsByStatus[currentTab] ?? [];
+  const isCurrentTabLoading = loadingStatus === currentTab && !rowsByStatus[currentTab];
 
   const applicantsApplying = React.useMemo(
     () =>
@@ -97,20 +94,23 @@ function ApplicantLists({ applicants, deniedCount }: ApplicantListsProps) {
     [filteredApplicants],
   );
 
-  const deniedBadgeCount = deniedRows ? applicantsDenied.length : deniedCount;
+  const deniedBadgeCount = counts.denied;
 
   return (
     <div className="mx-auto flex max-w-full flex-col gap-6">
       <ApplicantFilterHeaders
-        applicants={allApplicants}
-        setApplicants={setApplicantsFromFilters}
-        setCurrentTab={setCurrentTab}
+        applicants={currentRows}
+        setApplicants={setFilteredApplicants}
+        setCurrentTab={(value) => setCurrentTab(value as ApplicantStatus)}
       />
+      {isCurrentTabLoading && (
+        <p className="text-sm text-muted-foreground">Loading applicants...</p>
+      )}
       <Tabs
         defaultValue={currentTab}
         value={currentTab}
         onValueChange={(value) => {
-          setCurrentTab(value);
+          setCurrentTab(value as ApplicantStatus);
         }}
         className="w-full"
       >
@@ -120,9 +120,9 @@ function ApplicantLists({ applicants, deniedCount }: ApplicantListsProps) {
             className="!flex !h-auto flex-col gap-1 rounded-md px-3 py-3 text-sm font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm md:flex-row md:gap-2 md:px-4 md:py-2 dark:data-[state=active]:bg-gray-900"
           >
             <span className="truncate text-sm font-medium">Applicants</span>
-            {applicantsApplying.length > 0 && (
+            {counts.applying > 0 && (
               <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-blue-500 px-2 text-xs font-semibold text-white">
-                {applicantsApplying.length}
+                {counts.applying}
               </span>
             )}
           </TabsTrigger>
@@ -131,9 +131,9 @@ function ApplicantLists({ applicants, deniedCount }: ApplicantListsProps) {
             className="!flex !h-auto flex-col gap-1 rounded-md px-3 py-3 text-sm font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm md:flex-row md:gap-2 md:px-4 md:py-2 dark:data-[state=active]:bg-gray-900"
           >
             <span className="truncate text-sm font-medium">Testing</span>
-            {applicantsTesting.length > 0 && (
+            {counts.testing > 0 && (
               <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-amber-500 px-2 text-xs font-semibold text-white">
-                {applicantsTesting.length}
+                {counts.testing}
               </span>
             )}
           </TabsTrigger>
@@ -142,9 +142,9 @@ function ApplicantLists({ applicants, deniedCount }: ApplicantListsProps) {
             className="!flex !h-auto flex-col gap-1 rounded-md px-3 py-3 text-sm font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm md:flex-row md:gap-2 md:px-4 md:py-2 dark:data-[state=active]:bg-gray-900"
           >
             <span className="truncate text-sm font-medium">Onboarding</span>
-            {applicantsOnboarding.length > 0 && (
+            {counts.onboarding > 0 && (
               <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-yellow-500 px-2 text-xs font-semibold text-white">
-                {applicantsOnboarding.length}
+                {counts.onboarding}
               </span>
             )}
           </TabsTrigger>
@@ -153,9 +153,9 @@ function ApplicantLists({ applicants, deniedCount }: ApplicantListsProps) {
             className="!flex !h-auto flex-col gap-1 rounded-md px-3 py-3 text-sm font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm md:flex-row md:gap-2 md:px-4 md:py-2 dark:data-[state=active]:bg-gray-900"
           >
             <span className="truncate text-sm font-medium">Waitlist</span>
-            {applicantsWaitlist.length > 0 && (
+            {counts.waitlist > 0 && (
               <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-green-500 px-2 text-xs font-semibold text-white">
-                {applicantsWaitlist.length}
+                {counts.waitlist}
               </span>
             )}
           </TabsTrigger>
