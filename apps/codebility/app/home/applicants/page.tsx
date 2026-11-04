@@ -5,12 +5,16 @@ import { ApplicantsTableSkeleton } from "@/components/home/applicants/Applicants
 
 export const instant = false;
 
-export default function NewApplicants() {
+export default function NewApplicants({
+  searchParams,
+}: {
+  searchParams: Promise<{ status?: string }>;
+}) {
   return (
     <div className="mx-auto max-w-screen-xl">
       <div className="flex flex-col gap-4 pt-4">
         <Suspense fallback={<ApplicantsTableSkeleton />}>
-          <NewApplicantFetchComp />
+          <NewApplicantFetchComp searchParams={searchParams} />
         </Suspense>
       </div>
     </div>

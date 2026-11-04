@@ -1,32 +1,22 @@
-"use server";
-
 import { unstable_rethrow } from "next/navigation";
 
 import { createClientServerComponent } from "@/lib/global/supabase-server";
+import { logPerf } from "@/lib/global/timing";
+import { APPLICANT_STATUSES } from "@/constants/home/applicants/statuses";
 import type {
   ApplicantCounts,
   ApplicantStatus,
   NewApplicantType,
 } from "@/types/home/applicants/applicants";
 import { newApplicantsSchema } from "@/utils/home/applicants/applicants";
-import { requireFullAccess } from "@/lib/global/permissions";
-import { logPerf } from "@/lib/global/timing";
 
 const APPLICANT_SELECT =
   "id, first_name, last_name, email_address, phone_number, address, about, positions, display_position, portfolio_website, tech_stacks, image_url, availability_status, nda_status, level, application_status, rejected_count, facebook, linkedin, github, discord, years_of_experience, role_id, internal_status, mentor_id, nda_signature, nda_document, nda_signed_at, nda_request_sent, date_applied, applicant (*)";
 
-const APPLICANT_STATUSES: ApplicantStatus[] = [
-  "applying",
-  "testing",
-  "onboarding",
-  "waitlist",
-  "denied",
-];
 
 export async function getApplicantsByStatus(
   status: ApplicantStatus,
 ): Promise<NewApplicantType[]> {
-  await requireFullAccess();
   try {
     const supabase = await createClientServerComponent();
 
@@ -59,7 +49,6 @@ export async function getApplicantsByStatus(
 }
 
 export async function getApplicantCounts(): Promise<ApplicantCounts> {
-  await requireFullAccess();
   try {
     const supabase = await createClientServerComponent();
 

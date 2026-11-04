@@ -1,4 +1,5 @@
 "use server";
+import { requireIdentity } from "@/lib/global/authorize";
 
 import { redirect } from "next/navigation";
 import type { Database } from "@/types/global/supabase";
@@ -73,6 +74,7 @@ const validateUsername = (username: string): { valid: boolean; error?: string } 
 };
 
 export const signupUser = async (formData: FormData) => {
+  await requireIdentity();
   try {
     const supabase = await createClientServerComponent();
 
@@ -290,6 +292,7 @@ export const signinUser = async (input: {
   email: string;
   password: string;
 }) => {
+  await requireIdentity();
   const { email, password } = input;
   const supabase = await createClientServerComponent();
 
@@ -345,6 +348,7 @@ export const signinUser = async (input: {
 };
 
 export const signOut = async (): Promise<void> => {
+  await requireIdentity();
   try {
     const supabase = await createClientServerComponent();
 
@@ -359,6 +363,7 @@ export const signOut = async (): Promise<void> => {
 };
 
 export const resendVerificationEmail = async (email: string) => {
+  await requireIdentity();
   try {
     const supabase = await createClientServerComponent();
     

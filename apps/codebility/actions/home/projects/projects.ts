@@ -2,7 +2,7 @@
 
 import { updateTag } from "next/cache";
 import { CACHE_TAGS } from "@/lib/global/cache-tags";
-import { requireFullAccess } from "@/lib/global/permissions";
+import { authorize } from "@/lib/global/authorize";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import { getCurrentCodev } from "@/lib/global/current-codev";
 import type { Database } from "@/types/global/supabase";
@@ -67,7 +67,7 @@ export async function createProject(
 ): Promise<{ projectId: string }> {
   const parsed = projectFormSchema.parse(input);
 
-  await requireFullAccess();
+  await authorize("projects");
 
   const supabase = await createClientServerComponent();
 
@@ -92,7 +92,7 @@ export async function updateProject(
   const id = projectIdSchema.parse(projectId);
   const parsed = projectFormSchema.partial().parse(input);
 
-  await requireFullAccess();
+  await authorize("projects");
 
   const supabase = await createClientServerComponent();
 
@@ -114,7 +114,7 @@ export async function updateProject(
 export async function deleteProject(projectId: string): Promise<void> {
   const id = projectIdSchema.parse(projectId);
 
-  await requireFullAccess();
+  await authorize("projects");
 
   const supabase = await createClientServerComponent();
 

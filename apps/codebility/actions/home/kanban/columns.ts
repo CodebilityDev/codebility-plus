@@ -2,11 +2,8 @@
 
 import { updateTag } from "next/cache";
 import { CACHE_TAGS } from "@/lib/global/cache-tags";
-import {
-  requirePermission,
-  requireProjectAccess,
-  requireTaskManager,
-} from "@/lib/global/permissions";
+import { authorize } from "@/lib/global/authorize";
+import { requireProjectAccess, requireTaskManager } from "@/lib/global/permissions";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import type { KanbanColumn } from "@/types/home/kanban/kanban";
 import { POSITION_GAP } from "@/utils/home/kanban/position";
@@ -42,7 +39,7 @@ export async function createColumn(
   const parsedBoardId = boardIdSchema.parse(boardId);
   const parsedName = nameSchema.parse(name);
 
-  await requirePermission("kanban");
+  await authorize("kanban");
   await requireTaskManager();
 
   const supabase = await createClientServerComponent();
@@ -81,7 +78,7 @@ export async function updateColumn(
   const parsedColumnId = columnIdSchema.parse(columnId);
   const parsedName = nameSchema.parse(name);
 
-  await requirePermission("kanban");
+  await authorize("kanban", { table: "kanban_columns", id: parsedColumnId });
   await requireTaskManager();
 
   const supabase = await createClientServerComponent();
@@ -105,7 +102,7 @@ export async function updateColumn(
 export async function deleteColumn(columnId: string): Promise<void> {
   const parsedColumnId = columnIdSchema.parse(columnId);
 
-  await requirePermission("kanban");
+  await authorize("kanban", { table: "kanban_columns", id: parsedColumnId });
   await requireTaskManager();
 
   const supabase = await createClientServerComponent();

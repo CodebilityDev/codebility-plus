@@ -1,11 +1,13 @@
 "use server";
+import { requireIdentity } from "@/lib/global/authorize";
 
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import { revalidatePath } from "next/cache";
 
 export async function getOnboardingProgress(applicantId: string) {
   try {
-    const supabase = await createClientServerComponent();
+    await requireIdentity();
+  const supabase = await createClientServerComponent();
 
     const { data, error } = await supabase
       .from("onboarding_videos")
@@ -54,7 +56,8 @@ export async function updateVideoProgress({
   completed: boolean;
 }) {
   try {
-    const supabase = await createClientServerComponent();
+    await requireIdentity();
+  const supabase = await createClientServerComponent();
 
     // Check if record exists
     const { data: existingRecord } = await supabase
@@ -117,7 +120,8 @@ export async function saveQuizProgress({
   passed: boolean;
 }) {
   try {
-    const supabase = await createClientServerComponent();
+    await requireIdentity();
+  const supabase = await createClientServerComponent();
 
     const { error } = await supabase
       .from("applicant")
@@ -158,7 +162,8 @@ export async function saveQuizAndCommitment({
   canDoMobile: boolean;
 }) {
   try {
-    const supabase = await createClientServerComponent();
+    await requireIdentity();
+  const supabase = await createClientServerComponent();
 
     const { error } = await supabase
       .from("applicant")
@@ -188,7 +193,8 @@ export async function saveQuizAndCommitment({
 
 export async function completeOnboarding(codevId: string, newStatus = "waitlist") {
   try {
-    const supabase = await createClientServerComponent();
+    await requireIdentity();
+  const supabase = await createClientServerComponent();
 
     // Update codev status to waitlist (or specified status)
     const { error } = await supabase

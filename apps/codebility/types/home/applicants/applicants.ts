@@ -172,8 +172,8 @@ export type ApplicantStatus =
 export type ApplicantCounts = Record<ApplicantStatus, number>;
 
 export interface ApplicantListsProps {
-  initialStatus: ApplicantStatus;
-  initialApplicants: NewApplicantType[];
+  status: ApplicantStatus;
+  applicants: NewApplicantType[];
   counts: ApplicantCounts;
 }
 

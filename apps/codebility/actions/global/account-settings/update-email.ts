@@ -2,22 +2,17 @@
 
 import { revalidatePath } from "next/cache";
 
+import { authorize } from "@/lib/global/authorize";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 
 export async function updateCodevEmail(email: string) {
+  const identity = await authorize("settings");
   const supabase = await createClientServerComponent();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return { error: "User not found" };
-  }
 
   const { error } = await supabase
     .from("codev")
     .update({ email_address: email })
-    .eq("id", user.id);
+    .eq("id", identity.userId);
 
   if (error) {
     console.error("Error updating email in database:", error);

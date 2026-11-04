@@ -1,4 +1,5 @@
 "use server";
+import { authorize } from "@/lib/global/authorize";
 
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import { z } from "zod";
@@ -12,6 +13,7 @@ const uploadImageSchema = z.object({
 });
 
 export async function uploadProjectImage(file: File): Promise<string> {
+  await authorize("projects");
   const parsed = uploadImageSchema.parse({ file });
 
   if (!COVER_IMAGE_ALLOWED_TYPES.includes(parsed.file.type as (typeof COVER_IMAGE_ALLOWED_TYPES)[number])) {

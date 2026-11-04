@@ -1,4 +1,5 @@
 "use server";
+import { authorize } from "@/lib/global/authorize";
 
 import { updateTag } from "next/cache";
 import {
@@ -6,11 +7,7 @@ import {
   TASK_DETAIL_COLUMNS,
 } from "@/constants/home/kanban/kanban";
 import { CACHE_TAGS } from "@/lib/global/cache-tags";
-import {
-  requirePermission,
-  requireProjectAccessForEntities,
-  requireTaskManager,
-} from "@/lib/global/permissions";
+import { requireProjectAccessForEntities, requireTaskManager } from "@/lib/global/permissions";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import type { KanbanTask } from "@/types/home/kanban/kanban";
 import { toKanbanTask } from "@/utils/home/kanban/task";
@@ -65,7 +62,7 @@ const taskIdSchema = z.string().min(1);
 export async function getTaskDetail(taskId: string): Promise<KanbanTask | null> {
   const id = taskIdSchema.parse(taskId);
 
-  await requirePermission("kanban");
+  await authorize("kanban");
   await requireProjectAccessForEntities({ taskIds: [id] });
 
   const supabase = await createClientServerComponent();
@@ -110,7 +107,7 @@ export async function syncTaskMoves(input: {
 }): Promise<void> {
   const { moves } = syncTaskMovesInput.parse(input);
 
-  await requirePermission("kanban");
+  await authorize("kanban");
   await requireTaskManager();
   await requireProjectAccessForEntities({
     taskIds: moves.map((move) => move.taskId),
@@ -281,7 +278,7 @@ export async function createTask(input: {
     sidekickIds,
   } = createTaskInput.parse(input);
 
-  await requirePermission("kanban");
+  await authorize("kanban");
   await requireTaskManager();
   await requireProjectAccessForEntities({ columnIds: [columnId] });
 
@@ -355,7 +352,7 @@ export async function updateTask(input: {
     sidekickIds,
   } = updateTaskInput.parse(input);
 
-  await requirePermission("kanban");
+  await authorize("kanban");
   await requireTaskManager();
   await requireProjectAccessForEntities({ taskIds: [taskId] });
 
@@ -401,7 +398,7 @@ export async function updateTask(input: {
 export async function deleteTask(taskId: string): Promise<void> {
   const id = taskIdSchema.parse(taskId);
 
-  await requirePermission("kanban");
+  await authorize("kanban");
   await requireTaskManager();
   await requireProjectAccessForEntities({ taskIds: [id] });
 

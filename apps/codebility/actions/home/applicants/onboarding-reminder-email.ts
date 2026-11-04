@@ -1,4 +1,5 @@
 "use server";
+import { authorize } from "@/lib/global/authorize";
 
 import { Resend } from "resend";
 import {
@@ -9,6 +10,7 @@ import { DEFAULT_EMAIL_CONFIG } from "@/actions/home/applicants/email-config";
 import type { EmailRecipient } from "@/types/home/applicants/applicant-email";
 
 export const sendOnboardingReminder = async ({ email, name }: EmailRecipient) => {
+  await authorize("applicants");
   try {
     const waitListLink = process.env.NEXT_PUBLIC_MESSENGER_WAITLIST;
     const discordLink = process.env.NEXT_PUBLIC_DISCORD_LINK;
@@ -40,6 +42,7 @@ export const sendOnboardingReminder = async ({ email, name }: EmailRecipient) =>
 };
 
 export const sendMultipleOnboardingReminder = async (emails: string[]) => {
+  await authorize("applicants");
   try {
     const waitListLink = process.env.NEXT_PUBLIC_MESSENGER_WAITLIST;
     const discordLink = process.env.NEXT_PUBLIC_DISCORD_LINK;
@@ -76,6 +79,7 @@ export const sendOnboardingReminderWithUpdate = async ({
   name,
   applicantId,
 }: EmailRecipient & { applicantId: string }) => {
+  await authorize("applicants");
   const { updateReminderCountAction } = await import("@/actions/home/applicants/applicants");
 
   try {
@@ -90,6 +94,7 @@ export const sendOnboardingReminderWithUpdate = async ({
 export const sendMultipleOnboardingReminderWithUpdate = async (
   applicants: { email: string; applicantId: string }[]
 ) => {
+  await authorize("applicants");
   const { updateMultipleReminderCountAction } = await import("@/actions/home/applicants/applicants");
 
   try {
@@ -105,6 +110,7 @@ export const sendMultipleOnboardingReminderWithUpdate = async (
 };
 
 export const sendOnboardingReminderForConfig = async (email: string) => {
+  await authorize("applicants");
   const { createClientServerComponent } = await import("@/lib/global/supabase-server");
   const { updateReminderCountAction } = await import("@/actions/home/applicants/applicants");
 

@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "cross-env FORCE_COLOR=1 next dev",
     "build": "next build",
+    "check:auth": "node scripts/check-authorization.mjs",
     "start": "next start",
     "lint": "next typegen && eslint .",
     "typecheck": "next typegen && tsc --noEmit --pretty",

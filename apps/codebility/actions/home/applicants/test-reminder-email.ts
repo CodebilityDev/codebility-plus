@@ -1,4 +1,5 @@
 "use server";
+import { authorize } from "@/lib/global/authorize";
 
 import { Resend } from "resend";
 import { getTestReminderTextTemplate, getTestReminderHtmlTemplate } from "@/actions/home/applicants/test-reminder-email-template";
@@ -6,6 +7,7 @@ import { DEFAULT_EMAIL_CONFIG } from "@/actions/home/applicants/email-config";
 import type { EmailRecipient } from "@/types/home/applicants/applicant-email";
 
 export const sendTestReminder = async ({ email, name }: EmailRecipient) => {
+  await authorize("applicants");
   try {
     const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
 
@@ -35,6 +37,7 @@ export const sendTestReminder = async ({ email, name }: EmailRecipient) => {
 };
 
 export const sendMultipleTestReminderEmail = async (emails: string[]) => {
+  await authorize("applicants");
   try {
     const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
 
@@ -63,6 +66,7 @@ export const sendTestReminderWithUpdate = async ({
   name,
   applicantId,
 }: EmailRecipient & { applicantId: string }) => {
+  await authorize("applicants");
   const { updateReminderCountAction } = await import("@/actions/home/applicants/applicants");
 
   try {
@@ -77,6 +81,7 @@ export const sendTestReminderWithUpdate = async ({
 export const sendMultipleTestReminderEmailWithUpdate = async (
   applicants: { email: string; applicantId: string }[]
 ) => {
+  await authorize("applicants");
   const { updateMultipleReminderCountAction } = await import("@/actions/home/applicants/applicants");
 
   try {
@@ -92,6 +97,7 @@ export const sendMultipleTestReminderEmailWithUpdate = async (
 };
 
 export const sendTestReminderForConfig = async (email: string) => {
+  await authorize("applicants");
   const { createClientServerComponent } = await import("@/lib/global/supabase-server");
   const { updateReminderCountAction } = await import("@/actions/home/applicants/applicants");
 

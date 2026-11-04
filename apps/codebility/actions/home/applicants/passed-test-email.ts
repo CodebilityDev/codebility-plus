@@ -1,4 +1,5 @@
 "use server";
+import { authorize } from "@/lib/global/authorize";
 
 import { Resend } from "resend";
 import {
@@ -9,6 +10,7 @@ import { DEFAULT_EMAIL_CONFIG } from "@/actions/home/applicants/email-config";
 import type { EmailRecipient } from "@/types/home/applicants/applicant-email";
 
 export const sendPassedTestEmail = async ({ email, name }: EmailRecipient) => {
+  await authorize("applicants");
   try {
     const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
     const waitListLink = process.env.NEXT_PUBLIC_MESSENGER_WAITLIST;
@@ -42,6 +44,7 @@ export const sendPassedTestEmail = async ({ email, name }: EmailRecipient) => {
 export const sendMultiplePassedTestEmail = async (
   Applicant: { email: string; name: string }[]
 ) => {
+  await authorize("applicants");
   try {
     const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
 
@@ -78,6 +81,7 @@ export const sendMultiplePassedTestEmail = async (
 };
 
 export const sendPassedTestEmailForConfig = async (email: string) => {
+  await authorize("applicants");
   const { createClientServerComponent } = await import("@/lib/global/supabase-server");
 
   try {

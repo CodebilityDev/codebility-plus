@@ -3,6 +3,7 @@
 import { updateCodev } from "@/actions/applicant/profile/applicant-profile";
 import { expireCodevCaches } from "@/lib/global/cache-tags";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
+import { requireIdentity } from "@/lib/global/authorize";
 import type { UploadImageOptions } from "@/types/applicant/profile/profile";
 
 
@@ -17,6 +18,7 @@ export async function uploadImage(
   file: File,
   options: UploadImageOptions = defaultOptions,
 ) {
+  const identity = await requireIdentity();
   const supabase = await createClientServerComponent();
   try {
     const bucket = options.bucket ?? defaultOptions.bucket;
@@ -25,7 +27,7 @@ export async function uploadImage(
     // Generate a cleaner file path
     const fileExtension = file.name.split(".").pop() ?? "";
     const fileName = `${Date.now()}.${fileExtension}`;
-    const filePath = `${folder}/${fileName}`; // Simpler path structure
+    const filePath = `${identity.userId}/${fileName}`; // Simpler path structure
 
     const { error: uploadError } = await supabase.storage
       .from(bucket)

@@ -3,7 +3,7 @@
 import { updateTag } from "next/cache";
 import { CANDIDATE_COLUMNS, CANDIDATE_PAGE_SIZE } from "@/constants/home/projects/projects";
 import { CACHE_TAGS } from "@/lib/global/cache-tags";
-import { requireFullAccess } from "@/lib/global/permissions";
+import { authorize } from "@/lib/global/authorize";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import type { ContributorCandidatePage } from "@/types/home/projects/projects";
 import { z } from "zod";
@@ -33,7 +33,7 @@ export async function searchContributorCandidates(
   const term = searchQuerySchema.parse(query).trim();
   const pageNumber = z.number().int().min(0).parse(page);
 
-  await requireFullAccess();
+  await authorize("projects");
 
   const supabase = await createClientServerComponent();
 
@@ -84,7 +84,7 @@ export async function addContributors(
   const id = projectIdSchema.parse(projectId);
   const ids = [...new Set(contributorIdsSchema.parse(codevIds))];
 
-  await requireFullAccess();
+  await authorize("projects");
 
   const supabase = await createClientServerComponent();
 
@@ -132,7 +132,7 @@ export async function removeContributor(
   const id = projectIdSchema.parse(projectId);
   const contributorId = codevIdSchema.parse(codevId);
 
-  await requireFullAccess();
+  await authorize("projects");
 
   const supabase = await createClientServerComponent();
 

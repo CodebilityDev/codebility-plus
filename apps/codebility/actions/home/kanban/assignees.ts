@@ -1,6 +1,6 @@
 "use server";
 
-import { requirePermission } from "@/lib/global/permissions";
+import { authorize } from "@/lib/global/authorize";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import type { AssigneeOption } from "@/types/home/kanban/kanban";
 import { z } from "zod";
@@ -40,7 +40,7 @@ export async function searchAssignees(
   const term = querySchema.parse(query).trim();
   const id = projectIdSchema.parse(projectId);
 
-  await requirePermission("kanban");
+  await authorize("kanban");
 
   const supabase = await createClientServerComponent();
 
@@ -74,7 +74,7 @@ export async function getAssigneesByIds(ids: string[]): Promise<AssigneeOption[]
 
   if (unique.length === 0) return [];
 
-  await requirePermission("kanban");
+  await authorize("kanban");
 
   const supabase = await createClientServerComponent();
 

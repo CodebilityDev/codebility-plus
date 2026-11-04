@@ -3,19 +3,13 @@
 import { createClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
 
+import { authorize } from "@/lib/global/authorize";
 import { expireCodevCaches } from "@/lib/global/cache-tags";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 
 export async function deleteAuthUser() {
+  const identity = await authorize("settings");
   const supabase = await createClientServerComponent();
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-
-  if (userError || !user) {
-    return { error: "Unauthorized" };
-  }
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceRoleKey = process.env.DB_SERVICE_ROLE;
@@ -28,7 +22,7 @@ export async function deleteAuthUser() {
   const { error: rowError } = await supabase
     .from("codev")
     .delete()
-    .eq("id", user.id);
+    .eq("id", identity.userId);
 
   if (rowError) {
     console.error("Error deleting codev row:", rowError);
@@ -39,7 +33,7 @@ export async function deleteAuthUser() {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 
-  const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(user.id);
+  const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(identity.userId);
 
   if (deleteError) {
     console.error("Error deleting user:", deleteError);
