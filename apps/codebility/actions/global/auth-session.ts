@@ -74,7 +74,6 @@ const validateUsername = (username: string): { valid: boolean; error?: string } 
 };
 
 export const signupUser = async (formData: FormData) => {
-  await requireIdentity();
   try {
     const supabase = await createClientServerComponent();
 
@@ -363,7 +362,6 @@ export const signOut = async (): Promise<void> => {
 };
 
 export const resendVerificationEmail = async (email: string) => {
-  await requireIdentity();
   try {
     const supabase = await createClientServerComponent();
     
