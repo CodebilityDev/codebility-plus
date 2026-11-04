@@ -2,39 +2,43 @@ import { connection } from "next/server";
 import { cache } from "react";
 import type { CurrentUserProfile } from "@/types/global/current-user";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
+import { logPerf } from "@/lib/global/timing";
 
-/**
- * The signed-in codev row, read once per request.
- *
- * Server-only. Client components reach it through the
- * `getCurrentCodevAction` server action so that pages never read cookies
- * during render (which would force the whole route to render dynamically).
- */
 export const getCurrentCodev = cache(
   async (): Promise<CurrentUserProfile | null> => {
-  await connection();
+    await connection();
 
-  const supabase = await createClientServerComponent();
+    const startedAt = performance.now();
+    const supabase = await createClientServerComponent();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    const authStartedAt = performance.now();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    logPerf("auth.getUser", authStartedAt);
 
-  if (!user) return null;
+    if (!user) {
+      logPerf("codev.total", startedAt);
+      return null;
+    }
 
-  const { data, error } = await supabase
-    .from("codev")
-    .select(
-      "id, first_name, last_name, email_address, image_url, role_id, application_status, internal_status, availability_status",
-    )
-    .eq("id", user.id)
-    .single();
+    const selectStartedAt = performance.now();
+    const { data, error } = await supabase
+      .from("codev")
+      .select(
+        "id, first_name, last_name, email_address, image_url, role_id, application_status, internal_status, availability_status",
+      )
+      .eq("id", user.id)
+      .single();
+    logPerf("codev.select", selectStartedAt);
 
-  if (error) {
-    console.error("Error fetching current codev:", error);
-    return null;
-  }
+    if (error) {
+      console.error("Error fetching current codev:", error);
+      logPerf("codev.total", startedAt);
+      return null;
+    }
 
+    logPerf("codev.total", startedAt);
     return data;
   },
 );

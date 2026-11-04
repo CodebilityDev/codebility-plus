@@ -15,7 +15,6 @@ export default function ProjectCard({
   return (
     <Link
       href={`${pathsConfig.app.projects}/${project.id}`}
-      prefetch={false}
       className="group block overflow-hidden rounded-lg"
     >
       <Card className="h-full transition-shadow group-hover:shadow-md">

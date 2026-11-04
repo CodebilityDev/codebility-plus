@@ -37,6 +37,7 @@ loadEnvForRuntime();
  */
 const config = {
   cacheComponents: true,
+  partialPrefetching: true,
   reactStrictMode: true,
   typescript: {
     ignoreBuildErrors: false,

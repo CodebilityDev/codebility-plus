@@ -14,15 +14,12 @@ import HomeNavbar from "@/components/home/HomeNavbar";
 import HomeSidebar from "@/components/home/HomeSidebar";
 import NavbarSkeleton from "@/components/home/NavbarSkeleton";
 import SidebarSkeleton from "@/components/home/SidebarSkeleton";
-import { readHomeAccess } from "@/lib/home/proxy-access";
 import type { HomeLayoutProps } from "@/types/home/home";
 
 export const instant = false;
 export const prefetch = "partial";
 
-export default async function HomeLayout({ children }: HomeLayoutProps) {
-  const access = await readHomeAccess();
-
+export default function HomeLayout({ children }: HomeLayoutProps) {
   return (
     <ErrorBoundary>
       <ThemeProvider>
@@ -44,7 +41,7 @@ export default async function HomeLayout({ children }: HomeLayoutProps) {
             }
           >
             <Suspense fallback={<NavbarSkeleton />}>
-              <HomeNavbar access={access} />
+              <HomeNavbar />
             </Suspense>
           </ErrorBoundary>
           <div className="flex flex-1 overflow-hidden">
@@ -54,13 +51,13 @@ export default async function HomeLayout({ children }: HomeLayoutProps) {
               }
             >
               <Suspense fallback={<SidebarSkeleton />}>
-                <HomeSidebar access={access} />
+                <HomeSidebar />
               </Suspense>
             </ErrorBoundary>
             <DynamicMainContent>
               <ConditionalMainWrapper>
                 <AsyncErrorBoundary>
-                  <PermissionsProvider initialAccess={access}>
+                  <PermissionsProvider>
                     {children}
                   </PermissionsProvider>
                 </AsyncErrorBoundary>

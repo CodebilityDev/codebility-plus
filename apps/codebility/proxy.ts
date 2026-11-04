@@ -20,6 +20,7 @@ import {
   PROXY_ACCESS_HEADER,
   encodeProxyAccess,
 } from "@/lib/global/proxy-access";
+import { logPerf } from "@/lib/global/timing";
 
 export const config = {
   matcher: ["/((?!api|_next/static|.*\\..*|_next/image|favicon.ico).*)"],
@@ -170,11 +171,13 @@ async function fetchAccount(
     ? `id, role_id, application_status, roles(${PERMISSION_COLUMNS})`
     : "id, role_id, application_status";
 
+  const authStartedAt = performance.now();
   const { data, error } = await client.supabase
     .from("codev")
     .select(columns)
     .eq("id", userId)
     .single();
+  logPerf("proxy.account", authStartedAt);
 
   if (error) {
     console.error("Proxy account lookup failed:", error);
@@ -212,6 +215,8 @@ function toSignIn(client: ProxyClient, request: NextRequest, pathname: string) {
 }
 
 export async function proxy(request: NextRequest) {
+  const startedAt = performance.now();
+
   try {
     const { pathname } = request.nextUrl;
     const access = accessFor(pathname);
@@ -238,10 +243,12 @@ export async function proxy(request: NextRequest) {
         : passThrough(client);
     }
 
+    const authStartedAt = performance.now();
     const {
       data: { user },
       error: authError,
     } = await client.supabase.auth.getUser();
+    logPerf("proxy.auth", authStartedAt);
 
     if (authError || !user) return toSignIn(client, request, pathname);
 
@@ -288,5 +295,7 @@ export async function proxy(request: NextRequest) {
   } catch (error) {
     console.error("Proxy error:", error);
     return NextResponse.redirect(new URL(SIGN_IN, request.url));
+  } finally {
+    logPerf("proxy.total", startedAt);
   }
 }

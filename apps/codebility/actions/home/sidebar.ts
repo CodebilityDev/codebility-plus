@@ -3,11 +3,13 @@
 import pathsConfig from "@/constants/global/paths";
 import { requiresFullAccess } from "@/constants/global/permissions";
 import { getAccess } from "@/lib/global/permissions";
+import { logPerf } from "@/lib/global/timing";
 import type { Sidebar } from "@/types/home/home";
 import type { PermissionKey, ProxyAccess } from "@/types/global/permissions";
 
 
 export const getSidebarData = async (access?: ProxyAccess): Promise<Sidebar[]> => {
+  const startedAt = performance.now();
   const { permissions, hasFullAccess } = access ?? (await getAccess());
 
   const sidebarData: Sidebar[] = [
@@ -56,5 +58,6 @@ export const getSidebarData = async (access?: ProxyAccess): Promise<Sidebar[]> =
     }))
     .filter((section) => section.links.length > 0);
 
+  logPerf(access ? "sidebar.header" : "sidebar.query", startedAt);
   return sidebarData;
 };

@@ -1,10 +1,11 @@
 import { getCurrentCodev } from "@/lib/global/current-codev";
+import { readHomeAccess } from "@/lib/home/proxy-access";
 import { getCachedSidebarData } from "@/lib/home/sidebar-cached";
 
 import Navbar from "@/components/home/Navbar";
-import type { ProxyAccess } from "@/types/global/permissions";
 
-export default async function HomeNavbar({ access }: { access?: ProxyAccess }) {
+export default async function HomeNavbar() {
+  const access = await readHomeAccess();
   const currentUser = await getCurrentCodev();
   const sidebarData = await getCachedSidebarData(access);
 

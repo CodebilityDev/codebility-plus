@@ -165,7 +165,6 @@ const LeftSidebarClient = ({ sidebarData }: { sidebarData: Sidebar[] }) => {
                   <li key={link.route} role="none">
                     <Link
                       href={link.route}
-                      prefetch={false}
                       className={`${
                         isActive
                           ? "bg-gradient-to-r from-purple-800 via-customBlue-900 to-sky-500 text-light-900 rounded-lg"

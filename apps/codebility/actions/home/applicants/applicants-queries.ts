@@ -6,6 +6,7 @@ import { createClientServerComponent } from "@/lib/global/supabase-server";
 import type { NewApplicantType } from "@/types/home/applicants/applicants";
 import { newApplicantsSchema } from "@/utils/home/applicants/applicants";
 import { requireFullAccess } from "@/lib/global/permissions";
+import { logPerf } from "@/lib/global/timing";
 
 const APPLICANT_SELECT =
   "id, first_name, last_name, email_address, phone_number, address, about, positions, display_position, portfolio_website, tech_stacks, image_url, availability_status, nda_status, level, application_status, rejected_count, facebook, linkedin, github, discord, years_of_experience, role_id, internal_status, mentor_id, nda_signature, nda_document, nda_signed_at, nda_request_sent, date_applied, applicant (*)";
@@ -20,11 +21,13 @@ async function queryApplicants(denied: boolean): Promise<NewApplicantType[]> {
       .select(APPLICANT_SELECT)
       .order("date_applied", { ascending: false });
 
+    const queryStartedAt = performance.now();
     const { data, error } = denied
       ? await query.eq("application_status", "denied")
       : await query
           .not("application_status", "eq", "passed")
           .neq("application_status", "denied");
+    logPerf(denied ? "applicants.denied" : "applicants.list", queryStartedAt);
 
     if (error) {
       console.error("Error fetching new applicants:", error);
@@ -58,10 +61,12 @@ export async function getDeniedApplicantsCount(): Promise<number> {
   await requireFullAccess();
   try {
     const supabase = await createClientServerComponent();
+    const countStartedAt = performance.now();
     const { count } = await supabase
       .from("codev")
       .select("id", { count: "exact", head: true })
       .eq("application_status", "denied");
+    logPerf("applicants.count", countStartedAt);
 
     return count ?? 0;
   } catch (error) {

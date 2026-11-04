@@ -4,6 +4,8 @@
   "globalEnv": [
     "DB_SERVICE_ROLE",
     "NODE_ENV",
+    "PERF_LOG",
+    "VERCEL_ENV",
     "VERCEL_URL"
   ],
   "tasks": {

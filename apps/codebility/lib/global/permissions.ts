@@ -2,6 +2,7 @@ import { cache } from "react";
 import { getCurrentCodev } from "@/lib/global/current-codev";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import { getSidebarRoleId } from "@/utils/global/codev";
+import { logPerf } from "@/lib/global/timing";
 import { PERMISSION_COLUMNS, PERMISSION_KEYS, canManageTasks, isFullAccess, normalizeProjectRole } from "@/constants/global/permissions";
 import type { PermissionKey, ProjectAccess, ProjectRole, RolePermissions } from "@/types/global/permissions";
 
@@ -30,11 +31,13 @@ export const getAccess = cache(
 
     const supabase = await createClientServerComponent();
 
+    const rolesStartedAt = performance.now();
     const { data: roleData } = await supabase
       .from("roles")
       .select(PERMISSION_COLUMNS + ", name")
       .eq("id", roleId)
       .single();
+    logPerf("roles.select", rolesStartedAt);
 
     if (!roleData) {
       return { roleId: null, roleName: null, hasFullAccess: false, permissions: NO_PERMISSIONS };
