@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { pageSize } from "@/constants/global/page-size";
 import { cn } from "@/utils/global/cn";
 import type { SortingState, VisibilityState } from "@tanstack/react-table";
-import { flexRender, getCoreRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table";
+import { flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table";
 
 import type { NewApplicantType } from "@/types/home/applicants/applicants";
 
@@ -20,15 +20,18 @@ import type { DataTableProps } from "@/types/home/applicants/applicants";
 function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
   columns,
   data,
+  page,
+  totalPages,
+  onPageChange,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [rowSelection, setRowSelection] = React.useState({});
   const [, setColumnVisibility] =
     React.useState<VisibilityState>({});
-  const [pagination, setPagination] = React.useState({
-    pageIndex: 0,
+  const pagination = {
+    pageIndex: page - 1,
     pageSize: Number(pageSize.applicants),
-  });
+  };
 
   // Memoize initial column visibility to prevent recalculation
   const firstRowStatus = data[0]?.application_status;
@@ -46,22 +49,14 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
     [firstRowStatus],
   );
 
-  // Calculate total pages
-  const totalPages = useMemo(
-    () => Math.ceil(data.length / pagination.pageSize),
-    [data.length, pagination.pageSize],
-  );
-
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
     onRowSelectionChange: setRowSelection,
     onColumnVisibilityChange: setColumnVisibility,
-    onPaginationChange: setPagination,
     getRowId: (row) => row.id, // Use applicant ID instead of array index
     state: {
       sorting,
@@ -72,7 +67,7 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
       columnVisibility: initialColumnVisibility,
     },
     pageCount: totalPages,
-    manualPagination: false,
+    manualPagination: true,
   });
 
   const toBeFailed = useCallback(
@@ -98,37 +93,24 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
 
   // Define pagination callbacks outside of conditional rendering
   const handleNextPage = useCallback(() => {
-    table.nextPage();
-  }, [table]);
+    onPageChange(Math.min(totalPages, page + 1));
+  }, [onPageChange, totalPages, page]);
 
   const handlePreviousPage = useCallback(() => {
-    table.previousPage();
-  }, [table]);
+    onPageChange(Math.max(1, page - 1));
+  }, [onPageChange, page]);
 
   const setCurrentPage = useCallback(
-    (page: number) => {
-      table.setPageIndex(page - 1);
+    (nextPage: number) => {
+      onPageChange(nextPage);
     },
-    [table],
+    [onPageChange],
   );
 
   // Clear row selection when page changes
   React.useEffect(() => {
     setRowSelection({});
-  }, [pagination.pageIndex]);
-
-  // Reset pagination when data changes significantly (different length)
-  const prevDataLength = React.useRef(data.length);
-  React.useEffect(() => {
-    if (prevDataLength.current !== data.length) {
-      // Only reset if we're beyond the available pages
-      const newTotalPages = Math.ceil(data.length / pagination.pageSize);
-      if (pagination.pageIndex >= newTotalPages && newTotalPages > 0) {
-        setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-      }
-      prevDataLength.current = data.length;
-    }
-  }, [data.length, pagination.pageIndex, pagination.pageSize]);
+  }, [page]);
 
   return (
     <div className="space-y-4">
@@ -253,7 +235,7 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
 
       {/* Table pagination integrated with DefaultPagination component */}
       <div className="relative w-full">
-        {data.length > pagination.pageSize && (
+        {totalPages > 1 && (
           <DefaultPagination
             currentPage={table.getState().pagination.pageIndex + 1}
             handleNextPage={handleNextPage}

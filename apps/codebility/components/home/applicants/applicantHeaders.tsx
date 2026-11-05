@@ -11,25 +11,9 @@ import type { ApplicantFilterHeadersProps } from "@/types/home/applicants/applic
 
 function ApplicantFilterHeaders({
   applicants,
-  setApplicants,
-  setCurrentTab,
+  search,
+  onSearchChange,
 }: ApplicantFilterHeadersProps) {
-  const [searchTerm, setSearchTerm] = React.useState("");
-  const onSearch = (value: string) => {
-    setSearchTerm(value);
-
-    const filteredApplicants = applicants.filter((applicant) => {
-      const fullName = `${applicant.first_name} ${applicant.last_name}`;
-      const email = applicant.email_address;
-
-      return (
-        fullName.toLowerCase().includes(value.toLowerCase()) ||
-        email.toLowerCase().includes(value.toLowerCase())
-      );
-    });
-    setApplicants(filteredApplicants);
-    moveTab(filteredApplicants[0]?.application_status ?? "applying");
-  };
 
   const [, setSortField] = useState<string | null>(null);
   const [, setSortDirection] = useState<"asc" | "desc">("desc");
@@ -60,29 +44,6 @@ function ApplicantFilterHeaders({
   const reorderSorts = useCallback((newSortOptions: SortOption[]) => {
     setSortOptions(newSortOptions);
   }, [setSortOptions]);
-
-  const moveTab = (status: string) => {
-    switch (status) {
-      case "applying":
-        setCurrentTab("applying");
-        break;
-      case "testing":
-        setCurrentTab("testing");
-        break;
-      case "onboarding":
-        setCurrentTab("onboarding");
-        break;
-      case "waitlist":
-        setCurrentTab("waitlist");
-        break;
-      case "denied":
-        setCurrentTab("denied");
-        break;
-      default:
-        setCurrentTab("applying");
-        break;
-    }
-  };
 
   // Update a specific filter // Update a specific filter
   const [filters, setFilters] = useState<ApplicantFilters>({
@@ -288,7 +249,6 @@ function ApplicantFilterHeaders({
         endDate: "",
       },
     });
-    setApplicants(applicants);
   };
 
   const resetSort = () => {
@@ -309,8 +269,8 @@ function ApplicantFilterHeaders({
             <input
               type="text"
               placeholder="Search applicants..."
-              value={searchTerm}
-              onChange={(e) => onSearch(e.target.value)}
+              value={search}
+              onChange={(e) => onSearchChange(e.target.value)}
               className="h-11 w-full rounded-lg border border-gray-300 bg-gray-50 px-4 text-sm text-gray-900 placeholder-gray-500 focus:border-customBlue-500 focus:outline-none focus:ring-1 focus:ring-customBlue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-customBlue-400 dark:focus:ring-customBlue-400"
             />
             <div className="flex items-center justify-center gap-3">
@@ -344,8 +304,8 @@ function ApplicantFilterHeaders({
             <input
               type="text"
               placeholder="Search applicants..."
-              value={searchTerm}
-              onChange={(e) => onSearch(e.target.value)}
+              value={search}
+              onChange={(e) => onSearchChange(e.target.value)}
               className="h-11 w-full max-w-80 rounded-lg border border-gray-300 bg-gray-50 px-4 text-sm text-gray-900 placeholder-gray-500 focus:border-customBlue-500 focus:outline-none focus:ring-1 focus:ring-customBlue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-customBlue-400 dark:focus:ring-customBlue-400"
             />
             <ApplicantSorters

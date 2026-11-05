@@ -3,12 +3,10 @@ import { Suspense } from "react";
 import NewApplicantFetchComp from "@/components/home/applicants/applicantFetchComp";
 import { ApplicantsTableSkeleton } from "@/components/home/applicants/ApplicantsTableSkeleton";
 
-export const instant = false;
-
 export default function NewApplicants({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string }>;
+  searchParams: Promise<{ status?: string; page?: string; q?: string }>;
 }) {
   return (
     <div className="mx-auto max-w-screen-xl">

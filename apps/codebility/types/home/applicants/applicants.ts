@@ -16,6 +16,9 @@ export interface ExperienceRanges {
 export interface DataTableProps<TData extends NewApplicantType, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  page: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
 }
 
 export interface ApplicantFilters {
@@ -158,8 +161,8 @@ export interface ApplicantFiltersBadgeProps {
 
 export interface ApplicantFilterHeadersProps {
   applicants: NewApplicantType[];
-  setApplicants: React.Dispatch<React.SetStateAction<NewApplicantType[]>>;
-  setCurrentTab: React.Dispatch<React.SetStateAction<string>>;
+  search: string;
+  onSearchChange: (value: string) => void;
 }
 
 export type ApplicantStatus =
@@ -175,6 +178,9 @@ export interface ApplicantListsProps {
   status: ApplicantStatus;
   applicants: NewApplicantType[];
   counts: ApplicantCounts;
+  page: number;
+  totalPages: number;
+  search: string;
 }
 
 export interface ApplicantProcessTimelineProps {

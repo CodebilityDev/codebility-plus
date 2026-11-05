@@ -72,3 +72,56 @@ export async function getApplicantCounts(): Promise<ApplicantCounts> {
     return { applying: 0, testing: 0, onboarding: 0, waitlist: 0, denied: 0 };
   }
 }
+export async function getApplicantsPage({
+  status,
+  page,
+  pageSize,
+  search,
+}: {
+  status: ApplicantStatus;
+  page: number;
+  pageSize: number;
+  search?: string;
+}): Promise<{ applicants: NewApplicantType[]; total: number }> {
+  try {
+    const supabase = await createClientServerComponent();
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize - 1;
+
+    const queryStartedAt = performance.now();
+    let query = supabase
+      .from("codev")
+      .select(APPLICANT_SELECT, { count: "exact" })
+      .eq("application_status", status);
+
+    const term = search?.trim().replace(/[%,()]/g, "");
+    if (term) {
+      query = query.or(
+        `first_name.ilike.%${term}%,last_name.ilike.%${term}%,email_address.ilike.%${term}%`,
+      );
+    }
+
+    const { data, error, count } = await query
+      .order("date_applied", { ascending: false })
+      .range(from, to);
+    logPerf(`applicants.${status}.page`, queryStartedAt);
+
+    if (error) {
+      console.error("Error fetching applicants:", error);
+      return { applicants: [], total: 0 };
+    }
+
+    const parsedNewApplicants = newApplicantsSchema.array().safeParse(data);
+
+    if (parsedNewApplicants.error) {
+      console.error("Error parsing applicants:", parsedNewApplicants.error);
+      return { applicants: [], total: 0 };
+    }
+
+    return { applicants: parsedNewApplicants.data, total: count ?? 0 };
+  } catch (error) {
+    unstable_rethrow(error);
+    console.error("Error fetching applicants:", error);
+    return { applicants: [], total: 0 };
+  }
+}
