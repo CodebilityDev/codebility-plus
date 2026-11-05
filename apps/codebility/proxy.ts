@@ -20,6 +20,11 @@ import {
   PROXY_ACCESS_HEADER,
   encodeProxyAccess,
 } from "@/lib/global/proxy-access";
+import {
+  PERMISSION_CLAIM_VERSION,
+  decodePermissionMask,
+  readCustomClaims,
+} from "@/lib/global/session-claims";
 import { logPerf } from "@/lib/global/timing";
 
 export const config = {
@@ -224,18 +229,22 @@ async function fetchAccount(
 }
 
 function accessHeaders(
-  account: Account,
+  permissions: RolePermissions,
   hasFullAccess: boolean,
 ): Record<string, string> {
+  return {
+    [PROXY_ACCESS_HEADER]: encodeProxyAccess({ permissions, hasFullAccess }),
+  };
+}
+
+function accountPermissions(account: Account): RolePermissions {
   const permissions = {} as RolePermissions;
 
   for (const key of PERMISSION_KEYS) {
     permissions[key] = Boolean(account.roles?.[key]);
   }
 
-  return {
-    [PROXY_ACCESS_HEADER]: encodeProxyAccess({ permissions, hasFullAccess }),
-  };
+  return permissions;
 }
 
 function notFound(request: NextRequest) {
@@ -291,11 +300,28 @@ export async function proxy(request: NextRequest) {
     const userId = claims.sub;
 
     const currentLevel = typeof claims.aal === "string" ? claims.aal : null;
-    const cached = await cachedAccount(client, userId);
+    const custom = readCustomClaims(claims);
 
-    if (!cached) return toSignIn(client, request, pathname);
+    let permissions: RolePermissions;
+    let status: string | null;
+    let roleId: number | null;
+    let requiresAal2: boolean;
 
-    const { account, requiresAal2 } = cached;
+    if (custom.mask !== null && custom.version === PERMISSION_CLAIM_VERSION) {
+      permissions = decodePermissionMask(custom.mask);
+      status = custom.status;
+      roleId = custom.roleId;
+      requiresAal2 = custom.hasMfa;
+    } else {
+      const cached = await cachedAccount(client, userId);
+
+      if (!cached) return toSignIn(client, request, pathname);
+
+      permissions = accountPermissions(cached.account);
+      status = cached.account.application_status;
+      roleId = cached.account.role_id;
+      requiresAal2 = cached.requiresAal2;
+    }
 
     if (requiresAal2 && currentLevel !== "aal2" && pathname !== TWO_FACTOR) {
       return redirectTo(client, request, TWO_FACTOR);
@@ -316,19 +342,19 @@ export async function proxy(request: NextRequest) {
 
     const permission = permissionFor(pathname);
 
-    const target = statusRedirect(account.application_status, pathname);
+    const target = statusRedirect(status, pathname);
     if (target) return redirectTo(client, request, target);
 
-    const hasFullAccess = isFullAccess(account.role_id);
+    const hasFullAccess = isFullAccess(roleId);
 
     if (permission) {
       const allowed = requiresFullAccess(pathname)
         ? hasFullAccess
-        : Boolean(account.roles?.[permission]);
+        : Boolean(permissions[permission]);
       if (!allowed) return redirectTo(client, request, HOME);
     }
 
-    return passThrough(client, accessHeaders(account, hasFullAccess));
+    return passThrough(client, accessHeaders(permissions, hasFullAccess));
   } catch (error) {
     console.error("Proxy error:", error);
     return NextResponse.redirect(new URL(SIGN_IN, request.url));
