@@ -1,7 +1,7 @@
 "use server";
 
 import { updateTag } from "next/cache";
-import { CACHE_TAGS } from "@/lib/global/cache-tags";
+import { kanbanBoardTag } from "@/lib/global/cache-tags";
 import { authorize } from "@/lib/global/authorize";
 import { requireProjectAccess, requireTaskManager } from "@/lib/global/permissions";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
@@ -16,7 +16,7 @@ const nameSchema = z.string().trim().min(1).max(60);
 async function requireColumnProject(
   supabase: Awaited<ReturnType<typeof createClientServerComponent>>,
   columnId: string,
-): Promise<void> {
+): Promise<string> {
   const { data: column, error } = await supabase
     .from("kanban_columns")
     .select("board_id, kanban_boards(project_id)")
@@ -30,6 +30,8 @@ async function requireColumnProject(
   if (!projectId) throw new Error("Column not found");
 
   await requireProjectAccess(projectId, "member");
+
+  return projectId;
 }
 
 export async function createColumn(
@@ -66,7 +68,7 @@ export async function createColumn(
 
   if (createError) throw createError;
 
-  updateTag(CACHE_TAGS.kanbanBoard);
+  updateTag(kanbanBoardTag(board.project_id));
 
   return { id: created.id, name: created.name, position: created.position };
 }
@@ -83,7 +85,7 @@ export async function updateColumn(
 
   const supabase = await createClientServerComponent();
 
-  await requireColumnProject(supabase, parsedColumnId);
+  const projectId = await requireColumnProject(supabase, parsedColumnId);
 
   const { data: updated, error: updateError } = await supabase
     .from("kanban_columns")
@@ -94,7 +96,7 @@ export async function updateColumn(
 
   if (updateError) throw updateError;
 
-  updateTag(CACHE_TAGS.kanbanBoard);
+  updateTag(kanbanBoardTag(projectId));
 
   return { id: updated.id, name: updated.name, position: updated.position };
 }
@@ -107,7 +109,7 @@ export async function deleteColumn(columnId: string): Promise<void> {
 
   const supabase = await createClientServerComponent();
 
-  await requireColumnProject(supabase, parsedColumnId);
+  const projectId = await requireColumnProject(supabase, parsedColumnId);
 
   const { error: deleteError } = await supabase.rpc("delete_kanban_column", {
     p_column_id: parsedColumnId,
@@ -115,5 +117,5 @@ export async function deleteColumn(columnId: string): Promise<void> {
 
   if (deleteError) throw deleteError;
 
-  updateTag(CACHE_TAGS.kanbanBoard);
+  updateTag(kanbanBoardTag(projectId));
 }

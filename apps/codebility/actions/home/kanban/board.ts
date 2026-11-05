@@ -5,7 +5,10 @@ import {
   DEFAULT_COLUMN_NAMES,
   SPRINT_COLUMNS,
 } from "@/constants/home/kanban/kanban";
-import { CACHE_TAGS } from "@/lib/global/cache-tags";
+import {
+  kanbanBoardTag,
+  kanbanSprintsTag,
+} from "@/lib/global/cache-tags";
 import { authorize } from "@/lib/global/authorize";
 import { requireProjectAccessForEntities } from "@/lib/global/permissions";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
@@ -32,6 +35,7 @@ export async function ensureBoardForSprint(
 
   if (sprintError) throw sprintError;
   if (!sprint) throw new Error("Sprint not found");
+  if (!sprint.project_id) throw new Error("Sprint not found");
   if (sprint.board_id) return { boardId: sprint.board_id };
 
   const { data: board, error: boardError } = await supabase
@@ -59,7 +63,8 @@ export async function ensureBoardForSprint(
 
   if (linkError) throw linkError;
 
-  updateTag(CACHE_TAGS.kanbanBoard);
+  updateTag(kanbanBoardTag(sprint.project_id));
+  updateTag(kanbanSprintsTag(sprint.project_id));
 
   return { boardId: board.id };
 }

@@ -47,7 +47,7 @@ async function KanbanBoardContent({ params }: KanbanBoardPageProps) {
     redirect(pathsConfig.app.home);
   }
 
-  const board = await getBoard(sprintId);
+  const board = await getBoard(sprintId, projectId);
 
   if (!board) {
     return (

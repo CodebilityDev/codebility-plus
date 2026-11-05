@@ -6,7 +6,7 @@ import {
   TASK_COLUMNS,
   TASK_DETAIL_COLUMNS,
 } from "@/constants/home/kanban/kanban";
-import { CACHE_TAGS } from "@/lib/global/cache-tags";
+import { kanbanBoardTag } from "@/lib/global/cache-tags";
 import { requireProjectAccessForEntities, requireTaskManager } from "@/lib/global/permissions";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import type { KanbanTask } from "@/types/home/kanban/kanban";
@@ -109,7 +109,7 @@ export async function syncTaskMoves(input: {
 
   await authorize("kanban");
   await requireTaskManager();
-  await requireProjectAccessForEntities({
+  const projectIds = await requireProjectAccessForEntities({
     taskIds: moves.map((move) => move.taskId),
     columnIds: moves.map((move) => move.toColumnId),
   });
@@ -246,8 +246,10 @@ export async function syncTaskMoves(input: {
     const { error: upsertError } = await supabase.from("tasks").upsert(rows);
 
     if (upsertError) throw upsertError;
+  }
 
-    updateTag(CACHE_TAGS.kanbanBoard);
+  for (const projectId of projectIds) {
+    updateTag(kanbanBoardTag(projectId));
   }
 }
 
@@ -280,7 +282,9 @@ export async function createTask(input: {
 
   await authorize("kanban");
   await requireTaskManager();
-  await requireProjectAccessForEntities({ columnIds: [columnId] });
+  const projectIds = await requireProjectAccessForEntities({
+    columnIds: [columnId],
+  });
 
   const supabase = await createClientServerComponent();
 
@@ -320,7 +324,9 @@ export async function createTask(input: {
 
   if (!task) throw new Error("Could not create the task.");
 
-  updateTag(CACHE_TAGS.kanbanBoard);
+  for (const projectId of projectIds) {
+    updateTag(kanbanBoardTag(projectId));
+  }
 
   return task;
 }
@@ -354,7 +360,9 @@ export async function updateTask(input: {
 
   await authorize("kanban");
   await requireTaskManager();
-  await requireProjectAccessForEntities({ taskIds: [taskId] });
+  const projectIds = await requireProjectAccessForEntities({
+    taskIds: [taskId],
+  });
 
   if (
     title === undefined &&
@@ -392,7 +400,9 @@ export async function updateTask(input: {
 
   if (error) throw error;
 
-  updateTag(CACHE_TAGS.kanbanBoard);
+  for (const projectId of projectIds) {
+    updateTag(kanbanBoardTag(projectId));
+  }
 }
 
 export async function deleteTask(taskId: string): Promise<void> {
@@ -400,7 +410,7 @@ export async function deleteTask(taskId: string): Promise<void> {
 
   await authorize("kanban");
   await requireTaskManager();
-  await requireProjectAccessForEntities({ taskIds: [id] });
+  const projectIds = await requireProjectAccessForEntities({ taskIds: [id] });
 
   const supabase = await createClientServerComponent();
 
@@ -408,5 +418,7 @@ export async function deleteTask(taskId: string): Promise<void> {
 
   if (error) throw error;
 
-  updateTag(CACHE_TAGS.kanbanBoard);
+  for (const projectId of projectIds) {
+    updateTag(kanbanBoardTag(projectId));
+  }
 }

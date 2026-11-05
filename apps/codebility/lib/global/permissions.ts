@@ -189,12 +189,14 @@ export async function resolveProjectIds(entities: {
 export async function requireProjectAccessForEntities(
   entities: { taskIds?: string[]; columnIds?: string[]; sprintId?: string },
   requiredRole?: ProjectRole,
-): Promise<void> {
+): Promise<string[]> {
   const projectIds = await resolveProjectIds(entities);
 
   for (const projectId of projectIds) {
     await requireProjectAccess(projectId, requiredRole);
   }
+
+  return projectIds;
 }
 
 export const getAccessibleProjectIds = cache(async (): Promise<string[] | null> => {

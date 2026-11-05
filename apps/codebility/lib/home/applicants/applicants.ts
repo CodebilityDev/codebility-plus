@@ -53,7 +53,7 @@ export async function getApplicantsByStatus(
 
 export async function getApplicantCounts(): Promise<ApplicantCounts> {
   "use cache";
-  cacheLife("minutes");
+  cacheLife("hours");
   cacheTag(CACHE_TAGS.applicants);
 
   try {
@@ -90,8 +90,12 @@ export async function getApplicantsPage({
   pageSize: number;
   search?: string;
 }): Promise<{ applicants: NewApplicantType[]; total: number }> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag(CACHE_TAGS.applicants);
+
   try {
-    const supabase = await createClientServerComponent();
+    const supabase = createClientAnon();
     const from = (page - 1) * pageSize;
     const to = from + pageSize - 1;
 

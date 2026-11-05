@@ -5,7 +5,7 @@ export const CACHE_TAGS = {
   careersJobListings: "careers-job-listings",
   codevsFeaturedProjects: "codevs-featured-projects",
   codevsProfiles: "codevs-profiles",
-  kanbanBoard: "kanban-board",
+  kanbanProjects: "kanban-projects",
   landingAdmins: "landing-admins",
   landingInterns: "landing-interns",
   onboardingTeam: "onboarding-team",
@@ -21,6 +21,10 @@ export const CACHE_TAGS = {
 } as const;
 
 export type CacheTag = (typeof CACHE_TAGS)[keyof typeof CACHE_TAGS];
+
+export const kanbanBoardTag = (projectId: string) => `kanban-board-${projectId}`;
+
+export const kanbanSprintsTag = (projectId: string) => `kanban-sprints-${projectId}`;
 
 const CODEV_CACHE_TAGS: readonly CacheTag[] = [
   CACHE_TAGS.profileDetail,

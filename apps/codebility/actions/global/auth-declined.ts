@@ -67,7 +67,6 @@ export async function reApplyAction() {
   }
 
   updateTag(CACHE_TAGS.applicants);
-    revalidatePath("/home/applicants");
   revalidatePath("/auth/declined");
 
   redirect("/auth/waiting");

@@ -51,7 +51,6 @@ export async function applicantTakeTest({
 
         revalidatePath("/applicant/waiting");
         updateTag(CACHE_TAGS.applicants);
-    revalidatePath("/home/applicants");
     } catch (error) {
         if (error instanceof AuthorizationError) throw error;
         console.error("Error taking test:", error);
@@ -87,7 +86,6 @@ export async function applicantMoveToOnboard({
 
         revalidatePath("/applicant/waiting");
         updateTag(CACHE_TAGS.applicants);
-    revalidatePath("/home/applicants");
     } catch (error) {
         if (error instanceof AuthorizationError) throw error;
         console.error("Error taking test:", error);
@@ -122,7 +120,6 @@ export async function applicantSubmitTest({
 
         revalidatePath("/applicant/waiting");
         updateTag(CACHE_TAGS.applicants);
-    revalidatePath("/home/applicants");
     } catch (error) {
         if (error instanceof AuthorizationError) throw error;
         console.error("Error submitting test:", error);
@@ -157,7 +154,6 @@ export async function applicantUpdateTestSubmission({
 
         revalidatePath("/applicant/waiting");
         updateTag(CACHE_TAGS.applicants);
-    revalidatePath("/home/applicants");
     } catch (error) {
         if (error instanceof AuthorizationError) throw error;
         console.error("Error updating test submission:", error);
@@ -207,7 +203,6 @@ export async function applicantUpdateJoinedStatus({
 
         revalidatePath("/applicant/waiting");
         updateTag(CACHE_TAGS.applicants);
-    revalidatePath("/home/applicants");
     } catch (error) {
         if (error instanceof AuthorizationError) throw error;
         console.error("Error updating joined status:", error);

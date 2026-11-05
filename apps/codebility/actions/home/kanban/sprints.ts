@@ -3,7 +3,7 @@ import { authorize } from "@/lib/global/authorize";
 
 import { updateTag } from "next/cache";
 import { ensureBoardForSprint } from "@/actions/home/kanban/board";
-import { CACHE_TAGS } from "@/lib/global/cache-tags";
+import { kanbanSprintsTag } from "@/lib/global/cache-tags";
 import { requireProjectAccess } from "@/lib/global/permissions";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import { z } from "zod";
@@ -44,7 +44,7 @@ export async function createSprint(input: {
 
   await ensureBoardForSprint(sprint.id);
 
-  updateTag(CACHE_TAGS.kanbanBoard);
+  updateTag(kanbanSprintsTag(projectId));
 
   return { sprintId: sprint.id };
 }

@@ -1,7 +1,7 @@
 "use server";
 
 import { updateTag } from "next/cache";
-import { CACHE_TAGS } from "@/lib/global/cache-tags";
+import { CACHE_TAGS, kanbanBoardTag, kanbanSprintsTag } from "@/lib/global/cache-tags";
 import { authorize } from "@/lib/global/authorize";
 import { requireProjectAccess } from "@/lib/global/permissions";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
@@ -81,7 +81,7 @@ export async function createProject(
   if (error) throw error;
 
   updateTag(CACHE_TAGS.projectsList);
-  updateTag(CACHE_TAGS.kanbanBoard);
+  updateTag(CACHE_TAGS.kanbanProjects);
 
   return { projectId: project.id };
 }
@@ -109,7 +109,9 @@ export async function updateProject(
   if (error) throw error;
 
   updateTag(CACHE_TAGS.projectsList);
-  updateTag(CACHE_TAGS.kanbanBoard);
+  updateTag(CACHE_TAGS.kanbanProjects);
+  updateTag(kanbanBoardTag(id));
+  updateTag(kanbanSprintsTag(id));
   updateTag(`${CACHE_TAGS.projectDetail}-${id}`);
 }
 
@@ -189,7 +191,9 @@ export async function deleteProject(projectId: string): Promise<void> {
   if (projectError) throw projectError;
 
   updateTag(CACHE_TAGS.projectsList);
-  updateTag(CACHE_TAGS.kanbanBoard);
+  updateTag(CACHE_TAGS.kanbanProjects);
+  updateTag(kanbanBoardTag(id));
+  updateTag(kanbanSprintsTag(id));
   updateTag(`${CACHE_TAGS.projectDetail}-${id}`);
 }
 
@@ -271,6 +275,8 @@ export async function markProjectDone(projectId: string): Promise<void> {
   if (deleteBoardsError) throw deleteBoardsError;
 
   updateTag(CACHE_TAGS.projectsList);
-  updateTag(CACHE_TAGS.kanbanBoard);
+  updateTag(CACHE_TAGS.kanbanProjects);
+  updateTag(kanbanBoardTag(id));
+  updateTag(kanbanSprintsTag(id));
   updateTag(`${CACHE_TAGS.projectDetail}-${id}`);
 }

@@ -13,7 +13,11 @@ import {
   SPRINT_COLUMNS,
   TASK_COLUMNS,
 } from "@/constants/home/kanban/kanban";
-import { CACHE_TAGS } from "@/lib/global/cache-tags";
+import {
+  CACHE_TAGS,
+  kanbanBoardTag,
+  kanbanSprintsTag,
+} from "@/lib/global/cache-tags";
 import { createClientAnon } from "@/lib/global/supabase-anon";
 
 type KanbanClient = SupabaseClient<Database>;
@@ -21,7 +25,7 @@ type KanbanClient = SupabaseClient<Database>;
 export async function getCachedProjects(): Promise<ProjectListItem[]> {
   "use cache";
   cacheLife("hours");
-  cacheTag(CACHE_TAGS.kanbanBoard);
+  cacheTag(CACHE_TAGS.kanbanProjects);
 
   const { data, error } = await createClientAnon()
     .from("projects")
@@ -46,7 +50,7 @@ export async function getCachedSprints(
 ): Promise<SprintListItem[]> {
   "use cache";
   cacheLife("hours");
-  cacheTag(CACHE_TAGS.kanbanBoard);
+  cacheTag(kanbanSprintsTag(projectId));
 
   const { data, error } = await createClientAnon()
     .from("kanban_sprints")
@@ -67,10 +71,11 @@ export async function getCachedSprints(
 
 export async function getBoard(
   sprintId: string,
+  projectId: string,
 ): Promise<KanbanBoardSnapshot | null> {
   "use cache";
-  cacheLife("minutes");
-  cacheTag(CACHE_TAGS.kanbanBoard);
+  cacheLife("hours");
+  cacheTag(kanbanBoardTag(projectId));
 
   return loadBoardSnapshot(createClientAnon(), sprintId);
 }

@@ -181,7 +181,6 @@ export async function saveQuizProgress({
 
     revalidatePath("/applicant/onboarding");
     updateTag(CACHE_TAGS.applicants);
-    revalidatePath("/home/applicants");
     return { success: true };
   } catch (error) {
     console.error("Error in saveQuizProgress:", error);
@@ -238,7 +237,6 @@ export async function saveQuizAndCommitment({
 
     revalidatePath("/applicant/onboarding");
     updateTag(CACHE_TAGS.applicants);
-    revalidatePath("/home/applicants");
     return { success: true };
   } catch (error) {
     console.error("Error in saveQuizAndCommitment:", error);
@@ -295,7 +293,6 @@ export async function completeOnboarding(codevId: string, newStatus = "waitlist"
     revalidatePath("/applicant/onboarding");
     revalidatePath("/applicant/waiting");
     updateTag(CACHE_TAGS.applicants);
-    revalidatePath("/home/applicants");
     return { success: true };
   } catch (error) {
     console.error("Error in completeOnboarding:", error);
