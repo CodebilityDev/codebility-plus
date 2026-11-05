@@ -10,7 +10,7 @@ import { toast } from "react-hot-toast";
 import { Button } from "@codevs/ui/button";
 import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
-import { completeNdaRequest, completeNdaSigning } from "@/actions/global/nda-storage";
+import { completeNdaSigning } from "@/actions/global/nda-storage";
 import type { NdaSigningTokenClientProps, UserInfo, SignatureCanvasRef, SignaturePadProps } from "@/types/global/nda-signing";
 import { UserInfoSchema, generateNdaPdf } from "@/utils/global/nda-signing";
 
@@ -117,16 +117,12 @@ export default function NdaSigningTokenClient({
           first_name,
           last_name,
           codev_id: codevId,
-        }
+        },
+        token,
       );
 
       if (!result.success) {
         throw new Error(result.error ?? "Failed to complete NDA signing");
-      }
-
-      // Update NDA request status to completed
-      if (token) {
-        await updateNdaRequestStatus(token);
       }
 
       // Clean up localStorage
@@ -172,13 +168,6 @@ export default function NdaSigningTokenClient({
     } finally {
       setSigning(false);
     }
-  };
-
-  /**
-   * Updates the NDA request status to completed after successful signing
-   */
-  const updateNdaRequestStatus = async (ndaToken: string) => {
-    await completeNdaRequest(ndaToken);
   };
 
   if (showNameForm) {

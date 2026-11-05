@@ -5391,6 +5391,14 @@ export interface Database {
         Args: { p_codev_id: string }
         Returns: undefined
       }
+      sign_nda: {
+        Args: {
+          p_token: string
+          p_signature_url: string
+          p_document_url: string
+        }
+        Returns: boolean
+      }
       toggle_overflow_comment_like: {
         Args: { comment_id_param: string }
         Returns: boolean

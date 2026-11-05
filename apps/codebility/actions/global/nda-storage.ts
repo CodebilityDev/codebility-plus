@@ -143,49 +143,13 @@ export async function uploadNdaToStorage(
 }
 
 /**
- * Server action to update codev record with NDA URLs after successful storage upload
- */
-export async function updateCodevNdaUrls(
-  codevId: string,
-  signatureUrl: string,
-  documentUrl: string
-): Promise<{ success: boolean; error?: string }> {
-  try {
-    const supabase = await createClientServerComponent();
-    
-    const { error } = await supabase
-      .from("codev")
-      .update({
-        nda_signature: signatureUrl,
-        nda_document: documentUrl,
-        nda_status: true,
-        nda_signed_at: new Date().toISOString(),
-      })
-      .eq("id", codevId);
-
-    if (error) {
-      console.error(`Database update error for ${codevId}:`, error);
-      throw error;
-    }
-
-    updateTag(CACHE_TAGS.profileDetail);
-    return { success: true };
-  } catch (error) {
-    console.error("Error updating codev NDA URLs:", error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Failed to update database",
-    };
-  }
-}
-
-/**
  * Complete NDA signing workflow - uploads to storage then updates database
  */
 export async function completeNdaSigning(
   signatureDataUrl: string,
-  documentDataUrl: string, 
-  userData: UserData
+  documentDataUrl: string,
+  userData: UserData,
+  token: string,
 ): Promise<{ success: boolean; error?: string }> {
   
   if (!userData.codev_id) {
@@ -203,20 +167,23 @@ export async function completeNdaSigning(
       };
     }
 
-    // Step 2: Update database with URLs
-    const dbResult = await updateCodevNdaUrls(
-      userData.codev_id,
-      uploadResult.signatureUrl,
-      uploadResult.documentUrl
-    );
+    const supabase = await createClientServerComponent();
+    const { data: signed, error: recordError } = await supabase.rpc("sign_nda", {
+      p_token: token,
+      p_signature_url: uploadResult.signatureUrl,
+      p_document_url: uploadResult.documentUrl,
+    });
 
-    if (!dbResult.success) {
-      return { 
-        success: false, 
-        error: dbResult.error ?? "Failed to update database" 
-      };
+    if (recordError) {
+      console.error("Error recording NDA signature:", recordError);
+      return { success: false, error: recordError.message };
     }
 
+    if (!signed) {
+      return { success: false, error: "NDA link is invalid or expired" };
+    }
+
+    updateTag(CACHE_TAGS.profileDetail);
     return { success: true };
 
   } catch (error) {
@@ -267,19 +234,4 @@ export async function getNdaFilePath(url: string): Promise<string | null> {
   } catch {
     return Promise.resolve(null);
   }
-}
-export async function completeNdaRequest(token: string) {
-  const supabase = await createClientServerComponent();
-
-  const { error } = await supabase
-    .from("nda_requests")
-    .update({ status: "completed" })
-    .eq("token", token);
-
-  if (error) {
-    console.error("Error updating NDA request status:", error);
-    return { error: "Failed to update NDA request status" };
-  }
-
-  return { error: null };
 }
