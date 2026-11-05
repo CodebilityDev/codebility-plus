@@ -5,8 +5,6 @@ import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@codevs/ui/tabs";
-
 import { ApplicantDataTable } from "@/components/home/applicants/applicantDataTable";
 import ApplicantFilterHeaders from "@/components/home/applicants/applicantHeaders";
 import { getApplicantColumns } from "@/utils/home/applicants/applicants";
@@ -23,8 +21,10 @@ const TABS: { status: ApplicantStatus; label: string; color: string }[] = [
   { status: "denied", label: "Denied", color: "bg-red-500" },
 ];
 
-const TRIGGER_CLASS =
-  "!flex !h-auto flex-col gap-1 rounded-md px-3 py-3 text-sm font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm md:flex-row md:gap-2 md:px-4 md:py-2 dark:data-[state=active]:bg-gray-900";
+const TAB_CLASS =
+  "flex h-auto flex-col items-center justify-center gap-1 rounded-md px-3 py-3 text-sm font-medium transition-all md:flex-row md:gap-2 md:px-4 md:py-2";
+
+const TAB_ACTIVE_CLASS = "tab-gradient font-bold text-white";
 
 function applicantsHref(status: ApplicantStatus) {
   return status === "applying"
@@ -46,37 +46,42 @@ function ApplicantLists({ status, applicants, counts }: ApplicantListsProps) {
       <ApplicantFilterHeaders
         applicants={applicants}
         setApplicants={setFilteredApplicants}
-        setCurrentTab={(value) => router.push(applicantsHref(value as ApplicantStatus))}
+        setCurrentTab={(value) =>
+          router.push(applicantsHref(value as ApplicantStatus))
+        }
       />
-      <Tabs value={status} className="w-full">
-        <TabsList className="!grid !h-auto w-full grid-cols-2 gap-1 rounded-lg bg-gray-100 p-1 md:grid-cols-5 md:gap-1 dark:bg-gray-800">
+      <div className="w-full">
+        <nav
+          aria-label="Applicant status"
+          className="text-muted-foreground grid w-full grid-cols-2 gap-1 rounded-lg bg-gray-100 p-1 md:grid-cols-5 md:gap-1 dark:bg-gray-800"
+        >
           {TABS.map((tab) => (
-            <TabsTrigger
+            <Link
               key={tab.status}
-              value={tab.status}
-              asChild
-              className={TRIGGER_CLASS}
+              href={applicantsHref(tab.status)}
+              aria-current={tab.status === status ? "page" : undefined}
+              className={`${TAB_CLASS} ${
+                tab.status === status ? TAB_ACTIVE_CLASS : ""
+              }`}
             >
-              <Link href={applicantsHref(tab.status)}>
-                <span className="truncate text-sm font-medium">{tab.label}</span>
-                {counts[tab.status] > 0 && (
-                  <span
-                    className={`flex h-5 min-w-[20px] items-center justify-center rounded-full px-2 text-xs font-semibold text-white ${tab.color}`}
-                  >
-                    {counts[tab.status]}
-                  </span>
-                )}
-              </Link>
-            </TabsTrigger>
+              <span className="truncate">{tab.label}</span>
+              {counts[tab.status] > 0 && (
+                <span
+                  className={`flex h-5 min-w-[20px] items-center justify-center rounded-full px-2 text-xs font-semibold text-white ${tab.color}`}
+                >
+                  {counts[tab.status]}
+                </span>
+              )}
+            </Link>
           ))}
-        </TabsList>
-        <TabsContent value={status} className="mt-6">
+        </nav>
+        <div className="mt-6">
           <ApplicantDataTable
             data={filteredApplicants}
             columns={getApplicantColumns(status)}
           />
-        </TabsContent>
-      </Tabs>
+        </div>
+      </div>
     </div>
   );
 }
