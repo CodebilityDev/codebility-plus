@@ -1,8 +1,9 @@
 "use server";
+import { CACHE_TAGS } from "@/lib/global/cache-tags";
 import { AuthorizationError, requireIdentity } from "@/lib/global/authorize";
 
 import { createClientServerComponent } from "@/lib/global/supabase-server";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 
 export async function getOnboardingProgress(_applicantId: string) {
   try {
@@ -179,6 +180,7 @@ export async function saveQuizProgress({
     }
 
     revalidatePath("/applicant/onboarding");
+    updateTag(CACHE_TAGS.applicants);
     revalidatePath("/home/applicants");
     return { success: true };
   } catch (error) {
@@ -235,6 +237,7 @@ export async function saveQuizAndCommitment({
     }
 
     revalidatePath("/applicant/onboarding");
+    updateTag(CACHE_TAGS.applicants);
     revalidatePath("/home/applicants");
     return { success: true };
   } catch (error) {
@@ -291,6 +294,7 @@ export async function completeOnboarding(codevId: string, newStatus = "waitlist"
 
     revalidatePath("/applicant/onboarding");
     revalidatePath("/applicant/waiting");
+    updateTag(CACHE_TAGS.applicants);
     revalidatePath("/home/applicants");
     return { success: true };
   } catch (error) {

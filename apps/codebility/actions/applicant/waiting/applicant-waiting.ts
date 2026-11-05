@@ -1,8 +1,9 @@
 "use server";
+import { CACHE_TAGS } from "@/lib/global/cache-tags";
 
 import { AuthorizationError, requireIdentity } from "@/lib/global/authorize";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 
 export async function applicantTakeTest({
     applicantId,
@@ -49,7 +50,8 @@ export async function applicantTakeTest({
         }
 
         revalidatePath("/applicant/waiting");
-        revalidatePath("/home/applicants");
+        updateTag(CACHE_TAGS.applicants);
+    revalidatePath("/home/applicants");
     } catch (error) {
         if (error instanceof AuthorizationError) throw error;
         console.error("Error taking test:", error);
@@ -84,7 +86,8 @@ export async function applicantMoveToOnboard({
         }
 
         revalidatePath("/applicant/waiting");
-        revalidatePath("/home/applicants");
+        updateTag(CACHE_TAGS.applicants);
+    revalidatePath("/home/applicants");
     } catch (error) {
         if (error instanceof AuthorizationError) throw error;
         console.error("Error taking test:", error);
@@ -118,7 +121,8 @@ export async function applicantSubmitTest({
         }
 
         revalidatePath("/applicant/waiting");
-        revalidatePath("/home/applicants");
+        updateTag(CACHE_TAGS.applicants);
+    revalidatePath("/home/applicants");
     } catch (error) {
         if (error instanceof AuthorizationError) throw error;
         console.error("Error submitting test:", error);
@@ -152,7 +156,8 @@ export async function applicantUpdateTestSubmission({
         }
 
         revalidatePath("/applicant/waiting");
-        revalidatePath("/home/applicants");
+        updateTag(CACHE_TAGS.applicants);
+    revalidatePath("/home/applicants");
     } catch (error) {
         if (error instanceof AuthorizationError) throw error;
         console.error("Error updating test submission:", error);
@@ -201,7 +206,8 @@ export async function applicantUpdateJoinedStatus({
         }
 
         revalidatePath("/applicant/waiting");
-        revalidatePath("/home/applicants");
+        updateTag(CACHE_TAGS.applicants);
+    revalidatePath("/home/applicants");
     } catch (error) {
         if (error instanceof AuthorizationError) throw error;
         console.error("Error updating joined status:", error);

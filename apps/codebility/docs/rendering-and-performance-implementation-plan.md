@@ -241,3 +241,21 @@ Delete after confirming zero imports: `getClients`, `getEducation`, `getWorkSche
 - Optimistic mutations change error reporting; every optimistic patch needs a rollback path and a toast.
 - Project-scoping project actions changes access for non-full-access users; confirm with the product owner before shipping (Workstream F item 3).
 - Cached role permissions introduce staleness; invalidate on the settings write path and keep the TTL short.
+## 14. Schema drift: codev_total_points
+
+`/profiles` filters qualified talent with `public.codev_total_points`, a view that exists in the live project and in `types/global/supabase.ts` but is not created by any migration. The view was created outside the migration history, so a database provisioned from `supabase/migrations` alone would fail at runtime on /profiles.
+
+Current guard: `supabase/migrations/20261105_require_codev_total_points.sql` fails the migration run with an explicit message when the view is absent, instead of letting the page break later.
+
+To adopt it properly, capture the definition from the live database and add it to a migration:
+
+```sql
+select pg_get_viewdef('public.codev_total_points'::regclass, true);
+select grantee, privilege_type
+from information_schema.role_table_grants
+where table_schema = 'public' and table_name = 'codev_total_points';
+```
+
+Then add `create or replace view public.codev_total_points as <definition>` plus the grants, with `anon` and `authenticated` select, and delete the guard migration in the same commit.
+
+The same drift risk applies to the other views listed in `database.md` (`profile_points`, `public_codev_profiles`, `mentor_users`): none of them are created by a migration. A full baseline dump is the durable fix.

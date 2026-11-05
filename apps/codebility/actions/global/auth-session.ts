@@ -2,11 +2,13 @@
 import { requireIdentity } from "@/lib/global/authorize";
 
 import { redirect } from "next/navigation";
+import { updateTag } from "next/cache";
 import type { Database } from "@/types/global/supabase";
 
 type CodevInsert = Database["public"]["Tables"]["codev"]["Insert"];
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import { uploadNdaToStorage } from "@/actions/global/nda-storage";
+import { CACHE_TAGS } from "@/lib/global/cache-tags";
 import { toErrorMessage } from "@/utils/global/feedback";
 
 const uploadProfileImage = async (
@@ -253,6 +255,7 @@ export const signupUser = async (formData: FormData) => {
       .single();
 
     if (insertError) throw insertError;
+    updateTag(CACHE_TAGS.applicants);
 
     // Create applicant entry
     const { error } = await supabase

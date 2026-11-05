@@ -1,6 +1,7 @@
 "use server";
+import { CACHE_TAGS } from "@/lib/global/cache-tags";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { createClientServerComponent } from "@/lib/global/supabase-server";
@@ -65,7 +66,8 @@ export async function reApplyAction() {
     throw error;
   }
 
-  revalidatePath("/home/applicants");
+  updateTag(CACHE_TAGS.applicants);
+    revalidatePath("/home/applicants");
   revalidatePath("/auth/declined");
 
   redirect("/auth/waiting");
