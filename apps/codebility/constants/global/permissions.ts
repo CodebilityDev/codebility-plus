@@ -23,6 +23,10 @@ export const ROUTE_PERMISSION_MAP: Record<string, PermissionKey> = {
   "/home/projects": "projects",
 };
 
+export const EXACT_ROUTE_PERMISSIONS: Record<string, PermissionKey> = {
+  "/home": "dashboard",
+};
+
 export const FULL_ACCESS_ROUTES = ["/home/applicants"] as const;
 
 export function requiresFullAccess(pathname: string): boolean {

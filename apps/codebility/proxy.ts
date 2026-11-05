@@ -9,6 +9,7 @@ import {
 import type { ProxyClient } from "@/lib/global/proxy-session";
 import { createClientAnon } from "@/lib/global/supabase-anon";
 import {
+  EXACT_ROUTE_PERMISSIONS,
   PERMISSION_COLUMNS,
   PERMISSION_KEYS,
   ROUTE_PERMISSION_MAP,
@@ -103,10 +104,18 @@ function accessFor(pathname: string): Access {
 }
 
 function permissionFor(pathname: string): PermissionKey | null {
+  const exact = EXACT_ROUTE_PERMISSIONS[pathname];
+
+  if (exact) return exact;
+
   const match = PERMISSION_PREFIXES.find((prefix) =>
     pathname.startsWith(prefix),
   );
   return (match ? ROUTE_PERMISSION_MAP[match] : null) ?? null;
+}
+
+function denialTarget(pathname: string): string {
+  return pathname === HOME ? "/home/account-settings" : HOME;
 }
 
 function statusRedirect(status: string | null, pathname: string): string | null {
@@ -351,7 +360,9 @@ export async function proxy(request: NextRequest) {
       const allowed = requiresFullAccess(pathname)
         ? hasFullAccess
         : Boolean(permissions[permission]);
-      if (!allowed) return redirectTo(client, request, HOME);
+      if (!allowed) {
+        return redirectTo(client, request, denialTarget(pathname));
+      }
     }
 
     return passThrough(client, accessHeaders(permissions, hasFullAccess));
