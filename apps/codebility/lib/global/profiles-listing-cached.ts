@@ -65,18 +65,17 @@ function mapRow(row: ProfilesListingRow): Codev {
 async function fetchQualifiedCodevIds(
   supabase: SupabaseClient,
 ): Promise<string[] | null> {
-  const { data, error } = await supabase
-    .from("codev_total_points")
-    .select("codev_id")
-    .gte("skill_points", MIN_QUALIFIED_POINTS);
+  const { data, error } = await supabase.rpc("qualified_codev_ids", {
+    p_min_points: MIN_QUALIFIED_POINTS,
+  });
 
   if (error) {
     console.error("Supabase query error (profiles-listing points):", error);
     return null;
   }
 
-  return (data as { codev_id: string | null }[])
-    .map((row) => row.codev_id)
+  return (data ?? [])
+    .map((row: { codev_id: string | null }) => row.codev_id)
     .filter((id): id is string => Boolean(id));
 }
 

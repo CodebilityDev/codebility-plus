@@ -5399,6 +5399,10 @@ export interface Database {
         }
         Returns: boolean
       }
+      qualified_codev_ids: {
+        Args: { p_min_points: number }
+        Returns: { codev_id: string }[]
+      }
       record_quiz_progress: {
         Args: { p_score: number; p_total: number; p_passed: boolean }
         Returns: undefined
