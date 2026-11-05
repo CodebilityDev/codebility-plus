@@ -5399,6 +5399,10 @@ export interface Database {
         }
         Returns: boolean
       }
+      username_available: {
+        Args: { p_username: string }
+        Returns: boolean
+      }
       toggle_overflow_comment_like: {
         Args: { comment_id_param: string }
         Returns: boolean

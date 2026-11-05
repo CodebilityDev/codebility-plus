@@ -3,9 +3,7 @@ import { requireIdentity } from "@/lib/global/authorize";
 
 import { redirect } from "next/navigation";
 import { updateTag } from "next/cache";
-import type { Database } from "@/types/global/supabase";
 
-type CodevInsert = Database["public"]["Tables"]["codev"]["Insert"];
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import { uploadNdaToStorage } from "@/actions/global/nda-storage";
 import { CACHE_TAGS } from "@/lib/global/cache-tags";
@@ -103,45 +101,70 @@ export const signupUser = async (formData: FormData) => {
     const firstName = formData.get("first_name") as string;
     const lastName = formData.get("last_name") as string;
 
-    // Check for an existing user (comparing lowercase email)
-    const { data: existingUser } = await supabase
-      .from("codev")
-      .select("email_address")
-      .eq("email_address", email_address)
-      .single();
-
-    if (existingUser) {
-      return { success: false, error: "Email already exists" };
-    }
-
     if (username) {
-      // Validate username format
       const usernameValidation = validateUsername(username);
       if (!usernameValidation.valid) {
         return { success: false, error: usernameValidation.error };
       }
 
-      // Check if username is already taken (case-insensitive)
-      const { data: existingUsername } = await supabase
-        .from("codev")
-        .select("username")
-        .ilike("username", username)
-        .single();
+      const { data: usernameFree } = await supabase.rpc("username_available", {
+        p_username: username,
+      });
 
-      if (existingUsername) {
+      if (usernameFree === false) {
         return { success: false, error: "Username is already taken" };
       }
     }
-    // Handle profile image upload if provided
+
     const image_url = profileImage.size > 0
       ? await uploadProfileImage(profileImage, "profileImage", "codebility")
       : null;
 
-    // Create auth user
-    const baseUrl = process.env.NODE_ENV === 'production' 
-      ? 'https://www.codebility.tech' 
+    let nda_status = false;
+    let nda_signature: string | undefined = undefined;
+    let nda_document: string | undefined = undefined;
+    let nda_signed_at: string | undefined = undefined;
+    let ndaProcessedWithStorage = false;
+
+    const ndaSigned = formData.get("ndaSigned") as string;
+    const signature = formData.get("ndaSignature") as string;
+    const document = formData.get("ndaDocument") as string;
+    const signedAt = formData.get("ndaSignedAt") as string;
+
+    if (ndaSigned === "true" && signature && document) {
+      try {
+        const ndaUploadResult = await uploadNdaToStorage(signature, document, {
+          first_name: firstName,
+          last_name: lastName,
+          codev_id: undefined,
+        });
+
+        if (ndaUploadResult.success) {
+          nda_status = true;
+          nda_signature = ndaUploadResult.signatureUrl;
+          nda_document = ndaUploadResult.documentUrl;
+          nda_signed_at = new Date().toISOString();
+          ndaProcessedWithStorage = true;
+        } else {
+          console.error("Failed to upload NDA to storage:", ndaUploadResult.error);
+          nda_status = true;
+          nda_signature = signature;
+          nda_document = document;
+          nda_signed_at = signedAt || new Date().toISOString();
+        }
+      } catch (ndaError) {
+        console.error("Error processing NDA with storage system:", ndaError);
+        nda_status = true;
+        nda_signature = signature;
+        nda_document = document;
+        nda_signed_at = signedAt || new Date().toISOString();
+      }
+    }
+
+    const baseUrl = process.env.NODE_ENV === 'production'
+      ? 'https://www.codebility.tech'
       : process.env.NEXT_PUBLIC_APP_BASE_URL ?? 'http://localhost:3000';
-      
+
     const {
       data: { user },
       error: authError,
@@ -150,123 +173,34 @@ export const signupUser = async (formData: FormData) => {
       password,
       options: {
         emailRedirectTo: `${baseUrl}/auth/callback`,
+        data: {
+          first_name: firstName,
+          last_name: lastName,
+          username: username || null,
+          phone_number: (formData.get("phone_number") as string) || null,
+          about: (formData.get("about") as string) || null,
+          positions: formattedPositions,
+          display_position: display_position || "",
+          portfolio_website: (formData.get("portfolio_website") as string) || null,
+          tech_stacks,
+          image_url,
+          nda_status,
+          nda_signature: nda_signature ?? null,
+          nda_document: nda_document ?? null,
+          nda_signed_at: nda_signed_at ?? null,
+          facebook: (formData.get("facebook") as string) || null,
+          linkedin: (formData.get("linkedin") as string) || null,
+          github: (formData.get("github") as string) || null,
+          discord: (formData.get("discord") as string) || null,
+          years_of_experience,
+        },
       },
     });
 
     if (authError) throw authError;
     if (!user) throw new Error("Failed to create user");
 
-    // **ENHANCED NDA PROCESSING WITH STORAGE SYSTEM**
-    let nda_status = false;
-    let nda_signature: string | undefined = undefined;
-    let nda_document: string | undefined = undefined;
-    let nda_signed_at: string | undefined = undefined;
-    let ndaProcessedWithStorage = false;
-
-    // Check if NDA data was included in the form submission
-    const ndaSigned = formData.get("ndaSigned") as string;
-    const signature = formData.get("ndaSignature") as string;
-    const document = formData.get("ndaDocument") as string;
-    const signedAt = formData.get("ndaSignedAt") as string;
-
-    if (ndaSigned === "true" && signature && document) {
-      
-      try {
-        // **NEW: Upload NDA files to Supabase Storage instead of storing base64**
-        const ndaUploadResult = await uploadNdaToStorage(
-          signature,
-          document,
-          {
-            first_name: firstName,
-            last_name: lastName,
-            codev_id: user.id, // Use the newly created user ID
-          }
-        );
-
-        if (ndaUploadResult.success) {
-          
-          // Set the storage URLs instead of base64 data
-          nda_status = true;
-          nda_signature = ndaUploadResult.signatureUrl;
-          nda_document = ndaUploadResult.documentUrl;
-          nda_signed_at = new Date().toISOString();
-          ndaProcessedWithStorage = true;
-
-        } else {
-          console.error("Failed to upload NDA to storage:", ndaUploadResult.error);
-          
-          // **FALLBACK: Use base64 storage if storage upload fails**
-          nda_status = true;
-          nda_signature = signature;
-          nda_document = document;
-          nda_signed_at = signedAt || new Date().toISOString();
-        }
-      } catch (ndaError) {
-        console.error("Error processing NDA with storage system:", ndaError);
-        
-        // **FALLBACK: Use base64 storage if there's an error**
-        nda_status = true;
-        nda_signature = signature;
-        nda_document = document;
-        nda_signed_at = signedAt || new Date().toISOString();
-      }
-    }
-
-    // Prepare user data for insertion into the "codev" table
-    const userData: CodevInsert = {
-      id: user.id,
-      first_name: firstName,
-      last_name: lastName,
-      email_address,
-      username: username || null, // ADDED: Store username if provided, otherwise null
-      username_updated_at: username ? new Date().toISOString() : null, // ADDED: Track when username was set
-      phone_number: formData.get("phone_number") as string,
-      address: null,
-      about: (formData.get("about") as string) || null,
-      positions: formattedPositions,
-      display_position: display_position || "",
-      portfolio_website: (formData.get("portfolio_website") as string) || null,
-      tech_stacks,
-      image_url,
-      availability_status: true,
-      nda_status,
-      nda_signature,
-      nda_document,
-      nda_signed_at,
-      level: {},
-      application_status: "applying",
-      rejected_count: 0,
-      facebook: (formData.get("facebook") as string) || null,
-      linkedin: (formData.get("linkedin") as string) || null,
-      github: (formData.get("github") as string) || null,
-      discord: (formData.get("discord") as string) || null,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      years_of_experience,
-      role_id: 7,
-      internal_status: "TRAINING",
-      date_applied: new Date().toISOString(),
-    };
-
-    const { error: insertError } = await supabase
-      .from("codev")
-      .insert(userData)
-      .select()
-      .single();
-
-    if (insertError) throw insertError;
     updateTag(CACHE_TAGS.applicants);
-
-    // Create applicant entry
-    const { error } = await supabase
-      .from("applicant")
-      .insert({
-        codev_id: user.id
-      });
-
-    if (error) {
-      throw error;
-    }
 
     
     // **ENHANCED: Return additional information about NDA processing**
