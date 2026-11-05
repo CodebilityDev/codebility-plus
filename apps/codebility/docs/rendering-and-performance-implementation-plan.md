@@ -241,21 +241,21 @@ Delete after confirming zero imports: `getClients`, `getEducation`, `getWorkSche
 - Optimistic mutations change error reporting; every optimistic patch needs a rollback path and a toast.
 - Project-scoping project actions changes access for non-full-access users; confirm with the product owner before shipping (Workstream F item 3).
 - Cached role permissions introduce staleness; invalidate on the settings write path and keep the TTL short.
-## 14. Schema drift: codev_total_points
+## 14. Schema drift: public views
 
-`/profiles` filters qualified talent with `public.codev_total_points`, a view that exists in the live project and in `types/global/supabase.ts` but is not created by any migration. The view was created outside the migration history, so a database provisioned from `supabase/migrations` alone would fail at runtime on /profiles.
+`/profiles` filters qualified talent with `public.codev_total_points`, a view that existed only in the live project. It and the other two unmigrated views are now created by `supabase/migrations/20261105_adopt_public_views.sql`, captured from the live database:
 
-Current guard: `supabase/migrations/20261105_require_codev_total_points.sql` fails the migration run with an explicit message when the view is absent, instead of letting the page break later.
+- `codev_total_points`: per-codev skill points summed from `codev_points`, attendance points from `attendance_points`, and their total.
+- `mentor_users`: every codev whose `internal_status` is MENTOR.
+- `public_codev_profiles`: available codevs with their public profile fields.
 
-To adopt it properly, capture the definition from the live database and add it to a migration:
+Grants in the migration are `select` for `anon` and `authenticated` only. The live database grants every privilege on these views to both roles; that is default Supabase grant noise on a view, but it should be revoked separately if you want the two to match exactly.
 
-```sql
-select pg_get_viewdef('public.codev_total_points'::regclass, true);
-select grantee, privilege_type
-from information_schema.role_table_grants
-where table_schema = 'public' and table_name = 'codev_total_points';
-```
+Two properties are reproduced faithfully rather than fixed, because changing them changes results:
 
-Then add `create or replace view public.codev_total_points as <definition>` plus the grants, with `anon` and `authenticated` select, and delete the guard migration in the same commit.
+- `codev_total_points` groups by `attendance_points.points` instead of aggregating it, so a codev with several attendance rows yields several view rows and `attendance_points` is not summed.
+- The views run with the owner's rights, not `security_invoker`, so row level security on the base tables does not apply to them.
 
-The same drift risk applies to the other views listed in `database.md` (`profile_points`, `public_codev_profiles`, `mentor_users`): none of them are created by a migration. A full baseline dump is the durable fix.
+`profile_points` is a table, not a view, so it is out of scope here.
+
+Remaining drift: the views select from `codev`, `codev_points` and `attendance_points`, and those tables are still not created by any migration. A database built only from `supabase/migrations` still cannot be provisioned end to end. The durable fix remains a committed baseline dump (`supabase db dump --schema public`) as the first migration.
