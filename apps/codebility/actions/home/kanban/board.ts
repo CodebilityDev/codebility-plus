@@ -21,7 +21,7 @@ export async function getBoardSnapshot(
 ): Promise<KanbanBoardSnapshot | null> {
   const id = sprintIdSchema.parse(sprintId);
 
-  await authorize("kanban", { table: "kanban_sprints", id });
+  await authorize("kanban");
   await requireProjectAccessForEntities({ sprintId: id });
 
   const supabase = await createClientServerComponent();
@@ -34,7 +34,7 @@ export async function ensureBoardForSprint(
 ): Promise<{ boardId: string }> {
   const id = sprintIdSchema.parse(sprintId);
 
-  await authorize("kanban", { table: "kanban_sprints", id });
+  await authorize("kanban");
   await requireProjectAccessForEntities({ sprintId: id });
 
   const supabase = await createClientServerComponent();

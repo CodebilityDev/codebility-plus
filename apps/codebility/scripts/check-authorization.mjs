@@ -71,7 +71,20 @@ function exportsOf(source) {
   }));
 }
 
+const schemaSource = readFileSync(
+  path.join(root, "types/global/supabase.ts"),
+  "utf8",
+);
+const ownershipTables = new Set(["codev"]);
+for (const match of schemaSource.matchAll(/^\s{6}(\w+): \{\s*\n\s{8}Row: \{([\s\S]*?)\n\s{8}\}/gm)) {
+  const [, table, columns] = match;
+  if (/\b(?:codev_id|owner_id|created_by):/.test(columns)) ownershipTables.add(table);
+}
+
+const RESOURCE_CHECK = /authorize\(\s*"[^"]+"\s*,\s*\{\s*table:\s*"(\w+)"\s*,\s*id:/g;
+
 let files = 0;
+let badResources = 0;
 let mutations = 0;
 let guarded = 0;
 let publicCount = 0;
@@ -82,6 +95,16 @@ for (const file of filesUnder(actionsDir).sort()) {
   files += 1;
   const relative = path.relative(root, file).split(path.sep).join("/");
   const source = readFileSync(file, "utf8");
+
+  for (const match of source.matchAll(RESOURCE_CHECK)) {
+    const table = match[1];
+    if (!ownershipTables.has(table)) {
+      badResources += 1;
+      failures.push(
+        `${relative} passes a resource id for "${table}", which has no ownership column`,
+      );
+    }
+  }
 
   for (const exported of exportsOf(source)) {
     if (!MUTATION.test(exported.body)) continue;

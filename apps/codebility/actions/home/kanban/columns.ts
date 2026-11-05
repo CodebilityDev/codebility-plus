@@ -78,7 +78,7 @@ export async function updateColumn(
   const parsedColumnId = columnIdSchema.parse(columnId);
   const parsedName = nameSchema.parse(name);
 
-  await authorize("kanban", { table: "kanban_columns", id: parsedColumnId });
+  await authorize("kanban");
   await requireTaskManager();
 
   const supabase = await createClientServerComponent();
@@ -102,7 +102,7 @@ export async function updateColumn(
 export async function deleteColumn(columnId: string): Promise<void> {
   const parsedColumnId = columnIdSchema.parse(columnId);
 
-  await authorize("kanban", { table: "kanban_columns", id: parsedColumnId });
+  await authorize("kanban");
   await requireTaskManager();
 
   const supabase = await createClientServerComponent();
