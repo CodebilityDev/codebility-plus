@@ -11,14 +11,15 @@ import {
 } from "@/constants/home/projects/projects";
 import { normalizeProjectRole } from "@/constants/global/permissions";
 import { CACHE_TAGS } from "@/lib/global/cache-tags";
-import { createClientAnon } from "@/lib/global/supabase-anon";
+import { createClientServerComponent } from "@/lib/global/supabase-server";
 
 export async function getCachedProjects(): Promise<ProjectListItem[]> {
-  "use cache";
+  "use cache: private";
   cacheLife("hours");
   cacheTag(CACHE_TAGS.projectsList);
 
-  const { data, error } = await createClientAnon()
+  const supabase = await createClientServerComponent();
+  const { data, error } = await supabase
     .from("projects")
     .select(PROJECT_LIST_COLUMNS)
     .order("name", { ascending: true });
@@ -41,11 +42,12 @@ export async function getCachedProjects(): Promise<ProjectListItem[]> {
 export async function getCachedProject(
   projectId: string,
 ): Promise<ProjectDetail | null> {
-  "use cache";
+  "use cache: private";
   cacheLife("hours");
   cacheTag(`${CACHE_TAGS.projectDetail}-${projectId}`);
 
-  const { data, error } = await createClientAnon()
+  const supabase = await createClientServerComponent();
+  const { data, error } = await supabase
     .from("projects")
     .select(PROJECT_DETAIL_COLUMNS)
     .eq("id", projectId)
@@ -84,11 +86,12 @@ export async function getCachedProject(
 export async function getCachedContributors(
   projectId: string,
 ): Promise<ProjectContributor[]> {
-  "use cache";
+  "use cache: private";
   cacheLife("minutes");
   cacheTag(`${CACHE_TAGS.projectDetail}-${projectId}`);
 
-  const { data, error } = await createClientAnon()
+  const supabase = await createClientServerComponent();
+  const { data, error } = await supabase
     .from("project_members")
     .select(CONTRIBUTOR_COLUMNS)
     .eq("project_id", projectId);

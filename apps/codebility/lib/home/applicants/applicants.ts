@@ -2,7 +2,6 @@ import { cacheLife, cacheTag } from "next/cache";
 import { unstable_rethrow } from "next/navigation";
 
 import { CACHE_TAGS } from "@/lib/global/cache-tags";
-import { createClientAnon } from "@/lib/global/supabase-anon";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import { logPerf } from "@/lib/global/timing";
 import { APPLICANT_STATUSES } from "@/constants/home/applicants/statuses";
@@ -52,12 +51,12 @@ export async function getApplicantsByStatus(
 }
 
 export async function getApplicantCounts(): Promise<ApplicantCounts> {
-  "use cache";
+  "use cache: private";
   cacheLife("hours");
   cacheTag(CACHE_TAGS.applicants);
 
   try {
-    const supabase = createClientAnon();
+    const supabase = await createClientServerComponent();
 
     const countsStartedAt = performance.now();
     const entries = await Promise.all(
@@ -90,12 +89,12 @@ export async function getApplicantsPage({
   pageSize: number;
   search?: string;
 }): Promise<{ applicants: NewApplicantType[]; total: number }> {
-  "use cache";
+  "use cache: private";
   cacheLife("hours");
   cacheTag(CACHE_TAGS.applicants);
 
   try {
-    const supabase = createClientAnon();
+    const supabase = await createClientServerComponent();
     const from = (page - 1) * pageSize;
     const to = from + pageSize - 1;
 

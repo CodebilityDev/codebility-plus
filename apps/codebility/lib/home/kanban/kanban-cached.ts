@@ -18,16 +18,17 @@ import {
   kanbanBoardTag,
   kanbanSprintsTag,
 } from "@/lib/global/cache-tags";
-import { createClientAnon } from "@/lib/global/supabase-anon";
+import { createClientServerComponent } from "@/lib/global/supabase-server";
 
 type KanbanClient = SupabaseClient<Database>;
 
 export async function getCachedProjects(): Promise<ProjectListItem[]> {
-  "use cache";
+  "use cache: private";
   cacheLife("hours");
   cacheTag(CACHE_TAGS.kanbanProjects);
 
-  const { data, error } = await createClientAnon()
+  const supabase = await createClientServerComponent();
+  const { data, error } = await supabase
     .from("projects")
     .select(PROJECT_COLUMNS)
     .order("name", { ascending: true });
@@ -48,11 +49,12 @@ export async function getCachedProjects(): Promise<ProjectListItem[]> {
 export async function getCachedSprints(
   projectId: string,
 ): Promise<SprintListItem[]> {
-  "use cache";
+  "use cache: private";
   cacheLife("hours");
   cacheTag(kanbanSprintsTag(projectId));
 
-  const { data, error } = await createClientAnon()
+  const supabase = await createClientServerComponent();
+  const { data, error } = await supabase
     .from("kanban_sprints")
     .select(SPRINT_COLUMNS)
     .eq("project_id", projectId)
@@ -73,11 +75,11 @@ export async function getBoard(
   sprintId: string,
   projectId: string,
 ): Promise<KanbanBoardSnapshot | null> {
-  "use cache";
+  "use cache: private";
   cacheLife("hours");
   cacheTag(kanbanBoardTag(projectId));
 
-  return loadBoardSnapshot(createClientAnon(), sprintId);
+  return loadBoardSnapshot(await createClientServerComponent(), sprintId);
 }
 
 export async function loadBoardSnapshot(
