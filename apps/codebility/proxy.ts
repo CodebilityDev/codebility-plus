@@ -163,6 +163,41 @@ async function profileExists(id: string): Promise<boolean> {
   return exists;
 }
 
+const ACCOUNT_TTL_MS = 60_000;
+const ACCOUNT_MAX_ENTRIES = 10_000;
+const accountCache = new Map<
+  string,
+  { account: Account; requiresAal2: boolean; expiresAt: number }
+>();
+
+async function cachedAccount(
+  client: ProxyClient,
+  userId: string,
+): Promise<{ account: Account; requiresAal2: boolean } | null> {
+  const cached = accountCache.get(userId);
+  if (cached && cached.expiresAt > Date.now()) {
+    return { account: cached.account, requiresAal2: cached.requiresAal2 };
+  }
+
+  const { data: assurance } =
+    await client.supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  const account = await fetchAccount(client, userId, true);
+
+  if (!account) return null;
+
+  if (accountCache.size >= ACCOUNT_MAX_ENTRIES) {
+    accountCache.clear();
+  }
+
+  accountCache.set(userId, {
+    account,
+    requiresAal2: assurance?.nextLevel === "aal2",
+    expiresAt: Date.now() + ACCOUNT_TTL_MS,
+  });
+
+  return { account, requiresAal2: assurance?.nextLevel === "aal2" };
+}
+
 async function fetchAccount(
   client: ProxyClient,
   userId: string,
@@ -235,50 +270,51 @@ export async function proxy(request: NextRequest) {
     const client = createProxyClient(request);
 
     if (access === "auth-entry") {
-      const {
-        data: { user },
-      } = await client.supabase.auth.getUser();
+      const { data } = await client.supabase.auth.getClaims();
 
-      return user
+      return data?.claims.sub
         ? redirectTo(client, request, HOME)
         : passThrough(client);
     }
 
-    const authStartedAt = performance.now();
-    const {
-      data: { user },
-      error: authError,
-    } = await client.supabase.auth.getUser();
-    logPerf("proxy.auth", authStartedAt);
+    const claimsStartedAt = performance.now();
+    const { data: claimsData, error: claimsError } =
+      await client.supabase.auth.getClaims();
+    logPerf("proxy.claims", claimsStartedAt);
 
-    if (authError || !user) return toSignIn(client, request, pathname);
+    const claims = claimsData?.claims;
 
-    const { data: assurance } =
-      await client.supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (claimsError || !claims?.sub) {
+      return toSignIn(client, request, pathname);
+    }
 
-    if (assurance) {
-      const { currentLevel, nextLevel } = assurance;
-      if (
-        nextLevel === "aal2" &&
-        currentLevel === "aal1" &&
-        pathname !== TWO_FACTOR
-      ) {
-        return redirectTo(client, request, TWO_FACTOR);
-      }
-      if (currentLevel === "aal2" && pathname === TWO_FACTOR) {
-        return redirectTo(client, request, HOME);
-      }
+    const userId = claims.sub;
+
+    const currentLevel = typeof claims.aal === "string" ? claims.aal : null;
+    const cached = await cachedAccount(client, userId);
+
+    if (!cached) return toSignIn(client, request, pathname);
+
+    const { account, requiresAal2 } = cached;
+
+    if (requiresAal2 && currentLevel !== "aal2" && pathname !== TWO_FACTOR) {
+      return redirectTo(client, request, TWO_FACTOR);
+    }
+    if (currentLevel === "aal2" && pathname === TWO_FACTOR) {
+      return redirectTo(client, request, HOME);
     }
 
     if (STATUS_EXEMPT_PATHS.has(pathname)) return passThrough(client);
 
-    if (!user.email_confirmed_at) {
+    const metadata = claims.user_metadata as
+      | { email_verified?: boolean }
+      | undefined;
+
+    if (metadata?.email_verified === false) {
       return redirectTo(client, request, EMAIL_VERIFICATION);
     }
 
     const permission = permissionFor(pathname);
-    const account = await fetchAccount(client, user.id, true);
-    if (!account) return toSignIn(client, request, pathname);
 
     const target = statusRedirect(account.application_status, pathname);
     if (target) return redirectTo(client, request, target);
