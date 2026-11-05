@@ -11,8 +11,6 @@ import pathsConfig from "@/constants/global/paths";
 import { getAccessibleProjectIds, getAccess } from "@/lib/global/permissions";
 import { getCachedContributors, getCachedProject } from "@/lib/home/projects/projects-cached";
 
-export const instant = false;
-
 interface ProjectDetailPageProps {
   params: Promise<{ projectId: string }>;
 }

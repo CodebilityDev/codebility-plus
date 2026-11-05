@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { useState } from "react";
 
 import useChangeBgNavigation from "@/hooks/global/useChangeBgNavigation";
 import Logo from "@/components/global/typography/Logo";
@@ -54,17 +54,13 @@ const Navigation = () => {
           <Logo />
         </div>
         <div className="flex items-center gap-2">
-          <Suspense fallback={"Loading User Auth"}>
-            <UserMenu handleLogout={handleLogout} />
-          </Suspense>
+          <UserMenu handleLogout={handleLogout} />
           </div>
         <MobileDrawer
           openSheet={openSheet}
           setOpenSheet={setOpenSheet}
           drawerAuth={
-            <Suspense fallback={"Loading User Auth"}>
               <DrawerAuthSection handleLogout={handleLogout} />        
-            </Suspense>
         }
         />
       </div>

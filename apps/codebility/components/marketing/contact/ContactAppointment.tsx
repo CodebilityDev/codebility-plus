@@ -2,7 +2,7 @@
 
 import { createAppointment } from "@/actions/marketing/contact/contact-appointment";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/global/ui/button";
 import { meetingTypes, timeSlots, unavailableSlots, DAYS, MONTHS } from "@/constants/marketing/contact/contact";
 import type { AppointmentProps } from "@/types/marketing/contact/contact";
@@ -11,10 +11,9 @@ import { getPHTToday, toDateString, formatDisplay } from "@/utils/marketing/cont
 
 
 export default function Appointment({ formData, onBack }: AppointmentProps) {
-  const today = getPHTToday();
-
-  const [viewYear, setViewYear] = useState(today.getFullYear());
-  const [viewMonth, setViewMonth] = useState(today.getMonth());
+  const [today, setToday] = useState<Date | null>(null);
+  const [viewYear, setViewYear] = useState(1970);
+  const [viewMonth, setViewMonth] = useState(0);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedSlot, setSelectedSlot] = useState("");
   const [meetingType, setMeetingType] = useState("");
@@ -22,6 +21,16 @@ export default function Appointment({ formData, onBack }: AppointmentProps) {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const mount = () => {
+      const current = getPHTToday();
+      setToday(current);
+      setViewYear(current.getFullYear());
+      setViewMonth(current.getMonth());
+    };
+    mount();
+  }, []);
 
   const canSubmit = selectedDate && selectedSlot && meetingType &&
     (meetingType !== "other" || otherTool.trim());
@@ -39,15 +48,20 @@ export default function Appointment({ formData, onBack }: AppointmentProps) {
   };
 
   const canGoPrev =
-    viewYear > today.getFullYear() ||
-    (viewYear === today.getFullYear() && viewMonth > today.getMonth());
+    today !== null &&
+    (viewYear > today.getFullYear() ||
+      (viewYear === today.getFullYear() && viewMonth > today.getMonth()));
 
   const isDisabled = (day: number) => {
+    if (!today) return true;
     const d = new Date(viewYear, viewMonth, day);
     return d < today || d.getDay() === 0 || d.getDay() === 6;
   };
   const isToday = (day: number) =>
-    day === today.getDate() && viewMonth === today.getMonth() && viewYear === today.getFullYear();
+    today !== null &&
+    day === today.getDate() &&
+    viewMonth === today.getMonth() &&
+    viewYear === today.getFullYear();
   const isSelected = (day: number) =>
     selectedDate === toDateString(viewYear, viewMonth, day);
 
@@ -150,7 +164,7 @@ export default function Appointment({ formData, onBack }: AppointmentProps) {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
-              <p className="text-sm font-semibold">{MONTHS[viewMonth]} {viewYear}</p>
+              <p className="text-sm font-semibold">{today ? `${MONTHS[viewMonth]} ${viewYear}` : "--"}</p>
               <button type="button" onClick={nextMonth}
                 className="flex h-7 w-7 items-center justify-center rounded-md border border-white/10 text-white/50 transition-all hover:border-white/20 hover:text-white/80">
                 <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -182,7 +196,7 @@ export default function Appointment({ formData, onBack }: AppointmentProps) {
                       todayCell ? "border border-violet-500/40 text-violet-300 hover:bg-violet-500/10" :
                       "text-white/60 hover:bg-white/5 hover:text-white"
                     }`}>
-                    {day}
+                    {today ? day : ""}
                     {todayCell && !selected && (
                       <span className="absolute bottom-1 left-1/2 h-0.5 w-0.5 -translate-x-1/2 rounded-full bg-violet-400" />
                     )}

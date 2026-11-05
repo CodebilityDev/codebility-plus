@@ -6,9 +6,6 @@ import { Toaster } from "@/components/global/ui/toaster";
 import TwoFactorForm from "@/components/auth/2fa-challenge/TwoFactorForm";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 
-export const instant = false;
-
-
 async function TwoFactorGate() {
   const supabase = await createClientServerComponent();
   const { data } = await supabase.auth.mfa.listFactors();

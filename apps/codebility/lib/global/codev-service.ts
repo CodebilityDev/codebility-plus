@@ -1,7 +1,7 @@
 import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Client, Codev, Project } from "@/types/global/codev";
+import type { Codev, Project } from "@/types/global/codev";
 import type { Database } from "@/types/global/supabase";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 
@@ -166,30 +166,4 @@ export const getCodevsWithClient = async (
   })) as unknown as Codev[];
 
   return { error: null, data: normalizedData };
-};
-
-
-export const getClients = async (): Promise<{
-  error: unknown;
-  data: Client[] | null;
-}> => {
-   const supabase = await createClientServerComponent();
-  const { data, error } = await supabase.from("clients").select(`
-    id,
-    name,
-    email,
-    phone_number,
-    industry,
-    company_logo,
-    website,
-    status,
-    client_type,
-    country,
-    address,
-    testimony,
-    created_at,
-    updated_at
-  `);
-
-  return { error, data: data ?? null };
 };

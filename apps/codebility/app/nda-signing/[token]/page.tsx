@@ -6,8 +6,6 @@ import { getNdaRequestCodevId } from "@/lib/global/nda-requests";
 import { getSiteDate } from "@/lib/global/site-date";
 import type { NdaSigningTokenPageProps } from "@/types/global/nda-signing";
 
-export const instant = false;
-
 export default function NdaSigningTokenPage({ params }: NdaSigningTokenPageProps) {
   return (
     <Suspense fallback={<NdaSigningSkeleton />}>

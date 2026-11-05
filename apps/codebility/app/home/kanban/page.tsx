@@ -7,8 +7,6 @@ import KanbanProjectsTable from "@/components/home/kanban/KanbanProjectsTable";
 import { getAccessibleProjectIds } from "@/lib/global/permissions";
 import { getCachedProjects } from "@/lib/home/kanban/kanban-cached";
 
-export const instant = false;
-
 export default function KanbanProjectsPage() {
   return (
     <div className="mx-auto w-full max-w-screen-xl px-4 py-6">

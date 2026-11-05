@@ -12,7 +12,11 @@ export function JobCard({
   job,
   onApply,
 }: JobCardProps) {
-  const [postedDate] = useState(() => new Date(job.posted_date).toLocaleDateString());
+  const [postedDate] = useState(() =>
+    new Date(job.posted_date).toLocaleDateString("en-US", {
+      timeZone: "Asia/Manila",
+    }),
+  );
   return (
     <div className="group relative overflow-hidden rounded-lg border border-gray-800 bg-gray-900/50 p-6 backdrop-blur-sm transition-all hover:border-customViolet-100/50 hover:bg-gray-900/70">
       <div className="absolute inset-0 bg-gradient-to-r from-customViolet-100/5 to-customBlue-100/5 opacity-0 transition-opacity group-hover:opacity-100" />

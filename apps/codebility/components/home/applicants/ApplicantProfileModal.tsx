@@ -190,7 +190,7 @@ const ApplicantProfileModal = () => {
                   </div>
                   {selectedApplicant.date_applied && (
                     <p className="mt-2 text-sm text-gray-500">
-                      Applied on {new Date(selectedApplicant.date_applied).toLocaleDateString()}
+                      Applied on {new Date(selectedApplicant.date_applied).toLocaleDateString("en-US", { timeZone: "Asia/Manila" })}
                     </p>
                   )}
                 </div>
@@ -204,7 +204,7 @@ const ApplicantProfileModal = () => {
                     </p>
                     {selectedApplicant.applicant.test_taken && (
                       <p className="text-sm text-gray-500">
-                        Taken on {new Date(selectedApplicant.applicant.test_taken).toLocaleDateString()}
+                        Taken on {new Date(selectedApplicant.applicant.test_taken).toLocaleDateString("en-US", { timeZone: "Asia/Manila" })}
                       </p>
                     )}
                     {selectedApplicant.applicant.fork_url && (
@@ -266,7 +266,7 @@ const ApplicantProfileModal = () => {
                               Signed
                             </span>
                             <span className="text-xs text-gray-500 dark:text-gray-400">
-                              {new Date(selectedApplicant.applicant.commitment_signed_at).toLocaleDateString()}
+                              {new Date(selectedApplicant.applicant.commitment_signed_at).toLocaleDateString("en-US", { timeZone: "Asia/Manila" })}
                             </span>
                           </div>
                         </div>

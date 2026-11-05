@@ -26,8 +26,8 @@ export function splitTimeLeft(target: Date): TimeLeft {
   };
 }
 
-export function useCountdown(target: Date): TimeLeft {
-  return useRunningCountdown(target) ?? splitTimeLeft(target);
+export function useCountdown(target: Date): TimeLeft | null {
+  return useRunningCountdown(target);
 }
 
 export function useDeferredCountdown(target: Date): TimeLeft | null {

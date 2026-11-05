@@ -1,9 +1,12 @@
+"use client";
+
 import Image from "next/image";
+import { useMediaQuery } from "@/hooks/global/useMediaQuery";
 import type { StickyLogoProps } from "@/types/auth/onboarding/onboarding";
 
 
 export default function StickyLogo({ logoRef, isVisible }: StickyLogoProps) {
-  const isDesktop = typeof window !== "undefined" && window.innerWidth >= 1024;
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
 
   return (
     <div

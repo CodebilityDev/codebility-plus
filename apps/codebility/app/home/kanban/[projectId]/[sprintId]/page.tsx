@@ -21,8 +21,6 @@ import { getBoard } from "@/lib/home/kanban/kanban-cached";
 import { KanbanStoreProvider } from "@/providers/home/kanban/KanbanStoreProvider";
 import type { KanbanBoardPageProps } from "@/types/home/kanban/kanban";
 
-export const instant = false;
-
 export default function KanbanBoardPage({ params }: KanbanBoardPageProps) {
   return (
     <Suspense fallback={<KanbanBoardPageSkeleton />}>

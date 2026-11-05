@@ -4,8 +4,6 @@ import { createClientServerComponent } from "@/lib/global/supabase-server";
 import OnboardingClient from "@/components/applicant/onboarding/OnboardingClient";
 import OnboardingSkeleton from "@/components/applicant/onboarding/OnboardingSkeleton";
 
-export const instant = false;
-
 export default function OnboardingPage() {
   return (
     <Suspense fallback={<OnboardingSkeleton />}>

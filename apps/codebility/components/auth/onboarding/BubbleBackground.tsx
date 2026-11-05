@@ -98,12 +98,16 @@ function generateBubbles(): { big: Bubble[]; small: Bubble[] } {
 
 export function BubbleBackground() {
   const ref = useRef<HTMLDivElement>(null);
-  const [bubbles] = useState<{ big: Bubble[]; small: Bubble[] }>(() => {
-    if (typeof window === "undefined") return { big: [], small: [] };
-    return generateBubbles();
+  const [bubbles, setBubbles] = useState<{ big: Bubble[]; small: Bubble[] }>({
+    big: [],
+    small: [],
   });
   const { big, small } = bubbles;
 
+  useEffect(() => {
+    const mount = () => setBubbles(generateBubbles());
+    mount();
+  }, []);
 
   // Mouse parallax via CSS variables (hook-safe)
   useEffect(() => {

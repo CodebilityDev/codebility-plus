@@ -1,8 +1,7 @@
 import type { CurrentUserProfile } from "@/types/global/current-user";
 import type { PermissionKey, RolePermissions } from "@/types/global/permissions";
+import { getSessionIdentity } from "@/lib/global/session";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
-import { getAccess } from "@/lib/global/permissions";
-import { getCurrentCodev } from "@/lib/global/current-codev";
 import { logPerf } from "@/lib/global/timing";
 
 export interface Identity {
@@ -45,22 +44,16 @@ function ownerOf(
 
 export async function requireIdentity(): Promise<Identity> {
   const startedAt = performance.now();
-  const supabase = await createClientServerComponent();
+  const { userId, codev, access } = await getSessionIdentity();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
+  if (!userId) {
     throw new AuthorizationError("unauthenticated", "Unauthorized");
   }
 
-  const access = await getAccess();
-  const codev = await getCurrentCodev();
   logPerf("authorize.identity", startedAt);
 
   return {
-    userId: user.id,
+    userId,
     codev,
     permissions: access.permissions,
     hasFullAccess: access.hasFullAccess,

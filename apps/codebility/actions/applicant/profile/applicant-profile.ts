@@ -18,16 +18,41 @@ type EducationInsert = Database["public"]["Tables"]["education"]["Insert"];
 type EducationUpdate = Database["public"]["Tables"]["education"]["Update"];
 
 
-// Codev profile functions
+const PROFILE_FIELDS: readonly string[] = [
+  "first_name",
+  "last_name",
+  "about",
+  "address",
+  "phone_number",
+  "positions",
+  "display_position",
+  "portfolio_website",
+  "tech_stacks",
+  "image_url",
+  "availability_status",
+  "years_of_experience",
+  "facebook",
+  "linkedin",
+  "github",
+  "discord",
+  "level",
+];
+
 export async function updateCodev(updatedData: CodevUpdate) {
   try {
     const identity = await requireIdentity();
   const supabase = await createClientServerComponent();
 
+    const allowed = Object.fromEntries(
+      Object.entries(updatedData).filter(([key]) =>
+        PROFILE_FIELDS.includes(key),
+      ),
+    );
+
     const { data, error } = await supabase
       .from("codev")
       .update({
-        ...updatedData,
+        ...allowed,
         updated_at: new Date().toISOString(),
       })
       .eq("id", identity.userId)
@@ -201,26 +226,6 @@ export async function deleteEducation(id: string) {
   }
 }
 
-export async function getEducation(_codevId: string) {
-  try {
-    const identity = await requireIdentity();
-  const supabase = await createClientServerComponent();
-    const { data, error } = await supabase
-      .from("education")
-      .select(
-        "id, codev_id, institution, degree, major_subject, description, achievements, start_date, end_date, created_at, updated_at",
-      )
-      .eq("codev_id", identity.userId)
-      .order("start_date", { ascending: false });
-
-    if (error) throw error;
-    return data;
-  } catch (error) {
-    console.error("Error fetching education:", error);
-    throw error;
-  }
-}
-
 export async function updateWorkSchedule(
   schedule: Omit<WorkSchedule, "id" | "created_at" | "updated_at">,
 ) {
@@ -287,24 +292,6 @@ export async function updateWorkSchedule(
     } else {
       console.error("Error updating work schedule:", error);
     }
-    throw error;
-  }
-}
-
-export async function getWorkSchedule(_codevId: string) {
-  try {
-    const identity = await requireIdentity();
-  const supabase = await createClientServerComponent();
-    const { data, error } = await supabase
-      .from("work_schedules")
-      .select("id, codev_id, days_of_week, start_time, end_time, created_at, updated_at")
-      .eq("codev_id", identity.userId)
-      .single();
-
-    if (error) throw error;
-    return data;
-  } catch (error) {
-    console.error("Error fetching work schedule:", error);
     throw error;
   }
 }
@@ -376,25 +363,6 @@ export async function deleteJobStatus(id: string) {
   } catch (error) {
     console.error("Error deleting job status:", error);
     throw new Error("Failed to delete job status");
-  }
-}
-
-export async function getJobStatuses(_codevId: string) {
-  try {
-    const identity = await requireIdentity();
-  const supabase = await createClientServerComponent();
-    const { data, error } = await supabase
-      .from("job_status")
-      .select(
-        "id, codev_id, job_title, company_name, employment_type, description, status, salary_range, work_setup, shift, hours_per_week, created_at, updated_at",
-      )
-      .eq("codev_id", identity.userId);
-
-    if (error) throw error;
-    return data;
-  } catch (error) {
-    console.error("Error fetching job statuses:", error);
-    throw error;
   }
 }
 

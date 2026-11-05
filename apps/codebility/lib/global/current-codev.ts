@@ -1,7 +1,7 @@
 import { connection } from "next/server";
 import { cache } from "react";
 import type { CurrentUserProfile } from "@/types/global/current-user";
-import { createClientServerComponent } from "@/lib/global/supabase-server";
+import { getSessionUser } from "@/lib/global/session";
 import { logPerf } from "@/lib/global/timing";
 
 export const getCurrentCodev = cache(
@@ -9,13 +9,7 @@ export const getCurrentCodev = cache(
     await connection();
 
     const startedAt = performance.now();
-    const supabase = await createClientServerComponent();
-
-    const authStartedAt = performance.now();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    logPerf("auth.getUser", authStartedAt);
+    const { user, supabase } = await getSessionUser();
 
     if (!user) {
       logPerf("codev.total", startedAt);

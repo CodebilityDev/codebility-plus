@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import ContactPage from "@/components/marketing/contact/ContactPage";
 
-export const instant = false;
-
 export const metadata: Metadata = {
     title: "Contact Us — Get in Touch with Codebility",
     description: "Have a project in mind? Contact Codebility to discuss your software development needs and schedule a consultation.",

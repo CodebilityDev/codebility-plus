@@ -115,9 +115,10 @@ export function formatStageDate(timestamp: string | null): string | null {
   if (!timestamp) return null;
   const date = new Date(timestamp);
   if (Number.isNaN(date.getTime())) return null;
-  return date.toLocaleDateString(undefined, {
+  return date.toLocaleDateString("en-US", {
     year: "numeric",
     month: "short",
     day: "numeric",
+    timeZone: "Asia/Manila",
   });
 }

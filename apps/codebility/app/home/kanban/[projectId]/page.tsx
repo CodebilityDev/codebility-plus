@@ -22,8 +22,6 @@ import {
 } from "@/lib/home/kanban/kanban-cached";
 import type { KanbanSprintsPageProps } from "@/types/home/kanban/kanban";
 
-export const instant = false;
-
 export default function KanbanSprintsPage({ params }: KanbanSprintsPageProps) {
   return (
     <Suspense fallback={<KanbanSprintsPageSkeleton />}>

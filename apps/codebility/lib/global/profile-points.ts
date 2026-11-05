@@ -246,34 +246,3 @@ export async function computeProfilePoints(
     },
   };
 }
-
-/**
- * Replaces the persisted `profile_points` rows with a freshly computed breakdown.
- * Returns the insert error, if any.
- */
-export async function persistProfilePoints(
-  supabase: SupabaseClient,
-  codevId: string,
-  breakdown: ProfilePointsBreakdown[],
-) {
-  const { error: deleteError } = await supabase
-    .from("profile_points")
-    .delete()
-    .eq("codev_id", codevId);
-
-  if (deleteError) {
-    console.error("Error deleting old profile points:", deleteError);
-  }
-
-  if (breakdown.length === 0) return null;
-
-  const { error } = await supabase.from("profile_points").insert(
-    breakdown.map((entry) => ({
-      codev_id: codevId,
-      category: entry.category,
-      points: entry.points,
-    })),
-  );
-
-  return error;
-}

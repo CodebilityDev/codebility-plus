@@ -27,19 +27,19 @@ export default function ApplicantProfileColSec({
   // Format dates on client to avoid hydration mismatch
   const dateAppliedFormatted = useMemo(
     () => applicant.date_applied
-      ? new Date(applicant.date_applied).toLocaleDateString()
+      ? new Date(applicant.date_applied).toLocaleDateString("en-US", { timeZone: "Asia/Manila" })
       : "N/A",
     [applicant.date_applied]
   );
   const testTakenFormatted = useMemo(
     () => applicant.applicant?.test_taken
-      ? new Date(applicant.applicant.test_taken).toLocaleDateString()
+      ? new Date(applicant.applicant.test_taken).toLocaleDateString("en-US", { timeZone: "Asia/Manila" })
       : "N/A",
     [applicant.applicant]
   );
   const lastRemindedFormatted = useMemo(
     () => applicant.applicant?.last_reminded_date
-      ? new Date(applicant.applicant.last_reminded_date).toLocaleDateString()
+      ? new Date(applicant.applicant.last_reminded_date).toLocaleDateString("en-US", { timeZone: "Asia/Manila" })
       : "",
     [applicant.applicant]
   );

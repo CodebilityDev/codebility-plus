@@ -1,9 +1,5 @@
 import { redirect } from "next/navigation";
 
-export const instant = false;
-
-// Add this line to prevent static generation
-
 const WaitingPage = () => {
   /* redirect to new page*/
   return redirect("/applicant/waiting");

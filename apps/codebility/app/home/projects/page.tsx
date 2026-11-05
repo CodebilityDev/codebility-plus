@@ -9,8 +9,6 @@ import ProjectsSkeleton from "@/components/home/projects/ProjectsSkeleton";
 import { getAccessibleProjectIds, getAccess } from "@/lib/global/permissions";
 import { getCachedProjects } from "@/lib/home/projects/projects-cached";
 
-export const instant = false;
-
 export default function ProjectsPage() {
   return (
     <div className="mx-auto w-full max-w-screen-xl px-4 py-6">

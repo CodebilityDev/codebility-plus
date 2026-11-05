@@ -4,8 +4,6 @@ import H1 from "@/components/global/layout/H1";
 import AccountSettings from "@/components/global/account-settings/AccountSettings";
 import { AccountSettingsSkeleton } from "@/components/global/account-settings/AccountSettingsSkeleton";
 
-export const instant = false;
-
 export default function HomeAccountSettingsPage() {
   return (
     <div className="mx-auto max-w-screen-xl">

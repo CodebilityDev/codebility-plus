@@ -1,9 +1,9 @@
 import { cache } from "react";
 import { getCurrentCodev } from "@/lib/global/current-codev";
+import { getRolePermissions } from "@/lib/global/role-permissions";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import { getSidebarRoleId } from "@/utils/global/codev";
-import { logPerf } from "@/lib/global/timing";
-import { PERMISSION_COLUMNS, PERMISSION_KEYS, canManageTasks, isFullAccess, normalizeProjectRole } from "@/constants/global/permissions";
+import { PERMISSION_KEYS, canManageTasks, isFullAccess, normalizeProjectRole } from "@/constants/global/permissions";
 import type { PermissionKey, ProjectAccess, ProjectRole, RolePermissions } from "@/types/global/permissions";
 
 export const NO_PERMISSIONS: RolePermissions = PERMISSION_KEYS.reduce(
@@ -29,34 +29,17 @@ export const getAccess = cache(
       return { roleId: null, roleName: null, hasFullAccess: false, permissions: NO_PERMISSIONS };
     }
 
-    const supabase = await createClientServerComponent();
+    const roleAccess = await getRolePermissions(roleId);
 
-    const rolesStartedAt = performance.now();
-    const { data: roleData } = await supabase
-      .from("roles")
-      .select(PERMISSION_COLUMNS + ", name")
-      .eq("id", roleId)
-      .single();
-    logPerf("roles.select", rolesStartedAt);
-
-    if (!roleData) {
+    if (!roleAccess) {
       return { roleId: null, roleName: null, hasFullAccess: false, permissions: NO_PERMISSIONS };
     }
 
-    const roleRecord = roleData as unknown as Record<string, unknown>;
-    const roleName = roleRecord.name as string | null;
-
     return {
       roleId,
-      roleName,
+      roleName: roleAccess.roleName,
       hasFullAccess: isFullAccess(roleId),
-      permissions: PERMISSION_KEYS.reduce(
-        (acc, key) => {
-          acc[key] = Boolean(roleRecord[key]);
-          return acc;
-        },
-        {} as RolePermissions,
-      ),
+      permissions: roleAccess.permissions,
     };
   },
 );

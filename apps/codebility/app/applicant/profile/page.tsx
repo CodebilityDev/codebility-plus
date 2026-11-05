@@ -18,8 +18,6 @@ import { ProfilePointsGate } from "@/components/applicant/profile/ProfilePointsG
 import ProfileCompletionGuide from "@/components/applicant/profile/ProfileCompletionGuide";
 import ProfileSkeleton from "@/components/applicant/profile/ProfileSkeleton";
 
-export const instant = false;
-
 function earnedCategories(points: { points: { category: string; points: number }[] } | null): string[] {
   if (!points) return [];
   return points.points

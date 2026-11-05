@@ -1,6 +1,5 @@
 "use server";
 
-import type { KanbanBoardSnapshot } from "@/types/home/kanban/kanban";
 import { updateTag } from "next/cache";
 import {
   DEFAULT_COLUMN_NAMES,
@@ -10,24 +9,10 @@ import { CACHE_TAGS } from "@/lib/global/cache-tags";
 import { authorize } from "@/lib/global/authorize";
 import { requireProjectAccessForEntities } from "@/lib/global/permissions";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
-import { loadBoardSnapshot } from "@/lib/home/kanban/kanban-cached";
 import { POSITION_GAP } from "@/utils/home/kanban/position";
 import { z } from "zod";
 
 const sprintIdSchema = z.string().min(1);
-
-export async function getBoardSnapshot(
-  sprintId: string,
-): Promise<KanbanBoardSnapshot | null> {
-  const id = sprintIdSchema.parse(sprintId);
-
-  await authorize("kanban");
-  await requireProjectAccessForEntities({ sprintId: id });
-
-  const supabase = await createClientServerComponent();
-
-  return loadBoardSnapshot(supabase, id);
-}
 
 export async function ensureBoardForSprint(
   sprintId: string,

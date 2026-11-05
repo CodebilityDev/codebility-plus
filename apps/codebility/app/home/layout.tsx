@@ -3,7 +3,6 @@ import { Suspense } from "react";
 import AsyncErrorBoundary from "@/components/global/feedback/AsyncErrorBoundary";
 import ErrorBoundary from "@/components/global/feedback/ErrorBoundary";
 import { ModalProviderHome } from "@/providers/home/ModalProviderHome";
-import { PermissionsProvider } from "@/providers/global/PermissionsProvider";
 import { ThemeProvider } from "@/providers/global/ThemeProvider";
 import { Toaster } from "sonner";
 
@@ -16,15 +15,14 @@ import NavbarSkeleton from "@/components/home/NavbarSkeleton";
 import SidebarSkeleton from "@/components/home/SidebarSkeleton";
 import type { HomeLayoutProps } from "@/types/home/home";
 
-export const instant = false;
-export const prefetch = "partial";
-
 export default function HomeLayout({ children }: HomeLayoutProps) {
   return (
     <ErrorBoundary>
       <ThemeProvider>
         <ModalProviderHome />
-        <ToastNotification />
+        <Suspense fallback={null}>
+          <ToastNotification />
+        </Suspense>
         <Toaster
           richColors
           position="top-right"
@@ -57,9 +55,7 @@ export default function HomeLayout({ children }: HomeLayoutProps) {
             <DynamicMainContent>
               <ConditionalMainWrapper>
                 <AsyncErrorBoundary>
-                  <PermissionsProvider>
-                    {children}
-                  </PermissionsProvider>
+                  {children}
                 </AsyncErrorBoundary>
               </ConditionalMainWrapper>
             </DynamicMainContent>

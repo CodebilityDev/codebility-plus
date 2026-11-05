@@ -18,24 +18,24 @@ export const DeclinedCountdown = ({ userData }: DeclinedCountdownProps) => {
 
   return (
     <div className="mb-6">
-      {!timeLeft.isExpired ? (
+      {!timeLeft?.isExpired ? (
         <>
           <p className="mb-2 text-lg font-semibold">
             Time until you can reapply:
           </p>
           <div className="flex justify-center space-x-4">
             <div className="text-center">
-              <span className="text-2xl font-bold">{timeLeft.days}</span> Days
+              <span className="text-2xl font-bold">{timeLeft?.days ?? "--"}</span> Days
             </div>
             <div className="text-center">
-              <span className="text-2xl font-bold">{timeLeft.hours}</span> Hours
+              <span className="text-2xl font-bold">{timeLeft?.hours ?? "--"}</span> Hours
             </div>
             <div className="text-center">
-              <span className="text-2xl font-bold">{timeLeft.minutes}</span>{" "}
+              <span className="text-2xl font-bold">{timeLeft?.minutes ?? "--"}</span>{" "}
               Minutes
             </div>
             <div className="text-center">
-              <span className="text-2xl font-bold">{timeLeft.seconds}</span>{" "}
+              <span className="text-2xl font-bold">{timeLeft?.seconds ?? "--"}</span>{" "}
               Seconds
             </div>
           </div>

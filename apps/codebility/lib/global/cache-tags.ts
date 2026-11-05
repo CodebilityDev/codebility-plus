@@ -14,6 +14,7 @@ export const CACHE_TAGS = {
   projectsList: "projects-list",
   proposalCodevs: "proposal-codevs",
   proposalProjects: "proposal-projects",
+  roles: "roles",
   servicesProjects: "services-projects",
   skillCategories: "skill-categories",
 } as const;
