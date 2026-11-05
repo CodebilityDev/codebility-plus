@@ -18,7 +18,7 @@ export async function submitJobApplication(
     const filePath = `resumes/${fileName}`;
 
     const { error: uploadError } = await supabase.storage
-      .from("codebility")
+      .from("documents")
       .upload(filePath, resume, { cacheControl: "3600", upsert: false });
 
     if (uploadError) {

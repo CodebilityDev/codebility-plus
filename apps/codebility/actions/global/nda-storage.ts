@@ -47,7 +47,7 @@ async function uploadFileToStorage(
   const supabase = await createClientServerComponent();
   
   try {
-    const { bucket = "codebility", folder = "nda", cacheControl = "3600", upsert = true } = options;
+    const { bucket = "documents", folder = "nda", cacheControl = "3600", upsert = true } = options;
 
     // Generate unique filename with timestamp
     const timestamp = Date.now();
@@ -66,15 +66,7 @@ async function uploadFileToStorage(
       throw uploadError;
     }
 
-    const { data: publicUrlData } = supabase.storage
-      .from(bucket)
-      .getPublicUrl(filePath);
-
-    if (!publicUrlData.publicUrl) {
-      throw new Error("Failed to get public URL");
-    }
-
-    return publicUrlData.publicUrl.toString();
+    return filePath;
 
   } catch (error) {
     console.error("File upload failed:", error);
@@ -115,13 +107,12 @@ export async function uploadNdaToStorage(
 
     // Upload signature to Supabase Storage
     const signatureUrl = await uploadFileToStorage(signatureFile, {
-      bucket: "codebility",
+      bucket: "documents",
       folder: "nda/signatures",
     });
 
-    // Upload document to Supabase Storage  
     const documentUrl = await uploadFileToStorage(documentFile, {
-      bucket: "codebility", 
+      bucket: "documents",
       folder: "nda/documents",
     });
 
