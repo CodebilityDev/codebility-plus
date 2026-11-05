@@ -163,16 +163,11 @@ export async function saveQuizProgress({
       );
     }
 
-    const { error } = await supabase
-      .from("applicant")
-      .update({
-        quiz_score: quizScore,
-        quiz_total: quizTotal,
-        quiz_passed: passed,
-        quiz_completed_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", applicant.id);
+    const { error } = await supabase.rpc("record_quiz_progress", {
+      p_score: quizScore,
+      p_total: quizTotal,
+      p_passed: passed,
+    });
 
     if (error) {
       console.error("Error saving quiz progress:", error);
@@ -218,17 +213,12 @@ export async function saveQuizAndCommitment({
       );
     }
 
-    const { error } = await supabase
-      .from("applicant")
-      .update({
-        quiz_score: quizScore,
-        quiz_total: quizTotal,
-        signature_data: signature,
-        can_do_mobile: canDoMobile,
-        commitment_signed_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", applicant.id);
+    const { error } = await supabase.rpc("record_quiz_and_commitment", {
+      p_score: quizScore,
+      p_total: quizTotal,
+      p_signature: signature,
+      p_can_do_mobile: canDoMobile,
+    });
 
     if (error) {
       console.error("Error saving quiz and commitment:", error);

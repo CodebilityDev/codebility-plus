@@ -5399,6 +5399,19 @@ export interface Database {
         }
         Returns: boolean
       }
+      record_quiz_progress: {
+        Args: { p_score: number; p_total: number; p_passed: boolean }
+        Returns: undefined
+      }
+      record_quiz_and_commitment: {
+        Args: {
+          p_score: number
+          p_total: number
+          p_signature: string
+          p_can_do_mobile: boolean
+        }
+        Returns: undefined
+      }
       username_available: {
         Args: { p_username: string }
         Returns: boolean
