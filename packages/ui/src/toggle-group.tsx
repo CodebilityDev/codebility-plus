@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import * as ToggleGroupPrimitive from "@radix-ui/react-toggle-group"
-import { type VariantProps } from "class-variance-authority"
+import type {VariantProps} from "class-variance-authority";
 
 import { cn } from "@codevs/ui"
 import { toggleVariants } from "./toggle"
@@ -37,8 +37,6 @@ const ToggleGroupItem = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof ToggleGroupPrimitive.Item> &
     VariantProps<typeof toggleVariants>
 >(({ className, children, variant, size, ...props }, ref) => {
-  const context = React.useContext(ToggleGroupContext)
-
   return (
         <ToggleGroupPrimitive.Item
       ref={ref}

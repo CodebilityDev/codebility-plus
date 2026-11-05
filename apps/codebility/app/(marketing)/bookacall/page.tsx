@@ -1,7 +1,7 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import React from "react";
 
-import BookACallPageContent from "./_components/BookACallPageContent";
+import BookACallPageContent from "@/components/marketing/bookacall/BookACallPageContent";
 
 export const metadata: Metadata = {
     title: "Book a Call — Schedule a Meeting with Codebility",

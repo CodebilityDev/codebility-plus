@@ -1,0 +1,383 @@
+"use server";
+import { requireIdentity } from "@/lib/global/authorize";
+
+import { CACHE_TAGS, expireCodevCaches } from "@/lib/global/cache-tags";
+import type {
+  JobStatus,
+  Position,
+  WorkExperience,
+  WorkSchedule,
+} from "@/types/global/codev";
+import { revalidatePath, updateTag } from "next/cache";
+
+import { createClientServerComponent } from "@/lib/global/supabase-server";
+import type { Database } from "@/types/global/supabase";
+
+type CodevUpdate = Database["public"]["Tables"]["codev"]["Update"];
+type EducationInsert = Database["public"]["Tables"]["education"]["Insert"];
+type EducationUpdate = Database["public"]["Tables"]["education"]["Update"];
+
+
+const PROFILE_FIELDS: readonly string[] = [
+  "first_name",
+  "last_name",
+  "about",
+  "address",
+  "phone_number",
+  "positions",
+  "display_position",
+  "portfolio_website",
+  "tech_stacks",
+  "image_url",
+  "availability_status",
+  "years_of_experience",
+  "facebook",
+  "linkedin",
+  "github",
+  "discord",
+  "level",
+];
+
+export async function updateCodev(updatedData: CodevUpdate) {
+  try {
+    const identity = await requireIdentity();
+  const supabase = await createClientServerComponent();
+
+    const allowed = Object.fromEntries(
+      Object.entries(updatedData).filter(([key]) =>
+        PROFILE_FIELDS.includes(key),
+      ),
+    );
+
+    const { data, error } = await supabase
+      .from("codev")
+      .update({
+        ...allowed,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", identity.userId)
+      .select("id");
+
+    if (error) throw error;
+    await expireCodevCaches();
+    return data;
+  } catch (error) {
+    console.error("Error updating codev:", error);
+    throw new Error("Failed to update profile");
+  }
+}
+
+export async function updateSocialLinks(socialData: {
+  facebook?: string;
+  linkedin?: string;
+  github?: string;
+  discord?: string;
+  portfolio_website?: string;
+}) {
+  try {
+    const identity = await requireIdentity();
+  const supabase = await createClientServerComponent();
+    const { data, error } = await supabase
+      .from("codev")
+      .update({
+        ...socialData,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", identity.userId)
+      .select("id");
+
+    if (error) throw error;
+    updateTag(CACHE_TAGS.profileDetail);
+    return data;
+  } catch (error) {
+    console.error("Error updating social links:", error);
+    throw new Error("Failed to update social links");
+  }
+}
+
+// Work experience functions
+export async function createWorkExperience(
+  workExp: Omit<WorkExperience, "id">,
+) {
+  try {
+    const identity = await requireIdentity();
+  const supabase = await createClientServerComponent();
+    const { data, error } = await supabase
+      .from("work_experience")
+      .insert({
+        ...workExp,
+        codev_id: identity.userId,
+      })
+      .select();
+
+    if (error) throw error;
+    updateTag(CACHE_TAGS.profileDetail);
+    updateTag(CACHE_TAGS.profilesListing);
+    return data;
+  } catch (error) {
+    console.error("Error creating work experience:", error);
+    throw new Error("Failed to create work experience");
+  }
+}
+
+export async function updateWorkExperience(
+  id: string,
+  expData: Partial<WorkExperience>,
+) {
+  try {
+    const identity = await requireIdentity();
+  const supabase = await createClientServerComponent();
+    const { data, error } = await supabase
+      .from("work_experience")
+      .update(expData)
+      .eq("codev_id", identity.userId)
+      .eq("id", id)
+      .select();
+
+    if (error) throw error;
+    updateTag(CACHE_TAGS.profileDetail);
+    updateTag(CACHE_TAGS.profilesListing);
+    return data;
+  } catch (error) {
+    console.error("Error updating work experience:", error);
+    throw new Error("Failed to update work experience");
+  }
+}
+
+export async function deleteWorkExperience(id: string) {
+  try {
+    const identity = await requireIdentity();
+  const supabase = await createClientServerComponent();
+    const { error } = await supabase
+      .from("work_experience")
+      .delete()
+      .eq("codev_id", identity.userId)
+      .eq("id", id);
+
+    if (error) throw error;
+    updateTag(CACHE_TAGS.profileDetail);
+    updateTag(CACHE_TAGS.profilesListing);
+  } catch (error) {
+    console.error("Error deleting work experience:", error);
+    throw new Error("Failed to delete work experience");
+  }
+}
+
+// Education functions
+export async function createEducation(education: EducationInsert) {
+  try {
+    const identity = await requireIdentity();
+  const supabase = await createClientServerComponent();
+    const { data, error } = await supabase
+      .from("education")
+      .insert({
+        ...education,
+        codev_id: identity.userId,
+      })
+      .select();
+
+    if (error) throw error;
+    updateTag(CACHE_TAGS.profileDetail);
+    return data;
+  } catch (error) {
+    console.error("Error creating education:", error);
+    throw new Error("Failed to create education");
+  }
+}
+
+export async function updateEducation(
+  id: string,
+  educationData: EducationUpdate,
+) {
+  try {
+    const identity = await requireIdentity();
+  const supabase = await createClientServerComponent();
+    const { data, error } = await supabase
+      .from("education")
+      .update(educationData)
+      .eq("codev_id", identity.userId)
+      .eq("id", id)
+      .select();
+
+    if (error) throw error;
+    updateTag(CACHE_TAGS.profileDetail);
+    return data;
+  } catch (error) {
+    console.error("Error updating education:", error);
+    throw new Error("Failed to update education");
+  }
+}
+
+export async function deleteEducation(id: string) {
+  try {
+    const identity = await requireIdentity();
+  const supabase = await createClientServerComponent();
+    const { error } = await supabase
+      .from("education")
+      .delete()
+      .eq("codev_id", identity.userId)
+      .eq("id", id);
+
+    if (error) throw error;
+    updateTag(CACHE_TAGS.profileDetail);
+  } catch (error) {
+    console.error("Error deleting education:", error);
+    throw new Error("Failed to delete education");
+  }
+}
+
+export async function updateWorkSchedule(
+  schedule: Omit<WorkSchedule, "id" | "created_at" | "updated_at">,
+) {
+  try {
+    const identity = await requireIdentity();
+  const supabase = await createClientServerComponent();
+
+
+    const validDays = [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday",
+    ];
+    const sanitizedDays = schedule.days_of_week.filter((day) =>
+      validDays.includes(day),
+    );
+
+    if (sanitizedDays.length === 0) {
+      throw new Error("Invalid days_of_week provided");
+    }
+
+    // Delete existing schedule for this user
+    const { error: deleteError } = await supabase
+      .from("work_schedules")
+      .delete()
+      .eq("codev_id", identity.userId);
+
+    if (deleteError) {
+      console.error(
+        "Error deleting existing schedule:",
+        deleteError.message || deleteError,
+      );
+      throw new Error("Failed to delete existing schedule");
+    }
+
+    // Insert the new schedule
+    const { data, error: insertError } = await supabase
+      .from("work_schedules")
+      .insert({
+        codev_id: identity.userId,
+        days_of_week: sanitizedDays,
+        start_time: schedule.start_time,
+        end_time: schedule.end_time,
+      })
+      .select();
+
+    if (insertError) {
+      console.error(
+        "Error inserting new schedule:",
+        insertError.message || insertError,
+      );
+      throw new Error("Failed to insert new schedule");
+    }
+
+    updateTag(CACHE_TAGS.profileDetail);
+    return data[0];
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error("Error updating work schedule:", error.message);
+    } else {
+      console.error("Error updating work schedule:", error);
+    }
+    throw error;
+  }
+}
+
+export async function createJobStatus(jobStatus: Omit<JobStatus, "id">) {
+  try {
+    const identity = await requireIdentity();
+  const supabase = await createClientServerComponent();
+    const { data, error } = await supabase
+      .from("job_status")
+      .insert({
+        ...jobStatus,
+        status: "active", // Set default status
+        codev_id: identity.userId,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .select("id")
+      .single();
+
+    if (error) throw error;
+    revalidatePath("/applicant/profile");
+    return [data]; // Return as array to match expected format
+  } catch (error) {
+    console.error("Error creating job status:", error);
+    throw error;
+  }
+}
+
+export async function updateJobStatus(
+  id: string,
+  jobStatusData: Partial<JobStatus>,
+) {
+  try {
+    const identity = await requireIdentity();
+  const supabase = await createClientServerComponent();
+    const { data, error } = await supabase
+      .from("job_status")
+      .update({
+        ...jobStatusData,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("codev_id", identity.userId)
+      .eq("id", id)
+      .select("id")
+      .single();
+
+    if (error) throw error;
+    revalidatePath("/applicant/profile");
+    return data;
+  } catch (error) {
+    console.error("Error updating job status:", error);
+    throw error;
+  }
+}
+
+export async function deleteJobStatus(id: string) {
+  try {
+    const identity = await requireIdentity();
+  const supabase = await createClientServerComponent();
+    const { error } = await supabase
+      .from("job_status")
+      .delete()
+      .eq("codev_id", identity.userId)
+      .eq("id", id);
+
+    if (error) throw error;
+    revalidatePath("/applicant/profile");
+  } catch (error) {
+    console.error("Error deleting job status:", error);
+    throw new Error("Failed to delete job status");
+  }
+}
+
+export const getPositions = async (): Promise<{
+  error: any;
+  data: Position[] | null;
+}> => {
+  await requireIdentity();
+  const supabase = await createClientServerComponent();
+
+  const { data, error } = await supabase.from("positions").select("id, name, description");
+  if (error) {
+    console.error("Error fetching positions:", error);
+    return { error, data: null };
+  }
+
+  return { error: null, data };
+};

@@ -1,62 +1,68 @@
-import "@/app/globals.css";
+import "@/styles/global/globals.css";
 
-import React from "react";
-import { Metadata } from "next";
+
+import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
-import { Toaster } from "@/components/ui/toaster";
-import { ThemeProvider } from "@/store/providers/ThemeProvider";
-import ToasterContext from "@/store/providers/ToasterProvider";
-import ReactQueryProvider from "@/hooks/query/reactQuery";
+import { Toaster } from "@/components/global/ui/toaster";
+import { ThemeProvider } from "@/providers/global/ThemeProvider";
+import ToasterContext from "@/providers/global/ToasterProvider";
 import { TooltipProvider } from "@codevs/ui/tooltip";
+import JsonLd from "@/components/global/marketing/JsonLd";
+import { organizationSchema, websiteSchema } from "@/constants/global/app";
+import type { RootLayoutProps } from "@/types/global/app";
+
+
 
 const outfit = Outfit({
-	subsets: ["latin"],
-	preload: false,
+    subsets: ["latin"],
+    preload: false,
 });
 
-export async function generateMetadata(): Promise<Metadata> {
-	return {
-		title: "Codebility",
-		description: "Everyone has the ability to code",
-		icons: {
-			icon: [
-				{ url: "/favicon.ico" },
-				{ url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-				{ url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-			],
-			apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
-			other: [
-				{ rel: "mask-icon", url: "/safari-pinned-tab.svg", color: "#5bbad5" },
-			],
-		},
-		manifest: "/site.webmanifest",
-		openGraph: {
-			title: "Codebility",
-			description: "Everyone has the ability to code",
-			url: "https://www.codebility.tech/",
-			siteName: "Codebility",
-			images: [
-				{
-					url: "/og-image.jpg",
-					width: 1200,
-					height: 630,
-					alt: "Codebility Logo",
-				},
-			],
-			type: "website",
-		},
-	};
+export function generateMetadata(): Metadata {
+    return {
+        // CBP-135 follow-up fix: metadataBase was missing on dev, confirmed via
+        // pasted layout.tsx. Required so relative OG image paths (/og-image.jpg)
+        // resolve correctly in social previews.
+        metadataBase: new URL("https://www.codebility.tech"),
+        title: "Codebility",
+        description: "Everyone has the ability to code",
+        icons: {
+            icon: [
+                { url: "/favicon.ico" },
+                { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+                { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+            ],
+            apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+            other: [
+                { rel: "mask-icon", url: "/safari-pinned-tab.svg", color: "#5bbad5" },
+            ],
+        },
+        manifest: "/site.webmanifest",
+        openGraph: {
+            title: "Codebility",
+            description: "Everyone has the ability to code",
+            url: "https://www.codebility.tech/",
+            siteName: "Codebility",
+            images: [
+                {
+                    url: "/og-image.jpg",
+                    width: 1200,
+                    height: 630,
+                    alt: "Codebility Logo",
+                },
+            ],
+            type: "website",
+        },
+    };
 }
 
 export default function RootLayout({
-	children,
-}: {
-	children: React.ReactNode;
-}) {
-	return (
-		<html lang="en" className={outfit.className} suppressHydrationWarning>
-			<head>
-				{/*  <script
+    children,
+}: RootLayoutProps) {
+    return (
+        <html lang="en" className={outfit.className} suppressHydrationWarning>
+            <head>
+                {/*  <script
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
@@ -76,23 +82,23 @@ export default function RootLayout({
             `,
           }}
         /> */}
-			</head>
-			<body suppressHydrationWarning>
-				<ReactQueryProvider>
-					<ThemeProvider
-						attribute="class"
-						defaultTheme="system"
-						enableSystem
-						disableTransitionOnChange
-					>
-						<TooltipProvider>
-							<Toaster />
-							<ToasterContext />
-							{children}
-						</TooltipProvider>
-					</ThemeProvider>
-				</ReactQueryProvider>
-			</body>
-		</html>
-	);
+            </head>
+            <body suppressHydrationWarning>
+                <JsonLd data={organizationSchema} />
+                <JsonLd data={websiteSchema} />
+                <ThemeProvider
+                    attribute="class"
+                    defaultTheme="system"
+                    enableSystem
+                    disableTransitionOnChange
+                >
+                    <TooltipProvider>
+                        <Toaster />
+                        <ToasterContext />
+                        {children}
+                    </TooltipProvider>
+                </ThemeProvider>
+            </body>
+        </html>
+    );
 }

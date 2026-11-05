@@ -9,7 +9,7 @@ import { cn } from "@codevs/ui";
 const DropdownMenu = React.forwardRef<
   HTMLDivElement,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Root>
->(({ modal = false, ...props }, ref) => (
+>(({ modal = false, ...props }, _ref) => (
   <DropdownMenuPrimitive.Root modal={modal} {...props} />
 ));
 DropdownMenu.displayName = DropdownMenuPrimitive.Root.displayName;
