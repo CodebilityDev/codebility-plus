@@ -46,6 +46,7 @@ const PUBLIC_PATHS = new Set([
   "/careers",
   "/ai-integration",
   "/profiles",
+  "/proposal",
   "/nda-signing/public",
   "/auth/callback",
   "/auth/password-reset",
