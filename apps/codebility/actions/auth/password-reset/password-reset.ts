@@ -17,32 +17,8 @@ export const resetUserPassword = async (email: string) => {
             process.env.NEXT_PUBLIC_APP_BASE_URL ??
             "http://localhost:3000";
 
-        // Check user record by email
-        const { data, error: userError } = await supabase
-            .from("codev")
-            .select("id, application_status")
-            .eq("email_address", normalizedEmail)
-            .maybeSingle();
-
-        if (userError) {
-            console.error("Database query error:", userError);
-            throw new Error(`Database error: ${userError.message}`);
-        }
-
-        if (!data) {
-            console.error("User not found for email:", normalizedEmail);
-            throw new Error("No account found with this email address");
-        }
-
-        // Determine redirect destination after magic link callback
-        const isPassed = data.application_status === "passed";
-        const url = isPassed 
-            ? `${origin}/auth/callback?redirect_to=/home/account-settings` 
-            : `${origin}/auth/callback?redirect_to=/applicant/account-settings`;
-
-        // Send password reset email using Supabase Auth
         const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
-            redirectTo: url,
+            redirectTo: `${origin}/auth/callback`,
         });
 
         if (error) {
