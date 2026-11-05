@@ -1,6 +1,10 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 
-import { ServicesPageView } from "@/lib/services/ServicesPageView";
+import Calendly from "@/components/global/marketing/MarketingCalendly";
+import { ClientTechyBackground } from "@/components/marketing/services/ClientTechyBackground";
+import { ServicesProjectsBlock } from "@/components/marketing/services/ServicesProjectsBlock";
+import { Hero as ServicesHero } from "@/components/marketing/services/ServicesHero";
+import type { ServicesPageProps } from "@/types/marketing/services/services";
 
 export const metadata: Metadata = {
   title: "Our Services — Web & App Development | Codebility",
@@ -30,8 +34,17 @@ export const metadata: Metadata = {
   },
 };
 
-const ServicesPage = async () => {
-  return <ServicesPageView />;
+const ServicesPage = ({ searchParams }: ServicesPageProps) => {
+  return (
+    <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden overflow-y-hidden bg-[#030303]">
+      <ClientTechyBackground />
+      <div className="relative z-10">
+        <ServicesHero />
+        <ServicesProjectsBlock searchParams={searchParams} />
+        <Calendly />
+      </div>
+    </div>
+  );
 };
 
 export default ServicesPage;

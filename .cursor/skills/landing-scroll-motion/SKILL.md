@@ -12,8 +12,9 @@ description: >-
 # Landing scroll motion + effect replacements
 
 **Always read this skill** before changing marketing landing animations,
-scroll listeners, or client-side effects under
-`apps/codebility/app/(marketing)/`.
+scroll listeners, or client-side effects in the marketing site:
+`apps/codebility/app/(marketing)/` (routes), `components/marketing/` and
+`components/global/marketing/`.
 
 ## Editing rule
 
