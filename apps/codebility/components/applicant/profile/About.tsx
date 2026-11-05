@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Box from "@/components/global/layout/Box";
 import { Button } from "@/components/global/ui/button";
 import { IconEdit } from "@/public/assets/svgs/index";
@@ -17,7 +16,6 @@ import type { AboutProps, FormValues } from "@/types/applicant/profile/profile";
 
 
 const About = ({ data, earnedCategories }: AboutProps) => {
-  const router = useRouter();
   const [isEditMode, setIsEditMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -45,8 +43,6 @@ const About = ({ data, earnedCategories }: AboutProps) => {
       await updateCodev(formData);
       toast.success("Your about was successfully updated!", { id: toastId });
       setIsEditMode(false);
-
-      router.refresh();
     } catch (error) {
       console.error(error);
       toast.error("Something went wrong, please try again later!");

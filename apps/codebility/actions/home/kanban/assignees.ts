@@ -1,6 +1,7 @@
 "use server";
 
 import { authorize } from "@/lib/global/authorize";
+import { requireProjectAccess } from "@/lib/global/permissions";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import type { AssigneeOption } from "@/types/home/kanban/kanban";
 import { z } from "zod";
@@ -41,6 +42,7 @@ export async function searchAssignees(
   const id = projectIdSchema.parse(projectId);
 
   await authorize("kanban");
+  await requireProjectAccess(id);
 
   const supabase = await createClientServerComponent();
 
@@ -69,12 +71,17 @@ export async function searchAssignees(
   return data.map(toAssigneeOption);
 }
 
-export async function getAssigneesByIds(ids: string[]): Promise<AssigneeOption[]> {
+export async function getAssigneesByIds(
+  ids: string[],
+  projectId: string,
+): Promise<AssigneeOption[]> {
   const unique = [...new Set(idsSchema.parse(ids))];
+  const id = projectIdSchema.parse(projectId);
 
   if (unique.length === 0) return [];
 
   await authorize("kanban");
+  await requireProjectAccess(id);
 
   const supabase = await createClientServerComponent();
 

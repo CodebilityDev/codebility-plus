@@ -27,7 +27,6 @@ const PUBLIC = new Set([
   "actions/global/nda-storage.ts#completeNdaSigning",
   "actions/global/nda-storage.ts#completeNdaRequest",
   "actions/global/account-settings.ts#checkUsernameAvailability",
-  "actions/global/account-settings.ts#getUsernameData",
 ]);
 
 const MUTATION =

@@ -1,16 +1,17 @@
 "use server";
 
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import type { NewApplicantType } from "@/types/home/applicants/applicants";
 import { createAdminClient } from "@/lib/home/applicants/supabase-admin";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
-import { expireCodevCaches } from "@/lib/global/cache-tags";
+import { CACHE_TAGS, expireCodevCaches } from "@/lib/global/cache-tags";
 import { AuthorizationError, authorize } from "@/lib/global/authorize";
 
 // Helper function to revalidate the applicants page
 function revalidateApplicants(): Promise<void> {
     revalidatePath("/home/applicants");
+    updateTag(CACHE_TAGS.applicants);
     return Promise.resolve();
 }
 

@@ -2,21 +2,35 @@ import { cacheLife, cacheTag } from "next/cache";
 
 import { CACHE_TAGS } from "@/lib/global/cache-tags";
 import { createClientAnon } from "@/lib/global/supabase-anon";
-import { getCodevsWithClient } from "@/lib/global/codev-service";
 
 const FOUNDER_USER_ID = process.env.NEXT_PUBLIC_FOUNDER_USER_ID ?? "";
+const TEAM_SELECT =
+  "id, first_name, last_name, display_position, image_url, availability_status";
+const TEAM_LIMIT = 100;
 
 export async function getTeamData() {
   "use cache";
   cacheLife("hours");
   cacheTag(CACHE_TAGS.onboardingTeam);
+  const supabase = createClientAnon();
+
   // Fetch both admins and mentors in parallel
   const [
     { data: admins, error: adminError },
     { data: mentors, error: mentorError },
   ] = await Promise.all([
-    getCodevsWithClient(createClientAnon(), { filters: { role_id: 1 } }), // Admin role
-    getCodevsWithClient(createClientAnon(), { filters: { role_id: 5 } }), // Mentor role
+    supabase
+      .from("codev")
+      .select(TEAM_SELECT)
+      .eq("role_id", 1)
+      .order("id", { ascending: true })
+      .limit(TEAM_LIMIT),
+    supabase
+      .from("codev")
+      .select(TEAM_SELECT)
+      .eq("role_id", 5)
+      .order("id", { ascending: true })
+      .limit(TEAM_LIMIT),
   ]);
 
   if (adminError || mentorError) {
@@ -29,7 +43,7 @@ export async function getTeamData() {
   }
 
   // Filter available admins and identify CEO
-  const availableAdmins = (admins ?? []).filter(
+  const availableAdmins = admins.filter(
     (admin) => admin.availability_status !== false
   );
 
@@ -72,7 +86,7 @@ export async function getTeamData() {
     }));
 
   // Sort and map mentors
-  const sortedMentors = (mentors ?? [])
+  const sortedMentors = mentors
     .filter((mentor) => mentor.availability_status !== false)
     .sort((a, b) => {
       const aHasImage = !!a.image_url;

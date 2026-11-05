@@ -114,7 +114,8 @@ const TimeSchedule = ({ data, codevId }: TimeScheduleProps) => {
         end_time: schedule.end_time,
       };
 
-      await updateWorkSchedule(scheduleData);
+      const saved = await updateWorkSchedule(scheduleData);
+      if (saved) setSchedule(saved);
       toast.success("Schedule updated successfully!", { id: toastId });
       setIsEditMode(false);
     } catch (error) {

@@ -41,6 +41,10 @@ export interface ProfilesListSectionProps {
   searchParams: ProfilesPageProps["searchParams"];
 }
 
+export interface ProfilesPositionFilterProps {
+  positions: string[];
+}
+
 export interface ProfilesListPaginationProps {
   initialData: ProfilesListingPage;
   pageSize: number;

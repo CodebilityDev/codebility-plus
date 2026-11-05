@@ -2,8 +2,6 @@ import { cacheLife, cacheTag } from "next/cache";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Codev } from "@/types/global/codev";
 import type { ProfilesListingPage } from "@/types/global/profiles-listing";
-import { getQualifiedCodevs } from "@/utils/global/codev-qualification";
-import { prioritizeCodevs } from "@/utils/global/codev-priority";
 import { CACHE_TAGS } from "@/lib/global/cache-tags";
 import { createClientAnon } from "@/lib/global/supabase-anon";
 import type { ProfilesListingRow } from "@/types/global/lib";
@@ -12,6 +10,7 @@ import type { ProfilesListingRow } from "@/types/global/lib";
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 5;
 const MAX_LIMIT = 50;
+const MIN_QUALIFIED_POINTS = 100;
 
 const PROFILES_LISTING_SELECT = `
   id,
@@ -63,54 +62,105 @@ function mapRow(row: ProfilesListingRow): Codev {
   } as Codev;
 }
 
-async function fetchQualifiedProfiles(
+async function fetchQualifiedCodevIds(
   supabase: SupabaseClient,
-): Promise<Codev[] | null> {
+): Promise<string[] | null> {
+  const { data, error } = await supabase
+    .from("codev_total_points")
+    .select("codev_id")
+    .gte("skill_points", MIN_QUALIFIED_POINTS);
+
+  if (error) {
+    console.error("Supabase query error (profiles-listing points):", error);
+    return null;
+  }
+
+  return (data as { codev_id: string | null }[])
+    .map((row) => row.codev_id)
+    .filter((id): id is string => Boolean(id));
+}
+
+async function fetchPositions(
+  supabase: SupabaseClient,
+  codevIds: string[],
+): Promise<string[] | null> {
+  if (codevIds.length === 0) return [];
+
   const { data, error } = await supabase
     .from("codev")
-    .select(PROFILES_LISTING_SELECT)
-    .eq("application_status", "passed");
+    .select("display_position")
+    .in("id", codevIds)
+    .eq("application_status", "passed")
+    .eq("availability_status", true)
+    .not("display_position", "is", null);
+
+  if (error) {
+    console.error("Supabase query error (profiles-listing positions):", error);
+    return null;
+  }
+
+  return [
+    ...new Set(
+      (data as { display_position: string | null }[])
+        .map((row) => row.display_position)
+        .filter((value): value is string => Boolean(value)),
+    ),
+  ].sort((a, b) => a.localeCompare(b));
+}
+
+async function fetchProfilesPage(
+  supabase: SupabaseClient,
+  codevIds: string[],
+  position: string,
+  from: number,
+  to: number,
+): Promise<{ codevs: Codev[]; total: number } | null> {
+  if (codevIds.length === 0) return { codevs: [], total: 0 };
+
+  let query = supabase
+    .from("codev")
+    .select(PROFILES_LISTING_SELECT, { count: "exact" })
+    .in("id", codevIds)
+    .eq("application_status", "passed")
+    .eq("availability_status", true)
+    .order("landing_rank_score", { ascending: false })
+    .order("id", { ascending: true })
+    .range(from, to);
+
+  if (position) {
+    query = query.eq("display_position", position);
+  }
+
+  const { data, error, count } = await query;
 
   if (error) {
     console.error("Supabase query error (profiles-listing):", error);
     return null;
   }
 
-  const rows = data as ProfilesListingRow[];
-  const codevs = rows.map(mapRow);
-  const qualified = getQualifiedCodevs(codevs);
-  return prioritizeCodevs(qualified);
+  return {
+    codevs: (data as ProfilesListingRow[]).map(mapRow),
+    total: count ?? 0,
+  };
 }
 
-function getPositions(codevs: Codev[]): string[] {
-  return [
-    ...new Set(
-      codevs
-        .map((codev) => codev.display_position)
-        .filter((value): value is string => Boolean(value)),
-    ),
-  ].sort((a, b) => a.localeCompare(b));
-}
-
-function paginateCodevs(
+function buildListingPage(
   codevs: Codev[],
+  total: number,
+  positions: string[],
   position: string,
   page: number,
   limit: number,
 ): ProfilesListingPage {
-  const filtered = position
-    ? codevs.filter((codev) => codev.display_position === position)
-    : codevs;
-
-  const total = filtered.length;
-  const totalPages = total === 0 ? 0 : Math.ceil(total / limit);
-  const from = (page - 1) * limit;
-  const slice = filtered.slice(from, from + limit);
-
   return {
-    codevs: slice,
-    pagination: { page, limit, total, totalPages },
-    positions: getPositions(codevs),
+    codevs,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: total === 0 ? 0 : Math.ceil(total / limit),
+    },
+    positions,
     position,
   };
 }
@@ -126,18 +176,47 @@ export async function getProfilesListingPage(
   const position = options?.position?.trim() ?? "";
   const page = parsePositiveInt(options?.page, DEFAULT_PAGE);
   const limit = parsePositiveInt(options?.limit, DEFAULT_LIMIT, MAX_LIMIT);
+  const from = (page - 1) * limit;
+  const to = from + limit - 1;
 
-  const qualified = await fetchQualifiedProfiles(supabase);
-  if (!qualified) return null;
+  const codevIds = await fetchQualifiedCodevIds(supabase);
+  if (!codevIds) return null;
 
-  return paginateCodevs(qualified, position, page, limit);
+  const [positions, result] = await Promise.all([
+    fetchPositions(supabase, codevIds),
+    fetchProfilesPage(supabase, codevIds, position, from, to),
+  ]);
+
+  if (!positions || !result) return null;
+
+  return buildListingPage(
+    result.codevs,
+    result.total,
+    positions,
+    position,
+    page,
+    limit,
+  );
 }
 
-async function getCachedQualifiedProfiles() {
+async function getCachedQualifiedCodevIds() {
   "use cache";
   cacheLife("hours");
   cacheTag(CACHE_TAGS.profilesListing);
-  return fetchQualifiedProfiles(createClientAnon());
+  return fetchQualifiedCodevIds(createClientAnon());
+}
+
+async function getCachedQualifiedPositions() {
+  "use cache";
+  cacheLife("hours");
+  cacheTag(CACHE_TAGS.profilesListing);
+  const codevIds = await getCachedQualifiedCodevIds();
+  if (!codevIds) return null;
+  return fetchPositions(createClientAnon(), codevIds);
+}
+
+export async function getCachedProfilesListingPositions(): Promise<string[]> {
+  return (await getCachedQualifiedPositions()) ?? [];
 }
 
 export async function getCachedProfilesListingPage(
@@ -148,9 +227,27 @@ export async function getCachedProfilesListingPage(
   "use cache";
   cacheLife("hours");
   cacheTag(CACHE_TAGS.profilesListing);
-  const qualified = await getCachedQualifiedProfiles();
-  if (!qualified) return null;
-  return paginateCodevs(qualified, position, page, limit);
+  const from = (page - 1) * limit;
+  const to = from + limit - 1;
+
+  const codevIds = await getCachedQualifiedCodevIds();
+  if (!codevIds) return null;
+
+  const [positions, result] = await Promise.all([
+    getCachedQualifiedPositions(),
+    fetchProfilesPage(createClientAnon(), codevIds, position, from, to),
+  ]);
+
+  if (!positions || !result) return null;
+
+  return buildListingPage(
+    result.codevs,
+    result.total,
+    positions,
+    position,
+    page,
+    limit,
+  );
 }
 
 async function fetchProfileProjects(codevId: string) {

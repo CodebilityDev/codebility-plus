@@ -16,8 +16,12 @@ import { sendMultipleDenyEmail } from "@/actions/home/applicants/deny-email";
 import { sendMultipleOnboardingReminderWithUpdate } from "@/actions/home/applicants/onboarding-reminder-email";
 import { sendMultiplePassedTestEmail } from "@/actions/home/applicants/passed-test-email";
 import { sendMultipleTestReminderEmailWithUpdate } from "@/actions/home/applicants/test-reminder-email";
-import type { ApplicantRowActionButtonProps } from "@/types/home/applicants/applicants";
+import type { ApplicantRowActionButtonProps, NewApplicantType } from "@/types/home/applicants/applicants";
 
+interface RowState {
+  application_status: string;
+  reminded_count: number;
+}
 
 export default function ApplicantRowActionButton({
   applicants,
@@ -43,6 +47,36 @@ export default function ApplicantRowActionButton({
     | null
   >(null);
 
+  const [rowState, setRowState] = useState<Record<string, RowState>>({});
+
+  const statusOf = (applicant: NewApplicantType) =>
+    rowState[applicant.id]?.application_status ?? applicant.application_status;
+
+  const activeStatus = applicants[0] ? statusOf(applicants[0]) : null;
+
+  const recordRowState = (patch: (current: RowState) => Partial<RowState>) => {
+    setRowState((prev) => {
+      const next = { ...prev };
+      for (const applicant of applicants) {
+        const current = next[applicant.id] ?? {
+          application_status: applicant.application_status,
+          reminded_count: applicant.applicant?.reminded_count ?? 0,
+        };
+        next[applicant.id] = { ...current, ...patch(current) };
+      }
+      return next;
+    });
+  };
+
+  const moveRowsTo = (status: string) => {
+    recordRowState(() => ({ application_status: status, reminded_count: 0 }));
+    if (
+      applicants.some((applicant) => applicant.application_status !== status)
+    ) {
+      router.refresh();
+    }
+  };
+
   const handleMoveAllToApplying = async () => {
     setLoading(true);
     try {
@@ -55,7 +89,7 @@ export default function ApplicantRowActionButton({
         description: "All selected applicants have been moved to applying.",
       });
       onActionComplete?.();
-      router.refresh();
+      moveRowsTo("applying");
     } catch (error) {
       console.error(error);
       toast({
@@ -79,7 +113,7 @@ export default function ApplicantRowActionButton({
       });
       setOpen(false);
       onActionComplete?.();
-      router.refresh();
+      moveRowsTo("testing");
     } catch (error) {
       toast({
         title: "Error",
@@ -103,7 +137,7 @@ export default function ApplicantRowActionButton({
         description: "All selected applicants have been moved to onboarding.",
       });
       onActionComplete?.();
-      router.refresh();
+      moveRowsTo("onboarding");
     } catch (error) {
       console.error(error);
       toast({
@@ -133,7 +167,7 @@ export default function ApplicantRowActionButton({
         description: "All selected applicants have been denied.",
       });
       onActionComplete?.();
-      router.refresh();
+      moveRowsTo("denied");
     } catch (error) {
       console.error(error);
     }
@@ -158,7 +192,7 @@ export default function ApplicantRowActionButton({
         description: "All selected applicants have passed the test.",
       });
       onActionComplete?.();
-      router.refresh();
+      moveRowsTo("onboarding");
     } catch (error) {
       console.error(error);
       toast({
@@ -182,7 +216,7 @@ export default function ApplicantRowActionButton({
         description: "All selected applicants have been accepted.",
       });
       onActionComplete?.();
-      router.refresh();
+      moveRowsTo("passed");
     } catch (error) {
       console.error(error);
       toast({
@@ -234,7 +268,7 @@ export default function ApplicantRowActionButton({
           "All selected applicants have been reminded to take the test.",
       });
       onActionComplete?.();
-      router.refresh();
+      recordRowState((current) => ({ reminded_count: current.reminded_count + 1 }));
     } catch (error) {
       console.error("Error sending reminder emails:", error);
       toast({
@@ -264,7 +298,7 @@ export default function ApplicantRowActionButton({
           "All selected applicants have been reminded to complete onboarding.",
       });
       onActionComplete?.();
-      router.refresh();
+      recordRowState((current) => ({ reminded_count: current.reminded_count + 1 }));
     } catch (error) {
       console.error("Error sending onboarding reminder emails:", error);
       toast({
@@ -278,8 +312,8 @@ export default function ApplicantRowActionButton({
 
   return (
     <div className="flex items-center justify-center gap-2">
-      {(applicants[0]?.application_status === "applying" ||
-        applicants[0]?.application_status === "denied") && (
+      {(activeStatus === "applying" ||
+        activeStatus === "denied") && (
         <Button
           variant="destructive"
           className="h-fit py-1 text-xs lg:text-sm bg-red-500"
@@ -292,7 +326,7 @@ export default function ApplicantRowActionButton({
         </Button>
       )}
 
-      {applicants[0]?.application_status === "testing" && (
+      {activeStatus === "testing" && (
         <>
           <Button
             className="h-fit py-1 text-xs lg:text-sm"
@@ -316,8 +350,8 @@ export default function ApplicantRowActionButton({
         </>
       )}
 
-      {(applicants[0]?.application_status === "onboarding" ||
-        applicants[0]?.application_status === "waitlist") && (
+      {(activeStatus === "onboarding" ||
+        activeStatus === "waitlist") && (
         <>
           <Button
             className="h-fit py-1 text-xs lg:text-sm"
@@ -361,7 +395,7 @@ export default function ApplicantRowActionButton({
           >
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {applicants[0]?.application_status !== "applying" && (
+            {activeStatus !== "applying" && (
               <DropdownMenuItem
                 className="text-black-500 dark:text-light-800 cursor-pointer"
                 onClick={() => {
@@ -372,7 +406,7 @@ export default function ApplicantRowActionButton({
                 Move All to Applying
               </DropdownMenuItem>
             )}
-            {applicants[0]?.application_status !== "testing" && (
+            {activeStatus !== "testing" && (
               <DropdownMenuItem
                 className="text-black-500 dark:text-light-800 cursor-pointer"
                 onClick={() => {
@@ -383,7 +417,7 @@ export default function ApplicantRowActionButton({
                 Move All to Testing
               </DropdownMenuItem>
             )}
-            {applicants[0]?.application_status !== "onboarding" && (
+            {activeStatus !== "onboarding" && (
               <DropdownMenuItem
                 className="text-black-500 dark:text-light-800 cursor-pointer"
                 onClick={() => {
@@ -394,7 +428,7 @@ export default function ApplicantRowActionButton({
                 Move All to Onboarding
               </DropdownMenuItem>
             )}
-            {applicants[0]?.application_status !== "denied" && (
+            {activeStatus !== "denied" && (
               <DropdownMenuItem
                 className="cursor-pointer text-red-500"
                 onClick={() => {
@@ -408,8 +442,8 @@ export default function ApplicantRowActionButton({
 
             <DropdownMenuSeparator />
             {/* remind all to take test */}
-            {(applicants[0]?.application_status === "testing" ||
-              applicants[0]?.application_status === "applying") && (
+            {(activeStatus === "testing" ||
+              activeStatus === "applying") && (
               <DropdownMenuItem
                 className="text-black-500 dark:text-light-800 cursor-pointer"
                 onClick={() => {
@@ -423,7 +457,7 @@ export default function ApplicantRowActionButton({
             )}
 
             {/* remind all to onboarding */}
-            {applicants[0]?.application_status === "onboarding" && (
+            {activeStatus === "onboarding" && (
               <DropdownMenuItem
                 className="text-black-500 dark:text-light-800 cursor-pointer"
                 onClick={() => {
@@ -436,7 +470,7 @@ export default function ApplicantRowActionButton({
               </DropdownMenuItem>
             )}
             <DropdownMenuSeparator />
-            {applicants[0]?.application_status === "testing" && (
+            {activeStatus === "testing" && (
               <div className="block cursor-pointer sm:hidden">
                 <DropdownMenuItem
                   onClick={() => {
@@ -459,8 +493,8 @@ export default function ApplicantRowActionButton({
               </div>
             )}
 
-            {(applicants[0]?.application_status === "onboarding" ||
-              applicants[0]?.application_status === "waitlist") && (
+            {(activeStatus === "onboarding" ||
+              activeStatus === "waitlist") && (
               <div className="block cursor-pointer sm:hidden">
                 <DropdownMenuItem
                   onClick={() => {

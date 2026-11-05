@@ -9,7 +9,6 @@ export default function ProjectDetailSkeleton() {
       className="flex flex-col gap-6"
     >
       <header>
-        <Skeleton className="mb-2 h-4 w-48" />
         <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <Skeleton className="h-9 w-56" />

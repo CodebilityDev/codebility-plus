@@ -18,6 +18,10 @@ import { sendPassedTestEmail } from "@/actions/home/applicants/passed-test-email
 import { sendTestReminderWithUpdate } from "@/actions/home/applicants/test-reminder-email";
 import type { ApplicantActionButtonProps } from "@/types/home/applicants/applicants";
 
+interface RowState {
+  application_status: string;
+  reminded_count: number;
+}
 
 export default function ApplicantActionButton({
   applicant,
@@ -43,9 +47,42 @@ export default function ApplicantActionButton({
     | null
   >(null);
 
+  const [rowState, setRowState] = useState<Record<string, RowState>>({});
+
+  const currentStatus =
+    rowState[applicant.id]?.application_status ?? applicant.application_status;
+  const currentRemindedCount =
+    rowState[applicant.id]?.reminded_count ??
+    applicant.applicant?.reminded_count ??
+    0;
+
+  const applyRowState = (next: Partial<RowState>) => {
+    setRowState((prev) => ({
+      ...prev,
+      [applicant.id]: {
+        application_status: currentStatus,
+        reminded_count: currentRemindedCount,
+        ...next,
+      },
+    }));
+
+    if (
+      next.application_status &&
+      next.application_status !== applicant.application_status
+    ) {
+      router.refresh();
+    }
+  };
+
   // Handle View Details click - uses our custom modal system
   const handleViewDetails = () => {
-    openModal(applicant);
+    openModal({
+      ...applicant,
+      application_status: currentStatus,
+      applicant: applicant.applicant
+        ? { ...applicant.applicant, reminded_count: currentRemindedCount }
+        : applicant.applicant,
+    });
   };
 
   // Handle Edit Applicant click
@@ -67,7 +104,7 @@ export default function ApplicantActionButton({
         title: "Applicant Moved",
         description: `${applicant.first_name} ${applicant.last_name} has been moved to applying.`,
       });
-      router.refresh();
+      applyRowState({ application_status: "applying", reminded_count: 0 });
     } catch (error) {
       console.error("Error moving applicant to applying:", error);
       toast({
@@ -90,7 +127,7 @@ export default function ApplicantActionButton({
         title: "Applicant Moved",
         description: `${applicant.first_name} ${applicant.last_name} has been moved to testing.`,
       });
-      router.refresh();
+      applyRowState({ application_status: "testing", reminded_count: 0 });
     } catch (error) {
       console.error("Error moving applicant to testing:", error);
       toast({
@@ -113,7 +150,7 @@ export default function ApplicantActionButton({
         title: "Applicant Moved",
         description: `${applicant.first_name} ${applicant.last_name} has been moved to onboarding.`,
       });
-      router.refresh();
+      applyRowState({ application_status: "onboarding", reminded_count: 0 });
     } catch (error) {
       console.error("Error moving applicant to onboarding:", error);
       toast({
@@ -136,7 +173,7 @@ export default function ApplicantActionButton({
         title: "Applicant Denied",
         description: `${applicant.first_name} ${applicant.last_name} has been moved to denied.`,
       });
-      router.refresh();
+      applyRowState({ application_status: "denied", reminded_count: 0 });
     } catch (error) {
       console.error("Error moving applicant to denied:", error);
       toast({
@@ -163,7 +200,7 @@ export default function ApplicantActionButton({
         title: "Applicant Passed",
         description: `${applicant.first_name} ${applicant.last_name} has been moved to onboarding.`,
       });
-      router.refresh();
+      applyRowState({ application_status: "onboarding", reminded_count: 0 });
     } catch (error) {
       console.error("Error passing applicant:", error);
       toast({
@@ -190,7 +227,7 @@ export default function ApplicantActionButton({
         title: "Applicant Failed",
         description: `${applicant.first_name} ${applicant.last_name} has been marked as failed.`,
       });
-      router.refresh();
+      applyRowState({ application_status: "denied", reminded_count: 0 });
     } catch (error) {
       console.error("Error failing applicant:", error);
       toast({
@@ -213,7 +250,7 @@ export default function ApplicantActionButton({
         title: "Applicant Accepted",
         description: `${applicant.first_name} ${applicant.last_name} has been accepted.`,
       });
-      router.refresh();
+      applyRowState({ application_status: "passed", reminded_count: 0 });
     } catch (error) {
       console.error("Error accepting applicant:", error);
       toast({
@@ -240,7 +277,7 @@ export default function ApplicantActionButton({
         title: "Applicant Denied",
         description: `${applicant.first_name} ${applicant.last_name} has been denied.`,
       });
-      router.refresh();
+      applyRowState({ application_status: "denied", reminded_count: 0 });
     } catch (error) {
       console.error("Error denying applicant:", error);
       toast({
@@ -267,6 +304,7 @@ export default function ApplicantActionButton({
         title: "Reminder Sent",
         description: `Test reminder sent to ${applicant.first_name} ${applicant.last_name}.`,
       });
+      applyRowState({ reminded_count: currentRemindedCount + 1 });
     } catch (error) {
       console.error("Error sending test reminder:", error);
       toast({
@@ -293,6 +331,7 @@ export default function ApplicantActionButton({
         title: "Reminder Sent",
         description: `Onboarding reminder sent to ${applicant.first_name} ${applicant.last_name}.`,
       });
+      applyRowState({ reminded_count: currentRemindedCount + 1 });
     } catch (error) {
       console.error("Error sending onboarding reminder:", error);
       toast({
@@ -403,7 +442,7 @@ export default function ApplicantActionButton({
           <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-700" />
 
           {/* Status Change Actions */}
-          {applicant.application_status !== "applying" && (
+          {currentStatus !== "applying" && (
             <DropdownMenuItem
               className="cursor-pointer rounded-md px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-50 hover:text-gray-900 focus:bg-gray-50 focus:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-gray-100"
               onClick={() => {
@@ -418,7 +457,7 @@ export default function ApplicantActionButton({
             </DropdownMenuItem>
           )}
 
-          {applicant.application_status !== "testing" && (
+          {currentStatus !== "testing" && (
             <DropdownMenuItem
               className="cursor-pointer rounded-md px-3 py-2 text-sm text-amber-700 transition-colors hover:bg-amber-50 hover:text-amber-800 focus:bg-amber-50 focus:text-amber-800 dark:text-amber-400 dark:hover:bg-amber-900/20 dark:hover:text-amber-300"
               onClick={() => {
@@ -433,7 +472,7 @@ export default function ApplicantActionButton({
             </DropdownMenuItem>
           )}
 
-          {applicant.application_status !== "onboarding" && (
+          {currentStatus !== "onboarding" && (
             <DropdownMenuItem
               className="cursor-pointer rounded-md px-3 py-2 text-sm text-emerald-700 transition-colors hover:bg-emerald-50 hover:text-emerald-800 focus:bg-emerald-50 focus:text-emerald-800 dark:text-emerald-400 dark:hover:bg-emerald-900/20 dark:hover:text-emerald-300"
               onClick={() => {
@@ -448,7 +487,7 @@ export default function ApplicantActionButton({
             </DropdownMenuItem>
           )}
 
-          {applicant.application_status !== "denied" && (
+          {currentStatus !== "denied" && (
             <DropdownMenuItem
               className="cursor-pointer rounded-md px-3 py-2 text-sm text-red-700 transition-colors hover:bg-red-50 hover:text-red-800 focus:bg-red-50 focus:text-red-800 dark:text-red-400 dark:hover:bg-red-900/20 dark:hover:text-red-300"
               onClick={() => {
@@ -466,7 +505,7 @@ export default function ApplicantActionButton({
           <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-700" />
 
           {/* Test Actions - only show for testing status */}
-          {applicant.application_status === "testing" && (
+          {currentStatus === "testing" && (
             <>
               <DropdownMenuItem
                 className="cursor-pointer rounded-md px-3 py-2 text-sm text-green-700 transition-colors hover:bg-green-50 hover:text-green-800 focus:bg-green-50 focus:text-green-800 dark:text-green-400 dark:hover:bg-green-900/20 dark:hover:text-green-300"
@@ -494,7 +533,7 @@ export default function ApplicantActionButton({
           )}
 
           {/* Onboarding Actions - only show for onboarding status */}
-          {applicant.application_status === "onboarding" && (
+          {currentStatus === "onboarding" && (
             <>
               <DropdownMenuItem
                 className="cursor-pointer rounded-md px-3 py-2 text-sm text-green-700 transition-colors hover:bg-green-50 hover:text-green-800 focus:bg-green-50 focus:text-green-800 dark:text-green-400 dark:hover:bg-green-900/20 dark:hover:text-green-300"
@@ -532,7 +571,7 @@ export default function ApplicantActionButton({
           )}
 
           {/* Waitlist Actions - only show for waitlist status */}
-          {applicant.application_status === "waitlist" && (
+          {currentStatus === "waitlist" && (
             <>
               <DropdownMenuItem
                 className="cursor-pointer rounded-md px-3 py-2 text-sm text-green-700 transition-colors hover:bg-green-50 hover:text-green-800 focus:bg-green-50 focus:text-green-800 dark:text-green-400 dark:hover:bg-green-900/20 dark:hover:text-green-300"
@@ -560,7 +599,7 @@ export default function ApplicantActionButton({
           )}
 
           {/* Remind to Take Test - show for testing and applying status */}
-          {(applicant.application_status === "testing" || applicant.application_status === "applying") && (
+          {(currentStatus === "testing" || currentStatus === "applying") && (
             <DropdownMenuItem
               className="cursor-pointer rounded-md px-3 py-2 text-sm text-blue-700 transition-colors hover:bg-blue-50 hover:text-blue-800 focus:bg-blue-50 focus:text-blue-800 dark:text-blue-400 dark:hover:bg-blue-900/20 dark:hover:text-blue-300"
               onClick={() => {

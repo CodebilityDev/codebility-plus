@@ -27,9 +27,18 @@ function earnedCategories(points: { points: { category: string; points: number }
 
 export default function ApplicantProfilePage() {
   return (
-    <Suspense fallback={<ProfileSkeleton />}>
-      <ProfileComponent />
-    </Suspense>
+    <div className="mx-auto max-w-screen-xl mt-8">
+      <Toaster position="top-center" reverseOrder={false} />
+      <div className="flex flex-col gap-4 pt-4">
+        <H1>Profile Settings</H1>
+        <span className="text-sm text-gray-400">
+          Complete your profile details to gain more additional points.
+        </span>
+        <Suspense fallback={<ProfileSkeleton />}>
+          <ProfileComponent />
+        </Suspense>
+      </div>
+    </div>
   );
 }
 
@@ -108,77 +117,69 @@ async function ProfileComponent() {
   };
 
   return (
-    <div className="mx-auto max-w-screen-xl mt-8">
-      <Toaster position="top-center" reverseOrder={false} />
-      <div className="flex flex-col gap-4 pt-4">
-        <H1>Profile Settings</H1>
-        <span className="text-sm text-gray-400">
-          Complete your profile details to gain more additional points. 
-        </span>
-        <ProfileCompletionGuide />
-        <div className="flex flex-col gap-8 md:flex-row">
-          <div className="flex w-full basis-[70%] flex-col gap-8 2xl:basis-[60%]">
-            <PersonalInfo data={codevData} positions={positions ?? []} />
-            <ProfilePointsGate>
-              {(points) => (
-                <About
-                  data={codevData}
+    <>
+      <ProfileCompletionGuide />
+      <div className="flex flex-col gap-8 md:flex-row">
+        <div className="flex w-full basis-[70%] flex-col gap-8 2xl:basis-[60%]">
+          <PersonalInfo data={codevData} positions={positions ?? []} />
+          <ProfilePointsGate>
+            {(points) => (
+              <About
+                data={codevData}
+                earnedCategories={earnedCategories(points)}
+              />
+            )}
+          </ProfilePointsGate>
+          <ProfilePointsGate>
+            {(points) => (
+              <>
+                <ContactInfo
                   earnedCategories={earnedCategories(points)}
+                  data={{
+                    facebook: user.facebook,
+                    linkedin: user.linkedin,
+                    github: user.github,
+                    discord: user.discord,
+                    portfolio_website: user.portfolio_website,
+                    phone_number: user.phone_number,
+                  }}
                 />
-              )}
-            </ProfilePointsGate>
-            <ProfilePointsGate>
-              {(points) => (
-                <>
-                  <ContactInfo
-                    earnedCategories={earnedCategories(points)}
-                    data={{
-                      facebook: user.facebook,
-                      linkedin: user.linkedin,
-                      github: user.github,
-                      discord: user.discord,
-                      portfolio_website: user.portfolio_website,
-                      phone_number: user.phone_number,
-                    }}
-                  />
-                  <EducationalBackground
-                    earnedCategories={earnedCategories(points)}
-                    data={education ?? []}
-                    codevId={user.id}
-                  />
-                  <Experience
-                    earnedCategories={earnedCategories(points)}
-                    data={workExperience ?? []}
-                    codevId={user.id}
-                  />
-                </>
-              )}
-            </ProfilePointsGate>
-          </div>
-          <div className="flex w-full basis-[30%] flex-col gap-8 2xl:basis-[40%]">
-            <ProfilePointsGate>
-              {(points) => (
-                <>
-                  <Photo
-                    earnedCategories={earnedCategories(points)}
-                    data={{ image_url: user.image_url ?? null }}
-                  />
-                  <Skills
-                    earnedCategories={earnedCategories(points)}
-                    data={{
-                      tech_stacks: user.tech_stacks,
-                      level: asLevelRecord(user.level),
-                    }}
-                  />
-                </>
-              )}
-            </ProfilePointsGate>
-            <TimeSchedule data={schedules?.[0] ?? null} codevId={user.id} />
-            <JobStatuses data={jobStatuses ?? []} />
-            
-          </div>
+                <EducationalBackground
+                  earnedCategories={earnedCategories(points)}
+                  data={education ?? []}
+                  codevId={user.id}
+                />
+                <Experience
+                  earnedCategories={earnedCategories(points)}
+                  data={workExperience ?? []}
+                  codevId={user.id}
+                />
+              </>
+            )}
+          </ProfilePointsGate>
+        </div>
+        <div className="flex w-full basis-[30%] flex-col gap-8 2xl:basis-[40%]">
+          <ProfilePointsGate>
+            {(points) => (
+              <>
+                <Photo
+                  earnedCategories={earnedCategories(points)}
+                  data={{ image_url: user.image_url ?? null }}
+                />
+                <Skills
+                  earnedCategories={earnedCategories(points)}
+                  data={{
+                    tech_stacks: user.tech_stacks,
+                    level: asLevelRecord(user.level),
+                  }}
+                />
+              </>
+            )}
+          </ProfilePointsGate>
+          <TimeSchedule data={schedules?.[0] ?? null} codevId={user.id} />
+          <JobStatuses data={jobStatuses ?? []} />
         </div>
       </div>
-    </div>
+    </>
   );
 }

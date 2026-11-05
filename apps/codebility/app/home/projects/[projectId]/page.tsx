@@ -1,6 +1,14 @@
 import { Suspense } from "react";
 
+import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+} from "@codevs/ui/breadcrumb";
 
 import ProjectDetailContributors from "@/components/home/projects/ProjectDetailContributors";
 import ProjectDetailHeader from "@/components/home/projects/ProjectDetailHeader";
@@ -20,6 +28,15 @@ export default function ProjectDetailPage({
 }: ProjectDetailPageProps) {
   return (
     <div className="mx-auto w-full max-w-screen-xl px-4 py-6">
+      <Breadcrumb className="mb-2">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link href={pathsConfig.app.projects}>Projects</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
       <Suspense fallback={<ProjectDetailSkeleton />}>
         <ProjectDetailContent params={params} />
       </Suspense>
@@ -29,17 +46,19 @@ export default function ProjectDetailPage({
 
 async function ProjectDetailContent({ params }: ProjectDetailPageProps) {
   const { projectId } = await params;
-  const [project, contributors, accessibleProjectIds, { hasFullAccess, roleId }] =
-    await Promise.all([
-      getCachedProject(projectId),
-      getCachedContributors(projectId),
-      getAccessibleProjectIds(),
-      getAccess(),
-    ]);
+  const [accessibleProjectIds, { hasFullAccess, roleId }] = await Promise.all([
+    getAccessibleProjectIds(),
+    getAccess(),
+  ]);
 
   if (accessibleProjectIds && !accessibleProjectIds.includes(projectId)) {
     redirect(pathsConfig.app.home);
   }
+
+  const [project, contributors] = await Promise.all([
+    getCachedProject(projectId),
+    getCachedContributors(projectId),
+  ]);
 
   if (!project) notFound();
 

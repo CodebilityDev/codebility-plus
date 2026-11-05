@@ -67,7 +67,7 @@ export default function TaskAssigneePicker({
 
     let active = true;
 
-    getAssigneesByIds(unknown)
+    getAssigneesByIds(unknown, projectId)
       .then((rows) => {
         if (rows.length === 0) return;
 
@@ -88,7 +88,7 @@ export default function TaskAssigneePicker({
     return () => {
       active = false;
     };
-  }, [valueKey, options]);
+  }, [valueKey, options, projectId]);
 
   function lookup(id: string) {
     return options[id] ?? candidates.find((entry) => entry.id === id);

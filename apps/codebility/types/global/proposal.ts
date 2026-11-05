@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 import type { Database } from "@/types/global/supabase";
 
 type CodevRow = Database["public"]["Tables"]["codev"]["Row"];
@@ -13,10 +15,19 @@ export type ProposalCodev = Pick<
   | "internal_status"
 >;
 
+export interface ProposalChromeProps {
+  year: number;
+  children: ReactNode;
+}
+
+export interface ProposalTabContextValue {
+  activeTab: number;
+  setActiveTab: (index: number) => void;
+}
+
 export interface ProposalViewProps {
   realProjects: RealProject[];
   codevProfiles: ProposalCodev[];
-  year: number;
 }
 
 export interface Service {

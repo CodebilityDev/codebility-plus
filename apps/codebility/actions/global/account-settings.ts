@@ -102,13 +102,15 @@ export const checkUsernameAvailability = async (username: string, currentUserId:
 };
 
 // Get user's current username data
-export const getUsernameData = async (userId: string) => {
+export const getUsernameData = async (_userId: string) => {
+    const identity = await requireIdentity();
+
     const supabase = await createClientServerComponent();
 
     const { data, error } = await supabase
         .from("codev")
         .select("username, username_updated_at")
-        .eq("id", userId)
+        .eq("id", identity.userId)
         .single();
 
     if (error) {

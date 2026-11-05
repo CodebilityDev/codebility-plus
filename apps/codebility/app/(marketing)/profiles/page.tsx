@@ -1,8 +1,15 @@
+import { Suspense } from "react";
+
 import type { Metadata } from "next";
+
+import { Skeleton } from "@codevs/ui/skeleton";
 
 import Section from "@/components/global/marketing/CodevsSection";
 import { CodevHireCodevModal } from "@/components/global/marketing/CodevHireCodevModal";
+import CodevContainer from "@/components/marketing/profiles/CodevContainer";
 import { ProfilesListBlock } from "@/components/marketing/profiles/ProfilesListBlock";
+import { ProfilesPositionFilter } from "@/components/marketing/profiles/ProfilesPositionFilter";
+import { getCachedProfilesListingPositions } from "@/lib/global/profiles-listing-cached";
 import type { ProfilesPageProps } from "@/types/marketing/profiles/profiles";
 
 export const metadata: Metadata = {
@@ -23,7 +30,9 @@ export const metadata: Metadata = {
     },
 };
 
-export default function Profiles({ searchParams }: ProfilesPageProps) {
+export default async function Profiles({ searchParams }: ProfilesPageProps) {
+    const positions = await getCachedProfilesListingPositions();
+
     return (
         <>
             <Section
@@ -34,7 +43,23 @@ export default function Profiles({ searchParams }: ProfilesPageProps) {
                 <div className="absolute inset-0 bg-gradient-to-br from-customBlue-950/20 to-purple-950/20" />
                 <div className="absolute -top-4 -right-4 h-96 w-96 rounded-full bg-gradient-to-br from-yellow-400/10 to-orange-400/10 blur-3xl" />
                 <div className="absolute -bottom-4 -left-4 h-96 w-96 rounded-full bg-gradient-to-br from-purple-400/10 to-pink-400/10 blur-3xl" />
-                <ProfilesListBlock searchParams={searchParams} />
+                <div className="relative z-10 flex flex-col gap-8">
+                    <CodevContainer />
+                    <Suspense
+                        fallback={
+                            <div className="m-auto h-full w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+                                <div className="mb-8 flex w-full flex-col items-center justify-between p-4">
+                                    <div className="flex w-full max-w-sm flex-col">
+                                        <Skeleton className="h-12 w-full rounded-full" />
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    >
+                        <ProfilesPositionFilter positions={positions} />
+                    </Suspense>
+                    <ProfilesListBlock searchParams={searchParams} />
+                </div>
             </Section>
             <CodevHireCodevModal />
         </>

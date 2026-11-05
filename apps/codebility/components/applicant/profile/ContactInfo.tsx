@@ -6,7 +6,6 @@ import InputField from "@/components/global/layout/InputPhone";
 import { Button } from "@/components/global/ui/button";
 
 import { IconEdit } from "@/public/assets/svgs/index";
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import type { Control } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -18,7 +17,6 @@ import type { ContactInfoProps, ContactInfoFormValues } from "@/types/applicant/
 
 
 const ContactInfo = ({ data, earnedCategories }: ContactInfoProps) => {
-  const router = useRouter();
   const [isEditMode, setIsEditMode] = useState(false);
   const hasPoints = earnedCategories.some((category) => ["phone_number","github","facebook","linkedin","discord","portfolio_website"].includes(category));
   const [isLoading, setIsLoading] = useState(false);
@@ -55,8 +53,6 @@ const ContactInfo = ({ data, earnedCategories }: ContactInfoProps) => {
         id: toastId,
       });
       setIsEditMode(false);
-
-      router.refresh();
     } catch (error) {
       console.error(error);
       toast.error("Something went wrong, please try again later!");

@@ -15,6 +15,22 @@ export async function getCodevs(options?: {
   return getCodevsWithClient(await createClientServerComponent(), options);
 }
 
+export async function getCodevSummary(id: string) {
+  const supabase = await createClientServerComponent();
+  const { data, error } = await supabase
+    .from("codev")
+    .select("id, first_name, last_name, display_position")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error) {
+    console.error("Error fetching Codev summary:", error);
+    return { error, data: null };
+  }
+
+  return { error: null, data };
+}
+
 export const getCodevsWithClient = async (
   supabase: SupabaseClient<Database>,
   {

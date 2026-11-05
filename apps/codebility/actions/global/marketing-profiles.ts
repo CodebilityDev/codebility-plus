@@ -1,19 +1,19 @@
 "use server";
 
 import type { Codev } from "@/types/global/codev";
-import { getCodevs } from "@/lib/global/codev-service";
+import { getCodevSummary } from "@/lib/global/codev-service";
 
 export async function getCodev(id: string): Promise<Codev | null> {
-	const { data, error } = await getCodevs({ filters: { id } });
+	const { data, error } = await getCodevSummary(id);
 
 	if (error) {
 		console.error("Failed to fetch Codev data:", error);
 		return null;
 	}
 
-	if (!data || data.length === 0) {
+	if (!data) {
 		return null;
 	}
 
-	return data[0] ?? null;
+	return data as Codev;
 }

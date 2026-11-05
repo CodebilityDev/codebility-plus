@@ -3,6 +3,7 @@
 import { updateTag } from "next/cache";
 import { CACHE_TAGS } from "@/lib/global/cache-tags";
 import { authorize } from "@/lib/global/authorize";
+import { requireProjectAccess } from "@/lib/global/permissions";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import { getCurrentCodev } from "@/lib/global/current-codev";
 import type { Database } from "@/types/global/supabase";
@@ -93,6 +94,7 @@ export async function updateProject(
   const parsed = projectFormSchema.partial().parse(input);
 
   await authorize("projects");
+  await requireProjectAccess(id, "team_leader");
 
   const supabase = await createClientServerComponent();
 
@@ -115,6 +117,7 @@ export async function deleteProject(projectId: string): Promise<void> {
   const id = projectIdSchema.parse(projectId);
 
   await authorize("projects");
+  await requireProjectAccess(id, "team_leader");
 
   const supabase = await createClientServerComponent();
 
@@ -194,6 +197,8 @@ export async function markProjectDone(projectId: string): Promise<void> {
   await authorize("projects");
 
   const id = projectIdSchema.parse(projectId);
+
+  await requireProjectAccess(id, "team_leader");
 
   const codev = await getCurrentCodev();
   if (!canMarkProjectDone(codev?.role_id ?? null)) {

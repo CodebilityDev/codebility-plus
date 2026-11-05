@@ -4,12 +4,10 @@ import type { FormEvent } from "react";
 
 import { useState } from "react";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@codevs/ui/alert-dialog";
 import { Badge } from "@codevs/ui/badge";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@codevs/ui/breadcrumb";
 import { Button } from "@codevs/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@codevs/ui/dialog";
 import { Input } from "@codevs/ui/input";
@@ -60,9 +58,11 @@ export default function ProjectDetailHeader({
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [markingDone, setMarkingDone] = useState(false);
   const [markDoneError, setMarkDoneError] = useState<string | null>(null);
+  const [overrides, setOverrides] = useState<Partial<ProjectDetail>>({});
 
-  const dateRange = formatDateRange(project.startDate, project.endDate);
-  const showMarkDone = canManage && canMarkProjectDone(roleId) && project.status !== "completed";
+  const view = { ...project, ...overrides };
+  const dateRange = formatDateRange(view.startDate, view.endDate);
+  const showMarkDone = canManage && canMarkProjectDone(roleId) && view.status !== "completed";
 
   async function handleEdit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -107,8 +107,8 @@ export default function ProjectDetailHeader({
         techStack,
         keyFeatures,
       });
+      setOverrides({ name, status });
       setEditOpen(false);
-      router.refresh();
     } catch (caught) {
       setSaveError(
         caught instanceof Error
@@ -144,7 +144,7 @@ export default function ProjectDetailHeader({
 
     try {
       await markProjectDone(project.id);
-      router.refresh();
+      setOverrides((prev) => ({ ...prev, status: "completed" }));
     } catch (caught) {
       setMarkDoneError(
         caught instanceof Error
@@ -158,39 +158,19 @@ export default function ProjectDetailHeader({
 
   return (
     <header>
-      <Breadcrumb className="mb-2">
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link href={pathsConfig.app.projects}>Projects</Link>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link
-                href={`${pathsConfig.app.projects}/${project.id}`}
-                aria-current="page"
-              >
-                {project.name}
-              </Link>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <H1>
-            {project.name}
-            {project.status && (
+            {view.name}
+            {view.status && (
               <Badge variant="secondary" className="ml-2 align-middle">
-                {project.status}
+                {view.status}
               </Badge>
             )}
           </H1>
-          {project.tagline && (
+          {view.tagline && (
             <p className="mt-1 text-sm text-muted-foreground">
-              {project.tagline}
+              {view.tagline}
             </p>
           )}
         </div>
@@ -216,7 +196,7 @@ export default function ProjectDetailHeader({
                       id="project-name"
                       name="name"
                       required
-                      defaultValue={project.name}
+                      defaultValue={view.name}
                     />
                   </div>
                   <div className="flex flex-col gap-2">
@@ -224,7 +204,7 @@ export default function ProjectDetailHeader({
                     <Input
                       id="project-tagline"
                       name="tagline"
-                      defaultValue={project.tagline ?? ""}
+                      defaultValue={view.tagline ?? ""}
                     />
                   </div>
                   <div className="grid gap-4 sm:grid-cols-2">
@@ -233,7 +213,7 @@ export default function ProjectDetailHeader({
                       <Input
                         id="project-status"
                         name="status"
-                        defaultValue={project.status ?? ""}
+                        defaultValue={view.status ?? ""}
                       />
                     </div>
                     <div className="flex flex-col gap-2">
@@ -241,7 +221,7 @@ export default function ProjectDetailHeader({
                       <Input
                         id="project-code"
                         name="projectCode"
-                        defaultValue={project.projectCode ?? ""}
+                        defaultValue={view.projectCode ?? ""}
                       />
                     </div>
                     <div className="flex flex-col gap-2">
@@ -250,7 +230,7 @@ export default function ProjectDetailHeader({
                         id="project-start"
                         name="startDate"
                         type="date"
-                        defaultValue={project.startDate ?? ""}
+                        defaultValue={view.startDate ?? ""}
                       />
                     </div>
                     <div className="flex flex-col gap-2">
@@ -259,7 +239,7 @@ export default function ProjectDetailHeader({
                         id="project-end"
                         name="endDate"
                         type="date"
-                        defaultValue={project.endDate ?? ""}
+                        defaultValue={view.endDate ?? ""}
                       />
                     </div>
                   </div>
@@ -407,9 +387,9 @@ export default function ProjectDetailHeader({
           </div>
         )}
       </div>
-      {[project.projectCode, dateRange].some(Boolean) && (
+      {[view.projectCode, dateRange].some(Boolean) && (
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
-          {project.projectCode && <span>{project.projectCode}</span>}
+          {view.projectCode && <span>{view.projectCode}</span>}
           {dateRange && <span>{dateRange}</span>}
         </div>
       )}

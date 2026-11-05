@@ -1,6 +1,7 @@
 import { updateTag } from "next/cache";
 
 export const CACHE_TAGS = {
+  applicants: "applicants",
   careersJobListings: "careers-job-listings",
   codevsFeaturedProjects: "codevs-featured-projects",
   codevsProfiles: "codevs-profiles",

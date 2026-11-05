@@ -5,7 +5,8 @@ import { createClientAnon } from "@/lib/global/supabase-anon";
 import type { CodevsFeaturedProjects, ProjectRow } from "@/types/global/lib";
 
 
-const PROJECT_SELECT = "id, name, description, main_image, status";
+const PROJECT_SELECT = "main_image";
+const FEATURED_PROJECT_LIMIT = 10;
 const FALLBACK_IMAGE = "/assets/images/index/projects-large.jpg";
 
 function resolveProjectImageUrl(mainImage: string | null | undefined): string {
@@ -38,14 +39,16 @@ export async function getCodevsFeaturedProjects(
   const { data, error } = await supabase
     .from("projects")
     .select(PROJECT_SELECT)
-    .order("created_at", { ascending: false });
+    .eq("public_display", true)
+    .order("created_at", { ascending: false })
+    .limit(FEATURED_PROJECT_LIMIT);
 
   if (error) {
     console.error("Supabase query error (codevs-featured-projects):", error);
     return null;
   }
 
-  const rows = data as ProjectRow[];
+  const rows = data as Pick<ProjectRow, "main_image">[];
   const slides = rows.map((project) =>
     resolveProjectImageUrl(project.main_image),
   );
