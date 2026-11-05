@@ -14,7 +14,7 @@ export async function applicantTakeTest({
     const identity = await requireIdentity();
 
     if (codevId !== identity.userId) {
-        throw new AuthorizationError("Forbidden");
+        throw new AuthorizationError("forbidden", "Forbidden");
     }
 
     try {
@@ -64,7 +64,7 @@ export async function applicantMoveToOnboard({
     const identity = await requireIdentity();
 
     if (codevId !== identity.userId) {
-        throw new AuthorizationError("Forbidden");
+        throw new AuthorizationError("forbidden", "Forbidden");
     }
 
     try {

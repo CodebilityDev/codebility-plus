@@ -12,10 +12,15 @@ export interface Identity {
   hasFullAccess: boolean;
 }
 
+export type AuthorizationCode = "unauthenticated" | "forbidden";
+
 export class AuthorizationError extends Error {
-  constructor(message: string) {
+  readonly code: AuthorizationCode;
+
+  constructor(code: AuthorizationCode, message: string) {
     super(message);
     this.name = "AuthorizationError";
+    this.code = code;
   }
 }
 
@@ -47,7 +52,7 @@ export async function requireIdentity(): Promise<Identity> {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    throw new AuthorizationError("Unauthorized");
+    throw new AuthorizationError("unauthenticated", "Unauthorized");
   }
 
   const access = await getAccess();
@@ -63,58 +68,66 @@ export async function requireIdentity(): Promise<Identity> {
 }
 
 export async function authorize(
-  permission?: PermissionKey,
+  permission: PermissionKey,
   resource?: { table: string; id: string },
 ): Promise<Identity> {
   const identity = await requireIdentity();
 
-  if (permission && !identity.permissions[permission]) {
+  if (!identity.permissions[permission]) {
     throw new AuthorizationError(
+      "forbidden",
       `Forbidden: missing permission "${permission}"`,
     );
   }
 
   if (resource && !identity.hasFullAccess) {
-    const startedAt = performance.now();
-    const supabase = await createClientServerComponent();
-
-    const client = supabase as unknown as {
-      from: (table: string) => {
-        select: (columns: string) => {
-          eq: (
-            column: string,
-            value: string,
-          ) => {
-            single: () => Promise<{
-              data: Record<string, unknown> | null;
-              error: unknown;
-            }>;
-          };
-        };
-      };
-    };
-
-    const { data, error } = await client
-      .from(resource.table)
-      .select("*")
-      .eq("id", resource.id)
-      .single();
-
-    logPerf("authorize.resource", startedAt);
-
-    if (error || !data) {
-      throw new AuthorizationError("Forbidden: resource not accessible");
-    }
-
-    const owner = ownerOf(
-      resource.table,
-      data,
-    );
-
-    if (owner !== identity.userId) {
-      throw new AuthorizationError("Forbidden: not the owner");
-    }
+    await assertOwnership(identity, resource);
   }
 
   return identity;
+}
+
+async function assertOwnership(
+  identity: Identity,
+  resource: { table: string; id: string },
+): Promise<void> {
+  const startedAt = performance.now();
+  const supabase = await createClientServerComponent();
+
+  const client = supabase as unknown as {
+    from: (table: string) => {
+      select: (columns: string) => {
+        eq: (
+          column: string,
+          value: string,
+        ) => {
+          maybeSingle: () => Promise<{
+            data: Record<string, unknown> | null;
+            error: unknown;
+          }>;
+        };
+      };
+    };
+  };
+
+  const { data, error } = await client
+    .from(resource.table)
+    .select("*")
+    .eq("id", resource.id)
+    .maybeSingle();
+
+  logPerf("authorize.resource", startedAt);
+
+  if (error || !data) {
+    throw new AuthorizationError(
+      "forbidden",
+      "Forbidden: resource not accessible",
+    );
+  }
+
+  const owner = ownerOf(resource.table, data);
+
+  if (owner !== identity.userId) {
+    throw new AuthorizationError("forbidden", "Forbidden: not the owner");
+  }
 }

@@ -191,6 +191,8 @@ export async function deleteProject(projectId: string): Promise<void> {
 }
 
 export async function markProjectDone(projectId: string): Promise<void> {
+  await authorize("projects");
+
   const id = projectIdSchema.parse(projectId);
 
   const codev = await getCurrentCodev();

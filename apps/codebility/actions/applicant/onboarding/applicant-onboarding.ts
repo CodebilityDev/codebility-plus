@@ -1,18 +1,31 @@
 "use server";
-import { requireIdentity } from "@/lib/global/authorize";
+import { AuthorizationError, requireIdentity } from "@/lib/global/authorize";
 
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import { revalidatePath } from "next/cache";
 
-export async function getOnboardingProgress(applicantId: string) {
+export async function getOnboardingProgress(_applicantId: string) {
   try {
-    await requireIdentity();
+    const identity = await requireIdentity();
   const supabase = await createClientServerComponent();
+
+    const { data: applicant } = await supabase
+      .from("applicant")
+      .select("id")
+      .eq("codev_id", identity.userId)
+      .maybeSingle();
+
+    if (!applicant) {
+      throw new AuthorizationError(
+        "forbidden",
+        "Forbidden: not your applicant record",
+      );
+    }
 
     const { data, error } = await supabase
       .from("onboarding_videos")
       .select("video_number, completed, watched_duration, total_duration")
-      .eq("applicant_id", applicantId)
+      .eq("applicant_id", applicant.id)
       .order("video_number", { ascending: true });
 
     if (error) {
@@ -43,7 +56,7 @@ export async function getOnboardingProgress(applicantId: string) {
 }
 
 export async function updateVideoProgress({
-  applicantId,
+  applicantId: _applicantId,
   videoNumber,
   watchedDuration,
   totalDuration,
@@ -56,14 +69,27 @@ export async function updateVideoProgress({
   completed: boolean;
 }) {
   try {
-    await requireIdentity();
+    const identity = await requireIdentity();
   const supabase = await createClientServerComponent();
+
+    const { data: applicant } = await supabase
+      .from("applicant")
+      .select("id")
+      .eq("codev_id", identity.userId)
+      .maybeSingle();
+
+    if (!applicant) {
+      throw new AuthorizationError(
+        "forbidden",
+        "Forbidden: not your applicant record",
+      );
+    }
 
     // Check if record exists
     const { data: existingRecord } = await supabase
       .from("onboarding_videos")
       .select("id, completed")
-      .eq("applicant_id", applicantId)
+      .eq("applicant_id", applicant.id)
       .eq("video_number", videoNumber)
       .single();
 
@@ -89,7 +115,7 @@ export async function updateVideoProgress({
     } else {
       // Create new record
       const { error } = await supabase.from("onboarding_videos").insert({
-        applicant_id: applicantId,
+        applicant_id: applicant.id,
         video_number: videoNumber,
         ...updateData,
       });
@@ -109,7 +135,7 @@ export async function updateVideoProgress({
 }
 
 export async function saveQuizProgress({
-  applicantId,
+  applicantId: _applicantId,
   quizScore,
   quizTotal,
   passed,
@@ -120,8 +146,21 @@ export async function saveQuizProgress({
   passed: boolean;
 }) {
   try {
-    await requireIdentity();
+    const identity = await requireIdentity();
   const supabase = await createClientServerComponent();
+
+    const { data: applicant } = await supabase
+      .from("applicant")
+      .select("id")
+      .eq("codev_id", identity.userId)
+      .maybeSingle();
+
+    if (!applicant) {
+      throw new AuthorizationError(
+        "forbidden",
+        "Forbidden: not your applicant record",
+      );
+    }
 
     const { error } = await supabase
       .from("applicant")
@@ -132,7 +171,7 @@ export async function saveQuizProgress({
         quiz_completed_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
-      .eq("id", applicantId);
+      .eq("id", applicant.id);
 
     if (error) {
       console.error("Error saving quiz progress:", error);
@@ -149,7 +188,7 @@ export async function saveQuizProgress({
 }
 
 export async function saveQuizAndCommitment({
-  applicantId,
+  applicantId: _applicantId,
   quizScore,
   quizTotal,
   signature,
@@ -162,8 +201,21 @@ export async function saveQuizAndCommitment({
   canDoMobile: boolean;
 }) {
   try {
-    await requireIdentity();
+    const identity = await requireIdentity();
   const supabase = await createClientServerComponent();
+
+    const { data: applicant } = await supabase
+      .from("applicant")
+      .select("id")
+      .eq("codev_id", identity.userId)
+      .maybeSingle();
+
+    if (!applicant) {
+      throw new AuthorizationError(
+        "forbidden",
+        "Forbidden: not your applicant record",
+      );
+    }
 
     const { error } = await supabase
       .from("applicant")
@@ -175,7 +227,7 @@ export async function saveQuizAndCommitment({
         commitment_signed_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
-      .eq("id", applicantId);
+      .eq("id", applicant.id);
 
     if (error) {
       console.error("Error saving quiz and commitment:", error);
@@ -193,10 +245,18 @@ export async function saveQuizAndCommitment({
 
 export async function completeOnboarding(codevId: string, newStatus = "waitlist") {
   try {
-    await requireIdentity();
+    const identity = await requireIdentity();
+
+    if (codevId !== identity.userId) {
+      throw new AuthorizationError("forbidden", "Forbidden: not your account");
+    }
+
+    if (newStatus !== "waitlist") {
+      throw new AuthorizationError("forbidden", "Forbidden: invalid status transition");
+    }
+
   const supabase = await createClientServerComponent();
 
-    // Update codev status to waitlist (or specified status)
     const { error } = await supabase
       .from("codev")
       .update({
@@ -210,26 +270,22 @@ export async function completeOnboarding(codevId: string, newStatus = "waitlist"
       return { success: false, error };
     }
 
-    // If transitioning to waitlist, save the timestamp in applicant table
-    if (newStatus === "waitlist") {
-      const { data: applicantData } = await supabase
+    const { data: applicantData } = await supabase
+      .from("applicant")
+      .select("id")
+      .eq("codev_id", codevId)
+      .single();
+
+    if (applicantData) {
+      const { error: applicantError } = await supabase
         .from("applicant")
-        .select("id")
-        .eq("codev_id", codevId)
-        .single();
+        .update({
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", applicantData.id);
 
-      if (applicantData) {
-        const { error: applicantError } = await supabase
-          .from("applicant")
-          .update({
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", applicantData.id);
-
-        if (applicantError) {
-          console.error("Error updating applicant waitlist timestamp:", applicantError);
-          // Don't fail the whole operation if this fails
-        }
+      if (applicantError) {
+        console.error("Error updating applicant waitlist timestamp:", applicantError);
       }
     }
 

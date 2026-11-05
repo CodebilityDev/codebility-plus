@@ -7,26 +7,35 @@ const quiet = process.argv.includes("--quiet");
 
 if (process.argv.includes("--help")) {
   console.log("Usage: node scripts/check-authorization.mjs [--quiet]");
+  console.log(
+    "Fails when a mutation exported from actions/** does not call authorize() or requireIdentity() before touching Supabase.",
+  );
   process.exit(0);
 }
 
 const PUBLIC = new Set([
-  "actions/global/nda-storage.ts",
-  "actions/marketing/careers/job-application.ts",
-  "actions/marketing/contact/contact-appointment.ts",
-  "actions/global/permissions.ts",
-  "actions/global/current-user.ts",
-  "actions/global/nav-user.ts",
-  "actions/global/marketing-profiles.ts",
+  "actions/auth/**",
+  "actions/marketing/**",
   "actions/global/auth-declined.ts",
-  "actions/auth/onboarding/onboarding-team.ts",
+  "actions/global/current-user.ts",
+  "actions/global/marketing-profiles.ts",
+  "actions/global/nav-user.ts",
+  "actions/global/permissions.ts",
+  "actions/global/auth-session.ts#signupUser",
+  "actions/global/auth-session.ts#signinUser",
+  "actions/global/auth-session.ts#resendVerificationEmail",
+  "actions/global/nda-storage.ts#uploadNdaToStorage",
+  "actions/global/nda-storage.ts#updateCodevNdaUrls",
+  "actions/global/nda-storage.ts#completeNdaSigning",
+  "actions/global/nda-storage.ts#completeNdaRequest",
+  "actions/global/account-settings.ts#checkUsernameAvailability",
+  "actions/global/account-settings.ts#getUsernameData",
 ]);
 
-const EXPORT = /^export\s+(?:(?:async\s+)?function|const\s+\w+\s*=\s*async)\s+(\w+)/gm;
-const GUARD = /\b(?:authorize|requireIdentity)\s*\(/;
-const READ = /^(get|list|search|find|read)/i;
-const MUTATION_PREFIX =
-  /^(create|update|delete|upsert|upload|save|complete|pass|deny|accept|move|reset|sync|add|remove|mark|submit|take|ensure)/i;
+const MUTATION =
+  /\.(?:insert|update|delete|upsert|rpc|upload|remove|move)\s*\(|auth\.updateUser\s*\(|auth\.admin\./;
+const DATA_ACCESS = /\.from\(|\.storage\b|\.rpc\(|supabase\.auth\./;
+const GUARD = /await\s+(?:authorize|requireIdentity)\s*\(/;
 
 function filesUnder(dir) {
   const files = [];
@@ -38,54 +47,76 @@ function filesUnder(dir) {
   return files;
 }
 
-function isMutation(name) {
-  if (name.includes("Action") || MUTATION_PREFIX.test(name)) return true;
-  return !READ.test(name);
+function isPublic(relative, name) {
+  if (PUBLIC.has(relative)) return true;
+  if (PUBLIC.has(`${relative}#${name}`)) return true;
+  for (const entry of PUBLIC) {
+    if (!entry.endsWith("**")) continue;
+    const prefix = entry.slice(0, -2);
+    if (relative.startsWith(prefix)) return true;
+  }
+  return false;
 }
 
-let checked = 0;
+function exportsOf(source) {
+  const starts = [];
+  const pattern = /^export\s+(?:async\s+)?(?:function|const)\s+(\w+)/gm;
+  let match;
+  while ((match = pattern.exec(source)) !== null) {
+    starts.push({ name: match[1], index: match.index });
+  }
+  return starts.map((start, i) => ({
+    name: start.name,
+    body: source.slice(start.index, i + 1 < starts.length ? starts[i + 1].index : source.length),
+  }));
+}
+
+let files = 0;
+let mutations = 0;
 let guarded = 0;
 let publicCount = 0;
-let failed = 0;
-const skipped = [];
 const failures = [];
+const skipped = [];
 
 for (const file of filesUnder(actionsDir).sort()) {
-  checked += 1;
+  files += 1;
   const relative = path.relative(root, file).split(path.sep).join("/");
-
-  if (PUBLIC.has(relative)) {
-    publicCount += 1;
-    skipped.push(relative);
-    continue;
-  }
-
   const source = readFileSync(file, "utf8");
 
-  if (GUARD.test(source)) {
+  for (const exported of exportsOf(source)) {
+    if (!MUTATION.test(exported.body)) continue;
+    mutations += 1;
+
+    if (isPublic(relative, exported.name)) {
+      publicCount += 1;
+      skipped.push(`${relative}#${exported.name}`);
+      continue;
+    }
+
+    const guard = exported.body.search(GUARD);
+    const access = exported.body.search(DATA_ACCESS);
+
+    if (guard === -1) {
+      failures.push(`${relative}#${exported.name} mutates without a guard`);
+      continue;
+    }
+
+    if (access !== -1 && guard > access) {
+      failures.push(`${relative}#${exported.name} touches the database before guarding`);
+      continue;
+    }
+
     guarded += 1;
-    continue;
-  }
-
-  const mutations = [...source.matchAll(EXPORT)]
-    .map((match) => match[1])
-    .filter(isMutation);
-
-  if (mutations.length > 0) {
-    failed += 1;
-    failures.push(
-      `${relative} ${mutations.length} unguarded mutation(s): ${mutations.join(", ")}`,
-    );
   }
 }
 
 if (!quiet) {
-  for (const relative of skipped) console.log(`${relative} skipped`);
-  for (const line of failures) console.log(line);
+  for (const entry of skipped) console.log(`public ${entry}`);
+  for (const failure of failures) console.log(`FAIL ${failure}`);
 }
 
 console.log(
-  `checked=${checked} files, guarded=${guarded}, public=${publicCount}, failed=${failed}`,
+  `checked=${files} files, mutations=${mutations}, guarded=${guarded}, public=${publicCount}, failed=${failures.length}`,
 );
 
-process.exitCode = failed > 0 ? 1 : 0;
+process.exitCode = failures.length > 0 ? 1 : 0;

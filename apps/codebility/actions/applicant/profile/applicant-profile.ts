@@ -1,7 +1,6 @@
 "use server";
 import { requireIdentity } from "@/lib/global/authorize";
 
-import { cachedUser } from "@/lib/applicant/profile/supabase-action";
 import { CACHE_TAGS, expireCodevCaches } from "@/lib/global/cache-tags";
 import type {
   JobStatus,
@@ -22,11 +21,8 @@ type EducationUpdate = Database["public"]["Tables"]["education"]["Update"];
 // Codev profile functions
 export async function updateCodev(updatedData: CodevUpdate) {
   try {
-    await requireIdentity();
+    const identity = await requireIdentity();
   const supabase = await createClientServerComponent();
-
-    const user = await cachedUser();
-    if (!user?.id) throw new Error("User not found");
 
     const { data, error } = await supabase
       .from("codev")
@@ -34,7 +30,7 @@ export async function updateCodev(updatedData: CodevUpdate) {
         ...updatedData,
         updated_at: new Date().toISOString(),
       })
-      .eq("id", user.id)
+      .eq("id", identity.userId)
       .select("id");
 
     if (error) throw error;
@@ -54,18 +50,15 @@ export async function updateSocialLinks(socialData: {
   portfolio_website?: string;
 }) {
   try {
-    await requireIdentity();
+    const identity = await requireIdentity();
   const supabase = await createClientServerComponent();
-    const user = await cachedUser();
-    if (!user?.id) throw new Error("User not found");
-
     const { data, error } = await supabase
       .from("codev")
       .update({
         ...socialData,
         updated_at: new Date().toISOString(),
       })
-      .eq("id", user.id)
+      .eq("id", identity.userId)
       .select("id");
 
     if (error) throw error;
@@ -82,16 +75,13 @@ export async function createWorkExperience(
   workExp: Omit<WorkExperience, "id">,
 ) {
   try {
-    await requireIdentity();
+    const identity = await requireIdentity();
   const supabase = await createClientServerComponent();
-    const user = await cachedUser();
-    if (!user?.id) throw new Error("User not found");
-
     const { data, error } = await supabase
       .from("work_experience")
       .insert({
         ...workExp,
-        codev_id: user.id,
+        codev_id: identity.userId,
       })
       .select();
 
@@ -110,15 +100,12 @@ export async function updateWorkExperience(
   expData: Partial<WorkExperience>,
 ) {
   try {
-    await requireIdentity();
+    const identity = await requireIdentity();
   const supabase = await createClientServerComponent();
-    const user = await cachedUser();
-    if (!user?.id) throw new Error("User not found");
-
     const { data, error } = await supabase
       .from("work_experience")
       .update(expData)
-      .eq("codev_id", user.id)
+      .eq("codev_id", identity.userId)
       .eq("id", id)
       .select();
 
@@ -134,15 +121,12 @@ export async function updateWorkExperience(
 
 export async function deleteWorkExperience(id: string) {
   try {
-    await requireIdentity();
+    const identity = await requireIdentity();
   const supabase = await createClientServerComponent();
-    const user = await cachedUser();
-    if (!user?.id) throw new Error("User not found");
-
     const { error } = await supabase
       .from("work_experience")
       .delete()
-      .eq("codev_id", user.id)
+      .eq("codev_id", identity.userId)
       .eq("id", id);
 
     if (error) throw error;
@@ -157,16 +141,13 @@ export async function deleteWorkExperience(id: string) {
 // Education functions
 export async function createEducation(education: EducationInsert) {
   try {
-    await requireIdentity();
+    const identity = await requireIdentity();
   const supabase = await createClientServerComponent();
-    const user = await cachedUser();
-    if (!user?.id) throw new Error("User not found");
-
     const { data, error } = await supabase
       .from("education")
       .insert({
         ...education,
-        codev_id: user.id,
+        codev_id: identity.userId,
       })
       .select();
 
@@ -184,15 +165,12 @@ export async function updateEducation(
   educationData: EducationUpdate,
 ) {
   try {
-    await requireIdentity();
+    const identity = await requireIdentity();
   const supabase = await createClientServerComponent();
-    const user = await cachedUser();
-    if (!user?.id) throw new Error("User not found");
-
     const { data, error } = await supabase
       .from("education")
       .update(educationData)
-      .eq("codev_id", user.id)
+      .eq("codev_id", identity.userId)
       .eq("id", id)
       .select();
 
@@ -207,15 +185,12 @@ export async function updateEducation(
 
 export async function deleteEducation(id: string) {
   try {
-    await requireIdentity();
+    const identity = await requireIdentity();
   const supabase = await createClientServerComponent();
-    const user = await cachedUser();
-    if (!user?.id) throw new Error("User not found");
-
     const { error } = await supabase
       .from("education")
       .delete()
-      .eq("codev_id", user.id)
+      .eq("codev_id", identity.userId)
       .eq("id", id);
 
     if (error) throw error;
@@ -226,17 +201,16 @@ export async function deleteEducation(id: string) {
   }
 }
 
-export async function getEducation(codevId: string) {
+export async function getEducation(_codevId: string) {
   try {
-    await requireIdentity();
+    const identity = await requireIdentity();
   const supabase = await createClientServerComponent();
-
     const { data, error } = await supabase
       .from("education")
       .select(
         "id, codev_id, institution, degree, major_subject, description, achievements, start_date, end_date, created_at, updated_at",
       )
-      .eq("codev_id", codevId)
+      .eq("codev_id", identity.userId)
       .order("start_date", { ascending: false });
 
     if (error) throw error;
@@ -251,11 +225,8 @@ export async function updateWorkSchedule(
   schedule: Omit<WorkSchedule, "id" | "created_at" | "updated_at">,
 ) {
   try {
-    await requireIdentity();
+    const identity = await requireIdentity();
   const supabase = await createClientServerComponent();
-    const user = await cachedUser();
-    if (!user?.id) throw new Error("User not found");
-
 
 
     const validDays = [
@@ -279,7 +250,7 @@ export async function updateWorkSchedule(
     const { error: deleteError } = await supabase
       .from("work_schedules")
       .delete()
-      .eq("codev_id", user.id);
+      .eq("codev_id", identity.userId);
 
     if (deleteError) {
       console.error(
@@ -293,7 +264,7 @@ export async function updateWorkSchedule(
     const { data, error: insertError } = await supabase
       .from("work_schedules")
       .insert({
-        codev_id: user.id,
+        codev_id: identity.userId,
         days_of_week: sanitizedDays,
         start_time: schedule.start_time,
         end_time: schedule.end_time,
@@ -320,15 +291,14 @@ export async function updateWorkSchedule(
   }
 }
 
-export async function getWorkSchedule(codevId: string) {
+export async function getWorkSchedule(_codevId: string) {
   try {
-    await requireIdentity();
+    const identity = await requireIdentity();
   const supabase = await createClientServerComponent();
-
     const { data, error } = await supabase
       .from("work_schedules")
       .select("id, codev_id, days_of_week, start_time, end_time, created_at, updated_at")
-      .eq("codev_id", codevId)
+      .eq("codev_id", identity.userId)
       .single();
 
     if (error) throw error;
@@ -341,17 +311,14 @@ export async function getWorkSchedule(codevId: string) {
 
 export async function createJobStatus(jobStatus: Omit<JobStatus, "id">) {
   try {
-    await requireIdentity();
+    const identity = await requireIdentity();
   const supabase = await createClientServerComponent();
-    const user = await cachedUser();
-    if (!user?.id) throw new Error("User not found");
-
     const { data, error } = await supabase
       .from("job_status")
       .insert({
         ...jobStatus,
         status: "active", // Set default status
-        codev_id: user.id,
+        codev_id: identity.userId,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
@@ -372,17 +339,15 @@ export async function updateJobStatus(
   jobStatusData: Partial<JobStatus>,
 ) {
   try {
-    await requireIdentity();
+    const identity = await requireIdentity();
   const supabase = await createClientServerComponent();
-    const user = await cachedUser();
-    if (!user?.id) throw new Error("User not found");
-
     const { data, error } = await supabase
       .from("job_status")
       .update({
         ...jobStatusData,
         updated_at: new Date().toISOString(),
       })
+      .eq("codev_id", identity.userId)
       .eq("id", id)
       .select("id")
       .single();
@@ -398,15 +363,12 @@ export async function updateJobStatus(
 
 export async function deleteJobStatus(id: string) {
   try {
-    await requireIdentity();
+    const identity = await requireIdentity();
   const supabase = await createClientServerComponent();
-    const user = await cachedUser();
-    if (!user?.id) throw new Error("User not found");
-
     const { error } = await supabase
       .from("job_status")
       .delete()
-      .eq("codev_id", user.id)
+      .eq("codev_id", identity.userId)
       .eq("id", id);
 
     if (error) throw error;
@@ -417,16 +379,16 @@ export async function deleteJobStatus(id: string) {
   }
 }
 
-export async function getJobStatuses(codevId: string) {
+export async function getJobStatuses(_codevId: string) {
   try {
-    await requireIdentity();
+    const identity = await requireIdentity();
   const supabase = await createClientServerComponent();
     const { data, error } = await supabase
       .from("job_status")
       .select(
         "id, codev_id, job_title, company_name, employment_type, description, status, salary_range, work_setup, shift, hours_per_week, created_at, updated_at",
       )
-      .eq("codev_id", codevId);
+      .eq("codev_id", identity.userId);
 
     if (error) throw error;
     return data;

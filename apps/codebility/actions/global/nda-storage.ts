@@ -1,5 +1,6 @@
 "use server";
 
+import { AuthorizationError, requireIdentity } from "@/lib/global/authorize";
 import { CACHE_TAGS } from "@/lib/global/cache-tags";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import type { UploadImageOptions, NdaUploadResult, UserData } from "@/types/global/actions";
@@ -234,6 +235,12 @@ export async function deleteNdaFile(
   filePath: string,
   bucket = "codebility"
 ): Promise<boolean> {
+  const identity = await requireIdentity();
+
+  if (!filePath.includes(identity.userId)) {
+    throw new AuthorizationError("forbidden", "Forbidden: not your file");
+  }
+
   const supabase = await createClientServerComponent();
   
   try {

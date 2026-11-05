@@ -3,7 +3,7 @@
 import { updateCodev } from "@/actions/applicant/profile/applicant-profile";
 import { expireCodevCaches } from "@/lib/global/cache-tags";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
-import { requireIdentity } from "@/lib/global/authorize";
+import { AuthorizationError, requireIdentity } from "@/lib/global/authorize";
 import type { UploadImageOptions } from "@/types/applicant/profile/profile";
 
 
@@ -69,6 +69,12 @@ export async function deleteImage(
   filePath: string,
   bucket = "codebility",
 ) {
+  const identity = await requireIdentity();
+
+  if (!filePath.startsWith(`${identity.userId}/`)) {
+    throw new AuthorizationError("forbidden", "Forbidden: not your file");
+  }
+
   const supabase = await createClientServerComponent();
   try {
     const { error } = await supabase.storage.from(bucket).remove([filePath]);

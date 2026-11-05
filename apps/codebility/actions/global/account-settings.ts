@@ -1,12 +1,19 @@
 "use server";
 
+import { AuthorizationError, requireIdentity } from "@/lib/global/authorize";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import { revalidatePath } from "next/cache";
 
 export const updatePassword = async (formData: FormData) => {
+    const identity = await requireIdentity();
+
     const email = formData.get("email") as string;
     const password = formData.get("currentPassword") as string;
     const newPassword = formData.get("newPassword") as string;
+
+    if (email !== identity.codev?.email_address) {
+        throw new AuthorizationError("forbidden", "Forbidden: not your account");
+    }
 
     const supabase = await createClientServerComponent();
 
@@ -114,6 +121,12 @@ export const getUsernameData = async (userId: string) => {
 
 // Update username
 export const updateUsername = async (userId: string, newUsername: string) => {
+    const identity = await requireIdentity();
+
+    if (userId !== identity.userId) {
+        throw new AuthorizationError("forbidden", "Forbidden: not your account");
+    }
+
     const supabase = await createClientServerComponent();
 
     // 1. Validate username format
