@@ -10,9 +10,14 @@ import type { StageState } from "@/types/home/applicants/applicants";
 import { Checkbox } from "@codevs/ui/checkbox";
 import type { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, Check, Dot, Circle, X } from "lucide-react";
-import Link from "next/link";
 import type { ReactNode } from "react";
 
+const externalHref = (value: string | null | undefined) => {
+  const href = value?.trim();
+  if (!href) return null;
+  const absolute = /^https?:\/\//i.test(href) ? href : `https://${href}`;
+  return /^https?:\/\/[^\s/]+\.[^\s/]+/i.test(absolute) ? absolute : null;
+};
 
 export const STATE_BADGE: Record<StageState, { text: string; className: string }> = {
   completed: {
@@ -145,46 +150,52 @@ export const baseColumns: ColumnDef<NewApplicantType>[] = [
     ),
     cell: ({ row }) => {
       const applicant = row.original;
+      const githubUrl = externalHref(applicant.github);
+      const facebookUrl = externalHref(applicant.facebook);
+      const portfolioUrl = externalHref(applicant.portfolio_website);
 
       return (
         <div className="flex items-center justify-start gap-1 px-2 py-2">
-          {applicant.github ? (
-            <Link
-              href={applicant.github}
+          {githubUrl ? (
+            <a
+              href={githubUrl}
               target="_blank"
+              rel="noopener noreferrer"
               className="rounded-full p-1 text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200"
               title="GitHub"
             >
               <IconGithub className="h-3.5 w-3.5 invert dark:invert-0" />
-            </Link>
+            </a>
           ) : (
             <div className="w-5 h-5"></div>
           )}
-          {applicant.facebook ? (
-            <Link
-              href={applicant.facebook}
+          {facebookUrl ? (
+            <a
+              href={facebookUrl}
               target="_blank"
+              rel="noopener noreferrer"
               className="rounded-full p-1 text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200"
               title="Facebook"
             >
               <IconFacebook className="h-3.5 w-3.5 invert dark:invert-0" />
-            </Link>
+            </a>
           ) : (
             <div className="w-5 h-5"></div>
           )}
-          {applicant.portfolio_website ? (
-            <Link
-              href={applicant.portfolio_website}
+          {portfolioUrl ? (
+            <a
+              href={portfolioUrl}
               target="_blank"
+              rel="noopener noreferrer"
               className="rounded-full p-1 text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200"
               title="Portfolio"
             >
               <IconLink className="h-3.5 w-3.5 invert dark:invert-0" />
-            </Link>
+            </a>
           ) : (
             <div className="w-5 h-5"></div>
           )}
-          {!applicant.github && !applicant.facebook && !applicant.portfolio_website && (
+          {!githubUrl && !facebookUrl && !portfolioUrl && (
             <span className="text-xs text-gray-500 dark:text-gray-500">
               None
             </span>
@@ -250,7 +261,7 @@ export const baseColumns: ColumnDef<NewApplicantType>[] = [
         <div className="flex flex-col items-center justify-center gap-0.5 px-2 py-2">
           <span className="text-xs font-medium text-gray-900 dark:text-gray-100">
             {applicant.date_applied
-              ? new Date(applicant.date_applied).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' })
+              ? new Date(applicant.date_applied).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit', timeZone: 'Asia/Manila' })
               : "N/A"}
           </span>
           {applicant.application_status !== "denied" && (
@@ -292,7 +303,7 @@ export const baseColumns: ColumnDef<NewApplicantType>[] = [
         <div className="flex flex-col items-center justify-center gap-0.5 px-2 py-2">
           <span className="text-[10px] font-medium text-gray-900 dark:text-gray-100">
             {applicant.applicant?.test_taken
-              ? new Date(applicant.applicant.test_taken).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+              ? new Date(applicant.applicant.test_taken).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'Asia/Manila' })
               : "Not taken"}
           </span>
           <div className="text-[10px]">
@@ -318,18 +329,19 @@ export const baseColumns: ColumnDef<NewApplicantType>[] = [
     ),
     cell: ({ row }) => {
       const applicant = row.original;
+      const forkUrl = externalHref(applicant.applicant?.fork_url);
 
       return (
         <div className="flex items-center justify-center px-2 py-2">
-          {applicant.applicant?.fork_url ? (
-            <Link
-              href={applicant.applicant.fork_url}
+          {forkUrl ? (
+            <a
+              href={forkUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="rounded-full p-1 text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200"
             >
               <IconLink className="h-3.5 w-3.5 text-gray-600 dark:text-gray-200" />
-            </Link>
+            </a>
           ) : (
             <span className="text-xs text-gray-500 dark:text-gray-500">
               N/A
@@ -457,7 +469,7 @@ export const waitlistColumns: ColumnDef<NewApplicantType>[] = [
                 Signed
               </span>
               <span className="text-[10px] text-gray-500 dark:text-gray-400">
-                {new Date(commitmentSigned).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                {new Date(commitmentSigned).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'Asia/Manila' })}
               </span>
             </div>
           ) : (
@@ -496,10 +508,10 @@ export const waitlistColumns: ColumnDef<NewApplicantType>[] = [
           {waitlistEntered ? (
             <div className="flex flex-col items-center gap-0.5">
               <span className="text-xs font-medium text-gray-900 dark:text-gray-100">
-                {new Date(waitlistEntered).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' })}
+                {new Date(waitlistEntered).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit', timeZone: 'Asia/Manila' })}
               </span>
               <span className="text-[10px] text-gray-500 dark:text-gray-400">
-                {new Date(waitlistEntered).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                {new Date(waitlistEntered).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Manila' })}
               </span>
             </div>
           ) : (

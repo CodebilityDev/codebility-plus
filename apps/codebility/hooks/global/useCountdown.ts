@@ -35,9 +35,7 @@ export function useDeferredCountdown(target: Date): TimeLeft | null {
 }
 
 function useRunningCountdown(target: Date): TimeLeft | null {
-  const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(() =>
-    typeof window === "undefined" ? null : splitTimeLeft(target),
-  );
+  const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
 
   useEffect(() => {
     const tick = () => {
