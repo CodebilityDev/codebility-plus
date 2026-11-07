@@ -118,6 +118,25 @@ export const signupUser = async (formData: FormData) => {
       }
     }
 
+    const { data: emailState } = await supabase.rpc("email_status", {
+      p_email: email_address,
+    });
+
+    if (emailState === "registered") {
+      return {
+        success: false,
+        error: "This email is already registered. Please sign in instead.",
+      };
+    }
+
+    if (emailState === "declined") {
+      return {
+        success: false,
+        error:
+          "This email was previously declined. Sign in and reapply from the declined page.",
+      };
+    }
+
     const image_url =
       profileImage && profileImage.size > 0
         ? await uploadProfileImage(profileImage, "profileImage", "codebility")

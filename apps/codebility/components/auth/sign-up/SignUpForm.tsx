@@ -685,7 +685,12 @@ export default function SignUpForm() {
               </Button>
               <Button
                 type="submit"
-                disabled={isSubmitting || !ndaSigned}
+                disabled={
+                  isSubmitting ||
+                  !ndaSigned ||
+                  emailStatus === "registered" ||
+                  emailStatus === "declined"
+                }
                 className="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? "Processing..." : "Apply"}
