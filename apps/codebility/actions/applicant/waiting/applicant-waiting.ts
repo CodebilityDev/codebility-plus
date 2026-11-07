@@ -57,6 +57,8 @@ export async function applicantTakeTest({
     }
 }
 
+const PRIORITY_POSITIONS = ["QA Engineer", "Project Manager", "Admin", "Marketing"];
+
 export async function applicantMoveToOnboard({
     codevId,
 }: {
@@ -68,28 +70,53 @@ export async function applicantMoveToOnboard({
         throw new AuthorizationError("forbidden", "Forbidden");
     }
 
-    try {
-        const supabase = await createClientServerComponent();
+    const supabase = await createClientServerComponent();
 
-        const { error: codevError } = await supabase
+    const { data: profile, error: profileError } = await supabase
+        .from("codev")
+        .select("application_status, display_position")
+        .eq("id", identity.userId)
+        .single();
+
+    if (profileError || !profile) {
+        throw new AuthorizationError("forbidden", "Forbidden: profile not found");
+    }
+
+    if (!PRIORITY_POSITIONS.includes(profile.display_position ?? "")) {
+        throw new AuthorizationError(
+            "forbidden",
+            "Forbidden: this position must take the assessment",
+        );
+    }
+
+    if (profile.application_status === "applying") {
+        const { error: testingError } = await supabase
             .from("codev")
             .update({
-                application_status: "onboarding",
+                application_status: "testing",
                 updated_at: new Date().toISOString(),
             })
             .eq("id", identity.userId);
 
-        if (codevError) {
-            console.error("Error updating codev test:", codevError);
-            return undefined;
+        if (testingError) {
+            throw testingError;
         }
-
-        revalidatePath("/applicant/waiting");
-        updateTag(CACHE_TAGS.applicants);
-    } catch (error) {
-        if (error instanceof AuthorizationError) throw error;
-        console.error("Error taking test:", error);
     }
+
+    const { error: codevError } = await supabase
+        .from("codev")
+        .update({
+            application_status: "onboarding",
+            updated_at: new Date().toISOString(),
+        })
+        .eq("id", identity.userId);
+
+    if (codevError) {
+        throw codevError;
+    }
+
+    revalidatePath("/applicant/waiting");
+    updateTag(CACHE_TAGS.applicants);
 }
 
 export async function applicantSubmitTest({
