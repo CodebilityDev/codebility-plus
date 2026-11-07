@@ -89,6 +89,10 @@ export default function SignUpForm() {
   });
 
   useEffect(() => {
+    form.setValue("tech_stacks", stack);
+  }, [stack, form]);
+
+  useEffect(() => {
     // Check for existing NDA data in localStorage
     const checkNdaData = () => {
       const signature = localStorage.getItem("ndaSignature");
