@@ -333,3 +333,27 @@ export const resendVerificationEmail = async (email: string) => {
     };
   }
 };
+
+export const checkEmailStatus = async (
+  email: string,
+): Promise<"available" | "registered" | "declined"> => {
+  const normalized = email.trim().toLowerCase();
+  if (!normalized) return "available";
+
+  try {
+    const supabase = await createClientServerComponent();
+    const { data, error } = await supabase.rpc("email_status", {
+      p_email: normalized,
+    });
+
+    if (error) {
+      console.error("Email availability check failed:", error);
+      return "available";
+    }
+
+    return data === "declined" || data === "registered" ? data : "available";
+  } catch (error) {
+    console.error("Email availability check failed:", error);
+    return "available";
+  }
+};

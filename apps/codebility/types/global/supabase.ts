@@ -5399,6 +5399,10 @@ export interface Database {
         }
         Returns: boolean
       }
+      email_status: {
+        Args: { p_email: string }
+        Returns: string
+      }
       qualified_codev_ids: {
         Args: { p_min_points: number }
         Returns: { codev_id: string }[]

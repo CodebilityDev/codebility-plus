@@ -16,7 +16,7 @@ import { Checkbox } from "@codevs/ui/checkbox";
 import { Textarea } from "@codevs/ui/textarea";
 import { Toaster } from "@/components/global/ui/toaster";
 
-import { signupUser } from "@/actions/global/auth-session";
+import { checkEmailStatus, signupUser } from "@/actions/global/auth-session";
 import { useModal } from "@/hooks/global/use-modal";
 import { useTechStackStore } from "@/hooks/global/use-techstack";
 
@@ -63,6 +63,9 @@ export default function SignUpForm() {
   const [selectedPositions, setSelectedPositions] = useState<typeof POSITIONS>([]);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [emailStatus, setEmailStatus] = useState<
+    "idle" | "checking" | "available" | "registered" | "declined"
+  >("idle");
 
   const form = useForm<SignupFormData>({
     resolver: zodResolver(SignupFormSchema),
@@ -91,6 +94,30 @@ export default function SignUpForm() {
   useEffect(() => {
     form.setValue("tech_stacks", stack);
   }, [stack, form]);
+
+  const emailValue = form.watch("email_address");
+
+  useEffect(() => {
+    const value = (emailValue ?? "").trim();
+
+    if (!value || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+      setEmailStatus("idle");
+      return;
+    }
+
+    let cancelled = false;
+    setEmailStatus("checking");
+
+    const timer = setTimeout(async () => {
+      const status = await checkEmailStatus(value);
+      if (!cancelled) setEmailStatus(status);
+    }, 500);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [emailValue]);
 
   useEffect(() => {
     // Check for existing NDA data in localStorage
@@ -351,6 +378,25 @@ export default function SignUpForm() {
                   errors={form.formState.errors}
                   required
                 />
+
+                {emailStatus !== "idle" && (
+                  <p
+                    className={
+                      emailStatus === "available"
+                        ? "text-sm text-emerald-400"
+                        : emailStatus === "checking"
+                          ? "text-sm text-gray-400"
+                          : "text-sm text-red-400"
+                    }
+                  >
+                    {emailStatus === "checking" && "Checking availability..."}
+                    {emailStatus === "available" && "Email is available."}
+                    {emailStatus === "registered" &&
+                      "This email is already registered. Try signing in instead."}
+                    {emailStatus === "declined" &&
+                      "This email was previously declined. Sign in and reapply from the declined page."}
+                  </p>
+                )}
 
                 <FormField
                   label="Phone Number"

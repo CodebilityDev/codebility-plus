@@ -21,6 +21,7 @@ const PUBLIC = new Set([
   "actions/global/nav-user.ts",
   "actions/global/auth-session.ts#signupUser",
   "actions/global/auth-session.ts#signinUser",
+  "actions/global/auth-session.ts#checkEmailStatus",
   "actions/global/auth-session.ts#resendVerificationEmail",
   "actions/global/nda-storage.ts#uploadNdaToStorage",
   "actions/global/nda-storage.ts#updateCodevNdaUrls",
