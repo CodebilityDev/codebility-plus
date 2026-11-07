@@ -95,7 +95,9 @@ export const signupUser = async (formData: FormData) => {
     const display_position: string = positions[0]?.name ?? "";
     const years_of_experience =
       parseInt(formData.get("years_of_experience") as string) || 0;
-    const profileImage = formData.get("profileImage") as File;
+    const profileImageValue = formData.get("profileImage");
+    const profileImage =
+      profileImageValue instanceof File ? profileImageValue : null;
 
     // Extract user names for NDA processing
     const firstName = formData.get("first_name") as string;
@@ -116,9 +118,10 @@ export const signupUser = async (formData: FormData) => {
       }
     }
 
-    const image_url = profileImage.size > 0
-      ? await uploadProfileImage(profileImage, "profileImage", "codebility")
-      : null;
+    const image_url =
+      profileImage && profileImage.size > 0
+        ? await uploadProfileImage(profileImage, "profileImage", "codebility")
+        : null;
 
     let nda_status = false;
     let nda_signature: string | undefined = undefined;
