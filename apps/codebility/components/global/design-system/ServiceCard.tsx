@@ -1,9 +1,12 @@
+import { ArrowRight } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { cn } from "@codevs/ui";
 
 import { IconTile } from "@/components/global/design-system/IconTile";
+import { TextLink } from "@/components/global/design-system/TextLink";
 
 export interface ServiceCardProps {
   eyebrow: string;
@@ -12,6 +15,8 @@ export interface ServiceCardProps {
   icon?: ReactNode;
   imageSrc?: string;
   imageAlt?: string;
+  ctaLabel?: string;
+  ctaHref?: string;
   className?: string;
 }
 
@@ -22,6 +27,8 @@ function ServiceCard({
   icon,
   imageSrc,
   imageAlt,
+  ctaLabel,
+  ctaHref,
   className,
 }: ServiceCardProps) {
   return (
@@ -77,6 +84,14 @@ function ServiceCard({
         {title}
       </h3>
       <p className="relative z-10 text-sm text-white/60">{description}</p>
+      {ctaLabel && ctaHref ? (
+        <TextLink asChild className="relative z-10 mt-1">
+          <Link href={ctaHref}>
+            {ctaLabel}
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </TextLink>
+      ) : null}
     </div>
   );
 }

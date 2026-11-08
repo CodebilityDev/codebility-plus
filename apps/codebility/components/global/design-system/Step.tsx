@@ -21,6 +21,7 @@ export interface StepProps {
   stepNumber: number;
   title: string;
   description?: string;
+  meta?: string;
   className?: string;
 }
 
@@ -29,6 +30,7 @@ function Step({
   stepNumber,
   title,
   description,
+  meta,
   className,
 }: StepProps) {
   const number = String(stepNumber).padStart(2, "0");
@@ -62,6 +64,11 @@ function Step({
           <span className="text-sm text-white/50">{description}</span>
         )}
       </div>
+      {meta === undefined ? null : (
+        <span className="ml-auto shrink-0 whitespace-nowrap text-xs font-medium text-white/50">
+          {meta}
+        </span>
+      )}
     </div>
   );
 }

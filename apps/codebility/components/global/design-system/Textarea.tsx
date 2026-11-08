@@ -45,7 +45,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           aria-invalid={error ? true : undefined}
           aria-describedby={messageId}
           className={cn(
-            "h-24 w-full resize-none rounded-xl border border-white/10 bg-white/[0.04] p-4 text-[15px] leading-5 text-[#f4f4f4] outline-none transition-colors placeholder:text-white/40 hover:border-white/20 focus:border-[#9747ff] focus:ring-2 focus:ring-[#9747ff]/20 disabled:cursor-not-allowed disabled:opacity-50",
+            "h-24 w-full resize-none rounded-xl border border-white/10 bg-white/[0.04] p-4 text-[15px] leading-5 text-[#f4f4f4] outline-none transition-colors placeholder:text-white/50 hover:border-white/20 focus:border-[#9747ff] focus:ring-2 focus:ring-[#9747ff]/20 disabled:cursor-not-allowed disabled:opacity-50",
             error &&
               "border-[#d45454] hover:border-[#d45454] focus:border-[#d45454] focus:ring-[#d45454]/20",
             className,

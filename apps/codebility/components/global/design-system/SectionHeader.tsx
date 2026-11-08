@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { cn } from "@codevs/ui";
 
 import { Eyebrow } from "@/components/global/design-system/Eyebrow";
+import type { EyebrowVariant } from "@/components/global/design-system/Eyebrow";
 
 export type SectionHeaderAlign = "left" | "center";
 
@@ -14,6 +15,7 @@ const accentClasses =
 
 export interface SectionHeaderProps {
   eyebrow?: string;
+  eyebrowVariant?: EyebrowVariant;
   title: ReactNode;
   accent?: ReactNode;
   description?: ReactNode;
@@ -24,6 +26,7 @@ export interface SectionHeaderProps {
 
 function SectionHeader({
   eyebrow,
+  eyebrowVariant,
   title,
   accent,
   description,
@@ -39,7 +42,9 @@ function SectionHeader({
         className,
       )}
     >
-      {eyebrow ? <Eyebrow>{eyebrow}</Eyebrow> : null}
+      {eyebrow ? (
+        <Eyebrow variant={eyebrowVariant}>{eyebrow}</Eyebrow>
+      ) : null}
       <h2 className={headingClasses}>
         {title}
         {accent ? <span className={accentClasses}>{accent}</span> : null}

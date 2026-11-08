@@ -65,7 +65,7 @@ function Search({
         placeholder={placeholder}
         aria-label={inputAriaLabel ?? placeholder}
         disabled={disabled}
-        className="min-w-0 flex-1 bg-transparent text-[15px] leading-5 text-[#f4f4f4] outline-none placeholder:text-white/40 disabled:cursor-not-allowed"
+        className="min-w-0 flex-1 overflow-hidden text-ellipsis bg-transparent text-[15px] leading-5 text-[#f4f4f4] outline-none placeholder:text-white/50 disabled:cursor-not-allowed"
       />
       <Button size="sm" onClick={handleSearch} disabled={disabled}>
         {buttonLabel}

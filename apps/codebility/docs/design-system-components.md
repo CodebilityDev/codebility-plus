@@ -61,7 +61,7 @@ The page font is Outfit. Body copy is 400. UI labels and nav items are 500. Smal
 | `Search.tsx` | `Search` | controlled or uncontrolled value, `onSearch`, Find button |
 | `CheckboxCard.tsx` | `CheckboxCard` | Radix checkbox, controlled or uncontrolled, disabled |
 | `Switch.tsx` | `Switch` | Radix switch, `sm` / `md`, label, description, controlled or uncontrolled |
-| `Eyebrow.tsx` | `Eyebrow` | solid violet pill |
+| `Eyebrow.tsx` | `Eyebrow` | `solid` / `outline` pill |
 | `RoleBadge.tsx` | `RoleBadge` | `admin`, `mentor`, `codev` |
 | `StatusBadge.tsx` | `StatusBadge` | `available`, `busy` |
 | `TechTag.tsx` | `TechTag` | blue technology tag |
@@ -75,21 +75,28 @@ The page font is Outfit. Body copy is 400. UI labels and nav items are 500. Smal
 | `Tabs.tsx` | `Tabs`, `TabsList`, `Tab`, `TabsContent` | Radix tabs, segmented pill bar, counts |
 | `CategoryItem.tsx` | `CategoryItem` | icon, label, count, `active` |
 | `Accordion.tsx` | `Accordion`, `AccordionItem`, `AccordionTrigger`, `AccordionContent` | Radix accordion, single open item, plus and minus icons |
-| `Step.tsx` | `Step` | `done`, `active`, `upcoming` |
+| `Step.tsx` | `Step` | `done`, `active`, `upcoming`; optional `meta` label |
 | `CarouselPager.tsx` | `CarouselPager` | page, pageCount, previous and next |
 | `NavigationDesktop.tsx` | `NavigationDesktop` | links, active href, search trigger, sign in, CTA |
 | `NavigationMobile.tsx` | `NavigationMobile` | wordmark, menu button |
 | `MenuGlyph.tsx` | `MenuGlyph` | three-bar menu icon |
-| `ServiceCard.tsx` | `ServiceCard` | eyebrow, title, description, icon, media image |
+| `ServiceCard.tsx` | `ServiceCard` | eyebrow, title, description, icon, media image, optional CTA |
 | `StatCard.tsx` | `StatCard` | value, label, description, icon |
 | `MemberCard.tsx` | `MemberCard` | initials, name, role, badge slot, gradient, footer |
 | `DeveloperCard.tsx` | `DeveloperCard` | avatar, name, role, skills, availability, profile link |
 | `QuoteCard.tsx` | `QuoteCard` | quote, person, rating, pager |
 | `CTACard.tsx` | `CTACard` | eyebrow, title, description, action link |
 | `LogoCell.tsx` | `LogoCell` | `default` / `accent` cell wrapper |
-| `ClientLogo.tsx` | `ClientLogo` | `netmedia`, `zwift-tech`, `infraspan`, `averps` |
-| `SectionHeader.tsx` | `SectionHeader` | eyebrow, title, gradient accent, description, actions, alignment |
+| `ClientLogo.tsx` | `ClientLogo` | all 12 partner marks from `public/assets/images/partners` |
+| `SectionHeader.tsx` | `SectionHeader` | eyebrow, `eyebrowVariant`, title, gradient accent, description, actions, alignment |
 | `Wordmark.tsx` | `Wordmark` | Codebility wordmark |
+| `ProjectCard.tsx` | `ProjectCard` | project image, title, description, tag, live status, view project; `default` / `minimal` |
+| `MemberChip.tsx` | `MemberChip` | photo or initials, name, role, selected state |
+| `FeatureCard.tsx` | `FeatureCard` | icon, title, description; compact feature panel |
+| `SkillCategoryCard.tsx` | `SkillCategoryCard` | icon, category title, technology tags |
+| `JobListingRow.tsx` | `JobListingRow` | job title, description, tags, posted date, active row |
+| `ProfileCard.tsx` | `ProfileCard` | compact or tall profile card; photo or initials, role, skills, badge, profile and social links |
+| `MetricCard.tsx` | `MetricCard` | compact metric with icon, gradient value, label and description |
 
 ## Verification
 
