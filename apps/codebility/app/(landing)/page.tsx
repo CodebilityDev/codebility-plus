@@ -10,6 +10,8 @@ import { LandingPeople } from "@/components/landing/LandingPeople";
 import { LandingProcess } from "@/components/landing/LandingProcess";
 import { LandingServices } from "@/components/landing/LandingServices";
 import { LandingStories } from "@/components/landing/LandingStories";
+import { getCachedHeroCodevs } from "@/lib/landing/hero-codevs";
+import type { LandingSearchParams } from "@/types/landing/hero-codevs";
 
 export const metadata: Metadata = {
   title: "Codebility — Hire Skilled Filipino Developers",
@@ -34,10 +36,16 @@ export const metadata: Metadata = {
   },
 };
 
-export default function LandingPage() {
+export default async function LandingPage({
+  searchParams,
+}: {
+  searchParams: LandingSearchParams;
+}) {
+  const codevs = await getCachedHeroCodevs();
+
   return (
     <>
-      <LandingHero />
+      <LandingHero codevs={codevs} searchParams={searchParams} />
       <LandingPartners />
       <LandingServices />
       <LandingNumbers />

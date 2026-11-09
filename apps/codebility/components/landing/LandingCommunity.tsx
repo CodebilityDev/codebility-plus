@@ -51,20 +51,20 @@ const floatingAvatars: {
 
 export function LandingCommunity() {
   return (
-    <section id="community" className="py-16 lg:py-24">
+    <section id="community" className="py-[var(--cb-space-64)] lg:py-[var(--cb-space-96)]">
       <LandingContainer>
-        <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-[#0a0a0a] px-6 py-16 sm:px-10 lg:py-20">
+        <div className="relative overflow-hidden rounded-[var(--cb-radius-24)] border border-[color:var(--cb-border)] bg-[color:var(--cb-surface)] px-[var(--cb-space-24)] py-[var(--cb-space-64)] sm:px-[var(--cb-space-40)] lg:py-[var(--cb-space-80)]">
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(75%_90%_at_0%_0%,rgba(151,71,255,0.45),transparent_60%)]"
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(75%_90%_at_0%_0%,var(--cb-selected-border),transparent_60%)]"
           />
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_80%_at_100%_10%,rgba(151,71,255,0.3),transparent_60%)]"
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_80%_at_100%_10%,var(--cb-role-mentor-bg),transparent_60%)]"
           />
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(151,71,255,0.18)_0%,transparent_45%,rgba(151,71,255,0.22)_100%)]"
+            className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,var(--cb-primary-subtle)_0%,transparent_45%,var(--cb-role-mentor-bg)_100%)]"
           />
 
           {floatingAvatars.map((avatar) => (
@@ -86,7 +86,7 @@ export function LandingCommunity() {
             </span>
           ))}
 
-          <div className="relative flex flex-col items-center gap-5 text-center">
+          <div className="relative flex flex-col items-center gap-[var(--cb-space-20)] text-center">
             <AvatarStack
               items={stackPeople.map((person, index) => ({
                 initials: person.initials,
@@ -101,19 +101,19 @@ export function LandingCommunity() {
 
             <Eyebrow variant="outline">BE A CODEV</Eyebrow>
 
-            <h2 className="text-balance text-[32px] font-bold leading-9 tracking-tight text-[#f4f4f4] md:text-[44px] md:leading-[48px]">
+            <h2 className="text-balance text-[32px] font-bold leading-9 tracking-tight text-[color:var(--cb-text)] md:text-[44px] md:leading-[48px]">
               Join a community of{" "}
-              <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+              <span className="cb-accent-text">
                 100+ developers
               </span>
             </h2>
 
-            <p className="max-w-[54ch] text-base leading-6 text-white/60 sm:text-lg sm:leading-7">
+            <p className="max-w-[54ch] text-base leading-6 text-[color:var(--cb-text-muted)] sm:text-lg sm:leading-7">
               Sharpen your craft on real client projects, learn from mentors and
               unlock opportunities around the world.
             </p>
 
-            <div className="mt-1 flex flex-wrap items-center justify-center gap-3">
+            <div className="mt-[var(--cb-space-4)] flex flex-wrap items-center justify-center gap-[var(--cb-space-12)]">
               <Button asChild>
                 <Link href="/auth/sign-up">Join the Program</Link>
               </Button>

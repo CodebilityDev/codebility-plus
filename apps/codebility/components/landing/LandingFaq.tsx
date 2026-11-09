@@ -22,7 +22,7 @@ export function LandingFaq() {
   const activeFaqs = faqs.filter((faq) => faq.category === activeCategory);
 
   return (
-    <section id="faq" className="border-t border-white/10 py-24 lg:py-32">
+    <section id="faq" className="border-t border-[color:var(--cb-border)] py-[var(--cb-space-96)] lg:py-32">
       <LandingContainer>
         <SectionHeader
           eyebrowVariant="outline"
@@ -31,8 +31,8 @@ export function LandingFaq() {
           description="Everything clients and future CoDevs ask before getting started."
         />
 
-        <div className="mt-10 grid gap-6 lg:mt-12 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)] lg:items-start lg:gap-10">
-          <div className="flex flex-col gap-2">
+        <div className="mt-[var(--cb-space-40)] grid gap-[var(--cb-space-24)] lg:mt-[var(--cb-space-48)] lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)] lg:items-start lg:gap-[var(--cb-space-40)]">
+          <div className="flex flex-col gap-[var(--cb-space-8)]">
             {faqCategories.map((category) => {
               const Icon = category.icon;
 
@@ -49,14 +49,14 @@ export function LandingFaq() {
               );
             })}
 
-            <div className="mt-4 rounded-2xl border border-white/10 bg-[#0a0a0a] p-6">
-              <h3 className="text-lg font-semibold leading-6 text-[#f4f4f4]">
+            <div className="mt-[var(--cb-space-16)] rounded-[var(--cb-radius-16)] border border-[color:var(--cb-border)] bg-[color:var(--cb-surface)] p-[var(--cb-space-24)]">
+              <h3 className="text-lg font-semibold leading-6 text-[color:var(--cb-text)]">
                 Still have questions?
               </h3>
-              <p className="mt-2 text-sm leading-6 text-white/60">
+              <p className="mt-[var(--cb-space-8)] text-sm leading-6 text-[color:var(--cb-text-muted)]">
                 Talk to our team. We reply within one business day.
               </p>
-              <Button asChild size="sm" className="mt-5">
+              <Button asChild size="sm" className="mt-[var(--cb-space-20)]">
                 <Link href="#contact">Contact us</Link>
               </Button>
             </div>
@@ -64,7 +64,7 @@ export function LandingFaq() {
 
           <div
             id="faq-answers"
-            className="rounded-3xl border border-white/10 bg-[#0a0a0a] p-2"
+            className="rounded-[var(--cb-radius-24)] border border-[color:var(--cb-border)] bg-[color:var(--cb-surface)] p-[var(--cb-space-8)]"
           >
             <Accordion
               key={activeCategory}

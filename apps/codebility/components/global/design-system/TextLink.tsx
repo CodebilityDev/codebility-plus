@@ -21,7 +21,7 @@ const TextLink = React.forwardRef<HTMLAnchorElement, TextLinkProps>(
         aria-disabled={disabled || undefined}
         tabIndex={disabled ? -1 : tabIndex}
         className={cn(
-          "inline-flex items-center gap-2 text-[15px] leading-5 text-[#c084fc] transition-colors hover:text-purple-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6A78F2] focus-visible:ring-offset-2 focus-visible:ring-offset-[#030303]",
+          "inline-flex items-center gap-[var(--cb-space-8)] text-[15px] leading-5 text-[color:var(--cb-p400)] transition-colors hover:text-[color:var(--cb-p200)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--cb-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--cb-bg)]",
           disabled && "pointer-events-none opacity-50",
           className,
         )}

@@ -4,19 +4,20 @@ import * as React from "react";
 import { cn } from "@codevs/ui";
 
 export type AvatarGradient = "violet" | "teal" | "cyan";
-export type AvatarSize = 32 | 40 | 56 | 72;
+export type AvatarSize = 32 | 40 | 48 | 56 | 72;
 
 const sizeClasses: Record<AvatarSize, string> = {
-  32: "h-8 w-8 text-xs",
-  40: "h-10 w-10 text-xs",
-  56: "h-14 w-14 text-[17px]",
-  72: "h-[72px] w-[72px] text-[17px]",
+  32: "h-[var(--cb-size-32)] w-[var(--cb-size-32)] text-xs",
+  40: "h-[var(--cb-size-40)] w-[var(--cb-size-40)] text-xs",
+  48: "h-[var(--cb-size-48)] w-[var(--cb-size-48)] text-sm",
+  56: "h-[var(--cb-size-56)] w-[var(--cb-size-56)] text-[17px]",
+  72: "h-[var(--cb-size-72)] w-[var(--cb-size-72)] text-[17px]",
 };
 
 const gradientClasses: Record<AvatarGradient, string> = {
-  violet: "from-[#9747ff] to-[#c108fe]",
-  teal: "from-[#00738b] to-[#0a3b9d]",
-  cyan: "from-[#0c3fdb] to-[#02ffe2]",
+  violet: "from-[var(--cb-primary)] to-[var(--cb-mentor-end)]",
+  teal: "from-[var(--cb-brand-start)] to-[var(--cb-brand-mid)]",
+  cyan: "from-[var(--cb-brand-mid)] to-[var(--cb-teal)]",
 };
 
 export interface AvatarProps {
@@ -44,7 +45,7 @@ function Avatar({
         role={src ? undefined : "img"}
         aria-label={src ? undefined : (alt ?? initials)}
         className={cn(
-          "flex items-center justify-center overflow-hidden rounded-full bg-gradient-to-b font-semibold text-white",
+          "flex items-center justify-center overflow-hidden rounded-[var(--cb-radius-full)] bg-gradient-to-b font-semibold text-[color:var(--cb-text)]",
           sizeClasses[size],
           gradientClasses[gradient],
         )}
@@ -65,8 +66,8 @@ function Avatar({
         <span
           aria-hidden
           className={cn(
-            "absolute bottom-0 right-0 rounded-full border-2 border-[#030303] bg-[#4bce97]",
-            size === 32 ? "h-2.5 w-2.5" : "h-3 w-3",
+            "absolute bottom-0 right-0 rounded-[var(--cb-radius-full)] border-2 border-[color:var(--cb-bg)] bg-[color:var(--cb-success)]",
+            size === 32 ? "h-[var(--cb-size-10)] w-[var(--cb-size-10)]" : "h-[var(--cb-size-12)] w-[var(--cb-size-12)]",
           )}
         />
       ) : null}

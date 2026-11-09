@@ -14,10 +14,10 @@ function Eyebrow({ children, variant = "solid", className }: EyebrowProps) {
   return (
     <span
       className={cn(
-        "inline-flex h-7 w-fit items-center justify-center rounded-full border px-4 text-xs font-semibold uppercase leading-[18px] text-purple-100",
+        "inline-flex h-[var(--cb-size-28)] w-fit items-center justify-center rounded-[var(--cb-radius-full)] border px-[var(--cb-space-16)] text-xs font-semibold uppercase leading-[18px] text-[color:var(--cb-pill-text)]",
         variant === "outline"
-          ? "border-purple-400/40 bg-[#9747ff]/10"
-          : "border-purple-300/50 bg-[#9747ff]",
+          ? "border-[color:var(--cb-pill-border)] bg-[color:var(--cb-pill-bg)]"
+          : "border-[color:var(--cb-primary)] bg-[color:var(--cb-primary)]",
         className,
       )}
     >

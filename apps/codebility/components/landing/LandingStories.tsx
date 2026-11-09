@@ -14,9 +14,9 @@ const storyMetrics = [
 
 export function LandingStories() {
   return (
-    <section id="stories" className="border-t border-white/10 py-24 lg:py-32">
-      <LandingContainer className="grid gap-12 lg:grid-cols-2 lg:items-center lg:gap-16">
-        <div className="flex flex-col gap-6">
+    <section id="stories" className="border-t border-[color:var(--cb-border)] py-[var(--cb-space-96)] lg:py-32">
+      <LandingContainer className="grid gap-[var(--cb-space-48)] lg:grid-cols-2 lg:items-center lg:gap-[var(--cb-space-64)]">
+        <div className="flex flex-col gap-[var(--cb-space-24)]">
           <SectionHeader
             eyebrowVariant="outline"
             eyebrow="CLIENT STORIES"
@@ -25,21 +25,21 @@ export function LandingStories() {
             description="Startups and agencies rely on Codebility to extend their teams and ship faster."
           />
 
-          <div className="grid grid-cols-3 divide-x divide-white/10 rounded-2xl border border-white/10 bg-[#0a0a0a] py-5">
+          <div className="grid grid-cols-3 divide-x divide-[color:var(--cb-border)] rounded-[var(--cb-radius-16)] border border-[color:var(--cb-border)] bg-[color:var(--cb-surface)] py-[var(--cb-space-20)]">
             {storyMetrics.map((metric) => (
               <div
                 key={metric.label}
-                className="flex min-w-0 flex-col gap-1 px-4 sm:px-6"
+                className="flex min-w-0 flex-col gap-[var(--cb-space-4)] px-[var(--cb-space-16)] sm:px-[var(--cb-space-24)]"
               >
-                <p className="text-xl font-semibold leading-7 text-[#f4f4f4] sm:text-2xl sm:leading-8">
+                <p className="text-xl font-semibold leading-7 text-[color:var(--cb-text)] sm:text-2xl sm:leading-8">
                   {metric.value}
                 </p>
-                <p className="text-xs leading-4 text-white/50">{metric.label}</p>
+                <p className="text-xs leading-4 text-[color:var(--cb-text-muted)]">{metric.label}</p>
               </div>
             ))}
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-[var(--cb-space-12)]">
             <Button asChild variant="outline">
               <Link href="/#contact">Let&apos;s talk</Link>
             </Button>
@@ -52,7 +52,7 @@ export function LandingStories() {
         <div className="relative w-full">
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-0 rounded-[40px] bg-[#9747ff]/25 blur-3xl"
+            className="pointer-events-none absolute inset-0 rounded-[40px] bg-[color:color-mix(in_srgb,var(--cb-primary)_25%,transparent)] blur-3xl"
           />
           <QuoteCard
             className="relative"
@@ -67,7 +67,7 @@ export function LandingStories() {
           />
           <Quote
             aria-hidden
-            className="pointer-events-none absolute right-6 top-6 h-10 w-10 text-white/20"
+            className="pointer-events-none absolute right-6 top-6 h-[var(--cb-size-40)] w-[var(--cb-size-40)] text-[color:color-mix(in_srgb,var(--cb-white)_20%,transparent)]"
           />
         </div>
       </LandingContainer>

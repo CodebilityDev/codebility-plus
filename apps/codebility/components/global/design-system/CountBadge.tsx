@@ -14,7 +14,7 @@ function CountBadge({ count, max, label, className }: CountBadgeProps) {
     <span
       aria-label={label ?? display}
       className={cn(
-        "inline-flex min-h-6 min-w-6 items-center justify-center rounded-full bg-[#9747ff] px-1 text-[11px] font-medium leading-4 text-white",
+        "inline-flex min-h-[var(--cb-size-24)] min-w-[var(--cb-size-24)] items-center justify-center rounded-[var(--cb-radius-full)] bg-[color:var(--cb-primary)] px-[var(--cb-space-4)] text-[11px] font-medium leading-4 text-[color:var(--cb-text)]",
         className,
       )}
     >

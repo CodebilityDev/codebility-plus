@@ -8,13 +8,12 @@ import { Step } from "@/components/global/design-system/Step";
 import { LandingContainer } from "@/components/landing/LandingContainer";
 import { processSteps } from "@/constants/landing/landing-content";
 
-const accentClasses =
-  "whitespace-nowrap bg-gradient-to-b from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent";
+const accentClasses = "cb-accent-text whitespace-nowrap";
 
 function LandingProcess() {
   return (
-    <section id="process" className="border-t border-white/10 py-24 lg:py-32">
-      <LandingContainer className="grid gap-10 lg:grid-cols-2 lg:items-start lg:gap-16">
+    <section id="process" className="border-t border-[color:var(--cb-border)] py-[var(--cb-space-96)] lg:py-32">
+      <LandingContainer className="grid gap-[var(--cb-space-40)] lg:grid-cols-2 lg:items-start lg:gap-[var(--cb-space-64)]">
         <SectionHeader
           eyebrowVariant="outline"
           eyebrow="OUR PROCESS"
@@ -37,7 +36,7 @@ function LandingProcess() {
           }
         />
 
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-[var(--cb-space-8)]">
           {processSteps.map((step, index) => (
             <Step
               key={step.number}

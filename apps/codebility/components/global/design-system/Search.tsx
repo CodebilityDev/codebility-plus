@@ -1,6 +1,6 @@
 "use client";
 
-import { Search as SearchIcon } from "lucide-react";
+import { ArrowRight, Search as SearchIcon } from "lucide-react";
 import * as React from "react";
 
 import { Button } from "@/components/global/design-system/Button";
@@ -16,6 +16,7 @@ export interface SearchProps {
   disabled?: boolean;
   className?: string;
   inputAriaLabel?: string;
+  iconOnlyOnMobile?: boolean;
 }
 
 function Search({
@@ -28,6 +29,7 @@ function Search({
   disabled = false,
   className,
   inputAriaLabel,
+  iconOnlyOnMobile = false,
 }: SearchProps) {
   const [internalValue, setInternalValue] = React.useState(defaultValue ?? "");
   const current = value ?? internalValue;
@@ -39,14 +41,14 @@ function Search({
   return (
     <div
       className={cn(
-        "flex h-[54px] items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] p-1.5 pl-4 focus-within:border-[#9747ff] focus-within:ring-2 focus-within:ring-[#9747ff]/20",
+        "flex h-[var(--cb-size-56)] items-center gap-[var(--cb-space-8)] rounded-[var(--cb-radius-full)] border border-[color:var(--cb-border)] bg-[color:var(--cb-glass)] p-[var(--cb-space-6)] pl-[var(--cb-space-16)] focus-within:border-[color:var(--cb-primary)] focus-within:ring-2 focus-within:ring-[color:var(--cb-focus-glow)]",
         disabled && "opacity-50",
         className,
       )}
     >
       <SearchIcon
         aria-hidden
-        className="h-[18px] w-[18px] shrink-0 text-white/40"
+        className="h-[var(--cb-size-18)] w-[var(--cb-size-18)] shrink-0 text-[color:var(--cb-text-decorative)]"
       />
       <input
         type="text"
@@ -65,10 +67,30 @@ function Search({
         placeholder={placeholder}
         aria-label={inputAriaLabel ?? placeholder}
         disabled={disabled}
-        className="min-w-0 flex-1 overflow-hidden text-ellipsis bg-transparent text-[15px] leading-5 text-[#f4f4f4] outline-none placeholder:text-white/50 disabled:cursor-not-allowed"
+        className="min-w-0 flex-1 overflow-hidden text-ellipsis bg-transparent text-[15px] leading-5 text-[color:var(--cb-text)] outline-none placeholder:text-[color:var(--cb-text-muted)] disabled:cursor-not-allowed"
       />
-      <Button size="sm" onClick={handleSearch} disabled={disabled}>
-        {buttonLabel}
+      <Button
+        size="sm"
+        onClick={handleSearch}
+        disabled={disabled}
+        aria-label={iconOnlyOnMobile ? buttonLabel : undefined}
+        className={
+          iconOnlyOnMobile
+            ? "shrink-0 px-0 h-[var(--cb-size-44)] w-[var(--cb-size-44)] sm:h-[var(--cb-size-40)] sm:w-auto sm:px-[var(--cb-space-18)]"
+            : undefined
+        }
+      >
+        {iconOnlyOnMobile ? (
+          <>
+            <span className="hidden sm:inline">{buttonLabel}</span>
+            <ArrowRight
+              aria-hidden
+              className="h-[var(--cb-size-18)] w-[var(--cb-size-18)] sm:hidden"
+            />
+          </>
+        ) : (
+          buttonLabel
+        )}
       </Button>
     </div>
   );

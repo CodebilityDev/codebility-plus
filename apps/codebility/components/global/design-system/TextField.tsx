@@ -33,9 +33,9 @@ const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(
     const messageId = error ? errorId : helpText ? helpId : undefined;
 
     return (
-      <div className={cn("flex flex-col gap-2", containerClassName)}>
+      <div className={cn("flex flex-col gap-[var(--cb-space-8)]", containerClassName)}>
         {label ? (
-          <label htmlFor={inputId} className="text-sm text-white/70">
+          <label htmlFor={inputId} className="text-sm text-[color:var(--cb-text-secondary)]">
             {label}
           </label>
         ) : null}
@@ -45,20 +45,20 @@ const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(
           aria-invalid={error ? true : undefined}
           aria-describedby={messageId}
           className={cn(
-            "h-12 w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 text-[15px] leading-5 text-[#f4f4f4] outline-none transition-colors placeholder:text-white/50 hover:border-white/20 focus:border-[#9747ff] focus:ring-2 focus:ring-[#9747ff]/20 disabled:cursor-not-allowed disabled:opacity-50",
+            "h-[var(--cb-size-48)] w-full rounded-[var(--cb-radius-12)] border border-[color:var(--cb-border)] bg-[color:var(--cb-glass)] px-[var(--cb-space-16)] text-[15px] leading-5 text-[color:var(--cb-text)] outline-none transition-colors placeholder:text-[color:var(--cb-text-muted)] hover:border-[color:color-mix(in_srgb,var(--cb-white)_20%,transparent)] focus:border-[color:var(--cb-primary)] focus:ring-2 focus:ring-[color:var(--cb-focus-glow)] disabled:cursor-not-allowed disabled:opacity-50",
             error &&
-              "border-[#d45454] hover:border-[#d45454] focus:border-[#d45454] focus:ring-[#d45454]/20",
+              "border-[color:var(--cb-danger)] hover:border-[color:var(--cb-danger)] focus:border-[color:var(--cb-danger)] focus:ring-[color:var(--cb-danger)]",
             className,
             inputClassName,
           )}
           {...props}
         />
         {error ? (
-          <p id={errorId} className="text-xs leading-[18px] text-[#f08a8a]">
+          <p id={errorId} className="text-xs leading-[18px] text-[color:var(--cb-danger-text)]">
             {error}
           </p>
         ) : helpText ? (
-          <p id={helpId} className="text-xs leading-[18px] text-white/50">
+          <p id={helpId} className="text-xs leading-[18px] text-[color:var(--cb-text-muted)]">
             {helpText}
           </p>
         ) : null}

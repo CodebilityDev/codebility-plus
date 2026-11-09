@@ -28,10 +28,10 @@ const CategoryItem = React.forwardRef<HTMLButtonElement, CategoryItemProps>(
       type={type}
       aria-pressed={active}
       className={cn(
-        "flex h-12 w-full items-center gap-2 rounded-xl border px-4 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6A78F2] focus-visible:ring-offset-2 focus-visible:ring-offset-[#030303] disabled:pointer-events-none disabled:opacity-50",
+        "flex h-[var(--cb-size-48)] w-full items-center gap-[var(--cb-space-8)] rounded-[var(--cb-radius-12)] border px-[var(--cb-space-16)] text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--cb-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--cb-bg)] disabled:pointer-events-none disabled:opacity-50",
         active
-          ? "border-[#9747ff]/50 bg-[#9747ff]/[0.18] text-[#f4f4f4]"
-          : "border-white/10 bg-white/[0.02] text-[#f4f4f4] hover:border-white/20",
+          ? "border-[color:color-mix(in_srgb,var(--cb-primary)_50%,transparent)] bg-[color:color-mix(in_srgb,var(--cb-primary)_18%,transparent)] text-[color:var(--cb-text)]"
+          : "border-[color:var(--cb-border)] bg-[color:var(--cb-panel)] text-[color:var(--cb-text)] hover:border-[color:color-mix(in_srgb,var(--cb-white)_20%,transparent)]",
         className,
       )}
       {...props}
@@ -40,8 +40,8 @@ const CategoryItem = React.forwardRef<HTMLButtonElement, CategoryItemProps>(
         <span
           aria-hidden
           className={cn(
-            "flex h-[18px] w-[18px] shrink-0 items-center justify-center [&>svg]:h-[18px] [&>svg]:w-[18px]",
-            active ? "text-purple-200" : "text-white/60",
+            "flex h-[var(--cb-size-18)] w-[var(--cb-size-18)] shrink-0 items-center justify-center [&>svg]:h-[var(--cb-size-18)] [&>svg]:w-[var(--cb-size-18)]",
+            active ? "text-[color:var(--cb-p200)]" : "text-[color:var(--cb-text-muted)]",
           )}
         >
           {icon}
@@ -49,9 +49,9 @@ const CategoryItem = React.forwardRef<HTMLButtonElement, CategoryItemProps>(
       )}
       <span className="text-[15px] leading-5">{label}</span>
       {count === undefined ? null : (
-        <span className="text-xs text-white/50">{count}</span>
+        <span className="text-xs text-[color:var(--cb-text-muted)]">{count}</span>
       )}
-      <ChevronRight className="ml-auto h-[18px] w-[18px] shrink-0 text-white/50" />
+      <ChevronRight className="ml-auto h-[var(--cb-size-18)] w-[var(--cb-size-18)] shrink-0 text-[color:var(--cb-text-muted)]" />
     </button>
   ),
 );

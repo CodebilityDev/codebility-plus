@@ -31,6 +31,15 @@ const logoSources: Record<ClientLogoName, string> = {
   "zwift-tech": "/assets/images/partners/zwift-tech.png",
 };
 
+const logoScale: Partial<Record<ClientLogoName, string>> = {
+  bradwell: "scale-[1.4]",
+  "travel-tribe": "scale-[1.3]",
+};
+
+const logoBlend: Partial<Record<ClientLogoName, string>> = {
+  "travel-tribe": "mix-blend-screen",
+};
+
 const logoAlt: Record<ClientLogoName, string> = {
   ai: "AI",
   averps: "Averps",
@@ -54,13 +63,19 @@ export interface ClientLogoProps {
 
 function ClientLogo({ name, alt, className }: ClientLogoProps) {
   return (
-    <span className={cn("relative block h-10 w-[150px]", className)}>
+    <span
+      className={cn(
+        "relative block h-[52px] w-[120px] sm:h-[var(--cb-size-64)] sm:w-[170px]",
+        logoBlend[name],
+        className,
+      )}
+    >
       <Image
         src={logoSources[name]}
         alt={alt ?? logoAlt[name]}
         fill
-        sizes="150px"
-        className="object-contain object-center"
+        sizes="(min-width: 640px) 170px, 120px"
+        className={cn("object-contain object-center", logoScale[name])}
       />
     </span>
   );

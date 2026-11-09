@@ -32,7 +32,7 @@ function CheckboxCard({
   return (
     <label
       className={cn(
-        "flex h-12 items-center gap-3 rounded-xl border border-white/10 bg-white/[0.02] p-3 transition-colors [&:has([data-state=checked])]:border-[#9747ff]/50 [&:has([data-state=checked])]:bg-[#9747ff]/[0.18] [&:has(:focus-visible)]:ring-2 [&:has(:focus-visible)]:ring-[#6A78F2]/40",
+        "flex h-[var(--cb-size-48)] items-center gap-[var(--cb-space-12)] rounded-[var(--cb-radius-12)] border border-[color:var(--cb-border)] bg-[color:var(--cb-panel)] p-[var(--cb-space-12)] transition-colors [&:has([data-state=checked])]:border-[color:color-mix(in_srgb,var(--cb-primary)_50%,transparent)] [&:has([data-state=checked])]:bg-[color:color-mix(in_srgb,var(--cb-primary)_18%,transparent)] [&:has(:focus-visible)]:ring-2 [&:has(:focus-visible)]:ring-[color:var(--cb-ring)]",
         disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer",
         className,
       )}
@@ -44,13 +44,13 @@ function CheckboxCard({
         defaultChecked={defaultChecked}
         onCheckedChange={(next) => onCheckedChange?.(next === true)}
         disabled={disabled}
-        className="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[6px] border border-white/25 bg-transparent text-white outline-none data-[state=checked]:border-[#9747ff] data-[state=checked]:bg-[#9747ff] disabled:cursor-not-allowed"
+        className="flex h-[var(--cb-size-18)] w-[var(--cb-size-18)] shrink-0 items-center justify-center rounded-[6px] border border-[color:color-mix(in_srgb,var(--cb-white)_25%,transparent)] bg-transparent text-[color:var(--cb-text)] outline-none data-[state=checked]:border-[color:var(--cb-primary)] data-[state=checked]:bg-[color:var(--cb-primary)] disabled:cursor-not-allowed"
       >
         <CheckboxPrimitive.Indicator>
-          <Check aria-hidden className="h-3 w-3" strokeWidth={3} />
+          <Check aria-hidden className="h-[var(--cb-size-12)] w-[var(--cb-size-12)]" strokeWidth={3} />
         </CheckboxPrimitive.Indicator>
       </CheckboxPrimitive.Root>
-      <span id={labelId} className="text-sm text-[#f4f4f4]">
+      <span id={labelId} className="text-sm text-[color:var(--cb-text)]">
         {label}
       </span>
     </label>

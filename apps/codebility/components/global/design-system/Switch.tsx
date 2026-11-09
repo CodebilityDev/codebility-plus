@@ -41,17 +41,17 @@ function Switch({
       disabled={disabled}
       aria-describedby={description ? descriptionId : undefined}
       className={cn(
-        "relative inline-flex shrink-0 items-center rounded-full px-[3px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6A78F2] focus-visible:ring-offset-2 focus-visible:ring-offset-[#030303] data-[state=checked]:bg-[#9747ff] data-[state=unchecked]:bg-white/20 disabled:cursor-not-allowed disabled:opacity-50",
-        size === "sm" ? "h-5 w-9" : "h-[22px] w-10",
+        "relative inline-flex shrink-0 items-center rounded-[var(--cb-radius-full)] px-[3px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--cb-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--cb-bg)] data-[state=checked]:bg-[color:var(--cb-primary)] data-[state=unchecked]:bg-[color:color-mix(in_srgb,var(--cb-white)_20%,transparent)] disabled:cursor-not-allowed disabled:opacity-50",
+        size === "sm" ? "h-[var(--cb-size-20)] w-[var(--cb-size-36)]" : "h-[var(--cb-size-22)] w-[var(--cb-size-40)]",
         !label && !description && className,
       )}
     >
       <SwitchPrimitive.Thumb
         className={cn(
-          "rounded-full bg-white transition-transform",
+          "rounded-[var(--cb-radius-full)] bg-[color:var(--cb-white)] transition-transform",
           size === "sm"
-            ? "h-3.5 w-3.5 data-[state=checked]:translate-x-4"
-            : "h-4 w-4 data-[state=checked]:translate-x-[18px]",
+            ? "h-[var(--cb-size-14)] w-[var(--cb-size-14)] data-[state=checked]:translate-x-4"
+            : "h-[var(--cb-size-16)] w-[var(--cb-size-16)] data-[state=checked]:translate-x-[18px]",
         )}
       />
     </SwitchPrimitive.Root>
@@ -62,14 +62,14 @@ function Switch({
   return (
     <div
       className={cn(
-        "flex items-center justify-between gap-4",
+        "flex items-center justify-between gap-[var(--cb-space-16)]",
         disabled && "cursor-not-allowed",
         className,
       )}
     >
       <div
         className={cn(
-          "flex min-w-0 flex-col gap-0.5",
+          "flex min-w-0 flex-col gap-[var(--cb-space-2)]",
           disabled && "opacity-50",
         )}
       >
@@ -77,7 +77,7 @@ function Switch({
           <label
             htmlFor={switchId}
             className={cn(
-              "text-sm text-[#f4f4f4]",
+              "text-sm text-[color:var(--cb-text)]",
               disabled ? "cursor-not-allowed" : "cursor-pointer",
             )}
           >
@@ -87,7 +87,7 @@ function Switch({
         {description ? (
           <p
             id={descriptionId}
-            className="text-xs leading-[18px] text-white/50"
+            className="text-xs leading-[18px] text-[color:var(--cb-text-muted)]"
           >
             {description}
           </p>

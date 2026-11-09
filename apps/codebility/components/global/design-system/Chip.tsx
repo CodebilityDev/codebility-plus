@@ -17,11 +17,11 @@ const Chip = React.forwardRef<HTMLButtonElement, ChipProps>(
       type={type}
       aria-pressed={selected}
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-full border font-normal transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6A78F2] focus-visible:ring-offset-2 focus-visible:ring-offset-[#030303] disabled:pointer-events-none disabled:opacity-50",
-        size === "sm" ? "h-7 px-2.5 text-xs" : "h-8 px-3 text-sm",
+        "inline-flex items-center justify-center gap-[var(--cb-space-8)] rounded-[var(--cb-radius-full)] border font-normal transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[color:var(--cb-ring)] focus-visible:ring-offset-[color:var(--cb-bg)] disabled:pointer-events-none disabled:opacity-50",
+        size === "sm" ? "h-[var(--cb-size-28)] px-2.5 text-xs" : "h-[var(--cb-size-32)] px-[var(--cb-space-12)] text-sm",
         selected
-          ? "border-purple-400 bg-[#9747ff] text-purple-100"
-          : "border-white/10 bg-white/[0.04] text-white/70 hover:bg-white/10",
+          ? "border-[color:var(--cb-pill-border)] bg-[color:var(--cb-pill-bg)] text-[color:var(--cb-pill-text)] hover:bg-[color:color-mix(in_srgb,var(--cb-primary)_16%,transparent)]"
+          : "border-[color:var(--cb-border-solid)] bg-[color:var(--cb-surface-solid)] text-[color:var(--cb-text-secondary)] hover:bg-[color:var(--cb-surface-raised)]",
         className,
       )}
       {...props}

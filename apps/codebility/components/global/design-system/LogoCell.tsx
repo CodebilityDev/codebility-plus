@@ -5,8 +5,9 @@ import { cn } from "@codevs/ui";
 export type LogoCellVariant = "default" | "accent";
 
 const variantClasses: Record<LogoCellVariant, string> = {
-  default: "bg-white/[0.02]",
-  accent: "bg-[#9747ff]",
+  default: "bg-[color:var(--cb-panel)]",
+  accent:
+    "bg-[color:var(--cb-panel)] transition-colors duration-300 ease-out hover:bg-[color:var(--cb-primary)]",
 };
 
 export interface LogoCellProps {
@@ -19,7 +20,7 @@ function LogoCell({ children, variant = "default", className }: LogoCellProps) {
   return (
     <div
       className={cn(
-        "flex h-24 w-[200px] items-center justify-center border border-white/10",
+        "group flex h-[114px] w-[var(--cb-size-200)] items-center justify-center",
         variantClasses[variant],
         className,
       )}

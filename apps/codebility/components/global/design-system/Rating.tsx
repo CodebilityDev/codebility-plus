@@ -11,13 +11,13 @@ export interface RatingProps {
 
 function Rating({ value, max = 5, size = "sm", className }: RatingProps) {
   const filled = Math.min(max, Math.max(0, Math.round(value)));
-  const starClassName = size === "sm" ? "h-3.5 w-3.5" : "h-4 w-4";
+  const starClassName = size === "sm" ? "h-[var(--cb-size-14)] w-[var(--cb-size-14)]" : "h-[var(--cb-size-16)] w-[var(--cb-size-16)]";
 
   return (
     <span
       role="img"
       aria-label={`${value} out of ${max}`}
-      className={cn("inline-flex items-center gap-0.5", className)}
+      className={cn("inline-flex items-center gap-[var(--cb-space-2)]", className)}
     >
       {Array.from({ length: max }, (_, index) => (
         <Star
@@ -26,8 +26,8 @@ function Rating({ value, max = 5, size = "sm", className }: RatingProps) {
           className={cn(
             starClassName,
             index < filled
-              ? "fill-amber-400 text-amber-400"
-              : "fill-transparent text-white/25",
+              ? "fill-amber-400 text-[color:var(--cb-rating)]"
+              : "fill-transparent text-[color:color-mix(in_srgb,var(--cb-white)_25%,transparent)]",
           )}
         />
       ))}

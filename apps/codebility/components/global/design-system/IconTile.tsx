@@ -6,8 +6,8 @@ export type IconTileVariant = "primary" | "glass";
 export type IconTileShape = "square" | "circle";
 
 const variantClasses: Record<IconTileVariant, string> = {
-  primary: "border-purple-400/40 bg-[#9747ff] text-white",
-  glass: "border-white/10 bg-white/5 text-white/70",
+  primary: "border-[color:color-mix(in_srgb,var(--cb-p400)_40%,transparent)] bg-[color:var(--cb-primary)] text-[color:var(--cb-text)]",
+  glass: "border-[color:var(--cb-border)] bg-[color:var(--cb-glass)] text-[color:var(--cb-text-secondary)]",
 };
 
 export interface IconTileProps {
@@ -26,8 +26,8 @@ function IconTile({
   return (
     <span
       className={cn(
-        "flex h-11 w-11 shrink-0 items-center justify-center border",
-        shape === "circle" ? "rounded-full" : "rounded-xl",
+        "flex h-[var(--cb-size-44)] w-[var(--cb-size-44)] shrink-0 items-center justify-center border",
+        shape === "circle" ? "rounded-[var(--cb-radius-full)]" : "rounded-[var(--cb-radius-12)]",
         variantClasses[variant],
         className,
       )}

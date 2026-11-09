@@ -24,7 +24,7 @@ Every component is a named export. File names are PascalCase.
 7. Use `React.forwardRef` for button, input, anchor and Radix trigger elements. The first argument is the native element or Radix element.
 8. Use `next/image` for every image. Never use a raw `<img>`.
 9. Use `asChild` with Radix `Slot` when a button or link needs to wrap a Next `Link`.
-10. Keep the 2px `#6A78F2` focus ring with a 2px offset on every interactive element. Disabled controls keep `disabled:pointer-events-none disabled:opacity-50`.
+10. Keep the 2px `var(--cb-ring)` focus ring with a 2px offset on every interactive element. Disabled controls keep `disabled:pointer-events-none disabled:opacity-50`.
 11. Keep touch targets at least 44px where the control can be tapped. A 24px badge is not a touch control.
 
 ## Tokens
@@ -38,7 +38,8 @@ Every component is a named export. File names are PascalCase.
 | Primary hover | `#8435EA` |
 | Primary subtle | `#9747FF` at 18% |
 | Focus ring | `#6A78F2` |
-| Accent | `#02FFE2` |
+| Accent color | `#02FFE2` |
+| Accent gradient | `--cb-accent`: 90deg, `#C084FC` 0%, `#F472B6` 50%, `#22D3EE` 100% |
 | Text | `#F4F4F4` |
 | Muted text | `#F4F4F4` at 60% |
 | Border | `#F4F4F4` at 10% |
@@ -47,6 +48,8 @@ Every component is a named export. File names are PascalCase.
 | Warning | `#FBBF24` |
 
 The page font is Outfit. Body copy is 400. UI labels and nav items are 500. Small headings and titles are 600. Display headings are 700.
+
+Figma Dark, dimensions and primitives are exposed in `styles/global/figma-tokens.css` as `--cb-*` CSS variables. Use `--cb-accent` for the CB/Accent gradient. The `cb-accent-text` utility applies that gradient and reserves space for descenders when the text is clipped to the glyphs.
 
 ## Components
 

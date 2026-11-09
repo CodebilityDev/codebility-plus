@@ -6,16 +6,16 @@ import * as React from "react";
 import { cn } from "@codevs/ui";
 
 const iconButtonVariants = cva(
-  "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6A78F2] focus-visible:ring-offset-2 focus-visible:ring-offset-[#030303] disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex h-[var(--cb-size-40)] w-[var(--cb-size-40)] shrink-0 items-center justify-center rounded-[var(--cb-radius-full)] border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--cb-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--cb-bg)] disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
         outline:
-          "border-white/20 bg-white/[0.04] text-white/70 hover:border-white/30 hover:bg-white/10 hover:text-white",
+          "border-[color:color-mix(in_srgb,var(--cb-white)_20%,transparent)] bg-[color:var(--cb-glass)] text-[color:var(--cb-text-secondary)] hover:border-[color:color-mix(in_srgb,var(--cb-white)_30%,transparent)] hover:bg-[color:var(--cb-surface-hover)] hover:text-[color:var(--cb-text)]",
         ghost:
-          "border-transparent text-white/70 hover:bg-white/10 hover:text-white",
+          "border-transparent text-[color:var(--cb-text-secondary)] hover:bg-[color:var(--cb-surface-hover)] hover:text-[color:var(--cb-text)]",
         primary:
-          "border-purple-400/40 bg-[#9747ff] text-white hover:bg-[#8435ea]",
+          "border-[color:color-mix(in_srgb,var(--cb-p400)_40%,transparent)] bg-[color:var(--cb-primary)] text-[color:var(--cb-text)] hover:bg-[color:var(--cb-primary-hover)]",
       },
     },
     defaultVariants: {

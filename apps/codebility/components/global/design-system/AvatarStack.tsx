@@ -22,10 +22,11 @@ export interface AvatarStackProps {
 }
 
 const sizeClasses: Record<AvatarSize, string> = {
-  32: "h-8 w-8",
-  40: "h-10 w-10",
-  56: "h-14 w-14",
-  72: "h-[72px] w-[72px]",
+  32: "h-[var(--cb-size-32)] w-[var(--cb-size-32)]",
+  40: "h-[var(--cb-size-40)] w-[var(--cb-size-40)]",
+  48: "h-[var(--cb-size-48)] w-[var(--cb-size-48)]",
+  56: "h-[var(--cb-size-56)] w-[var(--cb-size-56)]",
+  72: "h-[var(--cb-size-72)] w-[var(--cb-size-72)]",
 };
 
 function AvatarStack({
@@ -48,7 +49,7 @@ function AvatarStack({
       {visible.map((item, index) => (
         <span
           key={`${item.initials}-${index}`}
-          className="-ml-2.5 rounded-full border-[3px] border-[#030303] first:ml-0"
+          className="-ml-2.5 rounded-[var(--cb-radius-full)] border-[3px] border-[color:var(--cb-bg)] first:ml-[var(--cb-space-0)]"
         >
           <Avatar {...item} size={size} />
         </span>
@@ -56,7 +57,7 @@ function AvatarStack({
       {remaining > 0 ? (
         <span
           className={cn(
-            "-ml-2.5 flex items-center justify-center rounded-full border border-[#030303] bg-[#121214] text-xs text-purple-200",
+            "-ml-2.5 flex items-center justify-center rounded-[var(--cb-radius-full)] border border-[color:var(--cb-bg)] bg-[color:var(--cb-surface-2)] text-xs text-[color:var(--cb-p200)]",
             sizeClasses[size],
           )}
         >

@@ -8,10 +8,9 @@ import type { EyebrowVariant } from "@/components/global/design-system/Eyebrow";
 export type SectionHeaderAlign = "left" | "center";
 
 const headingClasses =
-  "text-[32px] font-bold leading-9 tracking-tight text-[#f4f4f4] md:text-[44px] md:leading-[48px]";
+  "text-[32px] font-bold leading-9 tracking-tight text-[color:var(--cb-text)] md:text-[44px] md:leading-[48px]";
 
-const accentClasses =
-  "block bg-gradient-to-b from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent";
+const accentClasses = "cb-accent-text block";
 
 export interface SectionHeaderProps {
   eyebrow?: string;
@@ -37,7 +36,7 @@ function SectionHeader({
   return (
     <div
       className={cn(
-        "flex flex-col gap-3",
+        "flex flex-col gap-[var(--cb-space-12)]",
         align === "center" && "items-center text-center",
         className,
       )}
@@ -50,12 +49,12 @@ function SectionHeader({
         {accent ? <span className={accentClasses}>{accent}</span> : null}
       </h2>
       {description ? (
-        <p className="max-w-[54ch] text-lg leading-7 text-white/60">
+        <p className="max-w-[54ch] text-lg leading-7 text-[color:var(--cb-text-muted)]">
           {description}
         </p>
       ) : null}
       {actions ? (
-        <div className="flex flex-wrap items-center gap-3">{actions}</div>
+        <div className="flex flex-wrap items-center gap-[var(--cb-space-12)]">{actions}</div>
       ) : null}
     </div>
   );

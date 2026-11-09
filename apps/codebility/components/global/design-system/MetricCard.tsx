@@ -22,25 +22,27 @@ function MetricCard({
   return (
     <div
       className={cn(
-        "flex min-h-[120px] items-start gap-3 rounded-3xl border border-white/10 bg-white/[0.03] p-5",
+        "flex h-[200px] flex-col rounded-[20px] border border-[color:var(--cb-border)] bg-[color:var(--cb-panel)] p-[var(--cb-space-24)]",
         className,
       )}
     >
-      <IconTile
-        variant="glass"
-        className="h-10 w-10 shrink-0 [&>svg]:h-4 [&>svg]:w-4"
-      >
-        {icon}
-      </IconTile>
-      <div className="min-w-0">
-        <p className="bg-gradient-to-b from-purple-400 to-cyan-400 bg-clip-text text-[40px] font-bold leading-[44px] text-transparent">
+      <div className="flex items-center gap-[var(--cb-space-12)]">
+        <IconTile
+          variant="glass"
+          className="h-[var(--cb-size-44)] w-[var(--cb-size-44)] shrink-0 [&>svg]:h-[var(--cb-size-16)] [&>svg]:w-[var(--cb-size-16)]"
+        >
+          {icon}
+        </IconTile>
+        <p className="cb-metric-text text-[48px] font-bold leading-[48px] tracking-[-0.03em]">
           {value}
         </p>
-        <p className="text-sm font-semibold leading-5 text-[#f4f4f4]">
-          {label}
-        </p>
-        <p className="text-xs leading-[18px] text-white/50">{description}</p>
       </div>
+      <p className="mt-[var(--cb-space-28)] text-lg font-semibold leading-6 text-[color:var(--cb-text)]">
+        {label}
+      </p>
+      <p className="mt-[var(--cb-space-8)] text-sm leading-5 tracking-[-0.01em] text-[color:var(--cb-text-muted)]">
+        {description}
+      </p>
     </div>
   );
 }

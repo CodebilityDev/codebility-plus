@@ -3,9 +3,9 @@ import { cn } from "@codevs/ui";
 export type RoleBadgeRole = "admin" | "mentor" | "codev";
 
 const roleClasses: Record<RoleBadgeRole, string> = {
-  admin: "border-[#02ffe2]/30 bg-[#02ffe2]/10 text-[#02ffe2]",
-  mentor: "border-[#9747ff]/40 bg-[#9747ff]/[0.18] text-purple-200",
-  codev: "border-blue-500/30 bg-blue-500/10 text-blue-300",
+  admin: "border-[color:color-mix(in_srgb,var(--cb-teal)_30%,transparent)] bg-[color:color-mix(in_srgb,var(--cb-teal)_10%,transparent)] text-[color:var(--cb-teal)]",
+  mentor: "border-[color:color-mix(in_srgb,var(--cb-primary)_40%,transparent)] bg-[color:color-mix(in_srgb,var(--cb-primary)_18%,transparent)] text-[color:var(--cb-p200)]",
+  codev: "border-[color:var(--cb-role-codev-border)] bg-[color:color-mix(in_srgb,var(--cb-blue)_10%,transparent)] text-[color:var(--cb-role-codev-text)]",
 };
 
 const roleLabels: Record<RoleBadgeRole, string> = {
@@ -24,7 +24,7 @@ function RoleBadge({ role, label, className }: RoleBadgeProps) {
   return (
     <span
       className={cn(
-        "inline-flex h-6 items-center justify-center rounded-full border px-3 text-[11px] font-medium leading-4",
+        "inline-flex h-[var(--cb-size-24)] items-center justify-center rounded-[var(--cb-radius-full)] border px-[var(--cb-space-12)] text-[11px] font-medium leading-4",
         roleClasses[role],
         className,
       )}

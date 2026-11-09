@@ -37,7 +37,7 @@ function ProjectCard({
     <Link
       href={href}
       className={cn(
-        "group flex flex-col overflow-hidden rounded-3xl border border-white/10 bg-[#0a0a0a] transition-colors hover:border-[#9747ff]/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6A78F2] focus-visible:ring-offset-2 focus-visible:ring-offset-[#030303]",
+        "group flex flex-col overflow-hidden rounded-[var(--cb-radius-24)] border border-[color:var(--cb-border)] bg-[color:var(--cb-surface)] transition-colors hover:border-[color:color-mix(in_srgb,var(--cb-primary)_60%,transparent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--cb-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--cb-bg)]",
         minimal ? "self-start" : "h-full",
         className,
       )}
@@ -52,34 +52,34 @@ function ProjectCard({
           className="object-cover"
         />
         {!minimal && status ? (
-          <span className="absolute right-3 top-3 inline-flex h-6 items-center gap-1.5 rounded-full bg-[#030303]/80 px-2.5 text-[11px] font-medium leading-4 text-white/80 backdrop-blur">
+          <span className="absolute right-3 top-3 inline-flex h-[var(--cb-size-24)] items-center gap-[var(--cb-space-6)] rounded-[var(--cb-radius-full)] bg-[color:color-mix(in_srgb,var(--cb-bg)_80%,transparent)] px-2.5 text-[11px] font-medium leading-4 text-[color:var(--cb-text-secondary)] backdrop-blur">
             <span
               aria-hidden
-              className="h-1.5 w-1.5 rounded-full bg-[#4BCE97]"
+              className="h-[var(--cb-size-6)] w-[var(--cb-size-6)] rounded-[var(--cb-radius-full)] bg-[color:var(--cb-success)]"
             />
             {status}
           </span>
         ) : null}
       </div>
-      <div className="flex flex-1 flex-col gap-1 p-4">
-        <h3 className="text-[17px] font-semibold leading-6 text-[#f4f4f4]">
+      <div className="flex flex-1 flex-col gap-[var(--cb-space-4)] p-[var(--cb-space-16)]">
+        <h3 className="text-[17px] font-semibold leading-6 text-[color:var(--cb-text)]">
           {title}
         </h3>
-        <p className="text-[13px] leading-[19px] text-white/60">
+        <p className="text-[13px] leading-[19px] text-[color:var(--cb-text-muted)]">
           {description}
         </p>
         {minimal ? null : (
-          <div className="mt-auto flex items-center gap-3 pt-3">
+          <div className="mt-auto flex items-center gap-[var(--cb-space-12)] pt-[var(--cb-space-12)]">
             {tag ? (
-              <span className="inline-flex h-6 items-center rounded-full border border-[#9747ff]/40 bg-[#9747ff]/[0.12] px-2.5 text-[11px] font-medium leading-4 text-purple-200">
+              <span className="inline-flex h-[var(--cb-size-24)] items-center rounded-[var(--cb-radius-full)] border border-[color:color-mix(in_srgb,var(--cb-primary)_40%,transparent)] bg-[color:color-mix(in_srgb,var(--cb-primary)_12%,transparent)] px-2.5 text-[11px] font-medium leading-4 text-[color:var(--cb-p200)]">
                 {tag}
               </span>
             ) : null}
-            <span className="ml-auto inline-flex items-center gap-2 text-sm leading-5 text-[#c084fc]">
+            <span className="ml-auto inline-flex items-center gap-[var(--cb-space-8)] text-sm leading-5 text-[color:var(--cb-p400)]">
               View project
               <ArrowRight
                 aria-hidden
-                className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+                className="h-[var(--cb-size-16)] w-[var(--cb-size-16)] transition-transform group-hover:translate-x-0.5"
               />
             </span>
           </div>

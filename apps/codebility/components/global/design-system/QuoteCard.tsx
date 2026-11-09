@@ -32,11 +32,11 @@ function QuoteCard({
   return (
     <div
       className={cn(
-        "flex flex-col gap-4 rounded-3xl border border-purple-300/30 bg-[#121214] p-6 shadow-[0_0_48px_rgba(151,71,255,0.18)]",
+        "flex flex-col gap-[var(--cb-space-16)] rounded-[var(--cb-radius-24)] border border-[color:var(--cb-pill-border)] bg-[color:var(--cb-surface-2)] p-[var(--cb-space-24)] shadow-[0_0_48px_var(--cb-primary-subtle)]",
         className,
       )}
     >
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-[var(--cb-space-12)]">
         <Avatar
           initials={initials}
           src={avatarSrc}
@@ -44,26 +44,26 @@ function QuoteCard({
           size={40}
           gradient={avatarGradient}
         />
-        <div className="flex min-w-0 flex-col gap-0.5">
-          <p className="text-[17px] font-semibold leading-6 text-[#f4f4f4]">
+        <div className="flex min-w-0 flex-col gap-[var(--cb-space-2)]">
+          <p className="text-[17px] font-semibold leading-6 text-[color:var(--cb-text)]">
             {name}
           </p>
-          <p className="text-sm text-white/50">{role}</p>
+          <p className="text-sm text-[color:var(--cb-text-muted)]">{role}</p>
         </div>
       </div>
-      <blockquote className="text-lg leading-7 text-white/75">
+      <blockquote className="text-lg leading-7 text-[color:var(--cb-text-secondary)]">
         {quote}
       </blockquote>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-[var(--cb-space-16)]">
         <Rating value={rating} />
         {page && pageCount ? (
-          <div aria-hidden className="ml-auto flex items-center gap-1.5">
+          <div aria-hidden className="ml-auto flex items-center gap-[var(--cb-space-6)]">
             {Array.from({ length: pageCount }, (_, index) => (
               <span
                 key={index}
                 className={cn(
-                  "h-2 rounded-full",
-                  index === page - 1 ? "w-6 bg-[#9747ff]" : "w-2 bg-white/25",
+                  "h-[var(--cb-size-8)] rounded-[var(--cb-radius-full)]",
+                  index === page - 1 ? "w-[var(--cb-size-24)] bg-[color:var(--cb-primary)]" : "w-[var(--cb-size-8)] bg-[color:color-mix(in_srgb,var(--cb-white)_25%,transparent)]",
                 )}
               />
             ))}

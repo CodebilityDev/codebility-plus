@@ -27,19 +27,19 @@ export function LandingNavigation() {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/10 bg-[#030303]/85 backdrop-blur-xl">
-      <LandingContainer className="flex h-16 items-center gap-4">
+    <header className="sticky top-0 z-50 border-b border-[color:var(--cb-border)] bg-[color:color-mix(in_srgb,var(--cb-bg)_85%,transparent)] backdrop-blur-xl">
+      <LandingContainer className="flex h-[var(--cb-size-64)] items-center gap-[var(--cb-space-16)]">
         <Link
           href="/"
           aria-label="Codebility home"
-          className="shrink-0 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6A78F2] focus-visible:ring-offset-2 focus-visible:ring-offset-[#030303]"
+          className="shrink-0 rounded-[var(--cb-radius-full)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--cb-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--cb-bg)]"
         >
           <Wordmark width={170} priority />
         </Link>
 
         <nav
           aria-label="Primary"
-          className="mx-auto hidden items-center gap-1 rounded-full border border-white/10 bg-white/[0.03] p-1 lg:flex"
+          className="mx-auto hidden items-center gap-[var(--cb-space-4)] rounded-[var(--cb-radius-full)] border border-[color:var(--cb-border)] bg-[color:var(--cb-panel)] p-[var(--cb-space-4)] lg:flex"
         >
           {landingNavLinks.map((link) => (
             <NavItem
@@ -52,20 +52,20 @@ export function LandingNavigation() {
           ))}
           <form
             onSubmit={handleSearch}
-            className="ml-1 hidden h-9 w-[210px] items-center gap-2 rounded-full px-3 focus-within:border-[#9747ff] focus-within:ring-2 focus-within:ring-[#9747ff]/20 xl:flex"
+            className="ml-[var(--cb-space-4)] hidden h-[var(--cb-size-36)] w-[210px] items-center gap-[var(--cb-space-8)] rounded-[var(--cb-radius-full)] px-[var(--cb-space-12)] focus-within:border-[color:var(--cb-primary)] focus-within:ring-2 focus-within:ring-[color:var(--cb-focus-glow)] xl:flex"
           >
-            <Search className="h-4 w-4 shrink-0 text-white/40" />
+            <Search className="h-[var(--cb-size-16)] w-[var(--cb-size-16)] shrink-0 text-[color:var(--cb-text-decorative)]" />
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search developers..."
               aria-label="Search developers"
-              className="min-w-0 flex-1 bg-transparent text-xs text-[#f4f4f4] outline-none placeholder:text-white/50"
+              className="min-w-0 flex-1 bg-transparent text-xs text-[color:var(--cb-text)] outline-none placeholder:text-[color:var(--cb-text-muted)]"
             />
           </form>
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-[var(--cb-space-8)]">
           <Button
             asChild
             variant="ghost"
@@ -77,20 +77,20 @@ export function LandingNavigation() {
           <Button asChild size="sm" className="hidden lg:inline-flex">
             <Link href="/bookacall">
               Book a Call
-              <ArrowRight className="h-4 w-4" />
+              <ArrowRight className="h-[var(--cb-size-16)] w-[var(--cb-size-16)]" />
             </Link>
           </Button>
 
           <IconButton
             label={mobileOpen ? "Close menu" : "Open menu"}
             variant="outline"
-            className="h-11 w-11 lg:hidden"
+            className="h-[var(--cb-size-44)] w-[var(--cb-size-44)] lg:hidden"
             aria-expanded={mobileOpen}
             aria-controls="mobile-menu"
             onClick={() => setMobileOpen((open) => !open)}
           >
             {mobileOpen ? (
-              <X className="h-[18px] w-[18px]" />
+              <X className="h-[var(--cb-size-18)] w-[var(--cb-size-18)]" />
             ) : (
               <MenuGlyph />
             )}
@@ -99,15 +99,15 @@ export function LandingNavigation() {
       </LandingContainer>
 
       {mobileOpen ? (
-        <div id="mobile-menu" className="border-t border-white/10 bg-[#030303] lg:hidden">
-          <LandingContainer className="flex flex-col gap-4 py-4">
-            <nav aria-label="Mobile" className="flex flex-col gap-1">
+        <div id="mobile-menu" className="border-t border-[color:var(--cb-border)] bg-[color:var(--cb-bg)] lg:hidden">
+          <LandingContainer className="flex flex-col gap-[var(--cb-space-16)] py-[var(--cb-space-16)]">
+            <nav aria-label="Mobile" className="flex flex-col gap-[var(--cb-space-4)]">
               {landingNavLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileOpen(false)}
-                  className="flex h-11 items-center rounded-full px-4 text-sm font-medium text-white/70 transition-colors hover:bg-white/5 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6A78F2]"
+                  className="flex h-[var(--cb-size-44)] items-center rounded-[var(--cb-radius-full)] px-[var(--cb-space-16)] text-sm font-medium text-[color:var(--cb-text-secondary)] transition-colors hover:bg-[color:var(--cb-glass)] hover:text-[color:var(--cb-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--cb-ring)]"
                 >
                   {link.label}
                 </Link>
@@ -115,18 +115,18 @@ export function LandingNavigation() {
             </nav>
             <form
               onSubmit={handleSearch}
-              className="flex h-11 items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 focus-within:border-[#9747ff] focus-within:ring-2 focus-within:ring-[#9747ff]/20"
+              className="flex h-[var(--cb-size-44)] items-center gap-[var(--cb-space-8)] rounded-[var(--cb-radius-full)] border border-[color:var(--cb-border)] bg-[color:var(--cb-glass)] px-[var(--cb-space-16)] focus-within:border-[color:var(--cb-primary)] focus-within:ring-2 focus-within:ring-[color:var(--cb-focus-glow)]"
             >
-              <Search className="h-4 w-4 shrink-0 text-white/40" />
+              <Search className="h-[var(--cb-size-16)] w-[var(--cb-size-16)] shrink-0 text-[color:var(--cb-text-decorative)]" />
               <input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Search developers..."
                 aria-label="Search developers"
-                className="min-w-0 flex-1 bg-transparent text-sm text-[#f4f4f4] outline-none placeholder:text-white/50"
+                className="min-w-0 flex-1 bg-transparent text-sm text-[color:var(--cb-text)] outline-none placeholder:text-[color:var(--cb-text-muted)]"
               />
             </form>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-[var(--cb-space-8)]">
               <Button asChild variant="outline" size="sm">
                 <Link href="/auth/sign-in">Sign in</Link>
               </Button>

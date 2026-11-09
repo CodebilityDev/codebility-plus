@@ -14,15 +14,15 @@ const socialLinks = [
 
 export function LandingFooter() {
   return (
-    <footer className="pb-10 pt-10">
+    <footer className="pb-[var(--cb-space-40)] pt-[var(--cb-space-40)]">
       <LandingContainer>
-        <div className="rounded-3xl border border-white/10 bg-[#0a0a0a] p-6 sm:p-8 lg:p-10">
-          <div className="flex flex-col gap-6 border-b border-white/10 pb-8 md:flex-row md:items-center md:justify-between">
+        <div className="rounded-[var(--cb-radius-24)] border border-[color:var(--cb-border)] bg-[color:var(--cb-surface)] p-[var(--cb-space-24)] sm:p-[var(--cb-space-32)] lg:p-[var(--cb-space-40)]">
+          <div className="flex flex-col gap-[var(--cb-space-24)] border-b border-[color:var(--cb-border)] pb-[var(--cb-space-32)] md:flex-row md:items-center md:justify-between">
             <div>
-              <h2 className="text-2xl font-semibold leading-[30px] text-[#f4f4f4]">
+              <h2 className="text-2xl font-semibold leading-[30px] text-[color:var(--cb-text)]">
                 Stay in the loop
               </h2>
-              <p className="mt-1 text-sm text-white/50">
+              <p className="mt-[var(--cb-space-4)] text-sm text-[color:var(--cb-text-muted)]">
                 Project launches, open CoDev roles and engineering notes.
                 Monthly, no spam.
               </p>
@@ -30,14 +30,14 @@ export function LandingFooter() {
             <NewsletterForm />
           </div>
 
-          <div className="grid gap-8 py-8 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr]">
-            <div className="flex flex-col gap-4">
+          <div className="grid gap-[var(--cb-space-32)] py-[var(--cb-space-32)] md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr]">
+            <div className="flex flex-col gap-[var(--cb-space-16)]">
               <Wordmark width={150} />
-              <p className="max-w-[240px] text-sm leading-5 text-white/50">
+              <p className="max-w-[240px] text-sm leading-5 text-[color:var(--cb-text-muted)]">
                 A dynamic hub for innovation: hire vetted Filipino developers
                 or grow your career as a CoDev.
               </p>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-[var(--cb-space-12)]">
                 {socialLinks.map((social) => {
                   const Icon = social.icon;
                   return (
@@ -45,9 +45,9 @@ export function LandingFooter() {
                       key={social.label}
                       href={social.href}
                       aria-label={social.label}
-                      className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-white/60 transition-colors hover:border-white/20 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6A78F2] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]"
+                      className="flex h-[var(--cb-size-36)] w-[var(--cb-size-36)] items-center justify-center rounded-[var(--cb-radius-full)] border border-[color:var(--cb-border)] bg-[color:var(--cb-panel)] text-[color:var(--cb-text-muted)] transition-colors hover:border-[color:color-mix(in_srgb,var(--cb-white)_20%,transparent)] hover:text-[color:var(--cb-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--cb-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--cb-surface)]"
                     >
-                      <Icon className="h-4 w-4" />
+                      <Icon className="h-[var(--cb-size-16)] w-[var(--cb-size-16)]" />
                     </Link>
                   );
                 })}
@@ -55,16 +55,16 @@ export function LandingFooter() {
             </div>
 
             {footerColumns.map((column) => (
-              <div key={column.title} className="flex flex-col gap-3">
-                <p className="text-sm font-semibold text-[#f4f4f4]">
+              <div key={column.title} className="flex flex-col gap-[var(--cb-space-12)]">
+                <p className="text-sm font-semibold text-[color:var(--cb-text)]">
                   {column.title}
                 </p>
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-[var(--cb-space-8)]">
                   {column.links.map((link) => (
                     <Link
                       key={link.label}
                       href={link.href}
-                      className="w-fit text-sm text-white/50 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6A78F2] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]"
+                      className="w-fit text-sm text-[color:var(--cb-text-muted)] transition-colors hover:text-[color:var(--cb-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--cb-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--cb-surface)]"
                     >
                       {link.label}
                     </Link>
@@ -74,16 +74,16 @@ export function LandingFooter() {
             ))}
           </div>
 
-          <div className="flex flex-col gap-3 border-t border-white/10 pt-6 text-xs text-white/50 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-[var(--cb-space-12)] border-t border-[color:var(--cb-border)] pt-[var(--cb-space-24)] text-xs text-[color:var(--cb-text-muted)] sm:flex-row sm:items-center sm:justify-between">
             <p>© 2026 Codebility. All rights reserved.</p>
-            <div className="flex flex-wrap items-center gap-4">
-              <Link href="/privacy-policy" className="transition-colors hover:text-white">
+            <div className="flex flex-wrap items-center gap-[var(--cb-space-16)]">
+              <Link href="/privacy-policy" className="transition-colors hover:text-[color:var(--cb-text)]">
                 Terms
               </Link>
-              <Link href="/privacy-policy" className="transition-colors hover:text-white">
+              <Link href="/privacy-policy" className="transition-colors hover:text-[color:var(--cb-text)]">
                 Privacy
               </Link>
-              <Link href="/privacy-policy" className="transition-colors hover:text-white">
+              <Link href="/privacy-policy" className="transition-colors hover:text-[color:var(--cb-text)]">
                 Cookies
               </Link>
             </div>

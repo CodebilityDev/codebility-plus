@@ -5,15 +5,15 @@ import { cn } from "@codevs/ui";
 export type StepStatus = "done" | "active" | "upcoming";
 
 const statusClasses: Record<StepStatus, string> = {
-  done: "border-white/10 bg-white/[0.02]",
-  active: "border-[#9747ff]/50 bg-[#9747ff]/[0.18]",
-  upcoming: "border-white/10 bg-white/[0.02]",
+  done: "border-[color:var(--cb-border)] bg-[color:var(--cb-panel)]",
+  active: "border-[color:color-mix(in_srgb,var(--cb-primary)_50%,transparent)] bg-[color:color-mix(in_srgb,var(--cb-primary)_18%,transparent)]",
+  upcoming: "border-[color:var(--cb-border)] bg-[color:var(--cb-panel)]",
 };
 
 const tileClasses: Record<StepStatus, string> = {
-  done: "bg-[#4bce97] text-[#030303]",
-  active: "bg-[#9747ff] text-sm font-medium text-white",
-  upcoming: "bg-white/5 text-sm font-medium text-white/50",
+  done: "bg-[color:var(--cb-success)] text-[color:var(--cb-bg)]",
+  active: "bg-[color:var(--cb-primary)] text-sm font-medium text-[color:var(--cb-text)]",
+  upcoming: "bg-[color:var(--cb-glass)] text-sm font-medium text-[color:var(--cb-text-muted)]",
 };
 
 export interface StepProps {
@@ -38,7 +38,7 @@ function Step({
   return (
     <div
       className={cn(
-        "flex h-[86px] items-center gap-4 rounded-2xl border p-4",
+        "flex h-[86px] items-center gap-[var(--cb-space-16)] rounded-[var(--cb-radius-16)] border p-[var(--cb-space-16)]",
         statusClasses[status],
         className,
       )}
@@ -46,26 +46,26 @@ function Step({
       <span
         aria-hidden
         className={cn(
-          "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
+          "flex h-[var(--cb-size-40)] w-[var(--cb-size-40)] shrink-0 items-center justify-center rounded-[var(--cb-radius-12)]",
           tileClasses[status],
         )}
       >
         {status === "done" ? (
-          <Check className="h-3 w-3" strokeWidth={3} />
+          <Check className="h-[var(--cb-size-12)] w-[var(--cb-size-12)]" strokeWidth={3} />
         ) : (
           number
         )}
       </span>
-      <div className="flex min-w-0 flex-col gap-0.5">
-        <span className="text-[17px] font-semibold leading-6 text-[#f4f4f4]">
+      <div className="flex min-w-0 flex-col gap-[var(--cb-space-2)]">
+        <span className="text-[17px] font-semibold leading-6 text-[color:var(--cb-text)]">
           {title}
         </span>
         {description === undefined ? null : (
-          <span className="text-sm text-white/50">{description}</span>
+          <span className="text-sm text-[color:var(--cb-text-muted)]">{description}</span>
         )}
       </div>
       {meta === undefined ? null : (
-        <span className="ml-auto shrink-0 whitespace-nowrap text-xs font-medium text-white/50">
+        <span className="ml-auto shrink-0 whitespace-nowrap text-xs font-medium text-[color:var(--cb-text-muted)]">
           {meta}
         </span>
       )}

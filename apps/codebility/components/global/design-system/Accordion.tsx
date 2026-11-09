@@ -12,7 +12,7 @@ const Accordion = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <AccordionPrimitive.Root
     ref={ref}
-    className={cn("flex flex-col gap-2", className)}
+    className={cn("flex flex-col gap-[var(--cb-space-8)]", className)}
     {...props}
   />
 ));
@@ -26,7 +26,7 @@ const AccordionItem = React.forwardRef<
   <AccordionPrimitive.Item
     ref={ref}
     className={cn(
-      "group rounded-2xl border border-white/10 bg-white/[0.02] transition-colors data-[state=open]:border-[#9747ff]/40 data-[state=open]:bg-[#9747ff]/[0.18]",
+      "group rounded-[var(--cb-radius-16)] border border-[color:var(--cb-border)] bg-[color:var(--cb-panel)] transition-colors data-[state=open]:border-[color:color-mix(in_srgb,var(--cb-primary)_40%,transparent)] data-[state=open]:bg-[color:color-mix(in_srgb,var(--cb-primary)_18%,transparent)]",
       className,
     )}
     {...props}
@@ -43,14 +43,14 @@ const AccordionTrigger = React.forwardRef<
     <AccordionPrimitive.Trigger
       ref={ref}
       className={cn(
-        "flex w-full items-center gap-3 rounded-2xl px-5 py-4 text-left text-sm font-medium text-[#f4f4f4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6A78F2] focus-visible:ring-offset-2 focus-visible:ring-offset-[#030303] disabled:pointer-events-none disabled:opacity-50",
+        "flex w-full items-center gap-[var(--cb-space-12)] rounded-[var(--cb-radius-16)] px-[var(--cb-space-20)] py-[var(--cb-space-16)] text-left text-sm font-medium text-[color:var(--cb-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--cb-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--cb-bg)] disabled:pointer-events-none disabled:opacity-50",
         className,
       )}
       {...props}
     >
       {children}
-      <Plus className="ml-auto h-[18px] w-[18px] shrink-0 text-white/50 group-data-[state=open]:hidden" />
-      <Minus className="ml-auto hidden h-[18px] w-[18px] shrink-0 text-purple-200 group-data-[state=open]:block" />
+      <Plus className="ml-auto h-[var(--cb-size-18)] w-[var(--cb-size-18)] shrink-0 text-[color:var(--cb-text-muted)] group-data-[state=open]:hidden" />
+      <Minus className="ml-auto hidden h-[var(--cb-size-18)] w-[var(--cb-size-18)] shrink-0 text-[color:var(--cb-p200)] group-data-[state=open]:block" />
     </AccordionPrimitive.Trigger>
   </AccordionPrimitive.Header>
 ));
@@ -64,12 +64,12 @@ const AccordionContent = React.forwardRef<
   <AccordionPrimitive.Content
     ref={ref}
     className={cn(
-      "overflow-hidden text-sm text-white/70 transition-all data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down",
+      "overflow-hidden text-sm text-[color:var(--cb-text-secondary)] transition-all data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down",
       className,
     )}
     {...props}
   >
-    <div className="px-5 pb-5">{children}</div>
+    <div className="px-[var(--cb-space-20)] pb-[var(--cb-space-20)]">{children}</div>
   </AccordionPrimitive.Content>
 ));
 

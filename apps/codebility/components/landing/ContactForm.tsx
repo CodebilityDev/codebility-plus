@@ -41,8 +41,8 @@ export function ContactForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex h-full flex-col gap-5">
-      <div className="grid gap-4 md:grid-cols-2">
+    <form onSubmit={handleSubmit} className="flex h-full flex-col gap-[var(--cb-space-20)]">
+      <div className="grid gap-[var(--cb-space-16)] md:grid-cols-2">
         <TextField
           name="name"
           label="Full name"
@@ -60,9 +60,9 @@ export function ContactForm() {
         />
       </div>
 
-      <div className="flex flex-col gap-2">
-        <span className="text-sm text-white/70">Budget</span>
-        <div role="group" aria-label="Budget" className="flex flex-wrap gap-2">
+      <div className="flex flex-col gap-[var(--cb-space-8)]">
+        <span className="text-sm text-[color:var(--cb-text-secondary)]">Budget</span>
+        <div role="group" aria-label="Budget" className="flex flex-wrap gap-[var(--cb-space-8)]">
           {budgetOptions.map((option) => (
             <Chip
               key={option}
@@ -75,12 +75,12 @@ export function ContactForm() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-2">
-        <span className="text-sm text-white/70">What do you need?</span>
+      <div className="flex flex-col gap-[var(--cb-space-8)]">
+        <span className="text-sm text-[color:var(--cb-text-secondary)]">What do you need?</span>
         <div
           role="group"
           aria-label="What do you need?"
-          className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3"
+          className="grid grid-cols-1 gap-[var(--cb-space-8)] sm:grid-cols-2 lg:grid-cols-3"
         >
           {needOptions.map((option) => {
             const selected = needs.includes(option);
@@ -90,14 +90,14 @@ export function ContactForm() {
                 key={option}
                 selected={selected}
                 onClick={() => toggleNeed(option)}
-                className="h-10 w-full justify-start gap-2.5 px-3 text-[13px]"
+                className="h-[var(--cb-size-40)] w-full justify-start gap-2.5 px-[var(--cb-space-12)] text-[13px]"
               >
                 {selected ? (
-                  <Check aria-hidden className="h-3.5 w-3.5 shrink-0" />
+                  <Check aria-hidden className="h-[var(--cb-size-14)] w-[var(--cb-size-14)] shrink-0" />
                 ) : (
                   <Circle
                     aria-hidden
-                    className="h-3.5 w-3.5 shrink-0 text-white/30"
+                    className="h-[var(--cb-size-14)] w-[var(--cb-size-14)] shrink-0 text-[color:color-mix(in_srgb,var(--cb-white)_30%,transparent)]"
                   />
                 )}
                 {option}
@@ -113,19 +113,19 @@ export function ContactForm() {
         placeholder="A few lines about your goals and timeline..."
       />
 
-      <div className="mt-auto flex flex-col gap-3 pt-1 sm:flex-row sm:items-center sm:justify-between">
-        <p className="flex items-center gap-2 text-xs leading-[18px] text-white/50">
-          <Calendar aria-hidden className="h-4 w-4 shrink-0" />
+      <div className="mt-auto flex flex-col gap-[var(--cb-space-12)] pt-[var(--cb-space-4)] sm:flex-row sm:items-center sm:justify-between">
+        <p className="flex items-center gap-[var(--cb-space-8)] text-xs leading-[18px] text-[color:var(--cb-text-muted)]">
+          <Calendar aria-hidden className="h-[var(--cb-size-16)] w-[var(--cb-size-16)] shrink-0" />
           Next: choose a time on Calendly
         </p>
         <Button type="submit" className="w-full sm:w-auto">
           Send & book a call
-          <Send aria-hidden className="h-4 w-4" />
+          <Send aria-hidden className="h-[var(--cb-size-16)] w-[var(--cb-size-16)]" />
         </Button>
       </div>
 
       {submitted ? (
-        <p role="status" className="text-sm text-[#4bce97]">
+        <p role="status" className="text-sm text-[color:var(--cb-success)]">
           {"Thanks. We'll reply within one business day."}
         </p>
       ) : null}

@@ -6,10 +6,10 @@ export interface MenuGlyphProps {
 
 function MenuGlyph({ className }: MenuGlyphProps) {
   return (
-    <span aria-hidden className={cn("flex flex-col gap-1", className)}>
-      <span className="h-0.5 w-[18px] bg-[#f4f4f4]" />
-      <span className="h-0.5 w-[18px] bg-[#f4f4f4]" />
-      <span className="h-0.5 w-[18px] bg-[#f4f4f4]" />
+    <span aria-hidden className={cn("flex flex-col gap-[var(--cb-space-4)]", className)}>
+      <span className="h-[var(--cb-size-2)] w-[var(--cb-size-18)] bg-[color:var(--cb-white)]" />
+      <span className="h-[var(--cb-size-2)] w-[var(--cb-size-18)] bg-[color:var(--cb-white)]" />
+      <span className="h-[var(--cb-size-2)] w-[var(--cb-size-18)] bg-[color:var(--cb-white)]" />
     </span>
   );
 }

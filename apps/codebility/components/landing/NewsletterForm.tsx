@@ -22,7 +22,7 @@ export function NewsletterForm({ className }: NewsletterFormProps) {
           setSubmitted(true);
           setEmail("");
         }}
-        className="flex h-12 items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] p-1.5 pl-4 focus-within:border-[#9747ff] focus-within:ring-2 focus-within:ring-[#9747ff]/20"
+        className="flex h-[var(--cb-size-48)] items-center gap-[var(--cb-space-8)] rounded-[var(--cb-radius-full)] border border-[color:var(--cb-border)] bg-[color:var(--cb-glass)] p-[var(--cb-space-6)] pl-[var(--cb-space-16)] focus-within:border-[color:var(--cb-primary)] focus-within:ring-2 focus-within:ring-[color:var(--cb-focus-glow)]"
       >
         <input
           type="email"
@@ -31,14 +31,14 @@ export function NewsletterForm({ className }: NewsletterFormProps) {
           onChange={(event) => setEmail(event.target.value)}
           placeholder="you@company.com"
           aria-label="Email address"
-          className="min-w-0 flex-1 bg-transparent text-sm text-[#f4f4f4] outline-none placeholder:text-white/50"
+          className="min-w-0 flex-1 bg-transparent text-sm text-[color:var(--cb-text)] outline-none placeholder:text-[color:var(--cb-text-muted)]"
         />
         <Button type="submit" size="sm">
           Subscribe
         </Button>
       </form>
       {submitted ? (
-        <p className="mt-2 text-xs leading-[18px] text-[#7be0b6]">
+        <p className="mt-[var(--cb-space-8)] text-xs leading-[18px] text-[color:var(--cb-success-text)]">
           Subscribed. Check your inbox.
         </p>
       ) : null}

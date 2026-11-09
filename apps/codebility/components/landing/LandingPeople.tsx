@@ -33,8 +33,8 @@ export function LandingPeople() {
   const visiblePeople = people.filter((person) => matchesFilter(person, filter));
 
   return (
-    <section id="people" className="border-t border-white/10 py-24 lg:py-32">
-      <LandingContainer className="flex flex-col gap-8 lg:gap-10">
+    <section id="people" className="border-t border-[color:var(--cb-border)] py-[var(--cb-space-96)] lg:py-32">
+      <LandingContainer className="flex flex-col gap-[var(--cb-space-32)] lg:gap-[var(--cb-space-40)]">
         <SectionHeader
           align="center"
           title="Meet the people behind Codebility"
@@ -45,7 +45,7 @@ export function LandingPeople() {
           <div
             role="group"
             aria-label="Filter people by role"
-            className="flex flex-wrap items-center justify-center gap-1 rounded-full border border-white/10 bg-white/[0.03] p-1"
+            className="flex flex-wrap items-center justify-center gap-[var(--cb-space-4)] rounded-[var(--cb-radius-full)] border border-[color:var(--cb-border)] bg-[color:var(--cb-panel)] p-[var(--cb-space-4)]"
           >
             {peopleFilters.map((item) => {
               const selected = filter === item.value;
@@ -62,7 +62,7 @@ export function LandingPeople() {
                   <span
                     className={cn(
                       "text-xs leading-4",
-                      selected ? "text-white/70" : "text-white/50",
+                      selected ? "text-[color:var(--cb-text-secondary)]" : "text-[color:var(--cb-text-muted)]",
                     )}
                   >
                     {item.count}
@@ -76,7 +76,7 @@ export function LandingPeople() {
         <ul
           id="people-grid"
           aria-label="People at Codebility"
-          className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4"
+          className="grid grid-cols-1 gap-[var(--cb-space-16)] sm:grid-cols-2 xl:grid-cols-4"
         >
           {visiblePeople.map((person) => (
             <li key={person.name} className="min-w-0">
@@ -100,14 +100,14 @@ export function LandingPeople() {
           ))}
         </ul>
 
-        <div className="flex flex-wrap items-center justify-center gap-3">
+        <div className="flex flex-wrap items-center justify-center gap-[var(--cb-space-12)]">
           <Button asChild variant="outline">
             <Link href="/codevs">View all CoDevs</Link>
           </Button>
           <Button asChild>
             <Link href="/hire-a-codev">
               Hire CoDevs
-              <ArrowRight aria-hidden className="h-4 w-4" />
+              <ArrowRight aria-hidden className="h-[var(--cb-size-16)] w-[var(--cb-size-16)]" />
             </Link>
           </Button>
         </div>

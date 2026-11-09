@@ -14,7 +14,7 @@ const TabsList = React.forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      "scrollbar-hide inline-flex h-[50px] max-w-full items-center gap-1 overflow-x-auto rounded-full border border-white/10 bg-white/[0.04] p-1",
+      "scrollbar-hide inline-flex h-[50px] max-w-full items-center gap-[var(--cb-space-4)] overflow-x-auto rounded-[var(--cb-radius-full)] border border-[color:var(--cb-border)] bg-[color:var(--cb-glass)] p-[var(--cb-space-4)]",
       className,
     )}
     {...props}
@@ -36,14 +36,14 @@ const Tab = React.forwardRef<
   <TabsPrimitive.Trigger
     ref={ref}
     className={cn(
-      "group inline-flex h-10 items-center justify-center gap-2 rounded-full px-4 text-sm font-medium text-white/60 transition-colors hover:bg-white/5 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6A78F2] focus-visible:ring-offset-2 focus-visible:ring-offset-[#030303] data-[state=active]:bg-[#9747ff] data-[state=active]:text-white disabled:pointer-events-none disabled:opacity-50",
+      "group inline-flex h-[var(--cb-size-40)] items-center justify-center gap-[var(--cb-space-8)] rounded-[var(--cb-radius-full)] px-[var(--cb-space-16)] text-sm font-medium text-[color:var(--cb-text-muted)] transition-colors hover:bg-[color:var(--cb-glass)] hover:text-[color:var(--cb-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--cb-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--cb-bg)] data-[state=active]:bg-[color:var(--cb-primary)] data-[state=active]:text-[color:var(--cb-text)] disabled:pointer-events-none disabled:opacity-50",
       className,
     )}
     {...props}
   >
     {children}
     {count === undefined ? null : (
-      <span className="text-[11px] leading-4 text-white/50 group-data-[state=active]:text-white/80">
+      <span className="text-[11px] leading-4 text-[color:var(--cb-text-muted)] group-data-[state=active]:text-[color:var(--cb-text-secondary)]">
         {count}
       </span>
     )}
@@ -59,7 +59,7 @@ const TabsContent = React.forwardRef<
   <TabsPrimitive.Content
     ref={ref}
     className={cn(
-      "mt-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6A78F2] focus-visible:ring-offset-2 focus-visible:ring-offset-[#030303]",
+      "mt-[var(--cb-space-16)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--cb-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--cb-bg)]",
       className,
     )}
     {...props}
