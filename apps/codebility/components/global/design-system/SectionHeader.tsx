@@ -15,8 +15,10 @@ const accentClasses = "cb-accent-text block";
 export interface SectionHeaderProps {
   eyebrow?: string;
   eyebrowVariant?: EyebrowVariant;
+  eyebrowClassName?: string;
   title: ReactNode;
   accent?: ReactNode;
+  accentClassName?: string;
   description?: ReactNode;
   actions?: ReactNode;
   align?: SectionHeaderAlign;
@@ -26,8 +28,10 @@ export interface SectionHeaderProps {
 function SectionHeader({
   eyebrow,
   eyebrowVariant,
+  eyebrowClassName,
   title,
   accent,
+  accentClassName,
   description,
   actions,
   align = "left",
@@ -42,11 +46,15 @@ function SectionHeader({
       )}
     >
       {eyebrow ? (
-        <Eyebrow variant={eyebrowVariant}>{eyebrow}</Eyebrow>
+        <Eyebrow variant={eyebrowVariant} className={eyebrowClassName}>
+          {eyebrow}
+        </Eyebrow>
       ) : null}
       <h2 className={headingClasses}>
         {title}
-        {accent ? <span className={accentClasses}>{accent}</span> : null}
+        {accent ? (
+          <span className={cn(accentClasses, accentClassName)}>{accent}</span>
+        ) : null}
       </h2>
       {description ? (
         <p className="max-w-[54ch] text-lg leading-7 text-[color:var(--cb-text-muted)]">

@@ -1,8 +1,8 @@
 import { Suspense } from "react";
 
 import { HeroMarquee } from "@/components/landing/HeroMarquee";
+import { LandingSearchCardsSkeleton } from "@/components/landing/LandingSearchCardsSkeleton";
 import { LandingSearchResults } from "@/components/landing/LandingSearchResults";
-import { LandingSearchSkeleton } from "@/components/landing/LandingSearchSkeleton";
 import type {
   HeroCodev,
   LandingSearchParams,
@@ -33,7 +33,7 @@ async function LandingDeveloperContent({
   if (!query) return <HeroMarquee codevs={codevs} />;
 
   return (
-    <Suspense fallback={<LandingSearchSkeleton />}>
+    <Suspense fallback={<LandingSearchCardsSkeleton />}>
       <LandingSearchResults query={query} page={parsePage(params.page)} />
     </Suspense>
   );

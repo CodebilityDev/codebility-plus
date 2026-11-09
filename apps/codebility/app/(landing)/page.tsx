@@ -50,10 +50,10 @@ export default async function LandingPage({
       <LandingServices />
       <LandingNumbers />
       <LandingProcess />
-      <LandingPeople />
+      <LandingPeople searchParams={searchParams} />
       <LandingStories />
       <LandingFaq />
-      <LandingCommunity />
+      <LandingCommunity codevs={codevs} />
       <LandingContact />
     </>
   );

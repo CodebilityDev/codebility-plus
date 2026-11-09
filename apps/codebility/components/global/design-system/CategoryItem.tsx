@@ -49,9 +49,16 @@ const CategoryItem = React.forwardRef<HTMLButtonElement, CategoryItemProps>(
       )}
       <span className="text-[15px] leading-5">{label}</span>
       {count === undefined ? null : (
-        <span className="text-xs text-[color:var(--cb-text-muted)]">{count}</span>
+        <span className="ml-auto text-xs text-[color:var(--cb-text-muted)]">
+          {count}
+        </span>
       )}
-      <ChevronRight className="ml-auto h-[var(--cb-size-18)] w-[var(--cb-size-18)] shrink-0 text-[color:var(--cb-text-muted)]" />
+      <ChevronRight
+        className={cn(
+          "h-[var(--cb-size-18)] w-[var(--cb-size-18)] shrink-0 text-[color:var(--cb-text-muted)]",
+          count === undefined && "ml-auto",
+        )}
+      />
     </button>
   ),
 );

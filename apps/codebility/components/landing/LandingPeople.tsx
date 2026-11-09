@@ -1,117 +1,142 @@
-"use client";
-
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
-
-import { cn } from "@codevs/ui";
+import { Suspense } from "react";
 
 import { Button } from "@/components/global/design-system/Button";
-import { Chip } from "@/components/global/design-system/Chip";
 import { ProfileCard } from "@/components/global/design-system/ProfileCard";
 import { RoleBadge } from "@/components/global/design-system/RoleBadge";
 import { SectionHeader } from "@/components/global/design-system/SectionHeader";
 import { LandingContainer } from "@/components/landing/LandingContainer";
-import { people } from "@/constants/landing/landing-content";
-import type { LandingPerson } from "@/constants/landing/landing-content";
+import { LandingPeopleCards } from "@/components/landing/LandingPeopleTransition";
+import { LandingPeopleFilters } from "@/components/landing/LandingPeopleFilters";
+import { LandingPeopleGridSkeleton } from "@/components/landing/LandingPeopleGridSkeleton";
+import { LandingPeoplePagination } from "@/components/landing/LandingPeoplePagination";
+import { LandingPeopleTransition } from "@/components/landing/LandingPeopleTransition";
+import { getCachedLandingTeamPage } from "@/lib/landing/people";
+import type { LandingSearchParams } from "@/types/landing/hero-codevs";
+import type { TeamFilter } from "@/types/landing/people";
+import { teamFilters } from "@/types/landing/people";
 
-const peopleFilters = [
-  { value: "all", label: "All", count: "164" },
-  { value: "admin", label: "Admins", count: "8" },
-  { value: "mentor", label: "Mentors", count: "8" },
-  { value: "codev", label: "CoDevs", count: "100+" },
-] as const;
-
-type PeopleFilter = (typeof peopleFilters)[number]["value"];
-
-function matchesFilter(person: LandingPerson, filter: PeopleFilter) {
-  return filter === "all" || person.badgeRole === filter;
+interface LandingPeopleProps {
+  searchParams: LandingSearchParams;
 }
 
-export function LandingPeople() {
-  const [filter, setFilter] = useState<PeopleFilter>("all");
-  const visiblePeople = people.filter((person) => matchesFilter(person, filter));
+interface LandingPeopleContentProps {
+  searchParams: LandingSearchParams;
+}
+
+function parseTeamFilter(
+  value: string | string[] | undefined,
+): TeamFilter {
+  const candidate = Array.isArray(value) ? value[0] : value;
+
+  return teamFilters.includes(candidate as TeamFilter)
+    ? (candidate as TeamFilter)
+    : "all";
+}
+
+function parsePage(value: string | string[] | undefined): number {
+  const candidate = Array.isArray(value) ? value[0] : value;
+  const parsed = Number(candidate);
+
+  return Number.isInteger(parsed) && parsed >= 1 ? parsed : 1;
+}
+
+async function LandingPeopleContent({
+  searchParams,
+}: LandingPeopleContentProps) {
+  const params = await searchParams;
+  const filter = parseTeamFilter(params.team);
+  const page = parsePage(params.teamPage);
+  const data = await getCachedLandingTeamPage(filter, page);
 
   return (
-    <section id="people" className="border-t border-[color:var(--cb-border)] py-[var(--cb-space-96)] lg:py-32">
-      <LandingContainer className="flex flex-col gap-[var(--cb-space-32)] lg:gap-[var(--cb-space-40)]">
+    <div className="flex flex-col gap-[var(--cb-space-32)]">
+      <LandingPeopleFilters active={filter} counts={data.counts} />
+
+      {data.members.length > 0 ? (
+        <LandingPeopleCards>
+          <ul
+            id="people-grid"
+            aria-label="People at Codebility"
+            className="mx-auto grid w-full max-w-[1200px] grid-cols-1 gap-[var(--cb-space-24)] sm:grid-cols-2 xl:grid-cols-4"
+          >
+            {data.members.map((member) => (
+              <li key={member.id} className="min-w-0">
+                <ProfileCard
+                  variant="tall"
+                  name={member.name}
+                  role={member.role}
+                  initials={member.initials}
+                  imageSrc={member.imageSrc}
+                  badge={
+                    <RoleBadge
+                      role={member.badgeRole}
+                      label={member.badgeLabel}
+                    />
+                  }
+                  profileHref={`/profiles/${member.id}`}
+                />
+              </li>
+            ))}
+          </ul>
+        </LandingPeopleCards>
+      ) : (
+        <p className="py-[var(--cb-space-40)] text-center text-sm text-[color:var(--cb-text-muted)]">
+          No team members found for this filter.
+        </p>
+      )}
+
+      {data.totalPages > 1 ? (
+        <LandingPeoplePagination
+          filter={filter}
+          page={data.page}
+          totalPages={data.totalPages}
+        />
+      ) : null}
+
+      <div className="mt-[var(--cb-space-8)] flex flex-wrap items-center justify-center gap-[var(--cb-space-12)]">
+        <Button asChild variant="outline">
+          <Link href="/codevs">View all CoDevs</Link>
+        </Button>
+        <Button
+          asChild
+          className="shadow-[0_0_32px_color-mix(in_srgb,var(--cb-primary)_35%,transparent)]"
+        >
+          <Link href="/hire-a-codev">
+            Hire CoDevs
+            <ArrowRight
+              aria-hidden
+              className="h-[var(--cb-size-16)] w-[var(--cb-size-16)]"
+            />
+          </Link>
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function LandingPeople({ searchParams }: LandingPeopleProps) {
+  return (
+    <section
+      id="people"
+      className="border-t border-[color:var(--cb-border)] pb-[var(--cb-space-96)] pt-[var(--cb-space-96)] lg:pb-[102px] lg:pt-[118px]"
+    >
+      <LandingContainer className="flex flex-col gap-[var(--cb-space-32)]">
         <SectionHeader
           align="center"
           title="Meet the people behind Codebility"
           description="Admins, mentors and CoDevs who turn ideas into shipped products."
         />
 
-        <div className="flex justify-center">
-          <div
-            role="group"
-            aria-label="Filter people by role"
-            className="flex flex-wrap items-center justify-center gap-[var(--cb-space-4)] rounded-[var(--cb-radius-full)] border border-[color:var(--cb-border)] bg-[color:var(--cb-panel)] p-[var(--cb-space-4)]"
-          >
-            {peopleFilters.map((item) => {
-              const selected = filter === item.value;
-
-              return (
-                <Chip
-                  key={item.value}
-                  selected={selected}
-                  onClick={() => setFilter(item.value)}
-                  aria-controls="people-grid"
-                  className="whitespace-nowrap"
-                >
-                  {item.label}
-                  <span
-                    className={cn(
-                      "text-xs leading-4",
-                      selected ? "text-[color:var(--cb-text-secondary)]" : "text-[color:var(--cb-text-muted)]",
-                    )}
-                  >
-                    {item.count}
-                  </span>
-                </Chip>
-              );
-            })}
-          </div>
-        </div>
-
-        <ul
-          id="people-grid"
-          aria-label="People at Codebility"
-          className="grid grid-cols-1 gap-[var(--cb-space-16)] sm:grid-cols-2 xl:grid-cols-4"
-        >
-          {visiblePeople.map((person) => (
-            <li key={person.name} className="min-w-0">
-              <ProfileCard
-                variant="tall"
-                name={person.name}
-                role={person.role}
-                initials={person.initials}
-                imageSrc={person.imageSrc}
-                badge={
-                  person.badgeRole ? (
-                    <RoleBadge
-                      role={person.badgeRole}
-                      label={person.badgeLabel}
-                    />
-                  ) : null
-                }
-                profileHref="/codevs"
-              />
-            </li>
-          ))}
-        </ul>
-
-        <div className="flex flex-wrap items-center justify-center gap-[var(--cb-space-12)]">
-          <Button asChild variant="outline">
-            <Link href="/codevs">View all CoDevs</Link>
-          </Button>
-          <Button asChild>
-            <Link href="/hire-a-codev">
-              Hire CoDevs
-              <ArrowRight aria-hidden className="h-[var(--cb-size-16)] w-[var(--cb-size-16)]" />
-            </Link>
-          </Button>
-        </div>
+        <LandingPeopleTransition>
+          <Suspense fallback={<LandingPeopleGridSkeleton />}>
+            <LandingPeopleContent searchParams={searchParams} />
+          </Suspense>
+        </LandingPeopleTransition>
       </LandingContainer>
     </section>
   );
 }
+
+export { LandingPeople };

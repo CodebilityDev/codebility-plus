@@ -1,10 +1,9 @@
-import { Quote } from "lucide-react";
 import Link from "next/link";
 
 import { Button } from "@/components/global/design-system/Button";
-import { QuoteCard } from "@/components/global/design-system/QuoteCard";
 import { SectionHeader } from "@/components/global/design-system/SectionHeader";
 import { LandingContainer } from "@/components/landing/LandingContainer";
+import { LandingStoryDeck } from "@/components/landing/LandingStoryDeck";
 
 const storyMetrics = [
   { value: "120+", label: "Projects shipped" },
@@ -14,14 +13,27 @@ const storyMetrics = [
 
 export function LandingStories() {
   return (
-    <section id="stories" className="border-t border-[color:var(--cb-border)] py-[var(--cb-space-96)] lg:py-32">
-      <LandingContainer className="grid gap-[var(--cb-space-48)] lg:grid-cols-2 lg:items-center lg:gap-[var(--cb-space-64)]">
+    <section
+      id="stories"
+      className="relative overflow-hidden border-t border-[color:var(--cb-border)] pb-[var(--cb-space-96)] pt-[var(--cb-space-96)] lg:pb-[103px] lg:pt-32"
+    >
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 overflow-hidden"
+      >
+        <div className="absolute -right-40 top-[18%] h-[520px] w-[760px] rounded-full bg-[radial-gradient(ellipse_at_center,color-mix(in_srgb,var(--cb-primary)_20%,transparent)_0%,color-mix(in_srgb,var(--cb-primary)_8%,transparent)_48%,transparent_72%)] blur-3xl" />
+        <div className="absolute bottom-0 right-0 h-[280px] w-[620px] rounded-full bg-[radial-gradient(ellipse_at_center,color-mix(in_srgb,var(--cb-pink)_10%,transparent)_0%,transparent_72%)] blur-3xl" />
+      </div>
+
+      <LandingContainer className="relative grid gap-[var(--cb-space-48)] lg:grid-cols-2 lg:items-start lg:gap-[72px]">
         <div className="flex flex-col gap-[var(--cb-space-24)]">
           <SectionHeader
             eyebrowVariant="outline"
             eyebrow="CLIENT STORIES"
+            eyebrowClassName="px-[var(--cb-space-28)] tracking-[0.12em]"
             title="Trusted by clients"
             accent="around the globe"
+            accentClassName="w-fit"
             description="Startups and agencies rely on Codebility to extend their teams and ship faster."
           />
 
@@ -34,7 +46,9 @@ export function LandingStories() {
                 <p className="text-xl font-semibold leading-7 text-[color:var(--cb-text)] sm:text-2xl sm:leading-8">
                   {metric.value}
                 </p>
-                <p className="text-xs leading-4 text-[color:var(--cb-text-muted)]">{metric.label}</p>
+                <p className="text-xs leading-4 text-[color:var(--cb-text-muted)]">
+                  {metric.label}
+                </p>
               </div>
             ))}
           </div>
@@ -49,27 +63,7 @@ export function LandingStories() {
           </div>
         </div>
 
-        <div className="relative w-full">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 rounded-[40px] bg-[color:color-mix(in_srgb,var(--cb-primary)_25%,transparent)] blur-3xl"
-          />
-          <QuoteCard
-            className="relative"
-            avatarGradient="cyan"
-            quote="Codebility gave us a dedicated team within a week. We shipped our MVP on schedule and kept the same developers for the next release."
-            name="Client Name"
-            role="Founder, Partner Company"
-            initials="CN"
-            rating={5}
-            page={2}
-            pageCount={3}
-          />
-          <Quote
-            aria-hidden
-            className="pointer-events-none absolute right-6 top-6 h-[var(--cb-size-40)] w-[var(--cb-size-40)] text-[color:color-mix(in_srgb,var(--cb-white)_20%,transparent)]"
-          />
-        </div>
+        <LandingStoryDeck />
       </LandingContainer>
     </section>
   );

@@ -1,4 +1,4 @@
-import { ArrowRight, BadgeCheck, Globe, Linkedin } from "lucide-react";
+import { ArrowRight, BadgeCheck, Github, Linkedin } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
@@ -22,7 +22,7 @@ export interface ProfileCardProps {
   badge?: ReactNode;
   profileHref?: string;
   linkedinHref?: string;
-  websiteHref?: string;
+  githubHref?: string;
   variant?: ProfileCardVariant;
   className?: string;
 }
@@ -38,7 +38,7 @@ function ProfileCard({
   badge,
   profileHref,
   linkedinHref,
-  websiteHref,
+  githubHref,
   variant = "tall",
   className,
 }: ProfileCardProps) {
@@ -90,19 +90,20 @@ function ProfileCard({
   return (
     <div
       className={cn(
-        "flex h-[380px] w-full flex-col overflow-hidden rounded-[var(--cb-radius-24)] border border-[color:var(--cb-border)] bg-[color:var(--cb-surface)]",
+        "flex h-[360px] w-full flex-col overflow-hidden rounded-[var(--cb-radius-24)] border border-[color:var(--cb-border)] bg-[color:var(--cb-surface)]",
         className,
       )}
     >
-      <div className="relative h-[300px] w-full overflow-hidden">
+      <div className="relative h-[300px] w-full overflow-hidden bg-[#1A1A1A]">
         {imageSrc ? (
           <Image
             src={imageSrc}
             alt={imageAlt ?? name}
             fill
             unoptimized
+            loading="eager"
             sizes="(min-width: 1280px) 25vw, (min-width: 768px) 50vw, 100vw"
-            className="object-cover"
+            className="object-cover mix-blend-lighten"
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[var(--cb-surface-2)] via-[color:color-mix(in_srgb,var(--cb-brand-end)_20%,transparent)] to-[color:color-mix(in_srgb,var(--cb-brand-start)_20%,transparent)]">
@@ -111,12 +112,8 @@ function ProfileCard({
             </span>
           </div>
         )}
-        <span
-          aria-hidden
-          className="absolute inset-0 bg-gradient-to-t from-[var(--cb-bg)] via-transparent to-transparent"
-        />
         {badge ? <div className="absolute left-4 top-4">{badge}</div> : null}
-        <div className="absolute inset-x-4 bottom-4 rounded-[var(--cb-radius-12)] border border-[color:var(--cb-border)] bg-[color:color-mix(in_srgb,var(--cb-surface)_90%,transparent)] p-[var(--cb-space-12)]">
+        <div className="absolute inset-x-4 bottom-4 rounded-[var(--cb-radius-12)] border border-[color:var(--cb-border)] bg-[color:var(--cb-surface-solid)] p-[var(--cb-space-12)]">
           <p className="text-[17px] font-semibold leading-6 text-[color:var(--cb-text)]">
             {name}
           </p>
@@ -125,14 +122,17 @@ function ProfileCard({
       </div>
       <div className="flex flex-1 items-center justify-between px-[var(--cb-space-16)] py-[var(--cb-space-12)]">
         {profileHref ? (
-          <TextLink asChild>
+          <TextLink
+            asChild
+            className="text-[color:var(--cb-text-secondary)] hover:text-[color:var(--cb-text)]"
+          >
             <Link href={profileHref}>
               View profile
               <ArrowRight className="h-[var(--cb-size-16)] w-[var(--cb-size-16)]" />
             </Link>
           </TextLink>
         ) : (
-          <span className="inline-flex items-center gap-[var(--cb-space-8)] text-[15px] leading-5 text-[color:var(--cb-p400)]">
+          <span className="inline-flex items-center gap-[var(--cb-space-8)] text-[15px] leading-5 text-[color:var(--cb-text-secondary)]">
             View profile
             <ArrowRight className="h-[var(--cb-size-16)] w-[var(--cb-size-16)]" />
           </span>
@@ -149,16 +149,16 @@ function ProfileCard({
           ) : (
             <Linkedin aria-hidden className="h-[var(--cb-size-16)] w-[var(--cb-size-16)]" />
           )}
-          {websiteHref ? (
+          {githubHref ? (
             <Link
-              href={websiteHref}
-              aria-label={`${name} website`}
+              href={githubHref}
+              aria-label={`${name} on GitHub`}
               className="rounded-[var(--cb-radius-full)] transition-colors hover:text-[color:var(--cb-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--cb-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--cb-surface)]"
             >
-              <Globe className="h-[var(--cb-size-16)] w-[var(--cb-size-16)]" />
+              <Github className="h-[var(--cb-size-16)] w-[var(--cb-size-16)]" />
             </Link>
           ) : (
-            <Globe aria-hidden className="h-[var(--cb-size-16)] w-[var(--cb-size-16)]" />
+            <Github aria-hidden className="h-[var(--cb-size-16)] w-[var(--cb-size-16)]" />
           )}
         </div>
       </div>

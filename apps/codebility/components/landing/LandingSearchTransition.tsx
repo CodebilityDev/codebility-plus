@@ -10,7 +10,7 @@ import {
 } from "react";
 import type { ReactNode } from "react";
 
-import { LandingSearchSkeleton } from "@/components/landing/LandingSearchSkeleton";
+import { LandingSearchCardsSkeleton } from "@/components/landing/LandingSearchCardsSkeleton";
 
 interface LandingSearchTransitionValue {
   isPending: boolean;
@@ -67,14 +67,14 @@ function useLandingSearchTransition(): LandingSearchTransitionValue {
   return value;
 }
 
-function LandingDeveloperResults({ children }: { children: ReactNode }) {
+function LandingDeveloperCards({ children }: { children: ReactNode }) {
   const { isPending } = useLandingSearchTransition();
 
-  return isPending ? <LandingSearchSkeleton /> : <>{children}</>;
+  return isPending ? <LandingSearchCardsSkeleton /> : <>{children}</>;
 }
 
 export {
-  LandingDeveloperResults,
+  LandingDeveloperCards,
   LandingSearchTransition,
   useLandingSearchTransition,
 };

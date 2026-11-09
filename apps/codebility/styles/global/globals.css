@@ -16,6 +16,21 @@
     margin-bottom: -0.24em;
   }
 
+  .cb-community-text {
+    background-image: linear-gradient(
+      90deg,
+      #f472b6 0%,
+      #d9a0d0 28%,
+      #c6b4f4 50%,
+      #8cb3e8 72%,
+      #67e8f9 100%
+    );
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+
   .cb-metric-text {
     background-image: linear-gradient(
       90deg,

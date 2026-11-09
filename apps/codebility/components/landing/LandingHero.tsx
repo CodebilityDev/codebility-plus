@@ -4,15 +4,12 @@ import { Suspense } from "react";
 import { cn } from "@codevs/ui";
 
 import { Eyebrow } from "@/components/global/design-system/Eyebrow";
-import { HeroMarquee } from "@/components/landing/HeroMarquee";
 import { HeroSearch } from "@/components/landing/HeroSearch";
 import { HeroSearchShell } from "@/components/landing/HeroSearchShell";
 import { LandingContainer } from "@/components/landing/LandingContainer";
 import { LandingDeveloperContent } from "@/components/landing/LandingDeveloperContent";
-import {
-  LandingDeveloperResults,
-  LandingSearchTransition,
-} from "@/components/landing/LandingSearchTransition";
+import { LandingSearchCardsSkeleton } from "@/components/landing/LandingSearchCardsSkeleton";
+import { LandingSearchTransition } from "@/components/landing/LandingSearchTransition";
 import { heroStats } from "@/constants/landing/landing-content";
 import type {
   HeroCodev,
@@ -46,7 +43,9 @@ function LandingHero({ codevs, searchParams }: LandingHeroProps) {
 
         <h1 className="mt-[var(--cb-space-28)] text-center text-[44px] font-semibold leading-[1.08] tracking-[-0.03em] text-[color:var(--cb-text)] sm:text-[58px] sm:leading-[1.05] lg:text-[80px] lg:leading-[1.02]">
           Connecting you to the
-          <span className={cn("block", gradientText)}>right talent</span>
+          <span className={cn("mx-auto block w-fit", gradientText)}>
+            right talent
+          </span>
         </h1>
 
         <p className="mx-auto mt-[var(--cb-space-16)] max-w-[620px] text-center text-base leading-7 text-[color:var(--cb-text-muted)] sm:text-lg sm:leading-7">
@@ -91,14 +90,12 @@ function LandingHero({ codevs, searchParams }: LandingHeroProps) {
           </ul>
 
           <div className="mt-[var(--cb-space-56)] w-full">
-            <LandingDeveloperResults>
-              <Suspense fallback={<HeroMarquee codevs={codevs} />}>
-                <LandingDeveloperContent
-                  codevs={codevs}
-                  searchParams={searchParams}
-                />
-              </Suspense>
-            </LandingDeveloperResults>
+            <Suspense fallback={<LandingSearchCardsSkeleton />}>
+              <LandingDeveloperContent
+                codevs={codevs}
+                searchParams={searchParams}
+              />
+            </Suspense>
           </div>
         </LandingSearchTransition>
       </LandingContainer>

@@ -134,5 +134,5 @@
   --cb-border-navigation-divider: rgb(244 244 244 / 0.08);
   --cb-border: rgb(244 244 244 / 0.1);
   --cb-accent-color: var(--cb-teal);
-  --cb-accent: linear-gradient(90deg, var(--cb-p400) 0%, var(--cb-pink) 50%, var(--cb-cyan) 100%);
+  --cb-accent: linear-gradient(90deg, var(--cb-p400) 0%, #D97FE0 24%, var(--cb-pink) 46%, #C6A0D7 58%, #8CB3E8 70%, #41C5E5 85%, var(--cb-cyan) 100%);
 }

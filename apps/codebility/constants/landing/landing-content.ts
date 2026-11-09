@@ -429,6 +429,41 @@ export const needOptions = [
   "Hire CoDevs",
 ];
 
+export interface LandingTestimonial {
+  quote: string;
+  name: string;
+  role: string;
+  initials: string;
+  rating: number;
+}
+
+export const landingTestimonials: LandingTestimonial[] = [
+  {
+    quote:
+      "Codebility gave us a dedicated team within a week. We shipped our MVP on schedule and kept the same developers for the next release.",
+    name: "Client Name",
+    role: "Founder, Partner Company",
+    initials: "CN",
+    rating: 5,
+  },
+  {
+    quote:
+      "Codebility gave us the flexibility to scale without slowing delivery. The developers felt like part of our own team from the first sprint.",
+    name: "Maya Reyes",
+    role: "Head of Product, Brightline",
+    initials: "MR",
+    rating: 5,
+  },
+  {
+    quote:
+      "We needed a senior team fast. Within days we were shipping features, and the quality stayed strong through launch.",
+    name: "Daniel Cruz",
+    role: "Founder, Northstar Studio",
+    initials: "DC",
+    rating: 5,
+  },
+];
+
 export interface FooterLink {
   label: string;
   href: string;

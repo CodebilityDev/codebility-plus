@@ -1,4 +1,5 @@
 import { HeroDeveloperCard } from "@/components/landing/HeroDeveloperCard";
+import { LandingDeveloperCards } from "@/components/landing/LandingSearchTransition";
 import { LandingSearchClear } from "@/components/landing/LandingSearchClear";
 import { LandingSearchPagination } from "@/components/landing/LandingSearchPagination";
 import { searchHeroCodevs } from "@/lib/landing/hero-codevs";
@@ -42,11 +43,13 @@ async function LandingSearchResults({
 
         {hasResults ? (
           <>
-            <div className="grid grid-cols-1 gap-[var(--cb-space-16)] sm:grid-cols-2 lg:grid-cols-4">
-              {result.codevs.map((codev) => (
-                <HeroDeveloperCard key={codev.id} codev={codev} />
-              ))}
-            </div>
+            <LandingDeveloperCards>
+              <div className="mx-auto grid w-full max-w-[1272px] grid-cols-1 gap-[var(--cb-space-24)] sm:grid-cols-2 lg:grid-cols-4">
+                {result.codevs.map((codev) => (
+                  <HeroDeveloperCard key={codev.id} codev={codev} />
+                ))}
+              </div>
+            </LandingDeveloperCards>
             {result.totalPages > 1 ? (
               <LandingSearchPagination
                 query={result.query}

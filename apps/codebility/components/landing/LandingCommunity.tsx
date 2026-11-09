@@ -4,117 +4,116 @@ import { cn } from "@codevs/ui";
 
 import { Avatar } from "@/components/global/design-system/Avatar";
 import type { AvatarGradient } from "@/components/global/design-system/Avatar";
-import { AvatarStack } from "@/components/global/design-system/AvatarStack";
 import { Button } from "@/components/global/design-system/Button";
 import { Eyebrow } from "@/components/global/design-system/Eyebrow";
 import { LandingContainer } from "@/components/landing/LandingContainer";
-import { heroPeople, people } from "@/constants/landing/landing-content";
+import type { HeroCodev } from "@/types/landing/hero-codevs";
 
 const avatarGradients: AvatarGradient[] = ["violet", "teal", "cyan"];
+const communityTotal = 96;
 
-const stackPeople = [
-  ...people,
-  ...heroPeople.filter(
-    (hero) => !people.some((person) => person.name === hero.name),
-  ),
+const floatingPositions = [
+  "left-[9%] top-[18%] opacity-90",
+  "right-[8%] top-[23%] opacity-40",
+  "left-[14%] top-[80%] opacity-70",
+  "right-[14%] top-[76%] opacity-55",
 ];
 
-const floatingAvatars: {
-  initials: string;
-  src?: string;
-  gradient: AvatarGradient;
-  className: string;
-}[] = [
-  {
-    initials: "HC",
-    src: "/assets/images/landing/hallen-corpuz.png",
-    gradient: "violet",
-    className: "left-[7%] top-[13%] lg:block",
-  },
-  {
-    initials: "AJ",
-    gradient: "teal",
-    className: "right-[7%] top-[16%] lg:block",
-  },
-  {
-    initials: "JD",
-    src: "/assets/images/landing/jan-phillip-dacallos.png",
-    gradient: "cyan",
-    className: "left-[15%] top-[52%] xl:block",
-  },
-  {
-    initials: "WS",
-    gradient: "violet",
-    className: "right-[17%] top-[55%] xl:block",
-  },
-];
+interface LandingCommunityProps {
+  codevs: HeroCodev[];
+}
 
-export function LandingCommunity() {
+export function LandingCommunity({ codevs }: LandingCommunityProps) {
+  const topCodevs = codevs.slice(0, 6);
+  const floatingCodevs = [
+    codevs[6],
+    codevs[7],
+    codevs[0],
+    codevs[1],
+  ].filter((codev): codev is HeroCodev => Boolean(codev));
+  const remaining = Math.max(0, communityTotal - topCodevs.length);
+
   return (
-    <section id="community" className="py-[var(--cb-space-64)] lg:py-[var(--cb-space-96)]">
+    <section
+      id="community"
+      className="py-[var(--cb-space-64)] lg:pb-[112px] lg:pt-[113px]"
+    >
       <LandingContainer>
-        <div className="relative overflow-hidden rounded-[var(--cb-radius-24)] border border-[color:var(--cb-border)] bg-[color:var(--cb-surface)] px-[var(--cb-space-24)] py-[var(--cb-space-64)] sm:px-[var(--cb-space-40)] lg:py-[var(--cb-space-80)]">
+        <div className="relative overflow-hidden rounded-[var(--cb-radius-24)] border border-[color:var(--cb-border)] bg-[#0D0A10] px-[var(--cb-space-24)] py-[var(--cb-space-48)] sm:px-[var(--cb-space-40)] lg:h-[427px] lg:px-0 lg:py-0">
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(75%_90%_at_0%_0%,var(--cb-selected-border),transparent_60%)]"
-          />
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_80%_at_100%_10%,var(--cb-role-mentor-bg),transparent_60%)]"
-          />
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,var(--cb-primary-subtle)_0%,transparent_45%,var(--cb-role-mentor-bg)_100%)]"
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(75%_100%_at_50%_0%,#3A205A_0%,#2C1946_45%,#120D18_80%,#0D0A10_100%)]"
           />
 
-          {floatingAvatars.map((avatar) => (
+          {floatingCodevs.map((codev, index) => (
             <span
-              key={avatar.initials}
+              key={`${codev.id}-float`}
               aria-hidden
               className={cn(
-                "pointer-events-none absolute hidden",
-                avatar.className,
+                "pointer-events-none absolute hidden h-10 w-10 overflow-hidden rounded-[var(--cb-radius-full)] lg:block",
+                floatingPositions[index],
               )}
             >
               <Avatar
-                initials={avatar.initials}
-                src={avatar.src}
-                alt={avatar.initials}
-                gradient={avatar.gradient}
+                initials={codev.initials}
+                src={codev.imageSrc}
+                alt={codev.name}
+                gradient={avatarGradients[index % avatarGradients.length]}
                 size={40}
               />
             </span>
           ))}
 
-          <div className="relative flex flex-col items-center gap-[var(--cb-space-20)] text-center">
-            <AvatarStack
-              items={stackPeople.map((person, index) => ({
-                initials: person.initials,
-                alt: person.name,
-                src: person.imageSrc,
-                gradient: avatarGradients[index % avatarGradients.length],
-              }))}
-              max={6}
-              total={96}
-              size={40}
-            />
-
-            <Eyebrow variant="outline">BE A CODEV</Eyebrow>
-
-            <h2 className="text-balance text-[32px] font-bold leading-9 tracking-tight text-[color:var(--cb-text)] md:text-[44px] md:leading-[48px]">
-              Join a community of{" "}
-              <span className="cb-accent-text">
-                100+ developers
+          <div className="relative flex flex-col items-center text-center lg:pt-[53px]">
+            <div
+              role="group"
+              aria-label={`${communityTotal} CoDevs`}
+              className="flex items-center"
+            >
+              {topCodevs.map((codev, index) => (
+                <span
+                  key={codev.id}
+                  className={cn(
+                    "inline-flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-[var(--cb-radius-full)] border-2 border-[color:color-mix(in_srgb,var(--cb-white)_80%,transparent)] bg-[color:var(--cb-surface)]",
+                    index >= 4 && "hidden sm:inline-flex",
+                  )}
+                >
+                  <Avatar
+                    initials={codev.initials}
+                    src={codev.imageSrc}
+                    alt={codev.name}
+                    gradient={avatarGradients[index % avatarGradients.length]}
+                    size={40}
+                  />
+                </span>
+              ))}
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[var(--cb-radius-full)] border border-[color:color-mix(in_srgb,var(--cb-white)_10%,transparent)] bg-[#17111E] text-xs text-[color:var(--cb-p200)]">
+                +{remaining}
               </span>
+            </div>
+
+            <Eyebrow
+              variant="outline"
+              className="mt-[var(--cb-space-24)] px-[var(--cb-space-24)] tracking-[0.08em] lg:mt-[33px]"
+            >
+              BE A CODEV
+            </Eyebrow>
+
+            <h2 className="mt-[var(--cb-space-20)] text-balance text-[32px] font-bold leading-9 tracking-tight text-[color:var(--cb-text)] md:text-[44px] md:leading-[48px] lg:mt-[31px]">
+              Join a community of{" "}
+              <span className="cb-community-text">100+ developers</span>
             </h2>
 
-            <p className="max-w-[54ch] text-base leading-6 text-[color:var(--cb-text-muted)] sm:text-lg sm:leading-7">
+            <p className="mt-[var(--cb-space-16)] max-w-[600px] text-base leading-6 text-[color:var(--cb-text-muted)] sm:text-lg sm:leading-7">
               Sharpen your craft on real client projects, learn from mentors and
               unlock opportunities around the world.
             </p>
 
-            <div className="mt-[var(--cb-space-4)] flex flex-wrap items-center justify-center gap-[var(--cb-space-12)]">
-              <Button asChild>
+            <div className="mt-[var(--cb-space-16)] flex flex-wrap items-center justify-center gap-[var(--cb-space-12)] lg:mt-[13px]">
+              <Button
+                asChild
+                className="shadow-[0_0_36px_color-mix(in_srgb,var(--cb-primary)_35%,transparent)]"
+              >
                 <Link href="/auth/sign-up">Join the Program</Link>
               </Button>
               <Button asChild variant="outline">
