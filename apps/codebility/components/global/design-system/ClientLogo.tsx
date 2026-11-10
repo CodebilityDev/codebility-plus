@@ -59,9 +59,15 @@ export interface ClientLogoProps {
   name: ClientLogoName;
   alt?: string;
   className?: string;
+  imageClassName?: string;
 }
 
-function ClientLogo({ name, alt, className }: ClientLogoProps) {
+function ClientLogo({
+  name,
+  alt,
+  className,
+  imageClassName,
+}: ClientLogoProps) {
   return (
     <span
       className={cn(
@@ -75,7 +81,11 @@ function ClientLogo({ name, alt, className }: ClientLogoProps) {
         alt={alt ?? logoAlt[name]}
         fill
         sizes="(min-width: 640px) 170px, 120px"
-        className={cn("object-contain object-center", logoScale[name])}
+        className={cn(
+          "object-contain object-center",
+          logoScale[name],
+          imageClassName,
+        )}
       />
     </span>
   );

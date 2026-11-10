@@ -19,7 +19,7 @@ const strategyCallSchema = z.object({
   budget: z.string().trim().max(100),
   needs: z.array(z.string().trim().max(100)).max(20),
   details: z.string().max(2000),
-  appointmentDate: z.string().regex(/^\\d{4}-\\d{2}-\\d{2}$/),
+  appointmentDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   appointmentTime: z.enum(strategyCallTimes),
 });
 
