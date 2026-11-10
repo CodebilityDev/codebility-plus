@@ -17,6 +17,9 @@ export interface ProjectInfo {
   project_id: string;
   name: string;
   main_image: string | null;
+  description?: string | null;
+  website_url?: string | null;
+  category?: string | null;
 }
 
 export interface ProjectListProps {

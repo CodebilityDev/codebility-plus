@@ -1,4 +1,5 @@
 import { cacheLife, cacheTag } from "next/cache";
+import { createClient } from "@supabase/supabase-js";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Codev } from "@/types/global/codev";
 import type { ProfilesListingPage } from "@/types/global/profiles-listing";
@@ -65,17 +66,19 @@ function mapRow(row: ProfilesListingRow): Codev {
 async function fetchQualifiedCodevIds(
   supabase: SupabaseClient,
 ): Promise<string[] | null> {
-  const { data, error } = await supabase.rpc("qualified_codev_ids", {
+  const result = await supabase.rpc("qualified_codev_ids", {
     p_min_points: MIN_QUALIFIED_POINTS,
   });
+  const data = (result as { data?: unknown }).data ?? [];
+  const error = (result as { error?: { message: string } | null }).error;
 
   if (error) {
     console.error("Supabase query error (profiles-listing points):", error);
     return null;
   }
 
-  return (data ?? [])
-    .map((row: { codev_id: string | null }) => row.codev_id)
+  return (data as { codev_id: string | null }[])
+    .map((row) => row.codev_id)
     .filter((id): id is string => Boolean(id));
 }
 
@@ -249,6 +252,45 @@ export async function getCachedProfilesListingPage(
   );
 }
 
+async function fetchProjectCategoryNames(projectIds: string[]) {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey =
+    process.env.DB_SERVICE_ROLE ?? process.env.SERVICE_ROLE_KEY;
+
+  if (!url || !serviceRoleKey || projectIds.length === 0) {
+    return new Map<string, string>();
+  }
+
+  const admin = createClient(url, serviceRoleKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+      detectSessionInUrl: false,
+    },
+  });
+  const { data, error } = await admin
+    .from("project_categories")
+    .select("project_id, projects_category(name)")
+    .in("project_id", projectIds);
+
+  if (error) return new Map<string, string>();
+
+  const rows = data as unknown as {
+    project_id: string;
+    projects_category: { name: string }[] | { name: string } | null;
+  }[];
+
+  return new Map<string, string>(
+    rows.flatMap((row) => {
+      const category = Array.isArray(row.projects_category)
+        ? row.projects_category[0]
+        : row.projects_category;
+
+      return category?.name ? [[row.project_id, category.name] as const] : [];
+    }),
+  );
+}
+
 async function fetchProfileProjects(codevId: string) {
   const supabase = createClientAnon();
   const { data: members, error: memberError } = await supabase
@@ -258,20 +300,26 @@ async function fetchProfileProjects(codevId: string) {
 
   if (memberError || members.length === 0) return [];
 
+  const projectIds = members
+    .map((row) => row.project_id)
+    .filter((id): id is string => id !== null);
+
   const { data: projects, error: projectError } = await supabase
     .from("projects")
-    .select("id, name, main_image")
-    .in(
-      "id",
-      members.map((row) => row.project_id).filter((id): id is string => id !== null),
-    );
+    .select("id, name, main_image, description, website_url")
+    .in("id", projectIds);
 
   if (projectError) return [];
+
+  const categories = await fetchProjectCategoryNames(projectIds);
 
   return projects.map((project) => ({
     project_id: project.id,
     name: project.name,
     main_image: project.main_image,
+    description: project.description,
+    website_url: project.website_url,
+    category: categories.get(project.id) ?? null,
   }));
 }
 

@@ -48,6 +48,14 @@ export function LandingNavigation() {
     return () => media.removeEventListener("change", handleChange);
   }, []);
 
+  const isNavActive = (href: string) => {
+    if (href === "/codevs") {
+      return pathname.startsWith("/profiles") || pathname === "/codevs";
+    }
+
+    return pathname === href;
+  };
+
   const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const value = query.trim();
@@ -75,7 +83,7 @@ export function LandingNavigation() {
             <NavItem
               key={link.href}
               asChild
-              active={link.href === pathname}
+              active={isNavActive(link.href)}
             >
               <Link href={link.href}>{link.label}</Link>
             </NavItem>
@@ -145,7 +153,12 @@ export function LandingNavigation() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileOpen(false)}
-                  className="flex h-[var(--cb-size-44)] items-center rounded-[var(--cb-radius-full)] px-[var(--cb-space-16)] text-sm font-medium text-[color:var(--cb-text-secondary)] transition-colors hover:bg-[color:var(--cb-glass)] hover:text-[color:var(--cb-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--cb-ring)]"
+                  className={
+                    "flex h-[var(--cb-size-44)] items-center rounded-[var(--cb-radius-full)] px-[var(--cb-space-16)] text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--cb-ring)] " +
+                    (isNavActive(link.href)
+                      ? "bg-[color:var(--cb-panel)] text-[color:var(--cb-text)]"
+                      : "text-[color:var(--cb-text-secondary)] hover:bg-[color:var(--cb-glass)] hover:text-[color:var(--cb-text)]")
+                  }
                 >
                   {link.label}
                 </Link>
