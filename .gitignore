@@ -103,3 +103,5 @@ lint_output.txt
 ts_errors.txt
 .vercel
 .env*
+
+.pnpm-store/
