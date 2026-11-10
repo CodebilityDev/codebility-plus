@@ -7,6 +7,7 @@ import { Rating } from "@/components/global/design-system/Rating";
 import { ContactForm } from "@/components/landing/ContactForm";
 import { LandingContainer } from "@/components/landing/LandingContainer";
 import { StrategyCallCard } from "@/components/landing/StrategyCallCard";
+import { StrategyCallProvider } from "@/components/landing/StrategyCallProvider";
 
 const benefits = [
   { icon: Clock, label: "Free 30-minute consultation" },
@@ -43,11 +44,17 @@ export function LandingContact() {
           </p>
         </div>
 
-        <div className="mt-[var(--cb-space-40)] grid gap-[var(--cb-space-16)] lg:mt-[var(--cb-space-48)] lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-[var(--cb-space-24)]">
+        <StrategyCallProvider>
+          <div className="mt-[var(--cb-space-40)] grid gap-[var(--cb-space-16)] lg:mt-[var(--cb-space-48)] lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-[var(--cb-space-24)]">
           <div className="relative overflow-hidden rounded-[var(--cb-radius-24)] bg-[linear-gradient(135deg,var(--cb-brand-start)_0%,var(--cb-brand-mid)_30%,var(--cb-brand-end)_62%,var(--cb-primary)_100%)] p-[var(--cb-space-24)] text-[color:var(--cb-text)] sm:p-[var(--cb-space-32)]">
             <div
               aria-hidden
               className="pointer-events-none absolute -right-16 top-1/3 h-64 w-64 rounded-[var(--cb-radius-full)] bg-[color:color-mix(in_srgb,var(--cb-primary)_40%,transparent)] blur-3xl"
+            />
+
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 bottom-0 h-[64%] bg-[linear-gradient(180deg,transparent_0%,color-mix(in_srgb,var(--cb-bg)_28%,transparent)_42%,color-mix(in_srgb,var(--cb-bg)_82%,transparent)_78%,var(--cb-bg)_100%)]"
             />
 
             <div className="relative flex h-full flex-col">
@@ -102,7 +109,8 @@ export function LandingContact() {
           <div className="rounded-[var(--cb-radius-24)] border border-[color:var(--cb-border)] bg-[color:var(--cb-surface)] p-[var(--cb-space-24)] sm:p-[var(--cb-space-32)]">
             <ContactForm />
           </div>
-        </div>
+          </div>
+        </StrategyCallProvider>
       </LandingContainer>
     </section>
   );

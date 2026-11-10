@@ -3,8 +3,14 @@
   "$schema": "https://turbo.build/schema.json",
   "globalEnv": [
     "DB_SERVICE_ROLE",
+    "GOOGLE_CALENDAR_ID",
+    "GOOGLE_CALENDAR_TIME_ZONE",
+    "GOOGLE_CLIENT_ID",
+    "GOOGLE_CLIENT_SECRET",
+    "GOOGLE_REFRESH_TOKEN",
     "NODE_ENV",
     "PERF_LOG",
+    "SERVICE_ROLE_KEY",
     "VERCEL_ENV",
     "VERCEL_URL"
   ],
