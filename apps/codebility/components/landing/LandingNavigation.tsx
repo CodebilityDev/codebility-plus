@@ -19,6 +19,35 @@ export function LandingNavigation() {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [query, setQuery] = React.useState("");
 
+  React.useEffect(() => {
+    if (!mobileOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMobileOpen(false);
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [mobileOpen]);
+
+  React.useEffect(() => {
+    const media = window.matchMedia("(min-width: 1024px)");
+    const handleChange = () => {
+      if (media.matches) setMobileOpen(false);
+    };
+
+    media.addEventListener("change", handleChange);
+
+    return () => media.removeEventListener("change", handleChange);
+  }, []);
+
   const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const value = query.trim();
@@ -27,7 +56,8 @@ export function LandingNavigation() {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[color:var(--cb-border)] bg-[color:color-mix(in_srgb,var(--cb-bg)_85%,transparent)] backdrop-blur-xl">
+    <>
+      <header className="sticky top-0 z-50 border-b border-[color:var(--cb-border)] bg-[color:color-mix(in_srgb,var(--cb-bg)_85%,transparent)] backdrop-blur-xl">
       <LandingContainer className="flex h-[var(--cb-size-64)] items-center gap-[var(--cb-space-16)]">
         <Link
           href="/"
@@ -65,7 +95,7 @@ export function LandingNavigation() {
           </form>
         </nav>
 
-        <div className="flex items-center gap-[var(--cb-space-8)]">
+        <div className="ml-auto flex shrink-0 items-center gap-[var(--cb-space-8)] lg:ml-0">
           <Button
             asChild
             variant="ghost"
@@ -98,8 +128,16 @@ export function LandingNavigation() {
         </div>
       </LandingContainer>
 
+      </header>
+
       {mobileOpen ? (
-        <div id="mobile-menu" className="border-t border-[color:var(--cb-border)] bg-[color:var(--cb-bg)] lg:hidden">
+        <div
+          id="mobile-menu"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Mobile navigation"
+          className="fixed inset-x-0 bottom-0 top-[var(--cb-size-64)] z-40 overflow-y-auto overscroll-contain bg-[color:var(--cb-bg)] lg:hidden"
+        >
           <LandingContainer className="flex flex-col gap-[var(--cb-space-16)] py-[var(--cb-space-16)]">
             <nav aria-label="Mobile" className="flex flex-col gap-[var(--cb-space-4)]">
               {landingNavLinks.map((link) => (
@@ -128,15 +166,19 @@ export function LandingNavigation() {
             </form>
             <div className="grid grid-cols-2 gap-[var(--cb-space-8)]">
               <Button asChild variant="outline" size="sm">
-                <Link href="/auth/sign-in">Sign in</Link>
+                <Link href="/auth/sign-in" onClick={() => setMobileOpen(false)}>
+                  Sign in
+                </Link>
               </Button>
               <Button asChild size="sm">
-                <Link href="/bookacall">Book a Call</Link>
+                <Link href="/bookacall" onClick={() => setMobileOpen(false)}>
+                  Book a Call
+                </Link>
               </Button>
             </div>
           </LandingContainer>
         </div>
       ) : null}
-    </header>
+    </>
   );
 }

@@ -14,9 +14,9 @@ const socialLinks = [
 
 export function LandingFooter() {
   return (
-    <footer className="pb-[var(--cb-space-40)] pt-[var(--cb-space-40)]">
-      <LandingContainer>
-        <div className="rounded-[var(--cb-radius-24)] border border-[color:var(--cb-border)] bg-[color:var(--cb-surface)] p-[var(--cb-space-24)] sm:p-[var(--cb-space-32)] lg:p-[var(--cb-space-40)]">
+    <footer className="border-t border-[color:var(--cb-border)] bg-[color:var(--cb-surface)] lg:border-t-0 lg:bg-transparent">
+      <LandingContainer className="py-[var(--cb-space-48)] lg:py-[var(--cb-space-40)]">
+        <div className="lg:rounded-[var(--cb-radius-24)] lg:border lg:border-[color:var(--cb-border)] lg:bg-[color:var(--cb-surface)] lg:p-[var(--cb-space-40)]">
           <div className="flex flex-col gap-[var(--cb-space-24)] border-b border-[color:var(--cb-border)] pb-[var(--cb-space-32)] md:flex-row md:items-center md:justify-between">
             <div>
               <h2 className="text-2xl font-semibold leading-[30px] text-[color:var(--cb-text)]">
@@ -30,7 +30,7 @@ export function LandingFooter() {
             <NewsletterForm />
           </div>
 
-          <div className="grid gap-[var(--cb-space-32)] py-[var(--cb-space-32)] md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr]">
+          <div className="grid gap-[var(--cb-space-32)] pt-[var(--cb-space-32)] md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr]">
             <div className="flex flex-col gap-[var(--cb-space-16)]">
               <Wordmark width={150} />
               <p className="max-w-[240px] text-sm leading-5 text-[color:var(--cb-text-muted)]">
@@ -74,7 +74,7 @@ export function LandingFooter() {
             ))}
           </div>
 
-          <div className="flex flex-col gap-[var(--cb-space-12)] border-t border-[color:var(--cb-border)] pt-[var(--cb-space-24)] text-xs text-[color:var(--cb-text-muted)] sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-[var(--cb-space-32)] flex flex-col gap-[var(--cb-space-12)] border-t border-[color:var(--cb-border)] pt-[var(--cb-space-24)] text-xs text-[color:var(--cb-text-muted)] sm:flex-row sm:items-center sm:justify-between">
             <p>© 2026 Codebility. All rights reserved.</p>
             <div className="flex flex-wrap items-center gap-[var(--cb-space-16)]">
               <Link href="/privacy-policy" className="transition-colors hover:text-[color:var(--cb-text)]">

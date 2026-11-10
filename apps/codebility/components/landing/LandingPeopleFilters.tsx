@@ -51,13 +51,14 @@ function LandingPeopleFilters({
       >
         <TabsList
           aria-label="Filter team by role"
-          className="h-auto w-full flex-wrap justify-center overflow-visible sm:h-[50px] sm:w-auto sm:flex-nowrap"
+          className="flex h-auto w-full flex-wrap justify-center gap-[var(--cb-space-8)] overflow-visible rounded-none border-0 bg-transparent p-0 sm:w-auto"
         >
           {filters.map((filter) => (
             <Tab
               key={filter.value}
               value={filter.value}
               count={counts[filter.value]}
+              className="h-[var(--cb-size-32)] w-auto gap-[var(--cb-space-4)] px-[6px] text-xs hover:bg-transparent focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-[color:color-mix(in_srgb,var(--cb-white)_35%,transparent)] focus-visible:ring-offset-0 sm:px-[var(--cb-space-12)]"
             >
               {filter.label}
             </Tab>

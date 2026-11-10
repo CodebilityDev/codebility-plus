@@ -48,7 +48,7 @@ function LandingStoryDeck() {
         className="pointer-events-none absolute -bottom-2 left-1/2 h-16 w-[72%] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,color-mix(in_srgb,var(--cb-primary)_38%,transparent)_0%,transparent_72%)] blur-2xl"
       />
 
-      <div className="relative grid pt-8 lg:pt-[46px]">
+      <div className="relative grid items-stretch pt-8 lg:pt-[46px]">
         {landingTestimonials.map((testimonial, index) => {
           const position = (index - active + count) % count;
           const isActive = position === 0;
@@ -57,11 +57,11 @@ function LandingStoryDeck() {
             <div
               key={testimonial.name}
               aria-hidden={!isActive}
-              className={`col-start-1 row-start-1 w-full origin-top transition-[transform,opacity] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform ${stackClasses[position]}`}
+              className={`col-start-1 row-start-1 h-full w-full origin-center transition-[transform,opacity] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform ${stackClasses[position]}`}
             >
-              <div className="relative">
+              <div className="relative h-full">
                 <QuoteCard
-                  className={`min-h-[204px] [&>*]:transition-opacity [&>*]:duration-500 ${isActive ? "" : "[&>*]:opacity-0"}`}
+                  className={`h-full min-h-[204px] [&>*]:transition-opacity [&>*]:duration-500 ${isActive ? "" : "[&>*]:opacity-0"}`}
                   avatarGradient="cyan"
                   quote={testimonial.quote}
                   name={testimonial.name}
