@@ -1,11 +1,12 @@
 "use server";
 
+import type { applicationSchema } from "@/utils/global/job-application";
+import type { z } from "zod";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
-import type { ApplicationFormData } from "@/types/marketing/careers/careers";
 
 export async function submitJobApplication(
   jobId: string,
-  data: ApplicationFormData,
+  data: z.infer<typeof applicationSchema>,
   resume: File | null,
 ) {
   const supabase = await createClientServerComponent();

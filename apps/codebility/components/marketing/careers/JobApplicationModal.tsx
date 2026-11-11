@@ -5,7 +5,7 @@ import { Button } from "@/components/global/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/global/ui/dialog";
 import Input from "@/components/global/ui/input";
 import { useToast } from "@/components/global/ui/use-toast";
-import { submitJobApplication } from "@/actions/marketing/careers/job-application";
+import { submitJobApplication } from "@/actions/global/job-application";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Upload } from "lucide-react";
 import { useForm } from "react-hook-form";

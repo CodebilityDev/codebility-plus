@@ -1,10 +1,9 @@
-import { ArrowRight } from "lucide-react";
+import type { MouseEventHandler, ReactNode } from "react";
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { IconTile } from "@/components/global/design-system/IconTile";
+import { ArrowRight } from "lucide-react";
 
 import { cn } from "@codevs/ui";
-
-import { IconTile } from "@/components/global/design-system/IconTile";
 
 export interface JobListingTag {
   label: string;
@@ -21,6 +20,8 @@ export interface JobListingRowProps {
   href: string;
   active?: boolean;
   className?: string;
+  onClick?: MouseEventHandler<HTMLAnchorElement>;
+  ariaLabel?: string;
 }
 
 function JobListingRow({
@@ -32,10 +33,14 @@ function JobListingRow({
   href,
   active = false,
   className,
+  onClick,
+  ariaLabel,
 }: JobListingRowProps) {
   return (
     <Link
       href={href}
+      onClick={onClick}
+      aria-label={ariaLabel}
       className={cn(
         "group flex min-h-[92px] flex-col gap-[var(--cb-space-16)] border p-[var(--cb-space-16)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--cb-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--cb-bg)] md:flex-row md:items-center",
         active
@@ -50,7 +55,7 @@ function JobListingRow({
       >
         {icon}
       </IconTile>
-      <div className="flex min-w-0 flex-1 flex-col gap-[var(--cb-space-4)]">
+      <div className="cb-job-copy flex min-w-0 flex-1 flex-col gap-[var(--cb-space-4)]">
         <h3 className="text-[15px] font-semibold leading-[21px] text-[color:var(--cb-text)]">
           {title}
         </h3>
@@ -58,7 +63,7 @@ function JobListingRow({
           {description}
         </p>
       </div>
-      <div className="flex flex-wrap items-center gap-[var(--cb-space-8)] md:ml-auto">
+      <div className="cb-job-tags flex flex-wrap items-center gap-[var(--cb-space-8)] md:ml-auto">
         {tags.map((tag, index) => (
           <span
             key={`${tag.label}-${index}`}
@@ -77,14 +82,14 @@ function JobListingRow({
             {tag.label}
           </span>
         ))}
-        <span className="text-xs leading-[18px] text-[color:var(--cb-text-muted)]">
+        <span className="cb-job-date text-xs leading-[18px] text-[color:var(--cb-text-muted)]">
           Posted {postedAt}
         </span>
       </div>
       <span
         aria-hidden
         className={cn(
-          "ml-[var(--cb-space-4)] flex h-[var(--cb-size-40)] w-[var(--cb-size-40)] shrink-0 items-center justify-center self-end rounded-[var(--cb-radius-full)] border transition-colors md:self-auto",
+          "cb-job-arrow ml-[var(--cb-space-4)] flex h-[var(--cb-size-40)] w-[var(--cb-size-40)] shrink-0 items-center justify-center self-end rounded-[var(--cb-radius-full)] border transition-colors md:self-auto",
           active
             ? "border-[color:var(--cb-primary)] bg-[color:var(--cb-primary)] text-[color:var(--cb-text)]"
             : "border-[color:color-mix(in_srgb,var(--cb-white)_20%,transparent)] bg-[color:var(--cb-glass)] text-[color:var(--cb-text-secondary)] group-hover:border-[color:var(--cb-primary)] group-hover:bg-[color:var(--cb-primary)] group-hover:text-[color:var(--cb-text)]",
