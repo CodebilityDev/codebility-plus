@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { LandingCommunity } from "@/components/landing/LandingCommunity";
+import { LandingCommunity } from "@/components/global/marketing/LandingCommunity";
 import { LandingContact } from "@/components/landing/LandingContact";
 import { LandingFaq } from "@/components/landing/LandingFaq";
 import { LandingHero } from "@/components/landing/LandingHero";

@@ -10,7 +10,7 @@ import { IconButton } from "@/components/global/design-system/IconButton";
 import { MenuGlyph } from "@/components/global/design-system/MenuGlyph";
 import { NavItem } from "@/components/global/design-system/NavItem";
 import { Wordmark } from "@/components/global/design-system/Wordmark";
-import { LandingContainer } from "@/components/landing/LandingContainer";
+import { LandingContainer } from "@/components/global/layout/LandingContainer";
 import { landingNavLinks } from "@/constants/landing/landing-content";
 
 export function LandingNavigation() {

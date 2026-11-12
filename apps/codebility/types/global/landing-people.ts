@@ -36,3 +36,8 @@ export interface LandingTeamPage {
   total: number;
   totalPages: number;
 }
+
+export type CommunityMember = Pick<
+  TeamMember,
+  "id" | "name" | "initials" | "imageSrc"
+>;

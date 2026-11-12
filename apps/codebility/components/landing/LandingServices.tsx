@@ -6,7 +6,7 @@ import { cn } from "@codevs/ui";
 import { Button } from "@/components/global/design-system/Button";
 import { Eyebrow } from "@/components/global/design-system/Eyebrow";
 import { ServiceCard } from "@/components/global/design-system/ServiceCard";
-import { LandingContainer } from "@/components/landing/LandingContainer";
+import { LandingContainer } from "@/components/global/layout/LandingContainer";
 import { services } from "@/constants/landing/landing-content";
 
 function LandingServices() {

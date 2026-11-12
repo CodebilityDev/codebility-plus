@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { Button } from "@/components/global/design-system/Button";
 import { SectionHeader } from "@/components/global/design-system/SectionHeader";
-import { LandingContainer } from "@/components/landing/LandingContainer";
+import { LandingContainer } from "@/components/global/layout/LandingContainer";
 import { LandingStoryDeck } from "@/components/landing/LandingStoryDeck";
 
 const storyMetrics = [

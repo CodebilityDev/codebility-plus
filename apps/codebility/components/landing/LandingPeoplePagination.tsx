@@ -4,7 +4,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/global/design-system/Button";
 import { useLandingPeopleTransition } from "@/components/landing/LandingPeopleTransition";
-import type { TeamFilter } from "@/types/landing/people";
+import type { TeamFilter } from "@/types/global/landing-people";
 
 interface LandingPeoplePaginationProps {
   filter: TeamFilter;

@@ -5,7 +5,7 @@ import { Eyebrow } from "@/components/global/design-system/Eyebrow";
 import { IconTile } from "@/components/global/design-system/IconTile";
 import { Rating } from "@/components/global/design-system/Rating";
 import { ContactForm } from "@/components/landing/ContactForm";
-import { LandingContainer } from "@/components/landing/LandingContainer";
+import { LandingContainer } from "@/components/global/layout/LandingContainer";
 import { StrategyCallCard } from "@/components/landing/StrategyCallCard";
 
 const benefits = [

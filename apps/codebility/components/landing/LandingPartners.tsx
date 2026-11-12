@@ -1,7 +1,7 @@
 import { ClientLogo } from "@/components/global/design-system/ClientLogo";
 import { LogoCell } from "@/components/global/design-system/LogoCell";
 import { SectionHeader } from "@/components/global/design-system/SectionHeader";
-import { LandingContainer } from "@/components/landing/LandingContainer";
+import { LandingContainer } from "@/components/global/layout/LandingContainer";
 import { partners } from "@/constants/landing/landing-content";
 
 function LandingPartners() {

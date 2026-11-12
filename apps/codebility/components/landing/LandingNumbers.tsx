@@ -1,6 +1,6 @@
 import { MetricCard } from "@/components/global/design-system/MetricCard";
 import { SectionHeader } from "@/components/global/design-system/SectionHeader";
-import { LandingContainer } from "@/components/landing/LandingContainer";
+import { LandingContainer } from "@/components/global/layout/LandingContainer";
 import { metrics } from "@/constants/landing/landing-content";
 
 function LandingNumbers() {

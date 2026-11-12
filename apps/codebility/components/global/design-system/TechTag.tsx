@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 import { cn } from "@codevs/ui";
 
-export type TechTagTone = "blue" | "purple" | "teal" | "pink";
+export type TechTagTone = "blue" | "purple" | "teal" | "pink" | "neutral";
 
 export interface TechTagProps {
   children: ReactNode;
@@ -16,6 +16,8 @@ const toneClasses: Record<TechTagTone, string> = {
     "border-[color:var(--cb-pill-border)] bg-[color:var(--cb-pill-bg)] text-[color:var(--cb-p300)]",
   teal: "border-[color:var(--cb-role-admin-border)] bg-[color:var(--cb-role-admin-bg)] text-[color:var(--cb-role-admin-text)]",
   pink: "border-[color:color-mix(in_srgb,var(--cb-pink)_30%,transparent)] bg-[color:color-mix(in_srgb,var(--cb-pink)_10%,transparent)] text-[color:var(--cb-pink)]",
+  neutral:
+    "border-[color:var(--cb-border)] bg-[color:var(--cb-glass)] text-[color:var(--cb-text-secondary)]",
 };
 
 function TechTag({ children, tone = "blue", className }: TechTagProps) {

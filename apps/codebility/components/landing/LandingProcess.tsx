@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Button } from "@/components/global/design-system/Button";
 import { Eyebrow } from "@/components/global/design-system/Eyebrow";
 import { Step } from "@/components/global/design-system/Step";
-import { LandingContainer } from "@/components/landing/LandingContainer";
+import { LandingContainer } from "@/components/global/layout/LandingContainer";
 import { processSteps } from "@/constants/landing/landing-content";
 
 const accentClasses = "cb-accent-text whitespace-nowrap";

@@ -3,11 +3,13 @@ import type { ReactNode } from "react";
 import { cn } from "@codevs/ui";
 
 import { IconTile } from "@/components/global/design-system/IconTile";
+import type { IconTileVariant } from "@/components/global/design-system/IconTile";
 
 export interface FeatureCardProps {
   icon: ReactNode;
   title: string;
   description: string;
+  iconVariant?: IconTileVariant;
   className?: string;
 }
 
@@ -15,6 +17,7 @@ function FeatureCard({
   icon,
   title,
   description,
+  iconVariant = "primary",
   className,
 }: FeatureCardProps) {
   return (
@@ -24,7 +27,7 @@ function FeatureCard({
         className,
       )}
     >
-      <IconTile className="[&>svg]:h-[var(--cb-size-18)] [&>svg]:w-[var(--cb-size-18)]">{icon}</IconTile>
+      <IconTile variant={iconVariant} className="[&>svg]:h-[var(--cb-size-18)] [&>svg]:w-[var(--cb-size-18)]">{icon}</IconTile>
       <h3 className="text-[17px] font-semibold leading-6 text-[color:var(--cb-text)]">
         {title}
       </h3>

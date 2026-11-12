@@ -2,7 +2,7 @@ import { Globe, Linkedin, Mail } from "lucide-react";
 import Link from "next/link";
 
 import { Wordmark } from "@/components/global/design-system/Wordmark";
-import { LandingContainer } from "@/components/landing/LandingContainer";
+import { LandingContainer } from "@/components/global/layout/LandingContainer";
 import { NewsletterForm } from "@/components/landing/NewsletterForm";
 import { footerColumns } from "@/constants/landing/landing-content";
 

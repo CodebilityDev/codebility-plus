@@ -4,7 +4,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 
 import { Tab, Tabs, TabsList } from "@/components/global/design-system/Tabs";
 import { useLandingPeopleTransition } from "@/components/landing/LandingPeopleTransition";
-import type { TeamCounts, TeamFilter } from "@/types/landing/people";
+import type { TeamCounts, TeamFilter } from "@/types/global/landing-people";
 
 const filters: { value: TeamFilter; label: string }[] = [
   { value: "all", label: "All" },

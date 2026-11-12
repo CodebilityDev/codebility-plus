@@ -3,11 +3,13 @@ import type { ReactNode } from "react";
 import { cn } from "@codevs/ui";
 
 import { TechTag } from "@/components/global/design-system/TechTag";
+import type { TechTagTone } from "@/components/global/design-system/TechTag";
 
 export interface SkillCategoryCardProps {
   icon: ReactNode;
   title: string;
   skills: string[];
+  tone?: TechTagTone;
   className?: string;
 }
 
@@ -15,6 +17,7 @@ function SkillCategoryCard({
   icon,
   title,
   skills,
+  tone,
   className,
 }: SkillCategoryCardProps) {
   return (
@@ -37,7 +40,7 @@ function SkillCategoryCard({
       </div>
       <div className="flex flex-wrap gap-[var(--cb-space-6)]">
         {skills.map((skill) => (
-          <TechTag key={skill}>{skill}</TechTag>
+          <TechTag key={skill} tone={tone}>{skill}</TechTag>
         ))}
       </div>
     </div>

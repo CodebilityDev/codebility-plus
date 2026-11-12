@@ -6,7 +6,7 @@ import { cn } from "@codevs/ui";
 import { Eyebrow } from "@/components/global/design-system/Eyebrow";
 import { HeroSearch } from "@/components/landing/HeroSearch";
 import { HeroSearchShell } from "@/components/landing/HeroSearchShell";
-import { LandingContainer } from "@/components/landing/LandingContainer";
+import { LandingContainer } from "@/components/global/layout/LandingContainer";
 import { LandingDeveloperContent } from "@/components/landing/LandingDeveloperContent";
 import { LandingSearchCardsSkeleton } from "@/components/landing/LandingSearchCardsSkeleton";
 import { LandingSearchTransition } from "@/components/landing/LandingSearchTransition";

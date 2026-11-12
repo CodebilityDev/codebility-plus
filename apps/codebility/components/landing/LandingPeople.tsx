@@ -6,16 +6,16 @@ import { Button } from "@/components/global/design-system/Button";
 import { ProfileCard } from "@/components/global/design-system/ProfileCard";
 import { RoleBadge } from "@/components/global/design-system/RoleBadge";
 import { SectionHeader } from "@/components/global/design-system/SectionHeader";
-import { LandingContainer } from "@/components/landing/LandingContainer";
+import { LandingContainer } from "@/components/global/layout/LandingContainer";
 import { LandingPeopleCards } from "@/components/landing/LandingPeopleTransition";
 import { LandingPeopleFilters } from "@/components/landing/LandingPeopleFilters";
 import { LandingPeopleGridSkeleton } from "@/components/landing/LandingPeopleGridSkeleton";
 import { LandingPeoplePagination } from "@/components/landing/LandingPeoplePagination";
 import { LandingPeopleTransition } from "@/components/landing/LandingPeopleTransition";
-import { getCachedLandingTeamPage } from "@/lib/landing/people";
+import { getCachedLandingTeamPage } from "@/lib/global/landing-people";
 import type { LandingSearchParams } from "@/types/landing/hero-codevs";
-import type { TeamFilter } from "@/types/landing/people";
-import { teamFilters } from "@/types/landing/people";
+import type { TeamFilter } from "@/types/global/landing-people";
+import { teamFilters } from "@/types/global/landing-people";
 
 interface LandingPeopleProps {
   searchParams: LandingSearchParams;

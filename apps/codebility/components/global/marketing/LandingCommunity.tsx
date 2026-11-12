@@ -1,3 +1,4 @@
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 import { cn } from "@codevs/ui";
@@ -6,11 +7,10 @@ import { Avatar } from "@/components/global/design-system/Avatar";
 import type { AvatarGradient } from "@/components/global/design-system/Avatar";
 import { Button } from "@/components/global/design-system/Button";
 import { Eyebrow } from "@/components/global/design-system/Eyebrow";
-import { LandingContainer } from "@/components/landing/LandingContainer";
-import type { HeroCodev } from "@/types/landing/hero-codevs";
+import { LandingContainer } from "@/components/global/layout/LandingContainer";
+import type { CommunityMember } from "@/types/global/landing-people";
 
 const avatarGradients: AvatarGradient[] = ["violet", "teal", "cyan"];
-const communityTotal = 96;
 
 const floatingPositions = [
   "left-[9%] top-[18%] opacity-90",
@@ -19,24 +19,47 @@ const floatingPositions = [
   "right-[14%] top-[76%] opacity-55",
 ];
 
-interface LandingCommunityProps {
-  codevs: HeroCodev[];
+interface CommunityAction {
+  label: string;
+  href: string;
 }
 
-export function LandingCommunity({ codevs }: LandingCommunityProps) {
+interface LandingCommunityProps {
+  codevs: CommunityMember[];
+  total?: number;
+  eyebrow?: string;
+  description?: string;
+  secondaryAction?: CommunityAction;
+  floating?: boolean;
+  primaryArrow?: boolean;
+  className?: string;
+}
+
+export function LandingCommunity({
+  codevs,
+  total = 96,
+  eyebrow = "BE A CODEV",
+  description = "Sharpen your craft on real client projects, learn from mentors and unlock opportunities around the world.",
+  secondaryAction = { label: "How it works", href: "#process" },
+  floating = true,
+  primaryArrow = false,
+  className,
+}: LandingCommunityProps) {
   const topCodevs = codevs.slice(0, 6);
-  const floatingCodevs = [
-    codevs[6],
-    codevs[7],
-    codevs[0],
-    codevs[1],
-  ].filter((codev): codev is HeroCodev => Boolean(codev));
-  const remaining = Math.max(0, communityTotal - topCodevs.length);
+  const floatingCodevs = floating
+    ? [codevs[6], codevs[7], codevs[0], codevs[1]].filter(
+        (codev): codev is CommunityMember => Boolean(codev),
+      )
+    : [];
+  const remaining = Math.max(0, total - topCodevs.length);
 
   return (
     <section
       id="community"
-      className="py-[var(--cb-space-64)] lg:pb-[112px] lg:pt-[113px]"
+      className={cn(
+        "py-[var(--cb-space-64)] lg:pb-[112px] lg:pt-[113px]",
+        className,
+      )}
     >
       <LandingContainer>
         <div className="relative overflow-hidden rounded-[var(--cb-radius-24)] border border-[color:var(--cb-border)] bg-[#0D0A10] px-[var(--cb-space-24)] py-[var(--cb-space-48)] sm:px-[var(--cb-space-40)] lg:h-[427px] lg:px-0 lg:py-0">
@@ -67,7 +90,7 @@ export function LandingCommunity({ codevs }: LandingCommunityProps) {
           <div className="relative flex flex-col items-center text-center lg:pt-[53px]">
             <div
               role="group"
-              aria-label={`${communityTotal} CoDevs`}
+              aria-label={`${total} CoDevs`}
               className="flex items-center"
             >
               {topCodevs.map((codev, index) => (
@@ -96,7 +119,7 @@ export function LandingCommunity({ codevs }: LandingCommunityProps) {
               variant="outline"
               className="mt-[var(--cb-space-24)] px-[var(--cb-space-24)] tracking-[0.08em] lg:mt-[33px]"
             >
-              BE A CODEV
+              {eyebrow}
             </Eyebrow>
 
             <h2 className="mt-[var(--cb-space-20)] text-balance text-[32px] font-bold leading-9 tracking-tight text-[color:var(--cb-text)] md:text-[44px] md:leading-[48px] lg:mt-[31px]">
@@ -105,8 +128,7 @@ export function LandingCommunity({ codevs }: LandingCommunityProps) {
             </h2>
 
             <p className="mt-[var(--cb-space-16)] max-w-[600px] text-base leading-6 text-[color:var(--cb-text-muted)] sm:text-lg sm:leading-7">
-              Sharpen your craft on real client projects, learn from mentors and
-              unlock opportunities around the world.
+              {description}
             </p>
 
             <div className="mt-[var(--cb-space-16)] flex flex-wrap items-center justify-center gap-[var(--cb-space-12)] lg:mt-[13px]">
@@ -114,10 +136,18 @@ export function LandingCommunity({ codevs }: LandingCommunityProps) {
                 asChild
                 className="shadow-[0_0_36px_color-mix(in_srgb,var(--cb-primary)_35%,transparent)]"
               >
-                <Link href="/auth/sign-up">Join the Program</Link>
+                <Link href="/auth/sign-up">
+                  Join the Program
+                  {primaryArrow ? (
+                    <ArrowRight
+                      aria-hidden
+                      className="h-[var(--cb-size-16)] w-[var(--cb-size-16)]"
+                    />
+                  ) : null}
+                </Link>
               </Button>
               <Button asChild variant="outline">
-                <Link href="#process">How it works</Link>
+                <Link href={secondaryAction.href}>{secondaryAction.label}</Link>
               </Button>
             </div>
           </div>

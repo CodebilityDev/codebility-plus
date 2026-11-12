@@ -9,7 +9,7 @@ import type {
   LandingTeamPage,
   TeamFilter,
   TeamMember,
-} from "@/types/landing/people";
+} from "@/types/global/landing-people";
 
 const FOUNDER_USER_ID = process.env.NEXT_PUBLIC_FOUNDER_USER_ID ?? "";
 const TEAM_PAGE_SIZE = 4;
