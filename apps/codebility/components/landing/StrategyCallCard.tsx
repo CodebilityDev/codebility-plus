@@ -1,22 +1,36 @@
 "use client";
 
-import * as React from "react";
-
 import { cn } from "@codevs/ui";
 
-const weekdays = [
-  { label: "Mon", date: "3" },
-  { label: "Tue", date: "4" },
-  { label: "Wed", date: "5" },
-  { label: "Thu", date: "6" },
-  { label: "Fri", date: "7" },
-];
+import { useStrategyCall } from "@/components/landing/StrategyCallProvider";
+import { strategyCallTimes } from "@/constants/landing/strategy-call";
 
-const times = ["9:00 AM", "10:30 AM", "1:00 PM", "3:30 PM"];
+const emptyDays = Array.from({ length: 5 }, (_, index) => ({
+  isoDate: "",
+  weekday: "",
+  day: "",
+  key: "empty-" + index,
+}));
 
 export function StrategyCallCard({ className }: { className?: string }) {
-  const [weekday, setWeekday] = React.useState("Tue");
-  const [time, setTime] = React.useState("10:30 AM");
+  const {
+    days,
+    selectedDate,
+    selectedTime,
+    unavailableTimes,
+    loading,
+    error,
+    selectDate,
+    selectTime,
+  } = useStrategyCall();
+
+  const displayDays =
+    days.length > 0
+      ? days.map((day) => ({ ...day, key: day.isoDate }))
+      : emptyDays;
+  const availableCount = strategyCallTimes.filter(
+    (time) => !unavailableTimes.includes(time),
+  ).length;
 
   return (
     <div
@@ -42,34 +56,31 @@ export function StrategyCallCard({ className }: { className?: string }) {
       <div
         role="group"
         aria-label="Choose a weekday"
+        aria-busy={loading}
         className="mt-[var(--cb-space-16)] grid grid-cols-5 gap-[var(--cb-space-4)]"
       >
-        {weekdays.map((item) => {
-          const selected = weekday === item.label;
+        {displayDays.map((item) => {
+          const selected = Boolean(item.isoDate) && selectedDate === item.isoDate;
 
           return (
             <button
-              key={item.label}
+              key={item.key}
               type="button"
+              disabled={!item.isoDate}
               aria-pressed={selected}
-              onClick={() => setWeekday(item.label)}
+              onClick={() => selectDate(item.isoDate)}
               className={cn(
-                "flex min-h-[var(--cb-size-56)] flex-col items-center justify-center gap-[var(--cb-space-2)] rounded-[var(--cb-radius-12)] py-[var(--cb-space-8)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--cb-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--cb-surface)]",
+                "flex min-h-[var(--cb-size-56)] flex-col items-center justify-center gap-[var(--cb-space-2)] rounded-[var(--cb-radius-12)] border py-[var(--cb-space-8)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--cb-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--cb-surface)] disabled:cursor-wait",
                 selected
-                  ? "bg-[color:var(--cb-primary)] text-[color:var(--cb-text)]"
-                  : "text-[color:var(--cb-text-muted)] hover:bg-[color:var(--cb-glass)] hover:text-[color:var(--cb-text-secondary)]",
+                  ? "border-[color:var(--cb-primary)] bg-[color:var(--cb-primary)] text-[color:var(--cb-text)]"
+                  : "border-[color:color-mix(in_srgb,var(--cb-white)_14%,transparent)] bg-[color:color-mix(in_srgb,var(--cb-white)_3%,transparent)] text-[color:var(--cb-text-muted)] hover:border-[color:color-mix(in_srgb,var(--cb-white)_25%,transparent)] hover:bg-[color:var(--cb-glass)] hover:text-[color:var(--cb-text-secondary)]",
               )}
             >
               <span className="text-[11px] font-medium leading-4">
-                {item.label}
+                {item.weekday}
               </span>
-              <span
-                className={cn(
-                  "text-sm font-semibold leading-5",
-                  selected ? "text-[color:var(--cb-text)]" : "text-[color:var(--cb-text)]",
-                )}
-              >
-                {item.date}
+              <span className="text-sm font-semibold leading-5 text-[color:var(--cb-text)]">
+                {item.day}
               </span>
             </button>
           );
@@ -79,22 +90,30 @@ export function StrategyCallCard({ className }: { className?: string }) {
       <div
         role="group"
         aria-label="Choose a time"
+        aria-busy={loading}
         className="mt-[var(--cb-space-8)] grid grid-cols-4 gap-[var(--cb-space-4)] lg:grid-cols-2 xl:grid-cols-4"
       >
-        {times.map((item) => {
-          const selected = time === item;
+        {strategyCallTimes.map((item) => {
+          const unavailable = unavailableTimes.includes(item);
+          const disabled = loading || Boolean(error) || unavailable;
+          const selected = selectedTime === item;
 
           return (
             <button
               key={item}
               type="button"
               aria-pressed={selected}
-              onClick={() => setTime(item)}
+              disabled={disabled}
+              onClick={() => selectTime(item)}
               className={cn(
                 "flex h-[var(--cb-size-36)] items-center justify-center whitespace-nowrap rounded-[var(--cb-radius-8)] border px-[var(--cb-space-4)] text-[11px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--cb-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--cb-surface)] sm:text-xs",
                 selected
                   ? "border-transparent bg-[color:var(--cb-primary)] text-[color:var(--cb-text)]"
-                  : "border-[color:var(--cb-border)] bg-[color:var(--cb-panel)] text-[color:var(--cb-text-muted)] hover:border-[color:color-mix(in_srgb,var(--cb-white)_20%,transparent)] hover:text-[color:var(--cb-text-secondary)]",
+                  : unavailable
+                    ? "cursor-not-allowed border-[color:var(--cb-border)] bg-[color:var(--cb-panel)] text-[color:var(--cb-text-muted)] line-through"
+                    : disabled
+                      ? "cursor-not-allowed border-[color:var(--cb-border)] bg-[color:var(--cb-panel)] text-[color:var(--cb-text-muted)]"
+                      : "border-[color:var(--cb-border)] bg-[color:var(--cb-panel)] text-[color:var(--cb-text-muted)] hover:border-[color:color-mix(in_srgb,var(--cb-white)_20%,transparent)] hover:text-[color:var(--cb-text-secondary)]",
               )}
             >
               {item}
@@ -102,6 +121,18 @@ export function StrategyCallCard({ className }: { className?: string }) {
           );
         })}
       </div>
+
+      {loading ? (
+        <p className="mt-2 text-[11px] leading-4 text-[color:var(--cb-text-muted)]">
+          Checking availability...
+        </p>
+      ) : error ? (
+        <p className="mt-2 text-[11px] leading-4 text-red-400">{error}</p>
+      ) : availableCount === 0 ? (
+        <p className="mt-2 text-[11px] leading-4 text-[color:var(--cb-text-muted)]">
+          No times left on this day. Choose another date.
+        </p>
+      ) : null}
     </div>
   );
 }
