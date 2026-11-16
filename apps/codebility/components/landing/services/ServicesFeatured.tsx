@@ -13,7 +13,7 @@ import { LandingContainer } from "@/components/global/layout/LandingContainer";
 import {
   portfolioFeaturedCopy,
   portfolioFeaturedName,
-  portfolioHref,
+  portfolioProjectHref,
 } from "@/constants/landing/services/content";
 import type {
   PortfolioCategoryId,
@@ -126,7 +126,7 @@ export function ServicesFeatured({
   const description = isFeatured
     ? portfolioFeaturedCopy.description
     : active.description;
-  const href = portfolioHref({ project: active.id });
+  const href = portfolioProjectHref(active.id);
 
   return (
     <section className="pb-[var(--cb-space-64)] sm:pb-[var(--cb-space-80)] lg:pb-[var(--cb-space-96)]">

@@ -2,6 +2,7 @@ import type {
   PortfolioCategory,
   PortfolioCategoryId,
   PortfolioProject,
+  PortfolioScreen,
 } from "@/types/landing/services/portfolio";
 
 export const portfolioCategories: PortfolioCategory[] = [
@@ -280,6 +281,129 @@ export const portfolioCta = {
   secondaryHref: "/hire-a-codev",
 };
 
+interface PortfolioDetailFeature {
+  icon: string;
+  title: string;
+  description: string;
+}
+
+interface PortfolioProjectDetailOverride {
+  service?: string;
+  platform?: string;
+  features?: PortfolioDetailFeature[];
+  screens?: PortfolioScreen[];
+}
+
+export const portfolioProjectDetails: Record<
+  string,
+  PortfolioProjectDetailOverride
+> = {
+  TapUp: {
+    service: "Web Application",
+    platform: "Web · Mobile web · NFC cards",
+    features: [
+      {
+        icon: "template",
+        title: "Profile templates",
+        description: "Pre-designed, customizable by industry and role.",
+      },
+      {
+        icon: "palette",
+        title: "Card customization",
+        description: "Your info, photos and template designs.",
+      },
+      {
+        icon: "nfc",
+        title: "NFC physical cards",
+        description: "Share your profile with one tap.",
+      },
+      {
+        icon: "devices",
+        title: "Cross-device",
+        description: "Instant updates on every device.",
+      },
+    ],
+    screens: [
+      {
+        id: "web-overview",
+        label: "Web overview",
+        tab: "Web",
+        mode: "browser",
+        objectPosition: "0% 50%",
+      },
+      {
+        id: "profile-page",
+        label: "Profile page",
+        tab: "Web",
+        mode: "browser",
+        objectPosition: "100% 50%",
+      },
+      {
+        id: "mobile-experience",
+        label: "Mobile experience",
+        tab: "Mobile",
+        mode: "phone",
+        objectPosition: "50% 50%",
+      },
+      {
+        id: "nfc-cards",
+        label: "NFC cards",
+        tab: "Cards",
+        mode: "phone",
+        objectPosition: "0% 50%",
+      },
+    ],
+  },
+};
+
+export const portfolioDetailOrder = [
+  "Hosanna Eternal ERP System",
+  "TapUp",
+  "Gingko",
+];
+
+export const portfolioServiceLabels: Record<
+  Exclude<PortfolioCategoryId, "all">,
+  string
+> = {
+  "web-apps": "Web Application",
+  "cms-storefronts": "CMS & Storefront",
+  "mobile-apps": "Mobile Application",
+  "product-design": "Product Design",
+  "ai-development": "AI Development",
+};
+
+export const portfolioPlatformLabels: Record<
+  Exclude<PortfolioCategoryId, "all">,
+  string
+> = {
+  "web-apps": "Web",
+  "cms-storefronts": "CMS",
+  "mobile-apps": "Mobile",
+  "product-design": "Product design",
+  "ai-development": "AI",
+};
+
+export const portfolioProjectDetailCopy = {
+  allProjects: "All projects",
+  visitLive: "Visit live site",
+  featuresEyebrow: "KEY FEATURES",
+  featuresTitle: "What's inside",
+  featuresDescription:
+    "The main things the product does, in one line each.",
+  screensEyebrow: "SCREENS",
+  screensTitle: "Inside the product",
+  previousProject: "Previous project",
+  nextProject: "Next project",
+  buildEyebrow: "BUILD WITH US",
+  buildDescription:
+    "Same team, same process. Start with a free 30-minute strategy call.",
+  buildPrimary: "Book a Strategy Call",
+  buildSecondary: "See all projects",
+  buildPrimaryHref: "/bookacall",
+  buildSecondaryHref: "/services",
+};
+
 export const portfolioCategoryCounts: Record<PortfolioCategoryId, number> = {
   all: 37,
   "web-apps": 12,
@@ -328,6 +452,10 @@ export function normalizePortfolioCategory(
   return portfolioCategories.some((category) => category.id === candidate)
     ? (candidate as PortfolioCategoryId)
     : "all";
+}
+
+export function portfolioProjectHref(projectId: string) {
+  return `/services/${encodeURIComponent(projectId)}`;
 }
 
 export function portfolioHref(options: {

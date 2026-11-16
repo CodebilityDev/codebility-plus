@@ -53,6 +53,10 @@ export function LandingNavigation() {
       return pathname.startsWith("/profiles") || pathname === "/codevs";
     }
 
+    if (href === "/services") {
+      return pathname === "/services" || pathname.startsWith("/services/");
+    }
+
     return pathname === href;
   };
 

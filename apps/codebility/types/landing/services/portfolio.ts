@@ -29,6 +29,22 @@ export interface PortfolioProject {
   badge: string;
 }
 
+export type PortfolioScreenTab = "Web" | "Mobile" | "Cards";
+
+export interface PortfolioScreen {
+  id: string;
+  label: string;
+  tab: PortfolioScreenTab;
+  mode: "browser" | "phone";
+  objectPosition: string;
+}
+
+export interface PortfolioProjectDetail {
+  project?: PortfolioProject;
+  previous?: PortfolioProject;
+  next?: PortfolioProject;
+}
+
 export interface PortfolioCounts {
   projects: number;
   services: number;

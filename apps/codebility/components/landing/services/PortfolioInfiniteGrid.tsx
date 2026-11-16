@@ -7,7 +7,7 @@ import { PortfolioGridSkeleton } from "@/components/landing/services/PortfolioGr
 import { PortfolioProjectCard } from "@/components/landing/services/PortfolioProjectCard";
 import {
   portfolioBrowse,
-  portfolioHref,
+  portfolioProjectHref,
 } from "@/constants/landing/services/content";
 import type {
   PortfolioCategoryId,
@@ -112,11 +112,7 @@ export function PortfolioInfiniteGrid({
           <PortfolioProjectCard
             key={project.id}
             project={project}
-            href={portfolioHref({
-              category,
-              search,
-              project: project.id,
-            })}
+            href={portfolioProjectHref(project.id)}
           />
         ))}
       </div>

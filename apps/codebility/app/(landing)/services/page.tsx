@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { PortfolioBrowser } from "@/components/landing/services/PortfolioBrowser";
-import { PortfolioProjectModal } from "@/components/landing/services/PortfolioProjectModal";
 import { ServicesCta } from "@/components/landing/services/ServicesCta";
 import { ServicesFeatured } from "@/components/landing/services/ServicesFeatured";
 import { ServicesHero } from "@/components/landing/services/ServicesHero";
@@ -41,7 +40,6 @@ interface ServicesPageProps {
   searchParams: Promise<{
     category?: string | string[];
     search?: string | string[];
-    project?: string | string[];
   }>;
 }
 
@@ -78,9 +76,6 @@ export default function ServicesPage({ searchParams }: ServicesPageProps) {
       </Suspense>
       <Suspense fallback={<ServicesCtaSkeleton />}>
         <CtaContent />
-      </Suspense>
-      <Suspense fallback={null}>
-        <PortfolioProjectModal searchParams={searchParams} />
       </Suspense>
     </>
   );

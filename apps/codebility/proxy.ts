@@ -61,7 +61,7 @@ const PUBLIC_PATHS = new Set([
   EMAIL_VERIFICATION,
 ]);
 
-const PUBLIC_PREFIXES = [PROFILE_PREFIX, "/nda-signing/"];
+const PUBLIC_PREFIXES = [PROFILE_PREFIX, "/nda-signing/", "/services/"];
 
 const AUTH_ENTRY_PATHS = new Set([SIGN_IN, "/auth/sign-up", "/auth/onboarding"]);
 

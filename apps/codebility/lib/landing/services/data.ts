@@ -8,6 +8,7 @@ import {
   portfolioCategories,
   portfolioCategoryCount,
   portfolioCuratedGridNames,
+  portfolioDetailOrder,
   portfolioFeaturedName,
   portfolioPartnerCount,
   portfolioProjectOverrides,
@@ -20,6 +21,7 @@ import type {
   PortfolioCategoryId,
   PortfolioData,
   PortfolioProject,
+  PortfolioProjectDetail,
 } from "@/types/landing/services/portfolio";
 
 const PROJECT_SELECT = `
@@ -134,6 +136,44 @@ export async function getCachedPortfolioData(): Promise<PortfolioData> {
       rating: portfolioRating,
     },
     categories,
+  };
+}
+
+function orderProjectsForDetail(projects: PortfolioProject[]) {
+  const preferred = new Map(
+    portfolioDetailOrder.map((name, index) => [name, index]),
+  );
+
+  return [...projects].sort((a, b) => {
+    const aIndex = preferred.get(a.sourceName);
+    const bIndex = preferred.get(b.sourceName);
+
+    if (aIndex !== undefined || bIndex !== undefined) {
+      return (aIndex ?? Number.MAX_SAFE_INTEGER) -
+        (bIndex ?? Number.MAX_SAFE_INTEGER);
+    }
+
+    return a.name.localeCompare(b.name);
+  });
+}
+
+export async function getCachedPortfolioProjectDetail(
+  projectId: string,
+): Promise<PortfolioProjectDetail> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag(CACHE_TAGS.servicesProjects);
+
+  const data = await getCachedPortfolioData();
+  const ordered = orderProjectsForDetail(data.projects);
+  const index = ordered.findIndex((project) => project.id === projectId);
+
+  if (index < 0) return { project: undefined };
+
+  return {
+    project: ordered[index],
+    previous: ordered[index - 1],
+    next: ordered[index + 1],
   };
 }
 

@@ -13,15 +13,11 @@ import { Avatar } from "@/components/global/design-system/Avatar";
 import { Eyebrow } from "@/components/global/design-system/Eyebrow";
 import { Rating } from "@/components/global/design-system/Rating";
 import { LandingContainer } from "@/components/global/layout/LandingContainer";
-import { portfolioProof } from "@/constants/landing/services/content";
-import type {
-  PortfolioData,
-  PortfolioProject,
-} from "@/types/landing/services/portfolio";
-
-function projectHref(project: PortfolioProject) {
-  return `/services?project=${encodeURIComponent(project.id)}`;
-}
+import {
+  portfolioProjectHref,
+  portfolioProof,
+} from "@/constants/landing/services/content";
+import type { PortfolioData } from "@/types/landing/services/portfolio";
 
 const statIcons: Record<string, ComponentType<{ className?: string }>> = {
   briefcase: Briefcase,
@@ -131,7 +127,7 @@ export function ServicesProof({ data }: { data: PortfolioData }) {
                   {testimonial.projectLabel}: {project.name}
                 </p>
                 <Link
-                  href={projectHref(project)}
+                  href={portfolioProjectHref(project.id)}
                   className="inline-flex shrink-0 items-center gap-[var(--cb-space-6)] text-[13px] font-medium text-[color:var(--cb-p400)] transition-colors hover:text-[color:var(--cb-text)]"
                 >
                   View project
