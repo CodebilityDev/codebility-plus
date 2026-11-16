@@ -367,7 +367,7 @@ export async function deleteJobStatus(id: string) {
 }
 
 export const getPositions = async (): Promise<{
-  error: any;
+  error: unknown;
   data: Position[] | null;
 }> => {
   await requireIdentity();

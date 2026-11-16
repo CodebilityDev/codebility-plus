@@ -106,11 +106,13 @@ export async function getCachedPortfolioData(): Promise<PortfolioData> {
     .order("id", { ascending: true });
 
   if (error) {
-    console.error("Supabase query error (portfolio-projects):", error);
+    throw new Error(`Failed to load portfolio projects: ${error.message}`, {
+      cause: error,
+    });
   }
 
   const projects = sortProjects(
-    ((data ?? []) as unknown as ProjectRow[]).map(mapProject),
+    (data as unknown as ProjectRow[]).map(mapProject),
   );
   const categories = portfolioCategories.map((category) => ({
     ...category,

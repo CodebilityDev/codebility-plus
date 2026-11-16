@@ -1,9 +1,24 @@
+import SectionError from "@/components/global/feedback/SectionError";
 import ProfilesListPagination from "@/components/marketing/profiles/ProfilesListPagination";
 import { getSkillCategories } from "@/lib/global/skill-categories-cached";
+import { reportError } from "@/lib/global/error-reporting";
+import type { CodevBadgeSkillCategory } from "@/types/global/codev";
 import type { ProfilesListShellProps } from "@/types/marketing/profiles/profiles";
 
 export async function ProfilesListBody({ initialData, pageSize }: ProfilesListShellProps) {
-  const skillCategories = await getSkillCategories();
+  let skillCategories: CodevBadgeSkillCategory[];
+
+  try {
+    skillCategories = await getSkillCategories();
+  } catch (error) {
+    reportError(error, {
+      source: "section",
+      boundary: "ProfilesList",
+      route: "/profiles",
+      section: "skill-categories",
+    });
+    return <SectionError />;
+  }
 
   if (!initialData) {
     return (

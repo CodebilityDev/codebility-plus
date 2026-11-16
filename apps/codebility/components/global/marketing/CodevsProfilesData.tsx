@@ -17,7 +17,7 @@ export default async function CodevsProfilesData({
     getSkillCategories(),
   ]);
 
-  if (!data || data.codevs.length === 0) {
+  if (data.codevs.length === 0) {
     return (
       <p className="text-center text-2xl text-gray-500 dark:text-gray-400">
         Sorry, no data found.

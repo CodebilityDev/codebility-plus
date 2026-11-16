@@ -17,6 +17,7 @@ import { Textarea } from "@codevs/ui/textarea";
 import { Toaster } from "@/components/global/ui/toaster";
 
 import { checkEmailStatus, signupUser } from "@/actions/global/auth-session";
+import { reportError } from "@/lib/global/error-reporting";
 import { useModal } from "@/hooks/global/use-modal";
 import { useTechStackStore } from "@/hooks/global/use-techstack";
 
@@ -64,7 +65,7 @@ export default function SignUpForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [emailStatus, setEmailStatus] = useState<
-    "idle" | "checking" | "available" | "registered" | "declined"
+    "idle" | "checking" | "available" | "registered" | "declined" | "error"
   >("idle");
 
   const form = useForm<SignupFormData>({
@@ -109,9 +110,20 @@ export default function SignUpForm() {
     setEmailStatus("checking");
 
     const timer = setTimeout(() => {
-      void checkEmailStatus(value).then((status) => {
-        if (!cancelled) setEmailStatus(status);
-      });
+      void checkEmailStatus(value)
+        .then((status) => {
+          if (!cancelled) setEmailStatus(status);
+        })
+        .catch((error: unknown) => {
+          if (cancelled) return;
+
+          reportError(error, {
+            source: "client",
+            boundary: "sign-up",
+            section: "email-status",
+          });
+          setEmailStatus("error");
+        });
     }, 500);
 
     return () => {
@@ -385,8 +397,9 @@ export default function SignUpForm() {
                     className={
                       emailStatus === "available"
                         ? "text-sm text-emerald-400"
-                        : emailStatus === "checking"
-                          ? "text-sm text-gray-400"
+                        : emailStatus === "checking" ||
+                            emailStatus === "error"
+                          ? "text-sm text-amber-400"
                           : "text-sm text-red-400"
                     }
                   >
@@ -396,6 +409,8 @@ export default function SignUpForm() {
                       "This email is already registered. Try signing in instead."}
                     {emailStatus === "declined" &&
                       "This email was previously declined. Sign in and reapply from the declined page."}
+                    {emailStatus === "error" &&
+                      "We could not check this email right now. You can still apply, and we will verify it when you submit."}
                   </p>
                 )}
 

@@ -30,8 +30,7 @@ async function OnboardingGate() {
     .single();
 
   if (codevError) {
-    console.error("Error fetching codev data:", codevError);
-    redirect("/applicant/waiting");
+    throw codevError;
   }
 
   if (codevData.application_status !== "onboarding") {
@@ -47,8 +46,7 @@ async function OnboardingGate() {
     .single();
 
   if (applicantError) {
-    console.error("Error fetching applicant data:", applicantError);
-    redirect("/applicant/waiting");
+    throw applicantError;
   }
 
   return (

@@ -6,12 +6,14 @@ import { Button } from "@/components/global/design-system/Button";
 import { ProfileCard } from "@/components/global/design-system/ProfileCard";
 import { RoleBadge } from "@/components/global/design-system/RoleBadge";
 import { SectionHeader } from "@/components/global/design-system/SectionHeader";
+import SectionError from "@/components/global/feedback/SectionError";
 import { LandingContainer } from "@/components/global/layout/LandingContainer";
 import { LandingPeopleCards } from "@/components/landing/LandingPeopleTransition";
 import { LandingPeopleFilters } from "@/components/landing/LandingPeopleFilters";
 import { LandingPeopleGridSkeleton } from "@/components/landing/LandingPeopleGridSkeleton";
 import { LandingPeoplePagination } from "@/components/landing/LandingPeoplePagination";
 import { LandingPeopleTransition } from "@/components/landing/LandingPeopleTransition";
+import { reportError } from "@/lib/global/error-reporting";
 import { getCachedLandingTeamPage } from "@/lib/global/landing-people";
 import type { LandingSearchParams } from "@/types/landing/hero-codevs";
 import type { TeamFilter } from "@/types/global/landing-people";
@@ -48,7 +50,17 @@ async function LandingPeopleContent({
   const params = await searchParams;
   const filter = parseTeamFilter(params.team);
   const page = parsePage(params.teamPage);
-  const data = await getCachedLandingTeamPage(filter, page);
+  const data = await getCachedLandingTeamPage(filter, page).catch((error) => {
+    reportError(error, {
+      source: "section",
+      boundary: "LandingPeople",
+      route: "/",
+      section: "landing-people",
+    });
+    return null;
+  });
+
+  if (!data) return <SectionError />;
 
   return (
     <div className="flex flex-col gap-[var(--cb-space-32)]">

@@ -118,8 +118,10 @@ async function getCachedHireTalentPool(): Promise<HireTalentProfile[]> {
   ]);
 
   if (result.error) {
-    console.error("Supabase query error (hire-talent-profiles):", result.error);
-    return [];
+    throw new Error(
+      `Failed to load hire talent profiles: ${result.error.message}`,
+      { cause: result.error },
+    );
   }
 
   const categoryById = new Map(

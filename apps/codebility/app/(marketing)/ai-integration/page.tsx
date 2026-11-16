@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 
-import DevelopmentProcessReactFLow from "@/components/marketing/ai-integration/AiIntegration-development-process-react-flow";
+import DevelopmentProcessReactFLow from "@/components/marketing/ai-integration/AiIntegrationDevelopmentProcessReactFlowWrapper";
 import DevelopmentProcess from "@/components/marketing/ai-integration/AiIntegrationDevelopmentProcess";
 import HeroBackground from "@/components/marketing/ai-integration/AiIntegrationHeroBg";
 import LatestTech from "@/components/marketing/ai-integration/AiIntegrationLatestTech";
 import MobileAppServices from "@/components/marketing/ai-integration/AiIntegrationMobileAppServices";
 import NextStep from "@/components/marketing/ai-integration/AiIntegrationNextStep";
 import Partner from "@/components/marketing/ai-integration/AiIntegrationPartner";
-import PartnerReactFlow from "@/components/marketing/ai-integration/AiIntegrationPartnerReactFlow";
+import PartnerReactFlow from "@/components/marketing/ai-integration/AiIntegrationPartnerReactFlowWrapper";
 import AISolutions from "@/components/marketing/ai-integration/AiIntegrationSolutions";
 import UnparallelDigitalSuccess from "@/components/marketing/ai-integration/AiIntegrationUnparallelDigitalSuccess";
 

@@ -36,61 +36,56 @@ const CODEV_SELECT = `
 const CODEV_LIMIT = 50;
 const ACTIVE_INTERNAL_STATUSES = ["GRADUATED", "TRAINING", "MENTOR", "ADMIN"];
 
-export async function getRealProjects() {
+export async function getRealProjects(): Promise<RealProject[]> {
   "use cache";
   cacheLife("hours");
   cacheTag(CACHE_TAGS.proposalProjects);
-  try {
-    const supabase = createClientAnon();
 
-    const { data, error} = await supabase
-      .from('projects')
-      .select(PROJECT_SELECT)
-      .eq('public_display', true)
-      .order('created_at', { ascending: false })
-      .limit(PROJECT_LIMIT);
+  const supabase = createClientAnon();
 
-    if (error) {
-      throw error;
-    }
+  const { data, error } = await supabase
+    .from('projects')
+    .select(PROJECT_SELECT)
+    .eq('public_display', true)
+    .order('created_at', { ascending: false })
+    .limit(PROJECT_LIMIT);
 
-    // Flatten the categories structure - same approach as getPublicProjects
-    const projectsWithCategories = data.map((project) => ({
-      ...project,
-      categories: project.categories.map((cat) => cat.projects_category).filter(Boolean),
-    }));
-
-    return { data: projectsWithCategories as RealProject[], error: null };
-  } catch (error) {
-    console.error('Error fetching real projects:', error);
-    return { data: null, error: 'Failed to fetch real projects' };
+  if (error) {
+    throw new Error(`Failed to load proposal projects: ${error.message}`, {
+      cause: error,
+    });
   }
+
+  // Flatten the categories structure - same approach as getPublicProjects
+  const projectsWithCategories = data.map((project) => ({
+    ...project,
+    categories: project.categories.map((cat) => cat.projects_category).filter(Boolean),
+  }));
+
+  return projectsWithCategories as RealProject[];
 }
 
-export async function getCodevProfiles() {
+export async function getCodevProfiles(): Promise<Codev[]> {
   "use cache";
   cacheLife("hours");
   cacheTag(CACHE_TAGS.proposalCodevs);
-  try {
-    const supabase = createClientAnon();
 
-    // Fetch codevs and mentors with role information
-    const { data, error } = await supabase
-      .from('codev')
-      .select(CODEV_SELECT)
-      .in('role_id', [5, 10]) // Include both Mentor (5) and Codev (10)
-      .in('internal_status', ACTIVE_INTERNAL_STATUSES)
-      .order('created_at', { ascending: false })
-      .limit(CODEV_LIMIT);
+  const supabase = createClientAnon();
 
-    if (error) {
-      console.error('❌ Error in getCodevProfiles:', error);
-      throw error;
-    }
+  // Fetch codevs and mentors with role information
+  const { data, error } = await supabase
+    .from('codev')
+    .select(CODEV_SELECT)
+    .in('role_id', [5, 10]) // Include both Mentor (5) and Codev (10)
+    .in('internal_status', ACTIVE_INTERNAL_STATUSES)
+    .order('created_at', { ascending: false })
+    .limit(CODEV_LIMIT);
 
-    return { data: data as unknown as Codev[], error: null };
-  } catch (error) {
-    console.error('❌ Error fetching codev profiles:', error);
-    return { data: [], error: 'Failed to fetch codev profiles' };
+  if (error) {
+    throw new Error(`Failed to load proposal codevs: ${error.message}`, {
+      cause: error,
+    });
   }
+
+  return data as unknown as Codev[];
 }

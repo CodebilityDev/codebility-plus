@@ -1,7 +1,9 @@
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 
+import SectionError from "@/components/global/feedback/SectionError";
 import { ProfileSectionCard } from "@/components/landing/profiles/ProfileSectionCard";
+import { reportError } from "@/lib/global/error-reporting";
 import { getCachedProfileProjects } from "@/lib/global/profiles-listing-cached";
 
 interface ProfileProject {
@@ -78,7 +80,17 @@ function ProjectRow({ project }: { project: ProfileProject }) {
 }
 
 export async function ProfileCodevProjects({ id }: { id: string }) {
-  const projects = await getCachedProfileProjects(id);
+  const projects = await getCachedProfileProjects(id).catch((error) => {
+    reportError(error, {
+      source: "section",
+      boundary: "ProfileProjects",
+      route: `/profiles/${id}`,
+      section: "profile-projects",
+    });
+    return null;
+  });
+
+  if (!projects) return <SectionError />;
 
   if (projects.length === 0) return null;
 

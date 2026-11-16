@@ -1,19 +1,37 @@
+import SectionError from "@/components/global/feedback/SectionError";
 import { ProfileSectionCard } from "@/components/landing/profiles/ProfileSectionCard";
+import { reportError } from "@/lib/global/error-reporting";
 import { getCachedProfileDetail } from "@/lib/global/profile-detail-cached";
 import { getProfileReferenceDate } from "@/lib/landing/profiles/profile-reference";
+import type { Codev } from "@/types/global/codev";
 import {
   formatExperienceDuration,
   formatExperiencePeriod,
 } from "@/utils/landing/profiles/profile-display";
 
 export async function ProfileExperienceSection({ id }: { id: string }) {
-  const [codev, referenceDate] = await Promise.all([
-    getCachedProfileDetail(id),
-    getProfileReferenceDate(),
-  ]);
-  const experiences = codev?.work_experience ?? [];
+  let codev: Codev | null = null;
+  let referenceDate: string | null = null;
 
-  if (!codev || experiences.length === 0) return null;
+  try {
+    [codev, referenceDate] = await Promise.all([
+      getCachedProfileDetail(id),
+      getProfileReferenceDate(),
+    ]);
+  } catch (error) {
+    reportError(error, {
+      source: "section",
+      boundary: "ProfileExperience",
+      route: `/profiles/${id}`,
+      section: "profile-experience",
+    });
+    return <SectionError />;
+  }
+
+  if (!codev || !referenceDate) return null;
+
+  const experiences = codev.work_experience ?? [];
+  if (experiences.length === 0) return null;
 
   const sorted = [...experiences].sort((a, b) => {
     if (a.is_present !== b.is_present) return a.is_present ? -1 : 1;

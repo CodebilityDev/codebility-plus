@@ -49,15 +49,17 @@ function mapRow(row: JobListingRow): JobListing {
 
 export async function getCareersJobDepartments(
   supabase: SupabaseClient,
-): Promise<string[] | null> {
+): Promise<string[]> {
   const { data, error } = await supabase
     .from("job_listings")
     .select("department")
     .eq("status", "active");
 
   if (error) {
-    console.error("Supabase query error (careers-job-departments):", error);
-    return null;
+    throw new Error(
+      `Failed to load careers job departments: ${error.message}`,
+      { cause: error },
+    );
   }
 
   return [
@@ -78,7 +80,7 @@ export async function getCareersJobListingsPage(
     page?: number;
     limit?: number;
   },
-): Promise<CareersJobListingsPage | null> {
+): Promise<CareersJobListingsPage> {
   const department = options?.department?.trim() ?? "";
   const type = options?.type?.trim() ?? "";
   const level = options?.level?.trim() ?? "";
@@ -107,8 +109,10 @@ export async function getCareersJobListingsPage(
   const { data, error, count } = await query;
 
   if (error) {
-    console.error("Supabase query error (careers-job-listings):", error);
-    return null;
+    throw new Error(
+      `Failed to load careers job listings: ${error.message}`,
+      { cause: error },
+    );
   }
 
   const total = count ?? 0;

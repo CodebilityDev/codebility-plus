@@ -44,7 +44,11 @@ export default function ApplicantProfilePage() {
 
 async function ProfileComponent() {
   const supabase = await createClientServerComponent();
-  const { data: positions } = await getPositions();
+  const { data: positions, error: positionsError } = await getPositions();
+
+  if (positionsError) {
+    throw new Error("Failed to load positions");
+  }
 
   // Get current user
   const {
@@ -69,20 +73,15 @@ async function ProfileComponent() {
     .single();
 
   if (userError) {
-    console.error("Error fetching user:", userError);
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="text-lg text-red-500">Failed to load user profile</div>
-      </div>
-    );
+    throw userError;
   }
 
   // Fetch related data in parallel
   const [
-    { data: education },
-    { data: workExperience },
-    { data: schedules },
-    { data: jobStatuses },
+    { data: education, error: educationError },
+    { data: workExperience, error: workExperienceError },
+    { data: schedules, error: schedulesError },
+    { data: jobStatuses, error: jobStatusesError },
   ] = await Promise.all([
     supabase
       .from("education")
@@ -110,10 +109,15 @@ async function ProfileComponent() {
       .eq("codev_id", user.id),
   ]);
 
+  if (educationError) throw educationError;
+  if (workExperienceError) throw workExperienceError;
+  if (schedulesError) throw schedulesError;
+  if (jobStatusesError) throw jobStatusesError;
+
   // Combine data
   const codevData = {
     ...user,
-    education: education ?? [],
+    education,
   };
 
   return (
@@ -146,12 +150,12 @@ async function ProfileComponent() {
                 />
                 <EducationalBackground
                   earnedCategories={earnedCategories(points)}
-                  data={education ?? []}
+                  data={education}
                   codevId={user.id}
                 />
                 <Experience
                   earnedCategories={earnedCategories(points)}
-                  data={workExperience ?? []}
+                  data={workExperience}
                   codevId={user.id}
                 />
               </>
@@ -176,8 +180,8 @@ async function ProfileComponent() {
               </>
             )}
           </ProfilePointsGate>
-          <TimeSchedule data={schedules?.[0] ?? null} codevId={user.id} />
-          <JobStatuses data={jobStatuses ?? []} />
+          <TimeSchedule data={schedules[0] ?? null} codevId={user.id} />
+          <JobStatuses data={jobStatuses} />
         </div>
       </div>
     </>

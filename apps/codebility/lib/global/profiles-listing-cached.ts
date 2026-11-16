@@ -65,7 +65,7 @@ function mapRow(row: ProfilesListingRow): Codev {
 
 async function fetchQualifiedCodevIds(
   supabase: SupabaseClient,
-): Promise<string[] | null> {
+): Promise<string[]> {
   const result = await supabase.rpc("qualified_codev_ids", {
     p_min_points: MIN_QUALIFIED_POINTS,
   });
@@ -73,8 +73,10 @@ async function fetchQualifiedCodevIds(
   const error = (result as { error?: { message: string } | null }).error;
 
   if (error) {
-    console.error("Supabase query error (profiles-listing points):", error);
-    return null;
+    throw new Error(
+      `Failed to load qualified codev ids: ${error.message}`,
+      { cause: error },
+    );
   }
 
   return (data as { codev_id: string | null }[])
@@ -85,7 +87,7 @@ async function fetchQualifiedCodevIds(
 async function fetchPositions(
   supabase: SupabaseClient,
   codevIds: string[],
-): Promise<string[] | null> {
+): Promise<string[]> {
   if (codevIds.length === 0) return [];
 
   const { data, error } = await supabase
@@ -97,8 +99,10 @@ async function fetchPositions(
     .not("display_position", "is", null);
 
   if (error) {
-    console.error("Supabase query error (profiles-listing positions):", error);
-    return null;
+    throw new Error(
+      `Failed to load profile positions: ${error.message}`,
+      { cause: error },
+    );
   }
 
   return [
@@ -116,7 +120,7 @@ async function fetchProfilesPage(
   position: string,
   from: number,
   to: number,
-): Promise<{ codevs: Codev[]; total: number } | null> {
+): Promise<{ codevs: Codev[]; total: number }> {
   if (codevIds.length === 0) return { codevs: [], total: 0 };
 
   let query = supabase
@@ -136,8 +140,9 @@ async function fetchProfilesPage(
   const { data, error, count } = await query;
 
   if (error) {
-    console.error("Supabase query error (profiles-listing):", error);
-    return null;
+    throw new Error(`Failed to load profiles page: ${error.message}`, {
+      cause: error,
+    });
   }
 
   return {
@@ -174,7 +179,7 @@ export async function getProfilesListingPage(
     page?: number;
     limit?: number;
   },
-): Promise<ProfilesListingPage | null> {
+): Promise<ProfilesListingPage> {
   const position = options?.position?.trim() ?? "";
   const page = parsePositiveInt(options?.page, DEFAULT_PAGE);
   const limit = parsePositiveInt(options?.limit, DEFAULT_LIMIT, MAX_LIMIT);
@@ -182,14 +187,11 @@ export async function getProfilesListingPage(
   const to = from + limit - 1;
 
   const codevIds = await fetchQualifiedCodevIds(supabase);
-  if (!codevIds) return null;
 
   const [positions, result] = await Promise.all([
     fetchPositions(supabase, codevIds),
     fetchProfilesPage(supabase, codevIds, position, from, to),
   ]);
-
-  if (!positions || !result) return null;
 
   return buildListingPage(
     result.codevs,
@@ -213,12 +215,11 @@ async function getCachedQualifiedPositions() {
   cacheLife("hours");
   cacheTag(CACHE_TAGS.profilesListing);
   const codevIds = await getCachedQualifiedCodevIds();
-  if (!codevIds) return null;
   return fetchPositions(createClientAnon(), codevIds);
 }
 
 export async function getCachedProfilesListingPositions(): Promise<string[]> {
-  return (await getCachedQualifiedPositions()) ?? [];
+  return getCachedQualifiedPositions();
 }
 
 export async function getCachedProfilesListingPage(
@@ -233,14 +234,11 @@ export async function getCachedProfilesListingPage(
   const to = from + limit - 1;
 
   const codevIds = await getCachedQualifiedCodevIds();
-  if (!codevIds) return null;
 
   const [positions, result] = await Promise.all([
     getCachedQualifiedPositions(),
     fetchProfilesPage(createClientAnon(), codevIds, position, from, to),
   ]);
-
-  if (!positions || !result) return null;
 
   return buildListingPage(
     result.codevs,
@@ -273,7 +271,12 @@ async function fetchProjectCategoryNames(projectIds: string[]) {
     .select("project_id, projects_category(name)")
     .in("project_id", projectIds);
 
-  if (error) return new Map<string, string>();
+  if (error) {
+    throw new Error(
+      `Failed to load profile project categories: ${error.message}`,
+      { cause: error },
+    );
+  }
 
   const rows = data as unknown as {
     project_id: string;
@@ -298,7 +301,13 @@ async function fetchProfileProjects(codevId: string) {
     .select("project_id")
     .eq("codev_id", codevId);
 
-  if (memberError || members.length === 0) return [];
+  if (memberError) {
+    throw new Error(`Failed to load profile projects: ${memberError.message}`, {
+      cause: memberError,
+    });
+  }
+
+  if (members.length === 0) return [];
 
   const projectIds = members
     .map((row) => row.project_id)
@@ -309,7 +318,11 @@ async function fetchProfileProjects(codevId: string) {
     .select("id, name, main_image, description, website_url")
     .in("id", projectIds);
 
-  if (projectError) return [];
+  if (projectError) {
+    throw new Error(`Failed to load profile projects: ${projectError.message}`, {
+      cause: projectError,
+    });
+  }
 
   const categories = await fetchProjectCategoryNames(projectIds);
 
@@ -328,7 +341,12 @@ async function fetchProfileRating(codevId: string) {
     .rpc("calculate_member_rating_score", { member_uuid: codevId })
     .single();
 
-  if (error) return 0;
+  if (error) {
+    throw new Error(`Failed to load profile rating: ${error.message}`, {
+      cause: error,
+    });
+  }
+
   if (typeof data === "number") return data;
   return (data as { calculate_member_rating_score?: number } | null)
     ?.calculate_member_rating_score ?? 0;

@@ -1,7 +1,9 @@
+import SectionError from "@/components/global/feedback/SectionError";
 import { HeroDeveloperCard } from "@/components/landing/HeroDeveloperCard";
 import { LandingDeveloperCards } from "@/components/landing/LandingSearchTransition";
 import { LandingSearchClear } from "@/components/landing/LandingSearchClear";
 import { LandingSearchPagination } from "@/components/landing/LandingSearchPagination";
+import { reportError } from "@/lib/global/error-reporting";
 import { searchHeroCodevs } from "@/lib/landing/hero-codevs";
 
 interface LandingSearchResultsProps {
@@ -13,7 +15,18 @@ async function LandingSearchResults({
   query,
   page,
 }: LandingSearchResultsProps) {
-  const result = await searchHeroCodevs(query, page);
+  const result = await searchHeroCodevs(query, page).catch((error) => {
+    reportError(error, {
+      source: "section",
+      boundary: "LandingSearchResults",
+      route: "/",
+      section: "landing-search-results",
+    });
+    return null;
+  });
+
+  if (!result) return <SectionError />;
+
   const hasResults = result.codevs.length > 0;
 
   return (

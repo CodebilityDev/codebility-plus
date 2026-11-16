@@ -3,6 +3,7 @@
 import type { FormEvent } from "react";
 import { useEffect, useState } from "react";
 
+import dynamic from "next/dynamic";
 import { toast } from "sonner";
 
 import {
@@ -13,7 +14,6 @@ import {
 } from "@/actions/home/kanban/tasks";
 import { getTaskSkillCategories } from "@/actions/home/kanban/skill-categories";
 import { Button } from "@/components/global/ui/button";
-import KanbanRichTextEditor from "@/components/home/kanban/KanbanRichTextEditor";
 import TaskAssigneePicker from "@/components/home/kanban/TaskAssigneePicker";
 import {
   DIFFICULTY_LEVELS,
@@ -48,6 +48,19 @@ import {
   SelectValue,
 } from "@codevs/ui/select";
 import { Loader2, X } from "lucide-react";
+
+const KanbanRichTextEditor = dynamic(
+  () => import("@/components/home/kanban/KanbanRichTextEditor"),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        aria-hidden="true"
+        className="min-h-[200px] animate-pulse rounded-md border border-gray-300 bg-muted/40 dark:border-gray-700"
+      />
+    ),
+  },
+);
 
 function readId(data: unknown, key: string): string | null {
   if (typeof data !== "object" || data === null) return null;
@@ -164,7 +177,10 @@ export default function TaskCreateDrawer({
         setSkillCategories(rows);
       })
       .catch(() => {
-        if (active) setSkillCategories([]);
+        if (active) {
+          setSkillCategories([]);
+          setError("Could not load skill categories. Reopen the drawer to try again.");
+        }
       });
 
     return () => {

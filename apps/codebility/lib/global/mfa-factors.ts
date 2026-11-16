@@ -7,10 +7,7 @@ export const getMfaFactors = cache(async (): Promise<MfaFactor[]> => {
   const supabase = await createClientServerComponent();
   const { data, error } = await supabase.auth.mfa.listFactors();
 
-  if (error) {
-    console.error("Error fetching 2FA factors:", error);
-    return [];
-  }
+  if (error) throw error;
 
   return data.totp.map((factor) => ({
     id: factor.id,

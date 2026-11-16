@@ -69,7 +69,7 @@ function mapMembers(members: Codev[]) {
   }));
 }
 
-export async function getLandingAdminsData(): Promise<LandingAdminsData | null> {
+export async function getLandingAdminsData(): Promise<LandingAdminsData> {
   const supabase = createClientAnon();
 
   const [
@@ -80,7 +80,12 @@ export async function getLandingAdminsData(): Promise<LandingAdminsData | null> 
     supabase.from("codev").select(ADMIN_SELECT).eq("role_id", 5),
   ]);
 
-  if (adminError || mentorError) return null;
+  if (adminError || mentorError) {
+    throw new Error(
+      `Failed to load landing admins: ${(adminError ?? mentorError)?.message}`,
+      { cause: adminError ?? mentorError },
+    );
+  }
 
   return {
     admins: mapMembers(

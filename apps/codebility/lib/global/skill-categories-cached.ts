@@ -16,7 +16,7 @@ export async function getSkillCategories(): Promise<CodevBadgeSkillCategory[]> {
 
   if (error) {
     console.error("Error fetching skill categories:", error);
-    return [];
+    throw new Error("Failed to load skill categories");
   }
 
   return data.map((category) => ({

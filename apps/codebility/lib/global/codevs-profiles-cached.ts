@@ -57,7 +57,7 @@ function mapRow(row: CodevsProfileRow): Codev {
 
 export async function getCodevsProfilePositions(
   supabase: SupabaseClient,
-): Promise<string[] | null> {
+): Promise<string[]> {
   const { data, error } = await supabase
     .from("codev")
     .select("display_position")
@@ -67,8 +67,10 @@ export async function getCodevsProfilePositions(
     .not("display_position", "is", null);
 
   if (error) {
-    console.error("Supabase query error (codevs-profile-positions):", error);
-    return null;
+    throw new Error(
+      `Failed to load codev positions: ${error.message}`,
+      { cause: error },
+    );
   }
 
   const positions = [
@@ -89,7 +91,7 @@ export async function getCodevsProfilesPage(
     page?: number;
     limit?: number;
   },
-): Promise<CodevsProfilesPage | null> {
+): Promise<CodevsProfilesPage> {
   const position = options?.position?.trim() ?? "";
   const page = parsePositiveInt(options?.page, DEFAULT_PAGE);
   const limit = parsePositiveInt(options?.limit, DEFAULT_LIMIT, MAX_LIMIT);
@@ -97,7 +99,6 @@ export async function getCodevsProfilesPage(
   const to = from + limit - 1;
 
   const positions = await getCodevsProfilePositions(supabase);
-  if (!positions) return null;
 
   let query = supabase
     .from("codev")
@@ -116,8 +117,9 @@ export async function getCodevsProfilesPage(
   const { data, error, count } = await query;
 
   if (error) {
-    console.error("Supabase query error (codevs-profiles):", error);
-    return null;
+    throw new Error(`Failed to load codev profiles: ${error.message}`, {
+      cause: error,
+    });
   }
 
   const total = count ?? 0;

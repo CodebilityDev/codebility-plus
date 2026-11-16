@@ -1,11 +1,26 @@
 import Image from "next/image";
 
+import SectionError from "@/components/global/feedback/SectionError";
 import { ProfileSectionCard } from "@/components/landing/profiles/ProfileSectionCard";
+import { reportError } from "@/lib/global/error-reporting";
 import { getCachedProfileDetail } from "@/lib/global/profile-detail-cached";
+import type { Codev } from "@/types/global/codev";
 import { groupProfileTechStacks } from "@/utils/landing/profiles/profile-display";
 
 export async function ProfileSkillsSection({ id }: { id: string }) {
-  const codev = await getCachedProfileDetail(id);
+  let codev: Codev | null = null;
+
+  try {
+    codev = await getCachedProfileDetail(id);
+  } catch (error) {
+    reportError(error, {
+      source: "section",
+      boundary: "ProfileSkills",
+      route: `/profiles/${id}`,
+      section: "profile-skills",
+    });
+    return <SectionError />;
+  }
 
   if (!codev) return null;
 

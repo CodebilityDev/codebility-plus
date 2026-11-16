@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
+import SectionError from "@/components/global/feedback/SectionError";
 import { PortfolioBrowser } from "@/components/landing/services/PortfolioBrowser";
 import { ServicesCta } from "@/components/landing/services/ServicesCta";
 import { ServicesFeatured } from "@/components/landing/services/ServicesFeatured";
@@ -11,6 +12,7 @@ import {
   ServicesFeaturedSkeleton,
   ServicesProofSkeleton,
 } from "@/components/landing/services/ServicesSkeletons";
+import { reportError } from "@/lib/global/error-reporting";
 import { getCachedPortfolioData } from "@/lib/landing/services/data";
 
 export const metadata: Metadata = {
@@ -44,7 +46,17 @@ interface ServicesPageProps {
 }
 
 async function FeaturedContent() {
-  const data = await getCachedPortfolioData();
+  const data = await getCachedPortfolioData().catch((error) => {
+    reportError(error, {
+      source: "section",
+      boundary: "ServicesFeatured",
+      route: "/services",
+      section: "services-featured",
+    });
+    return null;
+  });
+
+  if (!data) return <SectionError />;
 
   return (
     <ServicesFeatured project={data.featured} secondary={data.secondary} />
@@ -52,13 +64,33 @@ async function FeaturedContent() {
 }
 
 async function ProofContent() {
-  const data = await getCachedPortfolioData();
+  const data = await getCachedPortfolioData().catch((error) => {
+    reportError(error, {
+      source: "section",
+      boundary: "ServicesProof",
+      route: "/services",
+      section: "services-proof",
+    });
+    return null;
+  });
+
+  if (!data) return <SectionError />;
 
   return <ServicesProof data={data} />;
 }
 
 async function CtaContent() {
-  const data = await getCachedPortfolioData();
+  const data = await getCachedPortfolioData().catch((error) => {
+    reportError(error, {
+      source: "section",
+      boundary: "ServicesCta",
+      route: "/services",
+      section: "services-cta",
+    });
+    return null;
+  });
+
+  if (!data) return <SectionError />;
 
   return <ServicesCta data={data} />;
 }

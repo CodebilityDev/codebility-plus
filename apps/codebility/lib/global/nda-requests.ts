@@ -14,8 +14,9 @@ export const getNdaRequestCodevId = cache(
       .maybeSingle();
 
     if (error) {
-      console.error("Error fetching codev ID:", error);
-      return null;
+      throw new Error(`Failed to load NDA request: ${error.message}`, {
+        cause: error,
+      });
     }
 
     return data?.codev_id ?? null;

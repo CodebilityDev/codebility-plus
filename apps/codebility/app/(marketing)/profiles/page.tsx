@@ -4,11 +4,13 @@ import type { Metadata } from "next";
 
 import { Skeleton } from "@codevs/ui/skeleton";
 
+import SectionError from "@/components/global/feedback/SectionError";
 import Section from "@/components/global/marketing/CodevsSection";
 import { CodevHireCodevModal } from "@/components/global/marketing/CodevHireCodevModal";
 import CodevContainer from "@/components/marketing/profiles/CodevContainer";
 import { ProfilesListBlock } from "@/components/marketing/profiles/ProfilesListBlock";
 import { ProfilesPositionFilter } from "@/components/marketing/profiles/ProfilesPositionFilter";
+import { reportError } from "@/lib/global/error-reporting";
 import { getCachedProfilesListingPositions } from "@/lib/global/profiles-listing-cached";
 import type { ProfilesPageProps } from "@/types/marketing/profiles/profiles";
 
@@ -31,7 +33,15 @@ export const metadata: Metadata = {
 };
 
 export default async function Profiles({ searchParams }: ProfilesPageProps) {
-    const positions = await getCachedProfilesListingPositions();
+    const positions = await getCachedProfilesListingPositions().catch((error) => {
+        reportError(error, {
+            source: "section",
+            boundary: "ProfilesPositions",
+            route: "/profiles",
+            section: "profiles-positions",
+        });
+        return null;
+    });
 
     return (
         <>
@@ -56,7 +66,13 @@ export default async function Profiles({ searchParams }: ProfilesPageProps) {
                             </div>
                         }
                     >
-                        <ProfilesPositionFilter positions={positions} />
+                        {positions ? (
+                            <ProfilesPositionFilter positions={positions} />
+                        ) : (
+                            <div className="relative z-10 m-auto h-full w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+                                <SectionError />
+                            </div>
+                        )}
                     </Suspense>
                     <ProfilesListBlock searchParams={searchParams} />
                 </div>

@@ -5,6 +5,7 @@ import { ArrowRight } from "lucide-react";
 import { Skeleton } from "@codevs/ui/skeleton";
 
 import { Button } from "@/components/global/design-system/Button";
+import SectionError from "@/components/global/feedback/SectionError";
 import { HireTalentCard } from "@/components/landing/hire-a-codev/HireTalentCard";
 import { HireTalentFilterBar } from "@/components/landing/hire-a-codev/HireTalentFilterBar";
 import { HireTalentFilters } from "@/components/landing/hire-a-codev/HireTalentFilters";
@@ -18,6 +19,7 @@ import {
   normalizeHireTalentFilter,
   normalizeHireTalentTech,
 } from "@/constants/landing/hire-a-codev/content";
+import { reportError } from "@/lib/global/error-reporting";
 import { getCachedHireTalentProfiles } from "@/lib/landing/hire-a-codev/data";
 
 interface HireTalentBrowserProps {
@@ -63,7 +65,19 @@ async function HireTalentCards({ searchParams }: HireTalentBrowserProps) {
   const params = await searchParams;
   const activeFilter = normalizeHireTalentFilter(params.filter);
   const activeTech = normalizeHireTalentTech(params.tech);
-  const profiles = await getCachedHireTalentProfiles(activeFilter, activeTech);
+  const profiles = await getCachedHireTalentProfiles(activeFilter, activeTech).catch(
+    (error) => {
+      reportError(error, {
+        source: "section",
+        boundary: "HireTalentCards",
+        route: "/hire-a-codev",
+        section: "hire-talent-cards",
+      });
+      return null;
+    },
+  );
+
+  if (!profiles) return <SectionError />;
 
   if (profiles.length === 0) {
     return (

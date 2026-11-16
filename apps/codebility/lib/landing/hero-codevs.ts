@@ -120,7 +120,7 @@ function mapHeroCodev(
 async function queryHeroCodevs(
   supabase: SupabaseClient<Database>,
   options: { search?: string; page: number; limit: number },
-): Promise<{ rows: HeroCodevRow[]; total: number } | null> {
+): Promise<{ rows: HeroCodevRow[]; total: number }> {
   const page = positivePage(options.page);
   const limit = options.limit;
   const from = (page - 1) * limit;
@@ -146,8 +146,9 @@ async function queryHeroCodevs(
   const { data, error, count } = await query.range(from, to);
 
   if (error) {
-    console.error("Supabase query error (hero-codevs):", error);
-    return null;
+    throw new Error(`Failed to load hero codevs: ${error.message}`, {
+      cause: error,
+    });
   }
 
   return {
@@ -165,8 +166,6 @@ export async function getCachedHeroCodevs(): Promise<HeroCodev[]> {
     queryHeroCodevs(createClientAnon(), { page: 1, limit: HERO_LIMIT }),
     getSkillCategories(),
   ]);
-
-  if (!result) return [];
 
   return result.rows.map((row) => mapHeroCodev(row, skillCategories));
 }
@@ -189,17 +188,6 @@ export async function searchHeroCodevs(
     }),
     getSkillCategories(),
   ]);
-
-  if (!result) {
-    return {
-      codevs: [],
-      page: currentPage,
-      limit: HERO_LIMIT,
-      total: 0,
-      totalPages: 0,
-      query: search,
-    };
-  }
 
   return {
     codevs: result.rows.map((row) => mapHeroCodev(row, skillCategories)),

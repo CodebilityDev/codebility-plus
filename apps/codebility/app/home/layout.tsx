@@ -1,6 +1,5 @@
 import { Suspense } from "react";
 
-import AsyncErrorBoundary from "@/components/global/feedback/AsyncErrorBoundary";
 import ErrorBoundary from "@/components/global/feedback/ErrorBoundary";
 import { ModalProviderHome } from "@/providers/home/ModalProviderHome";
 import { ThemeProvider } from "@/providers/global/ThemeProvider";
@@ -53,11 +52,7 @@ export default function HomeLayout({ children }: HomeLayoutProps) {
               </Suspense>
             </ErrorBoundary>
             <DynamicMainContent>
-              <ConditionalMainWrapper>
-                <AsyncErrorBoundary>
-                  {children}
-                </AsyncErrorBoundary>
-              </ConditionalMainWrapper>
+              <ConditionalMainWrapper>{children}</ConditionalMainWrapper>
             </DynamicMainContent>
           </div>
         </div>

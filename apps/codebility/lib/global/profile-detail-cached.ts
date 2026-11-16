@@ -118,8 +118,9 @@ export async function getProfileDetail(
     .maybeSingle();
 
   if (error) {
-    console.error("Supabase query error (profile-detail):", error);
-    return null;
+    throw new Error(`Failed to load profile detail: ${error.message}`, {
+      cause: error,
+    });
   }
 
   if (!data) return null;
@@ -137,8 +138,9 @@ export async function getProfileDetailMeta(
     .maybeSingle();
 
   if (error) {
-    console.error("Supabase query error (profile-detail-meta):", error);
-    return null;
+    throw new Error(`Failed to load profile detail meta: ${error.message}`, {
+      cause: error,
+    });
   }
 
   if (!data) return null;

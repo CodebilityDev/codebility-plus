@@ -1,6 +1,7 @@
 "use client";
 
 import type { StaticImageData } from "next/image";
+import dynamic from "next/dynamic";
 import React, { useState } from "react";
 import Image from "next/image";
 import Box from "@/components/global/layout/Box";
@@ -13,9 +14,28 @@ import toast from "react-hot-toast";
 import { Button } from "@codevs/ui/button";
 
 import { updateCodev } from "@/actions/applicant/profile/applicant-profile";
-import UploadPhotoModal from "@/components/applicant/profile/UploadPhotoModal";
 import type { PhotoProps } from "@/types/applicant/profile/profile";
 
+import { Loader2 } from "lucide-react";
+
+const UploadPhotoModal = dynamic(
+  () => import("@/components/applicant/profile/UploadPhotoModal"),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        role="status"
+        aria-label="Loading photo editor"
+        className="fixed inset-0 z-50 grid place-items-center bg-black/40"
+      >
+        <Loader2
+          aria-hidden="true"
+          className="h-6 w-6 animate-spin text-white"
+        />
+      </div>
+    ),
+  },
+);
 
 const Photo = ({ data, earnedCategories }: PhotoProps) => {
   const [uploadedAvatar, setUploadedAvatar] = useState<string | StaticImageData | null>(null);
@@ -134,13 +154,15 @@ const Photo = ({ data, earnedCategories }: PhotoProps) => {
           </div>
         </div>
 
-        <UploadPhotoModal
-          open={openUploadModal}
-          setOpen={setOpenUploadModal}
-          image={croppedAvatar ?? ""}
-          setImage={setCroppedAvatar}
-          setAvatar={setUploadedAvatar}
-        />
+        {openUploadModal ? (
+          <UploadPhotoModal
+            open={openUploadModal}
+            setOpen={setOpenUploadModal}
+            image={croppedAvatar ?? ""}
+            setImage={setCroppedAvatar}
+            setAvatar={setUploadedAvatar}
+          />
+        ) : null}
       </div>
     </Box>
   );

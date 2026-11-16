@@ -27,9 +27,11 @@ export const getCurrentCodev = cache(
     logPerf("codev.select", selectStartedAt);
 
     if (error) {
-      console.error("Error fetching current codev:", error);
       logPerf("codev.total", startedAt);
-      return null;
+
+      if (error.code === "PGRST116") return null;
+
+      throw error;
     }
 
     logPerf("codev.total", startedAt);

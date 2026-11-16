@@ -64,8 +64,9 @@ async function getCachedLandingCodevs() {
     .order("id", { ascending: true });
 
   if (error) {
-    console.error("Supabase query error (landing-team-codevs):", error);
-    return { count: 0, members: [] as TeamMember[] };
+    throw new Error(`Failed to load landing codevs: ${error.message}`, {
+      cause: error,
+    });
   }
 
   return {
@@ -82,10 +83,10 @@ export async function getLandingTeamData(): Promise<LandingTeamData> {
     getCachedLandingCodevs(),
   ]);
 
-  const admins = (adminsData?.admins ?? []).map((member) =>
+  const admins = adminsData.admins.map((member) =>
     mapMember(member, "admin", "Admin"),
   );
-  const mentors = (adminsData?.mentors ?? []).map((member) =>
+  const mentors = adminsData.mentors.map((member) =>
     mapMember(member, "mentor", "Mentor"),
   );
   const featuredMentor = mentors.find((member) =>

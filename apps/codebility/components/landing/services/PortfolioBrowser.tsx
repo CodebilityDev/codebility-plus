@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 
+import SectionError from "@/components/global/feedback/SectionError";
 import { LandingContainer } from "@/components/global/layout/LandingContainer";
 import { SectionHeader } from "@/components/global/design-system/SectionHeader";
 import { PortfolioFilters, PortfolioFilterList } from "@/components/landing/services/PortfolioFilters";
@@ -15,6 +16,7 @@ import {
   portfolioBrowse,
   portfolioPageSize,
 } from "@/constants/landing/services/content";
+import { reportError } from "@/lib/global/error-reporting";
 import { getCachedPortfolioPage } from "@/lib/landing/services/data";
 
 interface PortfolioBrowserProps {
@@ -37,7 +39,17 @@ async function PortfolioGrid({ searchParams }: PortfolioBrowserProps) {
     search,
     0,
     portfolioPageSize,
-  );
+  ).catch((error) => {
+    reportError(error, {
+      source: "section",
+      boundary: "PortfolioGrid",
+      route: "/services",
+      section: "portfolio-grid",
+    });
+    return null;
+  });
+
+  if (!page) return <SectionError />;
 
   if (page.projects.length === 0) {
     return (

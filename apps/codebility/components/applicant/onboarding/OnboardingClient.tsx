@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { Button } from "@/components/global/ui/button";
@@ -9,6 +9,7 @@ import VideoPlayer from "@/components/applicant/onboarding/VideoPlayer";
 import Quiz from "@/components/applicant/onboarding/Quiz";
 import Commitment from "@/components/applicant/onboarding/Commitment";
 import { getOnboardingProgress, completeOnboarding, saveQuizAndCommitment } from "@/actions/applicant/onboarding/applicant-onboarding";
+import { reportError } from "@/lib/global/error-reporting";
 import type { OnboardingProgressType } from "@/types/applicant/onboarding/applicant-onboarding";
 import { VIDEO_IDS, VIDEO_TITLES, VIDEO_DESCRIPTIONS } from "@/constants/applicant/onboarding/onboarding";
 import type { OnboardingClientProps } from "@/types/applicant/onboarding/onboarding";
@@ -28,35 +29,59 @@ export default function OnboardingClient({
     currentVideo: 1,
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [progressError, setProgressError] = useState(false);
   const [, setIsCompleting] = useState(false);
-  const [currentStep, setCurrentStep] = useState<"videos" | "quiz" | "commitment">("videos");
-  const [quizScore, setQuizScore] = useState<number>(0);
-  const [quizTotal, setQuizTotal] = useState<number>(0);
+  const [currentStep, setCurrentStep] = useState<"videos" | "quiz" | "commitment">(
+    () => {
+      if (applicantData.quiz_passed && !applicantData.commitment_signed_at) {
+        return "commitment";
+      }
+
+      if (applicantData.quiz_completed_at) {
+        return "quiz";
+      }
+
+      return "videos";
+    },
+  );
+  const [quizScore, setQuizScore] = useState<number>(
+    applicantData.quiz_passed && !applicantData.commitment_signed_at
+      ? (applicantData.quiz_score ?? 0)
+      : 0,
+  );
+  const [quizTotal, setQuizTotal] = useState<number>(
+    applicantData.quiz_passed && !applicantData.commitment_signed_at
+      ? (applicantData.quiz_total ?? 0)
+      : 0,
+  );
 
   const loadProgress = useCallback(async () => {
     setIsLoading(true);
-    const result = await getOnboardingProgress(applicantId);
-    if (result?.progress) {
+    setProgressError(false);
+
+    try {
+      const result = await getOnboardingProgress(applicantId);
+
+      if (!result) {
+        throw new Error("Onboarding progress is unavailable");
+      }
+
       setProgress(result.progress);
+    } catch (error) {
+      reportError(error, {
+        source: "client",
+        boundary: "onboarding",
+        section: "progress",
+      });
+      setProgressError(true);
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   }, [applicantId]);
 
-  const [posed, setPosed] = useState(false);
-
-  if (!posed) {
-    setPosed(true);
-
-    if (applicantData.quiz_passed && !applicantData.commitment_signed_at) {
-      setCurrentStep("commitment");
-      setQuizScore(applicantData.quiz_score ?? 0);
-      setQuizTotal(applicantData.quiz_total ?? 0);
-    } else if (applicantData.quiz_completed_at) {
-      setCurrentStep("quiz");
-    }
-
+  useEffect(() => {
     void loadProgress();
-  }
+  }, [loadProgress]);
 
 
   const handleVideoComplete = async () => {
@@ -176,6 +201,30 @@ export default function OnboardingClient({
   return (
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl">
+        {progressError && (
+          <div
+            role="alert"
+            className="mb-6 flex flex-col gap-3 rounded-lg border border-red-900/60 bg-red-950/30 p-4 sm:flex-row sm:items-center sm:justify-between"
+          >
+            <div>
+              <p className="font-semibold text-red-300">
+                Onboarding progress could not load
+              </p>
+              <p className="text-sm text-gray-400">
+                Your saved progress is still intact. Retry to check which videos
+                are complete.
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              onClick={() => void loadProgress()}
+              className="w-full sm:w-auto"
+            >
+              Retry
+            </Button>
+          </div>
+        )}
+
         {/* Header */}
         <div className="mb-8 text-center">
           <h1 className="mb-2 text-3xl font-bold lg:text-4xl">

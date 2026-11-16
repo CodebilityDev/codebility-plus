@@ -8,7 +8,7 @@ import { getCachedCareersJobDepartments } from "@/lib/global/careers-job-listing
 import type { JobListingsBlockProps } from "@/types/marketing/careers/careers";
 
 export async function JobListingsBlock({ searchParams }: JobListingsBlockProps) {
-  const departments = (await getCachedCareersJobDepartments()) ?? [];
+  const departments = await getCachedCareersJobDepartments();
 
   const headingSkeleton = (
     <div className="mb-12 text-center">

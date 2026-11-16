@@ -3,8 +3,11 @@ import { ArrowRight, Clock, GraduationCap } from "lucide-react";
 
 import { Button } from "@/components/global/design-system/Button";
 import { IconTile } from "@/components/global/design-system/IconTile";
+import SectionError from "@/components/global/feedback/SectionError";
 import { ProfileSectionCard } from "@/components/landing/profiles/ProfileSectionCard";
+import { reportError } from "@/lib/global/error-reporting";
 import { getCachedProfileDetail } from "@/lib/global/profile-detail-cached";
+import type { Codev } from "@/types/global/codev";
 import {
   formatDegreeLabel,
   formatEducationYears,
@@ -23,7 +26,19 @@ const DAY_NAMES = [
 ];
 
 export async function ProfileSidebarSection({ id }: { id: string }) {
-  const codev = await getCachedProfileDetail(id);
+  let codev: Codev | null = null;
+
+  try {
+    codev = await getCachedProfileDetail(id);
+  } catch (error) {
+    reportError(error, {
+      source: "section",
+      boundary: "ProfileSidebar",
+      route: `/profiles/${id}`,
+      section: "profile-sidebar",
+    });
+    return <SectionError />;
+  }
 
   if (!codev) return null;
 

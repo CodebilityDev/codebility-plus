@@ -18,8 +18,7 @@ export default async function JobListingsSection({ searchParams }: JobListingsSe
     getCachedCareersJobDepartments(),
   ]);
 
-  const initialData: CareersJobListingsInitial | null =
-    pageData && departments ? { ...pageData, departments } : null;
+  const initialData: CareersJobListingsInitial = { ...pageData, departments };
 
   return <JobListingsBody initialData={initialData} pageSize={PAGE_SIZE} />;
 }

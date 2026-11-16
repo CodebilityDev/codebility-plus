@@ -8,7 +8,7 @@ import { getCachedCodevsProfilePositions } from "@/lib/global/codevs-profiles-ca
 import type { CodevsProfilesProps } from "@/types/global/marketing";
 
 export default async function CodevsProfiles({ searchParams }: CodevsProfilesProps) {
-  const positions = (await getCachedCodevsProfilePositions()) ?? [];
+  const positions = await getCachedCodevsProfilePositions();
 
   return (
     <Section

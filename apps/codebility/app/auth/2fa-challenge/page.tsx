@@ -8,8 +8,11 @@ import { createClientServerComponent } from "@/lib/global/supabase-server";
 
 async function TwoFactorGate() {
   const supabase = await createClientServerComponent();
-  const { data } = await supabase.auth.mfa.listFactors();
-  const verifiedFactor = data?.totp.find(
+  const { data, error } = await supabase.auth.mfa.listFactors();
+
+  if (error) throw error;
+
+  const verifiedFactor = data.totp.find(
     (factor) => (factor.status as string) === "verified",
   );
 
