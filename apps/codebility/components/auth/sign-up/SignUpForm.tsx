@@ -98,7 +98,7 @@ export default function SignUpForm() {
   const emailValue = form.watch("email_address");
 
   useEffect(() => {
-    const value = (emailValue ?? "").trim();
+    const value = emailValue.trim();
 
     if (!value || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
       setEmailStatus("idle");
@@ -108,9 +108,10 @@ export default function SignUpForm() {
     let cancelled = false;
     setEmailStatus("checking");
 
-    const timer = setTimeout(async () => {
-      const status = await checkEmailStatus(value);
-      if (!cancelled) setEmailStatus(status);
+    const timer = setTimeout(() => {
+      void checkEmailStatus(value).then((status) => {
+        if (!cancelled) setEmailStatus(status);
+      });
     }, 500);
 
     return () => {

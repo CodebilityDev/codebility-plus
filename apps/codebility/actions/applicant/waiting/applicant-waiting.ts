@@ -78,7 +78,7 @@ export async function applicantMoveToOnboard({
         .eq("id", identity.userId)
         .single();
 
-    if (profileError || !profile) {
+    if (profileError) {
         throw new AuthorizationError("forbidden", "Forbidden: profile not found");
     }
 
