@@ -57,6 +57,7 @@ const PUBLIC_PATHS = new Set([
   "/nda-signing/public",
   "/auth/callback",
   "/auth/password-reset",
+  "/auth/update-password",
   EMAIL_VERIFICATION,
 ]);
 

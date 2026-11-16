@@ -1,3 +1,4 @@
+import pathsConfig from "@/constants/global/paths";
 import { createClientServerComponent } from "@/lib/global/supabase-server";
 import { NextResponse } from "next/server";
 
@@ -9,6 +10,12 @@ export async function GET(request: Request) {
   const origin = requestUrl.origin;
   const redirectTo = requestUrl.searchParams.get("redirect_to")?.toString();
   const tokenHash = requestUrl.searchParams.get("token_hash");
+  const next = requestUrl.searchParams.get("next");
+  const recoveryNext =
+    next === pathsConfig.auth.passwordUpdate ? next : null;
+  const isRecovery =
+    recoveryNext !== null ||
+    requestUrl.searchParams.get("type") === "recovery";
 
   if (tokenHash) {
     const supabase = await createClientServerComponent();
@@ -25,35 +32,36 @@ export async function GET(request: Request) {
       return NextResponse.redirect(new URL("/auth/sign-in", origin));
     }
 
+    if (recoveryNext) {
+      return NextResponse.redirect(new URL(recoveryNext, origin));
+    }
+
     if (redirectTo) {
       return NextResponse.redirect(`${origin}${redirectTo}`);
     }
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    return NextResponse.redirect(
+      new URL(pathsConfig.auth.passwordUpdate, origin),
+    );
+  }
 
-    if (user) {
-      const { data: codev } = await supabase
-        .from("codev")
-        .select("application_status")
-        .eq("id", user.id)
-        .maybeSingle();
+  if (code) {
+    if (isRecovery) {
+      const supabase = await createClientServerComponent();
+      const { error } = await supabase.auth.exchangeCodeForSession(code);
+
+      if (error) {
+        return NextResponse.redirect(new URL("/auth/sign-in", origin));
+      }
 
       return NextResponse.redirect(
         new URL(
-          codev?.application_status === "passed"
-            ? "/home/account-settings"
-            : "/applicant/account-settings",
+          recoveryNext ?? pathsConfig.auth.passwordUpdate,
           origin,
         ),
       );
     }
 
-    return NextResponse.redirect(new URL("/auth/sign-in", origin));
-  }
-
-  if (code) {
     const supabase = await createClientServerComponent();
 
     try {

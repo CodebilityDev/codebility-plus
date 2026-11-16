@@ -1,6 +1,7 @@
 "use server";
 
 import { createClientServerComponent } from "@/lib/global/supabase-server";
+import pathsConfig from "@/constants/global/paths";
 import { toErrorMessage } from "@/utils/global/feedback";
 import { headers } from "next/headers";
 
@@ -17,8 +18,11 @@ export const resetUserPassword = async (email: string) => {
             process.env.NEXT_PUBLIC_APP_BASE_URL ??
             "http://localhost:3000";
 
+        const callbackUrl = new URL(pathsConfig.auth.callback, origin);
+        callbackUrl.searchParams.set("next", pathsConfig.auth.passwordUpdate);
+
         const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
-            redirectTo: `${origin}/auth/callback`,
+            redirectTo: callbackUrl.toString(),
         });
 
         if (error) {
