@@ -24,6 +24,7 @@ export interface AvatarStackProps {
 const sizeClasses: Record<AvatarSize, string> = {
   32: "h-[var(--cb-size-32)] w-[var(--cb-size-32)]",
   40: "h-[var(--cb-size-40)] w-[var(--cb-size-40)]",
+  44: "h-[44px] w-[44px]",
   48: "h-[var(--cb-size-48)] w-[var(--cb-size-48)]",
   56: "h-[var(--cb-size-56)] w-[var(--cb-size-56)]",
   72: "h-[var(--cb-size-72)] w-[var(--cb-size-72)]",

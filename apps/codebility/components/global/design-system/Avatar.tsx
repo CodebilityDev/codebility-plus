@@ -4,11 +4,12 @@ import * as React from "react";
 import { cn } from "@codevs/ui";
 
 export type AvatarGradient = "violet" | "teal" | "cyan";
-export type AvatarSize = 32 | 40 | 48 | 56 | 72;
+export type AvatarSize = 32 | 40 | 44 | 48 | 56 | 72;
 
 const sizeClasses: Record<AvatarSize, string> = {
   32: "h-[var(--cb-size-32)] w-[var(--cb-size-32)] text-xs",
   40: "h-[var(--cb-size-40)] w-[var(--cb-size-40)] text-xs",
+  44: "h-[44px] w-[44px] text-sm",
   48: "h-[var(--cb-size-48)] w-[var(--cb-size-48)] text-sm",
   56: "h-[var(--cb-size-56)] w-[var(--cb-size-56)] text-[17px]",
   72: "h-[var(--cb-size-72)] w-[var(--cb-size-72)] text-[17px]",

@@ -1015,3 +1015,41 @@ html[data-landing-motion="ready"] [data-landing-content] {
   visibility: visible;
   pointer-events: auto;
 }
+@keyframes cb-portfolio-slide-left {
+  from {
+    opacity: 0;
+    transform: translateX(-18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes cb-portfolio-slide-right {
+  from {
+    opacity: 0;
+    transform: translateX(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.cb-portfolio-slide-left {
+  animation: cb-portfolio-slide-left 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.cb-portfolio-slide-right {
+  animation: cb-portfolio-slide-right 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cb-portfolio-slide-left,
+  .cb-portfolio-slide-right {
+    animation: none;
+  }
+}

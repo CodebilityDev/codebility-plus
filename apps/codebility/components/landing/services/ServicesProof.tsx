@@ -42,7 +42,7 @@ export function ServicesProof({ data }: { data: PortfolioData }) {
 
   return (
     <section className="relative border-t border-[color:var(--cb-border)] py-[7rem]">
-      <LandingContainer className="grid gap-[var(--cb-space-40)] lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-center lg:gap-[var(--cb-space-56)]">
+      <LandingContainer className="grid gap-[var(--cb-space-40)] lg:grid-cols-[minmax(0,1.03fr)_minmax(0,0.97fr)] lg:items-start lg:gap-[var(--cb-space-56)]">
         <div>
           <Eyebrow variant="outline" className="tracking-[0.12em]">
             {portfolioProof.eyebrow}
@@ -51,21 +51,21 @@ export function ServicesProof({ data }: { data: PortfolioData }) {
             {portfolioProof.titleLead}{" "}
             <span className="cb-community-text">{portfolioProof.titleAccent}</span>
           </h2>
-          <p className="mt-[var(--cb-space-12)] max-w-[560px] text-base leading-7 text-[color:var(--cb-text-muted)] sm:text-lg">
+          <p className="mt-[var(--cb-space-12)] max-w-[720px] text-base leading-7 text-[color:var(--cb-text-muted)] sm:text-lg">
             {portfolioProof.description}
           </p>
 
-          <div className="mt-[var(--cb-space-32)] grid grid-cols-2 gap-[var(--cb-space-16)]">
+          <div className="mt-[var(--cb-space-32)] grid grid-cols-2 gap-x-[var(--cb-space-16)] gap-y-[var(--cb-space-28)]">
             {portfolioProof.stats.map((stat) => {
               const Icon = statIcons[stat.icon] ?? Briefcase;
 
               return (
                 <div
                   key={stat.label}
-                  className="min-h-[170px] rounded-[var(--cb-radius-16)] border border-[color:var(--cb-border)] bg-[color:var(--cb-surface)] p-[var(--cb-space-20)]"
+                  className="min-h-[170px] rounded-[var(--cb-radius-16)] border border-[color:var(--cb-border)] bg-[color:var(--cb-surface)] p-[var(--cb-space-24)] lg:aspect-[307/170] lg:min-h-0"
                 >
                   <div className="flex items-center gap-[var(--cb-space-12)]">
-                    <span className="flex h-[var(--cb-size-36)] w-[var(--cb-size-36)] shrink-0 items-center justify-center rounded-[var(--cb-radius-8)] border border-[color:var(--cb-border)] bg-[color:var(--cb-glass)] text-[color:var(--cb-p300)]">
+                    <span className="flex h-[var(--cb-size-32)] w-[var(--cb-size-32)] shrink-0 items-center justify-center rounded-[var(--cb-radius-8)] border border-[color:var(--cb-border)] bg-[color:var(--cb-glass)] text-[color:var(--cb-p300)]">
                       <Icon
                         aria-hidden
                         className="h-[var(--cb-size-16)] w-[var(--cb-size-16)]"
@@ -75,7 +75,7 @@ export function ServicesProof({ data }: { data: PortfolioData }) {
                       {statValues[stat.icon] ?? stat.value}
                     </p>
                   </div>
-                  <p className="mt-[var(--cb-space-16)] text-[15px] font-semibold leading-5 text-[color:var(--cb-text)]">
+                  <p className="mt-[var(--cb-space-16)] text-base font-semibold leading-5 text-[color:var(--cb-text)]">
                     {stat.label}
                   </p>
                   <p className="mt-[var(--cb-space-4)] text-[13px] leading-5 text-[color:var(--cb-text-muted)]">
@@ -87,12 +87,12 @@ export function ServicesProof({ data }: { data: PortfolioData }) {
           </div>
         </div>
 
-        <div className="relative">
+        <div className="relative lg:mt-[86px]">
           <div
             aria-hidden
             className="pointer-events-none absolute -inset-x-6 -bottom-12 top-8 rounded-[48px] bg-[radial-gradient(ellipse_at_center,color-mix(in_srgb,var(--cb-primary)_30%,transparent)_0%,transparent_70%)] blur-3xl"
           />
-          <div className="relative min-h-[375px] overflow-hidden rounded-[var(--cb-radius-24)] border border-[color:var(--cb-border)] bg-[#0A0E0E] p-[var(--cb-space-32)] shadow-[0_0_70px_rgba(151,71,255,0.18)]">
+          <div className="relative min-h-[354px] overflow-hidden rounded-[var(--cb-radius-24)] border border-[color:var(--cb-border)] bg-[#0A0E0E] p-[var(--cb-space-32)] shadow-[0_0_70px_rgba(151,71,255,0.18)] lg:aspect-[595/354] lg:min-h-0">
             <Rating value={5} size="md" />
             <blockquote className="mt-[var(--cb-space-20)] text-lg leading-[1.6] text-[color:var(--cb-text-secondary)] sm:text-xl">
               &ldquo;{testimonial.quote}&rdquo;
@@ -101,14 +101,14 @@ export function ServicesProof({ data }: { data: PortfolioData }) {
               <Avatar
                 initials={testimonial.initials}
                 alt={testimonial.name}
-                size={48}
+                size={44}
                 gradient="violet"
               />
               <div>
-                <p className="text-[15px] font-semibold leading-5 text-[color:var(--cb-text)]">
+                <p className="text-base font-semibold leading-5 text-[color:var(--cb-text)]">
                   {testimonial.name}
                 </p>
-                <p className="mt-[var(--cb-space-2)] text-sm leading-5 text-[color:var(--cb-text-muted)]">
+                <p className="mt-[var(--cb-space-2)] text-[13px] leading-5 text-[color:var(--cb-text-muted)]">
                   {testimonial.role}
                 </p>
               </div>

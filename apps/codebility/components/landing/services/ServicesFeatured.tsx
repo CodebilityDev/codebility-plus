@@ -2,9 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowRight, Briefcase, Globe, Sparkles, Users } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { cn } from "@codevs/ui";
 
 import { Button } from "@/components/global/design-system/Button";
 import { Eyebrow } from "@/components/global/design-system/Eyebrow";
@@ -81,14 +82,34 @@ export function ServicesFeatured({
   secondary: PortfolioProject[];
 }) {
   const slides = project ? [project, ...secondary] : secondary;
+  const thumbnailSlides = project ? [...secondary, project] : secondary;
   const [activeId, setActiveId] = useState(slides[0]?.id ?? "");
-  const panelRef = useRef<HTMLElement | null>(null);
+  const [announce, setAnnounce] = useState(false);
   const active = slides.find((item) => item.id === activeId) ?? slides[0];
+  const slideIds = slides.map((item) => item.id).join("|");
+
+  useEffect(() => {
+    const ids = slideIds ? slideIds.split("|") : [];
+
+    if (ids.length < 2) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const timer = window.setInterval(() => {
+      if (document.visibilityState === "hidden") return;
+
+      setActiveId((current) => {
+        const index = ids.indexOf(current);
+        return ids[(index + 1) % ids.length] ?? current;
+      });
+      setAnnounce(false);
+    }, 6500);
+
+    return () => window.clearInterval(timer);
+  }, [activeId, slideIds]);
 
   if (!active) return null;
 
   const isFeatured = project?.id === active.id;
-  const thumbnails = slides.filter((item) => item.id !== active.id);
   const features = isFeatured
     ? portfolioFeaturedCopy.features
     : [
@@ -111,11 +132,9 @@ export function ServicesFeatured({
     <section className="pb-[var(--cb-space-64)] sm:pb-[var(--cb-space-80)] lg:pb-[var(--cb-space-96)]">
       <LandingContainer className="flex flex-col gap-[var(--cb-space-16)]">
         <article
-          ref={panelRef}
           id="featured-project-panel"
-          tabIndex={-1}
           aria-label="Featured project"
-          className="relative overflow-hidden rounded-[var(--cb-radius-24)] border border-[color:var(--cb-border)] bg-[color:var(--cb-surface)] shadow-[0_0_80px_-32px_color-mix(in_srgb,var(--cb-primary)_45%,transparent)] focus:outline-none"
+          className="relative overflow-hidden rounded-[var(--cb-radius-24)] border border-[color:var(--cb-border)] bg-[color:var(--cb-surface)] shadow-[0_0_80px_-32px_color-mix(in_srgb,var(--cb-primary)_45%,transparent)]"
         >
           <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
             <div className="relative flex flex-col justify-between gap-[var(--cb-space-32)] p-[var(--cb-space-24)] sm:p-[var(--cb-space-32)] lg:px-[var(--cb-space-40)] lg:py-[var(--cb-space-40)]">
@@ -124,7 +143,11 @@ export function ServicesFeatured({
                 className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_95%_at_0%_0%,color-mix(in_srgb,var(--cb-primary)_30%,transparent)_0%,transparent_68%)]"
               />
 
-              <div aria-live="polite" className="relative">
+              <div
+                key={active.id}
+                aria-live={announce ? "polite" : "off"}
+                className="cb-portfolio-slide-left relative"
+              >
                 <div className="flex flex-wrap items-center gap-[var(--cb-space-12)]">
                   <Eyebrow variant="outline" className="tracking-[0.14em]">
                     {portfolioFeaturedCopy.eyebrow}
@@ -187,7 +210,10 @@ export function ServicesFeatured({
               </div>
             </div>
 
-            <div className="relative aspect-[4/3] w-full overflow-hidden bg-[color:var(--cb-surface-2)] sm:aspect-[16/10] lg:aspect-auto lg:min-h-[470px]">
+            <div
+              key={active.id}
+              className="cb-portfolio-slide-right relative aspect-[4/3] w-full overflow-hidden bg-[color:var(--cb-surface-2)] sm:aspect-[16/10] lg:aspect-auto lg:min-h-[470px]"
+            >
               {active.imageSrc ? (
                 <Image
                   key={active.id}
@@ -211,13 +237,15 @@ export function ServicesFeatured({
         <div
           role="group"
           aria-label="Featured project thumbnails"
-          className="grid grid-cols-1 gap-[var(--cb-space-16)] sm:grid-cols-2 lg:grid-cols-4"
+          tabIndex={0}
+          className="scrollbar-hide flex snap-x snap-mandatory gap-[var(--cb-space-16)] overflow-x-auto pb-[var(--cb-space-4)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--cb-ring)]"
         >
-          {thumbnails.map((item) => {
+          {thumbnailSlides.map((item) => {
             const meta =
               item.sourceName === portfolioFeaturedName
                 ? portfolioFeaturedCopy.thumbnailMeta
                 : item.description;
+            const selected = item.id === active.id;
 
             return (
             <button
@@ -225,11 +253,17 @@ export function ServicesFeatured({
               type="button"
               aria-controls="featured-project-panel"
               aria-label={`Show ${item.name}`}
+              aria-pressed={selected}
               onClick={() => {
                 setActiveId(item.id);
-                panelRef.current?.focus({ preventScroll: true });
+                setAnnounce(true);
               }}
-              className="group flex h-full flex-col overflow-hidden rounded-[var(--cb-radius-16)] border border-[color:var(--cb-border)] bg-[color:var(--cb-surface-2)] text-left transition-colors duration-200 hover:border-[color:color-mix(in_srgb,var(--cb-primary)_45%,transparent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--cb-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--cb-bg)]"
+              className={cn(
+                "group flex w-[82%] shrink-0 snap-start flex-col overflow-hidden rounded-[var(--cb-radius-16)] border bg-[color:var(--cb-surface-2)] text-left transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--cb-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--cb-bg)] sm:w-[calc(50%-8px)] lg:w-[calc(25%-12px)]",
+                selected
+                  ? "border-[color:color-mix(in_srgb,var(--cb-primary)_65%,transparent)] ring-1 ring-[color:color-mix(in_srgb,var(--cb-primary)_35%,transparent)]"
+                  : "border-[color:var(--cb-border)] hover:border-[color:color-mix(in_srgb,var(--cb-primary)_45%,transparent)]",
+              )}
             >
               <span className="relative block aspect-[2.05/1] w-full overflow-hidden bg-[color:var(--cb-surface)]">
                 {item.imageSrc ? (
