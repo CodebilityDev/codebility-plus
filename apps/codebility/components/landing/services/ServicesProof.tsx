@@ -51,7 +51,7 @@ export function ServicesProof({ data }: { data: PortfolioData }) {
             {portfolioProof.description}
           </p>
 
-          <div className="mt-[var(--cb-space-32)] grid grid-cols-2 gap-x-[var(--cb-space-16)] gap-y-[var(--cb-space-28)]">
+          <div className="mt-[var(--cb-space-32)] grid grid-cols-1 gap-x-[var(--cb-space-16)] gap-y-[var(--cb-space-16)] sm:grid-cols-2 sm:gap-y-[var(--cb-space-28)]">
             {portfolioProof.stats.map((stat) => {
               const Icon = statIcons[stat.icon] ?? Briefcase;
 
