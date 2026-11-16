@@ -23,9 +23,7 @@ const updatePasswordSchema = z
   .object({
     password: z
       .string()
-      .min(6, "Password must be at least 6 characters")
-      .regex(/[A-Z]/, "Add at least one uppercase letter")
-      .regex(/[0-9]/, "Add at least one number"),
+      .min(8, "Password must be at least 8 characters"),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -125,10 +123,7 @@ export default function UpdatePasswordForm() {
     );
   }
 
-  const isButtonDisabled =
-    form.formState.isSubmitting ||
-    !form.formState.isValid ||
-    !form.formState.isDirty;
+  const isButtonDisabled = form.formState.isSubmitting;
 
   return (
     <div className="flex flex-col gap-4">
@@ -137,7 +132,7 @@ export default function UpdatePasswordForm() {
           Set a new password
         </h1>
         <p className="mt-2 text-sm text-white/60">
-          Choose a new password for your account.
+          Choose a new password for your account. Use at least 8 characters.
         </p>
       </div>
 
