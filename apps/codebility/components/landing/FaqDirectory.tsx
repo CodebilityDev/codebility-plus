@@ -320,11 +320,11 @@ export function FaqDirectory() {
       />
 
       <LandingContainer className="relative">
-        <header className="mx-auto max-w-[760px] text-center">
+        <header className="mx-auto w-full max-w-[1280px] text-center">
           <Eyebrow variant="outline" className="tracking-[0.3em]">
             FAQ
           </Eyebrow>
-          <h1 className="mt-4 text-4xl font-bold leading-tight tracking-tight text-[color:var(--cb-text)] sm:text-5xl lg:text-[56px] lg:leading-[1.05]">
+          <h1 className="mt-4 w-full bg-[linear-gradient(90deg,#F4F4F4_0%,#E9D5FF_50%,#A5F3FC_100%)] bg-clip-text text-[40px] font-bold leading-[48px] tracking-[0] text-transparent sm:text-[52px] sm:leading-[60px] lg:text-[60px] lg:leading-[68px]">
             Frequently Asked Questions
           </h1>
           <p className="mx-auto mt-3 max-w-[620px] text-sm leading-6 text-[color:var(--cb-text-muted)] sm:text-base">

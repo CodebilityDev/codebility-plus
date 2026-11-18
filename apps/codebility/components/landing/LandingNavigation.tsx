@@ -69,7 +69,7 @@ export function LandingNavigation() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-[color:var(--cb-border)] bg-[color:color-mix(in_srgb,var(--cb-bg)_85%,transparent)] backdrop-blur-xl">
+      <header className="border-b border-[color:var(--cb-border)] bg-[color:color-mix(in_srgb,var(--cb-bg)_85%,transparent)] backdrop-blur-xl">
       <LandingContainer className="flex h-[var(--cb-size-64)] items-center gap-[var(--cb-space-16)]">
         <Link
           href="/"
