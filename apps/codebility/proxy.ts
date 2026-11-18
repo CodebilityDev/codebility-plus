@@ -45,6 +45,7 @@ const PUBLIC_PATHS = new Set([
   "/",
   "/design-system",
   "/privacy-policy",
+  "/terms-and-conditions",
   "/contact",
   "/codevs",
   "/hire-a-codev",
