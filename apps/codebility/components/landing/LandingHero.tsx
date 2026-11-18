@@ -35,7 +35,7 @@ function LandingHero({ codevs, searchParams }: LandingHeroProps) {
         aria-hidden
         className="pointer-events-none absolute inset-0 overflow-hidden"
       >
-        <div className="absolute left-1/2 top-[-7rem] h-[50rem] w-[84rem] -translate-x-1/2 bg-[radial-gradient(ellipse_at_center,color-mix(in_srgb,var(--cb-primary)_32%,transparent)_0%,color-mix(in_srgb,var(--cb-primary)_20%,transparent)_40%,color-mix(in_srgb,var(--cb-primary)_8%,transparent)_60%,color-mix(in_srgb,var(--cb-primary)_3%,transparent)_75%,transparent_90%)]" />
+        <div className="absolute left-1/2 top-[-17.75rem] h-[71rem] w-[119rem] -translate-x-1/2 bg-[radial-gradient(closest-side,color-mix(in_srgb,var(--cb-primary)_32%,transparent)_0%,color-mix(in_srgb,var(--cb-primary)_20%,transparent)_40%,color-mix(in_srgb,var(--cb-primary)_8%,transparent)_60%,color-mix(in_srgb,var(--cb-primary)_3%,transparent)_75%,transparent_90%)]" />
       </div>
 
       <LandingContainer className="relative flex flex-col items-center">
