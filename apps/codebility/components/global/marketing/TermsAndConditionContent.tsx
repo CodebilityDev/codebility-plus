@@ -1,6 +1,12 @@
 "use client";
 
-export function TermsAndConditionContent() {
+export function TermsAndConditionContent({
+  variant = "default",
+  contactEmail,
+}: {
+  variant?: "default" | "document";
+  contactEmail?: string;
+}) {
   const contents = [
     {
       title: "Welcome to Codebility",
@@ -202,19 +208,56 @@ export function TermsAndConditionContent() {
   ];
 
   return (
-    <div className="bg-black-800 flex max-h-[540px] flex-col gap-5 overflow-y-auto p-4 text-white">
-      <p className="self-end text-xs italic text-[#898989] sm:text-sm">
-        Last Updated: May 23, 2024
-      </p>
+    <div
+      className={
+        variant === "document"
+          ? "privacy-terms-body"
+          : "bg-black-800 flex max-h-[540px] flex-col gap-5 overflow-y-auto p-4 text-white"
+      }
+      role={variant === "document" ? "region" : undefined}
+      aria-label={
+        variant === "document" ? "Terms and conditions text" : undefined
+      }
+      tabIndex={variant === "document" ? 0 : undefined}
+    >
+      {variant === "default" && (
+        <p className="self-end text-xs italic text-[#898989] sm:text-sm">
+          Last Updated: May 23, 2024
+        </p>
+      )}
       {contents.map((content, index) => (
-        <div key={index} className="flex flex-col gap-[10px]">
-          <h2 className="text-sm font-semibold sm:text-base" id={content.title}>
+        <section
+          key={content.title}
+          className={
+            variant === "document"
+              ? "privacy-terms-section"
+              : "flex flex-col gap-[10px]"
+          }
+        >
+          <h2
+            className={
+              variant === "document"
+                ? "privacy-terms-heading"
+                : "text-sm font-semibold sm:text-base"
+            }
+            id={content.title}
+          >
             {index !== 0 ? `${index}.` : ""} {content.title}
           </h2>
-          <span className="text-sm text-[#898989] sm:text-base">
-            {content.detail}
-          </span>
-        </div>
+          <div
+            className={
+              variant === "document"
+                ? "privacy-terms-copy"
+                : "text-sm text-[#898989] sm:text-base"
+            }
+          >
+            {content.title === "Contact Information" && contactEmail ? (
+              <a className="privacy-terms-email" href={`mailto:${contactEmail}`}>
+                {contactEmail}
+              </a>
+            ) : content.detail}
+          </div>
+        </section>
       ))}
     </div>
   );
