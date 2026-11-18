@@ -39,6 +39,9 @@ const config = {
   cacheComponents: true,
   partialPrefetching: true,
   reactStrictMode: true,
+  // @codevs/ui is a private workspace package whose source is consumed
+  // directly during local development and app builds.
+  transpilePackages: ["@codevs/ui"],
   typescript: {
     ignoreBuildErrors: false,
   },
