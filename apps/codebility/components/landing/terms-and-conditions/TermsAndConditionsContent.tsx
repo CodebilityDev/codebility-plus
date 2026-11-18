@@ -101,7 +101,7 @@ export function TermsAndConditionsContent() {
       <LandingContainer className="pb-[var(--cb-space-96)]">
         <div className="grid gap-[var(--cb-space-48)] lg:grid-cols-[240px_minmax(0,720px)] lg:gap-[var(--cb-space-48)]">
           <aside className="hidden lg:block">
-            <div className="sticky top-[var(--cb-space-96)] flex flex-col gap-[var(--cb-space-24)]">
+            <div className="sticky top-[var(--cb-space-96)] flex max-h-[calc(100dvh-var(--cb-space-96)-var(--cb-space-24))] flex-col gap-[var(--cb-space-24)] overflow-y-auto">
               <TermsToc />
               <div className="rounded-[var(--cb-radius-16)] border border-[color:var(--cb-border)] bg-[color:var(--cb-surface)] p-[var(--cb-space-16)]">
                 <p className="text-sm font-semibold">Questions?</p>
