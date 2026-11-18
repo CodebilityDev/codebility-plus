@@ -16,8 +16,8 @@
   },
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
       "default": "./src/index.ts"
     },
     "./accordion": "./src/accordion.tsx",

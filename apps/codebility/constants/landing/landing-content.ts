@@ -502,7 +502,7 @@ export const footerColumns = [
     links: [
       { label: "Terms & Conditions", href: "/privacy-policy" },
       { label: "Privacy Policy", href: "/privacy-policy" },
-      { label: "FAQs", href: "/#faq" },
+      { label: "FAQs", href: "/faq" },
     ],
   },
 ] satisfies { title: string; links: FooterLink[] }[];
