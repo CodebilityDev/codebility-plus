@@ -22,6 +22,7 @@ import { Checkbox } from "@codevs/ui/checkbox";
 import { checkEmailStatus, signupUser } from "@/actions/global/auth-session";
 import { AuthAlert } from "@/components/global/auth/AuthAlert";
 import { AuthField } from "@/components/global/auth/AuthField";
+import { NdaTerms } from "@/components/global/nda-signing/NdaTerms";
 import { Button } from "@/components/global/design-system/Button";
 import TechStackModal from "@/components/global/modals/TechStackModal";
 import PrivacyPolicyModal from "@/components/global/modals/PrivacyPolicyModal";
@@ -118,6 +119,12 @@ export default function SignUpForm() {
   }, [stack, form]);
 
   useEffect(() => {
+    if (step !== 4) return;
+
+    form.clearErrors(["privacyPolicy", "ndaAgreement"]);
+  }, [step, form]);
+
+  useEffect(() => {
     const value = emailValue.trim();
 
     if (!value || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
@@ -185,8 +192,18 @@ export default function SignUpForm() {
   }, [form]);
 
   const handleSignNda = () => {
+    const params = new URLSearchParams();
+
+    if (firstName.trim()) params.set("first_name", firstName.trim());
+    if (lastName.trim()) params.set("last_name", lastName.trim());
+
+    const query = params.toString();
+    const ndaUrl = query
+      ? `/nda-signing/public?${query}`
+      : "/nda-signing/public";
+
     const popup = window.open(
-      "/nda-signing/public",
+      ndaUrl,
       "nda-signing",
       "width=800,height=600,scrollbars=yes,resizable=yes",
     );
@@ -673,17 +690,7 @@ export default function SignUpForm() {
                 <h2 className="text-[15px] font-semibold leading-5 text-white">
                   Non-Disclosure Agreement
                 </h2>
-                <p className="mt-3 w-fit rounded bg-[#3a2a12] px-1 text-xs leading-5 text-[#fbbf24]">
-                  Placeholder: NDA text from Codebility
-                </p>
-                <p className="mt-3 text-[13px] leading-5 text-white/55">
-                  The full NDA appears here so applicants can read it without
-                  leaving the form. It scrolls inside this box.
-                </p>
-                <p className="mt-3 text-[13px] leading-5 text-white/55">
-                  Section headings, the parties and the confidentiality terms go
-                  here.
-                </p>
+                <NdaTerms className="mt-3 max-h-[250px] overflow-y-auto pr-2 text-[12px] leading-5 text-white/55 [&_h2]:text-[15px] [&_h2]:text-white [&_h3]:text-white" />
               </div>
 
               <button
@@ -748,12 +755,14 @@ export default function SignUpForm() {
                 </span>
               </label>
 
-              {form.formState.errors.ndaAgreement ? (
+              {form.formState.isSubmitted &&
+              form.formState.errors.ndaAgreement ? (
                 <p className="text-xs text-[#fca5a5]">
                   {form.formState.errors.ndaAgreement.message}
                 </p>
               ) : null}
-              {form.formState.errors.privacyPolicy ? (
+              {form.formState.isSubmitted &&
+              form.formState.errors.privacyPolicy ? (
                 <p className="text-xs text-[#fca5a5]">
                   {form.formState.errors.privacyPolicy.message}
                 </p>

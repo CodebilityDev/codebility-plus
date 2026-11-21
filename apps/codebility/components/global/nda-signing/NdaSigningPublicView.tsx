@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, forwardRef, useRef, useState } from "react";
+import { Suspense, forwardRef, useEffect, useRef, useState } from "react";
 import { useDynamicImport } from "@/hooks/global/useDynamicImport";
 import Image from "next/image";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,6 +18,8 @@ import type {
   UserInfo,
 } from "@/types/global/nda-signing";
 import { UserInfoSchema } from "@/utils/global/nda-signing";
+
+import { NdaTerms } from "@/components/global/nda-signing/NdaTerms";
 
 
 // Dynamic signature pad component with loading state
@@ -43,10 +45,19 @@ const SignaturePad = forwardRef<SignatureCanvasRef, SignaturePadProps>(
 
 SignaturePad.displayName = "SignaturePad";
 
-export default function NdaSigningPublicView({ formattedDate }: NdaSigningPublicViewProps) {
+export default function NdaSigningPublicView({
+  formattedDate,
+  initialFirstName = "",
+  initialLastName = "",
+}: NdaSigningPublicViewProps) {
   const signatureRef = useRef<SignatureCanvasRef | null>(null);
   const [signing, setSigning] = useState(false);
-  const [showNameForm, setShowNameForm] = useState(true);
+  const [providedName, setProvidedName] = useState({
+    first: initialFirstName.trim(),
+    last: initialLastName.trim(),
+  });
+  const hasProvidedName = Boolean(providedName.first && providedName.last);
+  const [showNameForm, setShowNameForm] = useState(!hasProvidedName);
 
   const {
     register,
@@ -55,12 +66,28 @@ export default function NdaSigningPublicView({ formattedDate }: NdaSigningPublic
   } = useForm<UserInfo>({
     resolver: zodResolver(UserInfoSchema),
     defaultValues: {
-      first_name: "",
-      last_name: "",
+      first_name: initialFirstName,
+      last_name: initialLastName,
     },
   });
 
-  // Clear signature canvas
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const first = initialFirstName.trim()
+      ? initialFirstName.trim()
+      : (params.get("first_name")?.trim() ?? "");
+    const last = initialLastName.trim()
+      ? initialLastName.trim()
+      : (params.get("last_name")?.trim() ?? "");
+
+    if (!first || !last) return;
+
+    setProvidedName({ first, last });
+    setShowNameForm(false);
+    localStorage.setItem("ndaUserFirstName", first);
+    localStorage.setItem("ndaUserLastName", last);
+  }, [initialFirstName, initialLastName]);
+
   const clearSignature = () => {
     if (signatureRef.current) {
       signatureRef.current.clear();
@@ -88,8 +115,10 @@ export default function NdaSigningPublicView({ formattedDate }: NdaSigningPublic
         return;
       }
 
-      const first_name = localStorage.getItem("ndaUserFirstName");
-      const last_name = localStorage.getItem("ndaUserLastName");
+      const first_name =
+        localStorage.getItem("ndaUserFirstName") ?? providedName.first;
+      const last_name =
+        localStorage.getItem("ndaUserLastName") ?? providedName.last;
 
       if (!first_name || !last_name) {
         toast.error("User information is missing. Please provide your name.");
@@ -434,54 +463,7 @@ export default function NdaSigningPublicView({ formattedDate }: NdaSigningPublic
         {/* Main content - Single page layout without scroll */}
         <div className="bg-light-900 text-black-400 z-[100] rounded-lg border p-6 shadow-md">
           {/* NDA Content - Full width, no scroll */}
-          <div className="mb-6 space-y-4 text-sm">
-            <h2 className="mb-4 text-xl font-bold">COMPANY NDA</h2>
-
-            <div className="font-semibold text-green-500">
-              <p>CODEBILITY</p>
-            </div>
-            
-            <h3 className="mt-6 font-bold">TERMS OF AGREEMENT</h3>
-            <p>
-              This agreement is created on {formattedDate} and remains in effect
-              indefinitely. The Intern has the flexibility to conclude their
-              tenure at any point, subject to the conditions outlined in
-              Termination of Agreement.
-            </p>
-
-            <h3 className="mt-6 font-bold">
-              CONFIDENTIALITY AND NON-DISCLOSURE AGREEMENT (NDA):
-            </h3>
-            <p>
-              A. The Intern agrees not to disclose, divulge, reveal, report or
-              use, for any purpose, any confidential information of Codebility,
-              which the Intern has obtained, or which was disclosed to the
-              Intern by Codebility because of this Agreement.
-            </p>
-            <br />
-            <p>
-              B. &quot;Confidential Information&quot; refers to any data or information
-              relating to the business by Codebility that is not generally known
-              to the public and that, if disclosed, could reasonably be expected
-              to cause harm to Codebility.
-            </p>
-            <br />
-            <h3 className="mt-6 font-bold">INTELLECTUAL PROPERTY</h3>
-            <br />
-            <p>
-              The Intern acknowledges and agrees that any intellectual property
-              provided by the Codebility during the internship will remain the
-              exclusive property of the Company.
-            </p>
-
-            <br />
-            <h3 className="mt-6 font-bold">AGREEMENT</h3>
-            <p>
-              This Agreement contains the entire agreement between the parties
-              and supersedes any prior written or oral agreements between them
-              concerning the subject matter of this Agreement.
-            </p>
-          </div>
+          <NdaTerms formattedDate={formattedDate} className="mb-6" />
 
           {/* Signature section */}
           <div className="mb-6">
@@ -509,13 +491,17 @@ export default function NdaSigningPublicView({ formattedDate }: NdaSigningPublic
 
           {/* Action buttons */}
           <div className="flex items-center justify-between">
-            <Button
-              variant="outline"
-              onClick={() => setShowNameForm(true)}
-              className="border-white text-white hover:bg-gray-800"
-            >
-              Edit Name
-            </Button>
+            {hasProvidedName ? (
+              <span />
+            ) : (
+              <Button
+                variant="outline"
+                onClick={() => setShowNameForm(true)}
+                className="border-white text-white hover:bg-gray-800"
+              >
+                Edit Name
+              </Button>
+            )}
             <Button
               onClick={handleSignNda}
               disabled={signing}

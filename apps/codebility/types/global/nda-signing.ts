@@ -27,4 +27,6 @@ export interface NdaSigningTokenClientProps {
 
 export interface NdaSigningPublicViewProps {
   formattedDate: string;
+  initialFirstName?: string;
+  initialLastName?: string;
 }
