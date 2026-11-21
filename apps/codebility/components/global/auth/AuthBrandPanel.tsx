@@ -31,7 +31,7 @@ export async function AuthBrandPanel({ className }: { className?: string }) {
   return (
     <aside
       className={cn(
-        "relative overflow-hidden rounded-[var(--cb-auth-panel-radius)] border border-white/10 p-8 pb-6 text-white [background:var(--cb-auth-panel-gradient)] xl:p-14 xl:pb-6",
+        "relative overflow-hidden rounded-[var(--cb-auth-panel-radius)] p-8 pb-6 text-white [background:var(--cb-auth-panel-gradient)] xl:p-14 xl:pb-6",
         className,
       )}
     >
