@@ -1,7 +1,7 @@
-import { AvatarStack } from "@/components/global/design-system/AvatarStack";
+import { Avatar } from "@/components/global/design-system/Avatar";
+import type { AvatarStackItem } from "@/components/global/design-system/AvatarStack";
 import { cn } from "@codevs/ui";
 import { getLandingTeamData } from "@/lib/global/landing-people";
-import type { AvatarStackItem } from "@/components/global/design-system/AvatarStack";
 
 const fallbackAvatars: AvatarStackItem[] = [
   { initials: "JT", gradient: "violet" },
@@ -31,23 +31,10 @@ export async function AuthBrandPanel({ className }: { className?: string }) {
   return (
     <aside
       className={cn(
-        "relative overflow-hidden rounded-[32px] border border-white/10 p-8 pb-6 text-white xl:p-14 xl:pb-6",
+        "relative overflow-hidden rounded-[var(--cb-auth-panel-radius)] border border-white/10 p-8 pb-6 text-white [background:var(--cb-auth-panel-gradient)] xl:p-14 xl:pb-6",
         className,
       )}
     >
-      <div
-        aria-hidden
-        className="absolute inset-0 bg-[linear-gradient(150deg,#0b1522_0%,#101827_32%,#2b1754_68%,#5b21b6_100%)]"
-      />
-      <div
-        aria-hidden
-        className="absolute -left-40 top-0 h-[44rem] w-[44rem] rounded-full bg-[radial-gradient(circle,rgba(96,165,250,0.11)_0%,transparent_68%)]"
-      />
-      <div
-        aria-hidden
-        className="absolute -right-40 bottom-[-12rem] h-[44rem] w-[44rem] rounded-full bg-[radial-gradient(circle,rgba(168,85,247,0.28)_0%,transparent_68%)]"
-      />
-
       <div className="relative flex h-full w-full flex-col">
         <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/55">
           Codebility
@@ -78,13 +65,25 @@ export async function AuthBrandPanel({ className }: { className?: string }) {
         </div>
 
         <div className="mt-auto w-full pt-16">
-          <div className="flex min-h-[104px] w-full items-center gap-4 rounded-[18px] border border-white/10 bg-black/35 p-4 backdrop-blur-sm">
-            <AvatarStack items={avatars} max={5} size={40} />
-            <div className="min-w-0">
-              <p className="text-[14px] font-semibold leading-5">
+          <div className="flex h-[var(--cb-community-card-height)] w-full items-center rounded-[var(--cb-community-card-radius)] border border-white/[0.06] bg-[var(--cb-community-card-bg)] px-6 backdrop-blur-sm">
+            <div role="group" aria-label="Codebility team" className="flex items-center">
+              {avatars.slice(0, 5).map((avatar, index) => (
+                <span
+                  key={`${avatar.initials}-${index}`}
+                  className={cn(
+                    "relative h-11 w-11 shrink-0 overflow-hidden rounded-full border-2 border-[var(--cb-community-avatar-border)]",
+                    index > 0 && "-ml-3",
+                  )}
+                >
+                  <Avatar {...avatar} size={40} className="block" />
+                </span>
+              ))}
+            </div>
+            <div className="ml-[18px] min-w-0 max-w-[346px]">
+              <p className="text-[16px] font-semibold leading-5 text-[#F4F4F4]">
                 Built by Filipino developers
               </p>
-              <p className="mt-0.5 max-w-[300px] text-[12px] leading-[18px] text-white/55">
+              <p className="mt-[1px] text-[14px] leading-[18px] text-[var(--cb-community-text-muted)]">
                 Interns, CoDevs and mentors working on real client projects.
               </p>
             </div>
