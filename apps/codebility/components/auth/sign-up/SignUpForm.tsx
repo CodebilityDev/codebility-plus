@@ -4,9 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ArrowLeft,
   ArrowRight,
-  Check,
   ChevronDown,
-  FileText,
   Plus,
   Upload,
   X,
@@ -22,6 +20,7 @@ import { Checkbox } from "@codevs/ui/checkbox";
 import { checkEmailStatus, signupUser } from "@/actions/global/auth-session";
 import { AuthAlert } from "@/components/global/auth/AuthAlert";
 import { AuthField } from "@/components/global/auth/AuthField";
+import { NdaSignature } from "@/components/global/nda-signing/NdaSignature";
 import { NdaTerms } from "@/components/global/nda-signing/NdaTerms";
 import { Button } from "@/components/global/design-system/Button";
 import TechStackModal from "@/components/global/modals/TechStackModal";
@@ -31,10 +30,7 @@ import { POSITIONS } from "@/constants/auth/sign-up/sign-up";
 import { useTechStackStore } from "@/hooks/global/use-techstack";
 import { useModal } from "@/hooks/global/use-modal";
 import { reportError } from "@/lib/global/error-reporting";
-import type {
-  NdaSignedPayload,
-  SignupFormData,
-} from "@/types/auth/sign-up/sign-up";
+import type { SignupFormData } from "@/types/auth/sign-up/sign-up";
 import { SignupFormSchema } from "@/utils/auth/sign-up/sign-up";
 
 import { SignUpProgress } from "@/components/auth/sign-up/SignUpProgress";
@@ -82,6 +78,7 @@ export default function SignUpForm() {
   >("idle");
   const [formError, setFormError] = useState<string | null>(null);
   const [ndaError, setNdaError] = useState<string | null>(null);
+  const [showAgreementErrors, setShowAgreementErrors] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<SignupFormData>({
@@ -121,6 +118,7 @@ export default function SignUpForm() {
   useEffect(() => {
     if (step !== 4) return;
 
+    setShowAgreementErrors(false);
     form.clearErrors(["privacyPolicy", "ndaAgreement"]);
   }, [step, form]);
 
@@ -157,78 +155,6 @@ export default function SignUpForm() {
       clearTimeout(timer);
     };
   }, [emailValue]);
-
-  useEffect(() => {
-    const signature = localStorage.getItem("ndaSignature");
-    const document = localStorage.getItem("ndaDocument");
-
-    if (signature && document) {
-      setNdaSigned(true);
-      setNdaData({ signature, document });
-      form.setValue("ndaAgreement", true);
-    }
-
-    const handleMessage = (event: MessageEvent) => {
-      if (event.origin !== window.location.origin) return;
-
-      const payload = event.data as NdaSignedPayload | undefined;
-
-      if (payload?.type === "NDA_SIGNED" && payload.signed === true) {
-        if (payload.signatureDataUrl && payload.documentDataUrl) {
-          localStorage.setItem("ndaSignature", payload.signatureDataUrl);
-          localStorage.setItem("ndaDocument", payload.documentDataUrl);
-          setNdaData({
-            signature: payload.signatureDataUrl,
-            document: payload.documentDataUrl,
-          });
-        }
-        setNdaSigned(true);
-        form.setValue("ndaAgreement", true);
-      }
-    };
-
-    window.addEventListener("message", handleMessage);
-    return () => window.removeEventListener("message", handleMessage);
-  }, [form]);
-
-  const handleSignNda = () => {
-    const params = new URLSearchParams();
-
-    if (firstName.trim()) params.set("first_name", firstName.trim());
-    if (lastName.trim()) params.set("last_name", lastName.trim());
-
-    const query = params.toString();
-    const ndaUrl = query
-      ? `/nda-signing/public?${query}`
-      : "/nda-signing/public";
-
-    const popup = window.open(
-      ndaUrl,
-      "nda-signing",
-      "width=800,height=600,scrollbars=yes,resizable=yes",
-    );
-
-    if (!popup) {
-      toast.error("Please allow pop-ups to sign the NDA");
-      return;
-    }
-
-    const checkClosed = setInterval(() => {
-      if (!popup.closed) return;
-
-      clearInterval(checkClosed);
-      setTimeout(() => {
-        const signature = localStorage.getItem("ndaSignature");
-        const document = localStorage.getItem("ndaDocument");
-
-        if (signature && document) {
-          setNdaSigned(true);
-          setNdaData({ signature, document });
-          form.setValue("ndaAgreement", true);
-        }
-      }, 500);
-    }, 1000);
-  };
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -303,8 +229,6 @@ export default function SignUpForm() {
         return;
       }
 
-      localStorage.removeItem("ndaSignature");
-      localStorage.removeItem("ndaDocument");
       clearStack();
       setApplication({
         name: data.first_name,
@@ -690,17 +614,21 @@ export default function SignUpForm() {
                 <h2 className="text-[15px] font-semibold leading-5 text-white">
                   Non-Disclosure Agreement
                 </h2>
-                <NdaTerms className="mt-3 max-h-[250px] overflow-y-auto pr-2 text-[12px] leading-5 text-white/55 [&_h2]:text-[15px] [&_h2]:text-white [&_h3]:text-white" />
-              </div>
+                <NdaTerms className="mt-3 max-h-[210px] overflow-y-auto pr-2 text-[12px] leading-5 text-white/55 [&_h2]:text-[15px] [&_h2]:text-white [&_h3]:text-white" />
 
-              <button
-                type="button"
-                onClick={handleSignNda}
-                className="flex w-fit items-center gap-2 text-[14px] font-medium text-white transition-colors hover:text-[#c084fc]"
-              >
-                <FileText aria-hidden className="h-4 w-4" />
-                Open the NDA in full
-              </button>
+                <div className="mt-4 border-t border-white/10">
+                  <NdaSignature
+                    firstName={firstName}
+                    lastName={lastName}
+                    signed={ndaSigned}
+                    onSigned={({ signature, document }) => {
+                      setNdaData({ signature, document });
+                      setNdaSigned(true);
+                      form.setValue("ndaAgreement", true);
+                    }}
+                  />
+                </div>
+              </div>
 
               <div className="flex items-center justify-between rounded-[8px] bg-white/[0.025] px-3 py-2.5 text-[13px]">
                 <span className="text-white">
@@ -708,13 +636,6 @@ export default function SignUpForm() {
                 </span>
                 <span className="text-xs text-white/35">Name from step 2</span>
               </div>
-
-              {ndaSigned ? (
-                <p className="flex items-center gap-2 text-[13px] text-[#7BE0B6]">
-                  <Check aria-hidden className="h-4 w-4" />
-                  NDA signed and ready to submit.
-                </p>
-              ) : null}
 
               <label className="flex cursor-pointer items-start gap-3 text-[13px] leading-5 text-white/75">
                 <Checkbox
@@ -755,14 +676,12 @@ export default function SignUpForm() {
                 </span>
               </label>
 
-              {form.formState.isSubmitted &&
-              form.formState.errors.ndaAgreement ? (
+              {showAgreementErrors && form.formState.errors.ndaAgreement ? (
                 <p className="text-xs text-[#fca5a5]">
                   {form.formState.errors.ndaAgreement.message}
                 </p>
               ) : null}
-              {form.formState.isSubmitted &&
-              form.formState.errors.privacyPolicy ? (
+              {showAgreementErrors && form.formState.errors.privacyPolicy ? (
                 <p className="text-xs text-[#fca5a5]">
                   {form.formState.errors.privacyPolicy.message}
                 </p>
@@ -804,6 +723,7 @@ export default function SignUpForm() {
                   type="submit"
                   disabled={isSubmitting}
                   className={actionButtonClass}
+                  onClick={() => setShowAgreementErrors(true)}
                 >
                   {isSubmitting ? "Submitting..." : "Submit application"}
                   <ArrowRight aria-hidden className="h-4 w-4" />
