@@ -137,7 +137,7 @@ const SignInForm = () => {
         <p className="mt-5 text-center text-[14px] text-white/60">
           New to Codebility?{" "}
           <Link
-            href={pathsConfig.auth.onboarding}
+            href={pathsConfig.auth.signUp}
             className="font-medium text-white transition-colors hover:text-[#c084fc]"
           >
             Join as a CoDev

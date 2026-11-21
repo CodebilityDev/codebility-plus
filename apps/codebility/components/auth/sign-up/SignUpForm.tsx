@@ -1,72 +1,87 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "react-hot-toast";
-
-import { ChevronDown, CheckCircle, AlertCircle } from "lucide-react";
-import { useRouter } from "next/navigation";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  ChevronDown,
+  FileText,
+  Plus,
+  Upload,
+  X,
+} from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 
-import { Button } from "@codevs/ui/button";
-import { Input } from "@codevs/ui/input";
-import { Label } from "@codevs/ui/label";
 import { Checkbox } from "@codevs/ui/checkbox";
-import { Textarea } from "@codevs/ui/textarea";
-import { Toaster } from "@/components/global/ui/toaster";
 
 import { checkEmailStatus, signupUser } from "@/actions/global/auth-session";
-import { reportError } from "@/lib/global/error-reporting";
-import { useModal } from "@/hooks/global/use-modal";
-import { useTechStackStore } from "@/hooks/global/use-techstack";
-
-// Import modals
+import { AuthAlert } from "@/components/global/auth/AuthAlert";
+import { AuthField } from "@/components/global/auth/AuthField";
+import { Button } from "@/components/global/design-system/Button";
 import TechStackModal from "@/components/global/modals/TechStackModal";
 import PrivacyPolicyModal from "@/components/global/modals/PrivacyPolicyModal";
-import { PasswordField } from "@/components/auth/sign-up/PasswordField";
+import { getTechStackIconName } from "@/constants/global/techstack";
 import { POSITIONS } from "@/constants/auth/sign-up/sign-up";
+import { useTechStackStore } from "@/hooks/global/use-techstack";
+import { useModal } from "@/hooks/global/use-modal";
+import { reportError } from "@/lib/global/error-reporting";
 import type {
-  SignupFormData,
-  FormFieldProps,
   NdaSignedPayload,
+  SignupFormData,
 } from "@/types/auth/sign-up/sign-up";
 import { SignupFormSchema } from "@/utils/auth/sign-up/sign-up";
 
-const FormField = ({ label, name, type = "text", placeholder, register, errors, required, className }: FormFieldProps) => (
-  <div className="space-y-1">
-    <Label className="text-white text-base font-medium">
-      {label} {required && <span className="text-red-400">*</span>}
-    </Label>
-    <Input
-      type={type}
-      {...register(name)}
-      placeholder={placeholder}
-      className={`bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 h-12 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 backdrop-blur-sm ${className ?? ""}`}
-    />
-    {errors[name] && (
-      <p className="text-sm text-red-400">{errors[name].message}</p>
-    )}
-  </div>
-);
+import { SignUpProgress } from "@/components/auth/sign-up/SignUpProgress";
+import { SignUpSuccess } from "@/components/auth/sign-up/SignUpSuccess";
+
+interface ApplicationSummary {
+  name: string;
+  email: string;
+}
+
+const stepFields: Record<number, (keyof SignupFormData)[]> = {
+  1: ["email_address", "username", "password", "confirmPassword"],
+  2: [
+    "first_name",
+    "last_name",
+    "phone_number",
+    "positions",
+    "tech_stacks",
+    "years_of_experience",
+  ],
+  3: ["about", "portfolio_website", "linkedin", "github", "facebook", "discord"],
+};
+
+const inputClass = "h-12";
+
+const actionButtonClass =
+  "h-12 rounded-full px-6 text-[15px] font-medium";
 
 export default function SignUpForm() {
-  const router = useRouter();
-  
-  // Modal hooks
   const { onOpen } = useModal();
-  const { stack } = useTechStackStore();
-  
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { stack, addRemoveStack, clearStack } = useTechStackStore();
+
+  const [step, setStep] = useState(1);
+  const [application, setApplication] = useState<ApplicationSummary | null>(
+    null,
+  );
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const [ndaSigned, setNdaSigned] = useState(false);
-  const [ndaData, setNdaData] = useState<{signature: string, document: string} | null>(null);
-  const [selectedPositions, setSelectedPositions] = useState<typeof POSITIONS>([]);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [ndaData, setNdaData] = useState<{
+    signature: string;
+    document: string;
+  } | null>(null);
   const [emailStatus, setEmailStatus] = useState<
     "idle" | "checking" | "available" | "registered" | "declined" | "error"
   >("idle");
+  const [formError, setFormError] = useState<string | null>(null);
+  const [ndaError, setNdaError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<SignupFormData>({
     resolver: zodResolver(SignupFormSchema),
@@ -92,11 +107,15 @@ export default function SignUpForm() {
     },
   });
 
+  const emailValue = form.watch("email_address");
+  const selectedPositions = form.watch("positions");
+  const years = form.watch("years_of_experience");
+  const firstName = form.watch("first_name");
+  const lastName = form.watch("last_name");
+
   useEffect(() => {
     form.setValue("tech_stacks", stack);
   }, [stack, form]);
-
-  const emailValue = form.watch("email_address");
 
   useEffect(() => {
     const value = emailValue.trim();
@@ -133,39 +152,31 @@ export default function SignUpForm() {
   }, [emailValue]);
 
   useEffect(() => {
-    // Check for existing NDA data in localStorage
-    const checkNdaData = () => {
-      const signature = localStorage.getItem("ndaSignature");
-      const document = localStorage.getItem("ndaDocument");
-      
-      if (signature && document) {
-        setNdaSigned(true);
-        setNdaData({ signature, document });
-        form.setValue("ndaAgreement", true);
-      }
-    };
+    const signature = localStorage.getItem("ndaSignature");
+    const document = localStorage.getItem("ndaDocument");
 
-    checkNdaData();
+    if (signature && document) {
+      setNdaSigned(true);
+      setNdaData({ signature, document });
+      form.setValue("ndaAgreement", true);
+    }
 
-    // Listen for NDA signing completion
     const handleMessage = (event: MessageEvent) => {
       if (event.origin !== window.location.origin) return;
 
       const payload = event.data as NdaSignedPayload | undefined;
 
       if (payload?.type === "NDA_SIGNED" && payload.signed === true) {
-        // Store NDA data temporarily in localStorage
         if (payload.signatureDataUrl && payload.documentDataUrl) {
           localStorage.setItem("ndaSignature", payload.signatureDataUrl);
           localStorage.setItem("ndaDocument", payload.documentDataUrl);
           setNdaData({
             signature: payload.signatureDataUrl,
-            document: payload.documentDataUrl
+            document: payload.documentDataUrl,
           });
         }
         setNdaSigned(true);
         form.setValue("ndaAgreement", true);
-        toast.success("NDA signed successfully! You can now complete your registration.");
       }
     };
 
@@ -173,100 +184,44 @@ export default function SignUpForm() {
     return () => window.removeEventListener("message", handleMessage);
   }, [form]);
 
-  // NDA signing handler
   const handleSignNda = () => {
     const popup = window.open(
-      "/nda-signing/public", 
-      "nda-signing", 
-      "width=800,height=600,scrollbars=yes,resizable=yes"
+      "/nda-signing/public",
+      "nda-signing",
+      "width=800,height=600,scrollbars=yes,resizable=yes",
     );
-    
+
     if (!popup) {
       toast.error("Please allow pop-ups to sign the NDA");
       return;
     }
 
     const checkClosed = setInterval(() => {
-      if (popup.closed) {
-        clearInterval(checkClosed);
-        setTimeout(() => {
-          // Check if NDA was completed
-          const signature = localStorage.getItem("ndaSignature");
-          const document = localStorage.getItem("ndaDocument");
-          
-          if (signature && document) {
-            setNdaSigned(true);
-            setNdaData({ signature, document });
-            form.setValue("ndaAgreement", true);
-          }
-        }, 500);
-      }
+      if (!popup.closed) return;
+
+      clearInterval(checkClosed);
+      setTimeout(() => {
+        const signature = localStorage.getItem("ndaSignature");
+        const document = localStorage.getItem("ndaDocument");
+
+        if (signature && document) {
+          setNdaSigned(true);
+          setNdaData({ signature, document });
+          form.setValue("ndaAgreement", true);
+        }
+      }, 500);
     }, 1000);
   };
 
-  // Form submission handler with storage integration
-  const onSubmit = async (data: SignupFormData) => {
-    if (!ndaSigned || !ndaData) {
-      toast.error("Please sign the NDA before submitting your application");
-      return;
-    }
-
-    try {
-      setIsSubmitting(true);
-      const formData = new FormData();
-      
-      // Basic info
-      Object.entries(data).forEach(([key, value]) => {
-        if (typeof value === "string" || typeof value === "number") {
-          formData.append(key, value.toString());
-        }
-      });
-
-      // Complex fields
-      formData.append("positions", JSON.stringify(selectedPositions));
-      formData.append("tech_stacks", JSON.stringify(stack));
-
-      if (profileImage) {
-        formData.append("profileImage", profileImage);
-      }
-
-      // NDA data for storage upload
-      formData.append("ndaSigned", "true");
-      formData.append("ndaSignature", ndaData.signature);
-      formData.append("ndaDocument", ndaData.document);
-
-      const result = await signupUser(formData);
-
-      if (result.success) {
-        // Clean up localStorage after successful signup
-        localStorage.removeItem("ndaSignature");
-        localStorage.removeItem("ndaDocument");
-        
-        toast.success("Account created! Check your email to verify your account.");
-        toast.success("Redirecting to verification page...", { duration: 2000 });
-        
-        setTimeout(() => {
-          router.push('/auth/verify');
-        }, 2000);
-      } else {
-        toast.error(result.error ?? "Failed to create account");
-      }
-    } catch (error) {
-      console.error("Signup error:", error);
-      toast.error("An unexpected error occurred. Please try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  // Image upload handler
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     const errors: string[] = [];
-    if (file.size > 5 * 1024 * 1024) errors.push("Image size must be less than 5MB");
-    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+    if (file.size > 5 * 1024 * 1024) {
+      errors.push("Image size must be less than 5MB");
+    }
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
       errors.push("Please select a valid image file (JPEG, PNG, or WebP)");
     }
 
@@ -278,129 +233,133 @@ export default function SignUpForm() {
     setProfileImage(file);
   };
 
+  const nextStep = async () => {
+    const fields = stepFields[step];
+    if (!fields) return;
+
+    const valid = await form.trigger(fields);
+    if (!valid) return;
+
+    const next = Math.min(step + 1, 4);
+
+    if (next === 4) {
+      form.clearErrors(["privacyPolicy", "ndaAgreement"]);
+    }
+
+    setStep(next);
+  };
+
+  const onSubmit = async (data: SignupFormData) => {
+    if (!ndaSigned || !ndaData) {
+      setNdaError("Please sign the NDA before submitting your application.");
+      return;
+    }
+
+    setFormError(null);
+    setNdaError(null);
+    setIsSubmitting(true);
+
+    try {
+      const formData = new FormData();
+
+      Object.entries(data).forEach(([key, value]) => {
+        if (typeof value === "string" || typeof value === "number") {
+          formData.append(key, value.toString());
+        }
+      });
+
+      formData.append("positions", JSON.stringify(data.positions));
+      formData.append("tech_stacks", JSON.stringify(stack));
+
+      if (profileImage) {
+        formData.append("profileImage", profileImage);
+      }
+
+      formData.append("ndaSigned", "true");
+      formData.append("ndaSignature", ndaData.signature);
+      formData.append("ndaDocument", ndaData.document);
+
+      const result = await signupUser(formData);
+
+      if (!result.success) {
+        setFormError(result.error ?? "Failed to create account");
+        return;
+      }
+
+      localStorage.removeItem("ndaSignature");
+      localStorage.removeItem("ndaDocument");
+      clearStack();
+      setApplication({
+        name: data.first_name,
+        email: data.email_address,
+      });
+    } catch (error) {
+      reportError(error, {
+        source: "client",
+        boundary: "sign-up",
+        section: "submit",
+      });
+      setFormError("An unexpected error occurred. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (application) {
+    return (
+      <div className="pt-16 lg:pt-[188px]">
+        <SignUpSuccess name={application.name} email={application.email} />
+      </div>
+    );
+  }
+
   return (
     <>
-      <Toaster />
-      <FormProvider {...form}>
-        <TechStackModal />
-        <PrivacyPolicyModal />
-      
-      <div className="min-h-screen w-full relative overflow-hidden bg-dark-100">
-        {/* Modern Tech Background Elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          {/* Animated geometric shapes */}
-          <div className="absolute top-20 left-20 w-2 h-32 bg-customBlue-100/30 animate-pulse" style={{animationDuration: '2s'}}></div>
-          <div className="absolute top-40 right-32 w-32 h-2 bg-customBlue-300/40 animate-pulse" style={{animationDuration: '3s', animationDelay: '0.5s'}}></div>
-          <div className="absolute bottom-40 left-40 w-2 h-24 bg-customBlue-400/35 animate-pulse" style={{animationDuration: '2.5s', animationDelay: '1s'}}></div>
-          
-          {/* Modern floating elements */}
-          <div className="absolute top-32 right-20 w-4 h-4 bg-customBlue-100 rounded-full animate-ping" style={{animationDuration: '3s'}}></div>
-          <div className="absolute bottom-32 left-16 w-3 h-3 bg-customBlue-300 rounded-full animate-ping" style={{animationDuration: '4s', animationDelay: '1s'}}></div>
-          <div className="absolute top-2/3 right-1/4 w-2 h-2 bg-customBlue-500 rounded-full animate-ping" style={{animationDuration: '5s', animationDelay: '2s'}}></div>
-          
-          {/* Tech grid lines */}
-          <div className="absolute inset-0" style={{
-            backgroundImage: `
-              linear-gradient(90deg, rgba(106, 120, 242, 0.1) 1px, transparent 1px),
-              linear-gradient(0deg, rgba(106, 120, 242, 0.1) 1px, transparent 1px)
-            `,
-            backgroundSize: '80px 80px'
-          }}></div>
-          
-          {/* Floating hexagons */}
-          <div className="absolute top-1/4 left-1/3 w-8 h-8 border border-customBlue-200/50 transform rotate-45 animate-floating"></div>
-          <div className="absolute bottom-1/3 right-1/4 w-6 h-6 border border-customBlue-400/40 transform rotate-12 animate-floating" style={{animationDelay: '1s'}}></div>
-          <div className="absolute top-1/2 left-16 w-4 h-4 border border-customBlue-300/60 transform -rotate-45 animate-floating" style={{animationDelay: '2s'}}></div>
-          
-          {/* Modern gradient overlays */}
-          <div className="absolute inset-0 bg-gradient-to-br from-customBlue-600/30 via-transparent to-customBlue-800/20"></div>
-          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-customBlue-400/10 to-customBlue-600/20"></div>
-          
-          {/* Pulsing circles */}
-          <div className="absolute top-1/3 right-1/3 w-64 h-64 border border-customBlue-100/20 rounded-full animate-ping" style={{animationDuration: '6s'}}></div>
-          <div className="absolute bottom-1/4 left-1/4 w-48 h-48 border border-customBlue-300/15 rounded-full animate-ping" style={{animationDuration: '8s', animationDelay: '2s'}}></div>
+      <TechStackModal />
+      <PrivacyPolicyModal />
+
+      <div className="w-full">
+        <h1 className="text-[40px] font-bold leading-[1.08] tracking-[-0.04em]">
+          Join as a CoDev
+        </h1>
+        <p className="mt-3 max-w-[440px] text-[15px] leading-6 text-white/65">
+          Four short steps. Fields marked optional can be added later from your
+          profile.
+        </p>
+
+        <div className="mt-8">
+          <SignUpProgress step={step} />
         </div>
 
-        <div className="relative z-10 flex min-h-screen items-center justify-center px-4 py-8">
-          <div className="w-full max-w-4xl mx-auto">
-            <div className="text-center mb-8">
-              <Image
-                src="/assets/svgs/logos/codebility-light.svg"
-                alt="Codebility"
-                width={200}
-                height={60}
-                className="mx-auto mb-6"
-              />
-              <h1 className="text-3xl font-bold text-white mb-3">Create new account</h1>
-              <p className="text-gray-300 mb-2">To use Codebility, please enter your details</p>
-              <p className="text-gray-400 text-sm">All fields not labeled optional are required.</p>
-            </div>
+        <form
+          className="mt-8"
+          noValidate
+          onSubmit={form.handleSubmit(onSubmit)}
+        >
+          {formError ? (
+            <AuthAlert className="mb-5">{formError}</AuthAlert>
+          ) : null}
 
-            <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-8 shadow-2xl">
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Profile Image Upload */}
-            <div className="flex flex-col items-center mb-8">
-              <div className="bg-gray-700/50 backdrop-blur-sm border border-gray-600 flex h-24 w-24 items-center justify-center rounded-full mb-4 hover:bg-gray-700/70 transition-colors">
-                <svg className="h-10 w-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                </svg>
-              </div>
-              <label htmlFor="profileImage" className="text-white text-base font-medium cursor-pointer hover:text-blue-400 transition-colors">
-                Upload picture
-              </label>
-              <input
-                id="profileImage"
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                onChange={handleImageChange}
-                className="hidden"
-              />
-              {profileImage && (
-                <p className="mt-2 text-sm text-green-400">{profileImage.name}</p>
-              )}
-            </div>
-
-            {/* Main Form Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Column 1 - Basic Info */}
-              <div className="space-y-4">
-                <FormField
-                  label="First Name"
-                  name="first_name"
-                  placeholder="Enter your first name"
-                  register={form.register}
-                  errors={form.formState.errors}
-                  required
-                />
-
-                <FormField
-                  label="Last Name"
-                  name="last_name"
-                  placeholder="Enter your last name"
-                  register={form.register}
-                  errors={form.formState.errors}
-                  required
-                />
-
-                <FormField
+          {step === 1 ? (
+            <div className="flex flex-col gap-5">
+              <div>
+                <AuthField
                   label="Email"
-                  name="email_address"
                   type="email"
-                  placeholder="Enter your email"
-                  register={form.register}
-                  errors={form.formState.errors}
-                  required
+                  placeholder="you@email.com"
+                  autoComplete="email"
+                  inputClassName={inputClass}
+                  error={form.formState.errors.email_address?.message}
+                  {...form.register("email_address")}
                 />
-
-                {emailStatus !== "idle" && (
+                {emailStatus !== "idle" ? (
                   <p
                     className={
                       emailStatus === "available"
-                        ? "text-sm text-emerald-400"
-                        : emailStatus === "checking" ||
-                            emailStatus === "error"
-                          ? "text-sm text-amber-400"
-                          : "text-sm text-red-400"
+                        ? "mt-2 text-xs text-[#7BE0B6]"
+                        : emailStatus === "checking" || emailStatus === "error"
+                          ? "mt-2 text-xs text-[#FBBF24]"
+                          : "mt-2 text-xs text-[#F08A8A]"
                     }
                   >
                     {emailStatus === "checking" && "Checking availability..."}
@@ -410,324 +369,453 @@ export default function SignUpForm() {
                     {emailStatus === "declined" &&
                       "This email was previously declined. Sign in and reapply from the declined page."}
                     {emailStatus === "error" &&
-                      "We could not check this email right now. You can still apply, and we will verify it when you submit."}
+                      "We could not check this email right now. You can still apply."}
                   </p>
-                )}
-
-                <FormField
-                  label="Phone Number"
-                  name="phone_number"
-                  type="tel"
-                  placeholder="+63 or 0 followed by your number"
-                  register={form.register}
-                  errors={form.formState.errors}
-                  required
-                />
-
-                <PasswordField
-                  label="Password"
-                  name="password"
-                  placeholder="Enter your password"
-                  register={form.register}
-                  errors={form.formState.errors}
-                  showPassword={showPassword}
-                  toggleShow={() => setShowPassword(!showPassword)}
-                />
-
-                <PasswordField
-                  label="Confirm Password"
-                  name="confirmPassword"
-                  placeholder="Confirm your password"
-                  register={form.register}
-                  errors={form.formState.errors}
-                  showPassword={showConfirmPassword}
-                  toggleShow={() => setShowConfirmPassword(!showConfirmPassword)}
-                />
+                ) : null}
               </div>
 
-              {/* Column 2 - Professional Info */}
-              <div className="space-y-4">
-                <FormField
+              <div>
+                <AuthField
                   label="Username"
-                  name="username"
-                  placeholder="Enter your username"
-                  register={form.register}
-                  errors={form.formState.errors}
-                  required
+                  placeholder="e.g. juandev"
+                  autoComplete="username"
+                  inputClassName={inputClass}
+                  error={form.formState.errors.username?.message}
+                  {...form.register("username")}
                 />
-                {/* Positions Dropdown */}
-                <div className="space-y-1">
-                  <Label className="text-white text-base font-medium">Positions <span className="text-red-400">*</span></Label>
-                  <div className="relative">
-                    <select
-                      value={selectedPositions[0]?.id.toString() ?? ""}
-                      onChange={(e) => {
-                        const position = POSITIONS.find(p => p.id === parseInt(e.target.value));
-                        if (position) {
-                          setSelectedPositions([position]);
-                          form.setValue("positions", [position]);
-                          form.clearErrors("positions");
-                        } else {
-                          setSelectedPositions([]);
-                          form.setValue("positions", []);
+                <p className="mt-2 text-xs leading-4 text-white/40">
+                  Shown on your public CoDev profile.
+                </p>
+              </div>
+
+              <div>
+                <AuthField
+                  label="Password"
+                  type="password"
+                  placeholder="Create a password"
+                  autoComplete="new-password"
+                  inputClassName={inputClass}
+                  error={form.formState.errors.password?.message}
+                  {...form.register("password")}
+                />
+                <p className="mt-2 text-xs leading-4 text-white/40">
+                  At least 8 characters.
+                </p>
+              </div>
+
+              <AuthField
+                label="Confirm password"
+                type="password"
+                placeholder="Repeat your password"
+                autoComplete="new-password"
+                inputClassName={inputClass}
+                error={form.formState.errors.confirmPassword?.message}
+                {...form.register("confirmPassword")}
+              />
+            </div>
+          ) : null}
+
+          {step === 2 ? (
+            <div className="flex flex-col gap-5">
+              <div className="flex items-start gap-4">
+                <label className="flex h-[72px] w-[72px] shrink-0 cursor-pointer items-center justify-center rounded-[12px] border border-dashed border-white/25 bg-[#111111] text-white/70 transition-colors hover:border-[#9747ff] hover:text-white">
+                  <Upload aria-hidden className="h-5 w-5" />
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
+                </label>
+                <div>
+                  <p className="text-[14px] font-semibold leading-5 text-white">
+                    Add a profile photo{" "}
+                    <span className="font-normal text-[#c084fc]">Upload</span>
+                  </p>
+                  <p className="mt-1 max-w-[300px] text-xs leading-4 text-white/40">
+                    Square, at least 800 × 800 px. Head and shoulders, plain
+                    background, no borders. JPG, PNG or WEBP.
+                  </p>
+                  {profileImage ? (
+                    <p className="mt-1 text-xs text-[#7BE0B6]">
+                      {profileImage.name}
+                    </p>
+                  ) : null}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <AuthField
+                  label="First name"
+                  placeholder="Juan"
+                  autoComplete="given-name"
+                  inputClassName={inputClass}
+                  error={form.formState.errors.first_name?.message}
+                  {...form.register("first_name")}
+                />
+                <AuthField
+                  label="Last name"
+                  placeholder="Dela Cruz"
+                  autoComplete="family-name"
+                  inputClassName={inputClass}
+                  error={form.formState.errors.last_name?.message}
+                  {...form.register("last_name")}
+                />
+              </div>
+
+              <AuthField
+                label="Phone number"
+                type="tel"
+                placeholder="+63 9XX XXX XXXX"
+                autoComplete="tel"
+                inputClassName={inputClass}
+                error={form.formState.errors.phone_number?.message}
+                {...form.register("phone_number")}
+              />
+
+              <div>
+                <p className="text-[13px] font-medium leading-5 text-white/80">
+                  Positions
+                </p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {POSITIONS.slice(0, 6).map((position) => {
+                    const active = selectedPositions.some(
+                      (item) => item.id === position.id,
+                    );
+
+                    return (
+                      <button
+                        key={position.id}
+                        type="button"
+                        onClick={() => {
+                          const next = active
+                            ? selectedPositions.filter(
+                                (item) => item.id !== position.id,
+                              )
+                            : [...selectedPositions, position];
+
+                          form.setValue("positions", next, {
+                            shouldValidate: true,
+                          });
+                        }}
+                        className={
+                          active
+                            ? "rounded-[7px] border border-[#9747ff]/60 bg-[#2a1543] px-3 py-2 text-[13px] text-white"
+                            : "rounded-[7px] border border-white/10 bg-[#141414] px-3 py-2 text-[13px] text-white/65 transition-colors hover:border-white/25 hover:text-white"
                         }
-                      }}
-                      className="bg-gray-700/50 border-gray-600 text-white h-12 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 backdrop-blur-sm w-full px-3 appearance-none cursor-pointer"
-                      style={{ appearance: 'none' }}
-                    >
-                      <option value="" className="text-gray-400">Select applicable positions</option>
-                      {POSITIONS.map((position) => (
-                        <option key={position.id} value={position.id.toString()} className="text-white bg-gray-700">
-                          {position.name}
-                        </option>
-                      ))}
-                    </select>
-                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
-                  </div>
-                  {selectedPositions[0] && (
-                    <p className="text-sm text-green-400">Selected: {selectedPositions[0].name}</p>
-                  )}
-                  {form.formState.errors.positions && (
-                    <p className="text-sm text-red-400">{form.formState.errors.positions.message}</p>
-                  )}
+                      >
+                        {position.name}
+                      </button>
+                    );
+                  })}
                 </div>
-
-                <div className="space-y-1">
-                  <Label className="text-white text-base font-medium">Years of Experience <span className="text-red-400">*</span></Label>
-                  <Input
-                    type="number"
-                    value={form.watch("years_of_experience") || 0}
-                    onChange={(e) => {
-                      const numValue = parseInt(e.target.value) || 0;
-                      form.setValue("years_of_experience", numValue);
-                      form.clearErrors("years_of_experience");
-                    }}
-                    placeholder="0"
-                    className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 h-12 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 backdrop-blur-sm"
-                  />
-                  {form.formState.errors.years_of_experience && (
-                    <p className="text-sm text-red-400">{form.formState.errors.years_of_experience.message}</p>
-                  )}
-                </div>
-
-                {/* Tech Stack Section */}
-                <div className="space-y-1">
-                  <Label className="text-white text-base font-medium">Tech Stack <span className="text-red-400">*</span></Label>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    role="combobox"
-                    className={`bg-gray-700/50 border-gray-600 text-gray-100 flex justify-between p-2 text-sm font-normal focus:outline-none h-12 rounded-lg w-full backdrop-blur-sm hover:bg-gray-700/70 transition-colors ${
-                      form.formState.errors.tech_stacks ? "border-red-400" : "border-gray-600"
-                    }`}
-                    onClick={() => onOpen("techStackModal")}
-                  >
-                    {stack.includes("none")
-                      ? "Non-tech role"
-                      : stack.length > 0
-                        ? `${stack.length} tech stack${stack.length > 1 ? "s" : ""} selected`
-                        : "Select your tech stack"}
-                    <ChevronDown className="h-5 w-5" />
-                  </Button>
-                  
-                  {stack.length > 0 && !stack.includes("none") && (
-                    <div className="text-xs text-gray-400 flex flex-wrap gap-1">
-                      {stack.map((tech) => (
-                        <span key={tech} className="bg-blue-600/80 text-white px-2 py-1 rounded backdrop-blur-sm">
-                          {tech.charAt(0).toUpperCase() + tech.slice(1)}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                  
-                  {form.formState.errors.tech_stacks && (
-                    <p className="text-sm text-red-400">{form.formState.errors.tech_stacks.message}</p>
-                  )}
-                </div>
-
-                <FormField
-                  label="Portfolio Website (Optional)"
-                  name="portfolio_website"
-                  type="url"
-                  placeholder="Enter your portfolio URL"
-                  register={form.register}
-                  errors={form.formState.errors}
-                />
-
-                <div className="space-y-1">
-                  <Label className="text-white text-base font-medium">About (Optional)</Label>
-                  <Textarea
-                    {...form.register("about")}
-                    placeholder="Tell us about yourself"
-                    rows={4}
-                    className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 backdrop-blur-sm resize-none"
-                  />
-                  {form.formState.errors.about && (
-                    <p className="text-sm text-red-400">{form.formState.errors.about.message}</p>
-                  )}
-                </div>
+                <p className="mt-2 text-xs text-white/40">Pick all that apply.</p>
+                {form.formState.errors.positions ? (
+                  <p className="mt-1 text-xs text-[#fca5a5]">
+                    {form.formState.errors.positions.message}
+                  </p>
+                ) : null}
               </div>
 
-            </div>
-
-            {/* Social Links Section */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-white">Social Links (Optional)</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  label="Facebook"
-                  name="facebook"
-                  placeholder="Enter your Facebook profile"
-                  register={form.register}
-                  errors={form.formState.errors}
-                />
-
-                <FormField
-                  label="LinkedIn"
-                  name="linkedin"
-                  placeholder="Enter your LinkedIn profile"
-                  register={form.register}
-                  errors={form.formState.errors}
-                />
-
-                <FormField
-                  label="GitHub"
-                  name="github"
-                  placeholder="Enter your GitHub profile"
-                  register={form.register}
-                  errors={form.formState.errors}
-                />
-
-                <FormField
-                  label="Discord"
-                  name="discord"
-                  placeholder="username#1234"
-                  register={form.register}
-                  errors={form.formState.errors}
-                />
-              </div>
-            </div>
-
-            {/* NDA Section */}
-            {ndaSigned ? (
-              <div className="bg-green-900/20 border border-green-600/30 p-3 rounded-lg">
-                <div className="flex items-center gap-2 text-green-400 mb-2">
-                  <CheckCircle className="h-5 w-5" />
-                  <span className="font-medium">NDA Signed</span>
-                </div>
-                <p className="text-sm text-green-400">
-                  ✓ NDA has been signed and will be automatically stored in our secure storage system.
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <Label className="text-white text-base font-medium">
-                    Non-Disclosure Agreement (NDA) <span className="text-red-400">*</span>
-                  </Label>
-                  <div className="flex items-center gap-2 text-orange-400 text-sm">
-                    <AlertCircle className="h-4 w-4" />
-                    <span>Required</span>
-                  </div>
-                </div>
-                <p className="text-sm text-gray-400">
-                  Please sign the NDA before completing your registration.
-                </p>
-                <Button
-                  type="button"
-                  onClick={handleSignNda}
-                  variant="outline"
-                  className="text-blue-400 border-blue-400 hover:bg-blue-400/10 bg-transparent"
+              <div>
+                <label
+                  htmlFor="years_of_experience"
+                  className="text-[13px] font-medium leading-5 text-white/80"
                 >
-                  Sign NDA
-                </Button>
+                  Years of experience
+                </label>
+                <div className="relative mt-2">
+                  <select
+                    id="years_of_experience"
+                    value={years ? String(years) : ""}
+                    onChange={(event) =>
+                      form.setValue(
+                        "years_of_experience",
+                        Number(event.target.value) || 0,
+                      )
+                    }
+                    className="h-12 w-full appearance-none rounded-[8px] border border-white/10 bg-[#151515] px-3.5 text-[14px] text-white outline-none transition-colors focus:border-[#9747ff] focus:ring-2 focus:ring-[#9747ff]/20"
+                  >
+                    <option value="">Select</option>
+                    {Array.from({ length: 11 }, (_, index) => (
+                      <option key={index} value={index}>
+                        {index === 0 ? "Less than 1 year" : `${index} years`}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown
+                    aria-hidden
+                    className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/50"
+                  />
+                </div>
               </div>
-            )}
 
-            {/* FIXED: Agreements - Added pointer events fix */}
-            <div className="space-y-4">
-              <div className="flex items-start space-x-3">
-                <Checkbox
-                  id="privacyPolicy"
-                  checked={form.watch("privacyPolicy")}
-                  onCheckedChange={(checked) => form.setValue("privacyPolicy", !!checked)}
-                  className="mt-1 border-gray-600 data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
-                  style={{ pointerEvents: 'auto' }} // FIXED: Ensures clickability
+              <div>
+                <p className="text-[13px] font-medium leading-5 text-white/80">
+                  Tech stack
+                </p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {stack.map((tech) => (
+                    <span
+                      key={tech}
+                      className="flex items-center gap-2 rounded-[6px] border border-[#9747ff]/40 bg-[#241438] px-2.5 py-1.5 text-[12px] capitalize text-white"
+                    >
+                      <Image
+                        src={`/assets/svgs/techstack/icon-${getTechStackIconName(tech)}.svg`}
+                        alt=""
+                        width={16}
+                        height={16}
+                        className="h-4 w-4 object-contain"
+                      />
+                      {tech}
+                      <button
+                        type="button"
+                        aria-label={`Remove ${tech}`}
+                        onClick={() => addRemoveStack(tech)}
+                        className="text-white/50 transition-colors hover:text-white"
+                      >
+                        <X aria-hidden className="h-3 w-3" />
+                      </button>
+                    </span>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => onOpen("techStackModal")}
+                    className="flex items-center gap-1.5 rounded-[6px] border border-white/10 bg-[#141414] px-2.5 py-1.5 text-[12px] text-white/65 transition-colors hover:border-white/25 hover:text-white"
+                  >
+                    <Plus aria-hidden className="h-3.5 w-3.5" />
+                    Add
+                  </button>
+                </div>
+                {form.formState.errors.tech_stacks ? (
+                  <p className="mt-1 text-xs text-[#fca5a5]">
+                    {form.formState.errors.tech_stacks.message}
+                  </p>
+                ) : null}
+              </div>
+            </div>
+          ) : null}
+
+          {step === 3 ? (
+            <div className="flex flex-col gap-5">
+              <div>
+                <div className="flex items-center justify-between">
+                  <label
+                    htmlFor="about"
+                    className="text-[13px] font-medium leading-5 text-white/80"
+                  >
+                    About you
+                  </label>
+                  <span className="text-xs text-white/40">Optional</span>
+                </div>
+                <textarea
+                  id="about"
+                  rows={4}
+                  placeholder="A few lines about what you build and what you want to learn."
+                  className="mt-2 w-full resize-none rounded-[8px] border border-white/10 bg-[#151515] px-3.5 py-3 text-[14px] leading-5 text-white outline-none transition-colors placeholder:text-white/35 focus:border-[#9747ff] focus:ring-2 focus:ring-[#9747ff]/20"
+                  {...form.register("about")}
                 />
-                <Label htmlFor="privacyPolicy" className="text-white text-sm leading-relaxed">
-                  I agree to the <span 
-                    className="text-blue-400 underline cursor-pointer"
+              </div>
+
+              <AuthField
+                label="Portfolio website"
+                type="url"
+                placeholder="https://"
+                labelAction={<span className="text-xs text-white/40">Optional</span>}
+                inputClassName={inputClass}
+                error={form.formState.errors.portfolio_website?.message}
+                {...form.register("portfolio_website")}
+              />
+
+              <div className="grid grid-cols-2 gap-4">
+                <AuthField
+                  label="LinkedIn"
+                  placeholder="linkedin.com/in/..."
+                  labelAction={<span className="text-xs text-white/40">Optional</span>}
+                  inputClassName={inputClass}
+                  error={form.formState.errors.linkedin?.message}
+                  {...form.register("linkedin")}
+                />
+                <AuthField
+                  label="GitHub"
+                  placeholder="github.com/..."
+                  labelAction={<span className="text-xs text-white/40">Optional</span>}
+                  inputClassName={inputClass}
+                  error={form.formState.errors.github?.message}
+                  {...form.register("github")}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <AuthField
+                  label="Facebook"
+                  placeholder="facebook.com/..."
+                  labelAction={<span className="text-xs text-white/40">Optional</span>}
+                  inputClassName={inputClass}
+                  error={form.formState.errors.facebook?.message}
+                  {...form.register("facebook")}
+                />
+                <AuthField
+                  label="Discord username"
+                  placeholder="e.g. juandev"
+                  labelAction={<span className="text-xs text-white/40">Optional</span>}
+                  inputClassName={inputClass}
+                  error={form.formState.errors.discord?.message}
+                  {...form.register("discord")}
+                />
+              </div>
+            </div>
+          ) : null}
+
+          {step === 4 ? (
+            <div className="flex flex-col gap-5">
+              <div className="rounded-[12px] border border-white/10 bg-[#0d0d0d] p-5">
+                <h2 className="text-[15px] font-semibold leading-5 text-white">
+                  Non-Disclosure Agreement
+                </h2>
+                <p className="mt-3 w-fit rounded bg-[#3a2a12] px-1 text-xs leading-5 text-[#fbbf24]">
+                  Placeholder: NDA text from Codebility
+                </p>
+                <p className="mt-3 text-[13px] leading-5 text-white/55">
+                  The full NDA appears here so applicants can read it without
+                  leaving the form. It scrolls inside this box.
+                </p>
+                <p className="mt-3 text-[13px] leading-5 text-white/55">
+                  Section headings, the parties and the confidentiality terms go
+                  here.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleSignNda}
+                className="flex w-fit items-center gap-2 text-[14px] font-medium text-white transition-colors hover:text-[#c084fc]"
+              >
+                <FileText aria-hidden className="h-4 w-4" />
+                Open the NDA in full
+              </button>
+
+              <div className="flex items-center justify-between rounded-[8px] bg-white/[0.025] px-3 py-2.5 text-[13px]">
+                <span className="text-white">
+                  Signing as {firstName} {lastName}
+                </span>
+                <span className="text-xs text-white/35">Name from step 2</span>
+              </div>
+
+              {ndaSigned ? (
+                <p className="flex items-center gap-2 text-[13px] text-[#7BE0B6]">
+                  <Check aria-hidden className="h-4 w-4" />
+                  NDA signed and ready to submit.
+                </p>
+              ) : null}
+
+              <label className="flex cursor-pointer items-start gap-3 text-[13px] leading-5 text-white/75">
+                <Checkbox
+                  checked={form.watch("ndaAgreement")}
+                  onCheckedChange={(checked) =>
+                    form.setValue("ndaAgreement", Boolean(checked), {
+                      shouldValidate: true,
+                    })
+                  }
+                  disabled={!ndaSigned}
+                  className="mt-0.5 border-white/25 data-[state=checked]:border-[#9747ff] data-[state=checked]:bg-[#9747ff]"
+                />
+                <span>
+                  I have read and agree to the Non-Disclosure Agreement.
+                </span>
+              </label>
+
+              <label className="flex cursor-pointer items-start gap-3 text-[13px] leading-5 text-white/75">
+                <Checkbox
+                  checked={form.watch("privacyPolicy")}
+                  onCheckedChange={(checked) =>
+                    form.setValue("privacyPolicy", Boolean(checked), {
+                      shouldValidate: true,
+                    })
+                  }
+                  className="mt-0.5 border-white/25 data-[state=checked]:border-[#9747ff] data-[state=checked]:bg-[#9747ff]"
+                />
+                <span>
+                  I agree to the{" "}
+                  <button
+                    type="button"
                     onClick={() => onOpen("privacyPolicyModal")}
+                    className="text-[#c084fc] underline underline-offset-2"
                   >
                     Privacy Policy
-                  </span> <span className="text-red-400">*</span>
-                </Label>
-              </div>
-              {form.formState.errors.privacyPolicy && (
-                <p className="text-sm text-red-400 ml-6">{form.formState.errors.privacyPolicy.message}</p>
-              )}
+                  </button>
+                  .
+                </span>
+              </label>
 
-              <div className="flex items-start space-x-3">
-                <Checkbox
-                  id="ndaAgreement"
-                  checked={form.watch("ndaAgreement")}
-                  onCheckedChange={(checked) => form.setValue("ndaAgreement", !!checked)}
-                  disabled={!ndaSigned}
-                  className="mt-1 border-gray-600 data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
-                  style={{ pointerEvents: 'auto' }} // FIXED: Ensures clickability
-                />
-                <Label htmlFor="ndaAgreement" className="text-white text-sm leading-relaxed">
-                  I agree to the <span className="text-blue-400 underline cursor-pointer">Non-Disclosure Agreement</span> <span className="text-red-400">*</span>
-                  {!ndaSigned && (
-                    <span className="text-yellow-400 ml-2">(Please sign the NDA first)</span>
-                  )}
-                </Label>
-              </div>
-              {form.formState.errors.ndaAgreement && (
-                <p className="text-sm text-red-400 ml-6">{form.formState.errors.ndaAgreement.message}</p>
-              )}
+              {form.formState.errors.ndaAgreement ? (
+                <p className="text-xs text-[#fca5a5]">
+                  {form.formState.errors.ndaAgreement.message}
+                </p>
+              ) : null}
+              {form.formState.errors.privacyPolicy ? (
+                <p className="text-xs text-[#fca5a5]">
+                  {form.formState.errors.privacyPolicy.message}
+                </p>
+              ) : null}
+              {ndaError ? (
+                <AuthAlert>{ndaError}</AuthAlert>
+              ) : null}
             </div>
+          ) : null}
 
-            {/* Action Buttons */}
-            <div className="flex justify-end space-x-4 pt-3">
-              <Button
-                type="button"
-                variant="outline"
-                className="px-8 py-3 text-gray-300 border-gray-600 hover:bg-gray-800 bg-transparent"
-                disabled={isSubmitting}
-                onClick={() => router.push("/")}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                disabled={
-                  isSubmitting ||
-                  !ndaSigned ||
-                  emailStatus === "registered" ||
-                  emailStatus === "declined"
-                }
-                className="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isSubmitting ? "Processing..." : "Apply"}
-              </Button>
-            </div>
-            </form>
+          <div className="mt-10 flex items-center justify-between gap-4">
+            <span className="text-[13px] text-white/35">
+              Step {step} of 4
+            </span>
+            <div className="flex items-center gap-2">
+              {step > 1 ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className={actionButtonClass}
+                  onClick={() => setStep((current) => Math.max(current - 1, 1))}
+                >
+                  <ArrowLeft aria-hidden className="h-4 w-4" />
+                  Back
+                </Button>
+              ) : null}
 
-            <p className="text-center mt-6 text-gray-300">
-              Already have an account?{" "}
-              <a
-                href="/auth/sign-in"
-                className="text-blue-400 hover:underline transition-colors"
-              >
-                Sign in
-              </a>
-            </p>
+              {step < 4 ? (
+                <Button
+                  type="button"
+                  className={actionButtonClass}
+                  onClick={() => void nextStep()}
+                >
+                  Continue
+                  <ArrowRight aria-hidden className="h-4 w-4" />
+                </Button>
+              ) : (
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className={actionButtonClass}
+                >
+                  {isSubmitting ? "Submitting..." : "Submit application"}
+                  <ArrowRight aria-hidden className="h-4 w-4" />
+                </Button>
+              )}
             </div>
           </div>
-        </div>
+        </form>
+
+        {step === 1 ? (
+          <p className="mt-6 text-center text-[14px] text-white/60">
+            Already have an account?{" "}
+            <Link
+              href="/auth/sign-in"
+              className="font-medium text-white transition-colors hover:text-[#c084fc]"
+            >
+              Sign in
+            </Link>
+          </p>
+        ) : null}
       </div>
-      </FormProvider>
     </>
   );
 }

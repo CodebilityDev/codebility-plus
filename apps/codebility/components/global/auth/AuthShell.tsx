@@ -2,10 +2,26 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-import { Wordmark } from "@/components/global/design-system/Wordmark";
-import { AuthBrandPanel } from "@/components/global/auth/AuthBrandPanel";
+import { cn } from "@codevs/ui";
 
-export function AuthShell({ children }: { children: ReactNode }) {
+import { AuthBrandPanel } from "@/components/global/auth/AuthBrandPanel";
+import { Wordmark } from "@/components/global/design-system/Wordmark";
+
+export type AuthBrandVariant = "signin" | "signup";
+
+export interface AuthShellProps {
+  children: ReactNode;
+  brandVariant?: AuthBrandVariant;
+  align?: "center" | "top";
+  contentClassName?: string;
+}
+
+export function AuthShell({
+  children,
+  brandVariant = "signin",
+  align = "center",
+  contentClassName,
+}: AuthShellProps) {
   return (
     <div className="min-h-[100dvh] bg-[#050505] text-white lg:grid lg:grid-cols-2 lg:gap-4 lg:p-4">
       <div className="flex min-h-[100dvh] flex-col px-5 pb-6 pt-5 lg:min-h-[calc(100dvh-2rem)] lg:px-16 lg:py-8">
@@ -22,8 +38,20 @@ export function AuthShell({ children }: { children: ReactNode }) {
           </Link>
         </header>
 
-        <main className="flex flex-1 items-center py-10 lg:py-8">
-          <div className="mx-auto w-full max-w-[416px]">{children}</div>
+        <main
+          className={cn(
+            "flex flex-1 py-10 lg:py-8",
+            align === "top" ? "items-start" : "items-center",
+          )}
+        >
+          <div
+            className={cn(
+              "mx-auto w-full",
+              contentClassName ?? "max-w-[416px]",
+            )}
+          >
+            {children}
+          </div>
         </main>
 
         <footer className="flex shrink-0 items-center justify-center gap-5 text-[13px] text-white/45 lg:justify-start">
@@ -42,7 +70,10 @@ export function AuthShell({ children }: { children: ReactNode }) {
         </footer>
       </div>
 
-      <AuthBrandPanel className="hidden lg:sticky lg:top-4 lg:flex lg:h-[calc(100dvh-2rem)] lg:self-start" />
+      <AuthBrandPanel
+        variant={brandVariant}
+        className="hidden lg:sticky lg:top-4 lg:flex lg:h-[calc(100dvh-2rem)] lg:self-start"
+      />
     </div>
   );
 }
