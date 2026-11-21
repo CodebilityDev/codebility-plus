@@ -82,7 +82,6 @@ export function LandingFaq() {
               key={activeCategory}
               type="single"
               collapsible
-              defaultValue={activeFaqs[0]?.question}
               className="gap-0"
             >
               {activeFaqs.map((faq) => (

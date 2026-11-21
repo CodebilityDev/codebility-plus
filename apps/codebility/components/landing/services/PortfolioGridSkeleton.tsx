@@ -11,7 +11,10 @@ export function PortfolioGridSkeleton({ count = 9 }: { count?: number }) {
       {Array.from({ length: count }).map((_, index) => (
         <div
           key={index}
-          className="overflow-hidden rounded-[var(--cb-radius-16)] border border-[color:var(--cb-border)] bg-[#0B0B0D]"
+          className={
+            "overflow-hidden rounded-[var(--cb-radius-16)] border border-[color:var(--cb-border)] bg-[#0B0B0D] " +
+            (index === 1 ? "hidden sm:block" : index > 1 ? "hidden xl:block" : "")
+          }
         >
           <Skeleton className="aspect-[16/10] w-full rounded-none border-b border-[color:var(--cb-border)]" />
           <div className="flex flex-col gap-[var(--cb-space-8)] p-[var(--cb-space-20)]">
