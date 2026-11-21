@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
 import { Suspense } from "react";
 
-import { LandingFooter } from "@/components/landing/LandingFooter";
-import { LandingNavigation } from "@/components/landing/LandingNavigation";
+import { LandingFooter } from "@/components/global/layout/LandingFooter";
+import { LandingNavigation } from "@/components/global/layout/LandingNavigation";
 
 export default function LandingLayout({ children }: { children: ReactNode }) {
   return (

@@ -1,29 +1,31 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import InputField from "@/components/global/layout/InputPhone";
-import { Button } from "@/components/global/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
-
-import type { FieldValues, SubmitHandler, Control } from "react-hook-form";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
-
 import { resetUserPassword } from "@/actions/auth/password-reset/password-reset";
+import { AuthAlert } from "@/components/global/auth/AuthAlert";
+import { AuthEmailSent } from "@/components/global/auth/AuthEmailSent";
+import { AuthField } from "@/components/global/auth/AuthField";
+import { AuthSubmitButton } from "@/components/global/auth/AuthSubmitButton";
 import type { Inputs } from "@/types/auth/password-reset/password-reset";
+import { toErrorMessage } from "@/utils/global/feedback";
 import { EmailValidation } from "@/utils/auth/password-reset/password-reset";
-
 
 const PasswordResetForm = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+  const [submittedEmail, setSubmittedEmail] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
 
   const {
-    control,
+    register,
     handleSubmit,
-      formState: { errors },
+    formState: { errors },
   } = useForm<Inputs>({
     resolver: zodResolver(EmailValidation),
     defaultValues: {
@@ -31,64 +33,90 @@ const PasswordResetForm = () => {
     },
   });
 
-  const onSubmit: SubmitHandler<FieldValues> = async (data) => {
+  const onSubmit = async ({ email }: Inputs) => {
     setIsLoading(true);
+    setFormError(null);
 
     try {
-      const { email } = data;
-
-      // call resetUserPassword function
-      await resetUserPassword(email as string);
-
-      toast.success("Password reset email sent successfully.");
-      setIsSubmitted(true);
-    } catch (error: any) {
-      console.error("Unexpected error:", error);
-      toast.error("Something went wrong");
+      await resetUserPassword(email);
+      setSubmittedEmail(email.trim().toLowerCase());
+    } catch (error) {
+      setFormError(
+        toErrorMessage(error, "We couldn't send the reset link. Please try again."),
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleResend = async () => {
+    if (!submittedEmail || isResending) return;
+
+    setIsResending(true);
+
+    try {
+      await resetUserPassword(submittedEmail);
+      toast.success("A new reset link is on its way.");
+    } catch (error) {
+      toast.error(toErrorMessage(error, "We couldn't resend the link."));
+    } finally {
+      setIsResending(false);
+    }
+  };
+
+  if (submittedEmail) {
+    return (
+      <AuthEmailSent
+        email={submittedEmail}
+        onResend={handleResend}
+        isResending={isResending}
+      />
+    );
+  }
+
   return (
-    <div className="flex flex-col gap-4">
-      <p className="text-center text-lg font-semibold lg:text-xl">
-        Forgot Password
+    <div className="w-full">
+      <h1 className="text-[40px] font-bold leading-[1.08] tracking-[-0.04em]">
+        Reset your password
+      </h1>
+      <p className="mt-3 max-w-[420px] text-[15px] leading-6 text-white/65">
+        Enter the email you signed up with and we&apos;ll send you a link to set
+        a new password.
       </p>
 
-      {isSubmitted ? (
-        <div className="mx-auto flex w-full flex-col items-center gap-8 py-10">
-          <h1 className="max-w-[266px] text-center text-xl font-light">
-            Please check your email inbox to reset your password.
-          </h1>
-          <Link href="/">
-            <Button className="text-sm font-light">Go to Homepage</Button>
+      <form className="mt-8" noValidate onSubmit={handleSubmit(onSubmit)}>
+        {formError ? <AuthAlert className="mb-5">{formError}</AuthAlert> : null}
+
+        <AuthField
+          id="email"
+          label="Email"
+          type="email"
+          placeholder="you@email.com"
+          autoComplete="email"
+          disabled={isLoading}
+          error={errors.email?.message}
+          {...register("email")}
+        />
+
+        <AuthSubmitButton
+          type="submit"
+          loading={isLoading}
+          loadingText="Sending..."
+          className="mt-7"
+        >
+          Send reset link
+        </AuthSubmitButton>
+
+        <div className="mt-6 text-center">
+          <Link
+            href="/auth/sign-in"
+            className="inline-flex items-center gap-2 text-[14px] font-medium text-white transition-colors hover:text-[#c084fc]"
+          >
+            <ArrowLeft aria-hidden className="h-4 w-4" />
+            Back to sign in
           </Link>
         </div>
-      ) : (
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="flex flex-col gap-8 py-10">
-            <InputField
-              id="email"
-              label="Email"
-              type="email"
-              control={control as Control<any>}
-              error={errors.email?.message}
-              disabled={isLoading}
-              inputClassName="bg-gray-50 border-gray-300"
-              name="email"
-            />
-            <Button
-              type="submit"
-              variant="default"
-              className="w-max self-end py-3 text-sm"
-              disabled={isLoading}
-            >
-              {isLoading ? "Sending..." : "Send Request"}
-            </Button>
-          </div>
-        </form>
-      )}
+      </form>
     </div>
   );
 };

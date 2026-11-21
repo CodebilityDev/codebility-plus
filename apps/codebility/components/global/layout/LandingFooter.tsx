@@ -3,8 +3,8 @@ import Link from "next/link";
 
 import { Wordmark } from "@/components/global/design-system/Wordmark";
 import { LandingContainer } from "@/components/global/layout/LandingContainer";
-import { NewsletterForm } from "@/components/landing/NewsletterForm";
-import { footerColumns } from "@/constants/landing/landing-content";
+import { NewsletterForm } from "@/components/global/marketing/NewsletterForm";
+import { footerColumns } from "@/constants/global/landing-chrome";
 
 const socialLinks = [
   { label: "LinkedIn", href: "https://www.linkedin.com/company/codebility", icon: Linkedin },
