@@ -1,9 +1,9 @@
-import { ArrowRight, Clock, FileText, Mail, ShieldCheck } from "lucide-react";
-import Link from "next/link";
+import { Clock, FileText, ShieldCheck } from "lucide-react";
 
-import { Button } from "@/components/global/design-system/Button";
 import { Eyebrow } from "@/components/global/design-system/Eyebrow";
 import { LandingContainer } from "@/components/global/layout/LandingContainer";
+import { LegalContactCard } from "@/components/global/marketing/LegalContactCard";
+import { LegalDocumentTabs } from "@/components/global/marketing/LegalDocumentTabs";
 import { LegalSidebar } from "@/components/global/marketing/LegalSidebar";
 import {
   TERMS_CONTACT_EMAIL,
@@ -24,11 +24,6 @@ const wordCount = [TERMS_INTRO, ...TERMS_SECTIONS.flatMap((s) => s.clauses)]
 const readMinutes = Math.max(1, Math.ceil(wordCount / 200));
 
 const mailto = `mailto:${TERMS_CONTACT_EMAIL}`;
-
-const legalTabs = [
-  { label: "Privacy Policy", href: "/privacy-policy", active: false },
-  { label: "Terms & Conditions", href: "/terms-and-conditions", active: true },
-];
 
 function ClauseText({ text }: { text: string }) {
   const [before, after] = text.split(TERMS_CONTACT_EMAIL);
@@ -75,25 +70,7 @@ export function TermsAndConditionsContent() {
                 {readMinutes} min read
               </span>
             </div>
-            <nav
-              aria-label="Legal documents"
-              className="inline-flex w-fit gap-[var(--cb-space-4)] rounded-[var(--cb-radius-12)] border border-[color:var(--cb-border)] bg-[color:var(--cb-glass)] p-[var(--cb-space-4)]"
-            >
-              {legalTabs.map((tab) => (
-                <Link
-                  key={tab.href}
-                  href={tab.href}
-                  aria-current={tab.active ? "page" : undefined}
-                  className={
-                    tab.active
-                      ? "rounded-[var(--cb-radius-8)] bg-[color:var(--cb-selected-fill)] px-[var(--cb-space-16)] py-[var(--cb-space-8)] text-sm text-[color:var(--cb-text)]"
-                      : "rounded-[var(--cb-radius-8)] px-[var(--cb-space-16)] py-[var(--cb-space-8)] text-sm text-[color:var(--cb-text-muted)] transition-colors hover:text-[color:var(--cb-text)]"
-                  }
-                >
-                  {tab.label}
-                </Link>
-              ))}
-            </nav>
+            <LegalDocumentTabs active="terms" />
           </div>
         </LandingContainer>
       </section>
@@ -149,25 +126,11 @@ export function TermsAndConditionsContent() {
               );
             })}
 
-            <div className="mt-[var(--cb-space-48)] flex flex-col gap-[var(--cb-space-20)] rounded-[var(--cb-radius-16)] border border-[color:var(--cb-border)] bg-[linear-gradient(90deg,rgb(151_71_255/0.18),transparent_70%)] p-[var(--cb-space-24)] sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-center gap-[var(--cb-space-16)]">
-                <span className="flex size-11 shrink-0 items-center justify-center rounded-[var(--cb-radius-12)] border border-[color:var(--cb-pill-border)] bg-[color:var(--cb-pill-bg)] text-[color:var(--cb-accent-text)]">
-                  <Mail size={18} aria-hidden />
-                </span>
-                <div>
-                  <p className="font-semibold">Questions about these terms?</p>
-                  <p className="text-sm text-[color:var(--cb-text-muted)]">
-                    Contact us and we&apos;ll get back to you.
-                  </p>
-                </div>
-              </div>
-              <Button asChild size="sm" className="w-fit">
-                <a href={mailto}>
-                  Email us
-                  <ArrowRight size={16} aria-hidden />
-                </a>
-              </Button>
-            </div>
+            <LegalContactCard
+              title="Questions about these terms?"
+              description="Contact us and we'll get back to you."
+              email={TERMS_CONTACT_EMAIL}
+            />
           </article>
         </div>
       </LandingContainer>

@@ -13,8 +13,8 @@ import { Button } from "@/components/global/design-system/Button";
 import { CategoryItem } from "@/components/global/design-system/CategoryItem";
 import { SectionHeader } from "@/components/global/design-system/SectionHeader";
 import { LandingContainer } from "@/components/global/layout/LandingContainer";
-import { faqCategories, faqs } from "@/constants/landing/landing-content";
-import type { FaqCategory } from "@/constants/landing/landing-content";
+import { faqCategories, faqs } from "@/constants/global/faq";
+import type { FaqCategory } from "@/constants/global/faq";
 
 export function LandingFaq() {
   const [activeCategory, setActiveCategory] =
