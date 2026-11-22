@@ -1,23 +1,25 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/global/ui/button";
-import pathsConfig from "@/constants/global/paths";
-import { SignInValidation } from "@/utils/auth/sign-in/auth-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ArrowRight } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import toast from "react-hot-toast";
 import type { z } from "zod";
 
 import { resendVerificationEmail, signinUser } from "@/actions/global/auth-session";
-import { toErrorMessage } from "@/utils/global/feedback";
-import SignInInputs from "@/components/auth/sign-in/SignInInput";
+import { AuthAlert } from "@/components/global/auth/AuthAlert";
+import { AuthField } from "@/components/global/auth/AuthField";
+import { AuthSubmitButton } from "@/components/global/auth/AuthSubmitButton";
+import pathsConfig from "@/constants/global/paths";
 import type { Inputs } from "@/types/auth/sign-in/sign-in";
-
+import { SignInValidation } from "@/utils/auth/sign-in/auth-schema";
+import { toErrorMessage } from "@/utils/global/feedback";
 
 const SignInForm = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
   const router = useRouter();
 
   const {
@@ -30,57 +32,37 @@ const SignInForm = () => {
 
   const onSubmit = async (values: z.infer<typeof SignInValidation>) => {
     setIsLoading(true);
+    setFormError(null);
 
     try {
-      // Normalize email (if your signup stored lowercase emails)
       const normalizedEmail = values.email_address.toLowerCase();
       const response = await signinUser({
         email: normalizedEmail,
         password: values.password,
       });
 
-      // If the response indicates failure, log and show the error toast
       if (!response.success) {
         throw new Error(response.error);
       }
 
       if (response.redirectTo) {
-        switch (response.redirectTo) {
-          case "/applicant/waiting":
-            toast("Your application is still under review");
-            break;
-          case "/auth/declined":
-            toast("Your application has been rejected");
-            break;
-          case "/home":
-            toast.success("Welcome back!");
-            break;
-        }
         router.replace(response.redirectTo);
       }
     } catch (error) {
-      console.error("Sign in error:", error);
       const message = toErrorMessage(error, "");
 
       if (
         message.includes("verify your email") ||
         message.includes("Email not confirmed")
       ) {
-        toast.error("Please verify your email first");
+        setFormError(
+          "Please verify your email first. We've sent a new verification link.",
+        );
 
-        // call supabase function to send verification email
         try {
-          const resendResult = await resendVerificationEmail(
-            values.email_address,
-          );
-          if (resendResult.success) {
-            toast.success("Verification email sent! Please check your inbox.");
-          } else {
-            toast.error("Failed to resend verification email");
-            throw new Error(resendResult.error);
-          }
-        } catch (resendError) {
-          console.error("Error resending verification email:", resendError);
+          await resendVerificationEmail(values.email_address);
+        } catch {
+          setFormError("We couldn't resend the verification email. Please try again.");
         }
 
         router.push("/auth/verify");
@@ -88,9 +70,11 @@ const SignInForm = () => {
         message.includes("Invalid login credentials") ||
         message.includes("Account not found")
       ) {
-        toast.error("Invalid email or password");
+        setFormError(
+          "Incorrect email or password. Check both and try again, or reset your password.",
+        );
       } else {
-        toast.error("Failed to sign in");
+        setFormError("We couldn't sign you in. Please try again.");
       }
     } finally {
       setIsLoading(false);
@@ -98,51 +82,83 @@ const SignInForm = () => {
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-md flex-col gap-2">
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="flex flex-col gap-4 py-3">
-          <SignInInputs
+    <div className="w-full">
+      <h1 className="text-[40px] font-bold leading-[1.08] tracking-[-0.04em]">
+        Sign in
+      </h1>
+      <p className="mt-3 max-w-[420px] text-[15px] leading-6 text-white/65">
+        Welcome back. Sign in with your CoDev, mentor or admin account.
+      </p>
+
+      <form className="mt-8" noValidate onSubmit={handleSubmit(onSubmit)}>
+        {formError ? <AuthAlert className="mb-5">{formError}</AuthAlert> : null}
+
+        <div className="flex flex-col gap-5">
+          <AuthField
             id="email_address"
             label="Email"
-            placeholder="Enter your Email"
-            register={register}
-            errors={errors}
-            disabled={isLoading}
             type="email"
+            placeholder="you@email.com"
+            autoComplete="email"
+            disabled={isLoading}
+            error={errors.email_address?.message}
+            {...register("email_address")}
           />
-          <SignInInputs
+
+          <AuthField
             id="password"
             label="Password"
-            placeholder="Enter your Password"
-            register={register}
-            errors={errors}
-            disabled={isLoading}
             type="password"
-          />
-          <button
-            type="button"
-            onClick={() => router.push(pathsConfig.auth.passwordReset)}
-            className="text-md hover:text-customBlue-100 w-max self-end text-right duration-300"
-          >
-            Forgot Password?
-          </button>
-          <Button
-            type="submit"
-            variant="default"
-            className="text-md w-full py-3 font-normal"
+            placeholder="Enter your password"
+            autoComplete="current-password"
             disabled={isLoading}
-          >
-            {isLoading ? (
-              <div className="flex items-center justify-center gap-2">
-                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                <span>Signing in...</span>
-              </div>
-            ) : (
-              "Sign In"
-            )}
-          </Button>
+            error={errors.password?.message}
+            labelAction={
+              <Link
+                href={pathsConfig.auth.passwordReset}
+                className="text-[13px] text-white/70 transition-colors hover:text-white"
+              >
+                Forgot password?
+              </Link>
+            }
+            {...register("password")}
+          />
         </div>
+
+        <AuthSubmitButton
+          type="submit"
+          loading={isLoading}
+          loadingText="Signing in..."
+          className="mt-7"
+        >
+          Sign in
+        </AuthSubmitButton>
+
+        <p className="mt-5 text-center text-[14px] text-white/60">
+          New to Codebility?{" "}
+          <Link
+            href={pathsConfig.auth.signUp}
+            className="font-medium text-white transition-colors hover:text-[#c084fc]"
+          >
+            Join as a CoDev
+          </Link>
+        </p>
       </form>
+
+      <div className="mt-8 border-t border-white/10" />
+
+      <div className="mt-6 flex flex-col gap-3 text-[14px] text-white/60 md:flex-row md:items-center md:justify-between">
+        <p className="max-w-[290px] leading-5">
+          Looking to hire developers? You don&apos;t need an account.
+        </p>
+        <Link
+          href="/bookacall"
+          className="flex w-fit items-center gap-2 font-medium text-white transition-colors hover:text-[#c084fc]"
+        >
+          Book a call
+          <ArrowRight aria-hidden className="h-4 w-4" />
+        </Link>
+      </div>
     </div>
   );
 };

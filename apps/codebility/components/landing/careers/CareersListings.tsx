@@ -134,7 +134,7 @@ export function CareersListings({
               const Icon = icons[index % icons.length] ?? Monitor;
               const active = selectedJob
                 ? selectedJob.id === job.id
-                : /AI Engineer/i.test(job.title);
+                : false;
               return (
                 <JobListingRow
                   key={job.id}

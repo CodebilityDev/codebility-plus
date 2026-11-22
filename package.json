@@ -25,6 +25,7 @@
     "native": "cd apps/expo && pnpm run start",
     "web": "cd apps/next && pnpm run next",
     "clean": "rimraf node_modules .turbo .next dist",
+    "clean:turbo": "rimraf .turbo/cache",
     "clean:workspaces": "turbo clean",
     "dev": "turbo watch dev",
     "codebility": "turbo run dev -F codebility...",

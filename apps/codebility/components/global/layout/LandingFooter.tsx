@@ -3,8 +3,8 @@ import Link from "next/link";
 
 import { Wordmark } from "@/components/global/design-system/Wordmark";
 import { LandingContainer } from "@/components/global/layout/LandingContainer";
-import { NewsletterForm } from "@/components/landing/NewsletterForm";
-import { footerColumns } from "@/constants/landing/landing-content";
+import { NewsletterForm } from "@/components/global/marketing/NewsletterForm";
+import { footerColumns } from "@/constants/global/landing-chrome";
 
 const socialLinks = [
   { label: "LinkedIn", href: "https://www.linkedin.com/company/codebility", icon: Linkedin },
@@ -77,7 +77,7 @@ export function LandingFooter() {
           <div className="mt-[var(--cb-space-32)] flex flex-col gap-[var(--cb-space-12)] border-t border-[color:var(--cb-border)] pt-[var(--cb-space-24)] text-xs text-[color:var(--cb-text-muted)] sm:flex-row sm:items-center sm:justify-between">
             <p>© 2026 Codebility. All rights reserved.</p>
             <div className="flex flex-wrap items-center gap-[var(--cb-space-16)]">
-              <Link href="/privacy-policy" className="transition-colors hover:text-[color:var(--cb-text)]">
+              <Link href="/terms-and-conditions" className="transition-colors hover:text-[color:var(--cb-text)]">
                 Terms
               </Link>
               <Link href="/privacy-policy" className="transition-colors hover:text-[color:var(--cb-text)]">

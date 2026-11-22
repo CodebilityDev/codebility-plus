@@ -45,6 +45,7 @@ const PUBLIC_PATHS = new Set([
   "/",
   "/design-system",
   "/privacy-policy",
+  "/terms-and-conditions",
   "/contact",
   "/codevs",
   "/hire-a-codev",
@@ -62,6 +63,8 @@ const PUBLIC_PATHS = new Set([
 ]);
 
 const PUBLIC_PREFIXES = [PROFILE_PREFIX, "/nda-signing/", "/services/"];
+
+const PROTECTED_PREFIXES = [HOME, APPLICANT, "/auth"];
 
 const AUTH_ENTRY_PATHS = new Set([SIGN_IN, "/auth/sign-up", "/auth/onboarding"]);
 
@@ -102,7 +105,12 @@ function accessFor(pathname: string): Access {
     return "public";
   }
   if (AUTH_ENTRY_PATHS.has(pathname)) return "auth-entry";
-  return "protected";
+
+  const protectedPath = PROTECTED_PREFIXES.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+  );
+
+  return protectedPath ? "protected" : "public";
 }
 
 function permissionFor(pathname: string): PermissionKey | null {

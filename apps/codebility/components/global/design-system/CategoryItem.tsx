@@ -55,7 +55,8 @@ const CategoryItem = React.forwardRef<HTMLButtonElement, CategoryItemProps>(
       )}
       <ChevronRight
         className={cn(
-          "h-[var(--cb-size-18)] w-[var(--cb-size-18)] shrink-0 text-[color:var(--cb-text-muted)]",
+          "h-[var(--cb-size-18)] w-[var(--cb-size-18)] shrink-0 text-[color:var(--cb-text-muted)] transition-transform",
+          active && "rotate-90",
           count === undefined && "ml-auto",
         )}
       />

@@ -11,7 +11,7 @@ import { MenuGlyph } from "@/components/global/design-system/MenuGlyph";
 import { NavItem } from "@/components/global/design-system/NavItem";
 import { Wordmark } from "@/components/global/design-system/Wordmark";
 import { LandingContainer } from "@/components/global/layout/LandingContainer";
-import { landingNavLinks } from "@/constants/landing/landing-content";
+import { landingNavLinks } from "@/constants/global/landing-chrome";
 
 export function LandingNavigation() {
   const pathname = usePathname();
@@ -69,7 +69,7 @@ export function LandingNavigation() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-[color:var(--cb-border)] bg-[color:color-mix(in_srgb,var(--cb-bg)_85%,transparent)] backdrop-blur-xl">
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-[color:var(--cb-border)] bg-[color:color-mix(in_srgb,var(--cb-bg)_85%,transparent)] backdrop-blur-xl lg:sticky">
       <LandingContainer className="flex h-[var(--cb-size-64)] items-center gap-[var(--cb-space-16)]">
         <Link
           href="/"
@@ -141,6 +141,8 @@ export function LandingNavigation() {
       </LandingContainer>
 
       </header>
+
+      <div aria-hidden className="h-[var(--cb-size-64)] lg:hidden" />
 
       {mobileOpen ? (
         <div
