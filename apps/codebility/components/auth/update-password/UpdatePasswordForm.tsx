@@ -1,29 +1,22 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ArrowLeft, Check, CircleAlert, Lock } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import toast from "react-hot-toast";
 import { z } from "zod";
 
-import { Button } from "@codevs/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@codevs/ui/form";
-import { Input } from "@codevs/ui/input";
-
+import { Button } from "@/components/global/design-system/Button";
+import { AuthAlert } from "@/components/global/auth/AuthAlert";
+import { AuthField } from "@/components/global/auth/AuthField";
+import { AuthStatusPanel } from "@/components/global/auth/AuthStatusPanel";
+import { AuthSubmitButton } from "@/components/global/auth/AuthSubmitButton";
 import { getClientSupabase } from "@/lib/global/supabase-client";
 
 const updatePasswordSchema = z
   .object({
-    password: z
-      .string()
-      .min(8, "Password must be at least 8 characters"),
+    password: z.string().min(8, "Password must be at least 8 characters"),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -34,8 +27,12 @@ const updatePasswordSchema = z
 type UpdatePasswordValues = z.infer<typeof updatePasswordSchema>;
 type SessionState = "checking" | "ready" | "invalid" | "success";
 
+const primaryButtonClass =
+  "h-[56px] w-full rounded-full bg-[#9747ff] text-[16px] font-medium shadow-[0_0_34px_rgba(151,71,255,0.26)] hover:bg-[#a855f7]";
+
 export default function UpdatePasswordForm() {
   const [sessionState, setSessionState] = useState<SessionState>("checking");
+  const [formError, setFormError] = useState<string | null>(null);
   const form = useForm<UpdatePasswordValues>({
     resolver: zodResolver(updatePasswordSchema),
     defaultValues: {
@@ -67,12 +64,14 @@ export default function UpdatePasswordForm() {
   }, []);
 
   const onSubmit = async ({ password }: UpdatePasswordValues) => {
+    setFormError(null);
+
     try {
       const supabase = getClientSupabase();
       const { error } = await supabase.auth.updateUser({ password });
 
       if (error) {
-        toast.error(error.message);
+        setFormError(error.message);
         return;
       }
 
@@ -80,7 +79,7 @@ export default function UpdatePasswordForm() {
       setSessionState("success");
       form.reset();
     } catch {
-      toast.error("An unexpected error occurred. Please try again.");
+      setFormError("An unexpected error occurred. Please try again.");
     }
   };
 
@@ -95,106 +94,103 @@ export default function UpdatePasswordForm() {
 
   if (sessionState === "invalid") {
     return (
-      <div className="flex flex-col items-center gap-4 py-8 text-center">
-        <h1 className="text-xl font-semibold">Reset link unavailable</h1>
-        <p className="max-w-sm text-sm text-white/70">
-          This password reset link is invalid or has expired. Request a new
-          link to continue.
-        </p>
-        <Button asChild className="text-sm">
-          <Link href="/auth/password-reset">Request a new link</Link>
+      <AuthStatusPanel
+        icon={CircleAlert}
+        tone="danger"
+        title="This link has expired"
+        description="Reset links work once and only for a limited time. Request a new one and use the latest email."
+      >
+        <Button asChild className={primaryButtonClass}>
+          <Link href="/auth/password-reset">Send a new link</Link>
         </Button>
-      </div>
+        <div className="mt-5 text-center">
+          <Link
+            href="/auth/sign-in"
+            className="inline-flex items-center gap-2 text-[14px] font-medium text-white transition-colors hover:text-[#c084fc]"
+          >
+            <ArrowLeft aria-hidden className="h-4 w-4" />
+            Back to sign in
+          </Link>
+        </div>
+      </AuthStatusPanel>
     );
   }
 
   if (sessionState === "success") {
     return (
-      <div className="flex flex-col items-center gap-4 py-8 text-center">
-        <h1 className="text-xl font-semibold">Password updated</h1>
-        <p className="max-w-sm text-sm text-white/70">
-          Your password has been changed. Sign in with your new password to
-          continue.
-        </p>
-        <Button asChild className="text-sm">
-          <Link href="/auth/sign-in">Go to sign in</Link>
+      <AuthStatusPanel
+        icon={Check}
+        tone="success"
+        title="Password updated"
+        description="Your password has been changed. Sign in with your new password."
+      >
+        <Button asChild className={primaryButtonClass}>
+          <Link href="/auth/sign-in">Sign in</Link>
         </Button>
-      </div>
+      </AuthStatusPanel>
     );
   }
 
-  const isButtonDisabled = form.formState.isSubmitting;
+  const password = form.watch("password");
+  const passwordIsValid = password.length >= 8;
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="text-center">
-        <h1 className="text-lg font-semibold lg:text-xl">
-          Set a new password
-        </h1>
-        <p className="mt-2 text-sm text-white/60">
-          Choose a new password for your account. Use at least 8 characters.
+    <div className="w-full">
+      <span className="flex h-14 w-14 items-center justify-center rounded-[14px] border border-[#9747ff]/25 bg-[#1c102c] text-[#c084fc]">
+        <Lock aria-hidden className="h-6 w-6" />
+      </span>
+
+      <h1 className="mt-9 text-[40px] font-bold leading-[1.08] tracking-[-0.04em]">
+        Set a new password
+      </h1>
+      <p className="mt-4 max-w-[420px] text-[15px] leading-6 text-white/65">
+        Choose a new password for your Codebility account.
+      </p>
+
+      <form className="mt-8" noValidate onSubmit={form.handleSubmit(onSubmit)}>
+        {formError ? <AuthAlert className="mb-5">{formError}</AuthAlert> : null}
+
+        <AuthField
+          label="New password"
+          type="password"
+          placeholder="Enter your new password"
+          autoComplete="new-password"
+          inputClassName="h-12"
+          error={form.formState.errors.password?.message}
+          {...form.register("password")}
+        />
+
+        <p className="mt-2 flex items-center gap-2 text-[13px] leading-5 text-[#A0A0A0]">
+          <Check
+            aria-hidden
+            className={
+              passwordIsValid ? "h-4 w-4 text-[#4BCE97]" : "h-4 w-4 text-white/30"
+            }
+          />
+          At least 8 characters
         </p>
-      </div>
 
-      <Form {...form}>
-        <form
-          className="space-y-3"
-          noValidate
-          onSubmit={form.handleSubmit(onSubmit)}
+        <div className="mt-5">
+          <AuthField
+            label="Confirm new password"
+            type="password"
+            placeholder="Repeat your new password"
+            autoComplete="new-password"
+            inputClassName="h-12"
+            error={form.formState.errors.confirmPassword?.message}
+            {...form.register("confirmPassword")}
+          />
+        </div>
+
+        <AuthSubmitButton
+          type="submit"
+          loading={form.formState.isSubmitting}
+          loadingText="Updating..."
+          className="mt-7"
         >
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input
-                    type="password"
-                    placeholder="New Password"
-                    label="New Password"
-                    autoComplete="new-password"
-                    parentClassName="flex gap-1 flex-col text-lg"
-                    variant="lightgray"
-                    className="text-sm"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage className="text-red-400" />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="confirmPassword"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input
-                    type="password"
-                    placeholder="Confirm Password"
-                    label="Confirm Password"
-                    autoComplete="new-password"
-                    parentClassName="flex gap-1 flex-col text-lg"
-                    variant="lightgray"
-                    className="text-sm"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage className="text-red-400" />
-              </FormItem>
-            )}
-          />
-
-          <Button
-            type="submit"
-            className="w-full py-3 text-sm"
-            disabled={isButtonDisabled}
-          >
-            {form.formState.isSubmitting ? "Updating..." : "Update Password"}
-          </Button>
-        </form>
-      </Form>
+          Update password
+        </AuthSubmitButton>
+      </form>
     </div>
   );
 }

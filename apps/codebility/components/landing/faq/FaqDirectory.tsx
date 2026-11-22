@@ -23,21 +23,21 @@ import { Eyebrow } from "@/components/global/design-system/Eyebrow";
 import { Search } from "@/components/global/design-system/Search";
 import { LandingContainer } from "@/components/global/layout/LandingContainer";
 
-type FaqTopic = {
+interface FaqTopic {
   id: string;
   label: string;
   count: number;
   icon: React.ElementType;
-};
+}
 
-type FaqEntry = {
+interface FaqEntry {
   question: string;
   answer: string;
-};
+}
 
-type FaqGroup = FaqTopic & {
+interface FaqGroup extends FaqTopic {
   entries: FaqEntry[];
-};
+}
 
 const faqGroups: FaqGroup[] = [
   {
@@ -221,15 +221,17 @@ const allFaqs = faqGroups.flatMap((group) => group.entries);
 
 function FaqGroup({ group, query }: { group: FaqGroup; query: string }) {
   const Icon = group.icon;
-  const normalizedQuery = query.trim().toLowerCase();
   const entries = React.useMemo(
-    () =>
-      normalizedQuery
+    () => {
+      const normalizedQuery = query.trim().toLowerCase();
+
+      return normalizedQuery
         ? group.entries.filter((entry) =>
             entry.question.toLowerCase().includes(normalizedQuery),
           )
-        : group.entries,
-    [group.entries, normalizedQuery],
+        : group.entries;
+    },
+    [group, query],
   );
   const entryQuestions = React.useMemo(
     () => entries.map((entry) => entry.question),

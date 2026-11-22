@@ -37,7 +37,7 @@ export function ServicesProof({ data }: { data: PortfolioData }) {
     projects[0];
 
   return (
-    <section className="relative border-t border-[color:var(--cb-border)] py-[7rem]">
+    <section className="relative overflow-hidden border-t border-[color:var(--cb-border)] py-[7rem]">
       <LandingContainer className="grid gap-[var(--cb-space-40)] lg:grid-cols-[minmax(0,1.03fr)_minmax(0,0.97fr)] lg:items-start lg:gap-[var(--cb-space-56)]">
         <div>
           <Eyebrow variant="outline" className="tracking-[0.12em]">

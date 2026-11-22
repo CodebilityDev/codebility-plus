@@ -17,7 +17,7 @@ export function ServicesHero() {
             {portfolioHero.eyebrow}
           </Eyebrow>
 
-          <h1 className="mt-[var(--cb-space-24)] text-[40px] font-bold leading-[1.05] tracking-[-0.03em] text-[color:var(--cb-text)] sm:text-[54px] lg:text-[68px] lg:leading-[1.02]">
+          <h1 className="mt-[var(--cb-space-24)] w-full max-w-full break-words text-[40px] font-bold leading-[1.05] tracking-[-0.03em] text-[color:var(--cb-text)] sm:text-[54px] lg:text-[68px] lg:leading-[1.02]">
             {portfolioHero.title}{" "}
             <span className="cb-community-text block">
               {portfolioHero.accent}

@@ -1,50 +1,29 @@
-import Image from "next/image";
-import Link from "next/link";
-import { Button } from "@/components/global/ui/button";
+import type { Metadata } from "next";
+import { Suspense } from "react";
 
-const NotFoundPage = () => {
-  return (
-    <section className="bg-backgroundColor text-primaryColor flex h-screen w-screen items-center justify-center overflow-hidden">
-      <div className="flex flex-col gap-8 text-center lg:gap-10">
-        <Link href="/">
-          <Image
-            className="mx-auto h-auto w-[250px] md:w-[350px] lg:w-[400px]"
-            src="/assets/svgs/codebility-dark-blue.svg"
-            alt="Codebility Logo"
-            priority
-            width={400}
-            height={90}
-          />
-        </Link>
+import { NotFoundContent } from "@/components/global/marketing/NotFoundContent";
+import { LandingFooter } from "@/components/global/layout/LandingFooter";
+import { LandingNavigation } from "@/components/global/layout/LandingNavigation";
 
-        <div className="flex flex-col gap-2">
-          <p className="text-3xl font-bold text-white md:text-6xl lg:text-7xl">
-            404
-          </p>
-          <p className="mx-auto text-sm font-bold uppercase text-white md:text-xl lg:max-w-[500px] lg:text-2xl">
-            Page Not Found
-          </p>
-        </div>
-
-        <Link
-          href="/"
-          className="from-customTeal via-customBlue-100 mx-auto h-12 w-44 rounded-full bg-gradient-to-r to-customViolet-300 p-0.5 hover:bg-gradient-to-br"
-        >
-          <Button className="bg-black-500 flex h-full w-full items-center justify-center rounded-full text-sm text-white lg:text-lg">
-            Go to Home Page
-          </Button>
-        </Link>
-
-        <div className="hero-gradient absolute top-0 z-10 h-[400px] w-[200px] overflow-hidden blur-[200px] lg:w-[500px] lg:blur-[350px]"></div>
-
-        <div className="hero-bubble">
-          {Array.from({ length: 4 }, (_, index) => (
-            <div key={index} />
-          ))}
-        </div>
-      </div>
-    </section>
-  );
+export const metadata: Metadata = {
+  title: "Page not found | Codebility",
+  robots: { index: false, follow: false },
 };
 
-export default NotFoundPage;
+export default function NotFound() {
+  return (
+    <div className="min-h-screen bg-[#030303] text-[#f4f4f4]">
+      <Suspense
+        fallback={
+          <div className="h-[var(--cb-size-64)] border-b border-[color:var(--cb-border)]" />
+        }
+      >
+        <LandingNavigation />
+      </Suspense>
+      <main className="relative">
+        <NotFoundContent />
+      </main>
+      <LandingFooter />
+    </div>
+  );
+}

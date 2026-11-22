@@ -500,7 +500,7 @@ export const footerColumns = [
   {
     title: "Legal",
     links: [
-      { label: "Terms & Conditions", href: "/privacy-policy" },
+      { label: "Terms & Conditions", href: "/terms-and-conditions" },
       { label: "Privacy Policy", href: "/privacy-policy" },
       { label: "FAQs", href: "/faq" },
     ],

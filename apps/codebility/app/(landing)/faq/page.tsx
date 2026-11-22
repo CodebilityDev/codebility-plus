@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { FaqDirectory } from "@/components/landing/FaqDirectory";
+import { FaqDirectory } from "@/components/landing/faq/FaqDirectory";
 
 export const metadata: Metadata = {
   title: "FAQ | Codebility",

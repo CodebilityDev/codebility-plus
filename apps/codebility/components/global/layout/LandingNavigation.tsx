@@ -11,7 +11,7 @@ import { MenuGlyph } from "@/components/global/design-system/MenuGlyph";
 import { NavItem } from "@/components/global/design-system/NavItem";
 import { Wordmark } from "@/components/global/design-system/Wordmark";
 import { LandingContainer } from "@/components/global/layout/LandingContainer";
-import { landingNavLinks } from "@/constants/landing/landing-content";
+import { landingNavLinks } from "@/constants/global/landing-chrome";
 
 export function LandingNavigation() {
   const pathname = usePathname();

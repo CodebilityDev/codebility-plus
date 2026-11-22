@@ -57,7 +57,7 @@ function Avatar({
             alt={alt ?? initials}
             width={size}
             height={size}
-            className="h-full w-full object-cover"
+            className="block h-full w-full object-cover object-center"
           />
         ) : (
           <span aria-hidden>{initials}</span>

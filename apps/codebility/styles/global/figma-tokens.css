@@ -133,6 +133,16 @@
   --cb-border-section-divider: rgb(244 244 244 / 0.06);
   --cb-border-navigation-divider: rgb(244 244 244 / 0.08);
   --cb-border: rgb(244 244 244 / 0.1);
+  --cb-auth-panel-base: #0D0A14;
+  --cb-auth-panel-cyan: rgb(34 211 238 / 0.16);
+  --cb-auth-panel-purple: rgb(151 71 255 / 0.55);
+  --cb-auth-panel-gradient: radial-gradient(65% 72% at 85% 0%, var(--cb-auth-panel-cyan) 0%, rgb(34 211 238 / 0) 100%), radial-gradient(76% 82% at 10% 100%, var(--cb-auth-panel-purple) 0%, rgb(151 71 255 / 0) 100%), var(--cb-auth-panel-base);
+  --cb-auth-panel-radius: 28px;
+  --cb-community-card-height: 104px;
+  --cb-community-card-radius: 20px;
+  --cb-community-card-bg: rgb(10 10 10 / 0.72);
+  --cb-community-avatar-border: #0D0A14;
+  --cb-community-text-muted: #A0A0A0;
   --cb-accent-color: var(--cb-teal);
   --cb-accent: linear-gradient(90deg, var(--cb-p400) 0%, #D97FE0 24%, var(--cb-pink) 46%, #C6A0D7 58%, #8CB3E8 70%, #41C5E5 85%, var(--cb-cyan) 100%);
 }
