@@ -5,7 +5,7 @@
 import { useModal } from "@/hooks/global/use-modal";
 
 import { Dialog, DialogContent, DialogTitle } from "@codevs/ui/dialog";
-import { TermsAndConditionContent } from "@/components/marketing/TermsAndConditionContent";
+import { TermsAndConditionContent } from "@/components/global/marketing/TermsAndConditionContent";
 import { TermsAndConditionFooter } from "@/components/marketing/TermsAndConditionFooter";
 import { TermsAndConditionNavBar } from "@/components/marketing/TermsAndConditionNavBar";
 
