@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/global/design-system/Button";
 import { Eyebrow } from "@/components/global/design-system/Eyebrow";
 import { LandingContainer } from "@/components/global/layout/LandingContainer";
-import { TermsToc } from "@/components/landing/terms-and-conditions/TermsToc";
+import { LegalSidebar } from "@/components/global/marketing/LegalSidebar";
 import {
   TERMS_CONTACT_EMAIL,
   TERMS_INTRO,
@@ -100,24 +100,11 @@ export function TermsAndConditionsContent() {
 
       <LandingContainer className="pb-[var(--cb-space-96)]">
         <div className="grid gap-[var(--cb-space-48)] lg:grid-cols-[240px_minmax(0,720px)] lg:gap-[var(--cb-space-48)]">
-          <aside className="hidden lg:block">
-            <div className="sticky top-[var(--cb-space-96)] flex max-h-[calc(100dvh-var(--cb-space-96)-var(--cb-space-24))] flex-col gap-[var(--cb-space-24)] overflow-y-auto">
-              <TermsToc />
-              <div className="rounded-[var(--cb-radius-16)] border border-[color:var(--cb-border)] bg-[color:var(--cb-surface)] p-[var(--cb-space-16)]">
-                <p className="text-sm font-semibold">Questions?</p>
-                <p className="mt-[var(--cb-space-4)] text-xs text-[color:var(--cb-text-muted)]">
-                  Email us about anything in these terms.
-                </p>
-                <a
-                  href={mailto}
-                  className="mt-[var(--cb-space-12)] inline-flex items-center gap-[var(--cb-space-8)] text-xs text-[color:var(--cb-link-text)] hover:text-[color:var(--cb-text)]"
-                >
-                  <Mail size={14} aria-hidden />
-                  {TERMS_CONTACT_EMAIL}
-                </a>
-              </div>
-            </div>
-          </aside>
+          <LegalSidebar
+            sections={TERMS_SECTIONS}
+            contactEmail={TERMS_CONTACT_EMAIL}
+            contactDescription="Email us about anything in these terms."
+          />
 
           <article className="pt-[var(--cb-space-40)]">
             <h2 className="text-lg font-semibold">Welcome to Codebility</h2>

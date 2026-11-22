@@ -101,87 +101,6 @@
   padding-bottom: 112px;
 }
 
-.privacy-policy-sidebar {
-  position: sticky;
-  top: 96px;
-}
-.privacy-policy-sidebar-inner {
-  max-height: calc(100dvh - 120px);
-  overflow-y: auto;
-  scrollbar-width: thin;
-}
-.privacy-policy-desktop-navigation > p {
-  margin-bottom: 14px;
-  color: #71717a;
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 18px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-.privacy-policy-desktop-navigation a {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-  padding: 9px 12px;
-  border-radius: 12px;
-  color: var(--cb-text-muted);
-  font-size: 14px;
-  line-height: 21px;
-  transition:
-    color 0.15s,
-    background 0.15s;
-}
-.privacy-policy-desktop-navigation a > span {
-  color: #71717a;
-  font-variant-numeric: tabular-nums;
-}
-.privacy-policy-desktop-navigation a:hover {
-  background: var(--cb-glass);
-  color: var(--cb-text);
-}
-.privacy-policy-desktop-navigation a[aria-current="location"] {
-  background: var(--cb-primary-subtle);
-  color: var(--cb-p100);
-}
-.privacy-policy-desktop-navigation a[aria-current="location"] > span {
-  color: var(--cb-p300);
-}
-.privacy-policy-questions {
-  margin-top: 28px;
-  padding: 20px;
-  border: 1px solid var(--cb-border);
-  border-radius: 18px;
-  background: #101010;
-}
-.privacy-policy-questions h2 {
-  font-size: 15px;
-  font-weight: 600;
-  line-height: 24px;
-}
-.privacy-policy-questions p {
-  margin-top: 4px;
-  color: var(--cb-text-muted);
-  font-size: 13px;
-  line-height: 22px;
-}
-.privacy-policy-questions a {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 12px;
-  color: var(--cb-p300);
-  font-size: 12px;
-  overflow-wrap: anywhere;
-}
-.privacy-policy-questions a > svg {
-  color: var(--cb-text-secondary);
-  flex-shrink: 0;
-}
-.privacy-policy-mobile-navigation {
-  display: none;
-}
-
 .privacy-policy-article {
   min-width: 0;
   font-size: 16px;
@@ -338,7 +257,7 @@
   }
 }
 
-@media (max-width: 767px) {
+@media (max-width: 1023px) {
   .privacy-policy-hero {
     padding-top: 48px;
     padding-bottom: 32px;
@@ -375,37 +294,6 @@
     gap: 32px;
     padding-top: 32px;
     padding-bottom: 64px;
-  }
-  .privacy-policy-sidebar {
-    position: static;
-  }
-  .privacy-policy-sidebar-inner {
-    max-height: none;
-    overflow: visible;
-  }
-  .privacy-policy-desktop-navigation,
-  .privacy-policy-questions {
-    display: none;
-  }
-  .privacy-policy-mobile-navigation {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .privacy-policy-mobile-navigation label {
-    color: var(--cb-text-muted);
-    font-size: 12px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-  .privacy-policy-mobile-navigation select {
-    width: 100%;
-    padding: 14px 12px;
-    border: 1px solid var(--cb-border);
-    border-radius: 12px;
-    background: #101010;
-    color: var(--cb-text);
-    font-size: 14px;
   }
   .privacy-policy-article {
     font-size: 15px;

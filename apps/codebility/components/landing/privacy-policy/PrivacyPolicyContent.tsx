@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/global/design-system/Button";
 import { Eyebrow } from "@/components/global/design-system/Eyebrow";
 import { LandingContainer } from "@/components/global/layout/LandingContainer";
-import { PrivacyPolicyNavigation } from "@/components/landing/privacy-policy/PrivacyPolicyNavigation";
+import { LegalSidebar } from "@/components/global/marketing/LegalSidebar";
 import { PrivacyPolicyTerms } from "@/components/landing/privacy-policy/PrivacyPolicyTerms";
 import {
   privacyContactEmail,
@@ -47,7 +47,11 @@ export default function PrivacyPolicyContent() {
           </div>
         </header>
         <div className="privacy-policy-layout">
-          <PrivacyPolicyNavigation />
+          <LegalSidebar
+            sections={privacySections}
+            contactEmail={privacyContactEmail}
+            contactDescription="Email us about anything in this policy."
+          />
           <article
             className="privacy-policy-article"
             aria-label="Privacy policy"

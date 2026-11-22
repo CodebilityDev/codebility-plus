@@ -13,7 +13,20 @@ import { TermsAndConditionContent } from "@/components/global/marketing/TermsAnd
 import { Button } from "@/components/global/design-system/Button";
 import { IconButton } from "@/components/global/design-system/IconButton";
 import { Clock3, Mail, ShieldCheck, X } from "lucide-react";
-import { privacyContactEmail } from "@/constants/landing/privacy-policy/privacy-policy-content";
+import {
+  TERMS_CONTACT_EMAIL,
+  TERMS_LAST_UPDATED,
+} from "@/constants/global/terms-and-conditions";
+
+const termsLastUpdatedLabel = new Date(TERMS_LAST_UPDATED).toLocaleDateString(
+  "en-US",
+  {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  },
+);
 
 export function PrivacyPolicyTerms() {
   return (
@@ -41,7 +54,10 @@ export function PrivacyPolicyTerms() {
               </DialogDescription>
               <p className="privacy-terms-date">
                 <Clock3 size={14} />
-                Last updated <time dateTime="2024-05-23">May 23, 2024</time>
+                Last updated{" "}
+                <time dateTime={TERMS_LAST_UPDATED}>
+                  {termsLastUpdatedLabel}
+                </time>
               </p>
             </DialogHeader>
             <DialogClose asChild>
@@ -54,14 +70,14 @@ export function PrivacyPolicyTerms() {
               </IconButton>
             </DialogClose>
           </div>
-          <TermsAndConditionContent variant="document" contactEmail={privacyContactEmail} />
+          <TermsAndConditionContent variant="document" />
           <div className="privacy-terms-footer">
-            <a href={`mailto:${privacyContactEmail}`}>
+            <a href={`mailto:${TERMS_CONTACT_EMAIL}`}>
               <Mail size={16} />
               <span>
                 Questions?{" "}
                 <span className="privacy-terms-email">
-                  {privacyContactEmail}
+                  {TERMS_CONTACT_EMAIL}
                 </span>
               </span>
             </a>
