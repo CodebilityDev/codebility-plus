@@ -43,6 +43,7 @@ const PROFILE_PREFIX = "/profiles/";
 
 const PUBLIC_PATHS = new Set([
   "/",
+  "/faq",
   "/design-system",
   "/privacy-policy",
   "/terms-and-conditions",

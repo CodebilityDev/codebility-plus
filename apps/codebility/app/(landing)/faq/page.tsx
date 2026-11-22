@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { FaqPageContent } from "@/components/landing/faq/FaqPageContent";
+import { FaqDirectory } from "@/components/landing/faq/FaqDirectory";
 
 export const metadata: Metadata = {
   title: "Frequently Asked Questions | Codebility",
@@ -24,5 +24,5 @@ export const metadata: Metadata = {
 };
 
 export default function FaqPage() {
-  return <FaqPageContent />;
+  return <FaqDirectory />;
 }
